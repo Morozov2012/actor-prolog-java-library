@@ -4,6 +4,7 @@ package morozov.run;
 
 import target.*;
 
+import morozov.run.errors.*;
 import morozov.syntax.scanner.*;
 
 import java.util.HashMap;

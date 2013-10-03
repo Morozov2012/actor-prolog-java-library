@@ -2,7 +2,7 @@
 
 package morozov.system.checker;
 
-import morozov.terms.*;
+import morozov.run.*;
 
 import java.net.URI;
 

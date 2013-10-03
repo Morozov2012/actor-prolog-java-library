@@ -6,6 +6,7 @@ import target.*;
 
 import morozov.classes.*;
 import morozov.system.gui.*;
+import morozov.system.gui.sadt.signals.*;
 import morozov.terms.*;
 
 import javax.swing.JDialog;
@@ -312,6 +313,30 @@ public class DiagramUtils {
 	public static void repaintDiagrams(InternalDiagramFrame[] frames) {
 		for (int n=0; n <= frames.length; n++) {
 			frames[n].repaint();
+		}
+	}
+	//
+	public static void safelyDisposeAllDiagrams(StaticContext context) {
+		Map<String,InternalDiagramFrame> innerWindows= StaticDiagramAttributes.retrieveInnerWindows(context);
+		Collection<InternalDiagramFrame> values= innerWindows.values();
+		final InternalDiagramFrame[] frames= values.toArray(new InternalDiagramFrame[0]);
+		if (SwingUtilities.isEventDispatchThread()) {
+			disposeDiagrams(frames);
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						disposeDiagrams(frames);
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	public static void disposeDiagrams(InternalDiagramFrame[] frames) {
+		for (int n=0; n <= frames.length; n++) {
+			frames[n].dispose();
 		}
 	}
 }

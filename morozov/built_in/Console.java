@@ -2,11 +2,15 @@
 
 package morozov.built_in;
 
+import morozov.run.*;
 import morozov.system.*;
+import morozov.system.errors.*;
 import morozov.system.files.*;
 import morozov.system.gui.*;
 import morozov.system.gui.dialogs.special.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import javax.swing.JOptionPane;
 import javax.swing.JColorChooser;
@@ -21,7 +25,10 @@ import java.awt.GraphicsEnvironment;
 import java.math.BigInteger;
 
 public abstract class Console extends Report {
+	//
 	protected java.io.File selectedFile= null;
+	//
+	abstract protected Term getBuiltInSlot_E_backslash_always_is_separator();
 	//
 	public void ask2s(ChoisePoint iX, Term title, Term question) throws Backtracking {
 		askUser(question.toString(iX),title.toString(iX));
@@ -57,7 +64,7 @@ public abstract class Console extends Report {
 			buttons,
 			0);
 		if (answer < 0) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		} else {
 			return new PrologString(buttons[answer]);
 		}
@@ -73,7 +80,7 @@ public abstract class Console extends Report {
 		if (answer==JOptionPane.YES_OPTION) {
 			return;
 		} else {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
@@ -165,7 +172,7 @@ public abstract class Console extends Report {
 			null,
 			initialValue.toString(iX));
 		if (text==null) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		} else {
 			if (functionOutput != null) {
 				functionOutput.value= new PrologString(text);
@@ -213,7 +220,7 @@ public abstract class Console extends Report {
 			warning);
 		String text= dialog.getValidatedText();
 		if (text==null) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		} else {
 			if (functionOutput != null) {
 				try {
@@ -221,7 +228,7 @@ public abstract class Console extends Report {
 					functionOutput.value= new PrologInteger(result);
 					// iX.pushTrail(functionOutput);
 				} catch (TermIsNotAnInteger error) {
-					throw new Backtracking();
+					throw Backtracking.instance;
 				}
 			}
 		}
@@ -266,7 +273,7 @@ public abstract class Console extends Report {
 			warning);
 		String text= dialog.getValidatedText();
 		if (text==null) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		} else {
 			if (functionOutput != null) {
 				try {
@@ -274,16 +281,40 @@ public abstract class Console extends Report {
 					functionOutput.value= new PrologReal(result);
 					// iX.pushTrail(functionOutput);
 				} catch (TermIsNotAReal error) {
-					throw new Backtracking();
+					throw Backtracking.instance;
 				}
 			}
 		}
 	}
 	//
+	public void inputFileName7ff(ChoisePoint iX, PrologVariable fileName, Term title, Term mask, Term types, Term startPath, Term multiSel, PrologVariable selList, PrologVariable selType) throws Backtracking {
+		try {
+			String dialogTitle= title.getStringValue(iX);
+			String dialogStartPath= startPath.getStringValue(iX);
+			inputFileName(iX,fileName,dialogTitle,mask,types,dialogStartPath,false,multiSel,selList,selType);
+		} catch (TermIsNotAString e) {
+			throw new WrongArgumentIsNotAString(title);
+		}
+	}
+	public void inputFileName7fs(ChoisePoint iX, Term title, Term mask, Term types, Term startPath, Term multiSel, PrologVariable selList, PrologVariable selType) throws Backtracking {
+		inputFileName7ff(iX,null,title,mask,types,startPath,multiSel,selList,selType);
+	}
+	public void inputFileName4ff(ChoisePoint iX, PrologVariable fileName, Term title, Term mask, Term types, Term startPath) throws Backtracking {
+		try {
+			String dialogTitle= title.getStringValue(iX);
+			String dialogStartPath= startPath.getStringValue(iX);
+			inputFileName(iX,fileName,dialogTitle,mask,types,dialogStartPath,false,null,null,null);
+		} catch (TermIsNotAString e) {
+			throw new WrongArgumentIsNotAString(title);
+		}
+	}
+	public void inputFileName4fs(ChoisePoint iX, Term title, Term mask, Term types, Term startPath) throws Backtracking {
+		inputFileName4ff(iX,null,title,mask,types,startPath);
+	}
 	public void inputFileName3ff(ChoisePoint iX, PrologVariable fileName, Term title, Term mask, Term types) throws Backtracking {
 		try {
 			String dialogTitle= title.getStringValue(iX);
-			inputFileName(iX,fileName,dialogTitle,mask,types,false);
+			inputFileName(iX,fileName,dialogTitle,mask,types,null,false,null,null,null);
 		} catch (TermIsNotAString e) {
 			throw new WrongArgumentIsNotAString(title);
 		}
@@ -292,16 +323,40 @@ public abstract class Console extends Report {
 		inputFileName3ff(iX,null,title,mask,types);
 	}
 	public void inputFileName2ff(ChoisePoint iX, PrologVariable fileName, Term mask, Term types) throws Backtracking {
-		inputFileName(iX,fileName,"",mask,types,false);
+		inputFileName(iX,fileName,"",mask,types,null,false,null,null,null);
 	}
 	public void inputFileName2fs(ChoisePoint iX, Term mask, Term types) throws Backtracking {
 		inputFileName2ff(iX,null,mask,types);
 	}
 	//
+	public void inputNewFileName7ff(ChoisePoint iX, PrologVariable fileName, Term title, Term mask, Term types, Term startPath, Term multiSel, PrologVariable selList, PrologVariable selType) throws Backtracking {
+		try {
+			String dialogTitle= title.getStringValue(iX);
+			String dialogStartPath= startPath.getStringValue(iX);
+			inputFileName(iX,fileName,dialogTitle,mask,types,dialogStartPath,true,multiSel,selList,selType);
+		} catch (TermIsNotAString e) {
+			throw new WrongArgumentIsNotAString(title);
+		}
+	}
+	public void inputNewFileName7fs(ChoisePoint iX, Term title, Term mask, Term types, Term startPath, Term multiSel, PrologVariable selList, PrologVariable selType) throws Backtracking {
+		inputNewFileName7ff(iX,null,title,mask,types,startPath,multiSel,selList,selType);
+	}
+	public void inputNewFileName4ff(ChoisePoint iX, PrologVariable fileName, Term title, Term mask, Term types, Term startPath) throws Backtracking {
+		try {
+			String dialogTitle= title.getStringValue(iX);
+			String dialogStartPath= startPath.getStringValue(iX);
+			inputFileName(iX,fileName,dialogTitle,mask,types,dialogStartPath,true,null,null,null);
+		} catch (TermIsNotAString e) {
+			throw new WrongArgumentIsNotAString(title);
+		}
+	}
+	public void inputNewFileName4fs(ChoisePoint iX, Term title, Term mask, Term types, Term startPath) throws Backtracking {
+		inputNewFileName4ff(iX,null,title,mask,types,startPath);
+	}
 	public void inputNewFileName3ff(ChoisePoint iX, PrologVariable fileName, Term title, Term mask, Term types) throws Backtracking {
 		try {
 			String dialogTitle= title.getStringValue(iX);
-			inputFileName(iX,fileName,dialogTitle,mask,types,true);
+			inputFileName(iX,fileName,dialogTitle,mask,types,null,true,null,null,null);
 		} catch (TermIsNotAString e) {
 			throw new WrongArgumentIsNotAString(title);
 		}
@@ -310,13 +365,13 @@ public abstract class Console extends Report {
 		inputNewFileName3ff(iX,null,title,mask,types);
 	}
 	public void inputNewFileName2ff(ChoisePoint iX, PrologVariable fileName, Term mask, Term types) throws Backtracking {
-		inputFileName(iX,fileName,"",mask,types,true);
+		inputFileName(iX,fileName,"",mask,types,null,true,null,null,null);
 	}
 	public void inputNewFileName2fs(ChoisePoint iX, Term mask, Term types) throws Backtracking {
 		inputNewFileName2ff(iX,null,mask,types);
 	}
 	//
-	protected void inputFileName(ChoisePoint iX, PrologVariable fileName, String dialogTitle, Term mask, Term types, boolean showSaveDialog) throws Backtracking {
+	protected void inputFileName(ChoisePoint iX, PrologVariable fileName, String dialogTitle, Term mask, Term types, String startPath, boolean showSaveDialog, Term multiSel, PrologVariable selList, PrologVariable selType) throws Backtracking {
 		try {
 			String initialMask= mask.getStringValue(iX);
 			FileNameMask[] masks= FileUtils.termToFileNameMasks(types,iX);
@@ -325,9 +380,19 @@ public abstract class Console extends Report {
 			//
 			JFileChooser chooser= new ExtendedFileChooser();
 			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+			chooser.setAcceptAllFileFilterUsed(false);
 			chooser.setDialogTitle(dialogTitle);
-			if (selectedFile != null) {
-				chooser.setCurrentDirectory(selectedFile);
+			if (startPath == null) {
+				if (selectedFile != null) {
+					// chooser.setCurrentDirectory(selectedFile);
+					chooser.setSelectedFile(selectedFile);
+				}
+			} else {
+				boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+				startPath= FileUtils.replaceBackslashes(startPath,backslashIsSeparator);
+				java.io.File file= new java.io.File(startPath);
+				// chooser.setCurrentDirectory(file);
+				chooser.setSelectedFile(file);
 			};
 			FileFilter initialFilter= null;
 			for (int n=0; n < masks.length; n++) {
@@ -339,6 +404,10 @@ public abstract class Console extends Report {
 			if (initialFilter != null) {
 				chooser.setFileFilter(initialFilter);
 			};
+			if (multiSel != null) {
+				boolean enableMultipleSelection= Converters.term2OnOff(multiSel,iX);
+				chooser.setMultiSelectionEnabled(enableMultipleSelection);
+			};
 			int returnVal;
 			if (showSaveDialog) {
 				returnVal= chooser.showSaveDialog(null);
@@ -347,13 +416,62 @@ public abstract class Console extends Report {
 			};
 			if(returnVal == JFileChooser.APPROVE_OPTION) {
 				selectedFile= chooser.getSelectedFile();
-				String name= FileUtils.tryToMakeRealName(selectedFile.toPath()).toString();
+				FileFilter currentFilter= chooser.getFileFilter();
+				FileNameMask currentMask= null;
+				if (currentFilter instanceof FileNameMask) {
+					currentMask= (FileNameMask)currentFilter;
+				};
+				// String selectedName= FileUtils.tryToMakeRealName(selectedFile.toPath()).toString();
+				String selectedName= selectedFile.toPath().toString();
+				if (currentMask != null) {
+					selectedName= currentMask.appendExtensionIfNecessary(selectedName);
+				};
 				if (fileName != null) {
-					fileName.value= new PrologString(name);
+					fileName.value= new PrologString(selectedName);
 					// iX.pushTrail(fileName);
+				};
+				if (selList != null) {
+					if (chooser.isMultiSelectionEnabled()) {
+						java.io.File[] selectedFiles= chooser.getSelectedFiles();
+						Term list= PrologEmptyList.instance;
+						for (int n= selectedFiles.length-1; n >= 0; n--) {
+							// String currentName= FileUtils.tryToMakeRealName(selectedFiles[n].toPath()).toString();
+							String currentName= selectedFiles[n].toPath().toString();
+							if (currentMask != null) {
+								currentName= currentMask.appendExtensionIfNecessary(currentName);
+							};
+							list= new PrologList(new PrologString(currentName),list);
+						};
+						selList.value= list;
+						iX.pushTrail(selList);
+					} else {
+						selList.value= new PrologList(new PrologString(selectedName),PrologEmptyList.instance);
+						iX.pushTrail(selList);
+					}
+				};
+				if (selType != null) {
+					if (currentMask != null) {
+						// System.out.printf("currentFilter= %s\n",currentFilter);
+						boolean maskIsFound= false;
+						for (int n=0; n < masks.length; n++) {
+							if (masks[n]==currentMask) {
+								selType.value= new PrologInteger(n+1);
+								iX.pushTrail(selType);
+								maskIsFound= true;
+								break;
+							}
+						};
+						if (!maskIsFound) {
+							selType.value= new PrologInteger(1); // Actor Prolog default value
+							iX.pushTrail(selType);
+						}
+					} else {
+						selType.value= new PrologInteger(1); // Actor Prolog default value
+						iX.pushTrail(selType);
+					}
 				}
 			} else {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			}
 		} catch (TermIsNotAString e) {
 			throw new WrongArgumentIsNotAString(mask);
@@ -412,7 +530,7 @@ public abstract class Console extends Report {
 				// iX.pushTrail(directoryName);
 			}
 		} else {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
@@ -429,7 +547,7 @@ public abstract class Console extends Report {
 			"", // title.toString(iX),
 			initialColor);
 		if (newColor==null) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		} else {
 			if (functionOutput != null) {
 				functionOutput.value= new PrologInteger(newColor.getRGB());
@@ -447,7 +565,7 @@ public abstract class Console extends Report {
 		if (option==JOptionPane.OK_OPTION) {
 			AttributeSet a2= m_fontDialog.getAttributes();
 			if (a2==null) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} else {
 				String fontName= StyleConstants.getFontFamily(a2);
 				int fontSize= StyleConstants.getFontSize(a2);
@@ -464,8 +582,8 @@ public abstract class Console extends Report {
 				}
 			}
 		} else {
-			throw new Backtracking();
-        	}
+			throw Backtracking.instance;
+		}
 	}
 	public void inputFont2s(ChoisePoint iX, PrologVariable outputVariable1, PrologVariable outputVariable2) throws Backtracking {
 		inputFont3s(iX,outputVariable1,outputVariable2,null);
@@ -544,10 +662,10 @@ public abstract class Console extends Report {
 					iX.pushTrail(selectedName);
 					iX.pushTrail(selectedPosition);
 				} else {
-					throw new Backtracking();
+					throw Backtracking.instance;
 				}
 			} else {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			};
 		} catch (TermIsNotAnInteger e) {
 			throw new WrongArgumentIsNotAnInteger(initialPosition);

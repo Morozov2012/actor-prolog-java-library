@@ -3,6 +3,7 @@
 package morozov.system.checker;
 
 import morozov.classes.*;
+import morozov.run.*;
 import morozov.terms.*;
 
 import java.math.BigInteger;
@@ -83,7 +84,6 @@ public class URL_Checker extends ThreadHolder {
 	}
 	//
 	public URL_Attributes performCheck(URL_Attributes recentAttributes, BigInteger currentTime) {
-		// System.out.printf("URL_Checker::performCheck\n");
 		try {
 			URL_Attributes newAttributes= URL_Utils.renewResourceAttributes(recentAttributes);
 			if (newAttributes.wereChanged(recentAttributes)) {

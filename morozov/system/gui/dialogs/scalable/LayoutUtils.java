@@ -13,6 +13,8 @@ import java.awt.FontMetrics;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import java.awt.Rectangle;
+import java.awt.Dimension;
+import java.awt.Component;
 
 public class LayoutUtils {
 	public static Insets calculateLayoutInsets(
@@ -31,21 +33,11 @@ public class LayoutUtils {
 			int leftBorder,
 			int bottomBorder,
 			int rightBorder) {
-		// FontMetrics metrics= getFontMetrics(font);
-		// int charWidth= metrics.charWidth('M');
 		FontRenderContext frc= metrics.getFontRenderContext();
 		TextLayout layout= new TextLayout("M",font,frc);
 		Rectangle rectangle= layout.getPixelBounds(null,0,0);
 		double charWidth= rectangle.getWidth();
 		double charHeight= rectangle.getHeight();
-		// Rectangle2D rectangle2D= font.getMaxCharBounds(frc);
-		// double charHeight= rectangle2D.getHeight();
-		//
-		// GridBagConstraints gBC= gridBagLayout.getConstraints(this);
-		// int topBorder= getInitialTopBorder();
-		// int leftBorder= getInitialLeftBorder();
-		// int bottomBorder= getInitialBottomBorder();
-		// int rightBorder= getInitialRightBorder();
 		if (isTop) {
 			topBorder= topBorder + (int)StrictMath.round(verticalPadding*charHeight);
 		};
@@ -58,7 +50,19 @@ public class LayoutUtils {
 		if (isRight) {
 			rightBorder= rightBorder + (int)StrictMath.round(horizontalPadding*charWidth);
 		};
-		// System.out.printf("topBorder=%d,leftBorder=%d,bottomBorder=%d,rightBorder=%d\n",topBorder,leftBorder,bottomBorder,rightBorder);
 		return new Insets(topBorder,leftBorder,bottomBorder,rightBorder);
+	}
+	public static Dimension computeDimension(Font font, Component component, double width, double height) {
+		FontMetrics metrics= component.getFontMetrics(font);
+		int charWidth= metrics.charWidth('M');
+		int currentWidth= (int)StrictMath.round(width*charWidth);
+		FontRenderContext frc= metrics.getFontRenderContext();
+		TextLayout layout= new TextLayout("M",font,frc);
+		Rectangle rectangle= layout.getPixelBounds(null,0,0);
+		double charHeight= rectangle.getHeight();
+		int currentHeight= (int)StrictMath.round(height*charHeight);
+		// scalableIcon.setSize(currentWidth,currentHeight);
+		Dimension dimension= new Dimension(currentWidth,currentHeight);
+		return dimension;
 	}
 }

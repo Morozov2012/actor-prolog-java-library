@@ -2,6 +2,8 @@
 
 package morozov.system.gui;
 
+import morozov.system.gui.signals.*;
+
 public class ExtendedCoordinates {
 	public ExtendedCoordinate x;
 	public ExtendedCoordinate y;
@@ -13,7 +15,7 @@ public class ExtendedCoordinates {
 		x= new ExtendedCoordinate(a);
 		y= new ExtendedCoordinate(b);
 	}
-	public boolean areCentered() throws ExtendedCoordinate.UseDefaultLocation {
+	public boolean areCentered() throws UseDefaultLocation {
 		if (x.isCentered() || y.isCentered()) {
 			return true;
 		} else {

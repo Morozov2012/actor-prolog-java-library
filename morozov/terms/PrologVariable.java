@@ -4,6 +4,11 @@ package morozov.terms;
 
 import morozov.classes.*;
 import morozov.domains.*;
+import morozov.domains.signals.*;
+import morozov.run.*;
+import morozov.system.*;
+import morozov.terms.errors.*;
+import morozov.terms.signals.*;
 
 import java.nio.charset.CharsetEncoder;
 import java.math.BigInteger;
@@ -78,7 +83,7 @@ public class PrologVariable extends Term {
 		if (value != null) {
 			value.isEmptyList(cp);
 		} else {
-			value= new PrologEmptyList();
+			value= PrologEmptyList.instance;
 			cp.pushTrail(this);
 		}
 	}
@@ -86,7 +91,7 @@ public class PrologVariable extends Term {
 		if (value != null) {
 			value.isOutputEmptyList(cp);
 		} else {
-			value= new PrologEmptyList();
+			value= PrologEmptyList.instance;
 			cp.pushTrail(this);
 		}
 	}
@@ -94,7 +99,7 @@ public class PrologVariable extends Term {
 		if (value != null) {
 			value.isEmptySet(cp);
 		} else {
-			value= new PrologEmptySet();
+			value= PrologEmptySet.instance;
 			cp.pushTrail(this);
 		}
 	}
@@ -102,7 +107,7 @@ public class PrologVariable extends Term {
 		if (value != null) {
 			value.isUnknownValue(cp);
 		} else {
-			value= new PrologUnknownValue();
+			value= PrologUnknownValue.instance;
 			cp.pushTrail(this);
 		}
 	}
@@ -110,7 +115,7 @@ public class PrologVariable extends Term {
 		if (value != null) {
 			value.isNoValue(cp);
 		} else {
-			value= new PrologNoValue();
+			value= PrologNoValue.instance;
 			cp.pushTrail(this);
 		}
 	}
@@ -233,14 +238,14 @@ public class PrologVariable extends Term {
 		if (value != null) {
 			return value.getNextListHead(cp);
 		} else {
-			throw new TermIsNotAList();
+			throw TermIsNotAList.instance;
 		}
 	}
 	public Term getNextListTail(ChoisePoint cp) throws EndOfList, TermIsNotAList {
 		if (value != null) {
 			return value.getNextListTail(cp);
 		} else {
-			throw new TermIsNotAList();
+			throw TermIsNotAList.instance;
 		}
 	}
 	public Term getExistentHead() {
@@ -283,14 +288,14 @@ public class PrologVariable extends Term {
 		if (value != null) {
 			return value.getNextListHeadSafely(cp);
 		} else {
-			throw new TermIsNotAList();
+			throw TermIsNotAList.instance;
 		}
 	}
 	public Term getNextListTailSafely(ChoisePoint cp) throws EndOfList, TermIsNotAList {
 		if (value != null) {
 			return value.getNextListTailSafely(cp);
 		} else {
-			throw new TermIsNotAList();
+			throw TermIsNotAList.instance;
 		}
 	}
 	public Term getNamedElement(long aName, ChoisePoint cp) throws Backtracking {
@@ -319,7 +324,7 @@ public class PrologVariable extends Term {
 		if (value != null) {
 			value.checkIfTermIsASet(cp);
 		} else {
-			throw new TermIsNotASet();
+			throw TermIsNotASet.instance;
 		}
 	}
 	public Term retrieveSetElementValue(ChoisePoint cp) throws Backtracking, TermIsNotSetElement {
@@ -360,7 +365,7 @@ public class PrologVariable extends Term {
 		if (value != null) {
 			value.hasNoMoreElements(aNames,cp);
 		} else {
-			value= new PrologEmptySet();
+			value= PrologEmptySet.instance;
 			cp.pushTrail(this);
 		}
 	}
@@ -400,21 +405,21 @@ public class PrologVariable extends Term {
 		if (value != null) {
 			return value.getNextPairName(cp);
 		} else {
-			throw new TermIsNotASet();
+			throw TermIsNotASet.instance;
 		}
 	}
 	public Term getNextPairValue(ChoisePoint cp) throws EndOfSet, TermIsNotASet, SetElementIsProhibited {
 		if (value != null) {
 			return value.getNextPairValue(cp);
 		} else {
-			throw new TermIsNotASet();
+			throw TermIsNotASet.instance;
 		}
 	}
 	public Term getNextSetTail(ChoisePoint cp) throws EndOfSet, TermIsNotASet {
 		if (value != null) {
 			return value.getNextSetTail(cp);
 		} else {
-			throw new TermIsNotASet();
+			throw TermIsNotASet.instance;
 		}
 	}
 	public Term exploreSetPositiveElements(HashMap<Long,Term> positiveMap, ChoisePoint cp) {
@@ -460,13 +465,13 @@ public class PrologVariable extends Term {
 	//	if (value != null)
 	//		return value.getAbstractWorldNumber(cp);
 	//	else
-	//		throw new TermIsUnboundVariable();
+	//		throw TermIsUnboundVariable.instance;
 	// }
 	public long getInternalWorldClass(AbstractWorld currentClass, ChoisePoint cp) throws Backtracking, TermIsNotAWorld, TermIsDummyWorld, TermIsUnboundVariable {
 		if (value != null) {
 			return value.getInternalWorldClass(currentClass,cp);
 		} else {
-			throw new TermIsUnboundVariable();
+			throw TermIsUnboundVariable.instance;
 		}
 	}
 	//
@@ -486,13 +491,21 @@ public class PrologVariable extends Term {
 		}
 	}
 	//
-	public AbstractWorld world(ChoisePoint cp) {
+	public Term internalWorldOrTerm(ChoisePoint cp) {
 		if (value != null) {
-			return value.world(cp);
+			return value.internalWorldOrTerm(cp);
 		} else {
-			throw new WrongTermIsNotBoundVariable(this);
+			return this;
 		}
 	}
+	//
+	// public AbstractWorld world(ChoisePoint cp) {
+	//	if (value != null) {
+	//		return value.world(cp);
+	//	} else {
+	//		throw new WrongTermIsNotBoundVariable(this);
+	//	}
+	// }
 	// "Unify with ..." functions
 	public void unifyWithStructure(long aFunctor, Term[] values, Term structure, ChoisePoint cp) throws Backtracking {
 		if (value != null) {
@@ -599,25 +612,32 @@ public class PrologVariable extends Term {
 		if (value != null) {
 			return value.circumscribe();
 		} else {
-			return new PrologUnknownValue();
+			return PrologUnknownValue.instance;
 		}
 	}
 	public Term copyValue(ChoisePoint cp, TermCircumscribingMode mode) {
 		if (value != null) {
 			return value.copyValue(cp,mode);
 		} else if (mode==TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES) {
-			return new PrologUnknownValue();
+			return PrologUnknownValue.instance;
 		} else if (mode==TermCircumscribingMode.CLONE_FREE_VARIABLES) {
 			return new PrologVariable();
 		} else {
 			throw new WrongTermIsNotBoundVariable(this);
 		}
 	}
+	public Term copyGroundValue(ChoisePoint cp) throws TermIsUnboundVariable {
+		if (value != null) {
+			return value.copyGroundValue(cp);
+		} else {
+			throw TermIsUnboundVariable.instance;
+		}
+	}
 	public Term substituteWorlds(HashMap<AbstractWorld,Term> map, ChoisePoint cp) {
 		if (value != null) {
 			return value.substituteWorlds(map,cp);
 		} else {
-			return new PrologUnknownValue();
+			return PrologUnknownValue.instance;
 		}
 	}
 	// Domain check
@@ -635,6 +655,262 @@ public class PrologVariable extends Term {
 	public Term checkSetTerm(long functor, PrologDomain headDomain, Term initialValue, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
 		if (value != null) {
 			return value.checkSetTerm(functor,headDomain,initialValue,cp,baseDomain);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	// Comparison operations
+	public void compareWithTerm(Term a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		if (value != null) {
+			value.compareWithTerm(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public void compareWithBigInteger(BigInteger a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		if (value != null) {
+			value.compareWithBigInteger(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public void compareWithLong(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		if (value != null) {
+			value.compareWithLong(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public void compareWithDouble(double a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		if (value != null) {
+			value.compareWithDouble(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public void compareWithString(String a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		if (value != null) {
+			value.compareWithString(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public void compareWithDate(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		if (value != null) {
+			value.compareWithDate(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public void compareTermWith(Term a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		if (value != null) {
+			value.compareTermWith(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public void compareBigIntegerWith(BigInteger a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		if (value != null) {
+			value.compareBigIntegerWith(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public void compareLongWith(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		if (value != null) {
+			value.compareLongWith(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public void compareDoubleWith(double a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		if (value != null) {
+			value.compareDoubleWith(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public void compareStringWith(String a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		if (value != null) {
+			value.compareStringWith(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public void compareDateWith(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		if (value != null) {
+			value.compareDateWith(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public void compareListWith(Term aHead, Term aTail, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		if (value != null) {
+			value.compareListWith(aHead,aTail,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	// Arithmetic operations
+	public Term reactWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.reactWithTerm(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public Term reactWithBigInteger(BigInteger a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.reactWithBigInteger(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public Term reactWithLong(long a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.reactWithLong(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public Term reactWithDouble(double a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.reactWithDouble(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public Term reactWithString(String a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.reactWithString(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public Term reactWithDate(long a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.reactWithDate(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public Term reactWithTime(long a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.reactWithTime(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public Term reactBigIntegerWith(BigInteger a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.reactBigIntegerWith(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public Term reactLongWith(long a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.reactLongWith(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public Term reactDoubleWith(double a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.reactDoubleWith(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public Term reactStringWith(String a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.reactStringWith(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public Term reactDateWith(long a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.reactDateWith(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public Term reactTimeWith(long a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.reactTimeWith(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public Term reactListWith(Term aHead, Term aTail, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.reactListWith(aHead,aTail,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	// Bitwise operations
+	public Term blitWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.blitWithTerm(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public Term blitWithBigInteger(BigInteger a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.blitWithBigInteger(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public Term blitWithLong(long a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.blitWithLong(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public Term blitWithDouble(double a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.blitWithDouble(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public Term blitBigIntegerWith(BigInteger a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.blitBigIntegerWith(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public Term blitLongWith(long a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.blitLongWith(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public Term blitDoubleWith(double a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.blitDoubleWith(a,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	public Term blitListWith(Term aHead, Term aTail, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.blitListWith(aHead,aTail,iX,op);
+		} else {
+			throw new WrongTermIsNotBoundVariable(this);
+		}
+	}
+	// Unary operations
+	public Term evaluate(ChoisePoint iX, UnaryOperation op) {
+		if (value != null) {
+			return value.evaluate(iX,op);
 		} else {
 			throw new WrongTermIsNotBoundVariable(this);
 		}

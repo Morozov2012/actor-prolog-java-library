@@ -2,6 +2,8 @@
 
 package morozov.system.gui;
 
+import morozov.system.gui.signals.*;
+
 public class CoordinateAndSize {
 	//
 	public int coordinate= 0;
@@ -20,10 +22,10 @@ public class CoordinateAndSize {
 				} else {
 					result.size= (int)StrictMath.round( logicalSize * spaceLimit / gridZ );
 				}
-			} catch (ExtendedSize.UseDefaultSize e2) {
+			} catch (UseDefaultSize e2) {
 				result.size= (int)StrictMath.round( (1 - logicalCoordinate / gridZ) * spaceLimit );
 			}
-		} catch (ExtendedCoordinate.CentreFigure e1) {
+		} catch (CentreFigure e1) {
 			try {
 				double logicalSize= lDZ.getValue();
 				if (logicalSize < 0) {
@@ -32,11 +34,11 @@ public class CoordinateAndSize {
 					result.size= (int)StrictMath.round( logicalSize * spaceLimit / gridZ );
 				};
 				result.coordinate= (spaceLimit - result.size) / 2;
-			} catch (ExtendedSize.UseDefaultSize e2) {
+			} catch (UseDefaultSize e2) {
 				result.coordinate= 0;
 				result.size= spaceLimit;
 			}
-		} catch (ExtendedCoordinate.UseDefaultLocation e1) {
+		} catch (UseDefaultLocation e1) {
 			result.coordinateIsToBeCalculatedAutomatically= true;
 			try {
 				double logicalSize= lDZ.getValue();
@@ -45,7 +47,7 @@ public class CoordinateAndSize {
 				} else {
 					result.size= (int)StrictMath.round( logicalSize * spaceLimit / gridZ );
 				}
-			} catch (ExtendedSize.UseDefaultSize e2) {
+			} catch (UseDefaultSize e2) {
 				result.size= spaceLimit;
 			}
 		};

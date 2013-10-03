@@ -2,6 +2,8 @@
 
 package morozov.classes;
 
+import morozov.classes.errors.*;
+import morozov.run.*;
 import morozov.terms.*;
 
 public class SuspendedCallState extends Term {

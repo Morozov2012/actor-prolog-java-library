@@ -12,11 +12,7 @@ package morozov.system.gui.dialogs.scalable;
  * @author IRE RAS Alexei A. Morozov
 */
 
-// import morozov.classes.*;
-// import morozov.system.gui.dialogs.common.*;
-// import morozov.terms.*;
-
-import javax.swing.border.*;
+import javax.swing.border.TitledBorder;
 import javax.swing.BorderFactory;
 import java.awt.Font;
 import java.awt.font.TextAttribute;

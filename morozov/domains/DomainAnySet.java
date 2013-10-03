@@ -2,7 +2,10 @@
 
 package morozov.domains;
 
+import morozov.domains.signals.*;
+import morozov.run.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -60,7 +63,7 @@ public class DomainAnySet extends DomainAlternative {
 					arguments[n]= currentElement;
 					setPositiveMap.remove(currentKey);
 				} else {
-					arguments[n]= null; // new PrologNoValue();
+					arguments[n]= null; // PrologNoValue.instance;
 				}
 			};
 			if (setPositiveMap.isEmpty()) {

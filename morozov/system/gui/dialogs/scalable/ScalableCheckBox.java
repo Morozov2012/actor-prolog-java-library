@@ -8,12 +8,16 @@ package morozov.system.gui.dialogs.scalable;
 
 import target.*;
 
+import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
+import morozov.system.gui.dialogs.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
-import javax.swing.*;
-import javax.swing.plaf.basic.*;
+import javax.swing.Icon;
+import javax.swing.Action;
+import javax.swing.plaf.basic.BasicRadioButtonUI;
 import javax.swing.JCheckBox;
 
 import java.awt.Font;
@@ -159,7 +163,7 @@ public class ScalableCheckBox extends ScalableAbstractButton {
 				}
 			}
 		} else {
-			return new PrologUnknownValue();
+			return PrologUnknownValue.instance;
 			// return null;
 		}
 	}
@@ -175,7 +179,7 @@ public class ScalableCheckBox extends ScalableAbstractButton {
 				return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
 			} else {
 				// return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
-				throw new RejectValue();
+				throw RejectValue.instance;
 			}
 		} catch (TermIsNotASymbol e1) {
 			try {
@@ -188,11 +192,11 @@ public class ScalableCheckBox extends ScalableAbstractButton {
 					return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
 				} else {
 					// return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
-					throw new RejectValue();
+					throw RejectValue.instance;
 				}
 			} catch (TermIsNotAString e2) {
 				// return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
-				throw new RejectValue();
+				throw RejectValue.instance;
 			}
 		}
 	}

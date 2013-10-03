@@ -4,8 +4,12 @@ package morozov.system.files;
 
 import target.*;
 
+import morozov.run.*;
 import morozov.system.*;
+import morozov.system.errors.*;
+import morozov.system.files.errors.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.nio.file.FileSystems;
 import java.nio.file.FileSystem;
@@ -33,11 +37,25 @@ import java.util.Properties;
 public class FileUtils {
 	protected static final FileSystem fileSystem= FileSystems.getDefault();
 	//
-	public static ExtendedFileName termToExtendedFileName(Term value, ChoisePoint iX) {
+	public static boolean checkIfBackslashIsSeparator(Term value, ChoisePoint iX) {
+		boolean backslashIsSeparator= Converters.term2YesNo(value,iX);
+		backslashIsSeparator= backslashIsSeparator || java.io.File.separatorChar=='\\';
+		return backslashIsSeparator;
+	}
+	//
+	public static String replaceBackslashes(String name, boolean backslashIsSeparator) {
+		if (backslashIsSeparator) {
+			int p1= name.indexOf('\\');
+			if (p1 >= 0) {
+				name= name.replace('\\','/');
+			}
+		};
+		return name;
+	}
+	//
+	public static ExtendedFileName termToExtendedFileName(Term value, ChoisePoint iX, boolean backslashIsSeparator) {
 		try {
 			long code= value.getSymbolValue(iX);
-			// if (code==SymbolCodes.symbolCode_E_console) {
-			//	return new ExtendedFileName(SystemFileName.CONSOLE);
 			if (code==SymbolCodes.symbolCode_E_stdin) {
 				return new ExtendedFileName(SystemFileName.STDIN);
 			} else if (code==SymbolCodes.symbolCode_E_stdout) {
@@ -49,7 +67,9 @@ public class FileUtils {
 			}
 		} catch (TermIsNotASymbol e1) {
 			try {
-				return new ExtendedFileName(value.getStringValue(iX));
+				String textName= value.getStringValue(iX);
+				textName= replaceBackslashes(textName,backslashIsSeparator);
+				return new ExtendedFileName(textName);
 			} catch (TermIsNotAString e2) {
 				throw new WrongTermIsNotFileName(value);
 			}
@@ -91,11 +111,11 @@ public class FileUtils {
 		try {
 			while (true) {
 				nextHead= currentTail.getNextListHead(iX);
-				String description= nextHead.getStringValue(iX);
-				currentTail= currentTail.getNextListTail(iX);
-				nextHead= currentTail.getNextListHead(iX);
 				String wildcardText= nextHead.getStringValue(iX);
 				String[] wildcards= stringToWildcards(wildcardText);
+				currentTail= currentTail.getNextListTail(iX);
+				nextHead= currentTail.getNextListHead(iX);
+				String description= nextHead.getStringValue(iX);
 				currentTail= currentTail.getNextListTail(iX);
 				list.add(new FileNameMask(description,wildcards));
 			}
@@ -200,12 +220,6 @@ public class FileUtils {
 				throw new WrongTermIsNotCharacterSet(value);
 			}
 		}
-	}
-	//
-	public static boolean checkIfBackslashIsSeparator(Term value, ChoisePoint iX) {
-		boolean backslashIsSeparator= Converters.term2YesNo(value,iX);
-		backslashIsSeparator= backslashIsSeparator || java.io.File.separatorChar=='\\';
-		return backslashIsSeparator;
 	}
 	//
 	public static List<Path> listSourceFiles(Path dir) {
@@ -385,6 +399,30 @@ public class FileUtils {
 			Files.move(path1,path2,StandardCopyOption.ATOMIC_MOVE);
 		} catch (IOException e) {
 		};
+	}
+	//
+	public static String extractFileNameExtension(String fileName, boolean backslashIsSeparator) {
+		String extension= "";
+		int p1= fileName.lastIndexOf('.');
+		if (p1 >= 0) {
+			String name= fileName.substring(0,p1);
+			extension= fileName.substring(p1);
+			int p2= extension.indexOf(':');
+			if (p2 >= 0) {
+				extension= "";
+			} else {
+				p2= extension.indexOf('/');
+				if (p2 >= 0) {
+					extension= "";
+				} else if (backslashIsSeparator) {
+					p2= extension.indexOf('\\');
+					if (p2 >= 0) {
+						extension= "";
+					}
+				}
+			}
+		};
+		return extension;
 	}
 	//
 	public static String modifyFileExtension(String fullName, String newExtension, boolean backslashIsSeparator) {

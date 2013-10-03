@@ -4,6 +4,9 @@ package morozov.terms;
 
 import morozov.classes.*;
 import morozov.system.*;
+import morozov.run.*;
+import morozov.terms.errors.*;
+import morozov.terms.signals.*;
 
 import java.math.BigInteger;
 import java.util.Comparator;

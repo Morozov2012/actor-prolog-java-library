@@ -4,6 +4,7 @@ package morozov.system.gui.space3d;
 
 import morozov.built_in.*;
 import morozov.classes.*;
+import morozov.system.gui.space3d.signals.*;
 import morozov.terms.*;
 
 import javax.swing.SwingUtilities;
@@ -25,6 +26,7 @@ import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.TimerTask;
+import java.lang.IllegalStateException;
 
 public class CustomizedPickCanvas
 		extends PickCanvas
@@ -41,7 +43,7 @@ public class CustomizedPickCanvas
 	protected long period= 150; // Actor Prolog default value
 	//
 	protected Canvas3D targetWorld;
-	protected javax.media.j3d.Canvas3D canvas3D;
+	protected javax.media.j3d.Canvas3D space3D;
 	protected java.util.Timer scheduler;
 	protected TimerTask currentTask;
 	//
@@ -52,7 +54,7 @@ public class CustomizedPickCanvas
 	public CustomizedPickCanvas(BranchGroup b, Canvas3D world, javax.media.j3d.Canvas3D c) {
 		super(c,b);
 		targetWorld= world;
-		canvas3D= c;
+		space3D= c;
 		// lit.setMaterial(new Material());
 		refineMouseEventListenerList();
 		refineMouseMotionEventListenerList();
@@ -94,11 +96,11 @@ public class CustomizedPickCanvas
 	}
 	//
 	protected void refineMouseEventListenerList() {
-		// MouseListener[] list1= canvas3D.getMouseListeners();
+		// MouseListener[] list1= space3D.getMouseListeners();
 		// for (int n= 0; n < list1.length; n++) {
 		//	System.out.printf("%s) list: %s\n",n,list1[n]);
 		// };
-		MouseListener[] list= canvas3D.getMouseListeners();
+		MouseListener[] list= space3D.getMouseListeners();
 		if (	handleMouseClicked ||
 			handleMouseEntered ||
 			handleMouseExited ||
@@ -109,13 +111,13 @@ public class CustomizedPickCanvas
 					return;
 				}
 			};
-			canvas3D.addMouseListener(this);
+			space3D.addMouseListener(this);
 		} else {
-			canvas3D.removeMouseListener(this);
+			space3D.removeMouseListener(this);
 		}
 	}
 	protected void refineMouseMotionEventListenerList() {
-		MouseMotionListener[] list= canvas3D.getMouseMotionListeners();
+		MouseMotionListener[] list= space3D.getMouseMotionListeners();
 		if (	handleMouseDragged ||
 			handleMouseMoved ) {
 			for (int n= 0; n < list.length; n++) {
@@ -123,9 +125,9 @@ public class CustomizedPickCanvas
 					return;
 				}
 			};
-			canvas3D.addMouseMotionListener(this);
+			space3D.addMouseMotionListener(this);
 		} else {
-			canvas3D.removeMouseMotionListener(this);
+			space3D.removeMouseMotionListener(this);
 		}
 	}
 	//
@@ -146,7 +148,7 @@ public class CustomizedPickCanvas
 		activateTimer();
 		if (handleMouseEntered) {
 			long domainSignature= targetWorld.entry_s_MouseEntered_1_i();
-			sendMessage(domainSignature,new PrologEmptyList());
+			sendMessage(domainSignature,PrologEmptyList.instance);
 		}
 	}
 	public void mouseExited(MouseEvent mouseEvent) {
@@ -155,7 +157,7 @@ public class CustomizedPickCanvas
 		suspendTimer();
 		if (handleMouseExited) {
 			long domainSignature= targetWorld.entry_s_MouseExited_1_i();
-			sendMessage(domainSignature,new PrologEmptyList());
+			sendMessage(domainSignature,PrologEmptyList.instance);
 		}
 	}
 	public void mousePressed(MouseEvent mouseEvent) {
@@ -210,13 +212,16 @@ public class CustomizedPickCanvas
 			if (info != null) {
 				Point location= info.getLocation();
 				// System.out.printf("Watch: %s\n",location);
-				SwingUtilities.convertPointFromScreen(location,canvas3D);
+				SwingUtilities.convertPointFromScreen(location,space3D);
 				// System.out.printf("Watch: [converted] %s\n",location);
 				setShapeLocation(location.x,location.y);
-				NodeLabel[] labels= retrieveNodeLabels();
-				updateNodeLabels(labels);
+				try {
+					NodeLabel[] labels= retrieveNodeLabels();
+					updateNodeLabels(labels);
+				} catch (IllegalStateException e2) {
+				}
 			}
-		} catch (HeadlessException e) {
+		} catch (HeadlessException e1) {
 		}
 	}
 	protected void updateNodeLabels(NodeLabel[] labels) {
@@ -274,11 +279,15 @@ public class CustomizedPickCanvas
 		return retrieveNodeLabelList();
 	}
 	protected Term retrieveNodeLabelList() throws NoObjectSelected {
-		NodeLabel[] labels= retrieveNodeLabels();
-		if (labels.length==0) {
-			throw new NoObjectSelected();
-		};
-		return nodeLabelsToTerm(labels);
+		try {
+			NodeLabel[] labels= retrieveNodeLabels();
+			if (labels.length==0) {
+				throw NoObjectSelected.instance;
+			};
+			return nodeLabelsToTerm(labels);
+		} catch (IllegalStateException e) {
+			throw NoObjectSelected.instance;
+		}
 	}
 	protected NodeLabel[] retrieveNodeLabels() {
 		PickResult[] results= pickAllSorted();
@@ -308,7 +317,7 @@ public class CustomizedPickCanvas
 		}
 	}
 	protected Term nodeLabelsToTerm(NodeLabel[] labels) {
-		Term result= new PrologEmptyList();
+		Term result= PrologEmptyList.instance;
 		for (int n= labels.length-1; n >= 0; n--) {
 			NodeLabel label= labels[n];
 			result= new PrologList(label.toTerm(),result);
@@ -316,7 +325,7 @@ public class CustomizedPickCanvas
 		return result;
 	}
 	protected Term nodeLabelsToTerm(ArrayList<NodeLabel> labels) {
-		Term result= new PrologEmptyList();
+		Term result= PrologEmptyList.instance;
 		for (int n= labels.size()-1; n >= 0; n--) {
 			NodeLabel label= labels.get(n);
 			result= new PrologList(label.toTerm(),result);
@@ -330,30 +339,47 @@ public class CustomizedPickCanvas
 	}
 	//
 	public void activateTimer() {
-		if (!isPassive) {
-			if (handleMouseEntered || handleMouseExited) {
-				if (currentTask==null) {
-					if (scheduler==null) {
-						scheduler= new java.util.Timer(true);
-					};
-					currentTask= new LocalTask(this);
-					long correctedPeriod= period;
-					if (correctedPeriod <= 1) {
-						correctedPeriod= 1;
-					};
-					scheduler.scheduleAtFixedRate(currentTask,correctedPeriod,correctedPeriod);
+		synchronized (this) {
+			if (!isPassive) {
+				if (handleMouseEntered || handleMouseExited) {
+					if (currentTask==null) {
+						if (scheduler==null) {
+							scheduler= new java.util.Timer(true);
+						};
+						currentTask= new LocalTask(this);
+						long correctedPeriod= period;
+						if (correctedPeriod <= 1) {
+							correctedPeriod= 1;
+						};
+						scheduler.scheduleAtFixedRate(currentTask,correctedPeriod,correctedPeriod);
+					}
 				}
 			}
 		}
 	}
 	public void suspendTimer() {
-		if (!isPassive) {
-			if (scheduler != null) {
-				if (currentTask != null) {
-					currentTask.cancel();
-					currentTask= null;
+		synchronized (this) {
+			if (!isPassive) {
+				if (scheduler != null) {
+					if (currentTask != null) {
+						currentTask.cancel();
+						currentTask= null;
+					};
+					scheduler.purge();
 				}
 			}
+		}
+	}
+	public void release() {
+		space3D.removeMouseListener(this);
+		space3D.removeMouseMotionListener(this);
+		if (scheduler != null) {
+			if (currentTask != null) {
+				currentTask.cancel();
+				currentTask= null;
+			};
+			scheduler.purge();
+			scheduler.cancel();
 		}
 	}
 }

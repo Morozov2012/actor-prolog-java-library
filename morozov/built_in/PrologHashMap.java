@@ -4,6 +4,7 @@ package morozov.built_in;
 
 import target.*;
 
+import morozov.run.*;
 import morozov.system.records.*;
 import morozov.terms.*;
 
@@ -62,7 +63,7 @@ public abstract class PrologHashMap extends Database {
 		if (result != null) {
 			a1.value= DatabaseUtils.extractSecondArgument(result.value,null);
 		} else {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	public void get1fs(ChoisePoint iX, Term a1) throws Backtracking {
@@ -72,7 +73,7 @@ public abstract class PrologHashMap extends Database {
 	public void containsKey1s(ChoisePoint iX, Term a1) throws Backtracking {
 		Term copy1= a1.copyValue(iX,TermCircumscribingMode.PROHIBIT_FREE_VARIABLES);
 		if (!databaseHash.containsKey(copy1)) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
@@ -82,7 +83,7 @@ public abstract class PrologHashMap extends Database {
 		if (record != null) {
 			retractCurrentRecord(record);
 		} else {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//

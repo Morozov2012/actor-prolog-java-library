@@ -6,12 +6,15 @@ import target.*;
 
 import morozov.classes.*;
 import morozov.system.gui.*;
+import morozov.system.gui.signals.*;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JInternalFrame;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.Point;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -23,6 +26,7 @@ public class ExtendedJInternalFrame
 	//
 	protected AbstractDialog dialog;
 	protected StaticContext staticContext;
+	protected AtomicBoolean insideDoLayout= new AtomicBoolean(false);
 	//
 	public ExtendedJInternalFrame(AbstractDialog d) {
 		dialog= d;
@@ -34,7 +38,7 @@ public class ExtendedJInternalFrame
 		staticContext= context;
 	}
 	//
-	public Point computePosition(AtomicReference<ExtendedCoordinates> actualCoordinates) throws ExtendedCoordinate.UseDefaultLocation {
+	public Point computePosition(AtomicReference<ExtendedCoordinates> actualCoordinates) throws UseDefaultLocation {
 		//
 		Dimension initialSize= getSize();
 		//
@@ -47,36 +51,30 @@ public class ExtendedJInternalFrame
 		double gridX= DefaultOptions.gridWidth;
 		double gridY= DefaultOptions.gridHeight;
 		//
-		Dimension parentLayoutSize= computeParentLayoutSize();
+		Rectangle parentLayoutSize= computeParentLayoutSize();
 		//
 		ExtendedCoordinates actualPoint= actualCoordinates.get();
-		x= DialogUtils.calculateRealCoordinate(actualPoint.x,parentLayoutSize.width,gridX,initialWidth);
-		y= DialogUtils.calculateRealCoordinate(actualPoint.y,parentLayoutSize.height,gridY,initialHeight);
+		x= DialogUtils.calculateRealCoordinate(actualPoint.x,parentLayoutSize.x,parentLayoutSize.width,gridX,initialWidth);
+		y= DialogUtils.calculateRealCoordinate(actualPoint.y,parentLayoutSize.y,parentLayoutSize.height,gridY,initialHeight);
 		//
 		return new Point(x,y);
 	}
-	public Dimension computeParentLayoutSize() {
+	public Rectangle computeParentLayoutSize() {
 		//
 		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(dialog.staticContext);
-		// Container parent= getParent();
 		//
-		// if (desktop != null) {
-			//
-			Dimension parentDimension= new Dimension();
-			desktop.getSize(parentDimension);
-			//
-			int parentWidth= parentDimension.width;
-			int parentHeight= parentDimension.height;
-			//
-			Dimension minimumParentSize= desktop.getUI().getMinimumSize(this);
-			//
-			int parentLayoutWidth= parentWidth - minimumParentSize.width;
-			int parentLayoutHeight= parentHeight - minimumParentSize.height;
-			//
-			return new Dimension(parentLayoutWidth,parentLayoutHeight);
-		// } else {
-		//	throw new CannotComputeDesktopSize();
-		// }
+		Dimension parentDimension= new Dimension();
+		desktop.getSize(parentDimension);
+		//
+		int parentWidth= parentDimension.width;
+		int parentHeight= parentDimension.height;
+		//
+		Dimension minimumParentSize= desktop.getUI().getMinimumSize(this);
+		//
+		int parentLayoutWidth= parentWidth - minimumParentSize.width;
+		int parentLayoutHeight= parentHeight - minimumParentSize.height;
+		//
+		return new Rectangle(0,0,parentLayoutWidth,parentLayoutHeight);
 	}
 	//
 	public void addToDesktop(JDesktopPane desktop) {
@@ -99,14 +97,39 @@ public class ExtendedJInternalFrame
 		super.doLayout();
 	}
 	//
+	public void safelyMaximize() {
+		DesktopUtils.safelyMaximize(this);
+	}
+	public void safelyMinimize() {
+		DesktopUtils.safelyMinimize(this);
+	}
+	public void safelyRestore() {
+		// safelyRestoreSize();
+		DesktopUtils.safelyRestore(this);
+	}
 	public void safelyRestoreSize() {
 		dialog.safelyRestoreSize();
 	}
+	public boolean safelyIsMaximized() {
+		return DesktopUtils.safelyIsMaximized(this);
+	}
+	public boolean safelyIsMinimized() {
+		return DesktopUtils.safelyIsMinimized(this);
+	}
+	public boolean safelyIsRestored() {
+		return DesktopUtils.safelyIsRestored(this);
+	}
 	public void doLayout() {
-		// dialog.doLayout(true);
-		// dialog.previousActualSize= new AtomicReference<Dimension>(new Dimension(10,10));
-		dialog.doLayout();
-		// dialog.doLayout();
+		if (insideDoLayout.compareAndSet(false,true)) {
+			try {
+				// dialog.doLayout(true);
+				// dialog.previousActualSize= new AtomicReference<Dimension>(new Dimension(10,10));
+				dialog.doLayout();
+				// dialog.doLayout();
+			} finally {
+				insideDoLayout.set(false);
+			}
+		}
 	}
 	//
 	public void mouseClicked(MouseEvent event) {

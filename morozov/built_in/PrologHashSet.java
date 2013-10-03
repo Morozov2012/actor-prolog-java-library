@@ -5,6 +5,7 @@ package morozov.built_in;
 import morozov.run.*;
 import morozov.system.records.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.util.HashSet;
 
@@ -53,10 +54,15 @@ public abstract class PrologHashSet extends Database {
 		//
 		public void execute(ChoisePoint iX) throws Backtracking {
 			if (!hasOutputArgument) {
-				Term copy= inputResult.copyValue(iX,TermCircumscribingMode.PROHIBIT_FREE_VARIABLES);
-				if (databaseHash.contains(copy)) {
-					c0.execute(iX);
-				} else {
+				try {
+					Term copy= inputResult.copyGroundValue(iX);
+					if (databaseHash.contains(copy)) {
+						c0.execute(iX);
+					} else {
+						// super.execute(iX);
+						throw Backtracking.instance;
+					}
+				} catch (TermIsUnboundVariable e) {
 					super.execute(iX);
 				}
 			} else {

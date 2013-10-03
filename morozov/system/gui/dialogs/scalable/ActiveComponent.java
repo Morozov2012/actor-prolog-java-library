@@ -12,16 +12,19 @@ package morozov.system.gui.dialogs.scalable;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.run.*;
 import morozov.system.gui.dialogs.*;
+import morozov.system.gui.dialogs.signals.*;
 import morozov.terms.*;
 
-import javax.swing.JComponent;
+// import javax.swing.JComponent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.event.ListSelectionEvent;
+import java.awt.Component;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.font.TextAttribute;
@@ -29,12 +32,13 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Color;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 public abstract class ActiveComponent implements ActionListener, ChangeListener, ListSelectionListener {
 	//
-	public JComponent component;
-	// public Object component;
+	// public JComponent component;
+	public Component component;
 	//
 	protected AbstractDialog targetDialog= null;
 	//
@@ -65,8 +69,8 @@ public abstract class ActiveComponent implements ActionListener, ChangeListener,
 	public void putRange(Term value, ChoisePoint iX) {
 	}
 	public Term getRange() {
-		// return new PrologEmptyList();
-		return new PrologUnknownValue();
+		// return PrologEmptyList.instance;
+		return PrologUnknownValue.instance;
 	}
 	//
 	public void setPadding(
@@ -95,7 +99,7 @@ public abstract class ActiveComponent implements ActionListener, ChangeListener,
 		colourlessFont= font;
 		if (component!=null) {
 			if (spaceColor!=null) {
-				Map<TextAttribute,Object> map= new Hashtable<TextAttribute,Object>();
+				Map<TextAttribute,Object> map= new HashMap<TextAttribute,Object>();
 				map.put(TextAttribute.BACKGROUND,spaceColor);
 				font= font.deriveFont(map);
 			};
@@ -121,10 +125,13 @@ public abstract class ActiveComponent implements ActionListener, ChangeListener,
 				gridBagLayout.setConstraints(component,gBC);
 			};
 			component.setFont(font);
+			// component.setMinimumSize(component.getPreferredSize());
+			// Предположительно, это может помочь в борьбе
+			// с проблемой схлопывания текстовых полей:
+			component.setMinimumSize(component.getPreferredSize());
 			// component.repaint();
 			// component.validate();
 			component.invalidate();
-			// component.setMinimumSize(component.getPreferredSize());
 		}
 	}
 	//
@@ -152,15 +159,15 @@ public abstract class ActiveComponent implements ActionListener, ChangeListener,
 			component.setBackground(c);
 		}
 	}
-	public void setOpaque(boolean f) {
-		if (component!=null) {
-			component.setOpaque(f);
-		}
-	}
+	// public void setOpaque(boolean f) {
+	//	if (component!=null) {
+	//		component.setOpaque(f);
+	//	}
+	// }
 	public void setAlarmColors(Color fc, Color bc) {
 	}
 	//
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformed(ActionEvent event) {
 		if (targetDialog!=null) {
 			targetDialog.reportValueUpdate(this);
 		}

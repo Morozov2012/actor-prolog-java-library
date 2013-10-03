@@ -1,7 +1,13 @@
 // (c) 2010 IRE RAS Alexei A. Morozov
-package morozov.domains;
 
-import morozov.system.*;import morozov.terms.*;public class DomainRealConstant extends DomainAlternative {
+package morozov.domains;
+
+import morozov.run.*;
+import morozov.system.*;
+import morozov.terms.*;
+import morozov.terms.signals.*;
+
+public class DomainRealConstant extends DomainAlternative {
 	protected double constantValue;
 	public DomainRealConstant(double value) {
 		constantValue= value;

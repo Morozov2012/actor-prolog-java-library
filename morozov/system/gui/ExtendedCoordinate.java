@@ -2,13 +2,9 @@
 
 package morozov.system.gui;
 
-import morozov.terms.*;
+import morozov.system.gui.signals.*;
 
 public class ExtendedCoordinate {
-	//
-	public class CentreFigure extends LightweightException {}
-	public class UseDefaultLocation extends LightweightException {}
-	//
 	private boolean locateFigureInDefaultPosition= true;
 	private boolean locateFigureInTheCentre= false;
 	private double value= 0;
@@ -33,7 +29,7 @@ public class ExtendedCoordinate {
 	}
 	public boolean isCentered() throws UseDefaultLocation {
 		if (locateFigureInDefaultPosition) {
-			throw new UseDefaultLocation();
+			throw UseDefaultLocation.instance;
 		} else {
 			return locateFigureInTheCentre;
 		}
@@ -45,9 +41,9 @@ public class ExtendedCoordinate {
 	}
 	public double getValue() throws UseDefaultLocation, CentreFigure {
 		if (locateFigureInDefaultPosition) {
-			throw new UseDefaultLocation();
+			throw UseDefaultLocation.instance;
 		} else if (locateFigureInTheCentre) {
-			throw new CentreFigure();
+			throw CentreFigure.instance;
 		} else {
 			return value;
 		}

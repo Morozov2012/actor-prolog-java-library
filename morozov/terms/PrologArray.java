@@ -3,11 +3,12 @@
 package morozov.terms;
 
 import morozov.classes.*;
+import morozov.run.*;
 
 public abstract class PrologArray extends Term {
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		if (t != this)
-			throw new Backtracking();
+			throw Backtracking.instance;
 	}
 	abstract public AbstractWorld createWorld();
 	abstract public void initiateWorld(AbstractWorld world);

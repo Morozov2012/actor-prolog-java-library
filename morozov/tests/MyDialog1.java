@@ -4,17 +4,22 @@ package morozov.tests;
 
 import target.*;
 
+import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.*;
 import morozov.system.gui.dialogs.scalable.common.*;
 import morozov.terms.*;
+
+import javax.swing.JButton;
+import javax.swing.JRootPane;
+import javax.swing.JSlider;
+import javax.swing.AbstractButton;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Window;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
-import javax.swing.*;
 
 public class MyDialog1 extends AbstractDialog {
 	ScalableButton control_14_4_0;
@@ -51,8 +56,8 @@ public class MyDialog1 extends AbstractDialog {
 	ScalablePanel panel4;
 	ScalablePanel panel3;
 	ScalablePanel panel2;
-	ActiveLabel control_1_0_2;
-	ActiveLabel control_1_0_1;
+	ScalableLabel control_1_0_2;
+	ScalableLabel control_1_0_1;
 	ScalablePanel panel1;
 	public MyDialog1(Window w) {
 		super(w);
@@ -125,7 +130,7 @@ public class MyDialog1 extends AbstractDialog {
 		gBC1.weighty= 1;
 		gBC1.ipadx= 0;
 		gBC1.ipady= 0;
-		control_1_0_1= new ActiveLabel(this,"Example of dialog window");
+		control_1_0_1= new ScalableLabel(this,"Example of dialog window");
 		control_1_0_1.setPadding(gBL1,false,false,true,false,1.5,0.7);
 		control_1_0_1.setScaling(1,1);
 		gBL1.setConstraints(control_1_0_1.component,gBC1);
@@ -141,7 +146,7 @@ public class MyDialog1 extends AbstractDialog {
 		gBC1.weighty= 1;
 		gBC1.ipadx= 0;
 		gBC1.ipady= 0;
-		control_1_0_2= new ActiveLabel(this,"Example of dialog window",24,TextAlignment.CENTER);
+		control_1_0_2= new ScalableLabel(this,"Example of dialog window",24,TextAlignment.CENTER);
 		control_1_0_2.setPadding(gBL1,false,false,true,false,1.5,0.7);
 		control_1_0_2.setScaling(1,1);
 		gBL1.setConstraints(control_1_0_2.component,gBC1);
@@ -974,26 +979,26 @@ public class MyDialog1 extends AbstractDialog {
 			this,
 			targetWorld,
 			new DialogEntry[] {
-				new DialogEntry(7000,control_1_0_2,false),
-				new DialogEntry(1010,control_5_1_1,false),
-				new DialogEntry(1020,control_5_2_1,true),
-				new DialogEntry(1030,control_6_1_1,true),
-				new DialogEntry(1040,control_6_1_2,true),
-				new DialogEntry(1050,control_7_1_1,true),
-				new DialogEntry(1060,control_7_1_2,true),
-				new DialogEntry(2010,bG8,true),
-				new DialogEntry(3010,control_11_1_1,true),
-				new DialogEntry(3020,control_11_1_2,true),
-				new DialogEntry(4011,control_12_1_1,false,DialogEntryType.RANGE),
-				new DialogEntry(4012,control_12_1_1,true),
-				new DialogEntry(4021,control_13_1_1,false,DialogEntryType.RANGE),
-				new DialogEntry(4022,control_13_1_1,true),
-				new DialogEntry(4031,control_13_1_2,false,DialogEntryType.RANGE),
-				new DialogEntry(4032,control_13_1_2,true),
-				new DialogEntry(5011,control_2_2_1,false,DialogEntryType.RANGE),
-				new DialogEntry(5012,control_2_2_1,true),
-				new DialogEntry(5021,control_2_1_2,false,DialogEntryType.RANGE),
-				new DialogEntry(5022,control_2_1_2,true)
+				new DialogEntry(this,7000,control_1_0_2,false),
+				new DialogEntry(this,1010,control_5_1_1,false),
+				new DialogEntry(this,1020,control_5_2_1,true),
+				new DialogEntry(this,1030,control_6_1_1,true),
+				new DialogEntry(this,1040,control_6_1_2,true),
+				new DialogEntry(this,1050,control_7_1_1,true),
+				new DialogEntry(this,1060,control_7_1_2,true),
+				new DialogEntry(this,2010,bG8,true),
+				new DialogEntry(this,3010,control_11_1_1,true),
+				new DialogEntry(this,3020,control_11_1_2,true),
+				new DialogEntry(this,4011,control_12_1_1,false,DialogEntryType.RANGE),
+				new DialogEntry(this,4012,control_12_1_1,true),
+				new DialogEntry(this,4021,control_13_1_1,false,DialogEntryType.RANGE),
+				new DialogEntry(this,4022,control_13_1_1,true),
+				new DialogEntry(this,4031,control_13_1_2,false,DialogEntryType.RANGE),
+				new DialogEntry(this,4032,control_13_1_2,true),
+				new DialogEntry(this,5011,control_2_2_1,false,DialogEntryType.RANGE),
+				new DialogEntry(this,5012,control_2_2_1,true),
+				new DialogEntry(this,5021,control_2_1_2,false,DialogEntryType.RANGE),
+				new DialogEntry(this,5022,control_2_1_2,true)
 			},
 			new DialogEntry[] {
 				new DialogEntry(this,"title",false,DialogEntryType.TITLE),

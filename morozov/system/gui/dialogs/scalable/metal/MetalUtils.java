@@ -6,8 +6,14 @@
 
 package morozov.system.gui.dialogs.scalable.metal;
 
-import javax.swing.plaf.metal.*;
-import java.awt.*;
+import javax.swing.plaf.metal.OceanTheme;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import java.awt.GradientPaint;
+import java.awt.Shape;
+import java.awt.Color;
+import java.awt.Graphics2D;
+import java.awt.Graphics;
+import java.awt.Component;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Ellipse2D;

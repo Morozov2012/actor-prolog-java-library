@@ -2,6 +2,8 @@
 
 package morozov.syntax.scanner;
 
+import morozov.syntax.scanner.signals.*;
+
 public class TokenPlain extends PrologToken {
 	protected PrologTokenType type;
 	public TokenPlain(PrologTokenType t, int p) {

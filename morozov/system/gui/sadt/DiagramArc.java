@@ -2,7 +2,7 @@
 
 package morozov.system.gui.sadt;
 
-import java.awt.Graphics;
+// import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Dimension;
 import java.awt.geom.Line2D;
@@ -73,8 +73,9 @@ public class DiagramArc {
 			}
 		}
 	}
-	public void draw(Graphics g0, Dimension size) {
-		Graphics2D g2= (Graphics2D)g0;
+	public void draw(Graphics2D g2, Dimension size) {
+		// Graphics2D g2= (Graphics2D)g0;
+		// DesktopUtils.setRenderingHints(g2);
 		double xA= StrictMath.round(size.width * x1);
 		double yA= StrictMath.round(size.height * y1);
 		double xB= StrictMath.round(size.width * x2);

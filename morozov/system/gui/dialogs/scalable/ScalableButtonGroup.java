@@ -6,10 +6,13 @@
 
 package morozov.system.gui.dialogs.scalable;
 
+import morozov.run.*;
 import morozov.system.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
+import morozov.system.gui.dialogs.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import javax.swing.ButtonModel;
 import javax.swing.AbstractButton;
@@ -110,21 +113,21 @@ public class ScalableButtonGroup extends ActiveComponent {
 			};
 			return new PrologInteger(0);
 		} else {
-			return new PrologUnknownValue();
+			return PrologUnknownValue.instance;
 		}
 	}
 	//
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
-			throw new RejectValue();
+			throw RejectValue.instance;
 		} else {
 			try {
 				BigInteger bigInteger= value.getIntegerValue(iX);
 				if (PrologInteger.isSmallInteger(bigInteger)) {
 					return new PrologInteger(bigInteger);
 				} else {
-					throw new RejectValue();
+					throw RejectValue.instance;
 				}
 			} catch (TermIsNotAnInteger e1) {
 				try {
@@ -133,7 +136,7 @@ public class ScalableButtonGroup extends ActiveComponent {
 					if (PrologInteger.isSmallInteger(bigInteger)) {
 						return new PrologInteger(bigInteger);
 					} else {
-						throw new RejectValue();
+						throw RejectValue.instance;
 					}
 				} catch (TermIsNotAReal e2) {
 					String text= value.toString(iX);

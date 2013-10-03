@@ -3,6 +3,7 @@
 package morozov.syntax;
 
 import morozov.terms.*;
+import morozov.syntax.errors.*;
 import morozov.syntax.scanner.*;
 
 import java.math.BigInteger;
@@ -140,8 +141,8 @@ public class Parser {
 				position++;
 				if (position < numberOfTokens && tokens[position].getType()==PrologTokenType.R_SQUARE_BRACKET) {
 					position++;
-					// return new PrologEmptyList();
-					Term result= new PrologEmptyList();
+					// return PrologEmptyList.instance;
+					Term result= PrologEmptyList.instance;
 					if (!rememberTextPositions) {
 						return result;
 					} else {
@@ -151,12 +152,12 @@ public class Parser {
 					ArrayList<Term> arguments= parseInternalTerms();
 					if (position < numberOfTokens) {
 						if (tokens[position].getType()==PrologTokenType.R_SQUARE_BRACKET) {
-							Term result= new PrologEmptyList();
+							Term result= PrologEmptyList.instance;
 							if (rememberTextPositions) {
 								result= new TermPosition(result,tokens[position].getPosition());
 							};
 							position++;
-							// Term result= new PrologEmptyList();
+							// Term result= PrologEmptyList.instance;
 							for (int n=arguments.size()-1; n >= 0; n--) {
 								// result= new PrologList(arguments.get(n),result);
 								Term internalTerm= arguments.get(n);
@@ -244,8 +245,8 @@ public class Parser {
 				if (position + 1 < numberOfTokens && tokens[position+1].getType()==PrologTokenType.L_BRACE) {
 					position= position + 2;
 					ArrayList<NamedTerm> arguments= new ArrayList<NamedTerm>();
-					// arguments.add(new NamedTerm(0,new PrologUnknownValue()));
-					Term result= new PrologUnknownValue();
+					// arguments.add(new NamedTerm(0,PrologUnknownValue.instance));
+					Term result= PrologUnknownValue.instance;
 					if (rememberTextPositions) {
 						result= new TermPosition(result,beginningOfTerm);
 					};
@@ -253,8 +254,8 @@ public class Parser {
 					return parseUnderdeterminedSet(arguments,beginningOfTerm);
 				} else {
 					position++;
-					// return new PrologUnknownValue();
-					Term result= new PrologUnknownValue();
+					// return PrologUnknownValue.instance;
+					Term result= PrologUnknownValue.instance;
 					if (!rememberTextPositions) {
 						return result;
 					} else {
@@ -304,18 +305,18 @@ public class Parser {
 	public Term parseUnderdeterminedSet(ArrayList<NamedTerm> arguments, int beginningOfTerm) {
 		Term result;
 		if (position < numberOfTokens && tokens[position].getType()==PrologTokenType.R_BRACE) {
-			result= new PrologEmptySet();
+			result= PrologEmptySet.instance;
 			if (rememberTextPositions) {
 				result= new TermPosition(result,tokens[position].getPosition());
 			};
 			position++;
-			// return new PrologEmptySet();
+			// return PrologEmptySet.instance;
 		} else {
 			// ArrayList<NamedTerm> arguments= parsePairs();
 			parsePairs(arguments);
 			if (position < numberOfTokens) {
 				if(tokens[position].getType()==PrologTokenType.R_BRACE) {
-					result= new PrologEmptySet();
+					result= PrologEmptySet.instance;
 					if (rememberTextPositions) {
 						result= new TermPosition(result,tokens[position].getPosition());
 					};
@@ -328,7 +329,7 @@ public class Parser {
 				throw new UnexpectedEndOfTokenList(tokens[numberOfTokens-1].getPosition());
 			}
 		};
-		// Term result= new PrologEmptySet();
+		// Term result= PrologEmptySet.instance;
 		for (int n=arguments.size()-1; n >= 0; n--) {
 			NamedTerm pair= arguments.get(n);
 			long currentNameCode= pair.nameCode;
@@ -395,15 +396,6 @@ public class Parser {
 								throw new NegativeNumbersAreNotAllowedHere(frontToken.getPosition());
 							} else {
 								long pairNameCode= PrologInteger.toLong(key);
-								// if (DefaultOptions.integerOverflowCheck) {
-								//	if (key.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) > 0) {
-								//		throw new IntegerValueIsTooBig();
-								//	} else {
-								//		pairNameCode= key.longValue();
-								//	}
-								// } else {
-								//	pairNameCode= key.longValue();
-								// };
 								Term pairValue= parseTerm();
 								terms.add(new NamedTerm(pairNameCode,pairValue,pairPosition));
 							}

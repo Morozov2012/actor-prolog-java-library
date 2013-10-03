@@ -12,20 +12,25 @@ package morozov.system.gui.dialogs.scalable;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.run.*;
 import morozov.system.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
+import morozov.system.gui.dialogs.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
+import javax.swing.JComboBox;
+import javax.swing.ListModel;
+import javax.swing.JTextField;
+import javax.swing.event.DocumentListener;
+import javax.swing.event.DocumentEvent;
+import javax.swing.plaf.ComponentUI;
 import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.Font;
 import java.awt.Color;
-import javax.swing.*;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.DocumentEvent;
-import javax.swing.plaf.ComponentUI;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -204,19 +209,19 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 							if (text != null) {
 								return new PrologString(text);
 							} else {
-								// return new PrologUnknownValue();
+								// return PrologUnknownValue.instance;
 								return new PrologString("");
 							}
 						} catch (NullPointerException e) {
-							// return new PrologUnknownValue();
+							// return PrologUnknownValue.instance;
 							return new PrologString("");
 						}
 					} else {
 						Object selectedValue= ((JComboBox)component).getSelectedItem();
 						// System.out.printf("selectedValue: %s\n",selectedValue);
 						if (selectedValue==null) {
-							// return new PrologEmptyList();
-							// return new PrologUnknownValue();
+							// return PrologEmptyList.instance;
+							// return PrologUnknownValue.instance;
 							return new PrologString("");
 						} else {
 							return new PrologString(selectedValue.toString());
@@ -226,33 +231,33 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 					Object selectedValue= ((JComboBox)component).getSelectedItem();
 					// System.out.printf("selectedValue: %s\n",selectedValue);
 					if (selectedValue==null) {
-						// return new PrologUnknownValue();
-						return new PrologEmptyList();
+						// return PrologUnknownValue.instance;
+						return PrologEmptyList.instance;
 					} else {
 						return new PrologString(selectedValue.toString());
 					}
 				}
 			}
 		} else {
-			// return new PrologEmptyList();
-			return new PrologUnknownValue();
+			// return PrologEmptyList.instance;
+			return PrologUnknownValue.instance;
 		}
 	}
 	public Term getRange() {
 		if (component!=null) {
 			synchronized(component) {
 				ListModel model= ((JComboBox)component).getModel();
-				Term result= new PrologEmptyList();
+				Term result= PrologEmptyList.instance;
 				for (int n=model.getSize()-1; n>=0; n--) {
 					result= new PrologList(new PrologString(model.getElementAt(n).toString()),result);
 				};
 				return result;
 			}
 		} else {
-			// return new PrologEmptyList();
-			return new PrologUnknownValue();
+			// return PrologEmptyList.instance;
+			return PrologUnknownValue.instance;
 		}
-        }
+	}
 	//
 	// Auxiliary function
 	//
@@ -271,7 +276,7 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 			comboBox.addItem(items[n]);
 		}
 	}
-	// protected Object makeObj(final String item)  {
+	// protected Object makeObj(final String item) {
 	//	return new Object() {
 	//		public String toString() { return item; }
 	//		};
@@ -280,7 +285,7 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
-			throw new RejectValue();
+			throw RejectValue.instance;
 		} else {
 			ArrayList<Term> items= DialogUtils.listToTermArray(value,iX);
 			// return Converters.arrayListToTerm(items);

@@ -5,6 +5,7 @@ package morozov.built_in;
 import target.*;
 
 import morozov.run.*;
+import morozov.run.errors.*;
 import morozov.system.*;
 import morozov.terms.*;
 
@@ -55,20 +56,22 @@ public abstract class FindAll extends Lambda {
 		Term targetWorld= getBuiltInSlot_E_world();
 		Term[] targetArguments;
 		final PrologVariable result= new PrologVariable();
-		// System.out.printf("subgoalIsCallOfFunction >>>%s<<<\n",subgoalIsCallOfFunction);
-		// System.out.printf("clauseIsFunction >>>%s<<< args.length()=%d\n",clauseIsFunction,args.length);
-		if (!subgoalIsCallOfFunction && clauseIsFunction) {
-			targetArguments= new Term[args.length+1];
-			targetArguments[0]= result;
-			for(int i= 0; i < args.length; i++) {
-				targetArguments[i+1]= args[i];
+		if (clauseIsFunction) {
+			if (subgoalIsCallOfFunction) {
+				targetArguments= new Term[args.length];
+				targetArguments[0]= result;
+				for(int i= 1; i < args.length; i++) {
+					targetArguments[i]= args[i];
+				}
+			} else {
+				targetArguments= new Term[args.length+1];
+				targetArguments[0]= result;
+				for(int i= 0; i < args.length; i++) {
+					targetArguments[i+1]= args[i];
+				}
 			}
 		} else {
-			targetArguments= new Term[args.length];
-			targetArguments[0]= result;
-			for(int i= 1; i < args.length; i++) {
-				targetArguments[i]= args[i];
-			};
+			targetArguments= args;
 		};
 		final AbstractCollection<Term> resultSet;
 		if (reduceResultList) {
@@ -81,7 +84,7 @@ public abstract class FindAll extends Lambda {
 			public void execute(ChoisePoint iX) throws Backtracking {
 				Term newResult= result.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 				resultSet.add(newResult);
-				throw new Backtracking();
+				throw Backtracking.instance;
 			}
 			public boolean isPhaseTermination() {
 				return false;
@@ -90,6 +93,9 @@ public abstract class FindAll extends Lambda {
 				return "RememberResult&Backtrack;";
 			}
 		};
+//for (int i=0; i < targetArguments.length; i++) {
+//	System.out.printf("%s) targetArguments: %s\n",i,targetArguments[i]);
+//}
 		Continuation c1= new DomainSwitch(completion,worldDomainSignatureNumber,targetWorld,FindAll.this,targetArguments);
 		ChoisePoint newIndex= new ChoisePoint(iX);
 		try {
@@ -98,7 +104,7 @@ public abstract class FindAll extends Lambda {
 		} catch (Backtracking b) {
 			newIndex.freeTrail();
 			if (subgoalIsCallOfFunction && clauseIsFunction) {
-				Term resultList= new PrologEmptyList();
+				Term resultList= PrologEmptyList.instance;
 				// ListIterator<Term> resultSetIterator= resultSet.listIterator(resultSet.size());
 				// Iterator<Term> resultSetIterator= resultSet.iterator();
 				Term[] resultArray= resultSet.toArray(new Term[0]);

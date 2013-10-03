@@ -4,6 +4,8 @@ package morozov.system.indices;
 
 import target.*;
 
+import morozov.system.indices.errors.*;
+
 import java.math.BigInteger;
 
 public class IndexRange {

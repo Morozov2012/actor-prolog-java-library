@@ -12,10 +12,12 @@ package morozov.system.gui.dialogs.scalable.common;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.run.*;
 import morozov.system.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.math.BigInteger;
 

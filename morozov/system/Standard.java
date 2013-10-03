@@ -5,8 +5,12 @@ package morozov.system;
 import target.*;
 
 import morozov.domains.*;
+import morozov.domains.errors.*;
 import morozov.run.*;
+import morozov.system.errors.*;
 import morozov.terms.*;
+import morozov.terms.errors.*;
+import morozov.terms.signals.*;
 
 import java.math.BigInteger;
 
@@ -31,7 +35,6 @@ public class Standard {
 					throw new UndefinedErrorExit(cp);
 				}
 			}
-       	
 		}
 	}
 	//
@@ -115,12 +118,12 @@ public class Standard {
 			String entry= domain.getStringValue(cp);
 			value= value.dereferenceValue(cp);
 			if (value.thisIsFreeVariable()) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} else {
 				PrologDomain domainItem= DomainTable.getDomainAlternatives(entry);
 				// System.out.printf("Standard:domainItem: %s %s\n",value,value.getClass());
 				if (!domainItem.coversTerm(value,cp,false)) {
-					throw new Backtracking();
+					throw Backtracking.instance;
 				}
 			}
 		} catch (TermIsNotAString e) {

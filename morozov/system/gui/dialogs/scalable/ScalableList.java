@@ -12,9 +12,11 @@ package morozov.system.gui.dialogs.scalable;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.run.*;
 import morozov.system.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
+import morozov.system.gui.dialogs.signals.*;
 import morozov.terms.*;
 
 import java.awt.Font;
@@ -79,22 +81,22 @@ public class ScalableList extends ActiveComponent {
 		if (component!=null) {
 			return ((AList)component).getValue();
 		} else {
-			return new PrologUnknownValue();
+			return PrologUnknownValue.instance;
 		}
 	}
 	public Term getRange() {
 		if (component!=null) {
 			return ((AList)component).getRange();
 		} else {
-			// return new PrologEmptyList();
-			return new PrologUnknownValue();
+			// return PrologEmptyList.instance;
+			return PrologUnknownValue.instance;
 		}
 	}
 	//
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
-			throw new RejectValue();
+			throw RejectValue.instance;
 		} else {
 			ArrayList<Term> items= DialogUtils.listToTermArray(value,iX);
 			if (enableMultiselection) {
@@ -103,7 +105,7 @@ public class ScalableList extends ActiveComponent {
 				if (items.size() >= 1) {
 					return items.get(items.size()-1);
 				} else {
-					return new PrologEmptyList();
+					return PrologEmptyList.instance;
 				}
 			}
 		}

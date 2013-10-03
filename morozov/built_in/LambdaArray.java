@@ -3,9 +3,13 @@
 package morozov.built_in;
 
 import morozov.run.*;
+import morozov.run.errors.*;
 import morozov.system.*;
+import morozov.system.errors.*;
 import morozov.system.indices.*;
+import morozov.system.indices.errors.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -59,13 +63,6 @@ public abstract class LambdaArray extends Lambda {
 		};
 		// ChoisePoint newIx= new ChoisePoint(iX);
 		ArrayIndices arrayIndices= new ArrayIndices(currentIndexValue);
-		// SlotVariable value= volume.get(arrayIndices);
-		// if (value==null) {
-		//	SlotVariable newSlot= new SlotVariable();
-		//	value= newSlot;
-		//	volume.put(arrayIndices,value);
-		//	iX.pushTrail(new HashMapState(volume,arrayIndices,newSlot));
-		// };
 		try {
 			Term value= accessArrayElement(arrayIndices,iX);
 			result.value= value;
@@ -249,7 +246,7 @@ public abstract class LambdaArray extends Lambda {
 					throw new IllegalNumberOfIndices(givenIndices.length,indexRanges.length);
 				} else {
 					// return;
-					throw new Backtracking();
+					throw Backtracking.instance;
 				}
 			};
 			boolean[] instantiateIndex= new boolean[givenIndices.length];
@@ -276,7 +273,7 @@ public abstract class LambdaArray extends Lambda {
 							if (indexRanges[n].includesValue(indexValue)) {
 								currentIndexValue[n]= indexValue;
 							} else {
-								throw new Backtracking();
+								throw Backtracking.instance;
 							}
 						}
 					}
@@ -285,7 +282,7 @@ public abstract class LambdaArray extends Lambda {
 				if (checkIndicesRange) {
 					throw new WrongArgumentIsNotAnInteger(index);
 				} else {
-					throw new Backtracking();
+					throw Backtracking.instance;
 				}
 			};
 			ChoisePoint newIx= new ChoisePoint(iX);
@@ -294,13 +291,6 @@ public abstract class LambdaArray extends Lambda {
 // ::: No indices are to be instantiated                            :::
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ArrayIndices arrayIndices= new ArrayIndices(currentIndexValue);
-// Term value= volume.get(arrayIndices);
-// if (value==null) {
-//	SlotVariable newSlot= new SlotVariable();
-//	value= newSlot;
-//	volume.put(arrayIndices,value);
-//	newIx.pushTrail(new HashMapState(volume,arrayIndices,newSlot));
-// };
 Term value= accessArrayElement(arrayIndices,newIx);
 if (isFunctionCall) {
 	result.value= value;
@@ -396,17 +386,8 @@ if (!skipPass) {
 			givenIndices[n].isInteger(currentIndexValue[n],newIx);
 		}
 	};
-	// System.out.printf("shellCoveringLoop: radius=%s\n",radius);
 	ArrayIndices arrayIndices= new ArrayIndices(currentIndexValue);
-	// Term value= volume.get(arrayIndices);
-	// if (value==null) {
-	//	SlotVariable newSlot= new SlotVariable();
-	//	value= newSlot;
-	//	volume.put(arrayIndices,value);
-	//	newIx.pushTrail(new HashMapState(volume,arrayIndices,newSlot));
-	// };
 	Term value= accessArrayElement(arrayIndices,newIx);
-	// System.out.printf("arrayIndices=%s ->  value=%s\n",arrayIndices,value);
 	if (isFunctionCall) {
 		result.value= value;
 	};
@@ -458,17 +439,17 @@ if (processBacktracking || skipPass) {
 // --------------------------------------------------------------------
 		continue;
 	} else {
-		throw new Backtracking();
+		throw Backtracking.instance;
 	}
 }
 // return;
-// throw new Backtracking();
+// throw Backtracking.instance;
 // ====================================================================
 			}
 		}
 	}
 };
-throw new Backtracking();
+throw Backtracking.instance;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 			}
 		}

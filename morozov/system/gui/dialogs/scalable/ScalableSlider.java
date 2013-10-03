@@ -12,10 +12,13 @@ package morozov.system.gui.dialogs.scalable;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.run.*;
 import morozov.system.gui.dialogs.*;
+import morozov.system.gui.dialogs.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
-import javax.swing.*;
+import javax.swing.JSlider;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.font.FontRenderContext;
@@ -96,18 +99,18 @@ public class ScalableSlider extends ActiveComponent {
 			// int position= maximum + minimum - ((JSlider)component).getValue();
 			// return new PrologInteger(position);
 		} else {
-			return new PrologUnknownValue();
+			return PrologUnknownValue.instance;
 		}
 	}
 	public Term getRange() {
 		if (component!=null) {
-			Term result= new PrologEmptyList();
+			Term result= PrologEmptyList.instance;
 			result= new PrologList(new PrologInteger(((JSlider)component).getMaximum()),result);
 			result= new PrologList(new PrologInteger(((JSlider)component).getMinimum()),result);
 			return result;
 		} else {
-			// return new PrologEmptyList();
-			return new PrologUnknownValue();
+			// return PrologEmptyList.instance;
+			return PrologUnknownValue.instance;
 		}
 	}
 	//
@@ -130,7 +133,7 @@ public class ScalableSlider extends ActiveComponent {
 				try {
 					minimum= number1.getSmallIntegerValue(iX);
 				} catch (TermIsNotAnInteger e2) {
-					// throw new Backtracking();
+					// throw Backtracking.instance;
 					// throw new TermIsNotSliderRange();
 					return;
 				}
@@ -141,7 +144,7 @@ public class ScalableSlider extends ActiveComponent {
 				try {
 					maximum= number2.getSmallIntegerValue(iX);
 				} catch (TermIsNotAnInteger e2) {
-					// throw new Backtracking();
+					// throw Backtracking.instance;
 					// throw new TermIsNotSliderRange();
 					return;
 				}
@@ -162,48 +165,48 @@ public class ScalableSlider extends ActiveComponent {
 		try {
 			value= value.dereferenceValue(iX);
 			if (value.thisIsFreeVariable()) {
-				throw new RejectRange();
+				throw RejectRange.instance;
 			};
 			Term number1= value.getNextListHead(iX);
 			number1= number1.dereferenceValue(iX);
 			if (number1.thisIsFreeVariable()) {
-				throw new RejectRange();
+				throw RejectRange.instance;
 			};
 			Term rest1= value.getNextListTail(iX);
 			rest1= rest1.dereferenceValue(iX);
 			if (rest1.thisIsFreeVariable()) {
-				throw new RejectRange();
+				throw RejectRange.instance;
 			};
 			Term number2= rest1.getNextListHead(iX);
 			number2= number2.dereferenceValue(iX);
 			if (number2.thisIsFreeVariable()) {
-				throw new RejectRange();
+				throw RejectRange.instance;
 			};
 			Term rest2= rest1.getNextListTail(iX);
 			rest2= rest2.dereferenceValue(iX);
 			if (rest2.thisIsFreeVariable()) {
-				throw new RejectRange();
+				throw RejectRange.instance;
 			} else if (!rest2.thisIsEmptyList()) {
 				// throw new TermIsNotSliderRange();
-				// return new PrologUnknownValue();
-				throw new RejectRange();
+				// return PrologUnknownValue.instance;
+				throw RejectRange.instance;
 			};
 			int minimum= DialogUtils.termToSmallInteger(number1,iX);
 			int maximum= DialogUtils.termToSmallInteger(number2,iX);
-			Term result= new PrologEmptyList();
+			Term result= PrologEmptyList.instance;
 			result= new PrologList(new PrologInteger(maximum),result);
 			result= new PrologList(new PrologInteger(minimum),result);
 			return result;
 		} catch (TermIsNotAList e1) {
 			// throw new TermIsNotSliderRange();
-			// return new PrologUnknownValue();
-			throw new RejectRange();
+			// return PrologUnknownValue.instance;
+			throw RejectRange.instance;
 		} catch (EndOfList e1) {
 			// throw new TermIsNotSliderRange();
-			// return new PrologUnknownValue();
-			throw new RejectRange();
+			// return PrologUnknownValue.instance;
+			throw RejectRange.instance;
 		} catch (RejectValue e1) {
-			throw new RejectRange();
+			throw RejectRange.instance;
 		}
 	}
 }

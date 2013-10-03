@@ -6,7 +6,10 @@ import target.*;
 
 import morozov.classes.*;
 import morozov.domains.*;
+import morozov.domains.signals.*;
 import morozov.run.*;
+import morozov.run.errors.*;
+import morozov.terms.signals.*;
 
 import java.nio.charset.CharsetEncoder;
 import java.util.HashMap;
@@ -83,14 +86,14 @@ public class PrologSet extends UnderdeterminedSetItem {
 			}
 		};
 		if (isUnexpectedElement) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		} else {
 			tail.hasNoMoreElements(aNames,cp);
 		}
 	}
 	public void prohibitNamedElement(long aName, ChoisePoint cp) throws Backtracking {
 		if (name == aName) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		} else {
 			tail.prohibitNamedElement(aName,cp);
 		}
@@ -98,7 +101,7 @@ public class PrologSet extends UnderdeterminedSetItem {
 	public void verifySet(long[] aNames, ChoisePoint cp) throws Backtracking {
 		for (int i= 0; i < aNames.length; i++) {
 			if (aNames[i] == name) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			}
 		};
 		tail.verifySet(aNames,cp);
@@ -156,7 +159,7 @@ public class PrologSet extends UnderdeterminedSetItem {
 	}
 	public void unifyWithProhibitedElement(long aName, Term aTail, Term aSet, ChoisePoint cp) throws Backtracking {
 		if (name == aName) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		} else {
 			HashMap<Long,Term> leftSetPositiveMap= new HashMap<Long,Term>();
 			HashSet<Long> leftSetNegativeMap= new HashSet<Long>();
@@ -197,6 +200,12 @@ public class PrologSet extends UnderdeterminedSetItem {
 			name,
 			value.copyValue(cp,mode),
 			tail.copyValue(cp,mode));
+	}
+	public PrologSet copyGroundValue(ChoisePoint cp) throws TermIsUnboundVariable {
+		return new PrologSet(
+			name,
+			value.copyGroundValue(cp),
+			tail.copyGroundValue(cp));
 	}
 	public PrologSet substituteWorlds(HashMap<AbstractWorld,Term> map, ChoisePoint cp) {
 		return new PrologSet(

@@ -6,14 +6,17 @@
 
 package morozov.system.gui.dialogs.scalable;
 
+import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
 import morozov.terms.*;
 
 import java.awt.Font;
 import java.awt.Color;
-import javax.swing.*;
-import javax.swing.plaf.basic.*;
+import javax.swing.Icon;
+import javax.swing.JRadioButton;
+import javax.swing.Action;
+import javax.swing.plaf.basic.BasicRadioButtonUI;
 
 public class ScalableRadioButton extends ScalableAbstractButton {
 	//
@@ -94,6 +97,6 @@ public class ScalableRadioButton extends ScalableAbstractButton {
 	public void putValue(Term value, ChoisePoint iX) {
 	}
 	public Term getValue() {
-		return new PrologUnknownValue();
+		return PrologUnknownValue.instance;
 	}
 }

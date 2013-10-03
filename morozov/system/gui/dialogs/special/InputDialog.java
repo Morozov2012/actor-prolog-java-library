@@ -7,15 +7,19 @@
 package morozov.system.gui.dialogs.special;
 
 import morozov.system.*;
-import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.math.BigInteger;
 
 import javax.swing.JOptionPane;
 import javax.swing.JDialog;
 import javax.swing.JTextField;
-import java.beans.*;
-import java.awt.event.*;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.awt.event.ComponentEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.WindowAdapter;
 
 public class InputDialog extends JDialog implements PropertyChangeListener {
 	//
@@ -79,9 +83,9 @@ public class InputDialog extends JDialog implements PropertyChangeListener {
 							double result= Converters.stringToReal(typedText);
 							// System.out.printf(">>>result=%f<<<",result);
 							if (Double.isNaN(result)) {
-								throw new TermIsNotAReal();
+								throw TermIsNotAReal.instance;
 							} else if (Double.isInfinite(result)) {
-								throw new TermIsNotAReal();
+								throw TermIsNotAReal.instance;
 							}
 						};
 						clearAndHide();

@@ -1,8 +1,13 @@
 // (c) 2010 IRE RAS Alexei A. Morozov
-package morozov.domains;
 
+package morozov.domains;
+
+import morozov.domains.signals.*;
+import morozov.run.*;
 import morozov.terms.*;
-public class DomainEmptySet extends DomainAlternative {
+import morozov.terms.signals.*;
+
+public class DomainEmptySet extends DomainAlternative {
 	public DomainEmptySet() {
 	}
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
@@ -38,24 +43,24 @@ import morozov.terms.*;
 	}
 	public Term checkAndOptimizeTerm(Term t, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
 		if (coversTerm(t,cp,baseDomain,false)) {
-			return new PrologEmptySet();
+			return PrologEmptySet.instance;
 		} else {
 			throw new DomainAlternativeDoesNotCoverTerm(t.getPosition());
 		}
 	}
 	public Term checkTerm(Term t, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
 		if (coversTerm(t,cp,baseDomain,false)) {
-			return new PrologEmptySet();
+			return PrologEmptySet.instance;
 		} else {
 			throw new DomainAlternativeDoesNotCoverTerm(t.getPosition());
 		}
 	}
 	public Term checkOptimizedSet(long[] keys, Term[] elements, Term tail, Term initialValue, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
 		if (keys.length == 0) {
-			return new PrologEmptySet();
+			return PrologEmptySet.instance;
 		} else {
 			if (coversTerm(initialValue,cp,baseDomain,false)) {
-				return new PrologEmptySet();
+				return PrologEmptySet.instance;
 			} else {
 				throw new DomainAlternativeDoesNotCoverTerm(initialValue.getPosition());
 			}

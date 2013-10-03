@@ -3,6 +3,7 @@
 package morozov.built_in;
 
 import morozov.classes.*;
+import morozov.run.*;
 import morozov.system.indices.*;
 import morozov.terms.*;
 
@@ -76,7 +77,8 @@ public abstract class DynamicWorlds extends LambdaArray {
 		while(allWorldsIterator.hasNext()) {
 			AbstractWorld world= allWorldsIterator.next();
 			world.closeFiles();
-		}
+		};
+		super.closeFiles();
 	}
 	public void stopProcesses() {
 		Collection<AbstractWorld> allWorlds= createdWorlds.values();

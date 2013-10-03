@@ -2,9 +2,11 @@
 
 package morozov.classes;
 
+import morozov.classes.errors.*;
+import morozov.run.*;
 import morozov.terms.*;
 
-import java.util.*;
+import java.util.ArrayList;
 
 public class SuspendedCallTableState extends Term {
 	private ArrayList<SuspendedCall> table;

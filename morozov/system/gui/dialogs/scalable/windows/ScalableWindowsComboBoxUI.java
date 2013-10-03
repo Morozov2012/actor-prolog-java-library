@@ -8,11 +8,19 @@ package morozov.system.gui.dialogs.scalable.windows;
 
 import morozov.system.gui.dialogs.scalable.common.*;
 
-import javax.swing.*;
-import javax.swing.plaf.basic.*;
+import javax.swing.UIManager;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.ListCellRenderer;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.plaf.basic.BasicComboBoxUI;
+import javax.swing.plaf.basic.BasicArrowButton;
 import javax.swing.plaf.ComponentUI;
 
-import java.awt.*;
+import java.awt.Insets;
+import java.awt.Dimension;
+import java.awt.Component;
+import java.awt.Color;
 
 /*
  * ScalableWindowsComboBoxUI implementation for the Actor Prolog language

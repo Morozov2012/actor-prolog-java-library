@@ -4,11 +4,17 @@ package morozov.system.gui;
 
 import target.*;
 
+import morozov.run.*;
 import morozov.system.*;
+import morozov.system.gui.errors.*;
+import morozov.system.gui.signals.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import javax.swing.UIManager;
-import java.awt.*;
+import java.awt.Font;
+import java.awt.Color;
 import java.math.BigInteger;
 
 public class GUI_Utils {
@@ -119,7 +125,7 @@ public class GUI_Utils {
 	public static Color termToColorSafe(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
-			throw new TermIsSymbolDefault();
+			throw TermIsSymbolDefault.instance;
 		} else {
 			return termToColor(value,iX);
 		}
@@ -143,7 +149,24 @@ public class GUI_Utils {
 						String colorName= value.getStringValue(iX);
 						return stringToColor(colorName);
 					} catch (TermIsNotAString e4) {
-						throw new WrongTermIsNotAColor(value);
+						try { // color3
+							Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_color3,3,iX);
+							float r= (float)Converters.argumentToReal(arguments[0],iX);
+							float g= (float)Converters.argumentToReal(arguments[1],iX);
+							float b= (float)Converters.argumentToReal(arguments[2],iX);
+							return new Color(r,g,b);
+						} catch (Backtracking b1) {
+							try { // color4
+								Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_color4,4,iX);
+								float r= (float)Converters.argumentToReal(arguments[0],iX);
+								float g= (float)Converters.argumentToReal(arguments[1],iX);
+								float b= (float)Converters.argumentToReal(arguments[2],iX);
+								float a= (float)Converters.argumentToReal(arguments[3],iX);
+								return new Color(r,g,b,a);
+							} catch (Backtracking b2) {
+								throw new WrongTermIsNotAColor(value);
+							}
+						}
 					}
 				}
 			}
@@ -151,7 +174,7 @@ public class GUI_Utils {
 	}
 	public static Color symbolCodeToColor(long code) throws TermIsSymbolDefault, IsNotColorSymbolCode {
 		if (code==SymbolCodes.symbolCode_E_default) {
-			throw new TermIsSymbolDefault();
+			throw TermIsSymbolDefault.instance;
 		} else if (code==SymbolCodes.symbolCode_E_Red) {
 			return colorRed;
 		} else if (code==SymbolCodes.symbolCode_E_Green) {
@@ -223,7 +246,7 @@ public class GUI_Utils {
 		} else if (code==SymbolCodes.symbolCode_E_SkyBlue) {
 			return colorSkyBlue;
 		} else {
-			throw new IsNotColorSymbolCode();
+			throw IsNotColorSymbolCode.instance;
 		}
 	}
 	//
@@ -245,7 +268,7 @@ public class GUI_Utils {
 	public static long nameToColorSymbolCode(String colorName) throws TermIsSymbolDefault, IsNotColorName {
 		colorName= colorName.toUpperCase();
 		if (colorName.equals("DEFAULT")) {
-			throw new TermIsSymbolDefault();
+			throw TermIsSymbolDefault.instance;
 		} else if (colorName.equals("RED")) {
 			return SymbolCodes.symbolCode_E_Red;
 		} else if (colorName.equals("GREEN")) {
@@ -315,14 +338,14 @@ public class GUI_Utils {
 		} else if (colorName.equals("SKYBLUE")) {
 			return SymbolCodes.symbolCode_E_SkyBlue;
 		} else {
-			throw new IsNotColorName();
+			throw IsNotColorName.instance;
 		}
 	}
 	//
 	public static String termToFontNameSafe(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
-			throw new TermIsSymbolDefault();
+			throw TermIsSymbolDefault.instance;
 		} else {
 			return termToFontName(value,iX);
 		}
@@ -345,7 +368,7 @@ public class GUI_Utils {
 	}
 	public static String symbolCodeToFontName(long code) throws TermIsSymbolDefault, IsNotFontNameSymbolCode {
 		if (code==SymbolCodes.symbolCode_E_default) {
-			throw new TermIsSymbolDefault();
+			throw TermIsSymbolDefault.instance;
 		} else if (code==SymbolCodes.symbolCode_E_system) {
 			return Font.DIALOG;
 		} else if (code==SymbolCodes.symbolCode_E_fixed) {
@@ -355,14 +378,14 @@ public class GUI_Utils {
 		} else if (code==SymbolCodes.symbolCode_E_helvetica) {
 			return Font.SANS_SERIF;
 		} else {
-			throw new IsNotFontNameSymbolCode();
+			throw IsNotFontNameSymbolCode.instance;
 		}
 	}
 	//
 	public static int termToFontSizeSafe(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
-			throw new TermIsSymbolDefault();
+			throw TermIsSymbolDefault.instance;
 		} else {
 			return termToFontSize(value,iX);
 		}
@@ -377,7 +400,7 @@ public class GUI_Utils {
 				try {
 					long code= value.getSymbolValue(iX);
 					if (code==SymbolCodes.symbolCode_E_default) {
-						throw new TermIsSymbolDefault();
+						throw TermIsSymbolDefault.instance;
 					} else {
 						throw new WrongTermIsNotFontSize(value);
 					}
@@ -391,7 +414,7 @@ public class GUI_Utils {
 	public static int termToFontStyleSafe(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
-			throw new TermIsSymbolDefault();
+			throw TermIsSymbolDefault.instance;
 		} else {
 			try {
 				return termToFontStyle(value,iX);
@@ -404,7 +427,7 @@ public class GUI_Utils {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_default) {
-				throw new TermIsSymbolDefault();
+				throw TermIsSymbolDefault.instance;
 			} else if (code==SymbolCodes.symbolCode_E_bold) {
 				return Font.BOLD;
 			} else if (code==SymbolCodes.symbolCode_E_italic) {
@@ -412,7 +435,7 @@ public class GUI_Utils {
 			} else if (code==SymbolCodes.symbolCode_E_underlined) {
 				return Font.PLAIN;
 			} else {
-				throw new IsNotFontStyle();
+				throw IsNotFontStyle.instance;
 			}
 		} catch (TermIsNotASymbol e1) {
 			try {
@@ -425,14 +448,14 @@ public class GUI_Utils {
 						numberOfItems= numberOfItems + 1;
 						long code= head.getSymbolValue(iX);
 						if (code==SymbolCodes.symbolCode_E_default) {
-							throw new TermIsSymbolDefault();
+							throw TermIsSymbolDefault.instance;
 						} else if (code==SymbolCodes.symbolCode_E_bold) {
 							isBold= true;
 						} else if (code==SymbolCodes.symbolCode_E_italic) {
 							isItalic= true;
 						} else if (code==SymbolCodes.symbolCode_E_underlined) {
 						} else {
-							throw new IsNotFontStyle();
+							throw IsNotFontStyle.instance;
 						};
 						value= value.getNextListTail(iX);
 					}
@@ -450,9 +473,9 @@ public class GUI_Utils {
 					return Font.PLAIN;
 				}
 			} catch (TermIsNotAList e3) {
-				throw new IsNotFontStyle();
+				throw IsNotFontStyle.instance;
 			} catch (TermIsNotASymbol e4) {
-				throw new IsNotFontStyle();
+				throw IsNotFontStyle.instance;
 			}
 		}
 	}
@@ -461,7 +484,7 @@ public class GUI_Utils {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_default) {
-				throw new TermIsSymbolDefault();
+				throw TermIsSymbolDefault.instance;
 			} else if (code==SymbolCodes.symbolCode_E_bold) {
 			} else if (code==SymbolCodes.symbolCode_E_italic) {
 			} else if (code==SymbolCodes.symbolCode_E_underlined) {
@@ -477,7 +500,7 @@ public class GUI_Utils {
 						try {
 							long code= head.getSymbolValue(iX);
 							if (code==SymbolCodes.symbolCode_E_default) {
-								throw new TermIsSymbolDefault();
+								throw TermIsSymbolDefault.instance;
 							} else if (code==SymbolCodes.symbolCode_E_bold) {
 							} else if (code==SymbolCodes.symbolCode_E_italic) {
 							} else if (code==SymbolCodes.symbolCode_E_underlined) {
@@ -508,7 +531,7 @@ public class GUI_Utils {
 		} else if (!isBold && !isItalic && isUnderlined) {
 			return new PrologSymbol(SymbolCodes.symbolCode_E_underlined);
 		} else {
-			Term result= new PrologEmptyList();
+			Term result= PrologEmptyList.instance;
 			if (isUnderlined) {
 				result= new PrologList(new PrologSymbol(SymbolCodes.symbolCode_E_underlined),result);
 			};
@@ -585,6 +608,34 @@ public class GUI_Utils {
 				}
 			}
 		}
-
+	}
+	//
+	public static String termToFrameTitleSafe(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
+		value= value.dereferenceValue(iX);
+		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
+			throw TermIsSymbolDefault.instance;
+		} else {
+			try {
+				return termToFrameTitle(value,iX);
+			} catch (RuntimeException e) {
+				throw TermIsSymbolDefault.instance;
+			}
+		}
+	}
+	public static String termToFrameTitle(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
+		try {
+			long code= value.getSymbolValue(iX);
+			if (code==SymbolCodes.symbolCode_E_default) {
+				throw TermIsSymbolDefault.instance;
+			} else {
+				throw new WrongTermIsNotFrameTitle(value);
+			}
+		} catch (TermIsNotASymbol e1) {
+			try {
+				return value.getStringValue(iX);
+			} catch (TermIsNotAString e2) {
+				throw new WrongTermIsNotFrameTitle(value);
+			}
+		}
 	}
 }

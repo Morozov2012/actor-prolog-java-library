@@ -190,6 +190,7 @@ public class URL_Attributes {
 			String.format("%d",maxWaitingInterval) + ";" +
 			String.format("%s",isDirectory) + ";" +
 			String.format("%d",lastModificationTime) + ";" +
-			String.format("%d",size) + ";";
+			String.format("%d",size) + ";" +
+			String.format("%s",exception) + ";";
 	}
 }

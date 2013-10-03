@@ -200,23 +200,33 @@ public class FontDialog extends JDialog {
 		if (m_attributes == null) {
 			return null;
 		};
-		StyleConstants.setFontFamily(m_attributes,
+		StyleConstants.setFontFamily(
+			m_attributes,
 			m_lstFontName.getSelected());
-		StyleConstants.setFontSize(m_attributes,
+		StyleConstants.setFontSize(
+			m_attributes,
 			m_lstFontSize.getSelectedInt());
-		StyleConstants.setBold(m_attributes,
+		StyleConstants.setBold(
+			m_attributes,
 			m_chkBold.isSelected());
-		StyleConstants.setItalic(m_attributes,
+		StyleConstants.setItalic(
+			m_attributes,
 			m_chkItalic.isSelected());
-		StyleConstants.setUnderline(m_attributes,
+		StyleConstants.setUnderline(
+			m_attributes,
 			m_chkUnderline.isSelected());
-		// StyleConstants.setStrikeThrough(m_attributes,
+		// StyleConstants.setStrikeThrough(
+		//	m_attributes,
 		//	m_chkStrikethrough.isSelected());
-		// StyleConstants.setSubscript(m_attributes,
+		// StyleConstants.setSubscript(
+		//	m_attributes,
 		//	m_chkSubscript.isSelected());
-		// StyleConstants.setSuperscript(m_attributes,
+		// StyleConstants.setSuperscript(
+		//	m_attributes,
 		//	m_chkSuperscript.isSelected());
-		// StyleConstants.setForeground(m_attributes,(Color)m_cbColor.getSelectedItem());
+		// StyleConstants.setForeground(
+		//	m_attributes,
+		//	(Color)m_cbColor.getSelectedItem());
 		return m_attributes;
 	}
 	public int getOption() { return m_option; }

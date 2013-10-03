@@ -8,12 +8,18 @@ package morozov.system.gui.dialogs.scalable.metal;
 
 import morozov.system.gui.dialogs.scalable.common.*;
 
-import javax.swing.*;
-import javax.swing.plaf.metal.*;
-import java.awt.*;
+import javax.swing.ButtonModel;
+import javax.swing.JRadioButton;
+import javax.swing.JToggleButton;
+import javax.swing.plaf.metal.MetalLookAndFeel;
+import java.awt.Graphics2D;
+import java.awt.Shape;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Area;
+import java.awt.RenderingHints;
 
 /*
  * ScalableMetalRadioButtonIcon implementation for the Actor Prolog language
@@ -34,8 +40,8 @@ public class ScalableMetalRadioButtonIcon extends ScalableMetalToggleButtonIcon 
 		return "RadioButton.gradient";
 	}
 	//
-	public void paintOceanEye(Component c, Graphics g0, int x, int y, int controlSize) {
-		Graphics2D g2= (Graphics2D)g0;
+	public void paintOceanEye(Component c, Graphics2D g2, int x, int y, int controlSize) {
+		// Graphics2D g2= (Graphics2D)g0;
 		ButtonModel model= ((JRadioButton)c).getModel();
 		boolean enabled= model.isEnabled();
 		boolean pressed= (enabled && model.isPressed() && model.isArmed());
@@ -87,8 +93,8 @@ public class ScalableMetalRadioButtonIcon extends ScalableMetalToggleButtonIcon 
 		g2.translate(-x,-y);
 	}
 	//
-	public void paintOrdinaryEye(Component c, Graphics g0, int x, int y, int controlSize) {
-		Graphics2D g2= (Graphics2D)g0;
+	public void paintOrdinaryEye(Component c, Graphics2D g2, int x, int y, int controlSize) {
+		// Graphics2D g2= (Graphics2D)g0;
 		JRadioButton rb= (JRadioButton)c;
 		ButtonModel model= rb.getModel();
 		boolean drawDot= model.isSelected();
@@ -102,10 +108,10 @@ public class ScalableMetalRadioButtonIcon extends ScalableMetalToggleButtonIcon 
 		Color interiorColor= background;
 		// Set up colors per RadioButtonModel condition
 		if (!model.isEnabled()) {
-			 whiteInnerLeftArc= whiteOuterRightArc= background;
+			whiteInnerLeftArc= whiteOuterRightArc= background;
 			darkCircle= shadow;
 		} else if (model.isPressed() && model.isArmed() ) {
-			 whiteInnerLeftArc= interiorColor= shadow;
+			whiteInnerLeftArc= interiorColor= shadow;
 			interiorColor= shadow;
 		};
 		g2.translate(x,y);
@@ -174,60 +180,64 @@ public class ScalableMetalRadioButtonIcon extends ScalableMetalToggleButtonIcon 
 		g2.translate(-x,-y);
 	}
 	//
-	protected void drawEye(JToggleButton tb, Graphics g, int x, int y, int controlSize) {
+	protected void drawEye(JToggleButton tb, Graphics2D g2, int x, int y, int controlSize) {
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+		// g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		if (MetalUtils.usingOcean()) {
-			paintOceanEye(tb,g,x,y,controlSize);
+			paintOceanEye(tb,g2,x,y,controlSize);
 		} else {
-			paintOrdinaryEye(tb,g,x,y,controlSize);
+			paintOrdinaryEye(tb,g2,x,y,controlSize);
 
 		};
 	}
 	//
-	protected void drawMarker(JToggleButton tb, Graphics g, int x, int y, int controlSize) {
+	protected void drawMarker(JToggleButton tb, Graphics2D g2, int x, int y, int controlSize) {
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+		// g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		ButtonModel model1= tb.getModel();
 		if (model1 instanceof ScalableToggleButtonModel) {
 			ScalableToggleButtonModel model2= (ScalableToggleButtonModel)model1;
 			if(model2.isUncertain()) {
 				if (model2.isEnabled()) {
-					drawUncertainMarker(tb,g,x,y,controlSize,failureBackgroundColor);
+					drawUncertainMarker(tb,g2,x,y,controlSize,failureBackgroundColor);
 				} else {
-					drawUncertainMarker(tb,g,x,y,controlSize,MetalLookAndFeel.getControlDarkShadow());
+					drawUncertainMarker(tb,g2,x,y,controlSize,MetalLookAndFeel.getControlDarkShadow());
 				}
 			} else if(model2.isSelected()) {
 				if (model2.isEnabled()) {
-					drawCheck(tb,g,x,y,controlSize,MetalLookAndFeel.getControlInfo());
+					drawCheck(tb,g2,x,y,controlSize,MetalLookAndFeel.getControlInfo());
 				} else {
-					drawCheck(tb,g,x,y,controlSize,MetalLookAndFeel.getControlDarkShadow());
+					drawCheck(tb,g2,x,y,controlSize,MetalLookAndFeel.getControlDarkShadow());
 				}
 			}
 		} else {
 			if(model1.isSelected()) {
 				if (model1.isEnabled()) {
-					drawCheck(tb,g,x,y,controlSize,MetalLookAndFeel.getControlInfo());
+					drawCheck(tb,g2,x,y,controlSize,MetalLookAndFeel.getControlInfo());
 				} else {
-					drawCheck(tb,g,x,y,controlSize,MetalLookAndFeel.getControlDarkShadow());
+					drawCheck(tb,g2,x,y,controlSize,MetalLookAndFeel.getControlDarkShadow());
 				}
 			}
 		}
 	}
 	//
-	protected void drawCheck(Component relatedComponent, Graphics g, int x, int y, int controlSize, Color markerColor) {
-		drawColoredMarker(relatedComponent,g,x,y,controlSize,markerColor);
+	protected void drawCheck(Component relatedComponent, Graphics2D g2, int x, int y, int controlSize, Color markerColor) {
+		drawColoredMarker(relatedComponent,g2,x,y,controlSize,markerColor);
 	}
 	//
-	protected void drawUncertainMarker(Component relatedComponent, Graphics g, int x, int y, int controlSize, Color markerColor) {
-		drawColoredMarker(relatedComponent,g,x,y,controlSize,markerColor);
+	protected void drawUncertainMarker(Component relatedComponent, Graphics2D g2, int x, int y, int controlSize, Color markerColor) {
+		drawColoredMarker(relatedComponent,g2,x,y,controlSize,markerColor);
 	}
 	//
-	protected void drawColoredMarker(Component relatedComponent, Graphics g, int x, int y, int controlSize, Color markerColor) {
-		// float diameter=  ((controlSize - 4) * 0.41);
-		// float diameter=  ((controlSize - 4) * 0.5);
+	protected void drawColoredMarker(Component relatedComponent, Graphics2D g2, int x, int y, int controlSize, Color markerColor) {
+		// float diameter= ((controlSize - 4) * 0.41);
+		// float diameter= ((controlSize - 4) * 0.5);
 		double diameter= controlSize * 0.55;
 		double deltaW= (controlSize - diameter)/2;
 		double doubleDeltaW= deltaW * 2;
 		double deltaH= (controlSize - diameter)/2;
 		double doubleDeltaH= deltaH * 2;
-		Graphics2D g2= (Graphics2D)g;
+		// Graphics2D g2= (Graphics2D)g;
 		g2.setPaint(markerColor);
 		g2.fill(new Ellipse2D.Double(x+deltaW,y+deltaH,controlSize-doubleDeltaW-1,controlSize-doubleDeltaH-1));
 		g2.draw(new Ellipse2D.Double(x+deltaW,y+deltaH,controlSize-doubleDeltaW-1,controlSize-doubleDeltaH-1));

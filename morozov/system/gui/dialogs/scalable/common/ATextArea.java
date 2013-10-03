@@ -12,12 +12,13 @@ package morozov.system.gui.dialogs.scalable.common;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.*;
 import morozov.terms.*;
 
-import javax.swing.*;
-import javax.swing.text.*;
+import javax.swing.JTextArea;
+import javax.swing.text.Document;
 
 public class ATextArea
 	extends JTextArea
@@ -50,9 +51,13 @@ public class ATextArea
 		// By default, just beep
 		// Toolkit.getDefaultToolkit().beep();
 		// outerBorder.setActiveFieldValueIsValid(true);
-		repaint();
+		// repaint(); // Возможно, это причина глюков.
 		if (targetDialog!=null) {
 			targetDialog.reportValueUpdate(targetComponent);
+			targetDialog.invalidate();
+			// targetDialog.repaint(); // Возможно, это причина глюков.
+			// Попытка бороться с глюками SWING:
+			// targetDialog.repaintAfterDelay();
 		}
 	}
 	public void reportFailure() {

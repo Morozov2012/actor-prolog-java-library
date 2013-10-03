@@ -12,9 +12,15 @@ package morozov.system.gui.dialogs.scalable.common;
  * @author IRE RAS Alexei A. Morozov
 */
 
-import javax.swing.border.*;
-import java.awt.*;
+import java.awt.BasicStroke;
+import java.awt.Stroke;
+import java.awt.Graphics2D;
+import java.awt.Graphics;
+import java.awt.Component;
+import java.awt.Color;
+import java.awt.Insets;
 import java.awt.geom.Rectangle2D;
+import javax.swing.border.EmptyBorder;
 
 public class ActiveFieldErrorBorder extends EmptyBorder {
 	//

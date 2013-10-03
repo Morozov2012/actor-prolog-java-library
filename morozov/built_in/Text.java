@@ -5,9 +5,12 @@ package morozov.built_in;
 import target.*;
 
 import morozov.run.*;
+import morozov.run.errors.*;
 import morozov.syntax.scanner.*;
 import morozov.system.*;
+import morozov.system.errors.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -183,7 +186,7 @@ public abstract class Text extends DataAbstraction {
 	}
 	protected void isIdentifier(String text) throws Backtracking {
 		if (!LexicalScanner.isAnyIdentifier(text)) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
@@ -256,7 +259,7 @@ public abstract class Text extends DataAbstraction {
 					if (p1 >= 0) {
 						if (hasOutput) {
 							outputResult.value= new PrologInteger(p1+1);
-							newIx.pushTrail(outputResult);
+							// newIx.pushTrail(outputResult);
 						};
 						try {
 							c0.execute(newIx);
@@ -266,7 +269,7 @@ public abstract class Text extends DataAbstraction {
 								currentPosition= p1 + 1;
 								continue;
 							} else {
-								throw new Backtracking();
+								throw Backtracking.instance;
 							}
 						};
 						return;
@@ -277,7 +280,7 @@ public abstract class Text extends DataAbstraction {
 					break;
 				}
 			};
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
@@ -286,7 +289,7 @@ public abstract class Text extends DataAbstraction {
 			int n= position.getSmallIntegerValue(iX);
 			String text= inputText.getStringValue(iX);
 			if (n < 0 || n > text.length()) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} else {
 				front.value= new PrologString(text.substring(0,n));
 				tail.value= new PrologString(text.substring(n));
@@ -304,7 +307,7 @@ public abstract class Text extends DataAbstraction {
 			int n= position.getSmallIntegerValue(iX);
 			String text= inputText.getStringValue(iX);
 			if (n < 0 || n > text.length()) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} else {
 				front.isString(text.substring(0,n),iX);
 				tail.value= new PrologString(text.substring(n));
@@ -321,7 +324,7 @@ public abstract class Text extends DataAbstraction {
 			int n= position.getSmallIntegerValue(iX);
 			String text= inputText.getStringValue(iX);
 			if (n < 0 || n > text.length()) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} else {
 				front.value= new PrologString(text.substring(0,n));
 				tail.isString(text.substring(n),iX);
@@ -338,7 +341,7 @@ public abstract class Text extends DataAbstraction {
 			int n= position.getSmallIntegerValue(iX);
 			String text= inputText.getStringValue(iX);
 			if (n < 0 || n > text.length()) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} else {
 				front.isString(text.substring(0,n),iX);
 				tail.isString(text.substring(n),iX);
@@ -469,7 +472,7 @@ public abstract class Text extends DataAbstraction {
 			};
 			return result;
 		} else {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
@@ -565,7 +568,7 @@ public abstract class Text extends DataAbstraction {
 		if (values[lastElement].isEmpty()) {
 			lastElement= lastElement - 1;
 		};
-		Term result= new PrologEmptyList();
+		Term result= PrologEmptyList.instance;
 		for (int n=lastElement; n >= 0; n--) {
 			String value= values[n];
 			while (true) {
@@ -589,7 +592,7 @@ public abstract class Text extends DataAbstraction {
 		try {
 			String text= inputText.getStringValue(iX);
 			if (text.length() < 1) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} else {
 				int code= text.codePointAt(0);
 				front.value= new PrologInteger(code);
@@ -610,12 +613,12 @@ public abstract class Text extends DataAbstraction {
 		try {
 			String text= inputText.getStringValue(iX);
 			if (text.length() < 1) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} else {
 				int code1= front.getSmallIntegerValue(iX);
 				int code2= text.codePointAt(0);
 				if (code1 != code2) {
-					throw new Backtracking();
+					throw Backtracking.instance;
 				} else {
 					tail.value= new PrologString(text.substring(1));
 					iX.pushTrail(tail);
@@ -636,12 +639,12 @@ public abstract class Text extends DataAbstraction {
 		try {
 			String text= inputText.getStringValue(iX);
 			if (text.length() < 1) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} else {
 				try {
 					String t2= tail.getStringValue(iX);
 					if ( !t2.equals(text.substring(1)) ) {
-						throw new Backtracking();
+						throw Backtracking.instance;
 					} else {
 						int code= text.codePointAt(0);
 						front.value= new PrologInteger(code);
@@ -664,17 +667,17 @@ public abstract class Text extends DataAbstraction {
 		try {
 			String text= inputText.getStringValue(iX);
 			if (text.length() < 1) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} else {
 				try {
 					int code1= front.getSmallIntegerValue(iX);
 					String t2= tail.getStringValue(iX);
 					int code2= text.codePointAt(0);
 					if (code1 != code2) {
-						throw new Backtracking();
+						throw Backtracking.instance;
 					} else {
 						if ( !t2.equals(text.substring(1)) ) {
-							throw new Backtracking();
+							throw Backtracking.instance;
 						}
 					}
 				} catch (TermIsNotAnInteger e1) {
@@ -727,13 +730,13 @@ public abstract class Text extends DataAbstraction {
 		boolean caseSensitivity= Converters.term2OnOff(getBuiltInSlot_E_case_sensitivity(),iX);
 		int index= SystemUtils.indexOf(text,target,0,caseSensitivity);
 		if (index == -1) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		} else {
 			StringBuilder result= new StringBuilder(text.substring(0,index));
 			result.append(replacement);
 			result.append(text.substring(index+target.length()));
 			a1.value= new PrologString(result.toString());
-			iX.pushTrail(a1);
+			// iX.pushTrail(a1);
 		}
 	}
 	public void replace3fs(ChoisePoint iX, Term a1, Term a2, Term a3) throws Backtracking {
@@ -758,7 +761,7 @@ public abstract class Text extends DataAbstraction {
 		boolean caseSensitivity= Converters.term2OnOff(getBuiltInSlot_E_case_sensitivity(),iX);
 		int index= SystemUtils.indexOf(text,target,0,caseSensitivity);
 		if (index == -1) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	public void replace2ff(ChoisePoint iX, PrologVariable a1, Term a2, Term a3) throws Backtracking {
@@ -821,7 +824,7 @@ public abstract class Text extends DataAbstraction {
 			modifiedText= text.replace(target,replacement);
 		};
 		a1.value= new PrologString(modifiedText);
-		iX.pushTrail(a1);
+		// iX.pushTrail(a1);
 	}
 	public void replaceAll3fs(ChoisePoint iX, Term a1, Term a2, Term a3) {
 	}

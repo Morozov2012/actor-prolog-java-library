@@ -4,9 +4,14 @@ package morozov.system.gui.space3d;
 
 import target.*;
 
+import morozov.run.*;
 import morozov.system.*;
+import morozov.system.errors.*;
 import morozov.system.gui.*;
+import morozov.system.gui.space3d.errors.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.awt.Color;
 import java.awt.event.KeyEvent;
@@ -45,53 +50,23 @@ public class Tools3D {
 	public static Point3d term2Coordinate(Term value, ChoisePoint iX) {
 		try { // Point3d
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_p,3,iX);
-			double x;
-			double y;
-			double z;
-			try {
-				x= Converters.termToReal(arguments[0],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(arguments[0]);
-			};
-			try {
-				y= Converters.termToReal(arguments[1],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(arguments[1]);
-			};
-			try {
-				z= Converters.termToReal(arguments[2],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(arguments[2]);
-			};
+			double x= Converters.argumentToReal(arguments[0],iX);
+			double y= Converters.argumentToReal(arguments[1],iX);
+			double z= Converters.argumentToReal(arguments[2],iX);
 			return new Point3d(x,y,z);
 		} catch (Backtracking b) {
-			throw new WrongArgumentIsNotAPoint3(value);
+			throw new WrongArgumentIsNotAPoint3D(value);
 		}
 	}
 	public static Point3f term2Coordinate3f(Term value, ChoisePoint iX) {
 		try { // Point3f
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_p,3,iX);
-			float x;
-			float y;
-			float z;
-			try {
-				x= (float)Converters.termToReal(arguments[0],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(arguments[0]);
-			};
-			try {
-				y= (float)Converters.termToReal(arguments[1],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(arguments[1]);
-			};
-			try {
-				z= (float)Converters.termToReal(arguments[2],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(arguments[2]);
-			};
+			float x= (float)Converters.argumentToReal(arguments[0],iX);
+			float y= (float)Converters.argumentToReal(arguments[1],iX);
+			float z= (float)Converters.argumentToReal(arguments[2],iX);
 			return new Point3f(x,y,z);
 		} catch (Backtracking b) {
-			throw new WrongArgumentIsNotAPoint3(value);
+			throw new WrongArgumentIsNotAPoint3D(value);
 		}
 	}
 	public static int[] term2Indices(Term value, ChoisePoint iX) {
@@ -136,53 +111,18 @@ public class Tools3D {
 	}
 	public static Color3f term2Color3OrExit(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		try { // Color3f
-			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_c3,3,iX);
-			float r;
-			float g;
-			float b;
-			try {
-				r= (float)Converters.termToReal(arguments[0],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(arguments[0]);
-			};
-			try {
-				g= (float)Converters.termToReal(arguments[1],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(arguments[1]);
-			};
-			try {
-				b= (float)Converters.termToReal(arguments[2],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(arguments[2]);
-			};
+			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_color3,3,iX);
+			float r= (float)Converters.argumentToReal(arguments[0],iX);
+			float g= (float)Converters.argumentToReal(arguments[1],iX);
+			float b= (float)Converters.argumentToReal(arguments[2],iX);
 			return new Color3f(r,g,b);
 		} catch (Backtracking b1) {
 			try { // Color3f
-				Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_c4,4,iX);
-				float r;
-				float g;
-				float b;
-				float a;
-				try {
-					r= (float)Converters.termToReal(arguments[0],iX);
-				} catch (TermIsNotAReal e) {
-					throw new WrongArgumentIsNotNumeric(arguments[0]);
-					};
-				try {
-					g= (float)Converters.termToReal(arguments[1],iX);
-				} catch (TermIsNotAReal e) {
-					throw new WrongArgumentIsNotNumeric(arguments[1]);
-				};
-				try {
-					b= (float)Converters.termToReal(arguments[2],iX);
-				} catch (TermIsNotAReal e) {
-					throw new WrongArgumentIsNotNumeric(arguments[2]);
-				};
-				try {
-					a= (float)Converters.termToReal(arguments[3],iX);
-				} catch (TermIsNotAReal e) {
-					throw new WrongArgumentIsNotNumeric(arguments[3]);
-				};
+				Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_color4,4,iX);
+				float r= (float)Converters.argumentToReal(arguments[0],iX);
+				float g= (float)Converters.argumentToReal(arguments[1],iX);
+				float b= (float)Converters.argumentToReal(arguments[2],iX);
+				float a= (float)Converters.argumentToReal(arguments[3],iX);
 				return new Color3f(new Color(r,g,b,a));
 			} catch (Backtracking b2) {
 				Color color= GUI_Utils.termToColor(value,iX);
@@ -193,24 +133,9 @@ public class Tools3D {
 	public static Point3f term2Attenuation(Term value, ChoisePoint iX) {
 		try { // Attenuation
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_a,3,iX);
-			float constant;
-			float linear;
-			float quadratic;
-			try {
-				constant= (float)Converters.termToReal(arguments[0],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(arguments[0]);
-			};
-			try {
-				linear= (float)Converters.termToReal(arguments[1],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(arguments[1]);
-			};
-			try {
-				quadratic= (float)Converters.termToReal(arguments[2],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(arguments[2]);
-			};
+			float constant= (float)Converters.argumentToReal(arguments[0],iX);
+			float linear= (float)Converters.argumentToReal(arguments[1],iX);
+			float quadratic= (float)Converters.argumentToReal(arguments[2],iX);
 			return new Point3f(constant,quadratic,quadratic);
 		} catch (Backtracking b) {
 			throw new WrongArgumentIsNotAnAttenuation(value);
@@ -220,24 +145,9 @@ public class Tools3D {
 	public static Vector3d term2Vector3(Term value, ChoisePoint iX) {
 		Term[] termArray= Converters.listToArray(value,iX);
 		if (termArray.length==3) {
-			double x;
-			double y;
-			double z;
-			try {
-				x= Converters.termToReal(termArray[0],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(termArray[0]);
-			};
-			try {
-				y= Converters.termToReal(termArray[1],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(termArray[1]);
-			};
-			try {
-				z= Converters.termToReal(termArray[2],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(termArray[2]);
-			};
+			double x= Converters.argumentToReal(termArray[0],iX);
+			double y= Converters.argumentToReal(termArray[1],iX);
+			double z= Converters.argumentToReal(termArray[2],iX);
 			return new Vector3d(x,y,z);
 		} else {
 			throw new WrongNumberOfElementsInList(value);
@@ -246,24 +156,9 @@ public class Tools3D {
 	public static Vector3f term2Vector3f(Term value, ChoisePoint iX) {
 		Term[] termArray= Converters.listToArray(value,iX);
 		if (termArray.length==3) {
-			float x;
-			float y;
-			float z;
-			try {
-				x= (float)Converters.termToReal(termArray[0],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(termArray[0]);
-			};
-			try {
-				y= (float)Converters.termToReal(termArray[1],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(termArray[1]);
-			};
-			try {
-				z= (float)Converters.termToReal(termArray[2],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(termArray[2]);
-			};
+			float x= (float)Converters.argumentToReal(termArray[0],iX);
+			float y= (float)Converters.argumentToReal(termArray[1],iX);
+			float z= (float)Converters.argumentToReal(termArray[2],iX);
 			return new Vector3f(x,y,z);
 		} else {
 			throw new WrongNumberOfElementsInList(value);
@@ -273,30 +168,10 @@ public class Tools3D {
 	public static Vector4d term2Vector4(Term value, ChoisePoint iX) {
 		Term[] termArray= Converters.listToArray(value,iX);
 		if (termArray.length==4) {
-			double x;
-			double y;
-			double z;
-			double w;
-			try {
-				x= Converters.termToReal(termArray[0],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(termArray[0]);
-			};
-			try {
-				y= Converters.termToReal(termArray[1],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(termArray[1]);
-			};
-			try {
-				z= Converters.termToReal(termArray[2],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(termArray[2]);
-			};
-			try {
-				w= Converters.termToReal(termArray[3],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(termArray[3]);
-			};
+			double x= Converters.argumentToReal(termArray[0],iX);
+			double y= Converters.argumentToReal(termArray[1],iX);
+			double z= Converters.argumentToReal(termArray[2],iX);
+			double w= Converters.argumentToReal(termArray[3],iX);
 			return new Vector4d(x,y,z,w);
 		} else {
 			throw new WrongNumberOfElementsInList(value);
@@ -306,30 +181,10 @@ public class Tools3D {
 	public static AxisAngle4d term2AxisAngle4(Term value, ChoisePoint iX) {
 		Term[] termArray= Converters.listToArray(value,iX);
 		if (termArray.length==4) {
-			double x;
-			double y;
-			double z;
-			double angle;
-			try {
-				x= Converters.termToReal(termArray[0],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(termArray[0]);
-			};
-			try {
-				y= Converters.termToReal(termArray[1],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(termArray[1]);
-			};
-			try {
-				z= Converters.termToReal(termArray[2],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(termArray[2]);
-			};
-			try {
-				angle= Converters.termToReal(termArray[3],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(termArray[3]);
-			};
+			double x= Converters.argumentToReal(termArray[0],iX);
+			double y= Converters.argumentToReal(termArray[1],iX);
+			double z= Converters.argumentToReal(termArray[2],iX);
+			double angle= Converters.argumentToReal(termArray[3],iX);
 			return new AxisAngle4d(x,y,z,angle);
 		} else {
 			throw new WrongNumberOfElementsInList(value);

@@ -3,7 +3,6 @@
 package morozov.run;
 
 import morozov.classes.*;
-import morozov.terms.*;
 
 public class ActorRegister {
 	public ActiveWorld currentProcess;

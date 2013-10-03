@@ -6,14 +6,14 @@ import morozov.terms.*;
 
 public enum NullaryArithmeticOperation {
 	RANDOM {
-		Term eval() {
+		public Term eval() {
 			return new PrologReal(StrictMath.random());
 		}
 	},
 	PI {
-		Term eval() {
+		public Term eval() {
 			return new PrologReal(StrictMath.PI);
 		}
 	};
-	abstract Term eval();
+	public abstract Term eval();
 }

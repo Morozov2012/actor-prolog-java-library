@@ -2,7 +2,7 @@
 
 package morozov.system.checker;
 
-import morozov.terms.*;
+import morozov.run.*;
 
 import java.math.BigInteger;
 import java.math.BigDecimal;

@@ -6,10 +6,13 @@
 
 package morozov.system.gui.dialogs.scalable;
 
+import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.terms.*;
 
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.Icon;
+import javax.swing.Action;
 
 import java.awt.Font;
 import java.awt.Insets;
@@ -74,6 +77,6 @@ public class ScalableButton extends ScalableAbstractButton {
 		// setText(value.toString(iX));
 	}
 	public Term getValue() {
-		return new PrologUnknownValue();
+		return PrologUnknownValue.instance;
 	}
 }

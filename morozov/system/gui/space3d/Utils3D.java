@@ -5,8 +5,12 @@ package morozov.system.gui.space3d;
 import target.*;
 
 import morozov.built_in.*;
+import morozov.run.*;
 import morozov.system.*;
+import morozov.system.gui.space3d.errors.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import javax.media.j3d.BranchGroup;
 import javax.media.j3d.View;
@@ -14,13 +18,13 @@ import com.sun.j3d.utils.universe.SimpleUniverse;
 
 public class Utils3D extends PrincipalNode3D {
 	//
-	public static BranchGroup termToBranchGroupOrNodeList(Term value, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D canvas3D, ChoisePoint iX) {
+	public static BranchGroup termToBranchGroupOrNodeList(Term value, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
 		try { // BranchGroup
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_BranchGroup,1,iX);
-			return attributesToBranchGroup(arguments[0],targetWorld,u,canvas3D,iX);
+			return attributesToBranchGroup(arguments[0],targetWorld,u,space3D,iX);
 		} catch (Backtracking b) {
 			BranchGroup branchGroup= new BranchGroup();
-			termToListOfNodes(branchGroup,branchGroup,value,targetWorld,u,canvas3D,null,iX);
+			termToListOfNodes(branchGroup,branchGroup,value,targetWorld,u,space3D,null,iX);
 			return branchGroup;
 			// throw new WrongArgumentIsNotBranchGroup(value);
 		}
@@ -110,7 +114,7 @@ public class Utils3D extends PrincipalNode3D {
 			try {
 				long code= value.getSymbolValue(iX);
 				if (code==SymbolCodes.symbolCode_E_default) {
-					throw new TermIsSymbolDefault();
+					throw TermIsSymbolDefault.instance;
 				} else {
 					throw new WrongTermIsNotFieldOfView(value);
 				}
@@ -127,7 +131,7 @@ public class Utils3D extends PrincipalNode3D {
 			try {
 				long code= value.getSymbolValue(iX);
 				if (code==SymbolCodes.symbolCode_E_default) {
-					throw new TermIsSymbolDefault();
+					throw TermIsSymbolDefault.instance;
 				} else {
 					throw new WrongTermIsNotFrontClipDistance(value);
 				}
@@ -144,7 +148,7 @@ public class Utils3D extends PrincipalNode3D {
 			try {
 				long code= value.getSymbolValue(iX);
 				if (code==SymbolCodes.symbolCode_E_default) {
-					throw new TermIsSymbolDefault();
+					throw TermIsSymbolDefault.instance;
 				} else {
 					throw new WrongTermIsNotBackClipDistance(value);
 				}

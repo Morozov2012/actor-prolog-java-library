@@ -8,8 +8,12 @@ package morozov.system.gui.dialogs.scalable.windows;
 
 import morozov.system.gui.dialogs.scalable.common.*;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.UIManager;
+import javax.swing.ButtonModel;
+import javax.swing.JCheckBox;
+import javax.swing.JToggleButton;
+import java.awt.Color;
+import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Line2D;
 
@@ -28,10 +32,10 @@ public class ScalableWindowsCheckBoxIcon extends ScalableToggleButtonIcon {
 		return 3;
 	}
 	//
-	protected void drawEye(JToggleButton tb, Graphics g0, int x, int y, int controlSize) {
+	protected void drawEye(JToggleButton tb, Graphics2D g2, int x, int y, int controlSize) {
 		JCheckBox cb= (JCheckBox)tb;
 		ButtonModel model= cb.getModel();
-		Graphics2D g2= (Graphics2D)g0;
+		// Graphics2D g2= (Graphics2D)g0;
 		Color controlShadow= UIManager.getColor("CheckBox.shadow");
 		Color eyeColor= null;
 		if((model.isPressed() && model.isArmed()) || !model.isEnabled()) {
@@ -93,29 +97,29 @@ public class ScalableWindowsCheckBoxIcon extends ScalableToggleButtonIcon {
 		}
 	}
 	//
-	protected void drawMarker(JToggleButton tb, Graphics g0, int x, int y, int controlSize) {
+	protected void drawMarker(JToggleButton tb, Graphics2D g2, int x, int y, int controlSize) {
 		ButtonModel model1= tb.getModel();
 		if (model1 instanceof ScalableToggleButtonModel) {
 			ScalableToggleButtonModel model2= (ScalableToggleButtonModel)model1;
 			if(model2.isUncertain()) {
 				if (model2.isEnabled()) {
-					CheckBoxUtils.drawUncertainMarker(tb,g0,x,y,controlSize,failureBackgroundColor);
+					CheckBoxUtils.drawUncertainMarker(tb,g2,x,y,controlSize,failureBackgroundColor);
 				} else {
-					CheckBoxUtils.drawUncertainMarker(tb,g0,x,y,controlSize,UIManager.getColor("CheckBox.shadow"));
+					CheckBoxUtils.drawUncertainMarker(tb,g2,x,y,controlSize,UIManager.getColor("CheckBox.shadow"));
 				}
 			} else if(model2.isSelected()) {
 				if (model2.isEnabled()) {
-					CheckBoxUtils.drawCheck(tb,g0,x,y,controlSize,UIManager.getColor("CheckBox.foreground"),model2.hasClassicStyle());
+					CheckBoxUtils.drawCheck(tb,g2,x,y,controlSize,UIManager.getColor("CheckBox.foreground"),model2.hasClassicStyle());
 				} else {
-					CheckBoxUtils.drawCheck(tb,g0,x,y,controlSize,UIManager.getColor("CheckBox.shadow"),model2.hasClassicStyle());
+					CheckBoxUtils.drawCheck(tb,g2,x,y,controlSize,UIManager.getColor("CheckBox.shadow"),model2.hasClassicStyle());
 				}
 			}
 		} else {
 			if(model1.isSelected()) {
 				if (model1.isEnabled()) {
-					CheckBoxUtils.drawCheck(tb,g0,x,y,controlSize,UIManager.getColor("CheckBox.foreground"),false);
+					CheckBoxUtils.drawCheck(tb,g2,x,y,controlSize,UIManager.getColor("CheckBox.foreground"),false);
 				} else {
-					CheckBoxUtils.drawCheck(tb,g0,x,y,controlSize,UIManager.getColor("CheckBox.shadow"),false);
+					CheckBoxUtils.drawCheck(tb,g2,x,y,controlSize,UIManager.getColor("CheckBox.shadow"),false);
 				}
 			}
 		}

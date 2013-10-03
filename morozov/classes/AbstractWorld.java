@@ -2,10 +2,13 @@
 
 package morozov.classes;
 
+import morozov.classes.errors.*;
 import morozov.run.*;
 import morozov.terms.*;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 
 public abstract class AbstractWorld extends ActorNumber {
 	// public AbstractProcess currentProcess;
@@ -25,7 +28,7 @@ public abstract class AbstractWorld extends ActorNumber {
 		if (currentProcess==process) {
 			return this;
 		} else {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
@@ -33,6 +36,9 @@ public abstract class AbstractWorld extends ActorNumber {
 		return this;
 	}
 	//
+	public Term internalWorldOrTerm(ChoisePoint cp) {
+		return this;
+	}
 	// public AbstractWorld world(ChoisePoint cp) {
 	//	return this;
 	// }
@@ -41,7 +47,7 @@ public abstract class AbstractWorld extends ActorNumber {
 	//
 	public void isWorld(Term v, ChoisePoint cp) throws Backtracking {
 		if (this != v) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	public boolean thisIsWorld() {
@@ -62,7 +68,7 @@ public abstract class AbstractWorld extends ActorNumber {
 		if (value != null) {
 			return value;
 		} else {
-			return new PrologUnknownValue();
+			return PrologUnknownValue.instance;
 		}
 	}
 	//

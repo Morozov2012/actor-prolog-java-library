@@ -4,10 +4,18 @@ package morozov.classes;
 
 import target.*;
 
+import morozov.classes.errors.*;
 import morozov.run.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.TreeSet;
 
 public abstract class AbstractProcess extends ActiveWorld {
 	protected AbstractWorld[] worldArray;
@@ -42,18 +50,22 @@ public abstract class AbstractProcess extends ActiveWorld {
 	//
 	// GET ABSTRACT CLASS NUMBER
 	public long getInternalWorldClass(AbstractWorld currentWorld, ChoisePoint cp) throws Backtracking, TermIsNotAWorld, TermIsUnboundVariable {
-		throw new Backtracking();
+		throw Backtracking.instance;
 	}
 	//
 	public AbstractWorld internalWorld(AbstractProcess process, ChoisePoint cp) throws Backtracking {
 		if (this==process) {
 			return getMainWorld();
 		} else {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
 	public AbstractWorld internalWorld(ChoisePoint cp) {
+		return getMainWorld();
+	}
+	//
+	public Term internalWorldOrTerm(ChoisePoint cp) {
 		return getMainWorld();
 	}
 	//
@@ -79,7 +91,6 @@ public abstract class AbstractProcess extends ActiveWorld {
 		suspendedCallTable.add(new SuspendedInternalCall(target,currentWorld,domainSignatureNumber,arguments));
 	}
 	public void pushAsyncCall(ChoisePoint iX, long domainSignatureNumber, Term target, AbstractWorld currentWorld, boolean isControlCall, boolean useBuffer, Term[] arguments) {
-		// System.out.printf("AbstractProcess::-1::pushAsyncCall::arguments.length=%s\n",arguments.length);
 		target= target.dereferenceValue(iX);
 		if (!target.thisIsUnknownValue()) {
 			if (target.thisIsFreeVariable()) {
@@ -93,7 +104,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 					targetWorld= currentWorld;
 				};
 				registerBinding(new AsyncCallTableState(asyncCallTable));
-				asyncCallTable.add(new AsyncCall(domainSignatureNumber,targetWorld,isControlCall,useBuffer,arguments,false));
+				asyncCallTable.add(new AsyncCall(domainSignatureNumber,target,targetWorld,isControlCall,useBuffer,arguments,false));
 			}
 		}
 	}
@@ -118,18 +129,15 @@ public abstract class AbstractProcess extends ActiveWorld {
 	// SENDING MESSAGES
 	// Sending Direct Messages
 	public void sendAsyncCall(ChoisePoint iX, long domainSignatureNumber, Term target, AbstractWorld currentWorld, boolean isControlCall, boolean useBuffer, Term[] arguments) {
-		// System.out.printf("AbstractProcess::0::arguments.length=%s\n",arguments.length);
 		target= target.dereferenceValue(iX);
-		// System.out.printf("AbstractProcess::sendAsyncCalls\n",target);
 		if (!target.thisIsUnknownValue()) {
 			if (target instanceof AbstractWorld) {
 				AbstractWorld receiver= (AbstractWorld)target; // .internalWorld(iX);
 				Term[] argumentList= new Term[arguments.length];
 				for (int i= 0; i < arguments.length; i++) {
 					argumentList[i]= arguments[i].copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
-					// System.out.printf("AbstractProcess::1::argumentList[%d]\n",i,argumentList[i]);
 				};
-				AsyncCall item= new AsyncCall(domainSignatureNumber,receiver,isControlCall,useBuffer,argumentList,true);
+				AsyncCall item= new AsyncCall(domainSignatureNumber,target,receiver,isControlCall,useBuffer,argumentList,true);
 				receiver.receiveAsyncCall(item);
 			} else if (target.thisIsFreeVariable()) {
 				currentWorld.pushSuspendedAsyncCall(domainSignatureNumber,target,currentWorld,isControlCall,useBuffer,arguments);
@@ -137,9 +145,8 @@ public abstract class AbstractProcess extends ActiveWorld {
 				Term[] argumentList= new Term[arguments.length];
 				for (int i= 0; i < arguments.length; i++) {
 					argumentList[i]= arguments[i].copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
-					// System.out.printf("AbstractProcess::2::argumentList[%d]\n",i,argumentList[i]);
 				};
-				AsyncCall item= new AsyncCall(domainSignatureNumber,currentWorld,isControlCall,useBuffer,argumentList,true);
+				AsyncCall item= new AsyncCall(domainSignatureNumber,target,currentWorld,isControlCall,useBuffer,argumentList,true);
 				currentWorld.receiveAsyncCall(item);
 			}
 		}
@@ -278,18 +285,15 @@ public abstract class AbstractProcess extends ActiveWorld {
 	}
 	//
 	public void sendAsyncCalls(ChoisePoint iX) {
-		// System.out.printf("AbstractProcess::sendAsyncCalls\n");
 		for(int i= 0; i < asyncCallTable.size(); i++) {
 			AsyncCall item= asyncCallTable.get(i);
 			if (item.isControlCall) {
-				// System.out.printf("AbstractProcess::[c]sendAsyncCall: %s [target:%s]\n",item,item.target);
 				sendAsyncCall(iX,item);
 			}
 		};
 		for(int i= 0; i < asyncCallTable.size(); i++) {
 			AsyncCall item= asyncCallTable.get(i);
 			if (!item.isControlCall) {
-				// System.out.printf("AbstractProcess::[i]sendAsyncCall: %s\n",item);
 				sendAsyncCall(iX,item);
 			}
 		};
@@ -465,7 +469,6 @@ public abstract class AbstractProcess extends ActiveWorld {
 						processFlowMessages(rootCP);
 					} else if (directMessage.isTheResetCommand()) {
 					} else {
-						// System.out.printf("!!! AbstractProcess::[2]acceptDirectMessage: %s\n",this);
 						Continuation c1= new PhaseTermination();
 						c1= new NeutralizeActors(c1);
 						if (!processWasProvedOneTimeAtLeast) {
@@ -474,6 +477,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 						processDirectMessageAndHandleBreak(
 							c1,
 							directMessage.domainSignatureNumber,
+							directMessage.target,
 							directMessage.targetWorld,
 							directMessage.arguments,
 							rootCP);
@@ -481,6 +485,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 				} finally {
 					synchronized(inputControlDirectMessages) {
 						if (inputControlDirectMessages.contains(directMessage)) {
+							// directMessage.sendConfirmation();
 							inputControlDirectMessages.remove(directMessage);
 							if (!directMessage.useBuffer) {
 								inputControlDirectMessagesHash.remove(directMessage);
@@ -549,7 +554,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 							public void execute(ChoisePoint iX) throws Backtracking {
 								Term newResult= result.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 								resultSet.add(newResult);
-								throw new Backtracking();
+								throw Backtracking.instance;
 							}
 							public boolean isPhaseTermination() {
 								return false;
@@ -563,6 +568,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 						processDirectMessageAndHandleBreak(
 							c1,
 							residentRequest.domainSignature,
+							targetWorld,
 							targetWorld,
 							argumentList,
 							rootCP);
@@ -574,7 +580,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 							public void execute(ChoisePoint iX) throws Backtracking {
 								Term newResult= result.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 								resultArray.add(0,newResult);
-								throw new Backtracking();
+								throw Backtracking.instance;
 							}
 							public boolean isPhaseTermination() {
 								return false;
@@ -589,12 +595,13 @@ public abstract class AbstractProcess extends ActiveWorld {
 							c1,
 							residentRequest.domainSignature,
 							targetWorld,
+							targetWorld,
 							argumentList,
 							rootCP);
 						resultSetIterator= resultArray.iterator();
 					};
 					// Iterator<Term> resultSetIterator= resultSet.descendingIterator();
-					Term resultList= new PrologEmptyList();
+					Term resultList= PrologEmptyList.instance;
 					while (resultSetIterator.hasNext()) {
 						Term currentResult= resultSetIterator.next();
 						resultList= new PrologList(currentResult,resultList);
@@ -648,12 +655,14 @@ public abstract class AbstractProcess extends ActiveWorld {
 					processDirectMessageAndHandleBreak(
 						c1,
 						directMessage.domainSignatureNumber,
+						directMessage.target,
 						directMessage.targetWorld,
 						directMessage.arguments,
 						rootCP);
 				} finally {
 					synchronized(inputInformationDirectMessages) {
 						if (inputInformationDirectMessages.contains(directMessage)) {
+							// directMessage.sendConfirmation();
 							inputInformationDirectMessages.remove(directMessage);
 							if (!directMessage.useBuffer) {
 								inputInformationDirectMessagesHash.remove(directMessage);
@@ -672,7 +681,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 	}
 	// Process One Timer Message
 	public void acceptTimerMessage() {
-		if (isProven) {
+		// if (isProven) { // 2013.09.07 В VIP оно переключающее.
 			boolean hasUpdatedPorts= false;
 			AbstractWorld targetWorld= null;
 			Iterator<AbstractWorld> iterator= null;
@@ -718,6 +727,8 @@ public abstract class AbstractProcess extends ActiveWorld {
 					System.out.printf("%s: ============================================\n",this);
 					printSlotVariables();
 				};
+				boolean recentState= isProven;
+				isProven= false;
 				try {
 					Continuation c1= new PhaseTermination();
 					c1= new NeutralizeActors(c1);
@@ -729,6 +740,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 						c1,
 						domainSignature,
 						targetWorld,
+						targetWorld,
 						new Term[0],
 						rootCP);
 				} finally {
@@ -737,16 +749,28 @@ public abstract class AbstractProcess extends ActiveWorld {
 						if (timerMessages.size() > 0) {
 							wakeUp();
 						}
-					}
+					};
+					if (!isProven) {
+						if (recentState) {
+							unsuccessfullyFinishPhase();
+						} else {
+							unsuccessfullyFinishPhaseAgain();
+						}
+					// This check cannot determine if the process
+					// was suspended before this phase.
+					};
+					// stateIsToBeSend.set(true);
+					enableStateSending();
 				}
 			}
 			if (debugThisProcess()) {
 				System.out.printf("%s: O.K. TIMER MESSAGE;\n",this);
 			}
-		}
+		// }
 	}
-	protected void processDirectMessageAndHandleBreak(Continuation c1, long domainSignature, AbstractWorld targetWorld, Term[] arguments, ChoisePoint iX) {
-		c1= new DomainSwitch(c1,domainSignature,targetWorld,targetWorld,arguments);
+	protected void processDirectMessageAndHandleBreak(Continuation c1, long domainSignature, Term target, AbstractWorld targetWorld, Term[] arguments, ChoisePoint iX) {
+		c1= new DomainSwitch(c1,domainSignature,target,targetWorld,arguments);
+		// System.out.printf("(1.2) executeDirectMessageAndHandleBreak; domainSignatureNumber=%s,target=%s,targetWorld=%s,arguments=%s\n",domainSignature,target,targetWorld,arguments);
 		executeDirectMessageAndHandleBreak(c1,targetWorld,iX);
 	}
 	protected void executeDirectMessageAndHandleBreak(Continuation c1, AbstractWorld targetWorld, ChoisePoint iX) {
@@ -1084,7 +1108,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 		if (value1 != null) {
 			return value1;
 		} else {
-			return new PrologUnknownValue();
+			return PrologUnknownValue.instance;
 		}
 	}
 	//

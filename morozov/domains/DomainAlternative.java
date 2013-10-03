@@ -1,7 +1,15 @@
 // (c) 2010 IRE RAS Alexei A. Morozov
-package morozov.domains;
 
-import morozov.terms.*;import java.util.HashMap;import java.util.Set;public abstract class DomainAlternative {
+package morozov.domains;
+
+import morozov.domains.signals.*;
+import morozov.run.*;
+import morozov.terms.*;
+
+import java.util.HashMap;
+import java.util.Set;
+
+public abstract class DomainAlternative {
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
 		return false;
 	}
@@ -36,7 +44,7 @@ import morozov.terms.*;import java.util.HashMap;import java.util.Set;public
 			keys.toArray(functors);
 			// Term[] arguments= new Term[functors.length];
 			DomainAlternative[] alternatives= baseDomain.alternatives;
-			Term result= new PrologEmptySet();
+			Term result= PrologEmptySet.instance;
 			for (int n=functors.length-1; n > 0; n--) {
 				long currentKey= functors[n];
 				Term currentElement= setPositiveMap.get(currentKey);
@@ -67,6 +75,6 @@ import morozov.terms.*;import java.util.HashMap;import java.util.Set;public
 		}
 	}
 	public PrologDomain getPairDomain(long key) throws IsNotPairDomainAlternative {
-		throw new IsNotPairDomainAlternative();
+		throw IsNotPairDomainAlternative.instance;
 	}
 }

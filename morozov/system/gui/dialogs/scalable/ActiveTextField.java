@@ -12,8 +12,10 @@ package morozov.system.gui.dialogs.scalable;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
+import morozov.system.gui.dialogs.signals.*;
 import morozov.terms.*;
 
 import java.awt.Font;
@@ -76,14 +78,14 @@ public class ActiveTextField extends ActiveComponent {
 		if (component!=null) {
 			return ((ATextField)component).getValue();
 		} else {
-			return new PrologUnknownValue();
+			return PrologUnknownValue.instance;
 		}
 	}
 	//
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
-			throw new RejectValue();
+			throw RejectValue.instance;
 		} else {
 			return super.standardizeValue(value,iX);
 		}

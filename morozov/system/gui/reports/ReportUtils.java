@@ -4,7 +4,11 @@ package morozov.system.gui.reports;
 
 import target.*;
 
+import morozov.run.*;
+import morozov.system.gui.reports.errors.*;
+import morozov.system.gui.reports.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.awt.Font;
 import java.awt.Color;
@@ -15,14 +19,14 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.lang.reflect.InvocationTargetException;
 
 public class ReportUtils {
-	public static void safelySetText(final String text, final InternalTextFrame textWindow) {
+	public static void safelySetText(final String text, final TextPaneNoWrap panel) {
 		if (SwingUtilities.isEventDispatchThread()) {
-			textWindow.panel.setText(text);
+			panel.setText(text);
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
-						textWindow.panel.setText(text);
+						panel.setText(text);
 					}
 				});
 			} catch (InterruptedException e) {
@@ -31,15 +35,15 @@ public class ReportUtils {
 		}
 	}
 	//
-	public static String safelyGetText(final InternalTextFrame textWindow) {
+	public static String safelyGetText(final TextPaneNoWrap panel) {
 		if (SwingUtilities.isEventDispatchThread()) {
-			return textWindow.panel.getText();
+			return panel.getText();
 		} else {
 			final StringBuilder text= new StringBuilder();
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
-						text.append(textWindow.panel.getText());
+						text.append(panel.getText());
 					}
 				});
 			} catch (InterruptedException e) {
@@ -49,14 +53,14 @@ public class ReportUtils {
 		}
 	}
 	//
-	public static void safelySetFont(final Font font, final InternalTextFrame textWindow) {
+	public static void safelySetFont(final Font font, final TextPaneNoWrap panel) {
 		if (SwingUtilities.isEventDispatchThread()) {
-			textWindow.panel.setFont(font);
+			panel.setFont(font);
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
-						textWindow.panel.setFont(font);
+						panel.setFont(font);
 					}
 				});
 			} catch (InterruptedException e) {
@@ -65,15 +69,15 @@ public class ReportUtils {
 		}
 	}
 	//
-	public static Font safelyGetFont(final InternalTextFrame textWindow) {
+	public static Font safelyGetFont(final TextPaneNoWrap panel) {
 		if (SwingUtilities.isEventDispatchThread()) {
-			return textWindow.panel.getFont();
+			return panel.getFont();
 		} else {
 			final AtomicReference<Font> font= new AtomicReference<Font>();
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
-						font.set(textWindow.panel.getFont());
+						font.set(panel.getFont());
 					}
 				});
 			} catch (InterruptedException e) {
@@ -83,14 +87,14 @@ public class ReportUtils {
 		}
 	}
 	//
-	public static void safelySetBackground(final Color color, final InternalTextFrame textWindow) {
+	public static void safelySetBackground(final Color color, final TextPaneNoWrap panel) {
 		if (SwingUtilities.isEventDispatchThread()) {
-			textWindow.panel.setBackground(color);
+			panel.setBackground(color);
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
-						textWindow.panel.setBackground(color);
+						panel.setBackground(color);
 					}
 				});
 			} catch (InterruptedException e) {
@@ -106,9 +110,9 @@ public class ReportUtils {
 			try {
 				long code= value.getSymbolValue(iX);
 				if (code==SymbolCodes.symbolCode_E_no_limit) {
-					throw new TermIsSymbolNoLimit();
+					throw TermIsSymbolNoLimit.instance;
 				} else if (code==SymbolCodes.symbolCode_E_window_height) {
-					throw new TermIsSymbolWindowHeight();
+					throw TermIsSymbolWindowHeight.instance;
 				} else {
 					throw new WrongTermIsNotMaxLineNumber(value);
 				}

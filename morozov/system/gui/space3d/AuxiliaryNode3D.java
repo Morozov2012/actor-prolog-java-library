@@ -5,9 +5,14 @@ package morozov.system.gui.space3d;
 import target.*;
 
 import morozov.built_in.*;
+import morozov.run.*;
 import morozov.system.*;
+import morozov.system.errors.*;
 import morozov.system.gui.*;
+import morozov.system.gui.space3d.errors.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.awt.Font;
 import java.awt.geom.Line2D;
@@ -26,8 +31,23 @@ import javax.media.j3d.BoundingSphere;
 import javax.media.j3d.Transform3D;
 import javax.media.j3d.Geometry;
 import javax.media.j3d.GeometryArray;
-import javax.media.j3d.IndexedTriangleArray;
+import javax.media.j3d.PointArray;
+import javax.media.j3d.LineArray;
+import javax.media.j3d.TriangleArray;
 import javax.media.j3d.QuadArray;
+import javax.media.j3d.GeometryStripArray;
+import javax.media.j3d.LineStripArray;
+import javax.media.j3d.TriangleStripArray;
+import javax.media.j3d.TriangleFanArray;
+import javax.media.j3d.IndexedGeometryArray;
+import javax.media.j3d.IndexedPointArray;
+import javax.media.j3d.IndexedLineArray;
+import javax.media.j3d.IndexedTriangleArray;
+import javax.media.j3d.IndexedQuadArray;
+import javax.media.j3d.IndexedGeometryStripArray;
+import javax.media.j3d.IndexedLineStripArray;
+import javax.media.j3d.IndexedTriangleStripArray;
+import javax.media.j3d.IndexedTriangleFanArray;
 import javax.media.j3d.Appearance;
 import javax.media.j3d.Material;
 import javax.media.j3d.ColoringAttributes;
@@ -44,8 +64,10 @@ import javax.media.j3d.ImageComponent2D;
 import java.awt.image.BufferedImage;
 import com.sun.j3d.utils.geometry.GeometryInfo;
 import com.sun.j3d.utils.geometry.NormalGenerator;
+import com.sun.j3d.utils.geometry.Stripifier;
 import com.sun.j3d.utils.picking.PickTool;
 import com.sun.j3d.utils.image.TextureLoader;
+import javax.media.j3d.OrientedShape3D;
 
 public class AuxiliaryNode3D extends Tools3D {
 	//
@@ -73,7 +95,6 @@ public class AuxiliaryNode3D extends Tools3D {
 					} else if (pairName==SymbolCodes.symbolCode_E_increasingAlphaDuration) {
 						// long increasingAlphaDuration= pairValue.getLongIntegerValue(iX);
 						long increasingAlphaDuration= Converters.termMillisecondsToMilliseconds(pairValue,iX);
-						// System.out.printf("increasingAlphaDuration=%s\n",increasingAlphaDuration);
 						node.setIncreasingAlphaDuration(increasingAlphaDuration);
 					} else if (pairName==SymbolCodes.symbolCode_E_decreasingAlphaDuration) {
 						// long decreasingAlphaDuration= pairValue.getLongIntegerValue(iX);
@@ -153,12 +174,8 @@ public class AuxiliaryNode3D extends Tools3D {
 						Point3d coordinate= term2Coordinate(pairValue,iX);
 						node.setCenter(coordinate);
 					} else if (pairName==SymbolCodes.symbolCode_E_radius) {
-						try {
-							double radius= Converters.termToReal(pairValue,iX);
-							node.setRadius(radius);
-						} catch (TermIsNotAReal e) {
-							throw new WrongArgumentIsNotNumeric(pairValue);
-						}
+						double radius= Converters.argumentToReal(pairValue,iX);
+						node.setRadius(radius);
 					} else {
 						throw new WrongArgumentIsUnknownBoundingSphereAttribute(key);
 					}
@@ -190,20 +207,28 @@ public class AuxiliaryNode3D extends Tools3D {
 						AxisAngle4d angle= term2AxisAngle4(pairValue,iX);
 						node.setRotation(angle);
 						iterator.remove();
-					} else if (pairName==SymbolCodes.symbolCode_E_scale) {
-						try {
-							double scale= Converters.termToReal(pairValue,iX);
-							node.setScale(scale);
-						} catch (TermIsNotAReal e) {
-							throw new WrongArgumentIsNotNumeric(pairValue);
-						};
+					}
+				};
+				iterator= nameList.iterator();
+				while(iterator.hasNext()) {
+					long key= iterator.next();
+					long pairName= - key;
+					Term pairValue= setPositiveMap.get(key);
+					if (pairName==SymbolCodes.symbolCode_E_scale) {
+						double scale= Converters.argumentToReal(pairValue,iX);
+						node.setScale(scale);
 						iterator.remove();
-					} else if (pairName==SymbolCodes.symbolCode_E_translation) {
+					}
+				};
+				iterator= nameList.iterator();
+				while(iterator.hasNext()) {
+					long key= iterator.next();
+					long pairName= - key;
+					Term pairValue= setPositiveMap.get(key);
+					if (pairName==SymbolCodes.symbolCode_E_translation) {
 						Vector3d vector= term2Vector3(pairValue,iX);
 						node.setTranslation(vector);
 						iterator.remove();
-					// } else {
-					//	throw new WrongArgumentIsUnknownTransform3DAttribute(key);
 					}
 				};
 				iterator= nameList.iterator();
@@ -212,14 +237,10 @@ public class AuxiliaryNode3D extends Tools3D {
 					long pairName= - key;
 					Term pairValue= setPositiveMap.get(key);
 					if (pairName==SymbolCodes.symbolCode_E_rotX) {
-						try {
-							double angle= Converters.termToReal(pairValue,iX);
-							Transform3D tempRotate= new Transform3D();
-							tempRotate.rotX(angle);
-							node.mul(tempRotate);
-						} catch (TermIsNotAReal e) {
-							throw new WrongArgumentIsNotNumeric(pairValue);
-						};
+						double angle= Converters.argumentToReal(pairValue,iX);
+						Transform3D tempRotate= new Transform3D();
+						tempRotate.rotX(angle);
+						node.mul(tempRotate);
 						iterator.remove();
 					}
 				};
@@ -229,14 +250,10 @@ public class AuxiliaryNode3D extends Tools3D {
 					long pairName= - key;
 					Term pairValue= setPositiveMap.get(key);
 					if (pairName==SymbolCodes.symbolCode_E_rotY) {
-						try {
-							double angle= Converters.termToReal(pairValue,iX);
-							Transform3D tempRotate= new Transform3D();
-							tempRotate.rotY(angle);
-							node.mul(tempRotate);
-						} catch (TermIsNotAReal e) {
-							throw new WrongArgumentIsNotNumeric(pairValue);
-						};
+						double angle= Converters.argumentToReal(pairValue,iX);
+						Transform3D tempRotate= new Transform3D();
+						tempRotate.rotY(angle);
+						node.mul(tempRotate);
 						iterator.remove();
 					}
 				};
@@ -246,14 +263,10 @@ public class AuxiliaryNode3D extends Tools3D {
 					long pairName= - key;
 					Term pairValue= setPositiveMap.get(key);
 					if (pairName==SymbolCodes.symbolCode_E_rotZ) {
-						try {
-							double angle= Converters.termToReal(pairValue,iX);
-							Transform3D tempRotate= new Transform3D();
-							tempRotate.rotZ(angle);
-							node.mul(tempRotate);
-						} catch (TermIsNotAReal e) {
-							throw new WrongArgumentIsNotNumeric(pairValue);
-						};
+						double angle= Converters.argumentToReal(pairValue,iX);
+						Transform3D tempRotate= new Transform3D();
+						tempRotate.rotZ(angle);
+						node.mul(tempRotate);
 						iterator.remove();
 					} else {
 						throw new WrongArgumentIsUnknownTransform3DAttribute(key);
@@ -273,22 +286,94 @@ public class AuxiliaryNode3D extends Tools3D {
 			GeometryInfo node= termToGeometryInfo(arguments[0],iX);
 			return node.getGeometryArray();
 		} catch (Backtracking b1) {
-		try { // Geometry
-			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_IndexedTriangleArray,1,iX);
-			IndexedTriangleArray node= attributesToIndexedTriangleArray(arguments[0],iX);
+		try { // PointArray
+			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_PointArray,1,iX);
+			PointArray node= attributesToPointArray(arguments[0],iX);
 			return node;
 		} catch (Backtracking b2) {
-		try { // Geometry
+		try { // LineArray
+			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_LineArray,1,iX);
+			LineArray node= attributesToLineArray(arguments[0],iX);
+			return node;
+		} catch (Backtracking b3) {
+		try { // TriangleArray
+			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_TriangleArray,1,iX);
+			TriangleArray node= attributesToTriangleArray(arguments[0],iX);
+			return node;
+		} catch (Backtracking b4) {
+		try { // QuadArray
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_QuadArray,1,iX);
 			QuadArray node= attributesToQuadArray(arguments[0],iX);
 			return node;
-		} catch (Backtracking b3) {
-		try { // Geometry
+		} catch (Backtracking b5) {
+		try { // LineStripArray
+			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_LineStripArray,1,iX);
+			LineStripArray node= attributesToLineStripArray(arguments[0],iX);
+			return node;
+		} catch (Backtracking b6) {
+		try { // TriangleStripArray
+			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_TriangleStripArray,1,iX);
+			TriangleStripArray node= attributesToTriangleStripArray(arguments[0],iX);
+			return node;
+		} catch (Backtracking b7) {
+		try { // TriangleFanArray
+			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_TriangleFanArray,1,iX);
+			TriangleFanArray node= attributesToTriangleFanArray(arguments[0],iX);
+			return node;
+		} catch (Backtracking b8) {
+		try { // IndexedPointArray
+			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_IndexedPointArray,1,iX);
+			IndexedPointArray node= attributesToIndexedPointArray(arguments[0],iX);
+			return node;
+		} catch (Backtracking b9) {
+		try { // IndexedLineArray
+			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_IndexedLineArray,1,iX);
+			IndexedLineArray node= attributesToIndexedLineArray(arguments[0],iX);
+			return node;
+		} catch (Backtracking b10) {
+		try { // IndexedTriangleArray
+			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_IndexedTriangleArray,1,iX);
+			IndexedTriangleArray node= attributesToIndexedTriangleArray(arguments[0],iX);
+			return node;
+		} catch (Backtracking b11) {
+		try { // IndexedQuadArray
+			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_IndexedQuadArray,1,iX);
+			IndexedQuadArray node= attributesToIndexedQuadArray(arguments[0],iX);
+			return node;
+		} catch (Backtracking b12) {
+		try { // IndexedLineStripArray
+			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_IndexedLineStripArray,1,iX);
+			IndexedLineStripArray node= attributesToIndexedLineStripArray(arguments[0],iX);
+			return node;
+		} catch (Backtracking b13) {
+		try { // IndexedTriangleStripArray
+			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_IndexedTriangleStripArray,1,iX);
+			IndexedTriangleStripArray node= attributesToIndexedTriangleStripArray(arguments[0],iX);
+			return node;
+		} catch (Backtracking b14) {
+		try { // IndexedTriangleFanArray
+			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_IndexedTriangleFanArray,1,iX);
+			IndexedTriangleFanArray node= attributesToIndexedTriangleFanArray(arguments[0],iX);
+			return node;
+		} catch (Backtracking b15) {
+		try { // Text3D
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Text3D,1,iX);
 			Text3D node= attributesToText3D(arguments[0],iX);
 			return node;
-		} catch (Backtracking b4) {
+		} catch (Backtracking b16) {
 			throw new WrongArgumentIsNotAGeometry(value);
+		}
+		}
+		}
+		}
+		}
+		}
+		}
+		}
+		}
+		}
+		}
+		}
 		}
 		}
 		}
@@ -339,6 +424,8 @@ public class AuxiliaryNode3D extends Tools3D {
 					node= new GeometryInfo(GeometryInfo.POLYGON_ARRAY);
 				};
 				boolean generateNormals= false;
+				Double creaseAngle= null;
+				boolean stripify= false;
 				iterator= nameList.iterator();
 				while(iterator.hasNext()) {
 					long key= iterator.next();
@@ -355,14 +442,26 @@ public class AuxiliaryNode3D extends Tools3D {
 						node.setStripCounts(stripCounts);
 					} else if (pairName==SymbolCodes.symbolCode_E_generateNormals) {
 						generateNormals= Converters.term2YesNo(pairValue,iX);
-					// } else if (pairName==SymbolCodes.symbolCode_E_primitive) {
+					} else if (pairName==SymbolCodes.symbolCode_E_creaseAngle) {
+						creaseAngle= Converters.argumentToReal(pairValue,iX);
+					} else if (pairName==SymbolCodes.symbolCode_E_stripify) {
+						stripify= Converters.term2YesNo(pairValue,iX);
 					} else {
 						throw new WrongArgumentIsUnknownGeometryInfoAttribute(key);
 					}
 				};
 				if (generateNormals) {
-					NormalGenerator ng= new NormalGenerator();
+					NormalGenerator ng;
+					if (creaseAngle==null) {
+						ng= new NormalGenerator();
+					} else {
+						ng= new NormalGenerator(creaseAngle);
+					};
 					ng.generateNormals(node);
+				};
+				if (stripify) {
+					Stripifier st= new Stripifier();
+					st.stripify(node);
 				};
 				return node;
 			} else {
@@ -511,7 +610,7 @@ public class AuxiliaryNode3D extends Tools3D {
 							int minFilter= termToMinificationFilter(pairValue,iX);
 							node.setMinFilter(minFilter);
 						} else {
-							throw new WrongArgumentIsUnknownText2DAttribute(key);
+							throw new WrongArgumentIsUnknownTexture2DAttribute(key);
 						}
 					};
 					return node;
@@ -626,12 +725,8 @@ public class AuxiliaryNode3D extends Tools3D {
 						Color3f color= term2Color3(pairValue,iX);
 						node.setSpecularColor(color);
 					} else if (pairName==SymbolCodes.symbolCode_E_shininess) {
-						try {
-							float shininess= (float)Converters.termToReal(pairValue,iX);
-							node.setShininess(shininess);
-						} catch (TermIsNotAReal e) {
-							throw new WrongArgumentIsNotNumeric(pairValue);
-						}
+						float shininess= (float)Converters.argumentToReal(pairValue,iX);
+						node.setShininess(shininess);
 					} else if (pairName==SymbolCodes.symbolCode_E_lightingEnable) {
 						boolean mode= Converters.term2YesNo(pairValue,iX);
 						node.setLightingEnable(mode);
@@ -727,18 +822,10 @@ public class AuxiliaryNode3D extends Tools3D {
 						cullFace= termToFaceCullingMode(pairValue,iX);
 						// iterator.remove();
 					} else if (pairName==SymbolCodes.symbolCode_E_polygonOffsetBias) {
-						try {
-							polygonOffsetBias= (float)Converters.termToReal(pairValue,iX);
-						} catch (TermIsNotAReal e) {
-							throw new WrongArgumentIsNotNumeric(pairValue);
-						}
+						polygonOffsetBias= (float)Converters.argumentToReal(pairValue,iX);
 						// iterator.remove();
 					} else if (pairName==SymbolCodes.symbolCode_E_polygonOffsetFactor) {
-						try {
-							polygonOffsetFactor= (float)Converters.termToReal(pairValue,iX);
-						} catch (TermIsNotAReal e) {
-							throw new WrongArgumentIsNotNumeric(pairValue);
-						}
+						polygonOffsetFactor= (float)Converters.argumentToReal(pairValue,iX);
 						// iterator.remove();
 					} else if (pairName==SymbolCodes.symbolCode_E_backFaceNormalFlip) {
 						backFaceNormalFlip= Converters.term2YesNo(pairValue,iX);
@@ -827,12 +914,8 @@ public class AuxiliaryNode3D extends Tools3D {
 					long pairName= - key;
 					Term pairValue= setPositiveMap.get(key);
 					if (pairName==SymbolCodes.symbolCode_E_transparency) {
-						try {
-							float transparency= (float)Converters.termToReal(pairValue,iX);
-							node.setTransparency(transparency);
-						} catch (TermIsNotAReal e) {
-							throw new WrongArgumentIsNotNumeric(pairValue);
-						}
+						float transparency= (float)Converters.argumentToReal(pairValue,iX);
+						node.setTransparency(transparency);
 					} else if (pairName==SymbolCodes.symbolCode_E_transparencyMode) {
 						int mode= termToTransparencyMode(pairValue,iX);
 						node.setTransparencyMode(mode);
@@ -900,15 +983,185 @@ public class AuxiliaryNode3D extends Tools3D {
 			throw new WrongArgumentIsNotASymbol(value);
 		}
 	}
-	public static IndexedTriangleArray termToIndexedTriangleArray(Term value, ChoisePoint iX) {
-		try { // IndexedTriangleArray
-			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_IndexedTriangleArray,1,iX);
-			return attributesToIndexedTriangleArray(arguments[0],iX);
-		} catch (Backtracking b) {
-			throw new WrongArgumentIsNotIndexedTriangleArray(value);
+	public static PointArray attributesToPointArray(Term attributes, ChoisePoint iX) {
+		return (PointArray)attributesToPlainGeometryArray(PlainGeometryArrayType.POINT,attributes,iX);
+	}
+	public static LineArray attributesToLineArray(Term attributes, ChoisePoint iX) {
+		return (LineArray)attributesToPlainGeometryArray(PlainGeometryArrayType.LINE,attributes,iX);
+	}
+	public static TriangleArray attributesToTriangleArray(Term attributes, ChoisePoint iX) {
+		return (TriangleArray)attributesToPlainGeometryArray(PlainGeometryArrayType.TRIANGLE,attributes,iX);
+	}
+	public static QuadArray attributesToQuadArray(Term attributes, ChoisePoint iX) {
+		return (QuadArray)attributesToPlainGeometryArray(PlainGeometryArrayType.QUAD,attributes,iX);
+	}
+	protected static GeometryArray attributesToPlainGeometryArray(PlainGeometryArrayType type, Term attributes, ChoisePoint iX) {
+		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
+		setEnd= setEnd.dereferenceValue(iX);
+		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
+			int vertexCount= 0; // Actor Prolog default value
+			boolean includeVertexPositions= true; // Actor Prolog default value
+			boolean includePerVertexNormals= false;
+			Set<Long> nameList= setPositiveMap.keySet();
+			Iterator<Long> iterator= nameList.iterator();
+			while(iterator.hasNext()) {
+				long key= iterator.next();
+				long pairName= - key;
+				Term pairValue= setPositiveMap.get(key);
+				if (pairName==SymbolCodes.symbolCode_E_vertexCount) {
+					try {
+						vertexCount= pairValue.getSmallIntegerValue(iX);
+					} catch (TermIsNotAnInteger e) {
+						throw new WrongArgumentIsNotAnInteger(pairValue);
+					};
+					iterator.remove();
+				} else if (pairName==SymbolCodes.symbolCode_E_includeVertexPositions) {
+					includeVertexPositions= Converters.term2YesNo(pairValue,iX);
+					iterator.remove();
+				} else if (pairName==SymbolCodes.symbolCode_E_includePerVertexNormals) {
+					includePerVertexNormals= Converters.term2YesNo(pairValue,iX);
+					iterator.remove();
+				}
+			};
+			int vertexFormat= 0;
+			if (includeVertexPositions) {
+				vertexFormat |= GeometryArray.COORDINATES;
+			};
+			if (includePerVertexNormals) {
+				vertexFormat |= GeometryArray.NORMALS;
+			};
+			GeometryArray node= null;
+			switch (type) {
+			case POINT:
+				node= new PointArray(vertexCount,vertexFormat);
+				break;
+			case LINE:
+				node= new LineArray(vertexCount,vertexFormat);
+				break;
+			case TRIANGLE:
+				node= new TriangleArray(vertexCount,vertexFormat);
+				break;
+			case QUAD:
+				node= new QuadArray(vertexCount,vertexFormat);
+				break;
+			};
+			iterator= nameList.iterator();
+			while(iterator.hasNext()) {
+				long key= iterator.next();
+				long pairName= - key;
+				Term pairValue= setPositiveMap.get(key);
+				if (pairName==SymbolCodes.symbolCode_E_coordinates) {
+					Point3d[] coordinates= term2Coordinates(pairValue,iX);
+					node.setCoordinates(0,coordinates);
+					iterator.remove();
+				} else if (pairName==SymbolCodes.symbolCode_E_normals) {
+					Vector3f[] normals= term2Normals(pairValue,iX);
+					node.setNormals(0,normals);
+					iterator.remove();
+				}
+			};
+			extractGeometryAttributes(node,nameList,setPositiveMap,iX);
+			return node;
+		} else {
+			throw new WrongArgumentIsNotAttributeSet(setEnd);
 		}
 	}
+	public static LineStripArray attributesToLineStripArray(Term attributes, ChoisePoint iX) {
+		return (LineStripArray)attributesToGeometryStripArray(GeometryStripArrayType.LINE,attributes,iX);
+	}
+	public static TriangleStripArray attributesToTriangleStripArray(Term attributes, ChoisePoint iX) {
+		return (TriangleStripArray)attributesToGeometryStripArray(GeometryStripArrayType.TRIANGLE,attributes,iX);
+	}
+	public static TriangleFanArray attributesToTriangleFanArray(Term attributes, ChoisePoint iX) {
+		return (TriangleFanArray)attributesToGeometryStripArray(GeometryStripArrayType.FAN,attributes,iX);
+	}
+	public static GeometryStripArray attributesToGeometryStripArray(GeometryStripArrayType type, Term attributes, ChoisePoint iX) {
+		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
+		setEnd= setEnd.dereferenceValue(iX);
+		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
+			int vertexCount= 0; // Actor Prolog default value
+			boolean includeVertexPositions= true; // Actor Prolog default value
+			boolean includePerVertexNormals= false;
+			int[] stripVertexCounts= new int[0]; // Actor Prolog default value
+			Set<Long> nameList= setPositiveMap.keySet();
+			Iterator<Long> iterator= nameList.iterator();
+			while(iterator.hasNext()) {
+				long key= iterator.next();
+				long pairName= - key;
+				Term pairValue= setPositiveMap.get(key);
+				if (pairName==SymbolCodes.symbolCode_E_vertexCount) {
+					try {
+						vertexCount= pairValue.getSmallIntegerValue(iX);
+					} catch (TermIsNotAnInteger e) {
+						throw new WrongArgumentIsNotAnInteger(pairValue);
+					};
+					iterator.remove();
+				} else if (pairName==SymbolCodes.symbolCode_E_includeVertexPositions) {
+					includeVertexPositions= Converters.term2YesNo(pairValue,iX);
+					iterator.remove();
+				} else if (pairName==SymbolCodes.symbolCode_E_includePerVertexNormals) {
+					includePerVertexNormals= Converters.term2YesNo(pairValue,iX);
+					iterator.remove();
+				} else if (pairName==SymbolCodes.symbolCode_E_stripVertexCounts) {
+					stripVertexCounts= term2StripCounts(pairValue,iX);
+					iterator.remove();
+				}
+			};
+			int vertexFormat= 0;
+			if (includeVertexPositions) {
+				vertexFormat |= GeometryArray.COORDINATES;
+			};
+			if (includePerVertexNormals) {
+				vertexFormat |= GeometryArray.NORMALS;
+			};
+			GeometryStripArray node= null;
+			switch (type) {
+			case LINE:
+				node= new LineStripArray(vertexCount,vertexFormat,stripVertexCounts);
+				break;
+			case TRIANGLE:
+				node= new TriangleStripArray(vertexCount,vertexFormat,stripVertexCounts);
+				break;
+			case FAN:
+				node= new TriangleFanArray(vertexCount,vertexFormat,stripVertexCounts);
+				break;
+			};
+			iterator= nameList.iterator();
+			while(iterator.hasNext()) {
+				long key= iterator.next();
+				long pairName= - key;
+				Term pairValue= setPositiveMap.get(key);
+				if (pairName==SymbolCodes.symbolCode_E_coordinates) {
+					Point3d[] coordinates= term2Coordinates(pairValue,iX);
+					node.setCoordinates(0,coordinates);
+					iterator.remove();
+				} else if (pairName==SymbolCodes.symbolCode_E_normals) {
+					Vector3f[] normals= term2Normals(pairValue,iX);
+					node.setNormals(0,normals);
+					iterator.remove();
+				}
+			};
+			extractGeometryAttributes(node,nameList,setPositiveMap,iX);
+			return node;
+		} else {
+			throw new WrongArgumentIsNotAttributeSet(setEnd);
+		}
+	}
+	public static IndexedPointArray attributesToIndexedPointArray(Term attributes, ChoisePoint iX) {
+		return (IndexedPointArray)attributesToIndexedGeometryArray(PlainGeometryArrayType.POINT,attributes,iX);
+	}
+	public static IndexedLineArray attributesToIndexedLineArray(Term attributes, ChoisePoint iX) {
+		return (IndexedLineArray)attributesToIndexedGeometryArray(PlainGeometryArrayType.LINE,attributes,iX);
+	}
 	public static IndexedTriangleArray attributesToIndexedTriangleArray(Term attributes, ChoisePoint iX) {
+		return (IndexedTriangleArray)attributesToIndexedGeometryArray(PlainGeometryArrayType.TRIANGLE,attributes,iX);
+	}
+	public static IndexedQuadArray attributesToIndexedQuadArray(Term attributes, ChoisePoint iX) {
+		return (IndexedQuadArray)attributesToIndexedGeometryArray(PlainGeometryArrayType.QUAD,attributes,iX);
+	}
+	public static IndexedGeometryArray attributesToIndexedGeometryArray(PlainGeometryArrayType type, Term attributes, ChoisePoint iX) {
 		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
 		Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
@@ -943,8 +1196,6 @@ public class AuxiliaryNode3D extends Tools3D {
 						throw new WrongArgumentIsNotAnInteger(pairValue);
 					};
 					iterator.remove();
-				// } else {
-				//	throw new WrongArgumentIsUnknownIndexedTriangleArrayAttribute(key);
 				}
 			};
 			int vertexFormat= 0;
@@ -954,7 +1205,21 @@ public class AuxiliaryNode3D extends Tools3D {
 			if (includePerVertexNormals) {
 				vertexFormat |= GeometryArray.NORMALS;
 			};
-			IndexedTriangleArray node= new IndexedTriangleArray(vertexCount,vertexFormat,indexCount);
+			IndexedGeometryArray node= null;
+			switch (type) {
+			case POINT:
+				node= new IndexedPointArray(vertexCount,vertexFormat,indexCount);
+				break;
+			case LINE:
+				node= new IndexedLineArray(vertexCount,vertexFormat,indexCount);
+				break;
+			case TRIANGLE:
+				node= new IndexedTriangleArray(vertexCount,vertexFormat,indexCount);
+				break;
+			case QUAD:
+				node= new IndexedQuadArray(vertexCount,vertexFormat,indexCount);
+				break;
+			};
 			iterator= nameList.iterator();
 			while(iterator.hasNext()) {
 				long key= iterator.next();
@@ -976,8 +1241,6 @@ public class AuxiliaryNode3D extends Tools3D {
 					int[] normalIndices= term2Indices(pairValue,iX);
 					node.setNormalIndices(0,normalIndices);
 					iterator.remove();
-				// } else {
-				//	throw new WrongArgumentIsUnknownIndexedTriangleArrayAttribute(key);
 				}
 			};
 			extractGeometryAttributes(node,nameList,setPositiveMap,iX);
@@ -986,15 +1249,16 @@ public class AuxiliaryNode3D extends Tools3D {
 			throw new WrongArgumentIsNotAttributeSet(setEnd);
 		}
 	}
-	public static QuadArray termToQuadArray(Term value, ChoisePoint iX) {
-		try { // QuadArray
-			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_QuadArray,1,iX);
-			return attributesToQuadArray(arguments[0],iX);
-		} catch (Backtracking b) {
-			throw new WrongArgumentIsNotQuadArray(value);
-		}
+	public static IndexedLineStripArray attributesToIndexedLineStripArray(Term attributes, ChoisePoint iX) {
+		return (IndexedLineStripArray)attributesToIndexedGeometryStripArray(GeometryStripArrayType.LINE,attributes,iX);
 	}
-	public static QuadArray attributesToQuadArray(Term attributes, ChoisePoint iX) {
+	public static IndexedTriangleStripArray attributesToIndexedTriangleStripArray(Term attributes, ChoisePoint iX) {
+		return (IndexedTriangleStripArray)attributesToIndexedGeometryStripArray(GeometryStripArrayType.TRIANGLE,attributes,iX);
+	}
+	public static IndexedTriangleFanArray attributesToIndexedTriangleFanArray(Term attributes, ChoisePoint iX) {
+		return (IndexedTriangleFanArray)attributesToIndexedGeometryStripArray(GeometryStripArrayType.FAN,attributes,iX);
+	}
+	public static IndexedGeometryStripArray attributesToIndexedGeometryStripArray(GeometryStripArrayType type, Term attributes, ChoisePoint iX) {
 		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
 		Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
@@ -1002,7 +1266,8 @@ public class AuxiliaryNode3D extends Tools3D {
 			int vertexCount= 0; // Actor Prolog default value
 			boolean includeVertexPositions= true; // Actor Prolog default value
 			boolean includePerVertexNormals= false;
-			// int indexCount= 0; // Actor Prolog default value
+			int indexCount= 0; // Actor Prolog default value
+			int[] stripIndexCounts= new int[0]; // Actor Prolog default value
 			Set<Long> nameList= setPositiveMap.keySet();
 			Iterator<Long> iterator= nameList.iterator();
 			while(iterator.hasNext()) {
@@ -1022,15 +1287,16 @@ public class AuxiliaryNode3D extends Tools3D {
 				} else if (pairName==SymbolCodes.symbolCode_E_includePerVertexNormals) {
 					includePerVertexNormals= Converters.term2YesNo(pairValue,iX);
 					iterator.remove();
-				// } else if (pairName==SymbolCodes.symbolCode_E_indexCount) {
-				//	try {
-				//		indexCount= pairValue.getSmallIntegerValue(iX);
-				//	} catch (TermIsNotAnInteger e) {
-				//		throw new WrongArgumentIsNotAnInteger(pairValue);
-				//	};
-				//	iterator.remove();
-				// } else {
-				//	throw new WrongArgumentIsUnknownIndexedTriangleArrayAttribute(key);
+				} else if (pairName==SymbolCodes.symbolCode_E_indexCount) {
+					try {
+						indexCount= pairValue.getSmallIntegerValue(iX);
+					} catch (TermIsNotAnInteger e) {
+						throw new WrongArgumentIsNotAnInteger(pairValue);
+					};
+					iterator.remove();
+				} else if (pairName==SymbolCodes.symbolCode_E_stripIndexCounts) {
+					stripIndexCounts= term2Indices(pairValue,iX);
+					iterator.remove();
 				}
 			};
 			int vertexFormat= 0;
@@ -1040,7 +1306,18 @@ public class AuxiliaryNode3D extends Tools3D {
 			if (includePerVertexNormals) {
 				vertexFormat |= GeometryArray.NORMALS;
 			};
-			QuadArray node= new QuadArray(vertexCount,vertexFormat);
+			IndexedGeometryStripArray node= null;
+			switch (type) {
+			case LINE:
+				node= new IndexedLineStripArray(vertexCount,vertexFormat,indexCount,stripIndexCounts);
+				break;
+			case TRIANGLE:
+				node= new IndexedTriangleStripArray(vertexCount,vertexFormat,indexCount,stripIndexCounts);
+				break;
+			case FAN:
+				node= new IndexedTriangleFanArray(vertexCount,vertexFormat,indexCount,stripIndexCounts);
+				break;
+			};
 			iterator= nameList.iterator();
 			while(iterator.hasNext()) {
 				long key= iterator.next();
@@ -1050,20 +1327,18 @@ public class AuxiliaryNode3D extends Tools3D {
 					Point3d[] coordinates= term2Coordinates(pairValue,iX);
 					node.setCoordinates(0,coordinates);
 					iterator.remove();
-				// } else if (pairName==SymbolCodes.symbolCode_E_coordinateIndices) {
-				//	int[] coordinateIndices= term2Indices(pairValue,iX);
-				//	node.setCoordinateIndices(0,coordinateIndices);
-				//	iterator.remove();
+				} else if (pairName==SymbolCodes.symbolCode_E_coordinateIndices) {
+					int[] coordinateIndices= term2Indices(pairValue,iX);
+					node.setCoordinateIndices(0,coordinateIndices);
+					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_normals) {
 					Vector3f[] normals= term2Normals(pairValue,iX);
 					node.setNormals(0,normals);
 					iterator.remove();
-				// } else if (pairName==SymbolCodes.symbolCode_E_normalIndices) {
-				//	int[] normalIndices= term2Indices(pairValue,iX);
-				//	node.setNormalIndices(0,normalIndices);
-				//	iterator.remove();
-				// } else {
-				//	throw new WrongArgumentIsUnknownIndexedTriangleArrayAttribute(key);
+				} else if (pairName==SymbolCodes.symbolCode_E_normalIndices) {
+					int[] normalIndices= term2Indices(pairValue,iX);
+					node.setNormalIndices(0,normalIndices);
+					iterator.remove();
 				}
 			};
 			extractGeometryAttributes(node,nameList,setPositiveMap,iX);
@@ -1139,13 +1414,9 @@ public class AuxiliaryNode3D extends Tools3D {
 					node.setPath(path);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_characterSpacing) {
-					try {
-						float characterSpacing= (float)Converters.termToReal(pairValue,iX);
-						node.setCharacterSpacing(characterSpacing);
-						iterator.remove();
-					} catch (TermIsNotAReal e) {
-						throw new WrongArgumentIsNotNumeric(pairValue);
-					}
+					float characterSpacing= (float)Converters.argumentToReal(pairValue,iX);
+					node.setCharacterSpacing(characterSpacing);
+					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_allowAlignmentRead) {
 					boolean mode= Converters.term2YesNo(pairValue,iX);
 					if (mode) {
@@ -1241,7 +1512,6 @@ public class AuxiliaryNode3D extends Tools3D {
 				Point3f basePosition= new Point3f();
 				node.getPosition(basePosition);
 				Point3d lowerPoint= new Point3d();
-				// System.out.printf("\n===\ntext: %s\n",text);
 				boundingBox.getLower(lowerPoint);
 				Point3d upperPoint= new Point3d();
 				boundingBox.getUpper(upperPoint);
@@ -1347,11 +1617,7 @@ public class AuxiliaryNode3D extends Tools3D {
 					} catch (TermIsSymbolDefault e) {
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_tessellationTolerance) {
-					try {
-						tessellationTolerance= Converters.termToReal(pairValue,iX);
-					} catch (TermIsNotAReal e) {
-						throw new WrongArgumentIsNotNumeric(pairValue);
-					}
+					tessellationTolerance= Converters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_extrudePath) {
 					extrudePath= termToFontExtrusion(pairValue,iX);
 				} else {
@@ -1406,17 +1672,9 @@ public class AuxiliaryNode3D extends Tools3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_depth) {
-					try {
-						depth= Converters.termToReal(pairValue,iX);
-					} catch (TermIsNotAReal e) {
-						throw new WrongArgumentIsNotNumeric(pairValue);
-					}
+					depth= Converters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_tessellationTolerance) {
-					try {
-						tessellationTolerance= Converters.termToReal(pairValue,iX);
-					} catch (TermIsNotAReal e) {
-						throw new WrongArgumentIsNotNumeric(pairValue);
-					}
+					tessellationTolerance= Converters.argumentToReal(pairValue,iX);
 				} else {
 					throw new WrongArgumentIsUnknownFontExtrusionAttribute(key);
 				}
@@ -1438,31 +1696,11 @@ public class AuxiliaryNode3D extends Tools3D {
 	}
 	protected static void extractDiffuseColor(Material node, Term value, ChoisePoint iX) {
 		try {
-			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_c4,4,iX);
-			float r;
-			float g;
-			float b;
-			float a;
-			try {
-				r= (float)Converters.termToReal(arguments[0],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(arguments[0]);
-				};
-			try {
-				g= (float)Converters.termToReal(arguments[1],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(arguments[1]);
-			};
-			try {
-				b= (float)Converters.termToReal(arguments[2],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(arguments[2]);
-			};
-			try {
-				a= (float)Converters.termToReal(arguments[3],iX);
-			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(arguments[3]);
-			};
+			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_color4,4,iX);
+			float r= (float)Converters.argumentToReal(arguments[0],iX);
+			float g= (float)Converters.argumentToReal(arguments[1],iX);
+			float b= (float)Converters.argumentToReal(arguments[2],iX);
+			float a= (float)Converters.argumentToReal(arguments[3],iX);
 			node.setDiffuseColor(r,g,b,a);
 		} catch (Backtracking b) {
 			Color3f color= term2Color3(value,iX);
@@ -1544,6 +1782,22 @@ public class AuxiliaryNode3D extends Tools3D {
 				return Background.SCALE_REPEAT;
 			} else {
 				throw new WrongArgumentIsNotImageScaleMode(value);
+			}
+		} catch (TermIsNotASymbol e) {
+			throw new WrongArgumentIsNotASymbol(value);
+		}
+	}
+	protected static int termToBillboardAlignmentMode(Term value, ChoisePoint iX) {
+		try {
+			long flag= value.getSymbolValue(iX);
+			if (flag==SymbolCodes.symbolCode_E_ROTATE_ABOUT_AXIS) {
+				return OrientedShape3D.ROTATE_ABOUT_AXIS;
+			} else if (flag==SymbolCodes.symbolCode_E_ROTATE_ABOUT_POINT) {
+				return OrientedShape3D.ROTATE_ABOUT_POINT;
+			} else if (flag==SymbolCodes.symbolCode_E_ROTATE_NONE) {
+				return OrientedShape3D.ROTATE_NONE;
+			} else {
+				throw new WrongArgumentIsNotBillboardAlignmentMode(value);
 			}
 		} catch (TermIsNotASymbol e) {
 			throw new WrongArgumentIsNotASymbol(value);

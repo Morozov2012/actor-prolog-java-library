@@ -12,17 +12,18 @@ package morozov.system.gui.dialogs.scalable.common;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.*;
 import morozov.terms.*;
 
-import javax.swing.*;
-import javax.swing.text.*;
-import javax.swing.border.*;
+import javax.swing.JTextField;
+import javax.swing.text.Document;
+import javax.swing.border.Border;
 
 import java.awt.Color;
-import java.awt.event.*;
 import java.awt.Font;
+import java.awt.event.KeyEvent;
 
 public class ATextField
 	extends JTextField

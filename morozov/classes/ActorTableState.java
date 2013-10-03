@@ -2,9 +2,11 @@
 
 package morozov.classes;
 
+import morozov.classes.errors.*;
+import morozov.run.*;
 import morozov.terms.*;
 
-import java.util.*;
+import java.util.HashSet;
 
 public class ActorTableState extends Term {
 	private HashSet<ActorNumber> table;

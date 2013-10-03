@@ -13,22 +13,28 @@ import javax.swing.JDesktopPane;
 import javax.swing.JPopupMenu;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
-
+import javax.swing.JApplet;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.GraphicsEnvironment;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsConfiguration;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.BorderLayout;
 import java.awt.Window;
+import java.awt.RenderingHints;
+import java.awt.Graphics2D;
+import java.beans.PropertyVetoException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.beans.PropertyVetoException;
 
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DesktopUtils {
@@ -39,7 +45,7 @@ public class DesktopUtils {
 	protected static final int borderSize= 3;
 	protected static final int viewerTitleHeight= 39;
 	//
-	public static void createPaneIfNecessary(StaticContext context) {
+	public static MainDesktopPane createPaneIfNecessary(StaticContext context) {
 		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(context);
 		if (desktop==null) {
 			ReentrantLock lock= StaticDesktopAttributes.retrieveDesktopGuard(context);
@@ -59,7 +65,10 @@ public class DesktopUtils {
 						Rectangle appletBounds= applet.getBounds();
 						if (appletBounds.width<=0 || appletBounds.height <= 0) {
 							GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
-							Rectangle bounds= env.getMaximumWindowBounds();
+							// Rectangle bounds= env.getMaximumWindowBounds();
+							GraphicsDevice device= env.getDefaultScreenDevice();
+							GraphicsConfiguration gc= device.getDefaultConfiguration();
+							Rectangle bounds= gc.getBounds();
 							applet.setSize(bounds.width-borderSize*2,bounds.height-borderSize*2-viewerTitleHeight);
 						};
 						desktop= new MainDesktopPane(context);
@@ -71,13 +80,33 @@ public class DesktopUtils {
 			} finally {
 				lock.unlock();
 			}
+		};
+		return desktop;
+	}
+	//
+	public static GraphicsConfiguration getGraphicsConfiguration(StaticContext context) {
+		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(context);
+		if (desktop != null) {
+			return desktop.getGraphicsConfiguration();
+		} else {
+			JApplet applet= StaticContext.retrieveApplet(context);
+			if (applet==null) {
+				GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
+				GraphicsDevice device= env.getDefaultScreenDevice();
+				return device.getDefaultConfiguration();
+			} else {
+				return applet.getGraphicsConfiguration();
+			}
 		}
 	}
 	// Auxiliary operations
 	static class MainWindow extends JFrame {
 		MainWindow(StaticContext context) {
 			GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
-			Rectangle bounds= env.getMaximumWindowBounds();
+			// Rectangle bounds= env.getMaximumWindowBounds();
+			GraphicsDevice device= env.getDefaultScreenDevice();
+			GraphicsConfiguration gc= device.getDefaultConfiguration();
+			Rectangle bounds= gc.getBounds();
 			setSize(bounds.width,bounds.height);
 			MainDesktopPane desktop= new MainDesktopPane(context);
 			StaticDesktopAttributes.setDesktopPane(desktop,context);
@@ -87,6 +116,35 @@ public class DesktopUtils {
 			} catch (SecurityException e) {
 				setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			}
+		}
+	}
+	//
+	public static Rectangle getCurrentDeviceBounds(StaticContext context) {
+		ReentrantLock lock= StaticDesktopAttributes.retrieveDesktopGuard(context);
+		lock.lock();
+		try {
+			JApplet applet= StaticContext.retrieveApplet(context);
+			if (applet==null) {
+				GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
+				// return env.getMaximumWindowBounds();
+				GraphicsDevice device= env.getDefaultScreenDevice();
+				GraphicsConfiguration gc= device.getDefaultConfiguration();
+				return gc.getBounds();
+			} else {
+				Rectangle appletBounds= applet.getBounds();
+				if (appletBounds.width<=0 || appletBounds.height <= 0) {
+					GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
+					// Rectangle bounds= env.getMaximumWindowBounds();
+					GraphicsDevice device= env.getDefaultScreenDevice();
+					GraphicsConfiguration gc= device.getDefaultConfiguration();
+					Rectangle bounds= gc.getBounds();
+					return new Rectangle(bounds.width-borderSize*2,bounds.height-borderSize*2-viewerTitleHeight);
+				} else {
+					return appletBounds;
+				}
+			}
+		} finally {
+			lock.unlock();
 		}
 	}
 	//
@@ -459,6 +517,22 @@ public class DesktopUtils {
 		sizeDifference.height= sizeDifference.height - cd.height;
 	}
 	//
+	public static void safelyGetSize(final Component component, final Dimension size) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			component.getSize(size);
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						component.getSize(size);
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	//
 	public static void setIconFalse(JInternalFrame frame) {
 		try {
 			frame.setIcon(false);
@@ -481,7 +555,7 @@ public class DesktopUtils {
 			}
 		}
 	}
-	public static void safelyRepaint(final InnerPage window) {
+	public static void safelyRepaint(final Component window) {
 		if (SwingUtilities.isEventDispatchThread()) {
 			window.repaint();
 		} else {
@@ -496,7 +570,7 @@ public class DesktopUtils {
 			}
 		}
 	}
-	public static void safelySetVisible(final boolean value, final InnerPage window) {
+	public static void safelySetVisible(final boolean value, final Component window) {
 		if (SwingUtilities.isEventDispatchThread()) {
 			window.setVisible(value);
 		} else {
@@ -509,6 +583,140 @@ public class DesktopUtils {
 			} catch (InterruptedException e) {
 			} catch (InvocationTargetException e) {
 			}
+		}
+	}
+	public static void safelyMaximize(final JInternalFrame window) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			maximize(window);
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						maximize(window);
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	protected static void maximize(final JInternalFrame window) {
+		if (window.isIcon()) {
+			try {
+				window.setIcon(false);
+			} catch (PropertyVetoException e) {
+			}
+		};
+		try {
+			window.setMaximum(true);
+		} catch (PropertyVetoException e) {
+		}
+	}
+	public static void safelyMinimize(final JInternalFrame window) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			minimize(window);
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						minimize(window);
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	protected static void minimize(final JInternalFrame window) {
+		if (window.isMaximum()) {
+			try {
+				window.setMaximum(false);
+			} catch (PropertyVetoException e) {
+			}
+		};
+		try {
+			window.setIcon(true);
+		} catch (PropertyVetoException e) {
+		}
+	}
+	public static void safelyRestore(final JInternalFrame window) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			restore(window);
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						restore(window);
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	protected static void restore(final JInternalFrame window) {
+		if (window.isMaximum()) {
+			try {
+				window.setMaximum(false);
+			} catch (PropertyVetoException e) {
+			}
+		};
+		if (window.isIcon()) {
+			try {
+				window.setIcon(false);
+			} catch (PropertyVetoException e) {
+			}
+		}
+	}
+	public static boolean safelyIsMaximized(final JInternalFrame window) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			return window.isMaximum();
+		} else {
+			final AtomicBoolean state= new AtomicBoolean(false);
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						state.set(window.isMaximum());
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			};
+			return state.get();
+		}
+	}
+	public static boolean safelyIsMinimized(final JInternalFrame window) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			return window.isIcon();
+		} else {
+			final AtomicBoolean state= new AtomicBoolean(false);
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						state.set(window.isIcon());
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			};
+			return state.get();
+		}
+	}
+	public static boolean safelyIsRestored(final JInternalFrame window) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			return !window.isMaximum() && !window.isIcon();
+		} else {
+			final AtomicBoolean state= new AtomicBoolean(false);
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						state.set(!window.isMaximum() && !window.isIcon());
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			};
+			return state.get();
 		}
 	}
 	public static void safelyMoveToFront(final InnerPage window) {
@@ -525,5 +733,30 @@ public class DesktopUtils {
 			} catch (InvocationTargetException e) {
 			}
 		}
+	}
+	public static void safelyDispose(final InnerPage window) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			window.dispose();
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						window.dispose();
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	//
+	public static void setRenderingHints(Graphics2D g2) {
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+		g2.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+		g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+		g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+		g2.setRenderingHint(RenderingHints.KEY_ALPHA_INTERPOLATION,RenderingHints.VALUE_ALPHA_INTERPOLATION_QUALITY);
+		g2.setRenderingHint(RenderingHints.KEY_COLOR_RENDERING,RenderingHints.VALUE_COLOR_RENDER_QUALITY);
+		g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL,RenderingHints.VALUE_STROKE_NORMALIZE);
 	}
 }

@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 public class FileNameMask extends FileFilter {
 	protected String textDescription;
 	protected String[] fileNameMasks;
+	protected String firstExtension= "";
 	private Pattern[] patterns;
 	public FileNameMask(String description, String requiredPatterns) {
 		this(description, new String[] {requiredPatterns});
@@ -26,11 +27,38 @@ public class FileNameMask extends FileFilter {
 	public FileNameMask(String description, String[] requiredPatterns) {
 		textDescription= description;
 		fileNameMasks= requiredPatterns;
+		if (fileNameMasks.length > 0) {
+			String firstMask= fileNameMasks[0];
+			firstExtension= extractExtension(firstMask);
+		};
 		int length= requiredPatterns.length;
 		patterns= new Pattern[length];
 		for (int n=0; n < length; n++) {
 			patterns[n]= wildcard2pattern(requiredPatterns[n]);
 		}
+	}
+	protected String extractExtension(String name) {
+		int p1= name.lastIndexOf('.');
+		if (p1 >= 0) {
+			name= name.substring(p1);
+		};
+		int p2= name.lastIndexOf(']');
+		if (p2 >= 0) {
+			name= name.substring(0,p2);
+		};
+		int p3= name.lastIndexOf('[');
+		if (p3 >= 0) {
+			name= name.substring(0,p3);
+		};
+		int p4= name.lastIndexOf('*');
+		if (p4 >= 0) {
+			return "";
+		};
+		int p5= name.lastIndexOf('?');
+		if (p5 >= 0) {
+			return "";
+		};
+		return name;
 	}
 	//
 	public boolean accept(java.io.File f) {
@@ -166,5 +194,15 @@ public class FileNameMask extends FileFilter {
 			}
 		};
 		return Pattern.compile(new String(regularPattern,0,j),Pattern.CASE_INSENSITIVE);
+	}
+	//
+	public String appendExtensionIfNecessary(String name) {
+		if (firstExtension.length() > 0) {
+			int p1= name.lastIndexOf('.');
+			if (p1 < 0) {
+				name= name + firstExtension;
+			}
+		};
+		return name;
 	}
 }

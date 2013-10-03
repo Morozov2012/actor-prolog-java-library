@@ -12,11 +12,14 @@ package morozov.system.gui.dialogs.scalable;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
+import morozov.system.gui.dialogs.signals.*;
 import morozov.terms.*;
 
-import javax.swing.*;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import java.awt.Font;
 
 public class ScalableTextArea extends ActiveComponent {
@@ -26,10 +29,11 @@ public class ScalableTextArea extends ActiveComponent {
 	//
 	public ScalableTextArea(AbstractDialog tD, String text, int visibleRowCount, int visibleColumnCount) {
 		super(tD);
-		component= new JScrollPane();
+		JScrollPane scrollPane= new JScrollPane();
+		component= scrollPane;
 		area= new ATextArea(tD,this,text,visibleRowCount,visibleColumnCount);
 		area.setEditable(isEditable);
-		((JScrollPane)component).setViewportView(area);
+		scrollPane.setViewportView(area);
 	}
 	//
 	// protected int getInitialTopBorder() {return 5;}
@@ -50,7 +54,8 @@ public class ScalableTextArea extends ActiveComponent {
 			area.setFont(font);
 			super.setFont(font);
 			if (component!=null) {
-				((JScrollPane)component).setMinimumSize(((JScrollPane)component).getPreferredSize());
+				JScrollPane scrollPane= (JScrollPane)component;
+				scrollPane.setMinimumSize(scrollPane.getPreferredSize());
 			}
 		}
 	}
@@ -72,7 +77,7 @@ public class ScalableTextArea extends ActiveComponent {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
 			if (isEditable) {
-				throw new RejectValue();
+				throw RejectValue.instance;
 			} else {
 				return new PrologString("");
 			}

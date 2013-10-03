@@ -2,7 +2,10 @@
 
 package morozov.domains;
 
+import morozov.domains.signals.*;
+import morozov.run.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 public class DomainStructure extends MultiArgumentDomainItem {
 	protected long functor;

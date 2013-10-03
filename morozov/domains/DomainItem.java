@@ -2,6 +2,8 @@
 
 package morozov.domains;
 
+import morozov.domains.signals.*;
+import morozov.run.*;
 import morozov.terms.*;
 
 public class DomainItem extends MonoArgumentDomainItem {

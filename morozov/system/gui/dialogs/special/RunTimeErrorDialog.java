@@ -318,7 +318,8 @@ public class RunTimeErrorDialog extends JDialog implements ActionListener {
 		gBC3.ipady= 0;
 		// control_3_2_5= new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		control_3_2_5= new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		area_3_2_5= new JTextArea(stackTrace,7,textAreaWidth);
+		// area_3_2_5= new JTextArea(stackTrace,7,textAreaWidth);
+		area_3_2_5= new JTextArea(stackTrace,10,textAreaWidth);
 		area_3_2_5.setEditable(false);
 		// area_3_2_5.setLineWrap(true);
 		area_3_2_5.setLineWrap(false);

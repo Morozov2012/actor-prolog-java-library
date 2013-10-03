@@ -69,12 +69,10 @@ public class LocalFileAttributes {
 	}
 	protected boolean basicAttributesWereChanged(BasicFileAttributes recentAttributes) {
 		// Returns the creation time.
-		// System.out.printf("(1)LocalFileAttributes\n");
 		FileTime time= basicAttributes.creationTime();
 		if (time.compareTo(recentAttributes.creationTime()) != 0) {
 			return true;
 		};
-		// System.out.printf("(2)LocalFileAttributes\n");
 		// Returns an object that uniquely identifies the given file,
 		// or null if a file key is not available.
 		Object key1= basicAttributes.fileKey();
@@ -92,52 +90,41 @@ public class LocalFileAttributes {
 				return true;
 			}
 		};
-		// System.out.printf("(3)LocalFileAttributes\n");
 		// Tells whether the file is a directory.
 		if (basicAttributes.isDirectory() != recentAttributes.isDirectory()) {
 			return true;
 		};
-		// System.out.printf("(4)LocalFileAttributes\n");
 		// Tells whether the file is something other than a regular
 		// file, directory, or symbolic link.
 		if (basicAttributes.isOther() != recentAttributes.isOther()) {
 			return true;
 		};
-		// System.out.printf("(5)LocalFileAttributes\n");
 		// Tells whether the file is a regular file with opaque content.
 		if (basicAttributes.isRegularFile() != recentAttributes.isRegularFile()) {
 			return true;
 		};
-		// System.out.printf("(6)LocalFileAttributes\n");
 		// Tells whether the file is a symbolic link.
 		if (basicAttributes.isSymbolicLink() != recentAttributes.isSymbolicLink()) {
 			return true;
 		};
-		// System.out.printf("(7)LocalFileAttributes\n");
 		// Returns the time of last access.
 		if (basicAttributes.lastAccessTime().compareTo(recentAttributes.lastAccessTime()) != 0) {
 			return true;
 		};
-		// System.out.printf("(8)LocalFileAttributes\n");
 		// Returns the time of last modification.
 		if (basicAttributes.lastModifiedTime().compareTo(recentAttributes.lastModifiedTime()) != 0) {
 			return true;
 		};
-		// System.out.printf("(9)LocalFileAttributes\n");
 		// Returns the size of the file (in bytes).
 		if (basicAttributes.size() != recentAttributes.size()) {
 			return true;
 		};
-		// System.out.printf("(FALSE)LocalFileAttributes\n");
 		return false;
 	}
 	protected boolean directoryContentWasChanged(ArrayList<Path> recentContent) {
 		int size= directoryContent.size();
 		if (size == recentContent.size()) {
 			for (int n=0; n < size; n++) {
-				// System.out.printf("1) %s\n",directoryContent.get(n));
-				// System.out.printf("2) %s\n",recentContent.get(n));
-				// System.out.printf("3) %s\n",directoryContent.get(n).compareTo(recentContent.get(n)));
 				if (directoryContent.get(n).compareTo(recentContent.get(n)) != 0) {
 					return true;
 				}

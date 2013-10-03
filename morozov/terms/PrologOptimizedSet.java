@@ -6,7 +6,11 @@ import target.*;
 
 import morozov.classes.*;
 import morozov.domains.*;
+import morozov.domains.signals.*;
 import morozov.run.*;
+import morozov.run.errors.*;
+import morozov.terms.errors.*;
+import morozov.terms.signals.*;
 
 import java.nio.charset.CharsetEncoder;
 import java.util.HashMap;
@@ -27,7 +31,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 		};
 		tail= new PrologVariable();
 	}
-	public PrologOptimizedSet(PrologOptimizedSet set, ChoisePoint cp)  throws Backtracking {
+	public PrologOptimizedSet(PrologOptimizedSet set, ChoisePoint cp) throws Backtracking {
 		keys= set.keys;
 		elements= new Term[keys.length];
 		for (int i= 0; i < keys.length; i++) {
@@ -47,12 +51,12 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 		for (int i= 0; i < aElements.length; i++) {
 			Term e= aElements[i];
 			if (e==null) {
-				elements[i]= new PrologNoValue();
+				elements[i]= PrologNoValue.instance;
 			} else {
 				elements[i]= new PrologSetElement(e);
 			}
 		};
-		tail= new PrologEmptySet();
+		tail= PrologEmptySet.instance;
 	}
 	public PrologOptimizedSet(Term[] aElements, boolean closeSet, long[] aKeys) {
 		elements= new Term[aElements.length];
@@ -61,7 +65,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 			Term e= aElements[i];
 			if (e==null) {
 				if (closeSet) {
-					elements[i]= new PrologNoValue();
+					elements[i]= PrologNoValue.instance;
 				} else {
 					elements[i]= new PrologVariable();
 				}
@@ -70,7 +74,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 			}
 		};
 		if (closeSet) {
-			tail= new PrologEmptySet();
+			tail= PrologEmptySet.instance;
 		} else {
 			tail= new PrologVariable();
 		}
@@ -169,14 +173,14 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 		set.tail= tail;
 	}
 	public void setNoValueElements() {
-		Term noValue= new PrologNoValue();
+		Term noValue= PrologNoValue.instance;
 		for (int i= 0; i < elements.length; i++) {
 			Term e2= elements[i];
 			if (e2==null) {
 				elements[i]= noValue;
 			}
 		};
-		tail= new PrologEmptySet();
+		tail= PrologEmptySet.instance;
 	}
 	public void setGivenElement(long name, Term e1, Term tail, ChoisePoint cp) throws Backtracking {
 		for (int i= 0; i < elements.length; i++) {
@@ -186,20 +190,20 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 					elements[i]= e1;
 				} else {
 					// e1.isNoValue(cp);
-					throw new Backtracking();
+					throw Backtracking.instance;
 				};
 				tail.inheritSetElements(this,cp);
 				return;
 			}
 		};
-		throw new Backtracking();
+		throw Backtracking.instance;
 	}
 	public void prohibitGivenElement(long name, Term tail, ChoisePoint cp) throws Backtracking {
 		for (int i= 0; i < elements.length; i++) {
 			if (keys[i]==name) {
 				Term e2= elements[i];
 				if (e2==null) {
-					elements[i]= new PrologNoValue();
+					elements[i]= PrologNoValue.instance;
 				};
 				break;
 			}
@@ -211,7 +215,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 			if (keys[i]==aName) {
 				Term element= elements[i];
 				try {
-                                	return element.retrieveSetElementValue(cp);
+					return element.retrieveSetElementValue(cp);
 				} catch (TermIsNotSetElement e) {
 					throw new WrongTermIsNotSetElement(element);
 				}
@@ -237,7 +241,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 	}
 	public Term excludeNamedElements(long[] aNames, ChoisePoint cp) throws Backtracking {
 		PrologOptimizedSet clone= (PrologOptimizedSet)this.clone();
-		Term noValue= new PrologNoValue();
+		Term noValue= PrologNoValue.instance;
 		HashSet<Long> extraElementsToBeExcluded= null;
 		// for (int j= 0; j < elements.length; j++) {
 		//	System.out.printf("%d) keys[i]: %s\n",j,keys[j]);
@@ -417,6 +421,13 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 		PrologOptimizedSet clone= (PrologOptimizedSet)this.clone();
 		for (int i= 0; i < elements.length; i++) {
 			clone.elements[i]= elements[i].copyValue(cp,mode);
+		};
+		return clone;
+	}
+	public PrologOptimizedSet copyGroundValue(ChoisePoint cp) throws TermIsUnboundVariable {
+		PrologOptimizedSet clone= (PrologOptimizedSet)this.clone();
+		for (int i= 0; i < elements.length; i++) {
+			clone.elements[i]= elements[i].copyGroundValue(cp);
 		};
 		return clone;
 	}

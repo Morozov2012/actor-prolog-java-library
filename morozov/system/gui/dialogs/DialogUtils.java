@@ -7,7 +7,12 @@ import target.*;
 import morozov.run.*;
 import morozov.system.*;
 import morozov.system.gui.*;
+import morozov.system.gui.signals.*;
+import morozov.system.gui.dialogs.errors.*;
+import morozov.system.gui.dialogs.signals.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -17,7 +22,7 @@ public class DialogUtils {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_auto) {
-				throw new TermIsSymbolAuto();
+				throw TermIsSymbolAuto.instance;
 			} else {
 				throw new WrongTermIsNotDialogIdentifier(value);
 			}
@@ -26,44 +31,16 @@ public class DialogUtils {
 				return value.getStringValue(iX);
 			} catch (TermIsNotAString e2) {
 				throw new WrongTermIsNotDialogIdentifier(value);
-			}
-		}
-	}
-	public static String termToDialogTitleSafe(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
-		value= value.dereferenceValue(iX);
-		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
-			throw new TermIsSymbolDefault();
-		} else {
-			try {
-				return termToDialogTitle(value,iX);
-			} catch (RuntimeException e) {
-				throw new TermIsSymbolDefault();
-			}
-		}
-	}
-	public static String termToDialogTitle(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
-		try {
-			long code= value.getSymbolValue(iX);
-			if (code==SymbolCodes.symbolCode_E_default) {
-				throw new TermIsSymbolDefault();
-			} else {
-				throw new WrongTermIsNotDialogTitle(value);
-			}
-		} catch (TermIsNotASymbol e1) {
-			try {
-				return value.getStringValue(iX);
-			} catch (TermIsNotAString e2) {
-				throw new WrongTermIsNotDialogTitle(value);
 			}
 		}
 	}
 	//
-	public static int calculateRealCoordinate(ExtendedCoordinate lZ, int spaceLimit, double gridZ, double rDZ)
-		throws ExtendedCoordinate.UseDefaultLocation {
+	public static int calculateRealCoordinate(ExtendedCoordinate lZ, int spaceBeginning, int spaceLimit, double gridZ, double rDZ)
+		throws UseDefaultLocation {
 		try {
-			return (int)StrictMath.round((double)lZ.getValue() / gridZ * spaceLimit );
-		} catch (ExtendedCoordinate.CentreFigure e) {
-			return (int)StrictMath.round(((double)spaceLimit - rDZ) / 2);
+			return (int)StrictMath.round(spaceBeginning + (double)lZ.getValue() / gridZ * spaceLimit );
+		} catch (CentreFigure e) {
+			return (int)StrictMath.round(spaceBeginning + ((double)spaceLimit - rDZ) / 2);
 		}
 	}
 	//
@@ -286,7 +263,7 @@ public class DialogUtils {
 			return;
 		};
 		// if (tail.thisIsUnknownValue()) {
-		//	array.add(new PrologUnknownValue());
+		//	array.add(PrologUnknownValue.instance);
 		//	return;
 		// };
 		try {
@@ -336,7 +313,7 @@ public class DialogUtils {
 	protected static Term frontCell(Term value, ChoisePoint iX) throws TermIsNotFrontCell {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable()) {
-			throw new TermIsNotFrontCell();
+			throw TermIsNotFrontCell.instance;
 		};
 		if (value.thisIsUnknownValue()) {
 			return value;
@@ -346,7 +323,7 @@ public class DialogUtils {
 			if (PrologInteger.isSmallInteger(bigInteger)) {
 				return value;
 			} else {
-				throw new TermIsNotFrontCell();
+				throw TermIsNotFrontCell.instance;
 			}
 		} catch (TermIsNotAnInteger e1) {
 			try {
@@ -355,17 +332,17 @@ public class DialogUtils {
 				if (PrologInteger.isSmallInteger(bigInteger)) {
 					return new PrologInteger(bigInteger);
 				} else {
-					throw new TermIsNotFrontCell();
+					throw TermIsNotFrontCell.instance;
 				}
 			} catch (TermIsNotAReal e2) {
-				throw new TermIsNotFrontCell();
+				throw TermIsNotFrontCell.instance;
 			}
 		}
 	}
 	protected static Term rowTailToTerm(Term value, ChoisePoint iX) {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable()) {
-			return new PrologEmptyList();
+			return PrologEmptyList.instance;
 		};
 		try {
 			Term frontCell= value.getNextListHead(iX);
@@ -381,9 +358,9 @@ public class DialogUtils {
 			rest= rowTailToTerm(rest,iX);
 			return new PrologList(frontCell,rest);
 		} catch (EndOfList e5) {
-			return new PrologEmptyList();
+			return PrologEmptyList.instance;
 		} catch (TermIsNotAList e5) {
-			return new PrologEmptyList();
+			return PrologEmptyList.instance;
 		}
 	}
 	//
@@ -393,7 +370,7 @@ public class DialogUtils {
 			if (PrologInteger.isSmallInteger(bigInteger)) {
 				return bigInteger.intValue();
 			} else {
-				throw new RejectValue();
+				throw RejectValue.instance;
 			}
 		} catch (TermIsNotAnInteger e1) {
 			try {
@@ -402,11 +379,11 @@ public class DialogUtils {
 				if (PrologInteger.isSmallInteger(bigInteger)) {
 					return bigInteger.intValue();
 				} else {
-					throw new RejectValue();
+					throw RejectValue.instance;
 				}
 			} catch (TermIsNotAReal e2) {
-				// return new PrologUnknownValue();
-				throw new RejectValue();
+				// return PrologUnknownValue.instance;
+				throw RejectValue.instance;
 			}
 		}
 	}
@@ -423,7 +400,7 @@ public class DialogUtils {
 				} else if (code==SymbolCodes.symbolCode_E_centered) {
 					return new PrologSymbol(code);
 				} else {
-					throw new RejectValue();
+					throw RejectValue.instance;
 				}
 			} catch (TermIsNotASymbol e1) {
 				try {
@@ -434,7 +411,7 @@ public class DialogUtils {
 						double number= value.getRealValue(iX);
 						return new PrologReal(number);
 					} catch (TermIsNotAReal e3) {
-						throw new RejectValue();
+						throw RejectValue.instance;
 					}
 				}
 			}
@@ -454,7 +431,7 @@ public class DialogUtils {
 				} catch (TermIsSymbolDefault e1) {
 					return new PrologSymbol(SymbolCodes.symbolCode_E_default);
 				} catch (IsNotColorSymbolCode e1) {
-					throw new RejectValue();
+					throw RejectValue.instance;
 				}
 			} catch (TermIsNotASymbol e1) {
 				try {
@@ -462,7 +439,7 @@ public class DialogUtils {
 					// if (PrologInteger.isSmallInteger(bigInteger)) {
 						return new PrologInteger(bigInteger);
 					// } else {
-					//	throw new RejectValue();
+					//	throw RejectValue.instance;
 					// }
 				} catch (TermIsNotAnInteger e2) {
 					try {
@@ -471,7 +448,7 @@ public class DialogUtils {
 						// if (PrologInteger.isSmallInteger(bigInteger)) {
 							return new PrologInteger(bigInteger.intValue());
 						// } else {
-						// 	throw new RejectValue();
+						//	throw RejectValue.instance;
 						// }
 					} catch (TermIsNotAReal e3) {
 						try {
@@ -488,13 +465,13 @@ public class DialogUtils {
 								} catch (TermIsSymbolDefault e5) {
 									return new PrologSymbol(SymbolCodes.symbolCode_E_default);
 								} catch (IsNotColorName e5) {
-									throw new RejectValue();
+									throw RejectValue.instance;
 								} catch (IsNotColorSymbolCode e5) {
-									throw new RejectValue();
+									throw RejectValue.instance;
 								}
 							}
 						} catch (TermIsNotAString e4) {
-							throw new RejectValue();
+							throw RejectValue.instance;
 						}
 					}
 				}
@@ -515,14 +492,14 @@ public class DialogUtils {
 				} catch (TermIsSymbolDefault e1) {
 					return new PrologSymbol(SymbolCodes.symbolCode_E_default);
 				} catch (IsNotFontNameSymbolCode e1) {
-					throw new RejectValue();
+					throw RejectValue.instance;
 				}
 			} catch (TermIsNotASymbol e1) {
 				try {
 					String fontName= value.getStringValue(iX);
 					return new PrologString(fontName);
 				} catch (TermIsNotAString e4) {
-					throw new RejectValue();
+					throw RejectValue.instance;
 				}
 			}
 		}
@@ -538,19 +515,19 @@ public class DialogUtils {
 				return new PrologInteger(number);
 			} catch (TermIsNotAnInteger e1) {
 				try {
-					double number= StrictMath.round(value.getRealValue(iX));
-					BigInteger bigInteger= Converters.doubleToBigInteger(number);
-					return new PrologInteger(bigInteger);
+					double number= value.getRealValue(iX);
+					// BigInteger bigInteger= Converters.doubleToBigInteger(number);
+					return new PrologReal(number);
 				} catch (TermIsNotAReal e2) {
 					try {
 						long code= value.getSymbolValue(iX);
 						if (code==SymbolCodes.symbolCode_E_default) {
 							return new PrologSymbol(code);
 						} else {
-							throw new RejectValue();
+							throw RejectValue.instance;
 						}
 					} catch (TermIsNotASymbol e3) {
-						throw new RejectValue();
+						throw RejectValue.instance;
 					}
 				}
 			}
@@ -568,7 +545,7 @@ public class DialogUtils {
 			} catch (TermIsSymbolDefault e) {
 				return new PrologSymbol(SymbolCodes.symbolCode_E_default);
 			} catch (IsNotFontStyle e) {
-				throw new RejectValue();
+				throw RejectValue.instance;
 			}
 		}
 	}

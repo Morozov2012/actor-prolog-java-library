@@ -12,13 +12,18 @@ package morozov.system.gui.dialogs.scalable.common;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
+import javax.swing.JScrollPane;
+import javax.swing.ListModel;
+import javax.swing.ListSelectionModel;
+import javax.swing.JList;
 import java.awt.Font;
 import java.awt.FontMetrics;
-import javax.swing.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
@@ -147,15 +152,13 @@ public class AList extends JScrollPane {
 									}
 								}
 							} catch (TermIsNotAString e3) {
-								list.setValueIsAdjusting(true);
-								// try {
-									// ListModel model= list.getModel();
+								try {
+									list.setValueIsAdjusting(true);
 									list.clearSelection();
 									implementMultipleSelection(value,iX,model);
+								} finally {
 									list.setValueIsAdjusting(false);
-								// } catch (RuntimeException e3) {
-								//	list.setValueIsAdjusting(false);
-								// }
+								}
 							}
 						}
 					}
@@ -171,14 +174,17 @@ public class AList extends JScrollPane {
 				Arrays.sort(stringList,new AlphabeticComparator());
 			};
 			synchronized(list) {
-				list.setValueIsAdjusting(true);
-				list.clearSelection();
-				list.setListData(stringList);
-				if (useTabStops) {
-					renderer= new TabListCellRenderer(stringList);
-					list.setCellRenderer(renderer);
+				try {
+					list.setValueIsAdjusting(true);
+					list.clearSelection();
+					list.setListData(stringList);
+					if (useTabStops) {
+						renderer= new TabListCellRenderer(stringList);
+						list.setCellRenderer(renderer);
+					}
+				} finally {
+					list.setValueIsAdjusting(false);
 				};
-				list.setValueIsAdjusting(false);
 				targetDialog.repaint();
 				targetDialog.repaintAfterDelay();
 			}
@@ -190,20 +196,20 @@ public class AList extends JScrollPane {
 				ListModel model= list.getModel();
 				int mode= list.getSelectionMode();
 				if (model.getSize() <= 0 || list.isSelectionEmpty()) {
-					return new PrologEmptyList();
+					return PrologEmptyList.instance;
 				} else if (mode==ListSelectionModel.SINGLE_SELECTION) {
 					Object selectedValue= list.getSelectedValue();
 					if (selectedValue==null) {
-						return new PrologEmptyList();
+						return PrologEmptyList.instance;
 					} else {
 						return new PrologString(selectedValue.toString());
 					}
 				} else {
 					List<String> values= list.getSelectedValuesList();
 					if (values==null) {
-						return new PrologEmptyList();
+						return PrologEmptyList.instance;
 					} else {
-						Term result= new PrologEmptyList();
+						Term result= PrologEmptyList.instance;
 						for (int n=values.size()-1; n>=0; n--) {
 							result= new PrologList(new PrologString(values.get(n).toString()),result);
 						};
@@ -212,24 +218,24 @@ public class AList extends JScrollPane {
 				}
 			}
 		} else {
-			return new PrologEmptyList();
+			return PrologEmptyList.instance;
 		}
 	}
 	public Term getRange() {
 		if (list!=null) {
 			synchronized(list) {
 				ListModel model= list.getModel();
-				Term result= new PrologEmptyList();
+				Term result= PrologEmptyList.instance;
 				for (int n=model.getSize()-1; n>=0; n--) {
 					result= new PrologList(new PrologString(model.getElementAt(n).toString()),result);
 				};
 				return result;
 			}
 		} else {
-			return new PrologEmptyList();
-			// return new PrologUnknownValue();
+			return PrologEmptyList.instance;
+			// return PrologUnknownValue.instance;
 		}
-        }
+	}
 	//
 	// Auxiliary function
 	//

@@ -2,9 +2,11 @@
 
 package morozov.classes;
 
+import morozov.classes.errors.*;
+import morozov.run.*;
 import morozov.terms.*;
 
-import java.util.*;
+import java.util.ArrayList;
 
 public class AsyncCallTableState extends Term {
 	private ArrayList<AsyncCall> table;

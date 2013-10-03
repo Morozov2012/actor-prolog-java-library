@@ -5,14 +5,23 @@ package morozov.built_in;
 import target.*;
 
 import morozov.domains.*;
+import morozov.domains.errors.*;
+import morozov.domains.signals.*;
 import morozov.run.*;
-import morozov.system.*;
 import morozov.system.checker.*;
+import morozov.system.checker.errors.*;
+import morozov.system.checker.signals.*;
+import morozov.system.errors.*;
 import morozov.system.files.*;
+import morozov.system.files.errors.*;
 import morozov.system.records.*;
+import morozov.system.records.errors.*;
+import morozov.system.signals.*;
 import morozov.syntax.*;
-import morozov.syntax.scanner.*;
+import morozov.syntax.errors.*;
+import morozov.syntax.scanner.errors.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -43,7 +52,7 @@ public abstract class Database extends DataAbstraction {
 	abstract protected Term getBuiltInSlot_E_extension();
 	abstract protected Term getBuiltInSlot_E_max_waiting_time();
 	abstract protected Term getBuiltInSlot_E_character_set();
-	abstract protected Term getBuiltInSlot_E_backslash_is_separator_always();
+	abstract protected Term getBuiltInSlot_E_backslash_always_is_separator();
 	abstract protected PrologDomain getBuiltInSlotDomain_E_target_data();
 	//
 	public void insert1s(ChoisePoint iX, Term a1) {
@@ -129,7 +138,7 @@ public abstract class Database extends DataAbstraction {
 							currentRecord= getNextValidRecord(currentRecord);
 							continue;
 						} else {
-							throw new Backtracking();
+							throw Backtracking.instance;
 						}
 					};
 					return;
@@ -137,7 +146,7 @@ public abstract class Database extends DataAbstraction {
 					if (hasOutputArgument) {
 						outputResult.value= null;
 					};
-					throw new Backtracking();
+					throw Backtracking.instance;
 				}
 			}
 		}
@@ -189,14 +198,14 @@ public abstract class Database extends DataAbstraction {
 						if (newIx.isEnabled()) {
 							newIx.freeTrail();
 							if (currentRecord==null) {
-								throw new Backtracking();
+								throw Backtracking.instance;
 							} else {
 								currentRecord= currentRecord.nextRecord;
 							};
 							currentRecord= findMatch(currentRecord,pattern,newIx);
 							continue;
 						} else {
-							throw new Backtracking();
+							throw Backtracking.instance;
 						}
 					};
 					return;
@@ -204,7 +213,7 @@ public abstract class Database extends DataAbstraction {
 					if (isFunctionCall) {
 						result.value= null;
 					};
-					throw new Backtracking();
+					throw Backtracking.instance;
 				}
 			}
 		}
@@ -255,7 +264,7 @@ public abstract class Database extends DataAbstraction {
 							currentRecord= getNextValidRecord(currentRecord);
 							continue;
 						} else {
-							throw new Backtracking();
+							throw Backtracking.instance;
 						}
 					};
 					return;
@@ -263,7 +272,7 @@ public abstract class Database extends DataAbstraction {
 					if (hasOutputArgument) {
 						outputResult.value= null;
 					};
-					throw new Backtracking();
+					throw Backtracking.instance;
 				}
 			}
 		}
@@ -336,13 +345,13 @@ public abstract class Database extends DataAbstraction {
 	//
 	protected DatabaseRecord getNextValidRecord(DatabaseRecord currentRecord) throws Backtracking {
 		if (currentRecord==null) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		} else {
 			currentRecord= currentRecord.nextRecord;
 		};
 		while(true) {
 			if (currentRecord==null) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} else if (currentRecord.value != null) {
 				return currentRecord;
 			} else {
@@ -351,7 +360,7 @@ public abstract class Database extends DataAbstraction {
 					currentRecord= nextRecord;
 					continue;
 				} else {
-					throw new Backtracking();
+					throw Backtracking.instance;
 				}
 			}
 		}
@@ -359,7 +368,7 @@ public abstract class Database extends DataAbstraction {
 	protected DatabaseRecord findMatch(DatabaseRecord currentRecord, Term pattern, ChoisePoint iX) throws Backtracking {
 		while (true) {
 			if (currentRecord==null) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} else if (currentRecord.value != null) {
 				try {
 					currentRecord.value.unifyWith(pattern,iX);
@@ -374,7 +383,7 @@ public abstract class Database extends DataAbstraction {
 				currentRecord= nextRecord;
 				continue;
 			} else {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			}
 		}
 	}
@@ -426,6 +435,7 @@ public abstract class Database extends DataAbstraction {
 	}
 	public void saveContent(String fileName, ChoisePoint iX) {
 		CharacterSet requestedCharacterSet= FileUtils.term2CharacterSet(getBuiltInSlot_E_character_set(),iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		StringBuilder textBuffer= new StringBuilder();
 		// CharsetEncoder encoder= Charset.defaultCharset().newEncoder();
 		if (content != null) {
@@ -437,13 +447,9 @@ public abstract class Database extends DataAbstraction {
 			}
 		};
 		try {
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+			// fileName= FileUtils.replaceBackslashes(fileName,backslashIsSeparator);
 			FileUtils.create_BAK_File(fileName,backslashIsSeparator);
 			FileUtils.writeTextFile(textBuffer.toString(),fileName,requestedCharacterSet);
-			// FileUtils.createDirectories(fileName);
-			// FileChannel channel= new FileOutputStream(fileName).getChannel();
-			// channel.write(ByteBuffer.wrap(textBuffer.toString().getBytes()));
-			// channel.close();
 		} catch (IOException e) {
 			throw new FileInputOutputError(fileName,e);
 		}
@@ -465,7 +471,7 @@ public abstract class Database extends DataAbstraction {
 		recentErrorException= null;
 		CharacterSet requestedCharacterSet= FileUtils.term2CharacterSet(getBuiltInSlot_E_character_set(),iX);
 		int timeout= retrieveMaxWaitingTime(iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		try {
 			try {
 				String textBuffer= getContentOfResource(uri,requestedCharacterSet,timeout,backslashIsSeparator);
@@ -568,7 +574,7 @@ public abstract class Database extends DataAbstraction {
 			iX.pushTrail(a3);
 			iX.pushTrail(a4);
 		} else {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	public void recentLoadingError3s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3) throws Backtracking {
@@ -580,7 +586,7 @@ public abstract class Database extends DataAbstraction {
 			iX.pushTrail(a2);
 			iX.pushTrail(a3);
 		} else {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
@@ -597,20 +603,22 @@ public abstract class Database extends DataAbstraction {
 	protected void doesExist(URI uri, ChoisePoint iX) throws Backtracking {
 		CharacterSet characterSet= FileUtils.term2CharacterSet(getBuiltInSlot_E_character_set(),iX);
 		int timeout= retrieveMaxWaitingTime(iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		try {
 			URL_Utils.installCookieManagerIfNecessary(staticContext);
 			URL_Attributes attributes= URL_Utils.getResourceAttributes(uri,characterSet,timeout,staticContext,backslashIsSeparator);
 			if (!attributes.connectionWasSuccessful()) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			}
 		} catch (Throwable e1) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
 	public void delete1s(ChoisePoint iX, Term name) {
 		String fileName= retrieveDatabaseName(name,iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+		fileName= FileUtils.replaceBackslashes(fileName,backslashIsSeparator);
 		deleteFile(fileName);
 	}
 	public void delete0s(ChoisePoint iX) {
@@ -642,7 +650,7 @@ public abstract class Database extends DataAbstraction {
 	protected String getFullName(ChoisePoint iX, Term a1) {
 		try {
 			String fileName= a1.getStringValue(iX);
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 			return URL_Utils.getFullName(fileName,staticContext,backslashIsSeparator);
 		} catch (TermIsNotAString e1) {
 			throw new WrongArgumentIsNotAString(a1);
@@ -650,35 +658,20 @@ public abstract class Database extends DataAbstraction {
 	}
 	protected String getFullName(ChoisePoint iX) {
 		String location= retrieveLocationString(iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		return URL_Utils.getFullName(location,staticContext,backslashIsSeparator);
 	}
 	//
-	// public void getFullName1ff(ChoisePoint iX, PrologVariable a1, Term name) {
-	//	String fileName= retrieveDatabaseName(name,iX);
-	//	a1.value= new PrologString(fileName);
-	//	// iX.pushTrail(a1);
-	// }
-	// public void getFullName1fs(ChoisePoint iX, Term name) {
-	// }
-	// public void getFullName0ff(ChoisePoint iX, PrologVariable a1) {
-	//	String fileName= retrieveDatabaseName(iX);
-	//	a1.value= new PrologString(fileName);
-	//	// iX.pushTrail(a1);
-	// }
-	// public void getFullName0fs(ChoisePoint iX) {
-	// }
-	//
 	public void getURL1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
 		String resolvedName= getFullName(iX,a2);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		a1.value= new PrologString(URL_Utils.get_URL_string(resolvedName,staticContext,backslashIsSeparator));
 	}
 	public void getURL1fs(ChoisePoint iX, Term a1) {
 	}
 	public void getURL0ff(ChoisePoint iX, PrologVariable a1) {
 		String resolvedName= getFullName(iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		a1.value= new PrologString(URL_Utils.get_URL_string(resolvedName,staticContext,backslashIsSeparator));
 	}
 	public void getURL0fs(ChoisePoint iX) {
@@ -687,10 +680,10 @@ public abstract class Database extends DataAbstraction {
 	public void isLocalResource1s(ChoisePoint iX, Term a1) throws Backtracking {
 		try {
 			String path= a1.getStringValue(iX);
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 			String resolvedName= URL_Utils.getFullName(path,staticContext,backslashIsSeparator);
-			if (!URL_Utils.isLocalResource(resolvedName,backslashIsSeparator)) {
-				throw new Backtracking();
+			if (!URL_Utils.isResolvedNameOfLocalResource(resolvedName)) {
+				throw Backtracking.instance;
 			}
 		} catch (TermIsNotAString e) {
 			throw new WrongArgumentIsNotAString(a1);
@@ -699,16 +692,18 @@ public abstract class Database extends DataAbstraction {
 	}
 	public void isLocalResource0s(ChoisePoint iX) throws Backtracking {
 		String path= getFullName(iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		if (!URL_Utils.isLocalResource(path,backslashIsSeparator)) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
 	protected String retrieveDatabaseName(Term name, ChoisePoint iX) {
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		try {
 			String textName= name.getStringValue(iX);
 			textName= appendExtensionIfNecessary(textName,iX);
+			textName= FileUtils.replaceBackslashes(textName,backslashIsSeparator);
 			return FileUtils.makeRealName(textName);
 		} catch (TermIsNotAString e) {
 			throw new WrongTermIsNotFileName(name);
@@ -716,9 +711,11 @@ public abstract class Database extends DataAbstraction {
 	}
 	protected String retrieveDatabaseName(ChoisePoint iX) {
 		Term name= getBuiltInSlot_E_name();
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		try {
 			String textName= name.getStringValue(iX);
 			textName= appendExtensionIfNecessary(textName,iX);
+			textName= FileUtils.replaceBackslashes(textName,backslashIsSeparator);
 			return FileUtils.makeRealName(textName);
 		} catch (TermIsNotAString e) {
 			throw new WrongTermIsNotFileName(name);
@@ -732,7 +729,7 @@ public abstract class Database extends DataAbstraction {
 		try {
 			String textName= name.getStringValue(iX);
 			textName= appendExtensionIfNecessary(textName,iX);
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 			URI uri= URL_Utils.create_URI(textName,staticContext,backslashIsSeparator);
 			return uri;
 		} catch (TermIsNotAString e) {

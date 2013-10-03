@@ -12,10 +12,13 @@ package morozov.system.gui.dialogs.scalable;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.run.*;
 import morozov.system.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
+import morozov.system.gui.dialogs.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.awt.Font;
 import java.util.ArrayList;
@@ -79,31 +82,31 @@ public class ScalableTable extends ActiveComponent {
 		if (component!=null) {
 			return ((ATable)component).getValue();
 		} else {
-			return new PrologUnknownValue();
+			return PrologUnknownValue.instance;
 		}
 	}
 	public Term getRange() {
 		if (component!=null) {
 			return ((ATable)component).getRange();
 		} else {
-			// return new PrologEmptyList();
-			return new PrologUnknownValue();
+			// return PrologEmptyList.instance;
+			return PrologUnknownValue.instance;
 		}
 	}
 	//
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
-			throw new RejectValue();
+			throw RejectValue.instance;
 		} else {
 			ArrayList<Term> items= DialogUtils.tableToTermArray(value,iX);
 			if (enableMultiselection) {
 				return Converters.arrayListToTerm(items);
 			} else {
 				if (items.size() >= 1) {
-					return new PrologList(items.get(items.size()-1),new PrologEmptyList());
+					return new PrologList(items.get(items.size()-1),PrologEmptyList.instance);
 				} else {
-					return new PrologEmptyList();
+					return PrologEmptyList.instance;
 				}
 			}
 		}

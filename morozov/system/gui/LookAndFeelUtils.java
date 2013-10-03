@@ -6,6 +6,8 @@
 
 package morozov.system.gui;
 
+import morozov.system.gui.errors.*;
+
 import morozov.system.gui.dialogs.scalable.metal.*;
 import morozov.system.gui.dialogs.scalable.windows.*;
 
@@ -13,7 +15,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 public class LookAndFeelUtils {
-	static public synchronized void assignLookAndFeel() {
+	public static synchronized void assignLookAndFeel() {
 		boolean useMetalLookAndFeel= false;
 		String osName= System.getProperty("os.name");
 		// if (false && (osName != null) && (osName.indexOf("Windows") != -1)) {

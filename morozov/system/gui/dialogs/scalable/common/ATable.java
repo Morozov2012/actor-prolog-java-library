@@ -12,20 +12,23 @@ package morozov.system.gui.dialogs.scalable.common;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import javax.swing.ListSelectionModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.JTableHeader;
-import javax.swing.*;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Dimension;
 import javax.swing.border.Border;
 import java.awt.Insets;
-import java.lang.IndexOutOfBoundsException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ATable extends JScrollPane {
 	//
@@ -34,6 +37,8 @@ public class ATable extends JScrollPane {
 	protected ActiveComponent targetComponent= null;
 	protected int length;
 	// protected int height;
+	protected AtomicBoolean tableIsInitiated= new AtomicBoolean(false);
+	protected int[] initiallySelectedIndices;
 	//
 	public ATable(AbstractDialog tD, ActiveComponent tC, double tableLength, double tableHeight, ScalableTableColors colors, ScalableTableColumnDescription[] columnDescriptions, Term initialValue, ChoisePoint iX) {
 		targetDialog= tD;
@@ -65,27 +70,53 @@ public class ATable extends JScrollPane {
 	}
 	public void setSelectedIndex(int index) {
 		if (table!=null) {
+			if (!tableIsInitiated.get()) {
+				synchronized(tableIsInitiated) {
+					initiallySelectedIndices= new int[1];
+					initiallySelectedIndices[0]= index;
+				}
+			};
 			ListSelectionModel model= table.getSelectionModel();
-			model.clearSelection();
-			if (index > 0 && index <= table.getRowCount()) {
-				model.addSelectionInterval(index-1,index-1);
+			try {
+				model.setValueIsAdjusting(true);
+				model.clearSelection();
+				if (index > 0 && index <= table.getRowCount()) {
+					model.addSelectionInterval(index-1,index-1);
+				}
+			} finally {
+				model.setValueIsAdjusting(false);
 			}
 		}
 	}
 	public void setSelectedIndices(int[] indices) {
 		if (table!=null) {
-			ListSelectionModel model= table.getSelectionModel();
-			model.clearSelection();
-			for (int n=0; n < indices.length; n++) {
-				int index= indices[n];
-				// try {
-				if (index > 0 && index <= table.getRowCount()) {
-					// System.out.printf("index-1=%s\n",index-1);
-					model.addSelectionInterval(index-1,index-1);
+			if (!tableIsInitiated.get()) {
+				synchronized(tableIsInitiated) {
+					initiallySelectedIndices= indices;
 				}
-				// } catch(Throwable ee) {
-				// System.out.printf("ee=%s\n",ee);
-				// }
+			};
+			ListSelectionModel model= table.getSelectionModel();
+			int selectionMode= model.getSelectionMode();
+			try {
+				model.setValueIsAdjusting(true);
+				model.clearSelection();
+				if (selectionMode==ListSelectionModel.SINGLE_SELECTION) {
+					if (indices.length > 0) {
+						int index= indices[0];
+						if (index > 0 && index <= table.getRowCount()) {
+							model.addSelectionInterval(index-1,index-1);
+						}
+					}
+				} else {
+					for (int n=0; n < indices.length; n++) {
+						int index= indices[n];
+						if (index > 0 && index <= table.getRowCount()) {
+							model.addSelectionInterval(index-1,index-1);
+						}
+					}
+				}
+			} finally {
+				model.setValueIsAdjusting(false);
 			}
 		}
 	}
@@ -132,14 +163,18 @@ public class ATable extends JScrollPane {
 			synchronized(table) {
 				if (table.getRowCount() > 0) {
 					try {
-						ListSelectionModel model= table.getSelectionModel();
 						int number= value.getSmallIntegerValue(iX);
-						if (number > 0 && number <= table.getRowCount()) {
-							// list.clearSelection(); 2012.08.29
-							model.clearSelection();
-							model.addSelectionInterval(number-1,number-1);
-						} else if (number <= 0) {
-							model.clearSelection();
+						ListSelectionModel model= table.getSelectionModel();
+						try {
+							model.setValueIsAdjusting(true);
+							if (number > 0 && number <= table.getRowCount()) {
+								model.clearSelection();
+								model.addSelectionInterval(number-1,number-1);
+							} else if (number <= 0) {
+								model.clearSelection();
+							}
+						} finally {
+							model.setValueIsAdjusting(false);
 						}
 					} catch (TermIsNotAnInteger e1) {
 						// try {
@@ -159,36 +194,49 @@ public class ATable extends JScrollPane {
 		if (table!=null) {
 			synchronized(table) {
 				ScalableTableModel tableModel= (ScalableTableModel)table.getModel();
-				int[] selection= table.getSelectedRows();
-				for (int n= 0; n < selection.length; n++) {
-					if (n < tableModel.getRowCount()) {
-						try {
-							selection[n]= table.convertRowIndexToModel(selection[n]);
-						} catch (IndexOutOfBoundsException e) {
+				ListSelectionModel selectionModel= table.getSelectionModel();
+				int[] selection;
+				if (tableIsInitiated.compareAndSet(false,true)) {
+					int selectionMode= selectionModel.getSelectionMode();
+					int length= initiallySelectedIndices.length;
+					synchronized(tableIsInitiated) {
+						if (selectionMode==ListSelectionModel.SINGLE_SELECTION) {
+							if (length > 1) {
+								length= 1;
+							}
+						};
+						selection= new int[length];
+						for (int n= 0; n < length; n++) {
+							selection[n]= initiallySelectedIndices[n] - 1;
+						}
+					}
+				} else {
+					selection= table.getSelectedRows();
+					for (int n= 0; n < selection.length; n++) {
+						if (n < tableModel.getRowCount()) {
+							try {
+								selection[n]= table.convertRowIndexToModel(selection[n]);
+							} catch (IndexOutOfBoundsException e) {
+							}
 						}
 					}
 				};
-				tableModel.setTableValues(value,checkResidentValues,iX);
 				tableModel.fireTableStructureChanged();
-				ListSelectionModel selectionModel= table.getSelectionModel();
-				selectionModel.clearSelection();
-				for (int n= 0; n < selection.length; n++) {
-					int rowNumber= selection[n];
-					if (0 <= rowNumber && rowNumber < tableModel.getRowCount()) {
-						selectionModel.addSelectionInterval(rowNumber,rowNumber);
-						// System.out.printf("ADD:selection[%s]=%s\n",n,rowNumber);
+				try {
+					selectionModel.setValueIsAdjusting(true);
+					tableModel.setTableValues(value,checkResidentValues,iX);
+					selectionModel.clearSelection();
+					for (int n= 0; n < selection.length; n++) {
+						int rowNumber= selection[n];
+						if (0 <= rowNumber && rowNumber < tableModel.getRowCount()) {
+							selectionModel.addSelectionInterval(rowNumber,rowNumber);
+						}
 					}
+				} finally {
+					selectionModel.setValueIsAdjusting(false);
 				};
 				targetDialog.doLayout(true);
 				Dimension tableSize= table.getPreferredSize();
-				// System.out.printf("table.getPreferredSize()=%s\n",tableSize);
-				// Dimension tableSize2= new Dimension(tableSize.width+1,tableSize.height+16);
-				// Dimension tableSize2= new Dimension(320,60);
-				// System.out.printf("2=%s\n",tableSize2);
-				// table.setPreferredScrollableViewportSize(tableSize);
-				// setMinimumSize(tableSize);
-				//table.revalidate();
-				//targetDialog.doLayout(true);
 				targetDialog.repaint();
 				targetDialog.repaintAfterDelay();
 			}
@@ -205,7 +253,7 @@ public class ATable extends JScrollPane {
 				return model.getRows(selection);
 			}
 		} else {
-			return new PrologEmptyList();
+			return PrologEmptyList.instance;
 		}
 	}
 	public Term getRange() {
@@ -215,10 +263,10 @@ public class ATable extends JScrollPane {
 				return model.getContent();
 			}
 		} else {
-			return new PrologEmptyList();
-			// return new PrologUnknownValue();
+			return PrologEmptyList.instance;
+			// return PrologUnknownValue.instance;
 		}
-        }
+	}
 	//
 	public int[] getSelectedRows() {
 		return table.getSelectedRows();
@@ -237,22 +285,27 @@ public class ATable extends JScrollPane {
 	//
 	protected void implementMultipleSelection(Term tail, ChoisePoint iX) {
 		ListSelectionModel model= table.getSelectionModel();
-		model.clearSelection();
 		try {
-			while(true) {
-				Term value= tail.getNextListHead(iX);
-				try {
-					int number= value.getSmallIntegerValue(iX);
-					if (number > 0 && number <= table.getRowCount()) {
-						model.addSelectionInterval(number-1,number-1);
-					}
-				} catch (TermIsNotAnInteger e1) {
-					selectRowIfNecessary(value,iX,model);
-				};
-				tail= tail.getNextListTail(iX);
+			model.setValueIsAdjusting(true);
+			model.clearSelection();
+			try {
+				while(true) {
+					Term value= tail.getNextListHead(iX);
+					try {
+						int number= value.getSmallIntegerValue(iX);
+						if (number > 0 && number <= table.getRowCount()) {
+							model.addSelectionInterval(number-1,number-1);
+						}
+					} catch (TermIsNotAnInteger e1) {
+						selectRowIfNecessary(value,iX,model);
+					};
+					tail= tail.getNextListTail(iX);
+				}
+			} catch (EndOfList e) {
+			} catch (TermIsNotAList e) {
 			}
-		} catch (EndOfList e) {
-		} catch (TermIsNotAList e) {
+		} finally {
+			model.setValueIsAdjusting(false);
 		}
 	}
 	protected void selectRowIfNecessary(Term tail, ChoisePoint iX, ListSelectionModel selectionModel) {

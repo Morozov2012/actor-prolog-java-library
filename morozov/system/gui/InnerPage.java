@@ -13,6 +13,7 @@ import javax.swing.SwingUtilities;
 import java.awt.Component;
 import java.awt.Dimension;
 
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicReference;
 import java.lang.reflect.InvocationTargetException;
 
@@ -23,6 +24,13 @@ public class InnerPage extends JInternalFrame {
 	public AtomicReference<ExtendedCoordinate> logicalX= new AtomicReference<ExtendedCoordinate>(new ExtendedCoordinate());
 	public AtomicReference<ExtendedCoordinate> logicalY= new AtomicReference<ExtendedCoordinate>(new ExtendedCoordinate());
 	//
+	protected java.util.Timer scheduler;
+	protected TimerTask currentTask;
+	//
+	protected long repaintingDelay= 10; // ms
+	// protected long repaintingDelay= 1; // ms
+	// protected long repaintingDelay= 100; // ms
+	//
 	public InnerPage(String title) {
 		super(	title, // "Event Generator"
 			true, // Resizable
@@ -32,11 +40,10 @@ public class InnerPage extends JInternalFrame {
 		setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 		// setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		// addPropertyChangeListener(this);
+		scheduler= new java.util.Timer(true);
 	}
 	public void safelyRestoreSize(StaticContext context) {
-		// System.out.printf("safelyRestoreSize:InnerPage::1\n");
 		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(context);
-		// System.out.printf("safelyRestoreSize:InnerPage::2, desktop=%s\n",desktop);
 		if (desktop==null) {
 			return;
 		};
@@ -57,7 +64,6 @@ public class InnerPage extends JInternalFrame {
 		int realWidth= realXandWidth.size;
 		int realHeight= realYandHeight.size;
 		//
-		// System.out.printf("safelyRestoreSize:InnerPage::3\n");
 		if (	realXandWidth.coordinateIsToBeCalculatedAutomatically &&
 			realYandHeight.coordinateIsToBeCalculatedAutomatically) {
 			Dimension sizeDifference= new Dimension();
@@ -92,12 +98,7 @@ public class InnerPage extends JInternalFrame {
 				realY= step * newPosition;
 			}
 		};
-		// System.out.printf("InnerPage::realX=%s, realY=%s, realWidth=%s, realHeight=%s\n",realX,realY,realWidth,realHeight);
-		//
 		safelyRestoreSize(realX,realY,realWidth,realHeight);
-		// } catch (Throwable e) {
-		// System.out.printf("safelyRestoreSize:InnerPage::e=%s\n",e);
-		// }
 	}
 	// public void safelyRestoreSize(StaticContext context) {
 	//	MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(context);
@@ -128,4 +129,43 @@ public class InnerPage extends JInternalFrame {
 	// public void propertyChange(PropertyChangeEvent evt) {
 	//	System.out.printf("\nEVT=%s\n",evt);
 	// }
+	//
+	public void repaintAfterDelay() {
+		synchronized(this) {
+			if (currentTask != null) {
+				currentTask.cancel();
+				scheduler.purge();
+			};
+			currentTask= new LocalTask(this);
+			scheduler.schedule(currentTask,repaintingDelay);
+		}
+	}
+	public void skipDelayedRepainting() {
+		synchronized(this) {
+			if (currentTask != null) {
+				currentTask.cancel();
+				scheduler.purge();
+			};
+			currentTask= null;
+		}
+	}
+	//
+	public void repaint() {
+		super.repaint();
+	}
+}
+
+class LocalTask extends TimerTask {
+	private InnerPage innerPage;
+	//
+	public LocalTask(InnerPage page) {
+		innerPage= page;
+	}
+	//
+	public void run() {
+		// System.out.printf("LOCAL TASK!!!\n");
+		DesktopUtils.safelyRepaint(innerPage);
+		// innerPage.repaint();
+		// innerPage.revalidate();
+	}
 }

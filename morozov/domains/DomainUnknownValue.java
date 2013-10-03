@@ -1,8 +1,11 @@
 // (c) 2010 IRE RAS Alexei A. Morozov
-package morozov.domains;
 
+package morozov.domains;
+
+import morozov.run.*;
 import morozov.terms.*;
-public class DomainUnknownValue extends DomainAlternative {
+
+public class DomainUnknownValue extends DomainAlternative {
 	public DomainUnknownValue() {
 	}
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {

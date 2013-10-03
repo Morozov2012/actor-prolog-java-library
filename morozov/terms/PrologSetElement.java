@@ -3,6 +3,8 @@
 package morozov.terms;
 
 import morozov.classes.*;
+import morozov.run.*;
+import morozov.terms.signals.*;
 
 import java.nio.charset.CharsetEncoder;
 import java.util.HashMap;
@@ -38,6 +40,9 @@ public class PrologSetElement extends Term {
 	}
 	public PrologSetElement copyValue(ChoisePoint cp, TermCircumscribingMode mode) {
 		return new PrologSetElement(element.copyValue(cp,mode));
+	}
+	public PrologSetElement copyGroundValue(ChoisePoint cp) throws TermIsUnboundVariable {
+		return new PrologSetElement(element.copyGroundValue(cp));
 	}
 	public PrologSetElement substituteWorlds(HashMap<AbstractWorld,Term> map, ChoisePoint cp) {
 		return new PrologSetElement(element.substituteWorlds(map,cp));

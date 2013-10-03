@@ -4,10 +4,14 @@ package morozov.system.gui.dialogs;
 
 import morozov.built_in.*;
 import morozov.classes.*;
+import morozov.classes.errors.*;
 import morozov.run.*;
 import morozov.terms.*;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.HashMap;
 
 class AnAttemptToExtractWorldFromActiveUser extends RuntimeException {}
 class AnAttemptToExtractSlotFromActiveUser extends RuntimeException {}
@@ -20,7 +24,7 @@ public class ActiveUser extends ActiveWorld {
 	//
 	protected AbstractDialog targetDialog= null;
 	protected HashMap<SlotVariable,DialogEntry> slotMap= new HashMap<SlotVariable,DialogEntry>();
-	private HashSet<DialogEntry> userInterfaceMessages= new HashSet<DialogEntry>();
+	private HashSet<DialogEvent> userInterfaceMessages= new HashSet<DialogEvent>();
 	//
 	public ActiveUser() {
 		super(true,true);
@@ -55,9 +59,9 @@ public class ActiveUser extends ActiveWorld {
 	public void withdrawRequest(AbstractWorld target, Resident resident) {
 	}
 	// Receiving User Interface Messages
-	public void receiveUserInterfaceMessage(DialogEntry entry) {
+	public void receiveUserInterfaceMessage(DialogEntry entry, boolean sendFlowMessage,DialogEventType isControlModificationEvent) {
 		synchronized(userInterfaceMessages) {
-			userInterfaceMessages.add(entry);
+			userInterfaceMessages.add(new DialogEvent(entry,sendFlowMessage,isControlModificationEvent));
 		};
 		wakeUp();
 	}
@@ -82,7 +86,7 @@ public class ActiveUser extends ActiveWorld {
 	}
 	//
 	protected void acceptTimerMessage() {
-		DialogEntry[] messagesToBeProcessed= new DialogEntry[0];
+		DialogEvent[] messagesToBeProcessed= new DialogEvent[0];
 		synchronized(userInterfaceMessages) {
 			if (userInterfaceMessages.size() > 0) {
 				messagesToBeProcessed= userInterfaceMessages.toArray(messagesToBeProcessed);
@@ -91,9 +95,15 @@ public class ActiveUser extends ActiveWorld {
 		};
 		if (messagesToBeProcessed.length > 0) {
 			for (int n=0; n < messagesToBeProcessed.length; n++) {
-				targetDialog.transmitEntryValue(messagesToBeProcessed[n],rootCP);
+				// targetDialog.transmitEntryValue(messagesToBeProcessed[n].entry,rootCP);
+				messagesToBeProcessed[n].transmitEntryValue(targetDialog,rootCP);
 			};
 			targetDialog.prepareAndSendFlowMessages();
+		};
+		if (messagesToBeProcessed.length > 0) {
+			for (int n=0; n < messagesToBeProcessed.length; n++) {
+				messagesToBeProcessed[n].sendCreatedControlMessage(targetDialog,rootCP);
+			}
 		}
 	}
 	//
@@ -158,6 +168,7 @@ public class ActiveUser extends ActiveWorld {
 		};
 		initiateDialogEntries(targetWorld,userDefinedSlots);
 		initiateDialogEntries(targetWorld,systemSlots);
+		sendControlCreationMessages(userDefinedSlots);
 	}
 	protected void initiateSlotValues(Dialog targetWorld, DialogEntry[] slots) {
 		for (int i= 0; i < slots.length; i++) {
@@ -184,16 +195,22 @@ public class ActiveUser extends ActiveWorld {
 			if (item.isSlotName) {
 				Term value= targetWorld.getSlotByName(item.name);
 				value= value.extractSlotVariable();
-				if (!value.thisIsSlotVariable()) {
-					item.putValue(value.copyValue(rootCP,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES),rootCP);
-				}
+				// if (!value.thisIsSlotVariable()) {
+				// Constant slots are to be used too.
+				item.putValue(value.copyValue(rootCP,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES),rootCP);
+				// }
 				//if (!value.thisIsSlotVariable()) {
 				//	item.putValue(value.copyValue(rootCP,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES),rootCP);
 				//} else {
 				//	item.putValue(value.copyValue(rootCP,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES),rootCP);
 				//}
-
 			}
+		}
+	}
+	protected void sendControlCreationMessages(DialogEntry[] slots) {
+		for (int i= 0; i < slots.length; i++) {
+			DialogEntry item= slots[i];
+			receiveUserInterfaceMessage(item,false,DialogEventType.CREATED_CONTROL);
 		}
 	}
 	protected boolean removeNewlyProvedOldActors(HashSet<ActorNumber> oldActors) {

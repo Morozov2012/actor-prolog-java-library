@@ -2,11 +2,15 @@
 
 package morozov.classes;
 
+import morozov.classes.errors.*;
 import morozov.run.*;
 import morozov.terms.*;
 
-import java.util.*;
-import java.util.concurrent.atomic.*;
+import java.util.Iterator;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 class AnAttemptToExtractWorldFromResident extends RuntimeException {}
 class AnAttemptToExtractSlotFromResident extends RuntimeException {}
@@ -53,7 +57,7 @@ public class Resident extends ActiveWorld {
 		start();
 	}
 	public void closeFiles() {
-		stop();
+		// stop();
 	}
 	public void stopProcesses() {
 		stop();
@@ -70,7 +74,7 @@ public class Resident extends ActiveWorld {
 				world.withdrawRequest(this);
 				resultLists.remove(world);
 			}
-        	};
+		};
 		targetWorlds= worlds;
 	}
 	private Term[] prepareArguments(ChoisePoint cp) {

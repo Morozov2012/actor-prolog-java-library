@@ -1,8 +1,12 @@
 // (c) 2010 IRE RAS Alexei A. Morozov
-package morozov.domains;
 
+package morozov.domains;
+
+import morozov.run.*;
 import morozov.terms.*;
-public class DomainInteger extends DomainAlternative {
+import morozov.terms.signals.*;
+
+public class DomainInteger extends DomainAlternative {
 	public DomainInteger() {
 	}
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {

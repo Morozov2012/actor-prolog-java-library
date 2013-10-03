@@ -5,10 +5,13 @@ package morozov.built_in;
 import target.*;
 
 import morozov.classes.*;
-import morozov.system.*;
+import morozov.run.*;
+import morozov.system.errors.*;
 import morozov.system.gui.*;
 import morozov.system.gui.sadt.*;
+import morozov.system.gui.sadt.errors.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +24,13 @@ public abstract class FunctionModel extends Alpha {
 	//
 	public FunctionModel() {
 		// LookAndFeelUtils.assignLookAndFeel();
+	}
+	//
+	public void closeFiles() {
+		synchronized(this) {
+			DiagramUtils.safelyDisposeAllDiagrams(staticContext);
+		};
+		super.closeFiles();
 	}
 	//
 	public void registerComponents1s(ChoisePoint iX, Term value) {

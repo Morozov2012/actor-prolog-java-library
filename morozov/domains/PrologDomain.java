@@ -1,8 +1,12 @@
 // (c) 2010 IRE RAS Alexei A. Morozov
-package morozov.domains;
 
+package morozov.domains;
+
+import morozov.domains.signals.*;
+import morozov.run.*;
 import morozov.terms.*;
-public class PrologDomain {
+
+public class PrologDomain {
 	//
 	protected PrologDomainName name;
 	protected DomainAlternative[] alternatives;
@@ -96,6 +100,6 @@ import morozov.terms.*;
 				continue;
 			}
 		};
-		throw new UnknownPairName();
+		throw UnknownPairName.instance;
 	}
 }

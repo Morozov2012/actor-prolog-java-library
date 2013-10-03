@@ -8,13 +8,18 @@ package morozov.system.gui.dialogs;
 
 import target.*;
 
-import morozov.system.*;
+import morozov.run.*;
 import morozov.system.gui.*;
+import morozov.system.gui.dialogs.signals.*;
+import morozov.system.gui.signals.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.awt.Color;
 import java.awt.Point;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.Font;
 
 class IllegalCallOfInternalMethod extends RuntimeException {}
@@ -40,7 +45,7 @@ public enum DialogEntryType {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
 			String title= null;
 			try {
-				title= DialogUtils.termToDialogTitleSafe(value,iX);
+				title= GUI_Utils.termToFrameTitleSafe(value,iX);
 			} catch (TermIsSymbolDefault e1) {
 				title= dialog.getPredefinedTitle();
 			};
@@ -63,14 +68,14 @@ public enum DialogEntryType {
 					if (code==SymbolCodes.symbolCode_E_default) {
 						return new PrologSymbol(code);
 					} else {
-						throw new RejectValue();
+						throw RejectValue.instance;
 					}
 				} catch (TermIsNotASymbol e1) {
 					try {
 						String text= value.getStringValue(iX);
 						return new PrologString(text);
 					} catch (TermIsNotAString e2) {
-						throw new RejectValue();
+						throw RejectValue.instance;
 					}
 				}
 			}
@@ -80,24 +85,20 @@ public enum DialogEntryType {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
 			ExtendedCoordinate actualX= GUI_Utils.termToCoordinateSafe(value,iX);
 			try {
-				// GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
-				// Rectangle bounds= env.getMaximumWindowBounds();
-				Dimension bounds= dialog.computeParentLayoutSize();
+				Rectangle bounds= dialog.computeParentLayoutSize();
 				double gridX= DefaultOptions.gridWidth;
 				Point p= dialog.getLocation();
 				Dimension size= dialog.getSize();
-				p.x= DialogUtils.calculateRealCoordinate(actualX,bounds.width,gridX,size.getWidth());
+				p.x= DialogUtils.calculateRealCoordinate(actualX,bounds.x,bounds.width,gridX,size.getWidth());
 				dialog.setLocation(p);
-			} catch (ExtendedCoordinate.UseDefaultLocation e) {
+			} catch (UseDefaultLocation e) {
 			}
 		}
 		Term getValue(AbstractDialog dialog) {
-			// GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
-			// Rectangle bounds= env.getMaximumWindowBounds();
-			Dimension bounds= dialog.computeParentLayoutSize();
+			Rectangle bounds= dialog.computeParentLayoutSize();
 			double gridX= DefaultOptions.gridWidth;
 			Point p= dialog.getLocation();
-			return new PrologReal((double)p.x/((double)bounds.width/gridX));
+			return new PrologReal((double)p.x/(((double)(bounds.width-bounds.x))/gridX));
 		}
 		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 			return DialogUtils.standardizeCoordinateValue(value,iX);
@@ -107,26 +108,22 @@ public enum DialogEntryType {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
 			ExtendedCoordinate actualY= GUI_Utils.termToCoordinateSafe(value,iX);
 			try {
-				// GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
-				// Rectangle bounds= env.getMaximumWindowBounds();
-				Dimension bounds= dialog.computeParentLayoutSize();
+				Rectangle bounds= dialog.computeParentLayoutSize();
 				double gridY= DefaultOptions.gridHeight;
 				Point p= dialog.getLocation();
 				Dimension size= dialog.getSize();
-				p.y= DialogUtils.calculateRealCoordinate(actualY,bounds.height,gridY,size.getHeight());
+				p.y= DialogUtils.calculateRealCoordinate(actualY,bounds.y,bounds.height,gridY,size.getHeight());
 				dialog.setLocation(p);
-			} catch (ExtendedCoordinate.UseDefaultLocation e) {
+			} catch (UseDefaultLocation e) {
 			//} catch (Throwable eee) {
 			//	throw eee;
 			}
 		}
 		Term getValue(AbstractDialog dialog) {
-			// GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
-			// Rectangle bounds= env.getMaximumWindowBounds();
-			Dimension bounds= dialog.computeParentLayoutSize();
+			Rectangle bounds= dialog.computeParentLayoutSize();
 			double gridY= DefaultOptions.gridHeight;
 			Point p= dialog.getLocation();
-			return new PrologReal((double)p.y/((double)bounds.height/gridY));
+			return new PrologReal((double)p.y/(((double)(bounds.height-bounds.y))/gridY));
 		}
 		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 			return DialogUtils.standardizeCoordinateValue(value,iX);
@@ -275,7 +272,7 @@ public enum DialogEntryType {
 		Term getValue(AbstractDialog dialog) {
 			// Font oldFont= dialog.getFont();
 			// return new PrologInteger(oldFont.getSize());
-			return new PrologInteger(dialog.currentFontSize.get());
+			return new PrologReal(dialog.currentFontSize.get());
 		}
 		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 			return DialogUtils.standardizeFontSizeValue(value,iX);
@@ -296,7 +293,7 @@ public enum DialogEntryType {
 					try {
 						fontStyle= GUI_Utils.termToFontStyleSafe(DefaultOptions.dialogFontStyle,iX);
 						fontUnderline= GUI_Utils.fontIsUnderlined(DefaultOptions.dialogFontStyle,iX);
-                        		} catch (TermIsSymbolDefault e3) {
+					} catch (TermIsSymbolDefault e3) {
 						fontStyle= dialog.defaultDialogFontStyle;
 						fontUnderline= dialog.defaultDialogFontUnderline;
 					}

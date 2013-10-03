@@ -2,6 +2,8 @@
 
 package morozov.terms;
 
+import morozov.run.*;
+
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -35,7 +37,7 @@ public abstract class UnderdeterminedSetWithTail extends UnderdeterminedSet {
 				rightSetPositiveMap.remove(leftSetPositiveKey);
 			} else {
 				if (rightSetNegativeMap.contains(leftSetPositiveKey)) {
-					throw new Backtracking();
+					throw Backtracking.instance;
 				} else {
 					Term leftSetPositiveValue= leftSetPositiveMap.get(leftSetPositiveKey);
 					aTail.appendNamedElement(leftSetPositiveKey,leftSetPositiveValue,cp);
@@ -47,7 +49,7 @@ public abstract class UnderdeterminedSetWithTail extends UnderdeterminedSet {
 		while (leftSetNegativeIterator.hasNext()) {
 			long leftSetNegativeKey= leftSetNegativeIterator.next();
 			if (rightSetPositiveMap.containsKey(leftSetNegativeKey)) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} else {
 				if (rightSetNegativeMap.contains(leftSetNegativeKey)) {
 					rightSetNegativeMap.remove(leftSetNegativeKey);

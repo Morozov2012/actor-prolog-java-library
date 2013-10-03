@@ -2,6 +2,8 @@
 
 package morozov.system.gui.space3d;
 
+import morozov.system.gui.space3d.errors.*;
+
 import javax.media.j3d.Shape3D;
 import javax.media.j3d.TransformGroup;
 import javax.media.j3d.Group;
@@ -34,6 +36,30 @@ public class NodeContainer {
 	public NodeContainer(Node object) {
 		node= object;
 		type= ContentType.Node;
+	}
+	//
+	public Node getNode() {
+		if (type==ContentType.TransformGroup) {
+			return transformGroup;
+		} else if (type==ContentType.Group) {
+			return group;
+		} else if (type==ContentType.Node) {
+			return node;
+		} else {
+			throw new OperationIsNotDefinedForThisTypeOfNode(type);
+		}
+	}
+	//
+	public Node getParent() {
+		if (type==ContentType.TransformGroup) {
+			return transformGroup.getParent();
+		} else if (type==ContentType.Group) {
+			return group.getParent();
+		} else if (type==ContentType.Node) {
+			return node.getParent();
+		} else {
+			throw new OperationIsNotDefinedForThisTypeOfNode(type);
+		}
 	}
 	//
 	public void setTransform(Transform3D transform) {

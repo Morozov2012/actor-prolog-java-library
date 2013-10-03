@@ -2,9 +2,17 @@
 
 package morozov.terms;
 
+import morozov.run.*;
+import morozov.terms.signals.*;
+
 import java.nio.charset.CharsetEncoder;
 
-public class PrologNoValue extends Term {
+public final class PrologNoValue extends Term {
+	public static final PrologNoValue instance= new PrologNoValue();
+	//
+	private PrologNoValue() {
+	}
+	//
 	public static final String namePrologNoValue= "~";
 	public void isNoValue(ChoisePoint cp) throws Backtracking {
 	}
@@ -12,7 +20,7 @@ public class PrologNoValue extends Term {
 		return true;
 	}
 	public Term retrieveSetElementValue(ChoisePoint cp) throws Backtracking, TermIsNotSetElement {
-		throw new Backtracking();
+		throw Backtracking.instance;
 	}
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		t.isNoValue(cp);

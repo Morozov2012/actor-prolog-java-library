@@ -33,8 +33,12 @@ public class AButtonGroup extends ButtonGroup {
 			((ScalableToggleButtonModel)model).setUncertain(false);
 			((AbstractButton)currentButton).repaint();
 		};
+		boolean reportEvent= false;
+		if (b && !super.isSelected(m)) {
+			reportEvent= true;
+		}
 		super.setSelected(m,b);
-		if (targetDialog!=null) {
+		if (reportEvent && targetDialog!=null) {
 			targetDialog.reportValueUpdate(targetComponent);
 		}
 	}

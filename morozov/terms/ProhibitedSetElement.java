@@ -6,6 +6,9 @@ import target.*;
 
 import morozov.classes.*;
 import morozov.domains.*;
+import morozov.domains.signals.*;
+import morozov.run.*;
+import morozov.terms.signals.*;
 
 import java.nio.charset.CharsetEncoder;
 import java.util.HashMap;
@@ -27,14 +30,14 @@ public class ProhibitedSetElement extends UnderdeterminedSetItem {
 	}
 	public Term getNamedElement(long aName, ChoisePoint cp) throws Backtracking {
 		if (name == aName) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		} else {
 			return tail.getNamedElement(aName,cp);
 		}
 	}
 	// public Term checkSetAndGetNamedElement(long aName, ChoisePoint cp) throws Backtracking, TermIsNotASet {
 	//	if (name == aName) {
-	//		throw new Backtracking();
+	//		throw Backtracking.instance;
 	//	} else {
 	//		return tail.checkSetAndGetNamedElement(aName,cp);
 	//	}
@@ -82,7 +85,7 @@ public class ProhibitedSetElement extends UnderdeterminedSetItem {
 		return name;
 	}
 	public Term getNextPairValue(ChoisePoint cp) throws EndOfSet, TermIsNotASet, SetElementIsProhibited {
-		throw new SetElementIsProhibited();
+		throw SetElementIsProhibited.instance;
 	}
 	public Term getNextSetTail(ChoisePoint cp) throws EndOfSet, TermIsNotASet {
 		return tail;
@@ -99,7 +102,7 @@ public class ProhibitedSetElement extends UnderdeterminedSetItem {
 	}
 	public void appendNamedElement(long aName, Term aValue, ChoisePoint cp) throws Backtracking {
 		if (name == aName) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		} else {
 			tail.appendNamedElement(aName,aValue,cp);
 		}
@@ -112,7 +115,7 @@ public class ProhibitedSetElement extends UnderdeterminedSetItem {
 	// "Unify with ..." functions
 	public void unifyWithSet(long aName, Term aValue, Term aTail, Term aSet, ChoisePoint cp) throws Backtracking {
 		if (name == aName) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		} else {
 			HashMap<Long,Term> leftSetPositiveMap= new HashMap<Long,Term>();
 			HashSet<Long> leftSetNegativeMap= new HashSet<Long>();
@@ -167,6 +170,11 @@ public class ProhibitedSetElement extends UnderdeterminedSetItem {
 		return new ProhibitedSetElement(
 			name,
 			tail.copyValue(cp,mode));
+	}
+	public ProhibitedSetElement copyGroundValue(ChoisePoint cp) throws TermIsUnboundVariable {
+		return new ProhibitedSetElement(
+			name,
+			tail.copyGroundValue(cp));
 	}
 	public ProhibitedSetElement substituteWorlds(HashMap<AbstractWorld,Term> map, ChoisePoint cp) {
 		return new ProhibitedSetElement(

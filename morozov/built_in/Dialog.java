@@ -4,14 +4,16 @@ package morozov.built_in;
 
 import target.*;
 
+import morozov.run.*;
 import morozov.system.gui.*;
 import morozov.system.gui.dialogs.*;
-import morozov.run.*;
+import morozov.system.gui.dialogs.errors.*;
+import morozov.system.gui.dialogs.signals.*;
 import morozov.terms.*;
 
 import java.awt.Window;
 
-public abstract class Dialog extends Alpha {
+public abstract class Dialog extends ImageConsumer {
 	//
 	protected AbstractDialog targetObject= null;
 	//
@@ -28,10 +30,18 @@ public abstract class Dialog extends Alpha {
 	abstract protected Term getBuiltInSlot_E_background_color();
 	//
 	abstract public long entry_s_Action_1_i();
+	abstract public long entry_s_CreatedControl_1_i();
+	abstract public long entry_s_ModifiedControl_1_i();
 	abstract public long entry_f_DataRequest_1_i();
-	// abstract public long domainSignatureOfSubgoal_0_InClause_1(long predicateSignatureNumber);
 	//
 	public Dialog() {
+	}
+	//
+	public void closeFiles() {
+		if (targetObject != null) {
+			targetObject.safelyDispose();
+		};
+		super.closeFiles();
 	}
 	//
 	public void show2s(ChoisePoint iX, Term a1, Term a2) {
@@ -46,15 +56,66 @@ public abstract class Dialog extends Alpha {
 	}
 	//
 	public void redraw0s(ChoisePoint iX) {
-		if (targetObject!=null) {
+		if (targetObject != null) {
 			// targetObject.validate();
 			targetObject.safelyValidate();
 		}
 	}
 	//
 	public void hide0s(ChoisePoint iX) {
-		if (targetObject!=null) {
+		if (targetObject != null) {
 			targetObject.safelyHide();
+		}
+	}
+	//
+	public void maximize0s(ChoisePoint iX) {
+		prepareDialogIfNecessary(true,iX);
+		if (targetObject != null) {
+			targetObject.safelyMaximize();
+		}
+	}
+	//
+	public void minimize0s(ChoisePoint iX) {
+		prepareDialogIfNecessary(true,iX);
+		if (targetObject != null) {
+			targetObject.safelyMinimize();
+		}
+	}
+	//
+	public void restore0s(ChoisePoint iX) {
+		prepareDialogIfNecessary(true,iX);
+		if (targetObject != null) {
+			targetObject.safelyRestore();
+		}
+	}
+	//
+	public void isMaximized0s(ChoisePoint iX) throws Backtracking {
+		if (targetObject != null) {
+			if (!targetObject.safelyIsMaximized()) {
+				throw Backtracking.instance;
+			}
+		} else {
+			throw Backtracking.instance;
+		}
+	}
+	//
+	public void isMinimized0s(ChoisePoint iX) throws Backtracking {
+		if (targetObject != null) {
+			if (!targetObject.safelyIsMinimized()) {
+				throw Backtracking.instance;
+			}
+		} else {
+			throw Backtracking.instance;
+		}
+	}
+	//
+	public void isRestored0s(ChoisePoint iX) throws Backtracking {
+		if (targetObject != null) {
+			if (!targetObject.safelyIsRestored()) {
+				throw Backtracking.instance;
+			}
+		} else {
+			throw Backtracking.instance;
 		}
 	}
 	//
@@ -74,7 +135,13 @@ public abstract class Dialog extends Alpha {
 	}
 	//
 	public void action1s(ChoisePoint iX, Term actionName) {
-        }
+	}
+	//
+	public void createdControl1s(ChoisePoint iX, Term actionName) {
+	}
+	//
+	public void modifiedControl1s(ChoisePoint iX, Term actionName) {
+	}
 	//
 	public class Action1s extends Continuation {
 		// private Continuation c0;
@@ -92,9 +159,9 @@ public abstract class Dialog extends Alpha {
 		DesktopUtils.createPaneIfNecessary(staticContext);
 		if (targetObject==null) {
 			Window mainWindow= StaticDesktopAttributes.retrieveMainWindow(staticContext);
-                        targetObject= createDialog(mainWindow,iX);
+			targetObject= createDialog(mainWindow,iX);
 			targetObject.initiate(currentProcess,staticContext);
-                        targetObject.increaseDepthCounter();
+			targetObject.increaseDepthCounter();
 			targetObject.prepare(
 				this,
 				// getBuiltInSlot_E_sensitiveness(),
@@ -116,13 +183,13 @@ public abstract class Dialog extends Alpha {
 				targetObject.safelyAddAndDisplay(desktop,iX);
 			};
 			// targetObject.registerSlotVariables(); // DEBUG 2011.12.15
-                        targetObject.decreaseDepthCounter();
+			targetObject.decreaseDepthCounter();
 			targetObject.receiveInitiatingMessage();
 		} else if (showDialog) {
 			MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
-                        targetObject.increaseDepthCounter();
+			targetObject.increaseDepthCounter();
 			targetObject.safelyDisplay(desktop,iX);
-                        targetObject.decreaseDepthCounter();
+			targetObject.decreaseDepthCounter();
 		}
 	}
 	//
@@ -178,8 +245,12 @@ public abstract class Dialog extends Alpha {
 		}
 		//
 		public void execute(ChoisePoint iX) throws Backtracking {
-			throw new Backtracking();
+			throw Backtracking.instance;
 			// c0.execute(iX);
 		}
+	}
+	//
+	public MainDesktopPane getMainPane() {
+		return DesktopUtils.createPaneIfNecessary(staticContext);
 	}
 }

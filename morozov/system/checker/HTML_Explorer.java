@@ -4,20 +4,49 @@ package morozov.system.checker;
 
 import target.*;
 
+import morozov.run.*;
+import morozov.system.checker.signals.*;
 import morozov.system.files.*;
 import morozov.terms.*;
 
 import java.net.URI;
-
 import java.util.regex.Pattern;
 import java.util.Stack;
 import java.util.ArrayList;
 
 public class HTML_Explorer extends HTML_BasicExplorer {
 	//
+	protected boolean extractAttributes;
+	protected boolean coalesceAdjacentStrings;
+	protected boolean truncateStrings;
+	protected String[] tags;
+	protected String[] unpairedTagsTable;
+	protected String[] flatTagsTable;
+	protected String[][] referenceContainersTable;
+	protected String[][] specialEntitiesTable;
+	//
 	protected Stack<String> tagNesting= new Stack<String>();
 	//
-	public Term textToTerm(String aText, URI baseURI, String[] tags, String mask, boolean backslashIsSeparator) {
+	public HTML_Explorer(
+			boolean aExtractAttributes,
+			boolean aCoalesceAdjacentStrings,
+			boolean aTruncateStrings,
+			String[] aTags,
+			String[] aUnpairedTagsTable,
+			String[] aFlatTagsTable,
+			String[][] aReferenceContainersTable,
+			String[][] aSpecialEntitiesTable) {
+		extractAttributes= aExtractAttributes;
+		coalesceAdjacentStrings= aCoalesceAdjacentStrings;
+		truncateStrings= aTruncateStrings;
+		tags= aTags;
+		unpairedTagsTable= aUnpairedTagsTable;
+		flatTagsTable= aFlatTagsTable;
+		referenceContainersTable= aReferenceContainersTable;
+		specialEntitiesTable= aSpecialEntitiesTable;
+	}
+	//
+	public Term textToTerm(String aText, URI baseURI, String mask, boolean backslashIsSeparator) {
 		text= aText;
 		stack.clear();
 		stack.push(0);
@@ -33,7 +62,7 @@ public class HTML_Explorer extends HTML_BasicExplorer {
 			stack.push(stack.peek());
 			char[] nativePattern= mask.toCharArray();
 			Pattern pattern= FileNameMask.wildcard2UnixPattern(nativePattern);
-			Term list= extractTagStructure(baseURI,tags,pattern,backslashIsSeparator);
+			Term list= extractTagStructure(baseURI,pattern,backslashIsSeparator);
 			return list;
 		} finally {
 			stack.pop();
@@ -60,67 +89,147 @@ public class HTML_Explorer extends HTML_BasicExplorer {
 		}
 	}
 	//
-	protected Term extractTagStructure(URI baseURI, String[] tags, Pattern pattern, boolean backslashIsSeparator) {
+	protected Term extractTagStructure(URI baseURI, Pattern pattern, boolean backslashIsSeparator) {
 		ArrayList<Term> items= new ArrayList<Term>();
+		StringBuilder textBuffer= new StringBuilder();
 		while(stack.peek() < text.length()) {
 			int p1= stack.peek();
 			int pNext= p1;
+			int code= text.codePointAt(stack.peek());
+			if (code < 0x20) {
+				shiftTextPosition(1);
+				continue;
+			};
 			try {
+/*
+System.out.printf("[1]: %c%c%c%c%c\n",
+			text.codePointAt(stack.peek()),
+			text.codePointAt(stack.peek()+1),
+			text.codePointAt(stack.peek()+2),
+			text.codePointAt(stack.peek()+3),
+			text.codePointAt(stack.peek()+4));
+*/
 				// skipSpaces();
 				if (text.regionMatches(stack.peek(),"<",0,1)) {
+					if (text.regionMatches(stack.peek()+1,"!--",0,3)) {
+						shiftTextPosition(4);
+						skipCurrentComment();
+						continue;
+					};
+/*
+System.out.printf("[2]: %c%c%c%c%c\n",
+			text.codePointAt(stack.peek()),
+			text.codePointAt(stack.peek()+1),
+			text.codePointAt(stack.peek()+2),
+			text.codePointAt(stack.peek()+3),
+			text.codePointAt(stack.peek()+4));
+*/
+					// skipSpaces();
 					if (isEndOfBlock()) {
-						return assembleResultList(items);
+						break;
 					} else {
 						shiftTextPosition(1);
-						if (isHyperReference(baseURI,tags,pattern,items,backslashIsSeparator)) {
+						if (text.regionMatches(stack.peek(),"/",0,1)) {
+							skipCurrentTag();
+							continue;
+						} else if (isHyperReference(baseURI,pattern,items,textBuffer,backslashIsSeparator)) {
 							continue;
 						} else {
-							acceptBlock(baseURI,tags,pattern,items,backslashIsSeparator);
+/*
+System.out.printf("[5]: CALL acceptBlock %c%c%c%c%c\n",
+			text.codePointAt(stack.peek()),
+			text.codePointAt(stack.peek()+1),
+			text.codePointAt(stack.peek()+2),
+			text.codePointAt(stack.peek()+3),
+			text.codePointAt(stack.peek()+4));
+*/
+							acceptBlock(baseURI,pattern,items,textBuffer,backslashIsSeparator);
 							continue;
 						}
 					}
 				}
-			} catch (IllegalArgumentException e) {
-				stack.set(stack.size()-1,p1);
-				pNext= pNext + 1;
 			} catch (Backtracking b) {
 				stack.set(stack.size()-1,p1);
 				pNext= pNext + 1;
-			} catch(ReferenceIsNotEnabled e) {
-				continue;
+			} catch (IllegalArgumentException e) {
+				stack.set(stack.size()-1,p1);
+				pNext= pNext + 1;
 			};
 			int p2= text.indexOf('<',pNext);
 			if (p2 >= 0) {
 				if (p1 < p2) {
 					String textSegment= text.substring(p1,p2);
+					appendString(textSegment,items,textBuffer);
 					stack.set(stack.size()-1,p2);
-					textSegment= deleteControlCharacters(textSegment);
-					if (textSegment.length() > 0) {
-						items.add(new PrologString(textSegment));
-					}
 				} else {
 					String textSegment= text.substring(p1);
+					appendString(textSegment,items,textBuffer);
 					stack.set(stack.size()-1,text.length());
-					textSegment= deleteControlCharacters(textSegment);
-					if (textSegment.length() > 0) {
-						items.add(new PrologString(textSegment));
-					};
-					return assembleResultList(items);
+					break;
 				}
 			} else {
 				if (p1 < text.length()) {
 					String textSegment= text.substring(p1);
+					appendString(textSegment,items,textBuffer);
 					stack.set(stack.size()-1,text.length());
-					textSegment= deleteControlCharacters(textSegment);
-					if (textSegment.length() > 0) {
-						items.add(new PrologString(textSegment));
-					}
 				} else {
-					return assembleResultList(items);
+					break;
 				}
 			}
 		};
+		if (textBuffer.length() > 0) {
+			items.add(new PrologString(textBuffer.toString()));
+			textBuffer.setLength(0);
+		};
 		return assembleResultList(items);
+	}
+	protected void appendString(String segment, ArrayList<Term> items, StringBuilder textBuffer) {
+/*
+System.out.printf("[Q.1]: IN appendString textBuffer:>>>%s<<<\n",textBuffer);
+*/
+		if (truncateStrings) {
+			int beginning= segment.length();
+			for (int n= 0; n < segment.length(); n++) {
+				int code= segment.codePointAt(n);
+				if (code <= 0x20) {
+					continue;
+				} else {
+					beginning= n;
+					break;
+				}
+			};
+			int end= -1;
+			for (int n= segment.length()-1; n >= beginning; n--) {
+				int code= segment.codePointAt(n);
+				if (code <= 0x20) {
+					continue;
+				} else {
+					end= n;
+					break;
+				}
+			};
+			// if (beginning >= end) {
+			//	return;
+			// } else if (beginning > 0 || end < segment.length() - 1) {
+			//	segment= segment.substring(beginning,end+1);
+			// }
+			if (beginning > end) {
+				return;
+			} else if (beginning > 0 || end < segment.length()-1) {
+				segment= segment.substring(beginning,end+1);
+			}
+		};
+		segment= deleteControlCharacters(segment,true);
+		if (segment.length() > 0) {
+			if (coalesceAdjacentStrings) {
+				if (textBuffer.length() > 0) {
+					textBuffer.append(' ');
+				};
+				textBuffer.append(segment);
+			} else {
+				items.add(new PrologString(segment));
+			}
+		}
 	}
 	protected Term extractReferences(URI baseURI, String mask, boolean backslashIsSeparator) {
 		char[] nativePattern= mask.toCharArray();
@@ -131,38 +240,29 @@ public class HTML_Explorer extends HTML_BasicExplorer {
 			int p2= text.indexOf('<',p1);
 			if (p2 >= 0) {
 				stack.set(stack.size()-1,p2+1);
+				if (text.regionMatches(stack.peek(),"!--",0,3)) {
+					shiftTextPosition(3);
+					skipCurrentComment();
+					continue;
+				};
+				skipSpaces();
 				try {
-					if (isFrontTag("A")) {
-						shiftTextPosition(1);
-						String path= extractPairValue("HREF");
-						path= URL_Utils.replaceSlashesAndSpaces(path,backslashIsSeparator);
-						path= URL_Utils.replaceAmpersands(path);
-						path= resolveURI(baseURI,path);
-						if (!items.contains(path) && isEnabledReference(path,pattern,backslashIsSeparator)) {
-							items.add(path);
-						}
-					} else if (isFrontTag("IMG")) {
-						shiftTextPosition(3);
-						String path= extractPairValue("SRC");
-						path= URL_Utils.replaceSlashesAndSpaces(path,backslashIsSeparator);
-						path= URL_Utils.replaceAmpersands(path);
-						path= resolveURI(baseURI,path);
-						if (!items.contains(path) && isEnabledReference(path,pattern,backslashIsSeparator)) {
-							items.add(path);
-						}
-					} else if (isFrontTag("FRAME")) {
-						shiftTextPosition(5);
-						String path= extractPairValue("SRC");
-						path= URL_Utils.replaceSlashesAndSpaces(path,backslashIsSeparator);
-						path= URL_Utils.replaceAmpersands(path);
-						path= resolveURI(baseURI,path);
-						if (!items.contains(path) && isEnabledReference(path,pattern,backslashIsSeparator)) {
-							items.add(path);
+					for (int n= 0; n < referenceContainersTable.length; n++) {
+						String containerName= referenceContainersTable[n][0];
+						if (isFrontName(containerName)) {
+							shiftTextPosition(containerName.length());
+							String path= extractPairValue(referenceContainersTable[n][1]);
+							path= scanURI(path,baseURI,backslashIsSeparator);
+							if (!items.contains(path) && isEnabledReference(path,pattern,backslashIsSeparator)) {
+								items.add(path);
+							};
+							break;
 						}
 					};
 					skipCurrentTag();
-				} catch (IllegalArgumentException e) {
 				} catch (Backtracking b) {
+					stack.set(stack.size()-1,p2+1);
+				} catch (IllegalArgumentException e) {
 					stack.set(stack.size()-1,p2+1);
 				}
 			} else {
@@ -172,121 +272,274 @@ public class HTML_Explorer extends HTML_BasicExplorer {
 		return assembleReferenceList(items);
 	}
 	protected boolean isEndOfBlock() {
+		if (tagNesting.size() <= 0) {
+			return false;
+		};
 		try {
 			stack.push(stack.peek());
 			// skipSpaces();
 			if (text.regionMatches(stack.peek(),"<",0,1)) {
 				shiftTextPosition(1);
-				if (	isFrontTag("P") &&
-					tagNesting.size() > 0 &&
-					tagNesting.peek().regionMatches(true,0,"P",0,1)) {
-					return true;
-				} else if (text.regionMatches(stack.peek(),"/",0,1)) {
+				String currentTag= tagNesting.peek();
+				if (text.regionMatches(stack.peek(),"/",0,1)) {
 					shiftTextPosition(1);
-					// skipSpaces();
-					boolean isEnd= false;
-					String outerTag= null;
-					// int outerTagLength= 0;
-					for (int n= 0; n < tagNesting.size(); n++) {
-						outerTag= tagNesting.get(n);
-						if (isFrontTag(outerTag)) {
-							return true;
-						}
+					skipSpaces();
+					if (isFrontName(currentTag)) {
+						return true;
+					} else {
+						for (int n= tagNesting.size()-1; n >= 0; n--) {
+							String outerTag= tagNesting.get(n);
+							if (isFrontName(outerTag)) {
+								return true;
+							}
+						};
+						return false;
+					}
+				} else {
+					skipSpaces();
+					if (isFrontName(currentTag)) {
+						for (int n= 0; n < flatTagsTable.length-1; n++) {
+							if (currentTag.equals(flatTagsTable[n])) {
+								return true;
+							}
+						};
+						return false;
+					} else {
+						return false;
 					}
 				}
-			};
-			return false;
+			} else {
+				return false;
+			}
 		} finally {
 			stack.pop();
 		}
 	}
-	protected boolean isHyperReference(URI baseURI, String[] tags, Pattern pattern, ArrayList<Term> items, boolean backslashIsSeparator) throws Backtracking, ReferenceIsNotEnabled {
-		if (isFrontTag("A")) {
-			shiftTextPosition(1);
-			String path= extractPairValue("HREF");
-			path= URL_Utils.replaceSlashesAndSpaces(path,backslashIsSeparator);
-			path= URL_Utils.replaceAmpersands(path);
-			path= resolveURI(baseURI,path);
-			skipCurrentTag();
-			if (isEnabledReference(path,pattern,backslashIsSeparator)) {
-				try {
-					// skipCurrentTag();
-					tagNesting.push("A");
-					Term internalStructure= extractTagStructure(baseURI,tags,pattern,backslashIsSeparator);
-					items.add(new PrologStructure(SymbolCodes.symbolCode_E_ref,new Term[]{new PrologString(path),internalStructure}));
-					return true;
-				} finally {
-					tagNesting.pop();
+	protected boolean isHyperReference(URI baseURI, Pattern pattern, ArrayList<Term> items, StringBuilder textBuffer, boolean backslashIsSeparator) {
+		try {
+			stack.push(stack.peek());
+			skipSpaces();
+			String containerName= extractFrontName();
+			for (int n= 0; n < tags.length; n++) {
+				if (containerName.equals(tags[n])) {
+					stack.pop();
+					return false;
 				}
-			} else {
-				// return false;
-				throw new ReferenceIsNotEnabled();
-			}
-		} else if (isFrontTag("IMG")) {
-			shiftTextPosition(3);
-			String path= extractPairValue("SRC");
-			path= URL_Utils.replaceSlashesAndSpaces(path,backslashIsSeparator);
-			path= URL_Utils.replaceAmpersands(path);
-			path= resolveURI(baseURI,path);
-			skipCurrentTag();
-			if (isEnabledReference(path,pattern,backslashIsSeparator)) {
-				items.add(new PrologStructure(SymbolCodes.symbolCode_E_ref,new Term[]{new PrologString(path),new PrologEmptyList()}));
 			};
-			return true;
-		} else if (isFrontTag("FRAME")) {
-			shiftTextPosition(5);
-			String path= extractPairValue("SRC");
-			path= URL_Utils.replaceSlashesAndSpaces(path,backslashIsSeparator);
-			path= URL_Utils.replaceAmpersands(path);
-			path= resolveURI(baseURI,path);
-			skipCurrentTag();
-			if (isEnabledReference(path,pattern,backslashIsSeparator)) {
-				try {
+			for (int n= 0; n < referenceContainersTable.length; n++) {
+				if (containerName.equals(referenceContainersTable[n][0])) {
+					// shiftTextPosition(containerName.length());
+					int p1= stack.peek();
+					String path= extractPairValue(referenceContainersTable[n][1]);
+					path= scanURI(path,baseURI,backslashIsSeparator);
 					// skipCurrentTag();
-					tagNesting.push("FRAME");
-					Term internalStructure= extractTagStructure(baseURI,tags,pattern,backslashIsSeparator);
-					items.add(new PrologStructure(SymbolCodes.symbolCode_E_ref,new Term[]{new PrologString(path),internalStructure}));
-					return true;
-				} finally {
-					tagNesting.pop();
+					if (isEnabledReference(path,pattern,backslashIsSeparator)) {
+						ArrayList<Term> tagAttributes= new ArrayList<Term>();
+						if (extractAttributes) {
+							stack.set(stack.size()-1,p1);
+							extractTagAttributes(tagAttributes);
+						};
+						boolean tagIsUnpaired= skipCurrentTag();
+						if (!tagIsUnpaired) {
+							for (int i= 0; i < unpairedTagsTable.length; i++) {
+								if (containerName.equals(unpairedTagsTable[i])) {
+									tagIsUnpaired= true;
+									break;
+								}
+							}
+						};
+						if (tagIsUnpaired) {
+							if (textBuffer.length() > 0) {
+								items.add(new PrologString(textBuffer.toString()));
+								textBuffer.setLength(0);
+							};
+							Term internalStructure= PrologEmptyList.instance;
+							for (int k= tagAttributes.size()-1; k >= 0; k--) {
+								internalStructure= new PrologList(tagAttributes.get(k),internalStructure);
+							};
+							items.add(new PrologStructure(SymbolCodes.symbolCode_E_ref,new Term[]{new PrologString(path),internalStructure}));
+							return true;
+						} else {
+							try {
+								if (textBuffer.length() > 0) {
+									items.add(new PrologString(textBuffer.toString()));
+									textBuffer.setLength(0);
+								};
+								tagNesting.push(containerName);
+								Term internalStructure= extractTagStructure(baseURI,pattern,backslashIsSeparator);
+								for (int k= tagAttributes.size()-1; k >= 0; k--) {
+									internalStructure= new PrologList(tagAttributes.get(k),internalStructure);
+								};
+								items.add(new PrologStructure(SymbolCodes.symbolCode_E_ref,new Term[]{new PrologString(path),internalStructure}));
+								return true;
+							} finally {
+								tagNesting.pop();
+							}
+						}
+					} else {
+						skipCurrentTag();
+						return true;
+					}
 				}
-			} else {
-				// return false;
-				throw new ReferenceIsNotEnabled();
-			}
-		} else {
+			};
+			stack.pop();
+			return false;
+		} catch (Backtracking b) {
+			stack.pop();
+			return false;
+		} catch (IllegalArgumentException e) {
+			stack.pop();
 			return false;
 		}
 	}
 	//
-	protected void acceptBlock(URI baseURI, String[] tags, Pattern pattern, ArrayList<Term> items, boolean backslashIsSeparator) throws Backtracking {
-		// skipSpaces();
+	protected void acceptBlock(URI baseURI, Pattern pattern, ArrayList<Term> items, StringBuilder textBuffer, boolean backslashIsSeparator) throws Backtracking {
+		String tag;
+		try {
+			tag= extractFrontName();
+		} catch (Backtracking b) {
+			skipCurrentTag();
+			return;
+		};
 		boolean flag= false;
-		String tag= null;
-		int tagLength= 0;
 		for (int n= 0; n < tags.length; n++) {
-			tag= tags[n];
-			if (isFrontTag(tag)) {
+			if (tag.equals(tags[n])) {
 				flag= true;
-				tagLength= tag.length();
 				break;
 			}
 		};
 		if (flag) {
-			shiftTextPosition(tagLength);
-			try {
-				skipCurrentTag();
-				tagNesting.push(tag);
-				Term internalStructure= extractTagStructure(baseURI,tags,pattern,backslashIsSeparator);
+			ArrayList<Term> tagAttributes= new ArrayList<Term>();
+			if (extractAttributes) {
+				extractTagAttributes(tagAttributes);
+			};
+/*
+System.out.printf("[0]acceptBlock: >>>%s<<<\n",tag);
+System.out.printf("[1]: IN acceptBlock %c%c%c%c%c%c%c%c%c\n",
+			text.codePointAt(stack.peek()),
+			text.codePointAt(stack.peek()+1),
+			text.codePointAt(stack.peek()+2),
+			text.codePointAt(stack.peek()+3),
+			text.codePointAt(stack.peek()+4),
+			text.codePointAt(stack.peek()+5),
+			text.codePointAt(stack.peek()+6),
+			text.codePointAt(stack.peek()+7),
+			text.codePointAt(stack.peek()+8));
+*/
+			boolean tagIsUnpaired= skipCurrentTag();
+// System.out.printf("[2]tagIsUnpaired: >>>%s<<<\n",tagIsUnpaired);
+			if (!tagIsUnpaired) {
+				for (int n= 0; n < unpairedTagsTable.length; n++) {
+					if (tag.equals(unpairedTagsTable[n])) {
+						tagIsUnpaired= true;
+						break;
+					}
+				}
+			};
+			if (tagIsUnpaired) {
+				if (textBuffer.length() > 0) {
+					items.add(new PrologString(textBuffer.toString()));
+					textBuffer.setLength(0);
+				};
+				Term internalStructure= PrologEmptyList.instance;
+				for (int k= tagAttributes.size()-1; k >= 0; k--) {
+					internalStructure= new PrologList(tagAttributes.get(k),internalStructure);
+				};
 				items.add(new PrologStructure(SymbolCodes.symbolCode_E_block,new Term[]{new PrologString(tag),internalStructure}));
-				// return true;
-			} finally {
-				tagNesting.pop();
-				// return false;
+				return;
+			} else {
+				try {
+					if (textBuffer.length() > 0) {
+						items.add(new PrologString(textBuffer.toString()));
+						textBuffer.setLength(0);
+					};
+					tagNesting.push(tag);
+					Term internalStructure= extractTagStructure(baseURI,pattern,backslashIsSeparator);
+					for (int k= tagAttributes.size()-1; k >= 0; k--) {
+						internalStructure= new PrologList(tagAttributes.get(k),internalStructure);
+					};
+					items.add(new PrologStructure(SymbolCodes.symbolCode_E_block,new Term[]{new PrologString(tag),internalStructure}));
+				} finally {
+					tagNesting.pop();
+				}
 			}
 		} else {
 			skipCurrentTag();
-			// return true;
+		}
+	}
+	//
+	protected String scanURI(String path, URI baseURI, boolean backslashIsSeparator) {
+		path= deleteControlCharacters(path,false);
+		path= URL_Utils.replaceSlashesAndSpaces(path,backslashIsSeparator);
+		path= URL_Utils.replaceAmpersands(path);
+		path= deleteSharpIfNecessary(path);
+		URI name= baseURI.resolve(path);
+		return name.toASCIIString();
+	}
+	//
+	protected String deleteControlCharacters(String segment, boolean enableSpecialEntitiesReplace) {
+		boolean segmentIsSafe= true;
+		for (int n=0; n < segment.length(); n++) {
+			int code= segment.codePointAt(n);
+			if (code < 0x20) {
+				segmentIsSafe= false;
+				break;
+			} if (code == '&' && enableSpecialEntitiesReplace) {
+				segmentIsSafe= false;
+				break;
+			}
+		};
+		if (segmentIsSafe) {
+			return segment;
+		} else {
+			StringBuilder buffer= new StringBuilder("");
+			boolean previousCharacterWasControl= false;
+			for (int n=0; n < segment.length(); n++) {
+				int code= segment.codePointAt(n);
+				if (code < 0x20) {
+					previousCharacterWasControl= true;
+					continue;
+				} else if (code == 0x20) {
+					if (previousCharacterWasControl && buffer.length() > 0) {
+						buffer.append(' ');
+					};
+					buffer.append(' ');
+					previousCharacterWasControl= false;
+				} else if (code == '&' && enableSpecialEntitiesReplace) {
+					boolean isSpecialEntity= false;
+					for (int k= 0; k < specialEntitiesTable.length; k++) {
+						String currentSpecialEntity= specialEntitiesTable[k][0];
+						int specialEntityLength= currentSpecialEntity.length();
+						int endPosition= n + 1 + specialEntityLength;
+						if (	endPosition < text.length() &&
+							segment.regionMatches(true,n+1,currentSpecialEntity,0,specialEntityLength) &&
+							segment.codePointAt(endPosition) == ';') {
+							isSpecialEntity= true;
+							n= endPosition;
+							if (previousCharacterWasControl && buffer.length() > 0) {
+								buffer.append(' ');
+							};
+							buffer.append(specialEntitiesTable[k][1]);
+							previousCharacterWasControl= false;
+							break;
+						}
+					};
+					if (!isSpecialEntity) {
+						if (previousCharacterWasControl && buffer.length() > 0) {
+							buffer.append(' ');
+						};
+						buffer.appendCodePoint(code);
+						previousCharacterWasControl= false;
+					}
+				} else {
+					if (previousCharacterWasControl && buffer.length() > 0) {
+						buffer.append(' ');
+					};
+					buffer.appendCodePoint(code);
+					previousCharacterWasControl= false;
+				}
+			};
+			return buffer.toString();
 		}
 	}
 }

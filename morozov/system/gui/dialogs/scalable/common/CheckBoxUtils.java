@@ -12,13 +12,15 @@ package morozov.system.gui.dialogs.scalable.common;
  * @author IRE RAS Alexei A. Morozov
 */
 
-import java.awt.*;
+import java.awt.Graphics2D;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.Line2D;
 
 public class CheckBoxUtils {
-	public static void drawCheck(Component relatedComponent, Graphics g0, int x, int y, int controlSize, Color markerColor, boolean drawCross) {
-		Graphics2D g2= (Graphics2D)g0;
+	public static void drawCheck(Component relatedComponent, Graphics2D g2, int x, int y, int controlSize, Color markerColor, boolean drawCross) {
+		// Graphics2D g2= (Graphics2D)g0;
 		g2.setColor(markerColor);
 		// ERCT = rct(L,T,R,B),
 		int left= x;
@@ -83,7 +85,7 @@ public class CheckBoxUtils {
 		}
 	}
 	//
-	public static void drawUncertainMarker(Component relatedComponent, Graphics g0, int x, int y, int controlSize, Color markerColor) {
+	public static void drawUncertainMarker(Component relatedComponent, Graphics2D g2, int x, int y, int controlSize, Color markerColor) {
 		int left= x;
 		int right= x + controlSize - 1;
 		int top= y;
@@ -95,7 +97,7 @@ public class CheckBoxUtils {
 		int deltaH= (int)StrictMath.round((bottom - top) * 0.27);
 		int doubleDeltaH= deltaH * 2;
 		//
-		Graphics2D g2= (Graphics2D)g0;
+		// Graphics2D g2= (Graphics2D)g0;
 		g2.setColor(markerColor);
 		g2.fill(new Rectangle2D.Double(x+deltaW,y+deltaH,controlSize-doubleDeltaW,controlSize-doubleDeltaH));
 	}

@@ -55,18 +55,36 @@ public class ThreadHolder extends Thread {
 			} catch (InterruptedException e) {
 			} catch (ThreadDeath e) {
 				return;
+			} catch (CodedErrorExit e) {
+				if (e.isNormalTerminationOfTheProgram()) {
+					System.exit(0);
+				} else {
+					reportThrowable(e);
+					currentProcess.hasUpdatedPort.set(true);
+				}
+			} catch (ProcessedErrorExit e) {
+				if (e.isNormalTerminationOfTheProgram()) {
+					System.exit(0);
+				} else {
+					reportThrowable(e);
+					currentProcess.hasUpdatedPort.set(true);
+				}
 			} catch (Throwable e) {
-				if (DefaultOptions.runtimeErrorReport) {
-					long debugPosition= currentProcess.debugPosition;
-					long debugUnit= currentProcess.debugUnit;
-					int debugFileNumber= currentProcess.debugFileNumber;
-					Window mainWindow= StaticDesktopAttributes.retrieveMainWindow(currentProcess.staticContext);
-					RunTimeErrorDialog dialog= new RunTimeErrorDialog(this,mainWindow,e,debugPosition,debugUnit,debugFileNumber);
-					dialog.activate();
-				};
+				reportThrowable(e);
 				currentProcess.hasUpdatedPort.set(true);
 				// System.out.printf("ThreadHolder:O.K.\n");
 			}
+		}
+	}
+	//
+	protected void reportThrowable(Throwable e) {
+		if (DefaultOptions.runtimeErrorReport) {
+			long debugPosition= currentProcess.debugPosition;
+			long debugUnit= currentProcess.debugUnit;
+			int debugFileNumber= currentProcess.debugFileNumber;
+			Window mainWindow= StaticDesktopAttributes.retrieveMainWindow(currentProcess.staticContext);
+			RunTimeErrorDialog dialog= new RunTimeErrorDialog(this,mainWindow,e,debugPosition,debugUnit,debugFileNumber);
+			dialog.activate();
 		}
 	}
 	//

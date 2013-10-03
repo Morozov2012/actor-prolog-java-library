@@ -1,8 +1,14 @@
 // (c) 2010 IRE RAS Alexei A. Morozov
-package morozov.domains;
 
+package morozov.domains;
+
+import morozov.run.*;
 import morozov.terms.*;
-import java.math.BigInteger;public class DomainIntegerRange extends DomainAlternative {
+import morozov.terms.signals.*;
+
+import java.math.BigInteger;
+
+public class DomainIntegerRange extends DomainAlternative {
 	protected BigInteger leftBound;
 	protected BigInteger rightBound;
 	public DomainIntegerRange(long left, long right) {

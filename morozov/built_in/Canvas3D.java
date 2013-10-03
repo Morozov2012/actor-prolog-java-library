@@ -7,24 +7,21 @@ import target.*;
 import morozov.classes.*;
 import morozov.run.*;
 import morozov.system.*;
-import morozov.system.checker.*;
-import morozov.system.files.*;
+import morozov.system.errors.*;
 import morozov.system.gui.*;
 import morozov.system.gui.space3d.*;
+import morozov.system.gui.space3d.errors.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
-// import java.awt.*;
 import java.awt.Color;
-import javax.swing.SwingUtilities;
 import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
 import java.awt.GraphicsConfiguration;
-import java.awt.image.BufferedImage;
-import java.net.URI;
-import java.io.InputStream;
-import java.io.ByteArrayInputStream;
-import javax.imageio.ImageIO;
-import java.io.IOException;
+import java.awt.GraphicsDevice;
+import java.awt.Component;
+import javax.swing.SwingUtilities;
 
 import javax.media.j3d.Shape3D;
 import javax.media.j3d.BranchGroup;
@@ -46,30 +43,36 @@ import javax.vecmath.Color3f;
 import com.sun.j3d.utils.universe.SimpleUniverse;
 import com.sun.j3d.utils.universe.Viewer;
 
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Iterator;
 import java.util.Enumeration;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.lang.reflect.InvocationTargetException;
 
 public abstract class Canvas3D
-		extends Alpha
+		extends ImageConsumer
 		implements ComponentListener {
 	//
-	protected static final int defaultWaitingInterval= -1;
+	protected HashMap<NodeLabel,NodeContainer> localMemory= new HashMap<NodeLabel,NodeContainer>();
+	protected HashMap<Node,NodeLabel> inverseTable= new HashMap<Node,NodeLabel>();
 	//
-	abstract protected Term getBuiltInSlot_E_max_waiting_time();
-	abstract protected Term getBuiltInSlot_E_backslash_is_separator_always();
-	//
-	HashMap<NodeLabel,NodeContainer> localMemory= new HashMap<NodeLabel,NodeContainer>();
-	HashMap<Node,NodeLabel> inverseTable= new HashMap<Node,NodeLabel>();
+	protected HashSet<CustomizedPickCanvas> customizedPickCanvasList= new HashSet<CustomizedPickCanvas>();
 	//
 	protected static final Color defaultBackgroundColor= Color.BLACK;
 	//
 	protected AtomicReference<Color> backgroundColor= new AtomicReference<Color>();
-	protected ExtendedCanvas3D canvas3D= null;
+	//
+	protected AtomicBoolean controlIsInitialized= new AtomicBoolean(false);
+	protected ExtendedSpace3D space3D= null;
+	protected InternalFrame3D graphicWindow= null;
+	protected SimpleUniverse simpleUniverse= null;
+	protected TransformGroup spin= null;
+	protected Term currentSceneTree= null;
 	//
 	// protected int redrawingPeriod= 31; // [ms]
 	protected int redrawingPeriod= 310; // [ms]
@@ -104,92 +107,119 @@ public abstract class Canvas3D
 	abstract public long entry_s_MouseReleased_1_i();
 	abstract public long entry_s_MouseDragged_1_i();
 	abstract public long entry_s_MouseMoved_1_i();
+	abstract public long entry_s_Initialize_0();
+	abstract public long entry_s_Start_0();
+	abstract public long entry_s_Stop_0();
+	//
+	public Canvas3D() {
+		// This dummy call is necessary to load
+		// the vecmath.jar library before the start
+		// of rendering:
+		Color3f color3d= new Color3f(0,0,0);
+	}
+	//
+	public void closeFiles() {
+		if (graphicWindow != null) {
+			DesktopUtils.safelyDispose(graphicWindow);
+		};
+		super.closeFiles();
+	}
 	//
 	public void clear0s(ChoisePoint iX) {
-		if (desktopDoesNotExist()) {
-			return;
-		} else if (graphicWindowDoesNotExist()) {
-			return;
-		} else {
-			// DesktopUtils.createPaneIfNecessary(staticContext);
-			// InternalFrame3D graphicWindow= createInternalFrameIfNecessary(iX);
-			// localMemory.clear();
-			show1s(iX,new PrologEmptyList());
-		}
+		// if (desktopDoesNotExist()) {
+		//	return;
+		// } else if (space3DDoesNotExist()) {
+		//	return;
+		// } else {
+		show1s(iX,PrologEmptyList.instance);
+		// }
 	}
 	//
 	public void show1s(ChoisePoint iX, Term a1) {
-		DesktopUtils.createPaneIfNecessary(staticContext);
-		InternalFrame3D graphicWindow= createInternalFrameIfNecessary(iX,true);
-		showCanvas(a1,iX,graphicWindow);
+		createGraphicWindowIfNecessary(iX,true);
+		showCanvasAndSaveTree(a1,iX);
 	}
 	public void show0s(ChoisePoint iX) {
-		DesktopUtils.createPaneIfNecessary(staticContext);
-		createInternalFrameIfNecessary(iX,true);
+		createGraphicWindowIfNecessary(iX,true);
 	}
 	//
-	protected void showCanvas(Term a1, ChoisePoint iX, InternalFrame3D graphicWindow) {
-		//
-		// GraphicsConfiguration config=
-		//	SimpleUniverse.getPreferredConfiguration();
+	public static GraphicsConfiguration getGraphicsConfiguration(Component component) {
 		GraphicsConfigTemplate3D gct3D= new GraphicsConfigTemplate3D();
 		gct3D.setSceneAntialiasing(GraphicsConfigTemplate3D.REQUIRED);
-		GraphicsConfiguration config=
-			java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getBestConfiguration(gct3D);
-		//
-		canvas3D= new ExtendedCanvas3D(config);
+		GraphicsDevice device= component.getGraphicsConfiguration().getDevice();
+		GraphicsConfiguration config= device.getBestConfiguration(gct3D);
+		return config;
+	}
+	//
+	protected void showCanvasAndSaveTree(Term value, ChoisePoint iX) {
+		value= value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
+		synchronized(this) {
+			showCanvas(value,iX);
+			currentSceneTree= value;
+		}
+	}
+	protected void showCanvas(Term a1, ChoisePoint iX) {
+		if (space3D==null) {
+			if (graphicWindow != null) {
+				// GraphicsConfiguration config=
+				//	SimpleUniverse.getPreferredConfiguration();
+				// GraphicsConfiguration config=
+				//	java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getBestConfiguration(gct3D);
+				GraphicsConfiguration config= getGraphicsConfiguration(graphicWindow);
+				space3D= new ExtendedSpace3D(config);
+				graphicWindow.add(space3D,0);
+			} else {
+				return;
+			}
+		};
 		Color background= backgroundColor.get();
 		if (background != null) {
-			canvas3D.setBackground(background);
+			space3D.setBackground(background);
 		};
-		//
 		localMemory.clear();
-		//
-		// SimpleUniverse is a Convenience Utility class
-		SimpleUniverse simpleU= new SimpleUniverse(canvas3D);
-		//
-		setViewAttributes(simpleU,iX);
-		//
-		BranchGroup scene= Utils3D.termToBranchGroupOrNodeList(a1,this,simpleU,canvas3D,iX);
-		//
-		Transform3D tr= new Transform3D();
-		// tr.setScale(1.0);
-		TransformGroup tg= new TransformGroup(tr);
-		//
-		TransformGroup spin= new TransformGroup();
-		spin.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
-		spin.addChild(tg);
-		//
-		// javax.media.j3d.Alpha alpha= new javax.media.j3d.Alpha();
-		// alpha.setMode(javax.media.j3d.Alpha.INCREASING_ENABLE+javax.media.j3d.Alpha.DECREASING_ENABLE);
-		// alpha.setDecreasingAlphaDuration(10000);
-		// alpha.setIncreasingAlphaDuration(10000);
-		//
-		// RotationInterpolator rotator= new RotationInterpolator(alpha,spin);
-		// rotator.setMinimumAngle((float)(-0.1*(StrictMath.PI)/360));
-		// rotator.setMaximumAngle((float)(0.1*(StrictMath.PI)/360));
-		// spin.addChild(rotator);
-		//
-		SpecialBehavior specialBehavior= new SpecialBehavior(spin);
-		specialBehavior.setSchedulingBounds(new BoundingSphere());
-		spin.addChild(specialBehavior);
-		//
-		spin.addChild(scene);
-		//
-		BranchGroup branchGroup= new BranchGroup();
-		branchGroup.addChild(spin);
-		//
+		inverseTable.clear();
+		if (spin==null) {
+			Transform3D tr= new Transform3D();
+			TransformGroup tg= new TransformGroup(tr);
+			spin= new TransformGroup();
+			spin.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
+			spin.setCapability(TransformGroup.ALLOW_CHILDREN_READ);
+			spin.setCapability(TransformGroup.ALLOW_CHILDREN_WRITE);
+			spin.setCapability(BranchGroup.ALLOW_DETACH);
+			spin.addChild(tg);
+			SpecialBehavior specialBehavior= new SpecialBehavior(spin);
+			specialBehavior.setSchedulingBounds(new BoundingSphere());
+			spin.addChild(specialBehavior);
+		};
+		if (simpleUniverse==null) {
+			simpleUniverse= new SimpleUniverse(space3D,0);
+			setViewAttributes(simpleUniverse,iX);
+			BranchGroup scene= Utils3D.termToBranchGroupOrNodeList(a1,this,simpleUniverse,space3D,iX);
+			scene.setCapability(BranchGroup.ALLOW_DETACH);
+			spin.setChild(scene,0);
+			BranchGroup branchGroup= new BranchGroup();
+			branchGroup.setCapability(BranchGroup.ALLOW_DETACH);
+			branchGroup.addChild(spin);
+			simpleUniverse.addBranchGraph(branchGroup);
+		} else {
+			releasePickCanvas();
+			// simpleUniverse.removeAllLocales();
+			// simpleUniverse.cleanup();
+			setViewAttributes(simpleUniverse,iX);
+			BranchGroup scene= Utils3D.termToBranchGroupOrNodeList(a1,this,simpleUniverse,space3D,iX);
+			scene.setCapability(BranchGroup.ALLOW_DETACH);
+			spin.setChild(scene,0);
+		};
 		// This will move the ViewPlatform back a bit so the
 		// objects in the scene can be viewed.
-		simpleU.getViewingPlatform().setNominalViewingTransform();
-		// simpleU.addBranchGraph(scene);
-		simpleU.addBranchGraph(branchGroup);
-		graphicWindow.add(canvas3D);
-		graphicWindow.revalidate();
+		simpleUniverse.getViewingPlatform().setNominalViewingTransform();
+		if (graphicWindow != null) {
+			graphicWindow.revalidate();
+		}
 	}
-	protected void setViewAttributes(SimpleUniverse susimpleU, ChoisePoint iX) {
+	protected void setViewAttributes(SimpleUniverse simpleU, ChoisePoint iX) {
 		//
-		Viewer viewer= susimpleU.getViewer();
+		Viewer viewer= simpleU.getViewer();
 		View view= viewer.getView();
 		//
 		int projectionPolicy= Utils3D.termToProjectionPolicy(getBuiltInSlot_E_projection_policy(),iX);
@@ -238,7 +268,6 @@ public abstract class Canvas3D
 		//
 		boolean enableSceneAntialiasing= Converters.term2YesNo(getBuiltInSlot_E_enable_scene_antialiasing(),iX);
 		view.setSceneAntialiasingEnable(enableSceneAntialiasing);
-		// System.out.printf("view.setSceneAntialiasingEnable=%s\n",view.getSceneAntialiasingEnable());
 		boolean enableDepthBufferFreezing= Converters.term2YesNo(getBuiltInSlot_E_enable_depth_buffer_freezing(),iX);
 		view.setDepthBufferFreezeTransparent(enableDepthBufferFreezing);
 		boolean enableLocalEyeLighting= Converters.term2YesNo(getBuiltInSlot_E_enable_local_eye_lighting(),iX);
@@ -275,27 +304,112 @@ public abstract class Canvas3D
 	}
 	//
 	public void redraw0s(ChoisePoint iX) {
-		DesktopUtils.createPaneIfNecessary(staticContext);
-		Map<AbstractWorld,InternalFrame3D> innerWindows= StaticAttributes3D.retrieveInnerWindows(staticContext);
-		InternalFrame3D graphicWindow= innerWindows.get(this);
-		if (graphicWindow==null) {
-			createInternalFrameIfNecessary(iX);
-		} else {
-			redrawInternalFrame(graphicWindow,iX);
-			graphicWindow.safelyRestoreSize(staticContext);
-			DesktopUtils.safelyRepaint(graphicWindow);
+		createGraphicWindowIfNecessary(iX,false);
+		synchronized(this) {
+			if (graphicWindow != null) {
+				redrawInternalFrame(graphicWindow,iX);
+				graphicWindow.safelyRestoreSize(staticContext);
+				DesktopUtils.safelyRepaint(graphicWindow);
+			} else if (space3D != null) {
+				changeBackgroundColor(iX,getBuiltInSlot_E_background_color());
+				DesktopUtils.safelyRepaint(space3D);
+			}
 		}
 	}
 	//
 	public void hide0s(ChoisePoint iX) {
 		if (desktopDoesNotExist()) {
 			return;
-		} else if (graphicWindowDoesNotExist()) {
+		} else if (space3DDoesNotExist()) {
 			return;
 		} else {
-			DesktopUtils.createPaneIfNecessary(staticContext);
-			InternalFrame3D graphicWindow= createInternalFrameIfNecessary(iX);
-			DesktopUtils.safelySetVisible(false,graphicWindow);
+			createGraphicWindowIfNecessary(iX,false);
+			synchronized(this) {
+				if (graphicWindow != null) {
+					DesktopUtils.safelySetVisible(false,graphicWindow);
+				}
+			}
+		}
+	}
+	//
+	public void maximize0s(ChoisePoint iX) {
+		createGraphicWindowIfNecessary(iX,true);
+		synchronized(this) {
+			if (graphicWindow != null) {
+				DesktopUtils.safelyMaximize(graphicWindow);
+			}
+		}
+	}
+	//
+	public void minimize0s(ChoisePoint iX) {
+		createGraphicWindowIfNecessary(iX,true);
+		synchronized(this) {
+			if (graphicWindow != null) {
+				DesktopUtils.safelyMinimize(graphicWindow);
+			}
+		}
+	}
+	//
+	public void restore0s(ChoisePoint iX) {
+		createGraphicWindowIfNecessary(iX,true);
+		synchronized(this) {
+			if (graphicWindow != null) {
+				DesktopUtils.safelyRestore(graphicWindow);
+			}
+		}
+	}
+	//
+	public void isMaximized0s(ChoisePoint iX) throws Backtracking {
+		if (desktopDoesNotExist()) {
+			throw Backtracking.instance;
+		} else if (space3DDoesNotExist()) {
+			throw Backtracking.instance;
+		} else {
+			synchronized(this) {
+				if (graphicWindow != null) {
+					if (!DesktopUtils.safelyIsMaximized(graphicWindow)) {
+						throw Backtracking.instance;
+					}
+				} else {
+					throw Backtracking.instance;
+				}
+			}
+		}
+	}
+	//
+	public void isMinimized0s(ChoisePoint iX) throws Backtracking {
+		if (desktopDoesNotExist()) {
+			throw Backtracking.instance;
+		} else if (space3DDoesNotExist()) {
+			throw Backtracking.instance;
+		} else {
+			synchronized(this) {
+				if (graphicWindow != null) {
+					if(!DesktopUtils.safelyIsMinimized(graphicWindow)) {
+						throw Backtracking.instance;
+					}
+				} else {
+					throw Backtracking.instance;
+				}
+			}
+		}
+	}
+	//
+	public void isRestored0s(ChoisePoint iX) throws Backtracking {
+		if (desktopDoesNotExist()) {
+			throw Backtracking.instance;
+		} else if (space3DDoesNotExist()) {
+			throw Backtracking.instance;
+		} else {
+			synchronized(this) {
+				if (graphicWindow != null) {
+					if(!DesktopUtils.safelyIsRestored(graphicWindow)) {
+						throw Backtracking.instance;
+					}
+				} else {
+					throw Backtracking.instance;
+				}
+			}
 		}
 	}
 	//
@@ -303,74 +417,106 @@ public abstract class Canvas3D
 		changeBackgroundColor(iX,backgroundColor);
 	}
 	//
+	public void setNode2s(ChoisePoint iX, Term a1, Term a2) {
+		NodeLabel nodeLabel= Tools3D.termToNodeLabel(a1,iX);
+		synchronized(this) {
+			NodeContainer c= localMemory.get(nodeLabel);
+			if (c != null) {
+				BranchGroup newNode= PrincipalNode3D.termToBranchGroup(a2,this,simpleUniverse,space3D,iX);
+				Node parent= c.getParent();
+				if (parent != null && parent instanceof Group) {
+					Group group= (Group)parent;
+					int index= group.indexOfChild(c.getNode());
+					if (index >= 0) {
+						group.setChild(newNode,index);
+					}
+				}
+			} else {
+				throw new WrongArgumentIsUnknownNodeLabel(a1);
+			}
+		}
+	}
+	//
 	public void setTransform2s(ChoisePoint iX, Term a1, Term a2) {
 		NodeLabel nodeLabel= Tools3D.termToNodeLabel(a1,iX);
-		NodeContainer container= localMemory.get(nodeLabel);
-		if (container != null) {
-			Transform3D transform= PrincipalNode3D.termToTransform3D(a2,iX);
-			container.setTransform(transform);
-		} else {
-			throw new WrongArgumentIsUnknownNodeLabel(a1);
+		synchronized(this) {
+			NodeContainer c= localMemory.get(nodeLabel);
+			if (c != null) {
+				Transform3D transform= PrincipalNode3D.termToTransform3D(a2,iX);
+				c.setTransform(transform);
+			} else {
+				throw new WrongArgumentIsUnknownNodeLabel(a1);
+			}
 		}
 	}
 	//
 	public void setTranslation2s(ChoisePoint iX, Term a1, Term a2) {
 		NodeLabel nodeLabel= Tools3D.termToNodeLabel(a1,iX);
-		NodeContainer container= localMemory.get(nodeLabel);
-		if (container != null) {
-			// Transform3D transform= PrincipalNode3D.termToTransform3D(a2,iX);
-			Vector3d vector= Tools3D.term2Vector3(a2,iX);
-			container.setTranslation(vector);
-		} else {
-			throw new WrongArgumentIsUnknownNodeLabel(a1);
+		synchronized(this) {
+			NodeContainer c= localMemory.get(nodeLabel);
+			if (c != null) {
+				// Transform3D transform= PrincipalNode3D.termToTransform3D(a2,iX);
+				Vector3d vector= Tools3D.term2Vector3(a2,iX);
+				c.setTranslation(vector);
+			} else {
+				throw new WrongArgumentIsUnknownNodeLabel(a1);
+			}
 		}
 	}
 	//
 	public void setAppearance2s(ChoisePoint iX, Term a1, Term a2) {
 		NodeLabel nodeLabel= Tools3D.termToNodeLabel(a1,iX);
-		NodeContainer container= localMemory.get(nodeLabel);
-		if (container != null) {
-			Appearance appearance= AuxiliaryNode3D.termToAppearance(a2,this,iX);
-			container.setAppearance(appearance);
-		} else {
-			throw new WrongArgumentIsUnknownNodeLabel(a1);
+		synchronized(this) {
+			NodeContainer c= localMemory.get(nodeLabel);
+			if (c != null) {
+				Appearance appearance= AuxiliaryNode3D.termToAppearance(a2,this,iX);
+				c.setAppearance(appearance);
+			} else {
+				throw new WrongArgumentIsUnknownNodeLabel(a1);
+			}
 		}
 	}
 	//
 	public void setColoringAttributes2s(ChoisePoint iX, Term a1, Term a2) {
 		NodeLabel nodeLabel= Tools3D.termToNodeLabel(a1,iX);
-		NodeContainer container= localMemory.get(nodeLabel);
-		if (container != null) {
-			ColoringAttributes coloringAttributes= AuxiliaryNode3D.termToColoringAttributes(a2,iX);
-			container.setColoringAttributes(coloringAttributes);
-		} else {
-			throw new WrongArgumentIsUnknownNodeLabel(a1);
+		synchronized(this) {
+			NodeContainer c= localMemory.get(nodeLabel);
+			if (c != null) {
+				ColoringAttributes coloringAttributes= AuxiliaryNode3D.termToColoringAttributes(a2,iX);
+				c.setColoringAttributes(coloringAttributes);
+			} else {
+				throw new WrongArgumentIsUnknownNodeLabel(a1);
+			}
 		}
 	}
 	//
 	public void setFont3D2s(ChoisePoint iX, Term a1, Term a2) {
 		NodeLabel nodeLabel= Tools3D.termToNodeLabel(a1,iX);
-		NodeContainer container= localMemory.get(nodeLabel);
-		if (container != null) {
-			Font3D font= AuxiliaryNode3D.termToFont3D(a2,iX);
-			container.setFont3D(font);
-		} else {
-			throw new WrongArgumentIsUnknownNodeLabel(a1);
+		synchronized(this) {
+			NodeContainer c= localMemory.get(nodeLabel);
+			if (c != null) {
+				Font3D font= AuxiliaryNode3D.termToFont3D(a2,iX);
+				c.setFont3D(font);
+			} else {
+				throw new WrongArgumentIsUnknownNodeLabel(a1);
+			}
 		}
 	}
 	//
 	public void setString2s(ChoisePoint iX, Term a1, Term a2) {
 		NodeLabel nodeLabel= Tools3D.termToNodeLabel(a1,iX);
-		NodeContainer container= localMemory.get(nodeLabel);
-		if (container != null) {
-			container.setString(a2.toString(iX));
-		} else {
-			throw new WrongArgumentIsUnknownNodeLabel(a1);
+		synchronized(this) {
+			NodeContainer c= localMemory.get(nodeLabel);
+			if (c != null) {
+				c.setString(a2.toString(iX));
+			} else {
+				throw new WrongArgumentIsUnknownNodeLabel(a1);
+			}
 		}
 	}
 	//
 	public void action1s(ChoisePoint iX, Term actionName) {
-        }
+	}
 	//
 	public class Action1s extends Continuation {
 		// private Continuation c0;
@@ -384,13 +530,13 @@ public abstract class Canvas3D
 		}
 	}
 	//
-	public void mouseClicked1s(ChoisePoint iX, Term actionName) {
-        }
+	public void mouseClicked1s(ChoisePoint iX, Term NodeLabels) {
+	}
 	//
 	public class MouseClicked1s extends Continuation {
 		// private Continuation c0;
 		//
-		public MouseClicked1s(Continuation aC, Term actionName) {
+		public MouseClicked1s(Continuation aC, Term NodeLabels) {
 			c0= aC;
 		}
 		//
@@ -399,13 +545,13 @@ public abstract class Canvas3D
 		}
 	}
 	//
-	public void mouseEntered1s(ChoisePoint iX, Term actionName) {
-        }
+	public void mouseEntered1s(ChoisePoint iX, Term NodeLabels) {
+	}
 	//
 	public class MouseEntered1s extends Continuation {
 		// private Continuation c0;
 		//
-		public MouseEntered1s(Continuation aC, Term actionName) {
+		public MouseEntered1s(Continuation aC, Term NodeLabels) {
 			c0= aC;
 		}
 		//
@@ -414,13 +560,13 @@ public abstract class Canvas3D
 		}
 	}
 	//
-	public void mouseExited1s(ChoisePoint iX, Term actionName) {
-        }
+	public void mouseExited1s(ChoisePoint iX, Term NodeLabels) {
+	}
 	//
 	public class MouseExited1s extends Continuation {
 		// private Continuation c0;
 		//
-		public MouseExited1s(Continuation aC, Term actionName) {
+		public MouseExited1s(Continuation aC, Term NodeLabels) {
 			c0= aC;
 		}
 		//
@@ -429,13 +575,13 @@ public abstract class Canvas3D
 		}
 	}
 	//
-	public void mousePressed1s(ChoisePoint iX, Term actionName) {
-        }
+	public void mousePressed1s(ChoisePoint iX, Term NodeLabels) {
+	}
 	//
 	public class MousePressed1s extends Continuation {
 		// private Continuation c0;
 		//
-		public MousePressed1s(Continuation aC, Term actionName) {
+		public MousePressed1s(Continuation aC, Term NodeLabels) {
 			c0= aC;
 		}
 		//
@@ -444,13 +590,13 @@ public abstract class Canvas3D
 		}
 	}
 	//
-	public void mouseReleased1s(ChoisePoint iX, Term actionName) {
-        }
+	public void mouseReleased1s(ChoisePoint iX, Term NodeLabels) {
+	}
 	//
 	public class MouseReleased1s extends Continuation {
 		// private Continuation c0;
 		//
-		public MouseReleased1s(Continuation aC, Term actionName) {
+		public MouseReleased1s(Continuation aC, Term NodeLabels) {
 			c0= aC;
 		}
 		//
@@ -459,13 +605,13 @@ public abstract class Canvas3D
 		}
 	}
 	//
-	public void mouseDragged1s(ChoisePoint iX, Term actionName) {
-        }
+	public void mouseDragged1s(ChoisePoint iX, Term NodeLabels) {
+	}
 	//
 	public class MouseDragged1s extends Continuation {
 		// private Continuation c0;
 		//
-		public MouseDragged1s(Continuation aC, Term actionName) {
+		public MouseDragged1s(Continuation aC, Term NodeLabels) {
 			c0= aC;
 		}
 		//
@@ -474,19 +620,63 @@ public abstract class Canvas3D
 		}
 	}
 	//
-	public void mouseMoved1s(ChoisePoint iX, Term actionName) {
-        }
+	public void mouseMoved1s(ChoisePoint iX, Term NodeLabels) {
+	}
 	//
 	public class MouseMoved1s extends Continuation {
 		// private Continuation c0;
 		//
-		public MouseMoved1s(Continuation aC, Term actionName) {
+		public MouseMoved1s(Continuation aC, Term NodeLabels) {
 			c0= aC;
 		}
 		//
 		public void execute(ChoisePoint iX) throws Backtracking {
 			c0.execute(iX);
 		}
+	}
+	//
+	public void initialize0s(ChoisePoint iX) {
+	}
+	public void start0s(ChoisePoint iX) {
+	}
+	public void stop0s(ChoisePoint iX) {
+	}
+	//
+	public void registerCanvas3D(ExtendedSpace3D s, ChoisePoint iX) {
+		synchronized(this) {
+			if (space3D==null) {
+				space3D= s;
+				if (currentSceneTree != null) {
+					showCanvas(currentSceneTree,iX);
+				}
+			}
+		}
+	}
+	//
+	public void release(boolean dialogIsModal, ChoisePoint modalChoisePoint) {
+		synchronized(this) {
+			if (simpleUniverse!=null && graphicWindow==null) {
+				releasePickCanvas();
+				simpleUniverse.removeAllLocales();
+				simpleUniverse.cleanup();
+				simpleUniverse= null;
+				spin= null;
+				space3D= null;
+			};
+			localMemory.clear();
+			inverseTable.clear();
+		};
+		long domainSignature= entry_s_Stop_0();
+		callInternalProcedure(domainSignature,dialogIsModal,modalChoisePoint);
+	}
+	//
+	public void draw(boolean dialogIsModal, ChoisePoint modalChoisePoint) {
+		if (controlIsInitialized.compareAndSet(false,true)) {
+			long domainSignature1= entry_s_Initialize_0();
+			callInternalProcedure(domainSignature1,dialogIsModal,modalChoisePoint);
+		};
+		long domainSignature2= entry_s_Start_0();
+		callInternalProcedure(domainSignature2,dialogIsModal,modalChoisePoint);
 	}
 	// Auxiliary operations
 	protected boolean desktopDoesNotExist() {
@@ -497,14 +687,27 @@ public abstract class Canvas3D
 			return false;
 		}
 	}
-	public boolean graphicWindowDoesNotExist() {
-		Map<AbstractWorld,InternalFrame3D> innerWindows= StaticAttributes3D.retrieveInnerWindows(staticContext);
-		return !innerWindows.containsKey(this);
+	public boolean space3DDoesNotExist() {
+		// Map<AbstractWorld,InternalFrame3D> innerWindows= StaticAttributes3D.retrieveInnerWindows(staticContext);
+		// return !innerWindows.containsKey(this);
+		synchronized(this) {
+			return (space3D==null);
+		}
+	}
+	protected void createGraphicWindowIfNecessary(ChoisePoint iX, boolean enableMovingWindowToFront) {
+		synchronized(this) {
+			if (space3D==null && !controlIsInitialized.get()) {
+				DesktopUtils.createPaneIfNecessary(staticContext);
+				graphicWindow= createInternalFrameIfNecessary(iX,enableMovingWindowToFront);
+			} else if (graphicWindow != null) {
+				if (enableMovingWindowToFront) {
+					DesktopUtils.safelyMoveToFront(graphicWindow);
+				};
+				DesktopUtils.safelySetVisible(true,graphicWindow);
+			}
+		}
 	}
 	//
-	protected InternalFrame3D createInternalFrameIfNecessary(ChoisePoint iX) {
-		return createInternalFrameIfNecessary(iX,false);
-	}
 	protected InternalFrame3D createInternalFrameIfNecessary(ChoisePoint iX, boolean enableMovingWindowToFront) {
 		Map<AbstractWorld,InternalFrame3D> innerWindows= StaticAttributes3D.retrieveInnerWindows(staticContext);
 		InternalFrame3D graphicWindow= innerWindows.get(this);
@@ -533,7 +736,13 @@ public abstract class Canvas3D
 	//
 	protected InternalFrame3D createInternalFrame(ChoisePoint iX) {
 		//
-		String title= getBuiltInSlot_E_title().toString(iX);
+		// String title= getBuiltInSlot_E_title().toString(iX);
+		String title= null;
+		try {
+			title= GUI_Utils.termToFrameTitleSafe(getBuiltInSlot_E_title(),iX);
+		} catch (TermIsSymbolDefault e) {
+			title= "";
+		};
 		//
 		InternalFrame3D graphicWindow= new InternalFrame3D(title,staticContext);
 		Map<AbstractWorld,InternalFrame3D> innerWindows= StaticAttributes3D.retrieveInnerWindows(staticContext);
@@ -548,9 +757,15 @@ public abstract class Canvas3D
 		//
 		return graphicWindow;
 	}
-	protected void redrawInternalFrame(InternalFrame3D graphicWindow, ChoisePoint iX) {
-		String title= getBuiltInSlot_E_title().toString(iX);
-		redrawInternalFrame(graphicWindow,title,iX);
+	protected void redrawInternalFrame(InternalFrame3D container, ChoisePoint iX) {
+		// String title= getBuiltInSlot_E_title().toString(iX);
+		String title= null;
+		try {
+			title= GUI_Utils.termToFrameTitleSafe(getBuiltInSlot_E_title(),iX);
+		} catch (TermIsSymbolDefault e) {
+			title= "";
+		};
+		redrawInternalFrame(container,title,iX);
 	}
 	protected void redrawInternalFrame(InternalFrame3D graphicWindow, String title, ChoisePoint iX) {
 		//
@@ -592,15 +807,15 @@ public abstract class Canvas3D
 	}
 	protected void safelySetBackground(final Color color) {
 		if (SwingUtilities.isEventDispatchThread()) {
-			if (canvas3D != null) {
-				canvas3D.setBackground(color);
+			if (space3D != null) {
+				space3D.setBackground(color);
 			}
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
-						if (canvas3D != null) {
-							canvas3D.setBackground(color);
+						if (space3D != null) {
+							space3D.setBackground(color);
 						}
 					}
 				});
@@ -610,91 +825,46 @@ public abstract class Canvas3D
 		}
 	}
 	//
-	public BufferedImage readImage(Term fileName, ChoisePoint iX) {
-		URI uri= retrieveLocationURI(fileName,iX);
-		int timeout= retrieveMaxWaitingTime(iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
-		InputStream stream;
-		try {
-			byte[] array= URL_Utils.getContentOfResource(uri,null,timeout,staticContext,backslashIsSeparator);
-			stream= new ByteArrayInputStream(array);
-		} catch (CannotRetrieveContent e1) {
-			throw new FileInputOutputError(uri.toString(),e1);
-		};
-		try {
-			BufferedImage image= ImageIO.read(stream);
-			return image;
-		} catch(IOException e1) {
-			throw new FileInputOutputError(uri.toString(),e1);
+	public void rememberNode(NodeLabel label, TransformGroup node) {
+		synchronized(this) {
+			localMemory.put(label,new NodeContainer(node));
+			inverseTable.put(node,label);
 		}
 	}
-	protected URI retrieveLocationURI(Term name, ChoisePoint iX) {
-		try {
-			String textName= name.getStringValue(iX);
-			// textName= appendExtensionIfNecessary(textName,iX);
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
-			// System.out.printf("textName=>>>%s<<<\n",textName);
-			URI uri= URL_Utils.create_URI(textName,staticContext,backslashIsSeparator);
-			return uri;
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(name);
+	public void rememberNode(NodeLabel label, Group node) {
+		synchronized(this) {
+			localMemory.put(label,new NodeContainer(node));
+			inverseTable.put(node,label);
 		}
 	}
-	protected int retrieveMaxWaitingTime(ChoisePoint iX) {
-		Term interval= getBuiltInSlot_E_max_waiting_time();
-		try {
-			return URL_Utils.termToWaitingInterval(interval,iX);
-		} catch (TermIsSymbolDefault e1) {
-			try {
-				return URL_Utils.termToWaitingInterval(DefaultOptions.waitingInterval,iX);
-			} catch (TermIsSymbolDefault e2) {
-				return defaultWaitingInterval;
+	public void rememberNode(NodeLabel label, Node node) {
+		synchronized(this) {
+			localMemory.put(label,new NodeContainer(node));
+			inverseTable.put(node,label);
+		}
+	}
+	public Shape3D retrieveShape3D(NodeLabel label) {
+		synchronized(this) {
+			NodeContainer c= localMemory.get(label);
+			if (c != null) {
+				return c.retrieveShape3D(label);
+			} else {
+				throw new UndefinedNodeLabel(label);
+			}
+		}
+	}
+	public PointLight retrievePointLight(NodeLabel label) {
+		synchronized(this) {
+			NodeContainer c= localMemory.get(label);
+			if (c != null) {
+				return c.retrievePointLight(label);
+			} else {
+				throw new UndefinedNodeLabel(label);
 			}
 		}
 	}
 	//
-	public void rememberNode(NodeLabel label, TransformGroup node) {
-		// System.out.printf("REMEMBER:>>>%s<<<: %s\n",label,node);
-		localMemory.put(label,new NodeContainer(node));
-		inverseTable.put(node,label);
-	}
-	public void rememberNode(NodeLabel label, Group node) {
-		// System.out.printf("REMEMBER:>>>%s<<<: %s\n",label,node);
-		localMemory.put(label,new NodeContainer(node));
-		inverseTable.put(node,label);
-	}
-	public void rememberNode(NodeLabel label, Node node) {
-		// System.out.printf("REMEMBER:>>>%s<<<: %s\n",label,node);
-		localMemory.put(label,new NodeContainer(node));
-		inverseTable.put(node,label);
-	}
-	public Shape3D retrieveShape3D(NodeLabel label) {
-		// System.out.printf("RETRIEVE:>>>%s<<<\n",label);
-		NodeContainer container= localMemory.get(label);
-		if (container != null) {
-			return container.retrieveShape3D(label);
-		} else {
-			throw new UndefinedNodeLabel(label);
-		}
-	}
-	public PointLight retrievePointLight(NodeLabel label) {
-		// System.out.printf("RETRIEVE:>>>%s<<<\n",label);
-		NodeContainer container= localMemory.get(label);
-		if (container != null) {
-			return container.retrievePointLight(label);
-		} else {
-			throw new UndefinedNodeLabel(label);
-		}
-	}
-	//
 	public NodeLabel retrieveNodeLabel(Node node) {
-		// System.out.printf("RETRIEVE: %s\n",node);
-		// Set<Node> keys= inverseTable.keySet();
-		// Iterator<Node> iterator= keys.iterator();
-		// while(iterator.hasNext()) {
-		//	Node key= iterator.next();
-		//	System.out.printf("key: %s\n",key);
-		// };
 		Node current_object= node;
 		while (true) {
 			if (current_object==null) {
@@ -716,5 +886,17 @@ public abstract class Canvas3D
 	public void componentResized(ComponentEvent e) {
 	}
 	public void componentShown(ComponentEvent e) {
+	}
+	//
+	public void registerPickCanvas(CustomizedPickCanvas pc) {
+		customizedPickCanvasList.add(pc);
+	}
+	public void releasePickCanvas() {
+		Iterator<CustomizedPickCanvas> nodeList= customizedPickCanvasList.iterator();
+		while (nodeList.hasNext()) {
+			CustomizedPickCanvas node= nodeList.next();
+			node.release();
+		};
+		customizedPickCanvasList.clear();
 	}
 }

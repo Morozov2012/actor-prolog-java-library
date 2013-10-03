@@ -2,4 +2,4 @@
 
 package morozov.system.files;
 
-public enum PositioningMode {START, RELATIVE, END}
+public enum PositioningMode { START, RELATIVE, END }

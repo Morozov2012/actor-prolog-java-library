@@ -5,7 +5,10 @@ package morozov.classes;
 import java.awt.Window;
 import javax.swing.JApplet;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
 
 public class StaticContext {
 	//

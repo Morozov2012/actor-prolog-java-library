@@ -6,14 +6,16 @@
 
 package morozov.system.gui.dialogs.scalable.common;
 
-import morozov.system.*;
+import morozov.run.*;
 import morozov.system.gui.dialogs.*;
+import morozov.system.errors.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import javax.swing.table.AbstractTableModel;
 
 import java.util.ArrayList;
-import java.util.concurrent.atomic.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /*
  * ScalableTableModel implementation for the Actor Prolog language
@@ -45,11 +47,9 @@ public class ScalableTableModel extends AbstractTableModel {
 	}
 	//
 	public void setTableValues(Term value, boolean checkResidentValues, ChoisePoint iX) {
-		// System.out.printf("Resident::1:%s\n",value);
 		if (checkResidentValues && !useResident.get()) {
 			return;
 		};
-		// System.out.printf("Resident::2\n");
 		try {
 			String tableName= value.getStringValue(iX);
 			useResident.set(true);
@@ -58,13 +58,9 @@ public class ScalableTableModel extends AbstractTableModel {
 				resident= new ScalableTableResident(targetDialog,table);
 				resident.initiate(targetDialog.targetWorld,domainSignature,new PrologString(tableName));
 				resident.startProcesses();
-				// System.out.printf("Resident::3\n");
 			} else {
 				resident.initiate(targetDialog.targetWorld,domainSignature,new PrologString(tableName));
-				// System.out.printf("Resident::initiate/3(%s,%s,%s,%s)\n",targetDialog.targetWorld,this,domainSignature,new PrologString(tableName));
 			}
-			// System.out.printf("Resident::4\n");
-			// targetDialog.sendResidentRequest(resident,tableName,iX);
 		} catch (TermIsNotAString e1) {
 			if (!checkResidentValues) {
 				useResident.set(false);
@@ -73,11 +69,6 @@ public class ScalableTableModel extends AbstractTableModel {
 				};
 			};
 			synchronized(content) {
-				// int[] selection= table.getSelectedRows();
-				// for (int n= 0; n < selection.length; n++) {
-				//	selection[n] = table.convertRowIndexToModel(selection[n]);
-				//	System.out.printf("selection[%s]=%s\n",n,selection[n]);
-				// };
 				content.clear();
 				try {
 					while (true) {
@@ -102,23 +93,14 @@ public class ScalableTableModel extends AbstractTableModel {
 				} catch (EndOfList e2) {
 				} catch (TermIsNotAList e3) {
 					throw new WrongArgumentIsNotAList(value);
-				// } finally {
-				//	fireTableStructureChanged();
-				};
-				// ListSelectionModel selectionModel= table.getSelectionModel();
-				// selectionModel.clearSelection();
-				// for (int n= 0; n < selection.length; n++) {
-				//	// selectionModel.addSelectionInterval(selection[n],selection[n]);
-				//	table.addRowSelectionInterval(selection[n],selection[n]);
-				//	System.out.printf("ADD:selection[%s]=%s\n",n,selection[n]);
-				// }
+				}
 			}
 		}
 	}
 	//
 	public int getColumnCount() {
 		return numberOfColumns;
-        }
+	}
 	public int getRowCount() {
 		synchronized(content) {
 			// return numberOfRows;
@@ -146,12 +128,12 @@ public class ScalableTableModel extends AbstractTableModel {
 		return String.class;
 	}
 	public Term getRows(int[] selection) {
-		Term result= new PrologEmptyList();
+		Term result= PrologEmptyList.instance;
 		synchronized(content) {
 			for (int n=selection.length-1; n>=0; n--) {
 				int rowNumber= selection[n];
 				ArrayList<String> contentRow= content.get(rowNumber);
-				Term row= new PrologEmptyList();
+				Term row= PrologEmptyList.instance;
 				for (int k=numberOfColumns-1; k>=0; k--) {
 					String cell;
 					if (k + 1 <= contentRow.size()) {
@@ -168,11 +150,11 @@ public class ScalableTableModel extends AbstractTableModel {
 		return result;
 	}
 	public Term getContent() {
-		Term result= new PrologEmptyList();
+		Term result= PrologEmptyList.instance;
 		synchronized(content) {
 			for (int rowNumber=content.size()-1; rowNumber>=0; rowNumber--) {
 				ArrayList<String> contentRow= content.get(rowNumber);
-				Term row= new PrologEmptyList();
+				Term row= PrologEmptyList.instance;
 				for (int k=numberOfColumns-1; k>=0; k--) {
 					String cell;
 					if (k + 1 <= contentRow.size()) {

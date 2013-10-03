@@ -6,6 +6,7 @@ import target.*;
 
 import morozov.classes.*;
 import morozov.system.gui.*;
+import morozov.system.gui.signals.*;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JDialog;
@@ -16,9 +17,10 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.Insets;
 import java.awt.GraphicsEnvironment;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsConfiguration;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.beans.PropertyVetoException;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
@@ -35,7 +37,7 @@ public class ExtendedJDialog
 	protected AtomicReference<Dimension> restoredSize= new AtomicReference<Dimension>(new Dimension());
 	//
 	public ExtendedJDialog(AbstractDialog d, Window w, ModalityType type) {
-		super(w,null,type);
+		super(w,type);
 		dialog= d;
 		addMouseListener(this);
 	}
@@ -44,7 +46,7 @@ public class ExtendedJDialog
 		staticContext= context;
 	}
 	//
-	public Point computePosition(AtomicReference<ExtendedCoordinates> actualCoordinates) throws ExtendedCoordinate.UseDefaultLocation {
+	public Point computePosition(AtomicReference<ExtendedCoordinates> actualCoordinates) throws UseDefaultLocation {
 		//
 		Dimension initialSize= getSize();
 		//
@@ -57,19 +59,21 @@ public class ExtendedJDialog
 		double gridX= DefaultOptions.gridWidth;
 		double gridY= DefaultOptions.gridHeight;
 		//
-		// GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
-		// Rectangle bounds= env.getMaximumWindowBounds();
-		Dimension bounds= computeParentLayoutSize();
+		Rectangle bounds= computeParentLayoutSize();
 		ExtendedCoordinates actualPoint= actualCoordinates.get();
-		x= DialogUtils.calculateRealCoordinate(actualPoint.x,bounds.width,gridX,initialWidth);
-		y= DialogUtils.calculateRealCoordinate(actualPoint.y,bounds.height,gridY,initialHeight);
+		x= DialogUtils.calculateRealCoordinate(actualPoint.x,bounds.x,bounds.width,gridX,initialWidth);
+		y= DialogUtils.calculateRealCoordinate(actualPoint.y,bounds.y,bounds.height,gridY,initialHeight);
 		//
 		return new Point(x,y);
 	}
-	public Dimension computeParentLayoutSize() {
+	public Rectangle computeParentLayoutSize() {
 		GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
-		Rectangle bounds= env.getMaximumWindowBounds();
-		return new Dimension(bounds.width,bounds.height);
+		// Rectangle bounds= env.getMaximumWindowBounds();
+		GraphicsDevice device= env.getDefaultScreenDevice();
+		GraphicsConfiguration gc= device.getDefaultConfiguration();
+		Rectangle bounds= gc.getBounds();
+		// return new Dimension(bounds.width,bounds.height);
+		return bounds;
 	}
 	//
 	public void setClosable(boolean b) {
@@ -78,7 +82,24 @@ public class ExtendedJDialog
 	}
 	public void setIconifiable(boolean b) {
 	}
+	public void safelyMaximize() {
+	}
+	public void safelyMinimize() {
+	}
+	public void safelyRestore() {
+	}
+	public boolean safelyIsMaximized() {
+		return false;
+	}
+	public boolean safelyIsMinimized() {
+		return false;
+	}
+	public boolean safelyIsRestored() {
+		return true;
+	}
 	public void addToDesktop(JDesktopPane desktop) {
+	}
+	public void setMaximum(boolean b) {
 	}
 	//
 	public Dimension getRealMinimumSize() {
@@ -164,5 +185,9 @@ public class ExtendedJDialog
 	public void setLocationAndSize(Point location, Dimension size) {
 		setLocation(location);
 		setSize(size);
+	}
+	//
+	public boolean isMaximum() {
+		return false;
 	}
 }

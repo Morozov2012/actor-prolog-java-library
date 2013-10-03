@@ -12,9 +12,11 @@ package morozov.system.gui.dialogs.scalable.common;
  * @author IRE RAS Alexei A. Morozov
 */
 
-import morozov.terms.*;
+import morozov.run.*;
 
-import javax.swing.text.*;
+import javax.swing.text.PlainDocument;
+import javax.swing.text.AttributeSet;
+import javax.swing.text.BadLocationException;
 
 public class ActivePlainDocument extends PlainDocument {
 	//
@@ -81,10 +83,10 @@ public class ActivePlainDocument extends PlainDocument {
 				if (format.verify(content)) {
 					return content;
 				} else {
-					throw new Backtracking();
+					throw Backtracking.instance;
 				}
 				// if ((parsePosition.getIndex() != length) || (length <= 0)) {
-				//	throw new Backtracking();
+				//	throw Backtracking.instance;
 				// } else {
 				//	return content;
 				// }
@@ -92,7 +94,7 @@ public class ActivePlainDocument extends PlainDocument {
 				return getText(0,length);
 			}
 		} catch (BadLocationException e) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//

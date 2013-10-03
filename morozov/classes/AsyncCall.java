@@ -2,31 +2,36 @@
 
 package morozov.classes;
 
+import morozov.run.*;
 import morozov.terms.*;
 
 public class AsyncCall {
 	public long domainSignatureNumber;
-	// public Term target;
+	public Term target;
 	// public AbstractWorld currentWorld;
 	public AbstractWorld initialTarget;
 	public AbstractWorld targetWorld= null;
 	public boolean isControlCall;
 	public boolean useBuffer;
 	public Term[] arguments;
+	// public AsyncCallSender sender= null;
 	protected boolean argumentsAreCircumscribed= false;
 	//
 	public AsyncCall(long aSignatureNumber, AbstractWorld world, boolean type, boolean buffer, Term[] list, boolean argumentMode) {
 		domainSignatureNumber= aSignatureNumber;
-		// target= world;
-		// currentWorld= aCW;
+		target= world;
 		initialTarget= world;
-		// if (targetWorld==null) {
-		//	System.out.printf("targetWorld=%s\n",targetWorld);
-		//	throw new RuntimeException();
-		// };
 		isControlCall= type;
 		useBuffer= buffer;
-		// procName= name;
+		arguments= list;
+		argumentsAreCircumscribed= argumentMode;
+	}
+	public AsyncCall(long aSignatureNumber, Term dataItem, AbstractWorld world, boolean type, boolean buffer, Term[] list, boolean argumentMode) {
+		domainSignatureNumber= aSignatureNumber;
+		target= dataItem;
+		initialTarget= world;
+		isControlCall= type;
+		useBuffer= buffer;
 		arguments= list;
 		argumentsAreCircumscribed= argumentMode;
 	}
@@ -39,6 +44,7 @@ public class AsyncCall {
 	}
 	//
 	public void computeTargetWorld() {
+		target= target.internalWorldOrTerm(null);
 		targetWorld= initialTarget.internalWorld(null);
 	}
 	//
@@ -50,6 +56,12 @@ public class AsyncCall {
 			argumentsAreCircumscribed= true;
 		}
 	}
+	//
+	// public void sendConfirmation() {
+	//	if (sender != null) {
+	//		sender.confirmAsyncCall(this);
+	//	}
+	// }
 	//
 	public boolean equals(Object o) {
 		if (o==null) {

@@ -5,27 +5,51 @@ package morozov.built_in;
 import target.*;
 
 import morozov.classes.*;
+import morozov.run.*;
 import morozov.system.*;
 import morozov.system.gui.*;
 import morozov.system.gui.reports.*;
+import morozov.system.gui.reports.signals.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
 
-import java.awt.*;
-import javax.swing.text.*;
-import javax.swing.SwingUtilities;
+import java.awt.Color;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Insets;
+import java.awt.EventQueue;
 import javax.swing.JTextPane;
+import javax.swing.text.Document;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.AttributeSet;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.Map;
 import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
+import javax.swing.text.SimpleAttributeSet;
+import javax.swing.text.MutableAttributeSet;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Collections;
+import java.lang.reflect.InvocationTargetException;
 
 public abstract class Report
 		extends Text
 		// implements PropertyChangeListener {
 		implements ComponentListener {
+	//
+	protected InternalTextFrame graphicWindow= null;
+	protected ExtendedReportSpace space= null;
+	//
+	public AtomicReference<Term> textColor= new AtomicReference<Term>();
+	public AtomicReference<Term> spaceColor= new AtomicReference<Term>();
+	//
+	protected AtomicReference<MutableAttributeSet> rootTextStyle= new AtomicReference<MutableAttributeSet>(new SimpleAttributeSet());
+	protected Map<Color,MutableAttributeSet> transparentTextStyles= Collections.synchronizedMap(new HashMap<Color,MutableAttributeSet>());
+	//
+	protected ReportSpaceAttributes spaceAttributes= new ReportSpaceAttributes();
 	//
 	protected static final String defaultFontName= Font.MONOSPACED;
 	protected static final int defaultFontSize= 18;
@@ -48,34 +72,54 @@ public abstract class Report
 	abstract protected Term getBuiltInSlot_E_max_line_number();
 	abstract protected Term getBuiltInSlot_E_area_type();
 	//
+	abstract public long entry_s_Initialize_0();
+	abstract public long entry_s_Start_0();
+	abstract public long entry_s_Stop_0();
+	//
+	public Report() {
+	}
+	//
+	public void closeFiles() {
+		synchronized(this) {
+			if (graphicWindow != null) {
+				// graphicWindow.dispose();
+				DesktopUtils.safelyDispose(graphicWindow);
+			}
+		};
+		super.closeFiles();
+	}
+	//
 	public void clear0s(ChoisePoint iX) {
-		if (desktopDoesNotExist()) {
-			return;
-		} else if (reportDoesNotExist()) {
-			return;
-		} else {
-			DesktopUtils.createPaneIfNecessary(staticContext);
-			InternalTextFrame textWindow= createInternalFrameIfNecessary(iX);
-			ReportUtils.safelySetText("",textWindow);
+		createGraphicWindowIfNecessary(iX,false);
+		synchronized(this) {
+			Document doc= spaceAttributes.getStyledDocument();
+			if (doc != null) {
+				safelySetText("",doc);
+			}
 		}
 	}
 	//
 	public void setString1s(ChoisePoint iX, Term text) {
-		DesktopUtils.createPaneIfNecessary(staticContext);
-		InternalTextFrame textWindow= createInternalFrameIfNecessary(iX);
-		ReportUtils.safelySetText(text.toString(iX),textWindow);
+		createGraphicWindowIfNecessary(iX,false);
+		String buffer= text.toString(iX);
+		synchronized(this) {
+			Document doc= spaceAttributes.getStyledDocument();
+			if (doc != null) {
+				safelySetText(buffer,doc);
+			}
+		}
 	}
 	//
 	public void getString0ff(ChoisePoint iX, PrologVariable text) {
-		if (desktopDoesNotExist()) {
-			text.value= new PrologString("");
-		} else if (reportDoesNotExist()) {
-			text.value= new PrologString("");
-		} else {
-			String value;
-			DesktopUtils.createPaneIfNecessary(staticContext);
-			InternalTextFrame textWindow= createInternalFrameIfNecessary(iX);
-			String content= ReportUtils.safelyGetText(textWindow);
+		// createGraphicWindowIfNecessary(iX,false);
+		synchronized(this) {
+			String content;
+			Document doc= spaceAttributes.getStyledDocument();
+			if (doc != null) {
+				content= safelyGetText(doc);
+			} else {
+				content= "";
+			};
 			text.value= new PrologString(content);
 		}
 	}
@@ -83,36 +127,119 @@ public abstract class Report
 	}
 	//
 	public void show2s(ChoisePoint iX, Term a1, Term a2) {
-		DesktopUtils.createPaneIfNecessary(staticContext);
-		createInternalFrameIfNecessary(iX,true);
+		createGraphicWindowIfNecessary(iX,true);
 	}
 	public void show0s(ChoisePoint iX) {
-		DesktopUtils.createPaneIfNecessary(staticContext);
-		createInternalFrameIfNecessary(iX,true);
+		createGraphicWindowIfNecessary(iX,true);
 	}
 	//
 	public void redraw0s(ChoisePoint iX) {
-		DesktopUtils.createPaneIfNecessary(staticContext);
-		Map<AbstractWorld,InternalTextFrame> innerWindows= StaticReportAttributes.retrieveInnerWindows(staticContext);
-		InternalTextFrame textWindow= innerWindows.get(this);
-		if (textWindow==null) {
-			createInternalFrameIfNecessary(iX);
-		} else {
-			redrawInternalFrame(textWindow,iX);
-			textWindow.safelyRestoreSize(staticContext);
-			DesktopUtils.safelyRepaint(textWindow);
+		createGraphicWindowIfNecessary(iX,false);
+		synchronized(this) {
+			if (graphicWindow != null) {
+				redrawInternalFrame(graphicWindow,iX);
+				graphicWindow.safelyRestoreSize(staticContext);
+				DesktopUtils.safelyRepaint(graphicWindow);
+			} else if (space != null) {
+				redrawSpace(iX);
+				DesktopUtils.safelyRepaint(space);
+			}
 		}
 	}
 	//
 	public void hide0s(ChoisePoint iX) {
 		if (desktopDoesNotExist()) {
 			return;
-		} else if (reportDoesNotExist()) {
+		} else if (spaceDoesNotExist()) {
 			return;
 		} else {
-			DesktopUtils.createPaneIfNecessary(staticContext);
-			InternalTextFrame textWindow= createInternalFrameIfNecessary(iX);
-			DesktopUtils.safelySetVisible(false,textWindow);
+			createGraphicWindowIfNecessary(iX,false);
+			synchronized(this) {
+				if (graphicWindow != null) {
+					DesktopUtils.safelySetVisible(false,graphicWindow);
+				}
+			}
+		}
+	}
+	//
+	public void maximize0s(ChoisePoint iX) {
+		createGraphicWindowIfNecessary(iX,true);
+		synchronized(this) {
+			if (graphicWindow != null) {
+				DesktopUtils.safelyMaximize(graphicWindow);
+			}
+		}
+	}
+	//
+	public void minimize0s(ChoisePoint iX) {
+		createGraphicWindowIfNecessary(iX,true);
+		synchronized(this) {
+			if (graphicWindow != null) {
+				DesktopUtils.safelyMinimize(graphicWindow);
+			}
+		}
+	}
+	//
+	public void restore0s(ChoisePoint iX) {
+		createGraphicWindowIfNecessary(iX,true);
+		synchronized(this) {
+			if (graphicWindow != null) {
+				DesktopUtils.safelyRestore(graphicWindow);
+			}
+		}
+	}
+	//
+	public void isMaximized0s(ChoisePoint iX) throws Backtracking {
+		if (desktopDoesNotExist()) {
+			throw Backtracking.instance;
+		} else if (spaceDoesNotExist()) {
+			throw Backtracking.instance;
+		} else {
+			synchronized(this) {
+				if (graphicWindow != null) {
+					if (!DesktopUtils.safelyIsMaximized(graphicWindow)) {
+						throw Backtracking.instance;
+					}
+				} else {
+					throw Backtracking.instance;
+				}
+			}
+		}
+	}
+	//
+	public void isMinimized0s(ChoisePoint iX) throws Backtracking {
+		if (desktopDoesNotExist()) {
+			throw Backtracking.instance;
+		} else if (spaceDoesNotExist()) {
+			throw Backtracking.instance;
+		} else {
+			synchronized(this) {
+				if (graphicWindow != null) {
+					if(!DesktopUtils.safelyIsMinimized(graphicWindow)) {
+						throw Backtracking.instance;
+					}
+				} else {
+					throw Backtracking.instance;
+				}
+			}
+		}
+	}
+	//
+	public void isRestored0s(ChoisePoint iX) throws Backtracking {
+		if (desktopDoesNotExist()) {
+			throw Backtracking.instance;
+		} else if (spaceDoesNotExist()) {
+			throw Backtracking.instance;
+		} else {
+			synchronized(this) {
+				if (graphicWindow != null) {
+					if(!DesktopUtils.safelyIsRestored(graphicWindow)) {
+						throw Backtracking.instance;
+					}
+				} else {
+					throw Backtracking.instance;
+				}
+			}
 		}
 	}
 	//
@@ -135,37 +262,34 @@ public abstract class Report
 		write_text_buffer(iX,true,new StringBuilder());
 	}
 	//
-	public void setTextColor1s(ChoisePoint iX, Term textColor) {
-		DesktopUtils.createPaneIfNecessary(staticContext);
-		InternalTextFrame textWindow= createInternalFrameIfNecessary(iX);
-		textWindow.textColor.set(textColor.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES));
-		textWindow.spaceColor.set(getBuiltInSlot_E_space_color().copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES));
+	public void setTextColor1s(ChoisePoint iX, Term color) {
+		createGraphicWindowIfNecessary(iX,false);
+		textColor.set(color.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES));
+		spaceColor.set(getBuiltInSlot_E_space_color().copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES));
 	}
-	public void setTextColor2s(ChoisePoint iX, Term textColor, Term spaceColor) {
-		DesktopUtils.createPaneIfNecessary(staticContext);
-		InternalTextFrame textWindow= createInternalFrameIfNecessary(iX);
-		textWindow.textColor.set(textColor.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES));
-		textWindow.spaceColor.set(spaceColor.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES));
+	public void setTextColor2s(ChoisePoint iX, Term t, Term s) {
+		createGraphicWindowIfNecessary(iX,false);
+		textColor.set(t.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES));
+		spaceColor.set(s.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES));
 	}
 	//
 	public void changeFont2s(ChoisePoint iX, Term fontName, Term fontSize) {
+		createGraphicWindowIfNecessary(iX,false);
 		Term fontStyle= getBuiltInSlot_E_font_style();
 		change_font(iX,fontName,fontSize,fontStyle);
 	}
 	public void changeFont3s(ChoisePoint iX, Term fontName, Term fontSize, Term fontStyle) {
+		createGraphicWindowIfNecessary(iX,false);
 		change_font(iX,fontName,fontSize,fontStyle);
 	}
 	//
 	public void changeFontSize1s(ChoisePoint iX, Term fontSize) {
-		DesktopUtils.createPaneIfNecessary(staticContext);
-		InternalTextFrame textWindow= createInternalFrameIfNecessary(iX);
-		float size= computeFontSize(fontSize,iX);
-		Font font= ReportUtils.safelyGetFont(textWindow);
-		if (font==null) {
-			return;
-		} else {
-			font= font.deriveFont(size);
-			ReportUtils.safelySetFont(font,textWindow);
+		createGraphicWindowIfNecessary(iX,false);
+		int size= computeFontSize(fontSize,iX);
+		synchronized(this) {
+			if (space != null) {
+				space.setPanelFontSize(size,true);
+			}
 		}
 	}
 	protected int computeFontSize(Term fontSize, ChoisePoint iX) {
@@ -177,11 +301,17 @@ public abstract class Report
 				fontSize= getBuiltInSlot_E_font_size();
 				size= GUI_Utils.termToFontSize(fontSize,iX);
 			} catch (TermIsSymbolDefault e2) {
-				try {
-					fontSize= DefaultOptions.textFontSize;
-					size= GUI_Utils.termToFontSize(fontSize,iX);
-				} catch (TermIsSymbolDefault e3) {
-					size= defaultFontSize;
+				synchronized(this) {
+					if (graphicWindow != null) {
+						try {
+							fontSize= DefaultOptions.textFontSize;
+							size= GUI_Utils.termToFontSize(fontSize,iX);
+						} catch (TermIsSymbolDefault e3) {
+							size= defaultFontSize;
+						}
+					} else {
+						size= ReportSpaceAttributes.automaticFontSizeAdjustment;
+					}
 				}
 			}
 		};
@@ -190,6 +320,55 @@ public abstract class Report
 	//
 	public void changeBackgroundColor1s(ChoisePoint iX, Term backgroundColor) {
 		changeBackgroundColor(iX,backgroundColor);
+	}
+	//
+	public void initialize0s(ChoisePoint iX) {
+	}
+	public void start0s(ChoisePoint iX) {
+	}
+	public void stop0s(ChoisePoint iX) {
+	}
+	//
+	public void registerReport(ExtendedReportSpace s, ChoisePoint iX) {
+		synchronized(this) {
+			if (space==null) {
+				space= s;
+				spaceAttributes.implementValues(space);
+				spaceAttributes.setStaticContext(staticContext);
+				space.enableMouseListener();
+				// redrawSpace(iX);
+				// space.enableMouseMotionListener();
+				// space.setCommands(actualCommands);
+				// space.setEnableAntialiasing(sceneAntialiasingIsEnabled);
+				DesktopUtils.safelyRepaint(space);
+				// DesktopUtils.safelyRepaint(space.panel);
+				space.panel.revalidate();
+			}
+		}
+	}
+	//
+	public void release(TextPaneNoWrap panel, boolean dialogIsModal, ChoisePoint modalChoisePoint) {
+		synchronized(this) {
+			if (space != null && graphicWindow==null) {
+				spaceAttributes.collectValues(space);
+				// space.skipDelayedRepainting();
+				// space.disableMouseListener();
+				// space.disableMouseMotionListener();
+				space= null;
+			}
+		};
+		long domainSignature= entry_s_Stop_0();
+		callInternalProcedure(domainSignature,dialogIsModal,modalChoisePoint);
+	}
+	//
+	public void draw(boolean dialogIsModal, ChoisePoint modalChoisePoint) {
+		if (spaceAttributes.initializeControlIfNecessary()) {
+			redrawSpace(modalChoisePoint);
+			long domainSignature1= entry_s_Initialize_0();
+			callInternalProcedure(domainSignature1,dialogIsModal,modalChoisePoint);
+		};
+		long domainSignature2= entry_s_Start_0();
+		callInternalProcedure(domainSignature2,dialogIsModal,modalChoisePoint);
 	}
 	// Auxiliary operations
 	protected boolean desktopDoesNotExist() {
@@ -200,20 +379,33 @@ public abstract class Report
 			return false;
 		}
 	}
-	public boolean reportDoesNotExist() {
-		Map<AbstractWorld,InternalTextFrame> innerWindows= StaticReportAttributes.retrieveInnerWindows(staticContext);
-		return !innerWindows.containsKey(this);
+	public boolean spaceDoesNotExist() {
+		// Map<AbstractWorld,InternalTextFrame> innerWindows= StaticReportAttributes.retrieveInnerWindows(staticContext);
+		// return !innerWindows.containsKey(this);
+		synchronized(this) {
+			return (space==null);
+		}
+	}
+	protected void createGraphicWindowIfNecessary(ChoisePoint iX, boolean enableMovingWindowToFront) {
+		synchronized(this) {
+			if (space==null && spaceAttributes.controlIsNotInitialized()) {
+				DesktopUtils.createPaneIfNecessary(staticContext);
+				createInternalFrameIfNecessary(iX,enableMovingWindowToFront);
+			} else if (graphicWindow != null) {
+				if (enableMovingWindowToFront) {
+					DesktopUtils.safelyMoveToFront(graphicWindow);
+				};
+				DesktopUtils.safelySetVisible(true,graphicWindow);
+			}
+		}
 	}
 	//
-	protected InternalTextFrame createInternalFrameIfNecessary(ChoisePoint iX) {
-		return createInternalFrameIfNecessary(iX,false);
-	}
-	protected InternalTextFrame createInternalFrameIfNecessary(ChoisePoint iX, boolean enableMovingWindowToFront) {
+	protected void createInternalFrameIfNecessary(ChoisePoint iX, boolean enableMovingWindowToFront) {
 		Map<AbstractWorld,InternalTextFrame> innerWindows= StaticReportAttributes.retrieveInnerWindows(staticContext);
-		InternalTextFrame textWindow= innerWindows.get(this);
+		// InternalTextFrame innerWindow= innerWindows.get(this);
 		boolean restoreWindow= false;
 		boolean moveWindowToFront= false;
-		if (textWindow==null) {
+		if (graphicWindow==null) {
 			if (ReportUtils.isConsoleTextWindow(getBuiltInSlot_E_area_type(),iX)) {
 				InternalTextFrame consoleWindow= StaticReportAttributes.retrieveConsoleWindow(staticContext);
 				if (consoleWindow==null) {
@@ -222,65 +414,90 @@ public abstract class Report
 					try {
 						consoleWindow= StaticReportAttributes.retrieveConsoleWindow(staticContext);
 						if (consoleWindow==null) {
-							textWindow= createInternalFrame(iX);
-							StaticReportAttributes.setConsoleWindow(textWindow,staticContext);
+							graphicWindow= createInternalFrame(iX);
+							StaticReportAttributes.setConsoleWindow(graphicWindow,staticContext);
 							restoreWindow= true;
 						} else {
-							textWindow= consoleWindow;
+							graphicWindow= consoleWindow;
+							space= graphicWindow.scrollPane;
+							spaceAttributes.setStyledDocument(space.attributes.getStyledDocument());
+							redrawInternalFrame(graphicWindow,iX);
 						}
 					} finally {
 						lock.unlock();
 					}
 				} else {
-					textWindow= consoleWindow;
+					graphicWindow= consoleWindow;
+					space= graphicWindow.scrollPane;
+					spaceAttributes.setStyledDocument(space.attributes.getStyledDocument());
+					redrawInternalFrame(graphicWindow,iX);
 				}
 			} else {
-				synchronized(this) {
-					textWindow= innerWindows.get(this);
-					if (textWindow==null) {
-						textWindow= createInternalFrame(iX);
-						restoreWindow= true;
-					}
+				graphicWindow= innerWindows.get(this);
+				if (graphicWindow==null) {
+					graphicWindow= createInternalFrame(iX);
+					restoreWindow= true;
 				}
 			}
 		} else {
 			moveWindowToFront= true;
 		};
 		if (restoreWindow) {
-			textWindow.safelyRestoreSize(staticContext);
+			graphicWindow.safelyRestoreSize(staticContext);
 		};
 		if (moveWindowToFront && enableMovingWindowToFront) {
-			DesktopUtils.safelyMoveToFront(textWindow);
+			DesktopUtils.safelyMoveToFront(graphicWindow);
 		};
-		DesktopUtils.safelySetVisible(true,textWindow);
-		return textWindow;
+		// graphicWindow= innerWindow;
+		// space= graphicWindow.scrollPane;
+		// redrawInternalFrame(graphicWindow,null,iX);
+		DesktopUtils.safelySetVisible(true,graphicWindow);
+		// return graphicWindow;
 	}
 	//
 	protected InternalTextFrame createInternalFrame(ChoisePoint iX) {
 		//
-		String title= getBuiltInSlot_E_title().toString(iX);
+		// String title= getBuiltInSlot_E_title().toString(iX);
+		String title= null;
+		try {
+			title= GUI_Utils.termToFrameTitleSafe(getBuiltInSlot_E_title(),iX);
+		} catch (TermIsSymbolDefault e) {
+			title= "";
+		};
 		//
-		InternalTextFrame textWindow= new InternalTextFrame(title,staticContext);
+		spaceAttributes.setStaticContext(staticContext);
+		// InternalTextFrame innerWindow
+		graphicWindow= new InternalTextFrame(title,spaceAttributes);
 		Map<AbstractWorld,InternalTextFrame> innerWindows= StaticReportAttributes.retrieveInnerWindows(staticContext);
-		innerWindows.put(this,textWindow);
+		innerWindows.put(this,graphicWindow);
 		//
-		textWindow.addComponentListener(this);
+		graphicWindow.panel.setStyledDocument(spaceAttributes.getStyledDocument());
+		graphicWindow.addComponentListener(this);
 		//
 		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
-		desktop.add(textWindow);
+		desktop.add(graphicWindow);
 		//
-		redrawInternalFrame(textWindow,null,iX);
+		// redrawInternalFrame(innerWindow,null,iX);
+		// graphicWindow= innerWindow;
+		space= graphicWindow.scrollPane;
+		redrawInternalFrame(graphicWindow,iX);
 		//
-		return textWindow;
+		return graphicWindow;
 	}
-	protected void redrawInternalFrame(InternalTextFrame textWindow, ChoisePoint iX) {
-		String title= getBuiltInSlot_E_title().toString(iX);
-		redrawInternalFrame(textWindow,title,iX);
+	protected void redrawInternalFrame(InternalTextFrame graphicWindow, ChoisePoint iX) {
+		// String title= getBuiltInSlot_E_title().toString(iX);
+		String title= null;
+		try {
+			title= GUI_Utils.termToFrameTitleSafe(getBuiltInSlot_E_title(),iX);
+		} catch (TermIsSymbolDefault e) {
+			title= "";
+		};
+		redrawInternalFrame(graphicWindow,title,iX);
 	}
-	protected void redrawInternalFrame(InternalTextFrame textWindow, String title, ChoisePoint iX) {
+	protected void redrawInternalFrame(InternalTextFrame graphicWindow, String title, ChoisePoint iX) {
 		//
 		if (title != null) {
-			DesktopUtils.safelySetTitle(title,textWindow);
+			DesktopUtils.safelySetTitle(title,graphicWindow);
 		};
 		//
 		Term x= getBuiltInSlot_E_x();
@@ -288,111 +505,136 @@ public abstract class Report
 		Term width= getBuiltInSlot_E_width().copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 		Term height= getBuiltInSlot_E_height().copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 		//
-		textWindow.logicalWidth.set(GUI_Utils.termToSize(width,iX));
-		textWindow.logicalHeight.set(GUI_Utils.termToSize(height,iX));
-		textWindow.logicalX.set(GUI_Utils.termToCoordinate(x,iX));
-		textWindow.logicalY.set(GUI_Utils.termToCoordinate(y,iX));
+		graphicWindow.logicalWidth.set(GUI_Utils.termToSize(width,iX));
+		graphicWindow.logicalHeight.set(GUI_Utils.termToSize(height,iX));
+		graphicWindow.logicalX.set(GUI_Utils.termToCoordinate(x,iX));
+		graphicWindow.logicalY.set(GUI_Utils.termToCoordinate(y,iX));
 		//
-		// textWindow.safelyRestoreSize(staticContext);
+		// graphicWindow.safelyRestoreSize(staticContext);
 		//
+		redrawSpace(iX);
+	}
+	protected void redrawSpace(ChoisePoint iX) {
 		changeBackgroundColor(iX,getBuiltInSlot_E_background_color());
 		change_font(
 			iX,
 			getBuiltInSlot_E_font_name(),
 			getBuiltInSlot_E_font_size(),
 			getBuiltInSlot_E_font_style());
-		textWindow.textColor.set(getBuiltInSlot_E_text_color().copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES));
-		textWindow.spaceColor.set(getBuiltInSlot_E_space_color().copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES));
+		textColor.set(getBuiltInSlot_E_text_color().copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES));
+		spaceColor.set(getBuiltInSlot_E_space_color().copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES));
 	}
 	//
 	protected void write_text_buffer(ChoisePoint iX, boolean appendNewLine, StringBuilder textBuffer) {
 		if (appendNewLine) {
 			textBuffer.append("\n");
 		};
-		DesktopUtils.createPaneIfNecessary(staticContext);
-		InternalTextFrame textWindow= createInternalFrameIfNecessary(iX);
-		synchronized(textWindow) {
-			Document doc= textWindow.panel.getDocument();
-			Color textColor= defaultTextColor;
+		createGraphicWindowIfNecessary(iX,false);
+		// Document doc= space.panel.getDocument();
+		Color colorOfText= defaultTextColor;
+		try {
+			colorOfText= GUI_Utils.termToColor(textColor.get(),iX);
+		} catch (TermIsSymbolDefault e1) {
 			try {
-				textColor= GUI_Utils.termToColor(textWindow.textColor.get(),iX);
-			} catch (TermIsSymbolDefault e1) {
-				try {
-					textColor= GUI_Utils.termToColor(getBuiltInSlot_E_text_color(),iX);
-				} catch (TermIsSymbolDefault e2) {
-				}
-			};
-			Color spaceColor= defaultBackgroundColor;
-			boolean useSpaceColor= true;
+				colorOfText= GUI_Utils.termToColor(getBuiltInSlot_E_text_color(),iX);
+			} catch (TermIsSymbolDefault e2) {
+			}
+		};
+		Color colorOfSpace= defaultBackgroundColor;
+		boolean useSpaceColor= true;
+		try {
+			colorOfSpace= GUI_Utils.termToColor(spaceColor.get(),iX);
+		} catch (TermIsSymbolDefault e1) {
 			try {
-				spaceColor= GUI_Utils.termToColor(textWindow.spaceColor.get(),iX);
-			} catch (TermIsSymbolDefault e1) {
-				try {
-					spaceColor= GUI_Utils.termToColor(getBuiltInSlot_E_space_color(),iX);
-				} catch (TermIsSymbolDefault e2) {
-					useSpaceColor= false;
-				}
-			};
-			if (useSpaceColor) {
-				MutableAttributeSet opaqueTextAttributes= textWindow.getOpaqueTextStyle(textColor,spaceColor);
-				StyleConstants.setForeground(opaqueTextAttributes,textColor);
-				StyleConstants.setBackground(opaqueTextAttributes,spaceColor);
-				// try {
-					// doc.insertString(doc.getLength(),textBuffer.toString(),opaqueTextAttributes);
+				colorOfSpace= GUI_Utils.termToColor(getBuiltInSlot_E_space_color(),iX);
+			} catch (TermIsSymbolDefault e2) {
+				useSpaceColor= false;
+			}
+		};
+		synchronized(this) {
+			Document doc= spaceAttributes.getStyledDocument();
+			if (doc != null) {
+				if (useSpaceColor) {
+					MutableAttributeSet opaqueTextAttributes= getOpaqueTextStyle(colorOfText,colorOfSpace);
+					StyleConstants.setForeground(opaqueTextAttributes,colorOfText);
+					StyleConstants.setBackground(opaqueTextAttributes,colorOfSpace);
 					safelyInsertString(doc,textBuffer.toString(),opaqueTextAttributes);
-				// } catch (BadLocationException e) {
-				// }
-			} else {
-				MutableAttributeSet transparentTextAttributes= textWindow.getTransparentTextStyle(textColor);
-				StyleConstants.setForeground(transparentTextAttributes,textColor);
-				// try {
-					// doc.insertString(doc.getLength(),textBuffer.toString(),transparentTextAttributes);
+				} else {
+					MutableAttributeSet transparentTextAttributes= getTransparentTextStyle(colorOfText);
+					StyleConstants.setForeground(transparentTextAttributes,colorOfText);
 					safelyInsertString(doc,textBuffer.toString(),transparentTextAttributes);
-				// } catch (BadLocationException e) {
-				// }
-			};
-			// try {
+				};
 				try {
 					long maxLineNumber= ReportUtils.termToMaxLineNumber(getBuiltInSlot_E_max_line_number(),iX);
-					// String plainText= doc.getText(0,doc.getLength());
 					String plainText= safelyGetText(doc);
 					long numberOfLines= calculate_number_of_lines(plainText);
 					if (numberOfLines > maxLineNumber) {
 						long endPosition= calculate_position_of_line_end(plainText,maxLineNumber);
 						safelyRemoveText(doc,endPosition);
-						textWindow.panel.setDocument(doc);
+						// space.panel.setDocument(doc);
 					}
 				} catch (TermIsSymbolWindowHeight e) {
 					//
-					double pageHeight= textWindow.scrollPane.getViewport().getExtentSize().getHeight();
-					Insets scrollPaneInsets= textWindow.scrollPane.getViewport().getInsets();
-					double correctedPageHeight= pageHeight - scrollPaneInsets.top - scrollPaneInsets.bottom;
-					//
-					double textHeight= textWindow.panel.getMinimumSize().getHeight();
-					//
-					if (textHeight >= correctedPageHeight) {
-						// String plainText= doc.getText(0,doc.getLength());
-						String plainText= safelyGetText(doc);
-						Font font= textWindow.panel.getFont();
-						FontMetrics metrics= textWindow.panel.getFontMetrics(font);
-						double lineHeight= metrics.getHeight();
-						long pageCapacity= (long)Math.floor(correctedPageHeight / lineHeight);
-						pageCapacity= StrictMath.max(pageCapacity,1);
-						long endPosition= calculate_position_of_line_end(plainText,pageCapacity);
-						safelyRemoveText(doc,endPosition);
-						textWindow.panel.setDocument(doc);
+					if (space != null) {
+						synchronized(space) {
+							double pageHeight= space.getViewport().getExtentSize().getHeight();
+							Insets scrollPaneInsets= space.getViewport().getInsets();
+							double correctedPageHeight= pageHeight - scrollPaneInsets.top - scrollPaneInsets.bottom;
+							//
+							// double textHeight= space.getMinimumSize().getHeight();
+							double textHeight= space.panel.getMinimumSize().getHeight();
+							if (textHeight >= correctedPageHeight) {
+								// String plainText= doc.getText(0,doc.getLength());
+								String plainText= safelyGetText(doc);
+								Font font= space.getFont();
+								FontMetrics metrics= space.getFontMetrics(font);
+								double lineHeight= metrics.getHeight();
+								long pageCapacity= (long)Math.floor(correctedPageHeight / lineHeight);
+								pageCapacity= StrictMath.max(pageCapacity,1);
+								long endPosition= calculate_position_of_line_end(plainText,pageCapacity);
+								safelyRemoveText(doc,endPosition);
+								// space.panel.setDocument(doc);
+							}
+						}
 					}
 				} catch (TermIsSymbolNoLimit e) {
 				};
-				// textWindow.panel.setCaretPosition(doc.getLength());
-				safelySetCaretPosition(textWindow.panel);
-			// } catch (BadLocationException e) {
-			// }
+				if (space != null) {
+					safelySetCaretPosition(space.panel,doc.getLength());
+				}
+			}
+		}
+	}
+	//
+	protected static void safelySetText(final String buffer, final Document doc) {
+		if (EventQueue.isDispatchThread()) {
+			try {
+				// doc.setText(text);
+				doc.remove(0,doc.getLength());
+				doc.insertString(0,buffer,null);
+			} catch (BadLocationException e) {
+			}
+		} else {
+			try {
+				EventQueue.invokeAndWait(
+					new Runnable() {
+						public void run() {
+							try {
+								// doc.setText(text);
+								doc.remove(0,doc.getLength());
+								doc.insertString(0,buffer,null);
+							} catch (BadLocationException e) {
+							}
+						}
+					});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
 		}
 	}
 	//
 	protected static String safelyGetText(final Document doc) {
-		if (SwingUtilities.isEventDispatchThread()) {
+		if (EventQueue.isDispatchThread()) {
 			try {
 				return doc.getText(0,doc.getLength());
 			} catch (BadLocationException e) {
@@ -400,8 +642,9 @@ public abstract class Report
 			}
 		} else {
 			try {
+				waitForIdle();
 				final AtomicReference<StringBuilder> buffer= new AtomicReference<StringBuilder>(new StringBuilder());
-				SwingUtilities.invokeAndWait(
+				EventQueue.invokeAndWait(
 					new Runnable() {
 						public void run() {
 							try {
@@ -420,14 +663,15 @@ public abstract class Report
 	}
 	//
 	protected static void safelyInsertString(final Document doc, final String buffer, final AttributeSet textStyle) {
-		if (SwingUtilities.isEventDispatchThread()) {
+		if (EventQueue.isDispatchThread()) {
 			try {
 				doc.insertString(doc.getLength(),buffer,textStyle);
 			} catch (BadLocationException e) {
 			}
 		} else {
 			try {
-				SwingUtilities.invokeAndWait(
+				waitForIdle();
+				EventQueue.invokeAndWait(
 					new Runnable() {
 						public void run() {
 							try {
@@ -440,18 +684,18 @@ public abstract class Report
 			} catch (InvocationTargetException e) {
 			}
 		}
-
 	}
 	//
 	protected static void safelyRemoveText(final Document doc, final long endPosition) {
-		if (SwingUtilities.isEventDispatchThread()) {
+		if (EventQueue.isDispatchThread()) {
 			try {
 				doc.remove(0,(int)endPosition+1);
 			} catch (BadLocationException e) {
 			}
 		} else {
 			try {
-				SwingUtilities.invokeAndWait(
+				waitForIdle();
+				EventQueue.invokeAndWait(
 					new Runnable() {
 						public void run() {
 							try {
@@ -466,23 +710,18 @@ public abstract class Report
 		}
 	}
 	//
-	protected static void safelySetCaretPosition(final JTextPane panel) {
-		if (SwingUtilities.isEventDispatchThread()) {
-			// try {
-				Document doc= panel.getDocument();
-				panel.setCaretPosition(doc.getLength());
-			// } catch (BadLocationException e) {
-			// }
+	protected static void safelySetCaretPosition(final JTextPane panel, final int textLength) {
+		if (EventQueue.isDispatchThread()) {
+			// Document doc= panel.getDocument();
+			panel.setCaretPosition(textLength); // doc.getLength());
 		} else {
 			try {
-				SwingUtilities.invokeAndWait(
+				waitForIdle();
+				EventQueue.invokeAndWait(
 					new Runnable() {
 						public void run() {
-							// try {
-								Document doc= panel.getDocument();
-								panel.setCaretPosition(doc.getLength());
-							// } catch (BadLocationException e) {
-							// }
+							// Document doc= panel.getDocument();
+							panel.setCaretPosition(textLength); // doc.getLength());
 						}
 					});
 			} catch (InterruptedException e) {
@@ -507,7 +746,7 @@ public abstract class Report
 	}
 	//
 	protected long calculate_position_of_line_end(String text, long n) {
-		int bound= text.length()-1; 
+		int bound= text.length()-1;
 		long counter= n;
 		for(int i=bound; i >= 0; i--) {
 			int c= text.codePointAt(i);
@@ -522,8 +761,6 @@ public abstract class Report
 	}
 	//
 	public void change_font(ChoisePoint iX, Term fontName, Term fontSize, Term fontStyle) {
-		DesktopUtils.createPaneIfNecessary(staticContext);
-		InternalTextFrame textWindow= createInternalFrameIfNecessary(iX);
 		String name;
 		try {
 			name= GUI_Utils.termToFontName(fontName,iX);
@@ -562,13 +799,23 @@ public abstract class Report
 				}
 			}
 		};
-		textWindow.updateRootTextStyleUnderline(isUnderlined);
-		ReportUtils.safelySetFont(new Font(name,style,size),textWindow);
+		updateRootTextStyleUnderline(isUnderlined);
+		synchronized(this) {
+			// if (graphicWindow != null) {
+			//	int integerSize= (int)size;
+			//	Font font= new Font(name,style,integerSize);
+			//	if (size != (double)integerSize) {
+			//		font= font.deriveFont((float)size);
+			//	};
+			//	ReportUtils.safelySetFont(font,textWindow);
+			// } else
+			if (space != null) {
+				space.setPanelFont(name,style,size);
+			}
+		}
 	}
 	//
 	public void changeBackgroundColor(ChoisePoint iX, Term backgroundColor) {
-		DesktopUtils.createPaneIfNecessary(staticContext);
-		InternalTextFrame textWindow= createInternalFrameIfNecessary(iX);
 		Color color;
 		try {
 			color= GUI_Utils.termToColor(backgroundColor,iX);
@@ -580,8 +827,50 @@ public abstract class Report
 				color= defaultBackgroundColor;
 			}
 		};
-		textWindow.updateRootTextStyleBackground(color);
-		ReportUtils.safelySetBackground(color,textWindow);
+		updateRootTextStyleBackground(color);
+		synchronized(this) {
+			if (space != null) {
+				ReportUtils.safelySetBackground(color,space.panel);
+			}
+		}
+	}
+	//
+	public void updateRootTextStyleUnderline(boolean isUnderlined) {
+		synchronized(this) {
+			MutableAttributeSet style= rootTextStyle.get();
+			StyleConstants.setUnderline(style,isUnderlined);
+			rootTextStyle.set(style);
+		}
+	}
+	public void updateRootTextStyleBackground(Color color) {
+		synchronized(this) {
+			MutableAttributeSet style= rootTextStyle.get();
+			StyleConstants.setBackground(style,color);
+			rootTextStyle.set(style);
+		}
+	}
+	//
+	public MutableAttributeSet getOpaqueTextStyle(Color t, Color s) {
+		synchronized(this) {
+			MutableAttributeSet textStyle= new SimpleAttributeSet();
+			textStyle.setResolveParent(rootTextStyle.get());
+			StyleConstants.setForeground(textStyle,t);
+			StyleConstants.setBackground(textStyle,s);
+			return textStyle;
+		}
+	}
+	//
+	public MutableAttributeSet getTransparentTextStyle(Color t) {
+		synchronized(this) {
+			MutableAttributeSet textStyle= transparentTextStyles.get(t);
+			if (textStyle==null) {
+				textStyle= new SimpleAttributeSet();
+				textStyle.setResolveParent(rootTextStyle.get());
+				StyleConstants.setForeground(textStyle,t);
+				transparentTextStyles.put(t,textStyle);
+			};
+			return textStyle;
+		}
 	}
 	//
 	public void componentHidden(ComponentEvent e) {
@@ -592,5 +881,17 @@ public abstract class Report
 	public void componentResized(ComponentEvent e) {
 	}
 	public void componentShown(ComponentEvent e) {
+	}
+	//
+	public static synchronized void waitForIdle() {
+		try {
+			EventQueue.invokeAndWait(
+				new Runnable() {
+					public void run() {
+					}
+				} );
+		} catch(InterruptedException e) {
+		} catch(InvocationTargetException e) {
+		}
 	}
 }

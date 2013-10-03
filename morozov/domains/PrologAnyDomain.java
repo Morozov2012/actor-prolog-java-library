@@ -1,8 +1,12 @@
 // (c) 2010 IRE RAS Alexei A. Morozov
-package morozov.domains;
 
+package morozov.domains;
+
+import morozov.domains.signals.*;
+import morozov.run.*;
 import morozov.terms.*;
-public class PrologAnyDomain extends PrologDomain {
+
+public class PrologAnyDomain extends PrologDomain {
 	public PrologAnyDomain() {
 		super(new AnonymousDomainName(), new DomainAlternative[0]);
 	}

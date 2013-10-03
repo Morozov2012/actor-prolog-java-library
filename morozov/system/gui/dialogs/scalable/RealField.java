@@ -12,10 +12,13 @@ package morozov.system.gui.dialogs.scalable;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.run.*;
 import morozov.system.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
+import morozov.system.gui.dialogs.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 public class RealField extends ActiveTextField {
 	public RealField(AbstractDialog target, int columns) {
@@ -31,7 +34,7 @@ public class RealField extends ActiveTextField {
 			double number= Converters.termToReal(value,iX);
 			return new PrologReal(number);
 		} catch (TermIsNotAReal e) {
-			throw new RejectValue();
+			throw RejectValue.instance;
 		}
 	}
 }

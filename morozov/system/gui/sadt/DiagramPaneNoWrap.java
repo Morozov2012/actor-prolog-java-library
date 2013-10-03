@@ -4,12 +4,14 @@ package morozov.system.gui.sadt;
 
 import morozov.classes.*;
 import morozov.system.gui.*;
+import morozov.system.gui.sadt.signals.*;
 
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
 import javax.swing.JPopupMenu;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -41,10 +43,12 @@ public class DiagramPaneNoWrap extends JPanel implements MouseListener, ActionLi
 		addMouseListener(this);
 	}
 	//
-	public void paint(Graphics g) {
+	public void paint(Graphics g0) {
 		Dimension size= getSize();
-		super.paint(g);
-		graph.draw(g,size,diagramColors,componentSuccess);
+		super.paint(g0);
+		Graphics2D g2= (Graphics2D)g0;
+		DesktopUtils.setRenderingHints(g2);
+		graph.draw(g2,size,diagramColors,componentSuccess);
 	}
 	//
 	public void mouseClicked(MouseEvent event) {

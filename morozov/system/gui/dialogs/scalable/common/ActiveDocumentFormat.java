@@ -7,7 +7,7 @@
 package morozov.system.gui.dialogs.scalable.common;
 
 import morozov.system.*;
-import morozov.terms.*;
+import morozov.terms.signals.*;
 
 public enum ActiveDocumentFormat {
 	INTEGER {

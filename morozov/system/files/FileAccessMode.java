@@ -2,4 +2,4 @@
 
 package morozov.system.files;
 
-public enum FileAccessMode {READING, WRITING, APPENDING, MODIFYING}
+public enum FileAccessMode { READING, WRITING, APPENDING, MODIFYING }

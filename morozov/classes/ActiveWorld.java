@@ -5,8 +5,13 @@ package morozov.classes;
 import morozov.run.*;
 import morozov.terms.*;
 
-import java.util.*;
-import java.util.concurrent.atomic.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.ListIterator;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.HashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class ActiveWorld extends AbstractWorld {
 	protected boolean isSuspended= false;
@@ -234,7 +239,7 @@ public abstract class ActiveWorld extends AbstractWorld {
 					};
 					Term targetValue= tableItem.portValue;
 					valuesAreEqual= false;
-                	               	if (newValue==null && targetValue==null) {
+					if (newValue==null && targetValue==null) {
 						valuesAreEqual= true;
 					} else if (newValue!=null && targetValue!=null) {
 						try {
@@ -411,7 +416,7 @@ public abstract class ActiveWorld extends AbstractWorld {
 				if (debugThisProcess()) {
 					System.out.printf("%s: VARIABLE STORE; slotValue==null;\n",this);
 				};
-                        	continue;
+				continue;
 			};
 			HashSet<ActorNumber> oldActors= slotValue.oldActors;
 			boolean hasProvenActors= removeNewlyProvedOldActors(oldActors);
@@ -425,11 +430,11 @@ public abstract class ActiveWorld extends AbstractWorld {
 					System.out.printf("%s: [%d]newActors.isEmpty();\n",this,slotN);
 				};
 				if (!hasProvenActors) {
-					slotValue.recentValue= new PrologUnknownValue();
+					slotValue.recentValue= PrologUnknownValue.instance;
 					if (debugThisProcess()) {
-						System.out.printf("%s: [%d]slotValue.recentValue:= new PrologUnknownValue() = %s;\n",this,slotN,slotValue.recentValue);
+						System.out.printf("%s: [%d]slotValue.recentValue:= PrologUnknownValue.instance = %s;\n",this,slotN,slotValue.recentValue);
 					}
-                        	}
+				}
 			} else {
 				slotValue.recentValue= slotValue.actualValue;	// 25.08.2009
 				if (debugThisProcess()) {
@@ -567,7 +572,7 @@ public abstract class ActiveWorld extends AbstractWorld {
 				ActorNumber newActor= new TemporaryActor();
 				slotValue.newActors.add(newActor);
 				registerActorToBeProved(newActor,rootCP);
-       			};
+			};
 			// Path II
 			slotValue.portIsUpdated= false;
 			// Path III
@@ -626,7 +631,7 @@ public abstract class ActiveWorld extends AbstractWorld {
 			};
 			if (slotValue.actualValue==null) {
 				if (slotValue.oldActors.isEmpty()) {
-					slotValue.actualValue= new PrologUnknownValue();
+					slotValue.actualValue= PrologUnknownValue.instance;
 				} else {
 					slotValue.actualValue= slotValue.recentValue;
 				}
@@ -670,7 +675,7 @@ public abstract class ActiveWorld extends AbstractWorld {
 			}
 		} else {
 			newIndex.freeTrail();
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	protected HashSet<AbstractWorld> convolveActualSlotValues(ChoisePoint iX) {
@@ -714,7 +719,7 @@ public abstract class ActiveWorld extends AbstractWorld {
 				ActorNumber actor= oldActorsIterator.next();
 				if (neutralizedActors.contains(actor)) {
 					if (debugActorsOfThisProcess()) {
-                                        	System.out.printf("%s: NEUTR(3).; neutralizedActors.contains(%s);\n",this,actor);
+						System.out.printf("%s: NEUTR(3).; neutralizedActors.contains(%s);\n",this,actor);
 					};
 					continue;
 				};
@@ -803,7 +808,7 @@ public abstract class ActiveWorld extends AbstractWorld {
 	}
 	public boolean debugAllProcesses() {
 		return false;
-		//  return true;
+		// return true;
 	}
 	public String toString() {
 		return "(" + super.toString() + ")";

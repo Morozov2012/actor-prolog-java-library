@@ -4,9 +4,13 @@ package morozov.system;
 
 import target.*;
 
+import morozov.run.*;
 import morozov.syntax.scanner.*;
-import morozov.system.gui.dialogs.*;
+import morozov.system.errors.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
+import morozov.terms.errors.*;
+import morozov.terms.signals.*;
 
 import java.math.BigInteger;
 import java.math.BigDecimal;
@@ -27,6 +31,23 @@ public class Converters {
 	public static BigDecimal oneDayLengthBigDecimal	= BigDecimal.valueOf(86400000);
 	protected static final BigDecimal lengthOfYear	= new BigDecimal(31556925.9747);
 	protected static final BigDecimal big12		= new BigDecimal(12);
+	//
+	public static boolean term2OnOffDefault(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
+		try {
+			long code= value.getSymbolValue(iX);
+			if (code==SymbolCodes.symbolCode_E_on) {
+				return true;
+			} else if (code==SymbolCodes.symbolCode_E_off) {
+				return false;
+			} else if (code==SymbolCodes.symbolCode_E_default) {
+				throw TermIsSymbolDefault.instance;
+			} else {
+				throw new WrongTermIsNotTheOnOffDefaultSwitch(value);
+			}
+		} catch (TermIsNotASymbol e) {
+			throw new WrongTermIsNotTheOnOffDefaultSwitch(value);
+		}
+	}
 	//
 	public static boolean term2OnOff(Term value, ChoisePoint iX) {
 		try {
@@ -84,7 +105,7 @@ public class Converters {
 				if (acceptDateAndTime) {
 					return termToDateOrTime(value,iX);
 				} else {
-					throw new TermIsNotAnInteger();
+					throw TermIsNotAnInteger.instance;
 				}
 			}
 		}
@@ -101,11 +122,19 @@ public class Converters {
 					String text= value.getStringValue(iX);
 					result= stringToRoundInteger(text);
 				} catch (TermIsNotAString b3) {
-					throw new TermIsNotAnInteger();
+					throw TermIsNotAnInteger.instance;
 				}
 			}
 		};
 		return result;
+	}
+	//
+	public static BigInteger argumentToRoundInteger(Term value, ChoisePoint iX) {
+		try {
+			return termToRoundInteger(value,iX,false);
+		} catch (TermIsNotAnInteger e) {
+			throw new WrongArgumentIsNotAnInteger(value);
+		}
 	}
 	//
 	public static BigInteger stringToStrictInteger(String text) throws TermIsNotAnInteger {
@@ -119,26 +148,26 @@ public class Converters {
 				if (tokens[0].getType()==PrologTokenType.INTEGER) {
 					result= tokens[0].getIntegerValue();
 				} else {
-					throw new TermIsNotAnInteger();
+					throw TermIsNotAnInteger.instance;
 				}
 			} else if (tokens.length==3) {
 				if (tokens[0].getType()==PrologTokenType.MINUS) {
 					if (tokens[1].getType()==PrologTokenType.INTEGER) {
 						result= tokens[1].getIntegerValue().negate();
 					} else {
-						throw new TermIsNotAnInteger();
+						throw TermIsNotAnInteger.instance;
 					}
 				} else if (tokens[0].getType()==PrologTokenType.PLUS) {
 					if (tokens[1].getType()==PrologTokenType.INTEGER) {
 						result= tokens[1].getIntegerValue();
 					} else {
-						throw new TermIsNotAnInteger();
+						throw TermIsNotAnInteger.instance;
 					}
 				} else {
-					throw new TermIsNotAnInteger();
+					throw TermIsNotAnInteger.instance;
 				}
 			} else {
-				throw new TermIsNotAnInteger();
+				throw TermIsNotAnInteger.instance;
 			}
 		};
 		return result;
@@ -159,10 +188,10 @@ public class Converters {
 					try {
 						result= Converters.doubleToBigInteger(realValue);
 					} catch (TermIsNotAReal b3) {
-						throw new TermIsNotAnInteger();
+						throw TermIsNotAnInteger.instance;
 					}
 				} else {
-					throw new TermIsNotAnInteger();
+					throw TermIsNotAnInteger.instance;
 				}
 			} else if (tokens.length==3) {
 				if (tokens[0].getType()==PrologTokenType.MINUS) {
@@ -173,10 +202,10 @@ public class Converters {
 						try {
 							result= Converters.doubleToBigInteger(realValue).negate();
 						} catch (TermIsNotAReal b3) {
-							throw new TermIsNotAnInteger();
+							throw TermIsNotAnInteger.instance;
 						}
 					} else {
-						throw new TermIsNotAnInteger();
+						throw TermIsNotAnInteger.instance;
 					}
 				} else if (tokens[0].getType()==PrologTokenType.PLUS) {
 					if (tokens[1].getType()==PrologTokenType.INTEGER) {
@@ -186,16 +215,16 @@ public class Converters {
 						try {
 							result= Converters.doubleToBigInteger(realValue);
 						} catch (TermIsNotAReal b3) {
-							throw new TermIsNotAnInteger();
+							throw TermIsNotAnInteger.instance;
 						}
 					} else {
-						throw new TermIsNotAnInteger();
+						throw TermIsNotAnInteger.instance;
 					}
 				} else {
-					throw new TermIsNotAnInteger();
+					throw TermIsNotAnInteger.instance;
 				}
 			} else {
-				throw new TermIsNotAnInteger();
+				throw TermIsNotAnInteger.instance;
 			}
 		};
 		return result;
@@ -235,7 +264,7 @@ public class Converters {
 				long functor= value.getStructureFunctor(iX);
 				Term[] arguments= value.getStructureArguments(iX);
 				if (arguments.length > 1 || arguments.length < 1) {
-					throw new TermIsNotTimeInterval();
+					throw TermIsNotTimeInterval.instance;
 				};
 				if (functor == SymbolCodes.symbolCode_E_seconds) {
 					return termToNanosMultiplied(arguments[0],1,iX);
@@ -263,10 +292,10 @@ public class Converters {
 				} else if (functor == SymbolCodes.symbolCode_E_years) {
 					return termToNanosMultiplied(arguments[0],lengthOfYear,iX);
 				} else {
-					throw new TermIsNotTimeInterval();
+					throw TermIsNotTimeInterval.instance;
 				}
 			} catch (TermIsNotAStructure e2) {
-				throw new TermIsNotTimeInterval();
+				throw TermIsNotTimeInterval.instance;
 			}
 		}
 	}
@@ -283,7 +312,7 @@ public class Converters {
 				result= result.multiply(oneNanoBig).multiply(BigDecimal.valueOf(k));
 				return result;
 			} catch (TermIsNotAReal b2) {
-				throw new TermIsNotTimeInterval();
+				throw TermIsNotTimeInterval.instance;
 			}
 		}
 	}
@@ -299,7 +328,7 @@ public class Converters {
 				result= result.multiply(oneNanoBig).multiply(k);
 				return result;
 			} catch (TermIsNotAReal b2) {
-				throw new TermIsNotTimeInterval();
+				throw TermIsNotTimeInterval.instance;
 			}
 		}
 	}
@@ -315,7 +344,7 @@ public class Converters {
 				result= result.multiply(oneNanoBig).divide(k,MathContext.DECIMAL128);
 				return result;
 			} catch (TermIsNotAReal b2) {
-				throw new TermIsNotTimeInterval();
+				throw TermIsNotTimeInterval.instance;
 			}
 		}
 	}
@@ -327,97 +356,128 @@ public class Converters {
 			try {
 				return termToTime(value,iX);
 			} catch (TermIsNotATime b2) {
-				throw new TermIsNotAnInteger();
+				throw TermIsNotAnInteger.instance;
 			}
 		}
 	}
 	public static BigInteger termToDate(Term value, ChoisePoint iX) throws TermIsNotADate {
 		try {
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_date,3,iX);
-			int year= arguments[0].getSmallIntegerValue(iX);
-			int month= monthToInteger(arguments[1],iX); // .getSmallIntegerValue(iX);
-			int day= arguments[2].getSmallIntegerValue(iX);
+			long timeInMillis= termsToDate(arguments[0],arguments[1],arguments[2],value,iX);
+			return BigInteger.valueOf(timeInMillis);
+		} catch (Backtracking b) {
+			throw TermIsNotADate.instance;
+		}
+	}
+	public static long termsToDate(Term a1, Term a2, Term a3, Term term, ChoisePoint iX) throws TermIsNotADate {
+		try {
+			int year= a1.getSmallIntegerValue(iX);
+			int month= monthToInteger(a2,iX); // .getSmallIntegerValue(iX);
+			int day= a3.getSmallIntegerValue(iX);
 			Calendar calendar= Calendar.getInstance();
 			calendar.set(year,month-1,day);
 			long timeInMillis= calendar.getTimeInMillis();
-			return BigInteger.valueOf(timeInMillis);
-		} catch (Backtracking b1) {
-			throw new TermIsNotADate();
-		} catch (TermIsNotAnInteger b2) {
-			throw new WrongArgumentIsNotADate(value);
+			return timeInMillis;
+		} catch (TermIsNotAnInteger e) {
+			throw new WrongArgumentIsNotADate(term);
+		} catch (Backtracking b) {
+			throw TermIsNotADate.instance;
+		}
+	}
+	public static long argumentsToDate(Term a1, Term a2, Term a3, Term term, ChoisePoint iX) {
+		try {
+			return termsToDate(a1,a2,a3,term,iX);
+		} catch (TermIsNotADate e) {
+			throw new WrongArgumentIsNotADate(term);
 		}
 	}
 	public static BigInteger termToTime(Term value, ChoisePoint iX) throws TermIsNotATime {
 		try {
 			try {
 				Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_time,4,iX);
-				int hours= arguments[0].getSmallIntegerValue(iX);
-				int minutes= arguments[1].getSmallIntegerValue(iX);
-				int seconds= arguments[2].getSmallIntegerValue(iX);
-				int milliseconds= arguments[3].getSmallIntegerValue(iX);
-				Calendar calendar= Calendar.getInstance();
-				calendar.set(Calendar.HOUR_OF_DAY,hours);
-				calendar.set(Calendar.MINUTE,minutes);
-				calendar.set(Calendar.SECOND,seconds);
-				calendar.set(Calendar.MILLISECOND,milliseconds);
-				return BigInteger.valueOf(calendar.getTimeInMillis());
+				long timeInMillis= termsToTime(arguments[0],arguments[1],arguments[2],arguments[3],value,iX);
+				return BigInteger.valueOf(timeInMillis);
 			} catch (Backtracking b2) {
 				Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_time,3,iX);
-				int hours= arguments[0].getSmallIntegerValue(iX);
-				int minutes= arguments[1].getSmallIntegerValue(iX);
-				int seconds= arguments[2].getSmallIntegerValue(iX);
-				int milliseconds= 0; // arguments[3].getSmallIntegerValue(iX);
-				Calendar calendar= Calendar.getInstance();
-				calendar.set(Calendar.HOUR_OF_DAY,hours);
-				calendar.set(Calendar.MINUTE,minutes);
-				calendar.set(Calendar.SECOND,seconds);
-				calendar.set(Calendar.MILLISECOND,milliseconds);
-				return BigInteger.valueOf(calendar.getTimeInMillis());
+				long timeInMillis= termsToTime(arguments[0],arguments[1],arguments[2],value,iX);
+				return BigInteger.valueOf(timeInMillis);
 			}
 		} catch (Backtracking b1) {
-			throw new TermIsNotATime();
-		} catch (TermIsNotAnInteger b2) {
-			throw new WrongArgumentIsNotATime(value);
+			throw TermIsNotATime.instance;
+		}
+	}
+	public static long termsToTime(Term a1, Term a2, Term a3, Term a4, Term term, ChoisePoint iX) throws TermIsNotATime {
+		try {
+			int hours= a1.getSmallIntegerValue(iX);
+			int minutes= a2.getSmallIntegerValue(iX);
+			int seconds= a3.getSmallIntegerValue(iX);
+			int milliseconds= a4.getSmallIntegerValue(iX);
+			Calendar calendar= Calendar.getInstance();
+			calendar.set(Calendar.HOUR_OF_DAY,hours);
+			calendar.set(Calendar.MINUTE,minutes);
+			calendar.set(Calendar.SECOND,seconds);
+			calendar.set(Calendar.MILLISECOND,milliseconds);
+			return calendar.getTimeInMillis();
+		} catch (TermIsNotAnInteger e) {
+			throw new WrongArgumentIsNotATime(term);
+		}
+	}
+	public static long termsToTime(Term a1, Term a2, Term a3, Term term, ChoisePoint iX) throws TermIsNotATime {
+		try {
+			int hours= a1.getSmallIntegerValue(iX);
+			int minutes= a2.getSmallIntegerValue(iX);
+			int seconds= a3.getSmallIntegerValue(iX);
+			int milliseconds= 0; // arguments[3].getSmallIntegerValue(iX);
+			Calendar calendar= Calendar.getInstance();
+			calendar.set(Calendar.HOUR_OF_DAY,hours);
+			calendar.set(Calendar.MINUTE,minutes);
+			calendar.set(Calendar.SECOND,seconds);
+			calendar.set(Calendar.MILLISECOND,milliseconds);
+			return calendar.getTimeInMillis();
+		} catch (TermIsNotAnInteger e) {
+			throw new WrongArgumentIsNotATime(term);
+		}
+	}
+	public static long argumentsToTime(Term a1, Term a2, Term a3, Term a4, Term term, ChoisePoint iX) {
+		try {
+			return termsToTime(a1,a2,a3,a4,term,iX);
+		} catch (TermIsNotATime e) {
+			throw new WrongArgumentIsNotATime(term);
+		}
+	}
+	public static long argumentsToTime(Term a1, Term a2, Term a3, Term term, ChoisePoint iX) {
+		try {
+			return termsToTime(a1,a2,a3,term,iX);
+		} catch (TermIsNotATime e) {
+			throw new WrongArgumentIsNotATime(term);
 		}
 	}
 	//
 	public static Term integerToDate(BigInteger value) {
 		Calendar calendar= Calendar.getInstance();
-		// if (value.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) > 0) {
-		//	throw new IntegerValueIsTooBig();
-		// } else if (value.compareTo(BigInteger.valueOf(Long.MIN_VALUE)) < 0) {
-		//	throw new IntegerValueIsTooSmall();
-		// } else {
-			calendar.setTimeInMillis(PrologInteger.toLong(value));
-			int year= calendar.get(Calendar.YEAR);
-			int month= calendar.get(Calendar.MONTH) + 1;
-			int day= calendar.get(Calendar.DAY_OF_MONTH);
-			Term[] arguments= new Term[3];
-			arguments[0]= new PrologInteger(BigInteger.valueOf(year));
-			arguments[1]= new PrologInteger(BigInteger.valueOf(month));
-			arguments[2]= new PrologInteger(BigInteger.valueOf(day));
-			return new PrologStructure(SymbolCodes.symbolCode_E_date,arguments);
-		// }
+		calendar.setTimeInMillis(PrologInteger.toLong(value));
+		int year= calendar.get(Calendar.YEAR);
+		int month= calendar.get(Calendar.MONTH) + 1;
+		int day= calendar.get(Calendar.DAY_OF_MONTH);
+		Term[] arguments= new Term[3];
+		arguments[0]= new PrologInteger(BigInteger.valueOf(year));
+		arguments[1]= new PrologInteger(BigInteger.valueOf(month));
+		arguments[2]= new PrologInteger(BigInteger.valueOf(day));
+		return new PrologStructure(SymbolCodes.symbolCode_E_date,arguments);
 	}
 	public static Term integerToTime(BigInteger value) {
 		Calendar calendar= Calendar.getInstance();
-		// if (value.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) > 0) {
-		//	throw new IntegerValueIsTooBig();
-		// } else if (value.compareTo(BigInteger.valueOf(Long.MIN_VALUE)) < 0) {
-		//	throw new IntegerValueIsTooSmall();
-		// } else {
-			calendar.setTimeInMillis(PrologInteger.toLong(value));
-			int hours= calendar.get(Calendar.HOUR_OF_DAY);
-			int minutes= calendar.get(Calendar.MINUTE);
-			int seconds= calendar.get(Calendar.SECOND);
-			int milliseconds= calendar.get(Calendar.MILLISECOND);
-			Term[] arguments= new Term[4];
-			arguments[0]= new PrologInteger(BigInteger.valueOf(hours));
-			arguments[1]= new PrologInteger(BigInteger.valueOf(minutes));
-			arguments[2]= new PrologInteger(BigInteger.valueOf(seconds));
-			arguments[3]= new PrologInteger(BigInteger.valueOf(milliseconds));
-			return new PrologStructure(SymbolCodes.symbolCode_E_time,arguments);
-		// }
+		calendar.setTimeInMillis(PrologInteger.toLong(value));
+		int hours= calendar.get(Calendar.HOUR_OF_DAY);
+		int minutes= calendar.get(Calendar.MINUTE);
+		int seconds= calendar.get(Calendar.SECOND);
+		int milliseconds= calendar.get(Calendar.MILLISECOND);
+		Term[] arguments= new Term[4];
+		arguments[0]= new PrologInteger(BigInteger.valueOf(hours));
+		arguments[1]= new PrologInteger(BigInteger.valueOf(minutes));
+		arguments[2]= new PrologInteger(BigInteger.valueOf(seconds));
+		arguments[3]= new PrologInteger(BigInteger.valueOf(milliseconds));
+		return new PrologStructure(SymbolCodes.symbolCode_E_time,arguments);
 	}
 	public static Term integerToDays(BigInteger timeInMillis) {
 		// return new PrologInteger(BigInteger.valueOf((long)StrictMath.round(timeInMillis.doubleValue()/oneDayLengthLong)));
@@ -449,14 +509,28 @@ public class Converters {
 		try {
 			return new BigInteger(text.substring(0,p1));
 		} catch (NumberFormatException nfe) {
-			throw new TermIsNotAReal();
+			throw TermIsNotAReal.instance;
+		}
+	}
+	public static BigInteger doubleArgumentToBigInteger(double value, Term term) {
+		try {
+			return doubleToBigInteger(value);
+		} catch (TermIsNotAReal e) {
+			throw new WrongArgumentIsNotAReal(term);
+		}
+	}
+	public static BigInteger doubleValueToBigInteger(double value) {
+		try {
+			return doubleToBigInteger(value);
+		} catch (TermIsNotAReal e) {
+			throw new WrongArgumentIsNotAReal(new PrologReal(value));
 		}
 	}
 	public static BigDecimal doubleToBigDecimal(double value) throws TermIsNotAReal {
 		try {
 			return new BigDecimal(value);
 		} catch (NumberFormatException nfe) {
-			throw new TermIsNotAReal();
+			throw TermIsNotAReal.instance;
 		}
 	}
 	//
@@ -473,11 +547,19 @@ public class Converters {
 					String text= value.getStringValue(iX);
 					result= stringToReal(text);
 				} catch (TermIsNotAString b5) {
-					throw new TermIsNotAReal();
+					throw TermIsNotAReal.instance;
 				}
 			}
 		};
 		return result;
+	}
+	//
+	public static double argumentToReal(Term value, ChoisePoint iX) {
+		try {
+			return Converters.termToReal(value,iX);
+		} catch (TermIsNotAReal e) {
+			throw new WrongArgumentIsNotNumeric(value);
+		}
 	}
 	//
 	public static double stringToReal(String text) throws TermIsNotAReal {
@@ -493,7 +575,7 @@ public class Converters {
 				} else if (tokens[0].getType()==PrologTokenType.REAL) {
 					result= tokens[0].getRealValue();
 				} else {
-					throw new TermIsNotAReal();
+					throw TermIsNotAReal.instance;
 				}
 			} else if (tokens.length==3) {
 				if (tokens[0].getType()==PrologTokenType.MINUS) {
@@ -502,7 +584,7 @@ public class Converters {
 					} else if (tokens[1].getType()==PrologTokenType.REAL) {
 						result= - tokens[1].getRealValue();
 					} else {
-						throw new TermIsNotAReal();
+						throw TermIsNotAReal.instance;
 					}
 				} else if (tokens[0].getType()==PrologTokenType.PLUS) {
 					if (tokens[1].getType()==PrologTokenType.INTEGER) {
@@ -510,13 +592,13 @@ public class Converters {
 					} else if (tokens[1].getType()==PrologTokenType.REAL) {
 						result= tokens[1].getRealValue();
 					} else {
-						throw new TermIsNotAReal();
+						throw TermIsNotAReal.instance;
 					}
 				} else {
-					throw new TermIsNotAReal();
+					throw TermIsNotAReal.instance;
 				}
 			} else {
-				throw new TermIsNotAReal();
+				throw TermIsNotAReal.instance;
 			};
 		// };
 		return result;
@@ -539,7 +621,7 @@ public class Converters {
 						String text= value.getStringValue(iX);
 						result= stringToNumerical(text);
 					} catch (TermIsNotAString b4) {
-						throw new Backtracking();
+						throw Backtracking.instance;
 					}
 				}
 			}
@@ -561,7 +643,7 @@ public class Converters {
 					result= new PrologReal(tokens[0].getRealValue());
 				} else {
 					// throw new TermIsNotNumerical();
-					throw new Backtracking();
+					throw Backtracking.instance;
 				}
 			} else if (tokens.length==3) {
 				if (tokens[0].getType()==PrologTokenType.MINUS) {
@@ -571,7 +653,7 @@ public class Converters {
 						result= new PrologReal(-tokens[1].getRealValue());
 					} else {
 						// throw new TermIsNotNumerical();
-						throw new Backtracking();
+						throw Backtracking.instance;
 					}
 				} else if (tokens[0].getType()==PrologTokenType.PLUS) {
 					if (tokens[1].getType()==PrologTokenType.INTEGER) {
@@ -580,15 +662,15 @@ public class Converters {
 						result= new PrologReal(tokens[1].getRealValue());
 					} else {
 						// throw new TermIsNotNumerical();
-						throw new Backtracking();
+						throw Backtracking.instance;
 					}
 				} else {
 					// throw new TermIsNotNumerical();
-					throw new Backtracking();
+					throw Backtracking.instance;
 				}
 			} else {
 				// throw new TermIsNotNumerical();
-				throw new Backtracking();
+				throw Backtracking.instance;
 			}
 		};
 		return result;
@@ -627,11 +709,11 @@ public class Converters {
 				} else if ("DECEMBER".startsWith(name)) {
 					month= 12;
 				} else {
-					throw new Backtracking();
+					throw Backtracking.instance;
 				};
 				return month;
 			} catch (TermIsNotAString e2) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			}
 		}
 	}
@@ -660,22 +742,29 @@ public class Converters {
 	}
 	//
 	public static String[] termToStrings(Term value, ChoisePoint iX) {
+		return termToStrings(value,iX,false);
+	}
+	public static String[] termToStrings(Term value, ChoisePoint iX, boolean makeUpperCaseStrings) {
 		ArrayList<String> stringList= new ArrayList<String>();
-		termToStrings(stringList,value,iX);
+		termToStrings(stringList,value,iX,makeUpperCaseStrings);
 		return stringList.toArray(new String[0]);
 	}
-	public static void termToStrings(ArrayList<String> stringList, Term value, ChoisePoint iX) {
+	public static void termToStrings(ArrayList<String> stringList, Term value, ChoisePoint iX, boolean makeUpperCaseStrings) {
 		Term nextHead;
 		Term currentTail= value;
 		try {
 			while (true) {
 				nextHead= currentTail.getNextListHead(iX);
-				termToStrings(stringList,nextHead,iX);
+				termToStrings(stringList,nextHead,iX,makeUpperCaseStrings);
 				currentTail= currentTail.getNextListTail(iX);
 			}
 		} catch (EndOfList e) {
 		} catch (TermIsNotAList e) {
-			stringList.add(currentTail.toString(iX));
+			String string= currentTail.toString(iX);
+			if (makeUpperCaseStrings) {
+				string= string.toUpperCase();
+			};
+			stringList.add(string);
 		} catch (Throwable e) {
 		}
 	}
@@ -731,7 +820,7 @@ public class Converters {
 	}
 	//
 	public static Term arrayToList(Term[] array) {
-		Term buffer= new PrologEmptyList();
+		Term buffer= PrologEmptyList.instance;
 		for (int n=array.length-1; n >= 0; n--) {
 			buffer= new PrologList(array[n],buffer);
 		};
@@ -739,7 +828,7 @@ public class Converters {
 	}
 	//
 	public static Term arrayListToTerm(ArrayList<Term> array) {
-		Term result= new PrologEmptyList();
+		Term result= PrologEmptyList.instance;
 		for (int n=array.size()-1; n >= 0; n--) {
 			result= new PrologList(array.get(n),result);
 		};
@@ -747,14 +836,14 @@ public class Converters {
 	}
 	//
 	public static Term stringArrayToList(ArrayList<String> array) {
-		Term result= new PrologEmptyList();
+		Term result= PrologEmptyList.instance;
 		for (int n=array.size()-1; n >= 0; n--) {
 			result= new PrologList(new PrologString(array.get(n)),result);
 		};
 		return result;
 	}
 	public static Term stringArrayToListOfList(ArrayList<ArrayList<String>> array) {
-		Term result= new PrologEmptyList();
+		Term result= PrologEmptyList.instance;
 		for (int n=array.size()-1; n >= 0; n--) {
 			result= new PrologList(stringArrayToList(array.get(n)),result);
 		};
@@ -775,9 +864,34 @@ public class Converters {
 					argumentList.add(extraItem);
 				};
 				break;
-			} else
+			} else {
 				argumentList.add(item);
+			}
 		};
 		return argumentList.toArray(new Term[0]);
+	}
+	//
+	public static int termToProcessPriority(Term value, ChoisePoint iX) throws TermIsNotProcessPriority {
+		try {
+			int priority= value.getSmallIntegerValue(iX);
+			priority= StrictMath.max(priority,Thread.MIN_PRIORITY);
+			priority= StrictMath.min(priority,Thread.MAX_PRIORITY);
+			return priority;
+		} catch (TermIsNotAnInteger e1) {
+			try {
+				long functor= value.getSymbolValue(iX);
+				if (functor == SymbolCodes.symbolCode_E_NORM_PRIORITY) {
+					return Thread.NORM_PRIORITY;
+				} else if (functor == SymbolCodes.symbolCode_E_MIN_PRIORITY) {
+					return Thread.MIN_PRIORITY;
+				} else if (functor == SymbolCodes.symbolCode_E_MAX_PRIORITY) {
+					return Thread.MAX_PRIORITY;
+				} else {
+					throw TermIsNotProcessPriority.instance;
+				}
+			} catch (TermIsNotASymbol e2) {
+				throw TermIsNotProcessPriority.instance;
+			}
+		}
 	}
 }

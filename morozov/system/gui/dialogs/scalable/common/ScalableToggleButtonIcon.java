@@ -6,18 +6,19 @@
 
 package morozov.system.gui.dialogs.scalable.common;
 
-import javax.swing.*;
-import javax.swing.plaf.*;
+import javax.swing.JToggleButton;
+import javax.swing.Icon;
+import javax.swing.plaf.UIResource;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.font.FontRenderContext;
 import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
-import java.io.*;
-import java.util.*;
+import java.io.Serializable;
+import java.util.HashMap;
 
 /*
  * ScalableToggleButtonIcon implementation for the Actor Prolog language
@@ -77,9 +78,10 @@ public abstract class ScalableToggleButtonIcon implements Icon, UIResource, Seri
 				if (g2D!=null) {
 					FontRenderContext fRC= g2D.getFontRenderContext();
 					Rectangle2D r2D= givenFont.getStringBounds("M",fRC);
+					// Returns an integer Rectangle that completely encloses the Shape:
 					Rectangle rect= r2D.getBounds();
 					int width= (int)StrictMath.round(rect.getWidth());
-					int height= (int)StrictMath.round(rect.getHeight());
+					// int height= (int)StrictMath.round(rect.getHeight());
 					measuredSize= (int)StrictMath.round(width*horizontalScaling);
 					measuredFonts.put(givenFont,measuredSize);
 				}
@@ -96,7 +98,7 @@ public abstract class ScalableToggleButtonIcon implements Icon, UIResource, Seri
 	//
 	protected int getControlSize() {
 		// return 130;
-		return measuredSize + getSizeCorrection();
+		return (int)StrictMath.floor(measuredSize + getSizeCorrection());
 		// return 13;
 	}
 	//
@@ -112,13 +114,21 @@ public abstract class ScalableToggleButtonIcon implements Icon, UIResource, Seri
 		return getControlSize();
 	}
 	//
-	public void paintIcon(Component relatedComponent, Graphics g, int x, int y) {
-		JToggleButton tb= (JToggleButton)relatedComponent;
-		int controlSize= getControlSize();
-		drawEye(tb,g,x,y,controlSize);
-		drawMarker(tb,g,x,y,controlSize);
+	public void paintIcon(Component relatedComponent, Graphics g0, int x, int y) {
+		Graphics gg= g0.create();
+		try {
+			Graphics2D g2= (Graphics2D)gg;
+			// g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+			// g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+			JToggleButton tb= (JToggleButton)relatedComponent;
+			int controlSize= getControlSize();
+			drawEye(tb,g2,x,y,controlSize);
+			drawMarker(tb,g2,x,y,controlSize);
+		} finally {
+			gg.dispose();
+		}
 	}
 	//
-	abstract protected void drawEye(JToggleButton tb, Graphics g, int x, int y, int controlSize);
-	abstract protected void drawMarker(JToggleButton tb, Graphics g, int x, int y, int controlSize);
+	abstract protected void drawEye(JToggleButton tb, Graphics2D g2, int x, int y, int controlSize);
+	abstract protected void drawMarker(JToggleButton tb, Graphics2D g2, int x, int y, int controlSize);
 }

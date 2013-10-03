@@ -8,10 +8,16 @@ package morozov.system.gui.dialogs.scalable.metal;
 
 import morozov.system.gui.dialogs.scalable.common.*;
 
-import javax.swing.*;
+import javax.swing.UIManager;
+import javax.swing.DefaultListCellRenderer;
+import javax.swing.ListCellRenderer;
+import javax.swing.JComponent;
 import javax.swing.plaf.metal.MetalComboBoxUI;
 import javax.swing.plaf.ComponentUI;
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Insets;
+import java.awt.Component;
+import java.awt.Color;
 
 /*
  * ScalableMetalComboBoxUI implementation for the Actor Prolog language

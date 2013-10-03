@@ -2,7 +2,10 @@
 
 package morozov.domains;
 
+import morozov.domains.signals.*;
+import morozov.run.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 public class DomainSet extends MonoArgumentDomainItem {
 	protected long functor;
@@ -75,7 +78,7 @@ public class DomainSet extends MonoArgumentDomainItem {
 			initiateDomainItemIfNecessary();
 			return domainItem;
 		} else {
-			throw new IsNotPairDomainAlternative();
+			throw IsNotPairDomainAlternative.instance;
 		}
 	}
 }

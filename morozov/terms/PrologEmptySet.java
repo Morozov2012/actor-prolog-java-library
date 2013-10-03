@@ -3,13 +3,21 @@
 package morozov.terms;
 
 import morozov.domains.*;
+import morozov.domains.signals.*;
+import morozov.run.*;
+import morozov.terms.signals.*;
 
 import java.nio.charset.CharsetEncoder;
 
 import java.util.HashMap;
 import java.util.HashSet;
 
-public class PrologEmptySet extends UnderdeterminedSet {
+public final class PrologEmptySet extends UnderdeterminedSet {
+	public static final PrologEmptySet instance= new PrologEmptySet();
+	//
+	private PrologEmptySet() {
+	}
+	//
 	public void isEmptySet(ChoisePoint cp) throws Backtracking {
 	}
 	public boolean thisIsEmptySet() {
@@ -19,7 +27,7 @@ public class PrologEmptySet extends UnderdeterminedSet {
 		set.setNoValueElements();
 	}
 	// public Term checkSetAndGetNamedElement(long aName, ChoisePoint cp) throws Backtracking, TermIsNotASet {
-	//	throw new Backtracking();
+	//	throw Backtracking.instance;
 	// }
 	public void checkIfTermIsASet(ChoisePoint cp) throws TermIsNotASet {
 	}
@@ -33,13 +41,13 @@ public class PrologEmptySet extends UnderdeterminedSet {
 	public void verifySet(long[] aNames, ChoisePoint cp) throws Backtracking {
 	}
 	public long getNextPairName(ChoisePoint cp) throws EndOfSet, TermIsNotASet {
-		throw new EndOfSet();
+		throw EndOfSet.instance;
 	}
 	public Term getNextPairValue(ChoisePoint cp) throws EndOfSet, TermIsNotASet, SetElementIsProhibited {
-		throw new EndOfSet();
+		throw EndOfSet.instance;
 	}
 	public Term getNextSetTail(ChoisePoint cp) throws EndOfSet, TermIsNotASet {
-		throw new EndOfSet();
+		throw EndOfSet.instance;
 	}
 	public Term exploreSetPositiveElements(HashMap<Long,Term> positiveMap, ChoisePoint cp) {
 		return this;
@@ -51,7 +59,7 @@ public class PrologEmptySet extends UnderdeterminedSet {
 		return this;
 	}
 	public void appendNamedElement(long aName, Term aValue, ChoisePoint cp) throws Backtracking {
-		throw new Backtracking();
+		throw Backtracking.instance;
 	}
 	public void appendNamedElementProhibition(long aName, ChoisePoint cp) throws Backtracking {
 	}
@@ -86,7 +94,7 @@ public class PrologEmptySet extends UnderdeterminedSet {
 		//		rightSetPositiveMap.remove(leftSetPositiveKey);
 		//	} else {
 		//		if (rightSetNegativeMap.contains(leftSetPositiveKey)) {
-		//			throw new Backtracking();
+		//			throw Backtracking.instance;
 		//		} else {
 		//			Term leftSetPositiveValue= leftSetPositiveMap.get(leftSetPositiveKey);
 		//			aTail.appendNamedElement(leftSetPositiveKey,leftSetPositiveValue,cp);
@@ -98,7 +106,7 @@ public class PrologEmptySet extends UnderdeterminedSet {
 		// while (leftSetNegativeIterator.hasNext()) {
 		//	long leftSetNegativeKey= leftSetNegativeIterator.next();
 		//	if (rightSetPositiveMap.containsKey(leftSetNegativeKey)) {
-		//		throw new Backtracking();
+		//		throw Backtracking.instance;
 		//	} else {
 		//		if (rightSetNegativeMap.contains(leftSetNegativeKey)) {
 		//			rightSetNegativeMap.remove(leftSetNegativeKey);
@@ -109,7 +117,7 @@ public class PrologEmptySet extends UnderdeterminedSet {
 		//	leftSetNegativeIterator.remove();
 		// };
 		if (!rightSetPositiveMap.isEmpty()) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		};
 		// Set<Long> rightSetPositiveKeys= rightSetPositiveMap.keySet();
 		// Iterator<Long> rightSetPositiveIterator= rightSetPositiveKeys.iterator();

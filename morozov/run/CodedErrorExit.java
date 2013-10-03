@@ -13,6 +13,14 @@ public class CodedErrorExit extends ErrorExit {
 		numericCode= number;
 	}
 	//
+	public boolean isNormalTerminationOfTheProgram() {
+		if (numericCode.compareTo(BigInteger.ZERO)==0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	//
 	public Term createTerm() {
 		return new PrologInteger(numericCode);
 	}

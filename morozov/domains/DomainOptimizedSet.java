@@ -2,11 +2,13 @@
 
 package morozov.domains;
 
+import morozov.domains.signals.*;
+import morozov.run.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.util.HashMap;
 import java.util.Set;
-import java.util.Iterator;
 
 public class DomainOptimizedSet extends MultiArgumentDomainItem {
 	protected long[] functors;
@@ -101,7 +103,7 @@ public class DomainOptimizedSet extends MultiArgumentDomainItem {
 		initiateDomainItemsIfNecessary();
 		// System.out.printf("DimainOptimizedSet::checkTerm:t=%s\n",t);
 		Term[] arguments= checkCollectAndOptimizeSetElements(t,cp,baseDomain,false);
-		Term set= new PrologEmptySet();
+		Term set= PrologEmptySet.instance;
 		for (int n=arguments.length-1; n >= 0; n--) {
 			Term argument= arguments[n];
 			if (argument != null) {
@@ -134,7 +136,7 @@ public class DomainOptimizedSet extends MultiArgumentDomainItem {
 					};
 					setPositiveMap.remove(currentKey);
 				} else {
-					arguments[n]= null; // new PrologNoValue();
+					arguments[n]= null; // PrologNoValue.instance;
 				}
 			};
 			if (setPositiveMap.isEmpty()) {
@@ -163,7 +165,7 @@ public class DomainOptimizedSet extends MultiArgumentDomainItem {
 		if (elementNumber >= 0) {
 			return domainItems[elementNumber];
 		} else {
-			throw new IsNotPairDomainAlternative();
+			throw IsNotPairDomainAlternative.instance;
 		}
 	}
 }

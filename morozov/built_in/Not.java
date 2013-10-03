@@ -5,6 +5,7 @@ package morozov.built_in;
 import target.*;
 
 import morozov.run.*;
+import morozov.run.errors.*;
 import morozov.terms.*;
 
 public abstract class Not extends Lambda {
@@ -34,7 +35,7 @@ public abstract class Not extends Lambda {
 			newIndex.freeTrail();
 			return;
 		};
-		throw new Backtracking();
+		throw Backtracking.instance;
 	}
 	//
 	public class Negation extends Continuation {
@@ -79,7 +80,7 @@ public abstract class Not extends Lambda {
 				c0.execute(newIndex);
 				return;
 			};
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//

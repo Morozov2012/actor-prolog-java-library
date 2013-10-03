@@ -2,6 +2,8 @@
 
 package morozov.system.files;
 
+import morozov.system.files.errors.*;
+
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 

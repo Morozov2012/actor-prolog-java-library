@@ -4,10 +4,15 @@ package morozov.built_in;
 
 import target.*;
 
-import morozov.system.*;
+import morozov.run.*;
 import morozov.system.checker.*;
+import morozov.system.checker.errors.*;
+import morozov.system.checker.signals.*;
+import morozov.system.errors.*;
 import morozov.system.files.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -28,7 +33,7 @@ public abstract class WebResource extends Text {
 	abstract protected Term getBuiltInSlot_E_location();
 	abstract protected Term getBuiltInSlot_E_max_waiting_time();
 	abstract protected Term getBuiltInSlot_E_character_set();
-	abstract protected Term getBuiltInSlot_E_backslash_is_separator_always();
+	abstract protected Term getBuiltInSlot_E_backslash_always_is_separator();
 	// abstract protected Term getBuiltInSlot_E_mask();
 	// abstract protected Term getBuiltInSlot_E_send_full_path();
 	// abstract protected Term getBuiltInSlot_E_query();
@@ -56,7 +61,7 @@ public abstract class WebResource extends Text {
 	public void getParameters0fs(ChoisePoint iX) {
 	}
 	protected Term getResourceParameters(URI uri, CharacterSet characterSet, int timeout, ChoisePoint iX) {
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		try {
 			URL_Utils.installCookieManagerIfNecessary(staticContext);
 			URL_Attributes attributes= URL_Utils.getResourceAttributes(uri,characterSet,timeout,staticContext,backslashIsSeparator);
@@ -66,7 +71,7 @@ public abstract class WebResource extends Text {
 		}
 	}
 	protected Term getResourceParameters(String path, CharacterSet characterSet, int timeout, ChoisePoint iX) {
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		try {
 			URL_Utils.installCookieManagerIfNecessary(staticContext);
 			URI uri= getURI(iX,path);
@@ -110,7 +115,7 @@ public abstract class WebResource extends Text {
 			URL_Utils.installCookieManagerIfNecessary(staticContext);
 			CharacterSet characterSet= retrieveCharacterSet(iX);
 			int timeout= retrieveMaxWaitingTime(iX);
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 			Term result;
 			try {
 				result= getContentOfResource(uri,characterSet,timeout,backslashIsSeparator);
@@ -191,25 +196,25 @@ public abstract class WebResource extends Text {
 	}
 	protected String getFullName(ChoisePoint iX, String fileName) {
 		String location= retrieveLocationString(iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		return URL_Utils.getFullName(location,fileName,staticContext,backslashIsSeparator);
 	}
 	protected String getFullName(ChoisePoint iX) {
 		String location= retrieveLocationString(iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		return URL_Utils.getFullName(location,staticContext,backslashIsSeparator);
 	}
 	//
 	public void getURL1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
 		String resolvedName= getFullName(iX,a2);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		a1.value= new PrologString(URL_Utils.get_URL_string(resolvedName,staticContext,backslashIsSeparator));
 	}
 	public void getURL1fs(ChoisePoint iX, Term a1) {
 	}
 	public void getURL0ff(ChoisePoint iX, PrologVariable a1) {
 		String resolvedName= getFullName(iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		a1.value= new PrologString(URL_Utils.get_URL_string(resolvedName,staticContext,backslashIsSeparator));
 	}
 	public void getURL0fs(ChoisePoint iX) {
@@ -217,16 +222,16 @@ public abstract class WebResource extends Text {
 	//
 	protected URI getURI(ChoisePoint iX, String fileName) throws URISyntaxException {
 		String location= retrieveLocationString(iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		return URL_Utils.getURI(location,fileName,staticContext,backslashIsSeparator);
 	}
 	//
 	public void isLocalResource1s(ChoisePoint iX, Term a1) throws Backtracking {
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		try {
 			String path= a1.getStringValue(iX);
 			if (!URL_Utils.isLocalResource(getFullName(iX,path),backslashIsSeparator)) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			}
 		} catch (TermIsNotAString e) {
 			throw new WrongArgumentIsNotAString(a1);
@@ -235,15 +240,15 @@ public abstract class WebResource extends Text {
 	}
 	public void isLocalResource0s(ChoisePoint iX) throws Backtracking {
 		String path= getFullName(iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		if (!URL_Utils.isLocalResource(path,backslashIsSeparator)) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
 	protected URI retrieveLocationURI(ChoisePoint iX) {
 		Term location= getBuiltInSlot_E_location();
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		try {
 			String path= location.getStringValue(iX);
 			URI uri= URL_Utils.create_URI(path,staticContext,backslashIsSeparator);

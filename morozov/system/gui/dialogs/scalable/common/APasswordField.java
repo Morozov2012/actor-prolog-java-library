@@ -12,13 +12,14 @@ package morozov.system.gui.dialogs.scalable.common;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.*;
 import morozov.terms.*;
 
-import javax.swing.*;
-import javax.swing.text.*;
-import java.awt.event.*;
+import javax.swing.JPasswordField;
+import javax.swing.text.Document;
+import java.awt.event.KeyEvent;
 
 public class APasswordField
 	extends JPasswordField

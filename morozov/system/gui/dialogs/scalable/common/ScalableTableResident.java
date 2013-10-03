@@ -7,13 +7,14 @@
 package morozov.system.gui.dialogs.scalable.common;
 
 import morozov.classes.*;
+import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.terms.*;
 
 import javax.swing.SwingUtilities;
-import java.lang.reflect.InvocationTargetException;
 
-import java.util.concurrent.atomic.*;
+import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /*
  * ScalableTableResident implementation for the Actor Prolog language

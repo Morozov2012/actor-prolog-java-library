@@ -1,0 +1,82 @@
+// (c) 2013 IRE RAS Alexei A. Morozov
+
+package morozov.system.gui.space2d;
+
+import java.awt.Graphics2D;
+import java.awt.Image;
+import java.awt.Color;
+
+public class Java2DPickOutAndDrawImage extends Java2DCommand {
+	protected Image image;
+	protected Color color= null;
+	protected double destinationX1= 0;
+	protected double destinationY1= 0;
+	protected double destinationX2= 0;
+	protected double destinationY2= 0;
+	protected double sourceX1= 0;
+	protected double sourceY1= 0;
+	protected double sourceX2= 0;
+	protected double sourceY2= 0;
+	//
+	public Java2DPickOutAndDrawImage(Image aImage, double dX1, double dY1, double dX2, double dY2, double sX1, double sY1, double sX2, double sY2) {
+		image= aImage;
+		destinationX1= dX1;
+		destinationY1= dY1;
+		destinationX2= dX2;
+		destinationX2= dY2;
+		sourceX1= sX1;
+		sourceY1= sY1;
+		sourceX2= sX2;
+		sourceX2= sY2;
+	}
+	public Java2DPickOutAndDrawImage(Image aImage, double dX1, double dY1, double dX2, double dY2, double sX1, double sY1, double sX2, double sY2, Color aC) {
+		image= aImage;
+		color= aC;
+		destinationX1= dX1;
+		destinationY1= dY1;
+		destinationX2= dX2;
+		destinationX2= dY2;
+		sourceX1= sX1;
+		sourceY1= sY1;
+		sourceX2= sX2;
+		sourceX2= sY2;
+	}
+	public void execute(Graphics2D g2, DrawingMode drawingMode) {
+		double factorX= drawingMode.getFactorX();
+		double factorY= drawingMode.getFactorY();
+		int integerDestinationX1= (int)StrictMath.round(destinationX1*factorX);
+		int integerDestinationY1= (int)StrictMath.round(destinationY1*factorX);
+		int integerDestinationX2= (int)StrictMath.round(destinationX2*factorX);
+		int integerDestinationY2= (int)StrictMath.round(destinationY2*factorX);
+		int integerSourceX1= (int)StrictMath.round(sourceX1*factorX);
+		int integerSourceY1= (int)StrictMath.round(sourceY1*factorX);
+		int integerSourceX2= (int)StrictMath.round(sourceX2*factorX);
+		int integerSourceY2= (int)StrictMath.round(sourceY2*factorX);
+		if (color==null) {
+			g2.drawImage(
+				image,
+				integerDestinationX1,
+				integerDestinationY1,
+				integerDestinationX2,
+				integerDestinationY2,
+				integerSourceX1,
+				integerSourceY1,
+				integerSourceX2,
+				integerSourceY2,
+				null);
+		} else {
+			g2.drawImage(
+				image,
+				integerDestinationX1,
+				integerDestinationY1,
+				integerDestinationX2,
+				integerDestinationY2,
+				integerSourceX1,
+				integerSourceY1,
+				integerSourceX2,
+				integerSourceY2,
+				color,
+				null);
+		}
+	}
+}

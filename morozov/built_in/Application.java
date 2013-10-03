@@ -6,10 +6,14 @@ import target.*;
 
 import morozov.classes.*;
 import morozov.run.*;
+import morozov.system.errors.*;
 import morozov.system.checker.*;
+import morozov.system.checker.errors.*;
 import morozov.system.files.*;
+import morozov.system.files.errors.*;
 import morozov.system.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.io.IOException;
 import java.applet.AppletContext;
@@ -21,19 +25,31 @@ import java.net.URISyntaxException;
 import java.net.MalformedURLException;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class Application extends Alpha {
 	//
 	protected long processCounter= 0;
 	protected HashSet<Process> accountableProceses= new HashSet<Process>();
+	protected HashSet<PendingProcess> supervisors= new HashSet<PendingProcess>();
 	//
 	abstract protected Term getBuiltInSlot_E_command();
 	abstract protected Term getBuiltInSlot_E_arguments();
 	abstract protected Term getBuiltInSlot_E_window_mode();
 	abstract protected Term getBuiltInSlot_E_enable_multiple_instances();
-	abstract protected Term getBuiltInSlot_E_backslash_is_separator_always();
+	abstract protected Term getBuiltInSlot_E_backslash_always_is_separator();
 	//
 	abstract public long entry_s_End_1_i();
+	//
+	public void closeFiles() {
+		Iterator<PendingProcess> processList= supervisors.iterator();
+		while (processList.hasNext()) {
+			PendingProcess p= processList.next();
+			p.cancel();
+			p.interrupt();
+		};
+		super.closeFiles();
+	}
 	//
 	public void activate2s(ChoisePoint iX, Term command, Term arguments) {
 		try {
@@ -121,7 +137,8 @@ public abstract class Application extends Alpha {
 					processCounter++;
 					accountableProceses.add(p);
 					long domainSignature= entry_s_End_1_i();
-					PendingProcess supervisor= new PendingProcess(this,p,domainSignature);
+					PendingProcess supervisor= new PendingProcess(this,p,domainSignature,supervisors);
+					supervisors.add(supervisor);
 					supervisor.start();
 				}
 			} else {
@@ -147,9 +164,10 @@ public abstract class Application extends Alpha {
 		} else {
 			if (Desktop.isDesktopSupported()) {
 				Desktop desktop= Desktop.getDesktop();
-				boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+				boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 				if (URL_Utils.isLocalResource(arguments,backslashIsSeparator)) {
 					try {
+						arguments= FileUtils.replaceBackslashes(arguments,backslashIsSeparator);
 						java.io.File file= new java.io.File(arguments);
 						if (file.exists()) {
 							desktop.open(file);
@@ -217,11 +235,14 @@ class PendingProcess extends Thread {
 	protected Application targetWorld;
 	protected Process observedProcess;
 	protected long domainSignature;
+	protected HashSet<PendingProcess> supervisors;
+	protected AtomicBoolean isActual= new AtomicBoolean(true);
 	//
-	public PendingProcess(Application target, Process process, long signature) {
+	public PendingProcess(Application target, Process process, long signature, HashSet<PendingProcess> supervisorList) {
 		targetWorld= target;
 		observedProcess= process;
 		domainSignature= signature;
+		supervisors= supervisorList;
 	}
 	//
 	public void run() {
@@ -232,7 +253,14 @@ class PendingProcess extends Thread {
 		} catch (InterruptedException e) {
 			arguments[0]= new PrologSymbol(SymbolCodes.symbolCode_E_interrupted_exception);
 		};
-		AsyncCall item= new AsyncCall(domainSignature,targetWorld,true,true,arguments,true);
-		targetWorld.receiveAsyncCall(item);
+		supervisors.remove(this);
+		if (isActual.get()) {
+			AsyncCall item= new AsyncCall(domainSignature,targetWorld,true,true,arguments,true);
+			targetWorld.receiveAsyncCall(item);
+		}
+	}
+	//
+	public void cancel() {
+		isActual.set(false);
 	}
 }

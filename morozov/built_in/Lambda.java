@@ -24,7 +24,7 @@ public abstract class Lambda extends AbstractWorld {
 	}
 	//
 	public void alarm1s(ChoisePoint iX, Term exceptionName) throws Backtracking {
-		throw new Backtracking();
+		throw Backtracking.instance;
 	}
 	//
 	public class Alarm1s extends Continuation {
@@ -32,7 +32,7 @@ public abstract class Lambda extends AbstractWorld {
 		}
 		//
 		public void execute(ChoisePoint iX) throws Backtracking {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 }

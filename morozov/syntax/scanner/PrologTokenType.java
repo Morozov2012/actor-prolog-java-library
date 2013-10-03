@@ -2,6 +2,8 @@
 
 package morozov.syntax.scanner;
 
+import morozov.syntax.scanner.signals.*;
+
 public enum PrologTokenType {
 	END_OF_TEXT {
 		String toText() {
@@ -10,32 +12,32 @@ public enum PrologTokenType {
 	},
 	REST_OF_TEXT {
 		String toText() throws TokenIsCompound {
-			throw new TokenIsCompound();
+			throw TokenIsCompound.instance;
 		}
 	},
 	INTEGER {
 		String toText() throws TokenIsCompound {
-			throw new TokenIsCompound();
+			throw TokenIsCompound.instance;
 		}
 	},
 	REAL {
 		String toText() throws TokenIsCompound {
-			throw new TokenIsCompound();
+			throw TokenIsCompound.instance;
 		}
 	},
 	STRING {
 		String toText() throws TokenIsCompound {
-			throw new TokenIsCompound();
+			throw TokenIsCompound.instance;
 		}
 	},
 	SYMBOL {
 		String toText() throws TokenIsCompound {
-			throw new TokenIsCompound();
+			throw TokenIsCompound.instance;
 		}
 	},
 	VARIABLE {
 		String toText() throws TokenIsCompound {
-			throw new TokenIsCompound();
+			throw TokenIsCompound.instance;
 		}
 	},
 	COMMA {

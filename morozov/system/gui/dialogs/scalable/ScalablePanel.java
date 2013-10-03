@@ -106,8 +106,8 @@ public class ScalablePanel extends JPanel {
 	public void paint(Graphics g0) {
 		if (!isTransparent) {
 			// setOpaque(true);
-			Graphics gg= g0.create();
-			try {
+			// Graphics gg= g0.create();
+			// try {
 				Graphics2D g2= (Graphics2D)g0;
 				Color bgColor= getBackground();
 				g2.setColor(bgColor);
@@ -123,9 +123,9 @@ public class ScalablePanel extends JPanel {
 						x= x + 10;
 					}
 				}
-			} finally {
-				gg.dispose();
-			}
+			// } finally {
+			//	gg.dispose();
+			// }
 		};
 		paintBorder(g0);
 		super.paintComponents(g0);

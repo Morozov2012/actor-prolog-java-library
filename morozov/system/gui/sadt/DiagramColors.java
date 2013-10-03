@@ -4,8 +4,8 @@ package morozov.system.gui.sadt;
 
 import target.*;
 
-import morozov.system.*;
 import morozov.system.gui.*;
+import morozov.system.signals.*;
 
 import java.awt.Font;
 import java.awt.Color;

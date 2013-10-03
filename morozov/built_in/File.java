@@ -2,12 +2,17 @@
 
 package morozov.built_in;
 
-import morozov.syntax.scanner.*;
+import morozov.run.*;
+import morozov.syntax.errors.*;
+import morozov.syntax.scanner.errors.*;
 import morozov.syntax.*;
 import morozov.system.*;
 import morozov.system.checker.*;
+import morozov.system.errors.*;
 import morozov.system.files.*;
+import morozov.system.files.errors.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.io.BufferedReader;
 import java.io.BufferedInputStream;
@@ -71,7 +76,12 @@ public abstract class File extends Text {
 	// abstract protected Term getBuiltInSlot_E_type();
 	abstract protected Term getBuiltInSlot_E_random_access();
 	abstract protected Term getBuiltInSlot_E_character_set();
-	abstract protected Term getBuiltInSlot_E_backslash_is_separator_always();
+	abstract protected Term getBuiltInSlot_E_backslash_always_is_separator();
+	//
+	public void closeFiles() {
+		closeFile();
+		super.closeFiles();
+	}
 	//
 	public void clear0s(ChoisePoint iX) {
 		ExtendedFileName fileName= retrieveRealFileName(iX);
@@ -107,7 +117,8 @@ public abstract class File extends Text {
 		setString(iX,fileName,inputText);
 	}
 	public void setString2s(ChoisePoint iX, Term name, Term inputText) {
-		ExtendedFileName fileName= FileUtils.termToExtendedFileName(name,iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+		ExtendedFileName fileName= FileUtils.termToExtendedFileName(name,iX,backslashIsSeparator);
 		setString(iX,fileName,inputText);
 	}
 	protected void setString(ChoisePoint iX, ExtendedFileName fileName, Term inputText) {
@@ -133,7 +144,8 @@ public abstract class File extends Text {
 	}
 	//
 	public void getString1ff(ChoisePoint iX, PrologVariable outputText, Term name) {
-		ExtendedFileName fileName= FileUtils.termToExtendedFileName(name,iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+		ExtendedFileName fileName= FileUtils.termToExtendedFileName(name,iX,backslashIsSeparator);
 		getString(iX,outputText,fileName);
 	}
 	public void getString1fs(ChoisePoint iX, PrologVariable outputText, Term name) {
@@ -145,35 +157,18 @@ public abstract class File extends Text {
 	public void getString0fs(ChoisePoint iX) {
 	}
 	protected void getString(ChoisePoint iX, PrologVariable outputText, ExtendedFileName fileName) {
-		// ExtendedFileName fileName= retrieveRealFileName(iX);
-		// try {
 		if (!fileName.isSystemFile) {
 			CharacterSet requiredCharacterSet= FileUtils.term2CharacterSet(getBuiltInSlot_E_character_set(),iX);
 			outputText.value= new PrologString(FileUtils.readLocalTextFile(fileName.textName,requiredCharacterSet));
 		} else {
 			if (fileName.systemName==SystemFileName.STDIN) {
-				// try {
 				CharacterSet requiredCharacterSet= FileUtils.term2CharacterSet(getBuiltInSlot_E_character_set(),iX);
 				String buffer= FileUtils.readStdIn(requiredCharacterSet);
-				// String buffer;
-				// if (requiredCharacterSet.isDummy()) {
-				//	DataInputStream stdin= new DataInputStream(new BufferedInputStream(System.in));
-				//	try {
-				//		buffer= stdin.readLine();
-				//	} finally {
-				//		stdin.close();
-				//	}
-				// } else {
-				//	buffer= new BufferedReader(new InputStreamReader(System.in,requiredCharacterSet.toCharSet())).readLine();
-				// };
 				if (buffer != null) {
 					outputText.value= new PrologString(buffer);
 				} else {
 					outputText.value= new PrologString("");
 				}
-				// } catch (IOException e) {
-				//	throw new FileInputOutputError(fileName.toString(),e);
-				// }
 			} else if (fileName.systemName==SystemFileName.STDOUT) {
 				throw new StandardOutputStreamDoesNotSupportThisOperation();
 			} else {
@@ -184,7 +179,8 @@ public abstract class File extends Text {
 	//
 	public void open2s(ChoisePoint iX, Term name, Term mode) {
 		// String fileName= name.getStringValue(iX);
-		ExtendedFileName fileName= FileUtils.termToExtendedFileName(name,iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+		ExtendedFileName fileName= FileUtils.termToExtendedFileName(name,iX,backslashIsSeparator);
 		FileAccessMode requiredMode= FileUtils.termToFileAccessMode(mode,iX);
 		boolean requiredRandomAccessMode= Converters.term2OnOff(getBuiltInSlot_E_random_access(),iX);
 		CharacterSet requiredCharacterSet= FileUtils.term2CharacterSet(getBuiltInSlot_E_character_set(),iX);
@@ -513,14 +509,14 @@ public abstract class File extends Text {
 							if (value >= 0) {
 								return value;
 							} else {
-								throw new Backtracking();
+								throw Backtracking.instance;
 							}
 						} else if (currentMode==FileAccessMode.MODIFYING) {
 							int value= randomAccessFile.read();
 							if (value >= 0) {
 								return value;
 							} else {
-								throw new Backtracking();
+								throw Backtracking.instance;
 							}
 						} else {
 							throw new FileIsNotInReadingMode();
@@ -530,7 +526,7 @@ public abstract class File extends Text {
 						if (value >= 0) {
 							return value;
 						} else {
-							throw new Backtracking();
+							throw Backtracking.instance;
 						}
 					}
 				} else {
@@ -545,7 +541,7 @@ public abstract class File extends Text {
 						if (value >= 0) {
 							return value;
 						} else {
-							throw new Backtracking();
+							throw Backtracking.instance;
 						}
 					} else if (currentFileName.systemName==SystemFileName.STDOUT) {
 						throw new StandardOutputStreamDoesNotSupportThisOperation();
@@ -583,14 +579,14 @@ public abstract class File extends Text {
 							if (value != null) {
 								return value;
 							} else {
-								throw new Backtracking();
+								throw Backtracking.instance;
 							}
 						} else if (currentMode==FileAccessMode.MODIFYING) {
 							String value= randomAccessFile.readLine();
 							if (value != null) {
 								return value;
 							} else {
-								throw new Backtracking();
+								throw Backtracking.instance;
 							}
 						} else {
 							throw new FileIsNotInReadingMode();
@@ -600,7 +596,7 @@ public abstract class File extends Text {
 						if (value != null) {
 							return value;
 						} else {
-							throw new Backtracking();
+							throw Backtracking.instance;
 						}
 					}
 				} else {
@@ -615,7 +611,7 @@ public abstract class File extends Text {
 						if (value != null) {
 							return value;
 						} else {
-							throw new Backtracking();
+							throw Backtracking.instance;
 						}
 					} else if (currentFileName.systemName==SystemFileName.STDOUT) {
 						throw new StandardOutputStreamDoesNotSupportThisOperation();
@@ -644,7 +640,7 @@ public abstract class File extends Text {
 		try {
 			String text= readLine();
 			if (text==null) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			};
 			Parser parser= new Parser(true);
 			try {
@@ -652,20 +648,20 @@ public abstract class File extends Text {
 				if (terms.length==1) {
 					return terms[0];
 				} else {
-					throw new Backtracking();
+					throw Backtracking.instance;
 				}
 			} catch (LexicalScannerError e) {
 				long errorPosition= e.getPosition();
 				recentErrorText= text;
 				recentErrorPosition= errorPosition;
 				recentErrorException= e;
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} catch (ParserError e) {
 				long errorPosition= e.getPosition();
 				recentErrorText= text;
 				recentErrorPosition= errorPosition;
 				recentErrorException= e;
-				throw new Backtracking();
+				throw Backtracking.instance;
 			}
 		} catch (RuntimeException e) {
 			if (recentErrorException==null) {
@@ -688,7 +684,7 @@ public abstract class File extends Text {
 		try {
 			String text= readLine();
 			if (text==null) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			};
 			Parser parser= new Parser(true);
 			try {
@@ -699,13 +695,13 @@ public abstract class File extends Text {
 				recentErrorText= text;
 				recentErrorPosition= errorPosition;
 				recentErrorException= e;
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} catch (ParserError e) {
 				long errorPosition= e.getPosition();
 				recentErrorText= text;
 				recentErrorPosition= errorPosition;
 				recentErrorException= e;
-				throw new Backtracking();
+				throw Backtracking.instance;
 			}
 		} catch (RuntimeException e) {
 			if (recentErrorException==null) {
@@ -726,7 +722,7 @@ public abstract class File extends Text {
 			iX.pushTrail(a3);
 			iX.pushTrail(a4);
 		} else {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	public void recentReadingError3s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3) throws Backtracking {
@@ -738,7 +734,7 @@ public abstract class File extends Text {
 			iX.pushTrail(a2);
 			iX.pushTrail(a3);
 		} else {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
@@ -824,11 +820,11 @@ public abstract class File extends Text {
 							} else {
 								endOfBufferedReader(bufferedReader);
 							}
-							// throw new Backtracking();
+							// throw Backtracking.instance;
 						} else if (currentMode==FileAccessMode.WRITING) {
-							// throw new Backtracking();
+							// throw Backtracking.instance;
 						} else if (currentMode==FileAccessMode.APPENDING) {
-							// throw new Backtracking();
+							// throw Backtracking.instance;
 						} else if (currentMode==FileAccessMode.MODIFYING) {
 							endOfRandomAccessFile();
 						}
@@ -844,9 +840,9 @@ public abstract class File extends Text {
 							endOfBufferedReader(bufferedReader);
 						}
 					// } else {
-					//	throw new Backtracking();
+					//	throw Backtracking.instance;
 					}
-					// throw new Backtracking();
+					// throw Backtracking.instance;
 				}
 			} catch (java.io.IOException e) {
 				throw new InputOutputError(e);
@@ -861,13 +857,13 @@ public abstract class File extends Text {
 			try {
 				int c= stream.read();
 				if (c != -1) {
-					throw new Backtracking();
+					throw Backtracking.instance;
 				}
 			} finally {
 				stream.reset();
 			}
 		} else {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	protected void endOfBufferedReader(BufferedReader reader) throws Backtracking, IOException {
@@ -876,20 +872,20 @@ public abstract class File extends Text {
 			try {
 				int c= reader.read();
 				if (c != -1) {
-					throw new Backtracking();
+					throw Backtracking.instance;
 				}
 			} finally {
 				reader.reset();
 			}
 		} else {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	protected void endOfRandomAccessFile() throws Backtracking, IOException {
 		long position= randomAccessFile.getFilePointer();
 		long length= randomAccessFile.length();
 		if (length >= position + 1) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
@@ -973,7 +969,7 @@ public abstract class File extends Text {
 			ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
 			doesExist(fileName);
 		} catch (Throwable e) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	public void doesExist0s(ChoisePoint iX) throws Backtracking {
@@ -981,20 +977,15 @@ public abstract class File extends Text {
 			ExtendedFileName fileName= retrieveRealFileName(iX);
 			doesExist(fileName);
 		} catch (Throwable e) {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	protected void doesExist(ExtendedFileName fileName) throws Backtracking {
 		if (!fileName.isSystemFile) {
 			Path path= fileSystem.getPath(fileName.textName);
-			// if (!path.exists()) {
 			if (!Files.exists(path)) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			}
-			// java.io.File file= new java.io.File(fileName.textName);
-			// if (!file.exists()) {
-			//	throw new Backtracking();
-			// }
 		}
 	}
 	//
@@ -1013,13 +1004,13 @@ public abstract class File extends Text {
 				// BasicFileAttributes bfa= Attributes.readBasicFileAttributes(path);
 				BasicFileAttributes bfa= Files.readAttributes(path,BasicFileAttributes.class);
 				if (!bfa.isDirectory()) {
-					throw new Backtracking();
+					throw Backtracking.instance;
 				}
 			} catch (IOException e) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			}
 		} else {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
@@ -1044,7 +1035,7 @@ public abstract class File extends Text {
 					!file.canWrite() ||
 					!file.canExecute() ||
 					file.isDirectory() ) {
-					throw new Backtracking();
+					throw Backtracking.instance;
 				} else {
 					// path.checkAccess(AccessMode.READ);
 					// path.checkAccess(AccessMode.WRITE);
@@ -1053,19 +1044,19 @@ public abstract class File extends Text {
 					// if (	bfa.isDirectory() ||
 					BasicFileAttributes bfa= Files.readAttributes(file.toPath(),BasicFileAttributes.class);
 					if (	!bfa.isRegularFile()) {
-						throw new Backtracking();
+						throw Backtracking.instance;
 					}
 				}
 			} catch (UnsupportedOperationException e) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} catch (NoSuchFileException e) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} catch (AccessDeniedException e) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} catch (IOException e) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} catch (SecurityException e) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			}
 		}
 	}
@@ -1085,15 +1076,15 @@ public abstract class File extends Text {
 				// DosFileAttributes da= Attributes.readDosFileAttributes(path);
 				DosFileAttributes da= Files.readAttributes(path,DosFileAttributes.class);
 				if (!da.isArchive()) {
-					throw new Backtracking();
+					throw Backtracking.instance;
 				}
 			} catch (UnsupportedOperationException e) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} catch (IOException e) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			}
 		} else {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
@@ -1111,13 +1102,13 @@ public abstract class File extends Text {
 			java.io.File file= new java.io.File(fileName.textName);
 			// try {
 				if (!file.isHidden()) {
-					throw new Backtracking();
+					throw Backtracking.instance;
 				}
 			// } catch (IOException e) {
-			//	throw new Backtracking();
+			//	throw Backtracking.instance;
 			// }
 		} else {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
@@ -1133,27 +1124,27 @@ public abstract class File extends Text {
 		if (!fileName.isSystemFile) {
 			java.io.File file= new java.io.File(fileName.textName);
 			if (!file.exists() || file.canWrite()) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			}
 		//	Path path= fileSystem.getPath(fileName.textName);
 		//	try {
 		//		if (path.notExists()) {
-		//			throw new Backtracking();
+		//			throw Backtracking.instance;
 		//		} else {
 		//			path.checkAccess(AccessMode.WRITE);
 		//		}
 		//	} catch (UnsupportedOperationException e) {
-		//		throw new Backtracking();
+		//		throw Backtracking.instance;
 		//	} catch (NoSuchFileException e) {
-		//		throw new Backtracking();
+		//		throw Backtracking.instance;
 		//	} catch (AccessDeniedException e) {
-		//		throw new Backtracking();
+		//		throw Backtracking.instance;
 		//	} catch (IOException e) {
-		//		throw new Backtracking();
+		//		throw Backtracking.instance;
 		//	}
 		} else {
 			if (fileName.systemName != SystemFileName.STDIN) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			}
 		}
 	}
@@ -1173,15 +1164,15 @@ public abstract class File extends Text {
 				// DosFileAttributes da= Attributes.readDosFileAttributes(path);
 				DosFileAttributes da= Files.readAttributes(path,DosFileAttributes.class);
 				if (!da.isSystem()) {
-					throw new Backtracking();
+					throw Backtracking.instance;
 				}
 			} catch (UnsupportedOperationException e) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			} catch (IOException e) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			}
 		} else {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
@@ -1459,7 +1450,7 @@ public abstract class File extends Text {
 	}
 	protected Term listDirectory(String mask) {
 		List<Path> list= FileUtils.listSourceFiles(currentDirectory,mask);
-		Term result= new PrologEmptyList();
+		Term result= PrologEmptyList.instance;
 		for (int n=list.size()-1; n >= 0; n--) {
 			result= new PrologList(new PrologString(list.get(n).toString()),result);
 		};
@@ -1484,14 +1475,14 @@ public abstract class File extends Text {
 	//
 	public void getURL1ff(ChoisePoint iX, PrologVariable a1, Term name) {
 		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		a1.value= getURL(fileName,backslashIsSeparator);
 	}
 	public void getURL1fs(ChoisePoint iX, Term name) {
 	}
 	public void getURL0ff(ChoisePoint iX, PrologVariable a1) {
 		ExtendedFileName fileName= retrieveRealFileName(iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		a1.value= getURL(fileName,backslashIsSeparator);
 	}
 	public void getURL0fs(ChoisePoint iX) {
@@ -1515,12 +1506,12 @@ public abstract class File extends Text {
 	//
 	protected void extractFileName(ChoisePoint iX, ExtendedFileName fileName, PrologVariable a1, PrologVariable a2) {
 		if (!fileName.isSystemFile) {
-			boolean backslashIsSeparatorAlways= Converters.term2YesNo(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 			String fullName= fileName.textName;
 			int p1= fullName.lastIndexOf(':');
 			int p2= fullName.lastIndexOf('/');
 			p1= StrictMath.max(p1,p2);
-			if (backslashIsSeparatorAlways || java.io.File.separatorChar=='\\') {
+			if (backslashIsSeparator) {
 				p2= fullName.lastIndexOf('\\');
 				p1= StrictMath.max(p1,p2);
 			};
@@ -1545,28 +1536,6 @@ public abstract class File extends Text {
 			iX.pushTrail(a1);
 			iX.pushTrail(a2);
 		}
-		// if (!fileName.isSystemFile) {
-		//	Path totalPath= fileSystem.getPath(fileName.textName);
-		//	Path parent= totalPath.getParent();
-		//	// Path name= totalPath.getName();
-		//	Path name= totalPath.getName(totalPath.getNameCount()-1);
-		//	String shortName= name.toString();
-		//	String parentName;
-		//	if (parent != null) {
-		//		parentName= parent.toString();
-		//	} else {
-		//		parentName= "";
-		//	};
-		//	a1.value= new PrologString(parentName);
-		//	a2.value= new PrologString(shortName);
-		//	iX.pushTrail(a1);
-		//	iX.pushTrail(a2);
-		// } else {
-		//	a1.value= new PrologString("");
-		//	a2.value= fileName.toTerm();
-		//	iX.pushTrail(a1);
-		//	iX.pushTrail(a2);
-		// }
 	}
 	//
 	public void extractExtension3s(ChoisePoint iX, Term a1, PrologVariable a2, PrologVariable a3) {
@@ -1579,7 +1548,7 @@ public abstract class File extends Text {
 	}
 	protected void extractFileExtension(ChoisePoint iX, ExtendedFileName fileName, PrologVariable a1, PrologVariable a2) {
 		if (!fileName.isSystemFile) {
-			boolean backslashIsSeparatorAlways= Converters.term2YesNo(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 			String fullName= fileName.textName;
 			int p1= fullName.lastIndexOf('.');
 			if (p1 >= 0) {
@@ -1594,7 +1563,7 @@ public abstract class File extends Text {
 					if (p2 >= 0) {
 						name= fullName;
 						extension= "";
-					} else if (backslashIsSeparatorAlways || java.io.File.separatorChar=='\\') {
+					} else if (backslashIsSeparator) {
 						p2= extension.indexOf('\\');
 						if (p2 >= 0) {
 							name= fullName;
@@ -1626,7 +1595,7 @@ public abstract class File extends Text {
 		ExtendedFileName fileName= retrieveRelativeFileName(a1,iX);
 		try {
 			String newExtension= a2.getStringValue(iX);
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 			result.value= replaceFileExtension(fileName,newExtension,backslashIsSeparator);
 		} catch (TermIsNotAString e) {
 			throw new WrongArgumentIsNotAString(a2);
@@ -1638,7 +1607,7 @@ public abstract class File extends Text {
 		ExtendedFileName fileName= retrieveRelativeFileName(iX);
 		try {
 			String newExtension= a1.getStringValue(iX);
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 			result.value= replaceFileExtension(fileName,newExtension,backslashIsSeparator);
 		} catch (TermIsNotAString e) {
 			throw new WrongArgumentIsNotAString(a1);
@@ -1656,40 +1625,46 @@ public abstract class File extends Text {
 	}
 	//
 	protected ExtendedFileName retrieveRelativeFileName(Term name, ChoisePoint iX) {
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		try {
 			String textName= name.getStringValue(iX);
+			textName= FileUtils.replaceBackslashes(textName,backslashIsSeparator);
 			// textName= appendExtensionIfNecessary(textName,iX);
 			return new ExtendedFileName(textName);
 		} catch (TermIsNotAString e1) {
-			return FileUtils.termToExtendedFileName(name,iX);
+			return FileUtils.termToExtendedFileName(name,iX,backslashIsSeparator);
 		}
 	}
 	protected ExtendedFileName retrieveRelativeFileName(ChoisePoint iX) {
 		Term name= getBuiltInSlot_E_name();
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		try {
 			String textName= name.getStringValue(iX);
 			textName= appendExtensionIfNecessary(textName,iX);
+			textName= FileUtils.replaceBackslashes(textName,backslashIsSeparator);
 			return new ExtendedFileName(textName);
 		} catch (TermIsNotAString e1) {
-			return FileUtils.termToExtendedFileName(name,iX);
+			return FileUtils.termToExtendedFileName(name,iX,backslashIsSeparator);
 		}
 	}
 	protected ExtendedFileName retrieveRealFileName(Term name, ChoisePoint iX) {
 		return retrieveRealFileName(name,true,iX);
 	}
 	protected ExtendedFileName retrieveRealFileName(Term name, boolean appendExtension, ChoisePoint iX) {
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		try {
 			String textName= name.getStringValue(iX);
 			if (appendExtension) {
 				textName= appendExtensionIfNecessary(textName,iX);
 			};
+			textName= FileUtils.replaceBackslashes(textName,backslashIsSeparator);
 			if (currentDirectory==null) {
 				return new ExtendedFileName(FileUtils.makeRealName(textName));
 			} else {
 				return new ExtendedFileName(FileUtils.makeRealName(currentDirectory,textName));
 			}
 		} catch (TermIsNotAString e1) {
-			return FileUtils.termToExtendedFileName(name,iX);
+			return FileUtils.termToExtendedFileName(name,iX,backslashIsSeparator);
 		}
 	}
 	protected ExtendedFileName retrieveRealFileName(ChoisePoint iX) {
@@ -1697,18 +1672,20 @@ public abstract class File extends Text {
 	}
 	protected ExtendedFileName retrieveRealFileName(boolean appendExtension, ChoisePoint iX) {
 		Term name= getBuiltInSlot_E_name();
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		try {
 			String textName= name.getStringValue(iX);
 			if (appendExtension) {
 				textName= appendExtensionIfNecessary(textName,iX);
 			};
+			textName= FileUtils.replaceBackslashes(textName,backslashIsSeparator);
 			if (currentDirectory==null) {
 				return new ExtendedFileName(FileUtils.makeRealName(textName));
 			} else {
 				return new ExtendedFileName(FileUtils.makeRealName(currentDirectory,textName));
 			}
 		} catch (TermIsNotAString e1) {
-			return FileUtils.termToExtendedFileName(name,iX);
+			return FileUtils.termToExtendedFileName(name,iX,backslashIsSeparator);
 		}
 	}
 	protected String appendExtensionIfNecessary(String textName, ChoisePoint iX) {

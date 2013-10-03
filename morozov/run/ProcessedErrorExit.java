@@ -14,6 +14,10 @@ public class ProcessedErrorExit extends ErrorExit {
 		continuation= c;
 	}
 	//
+	public boolean isNormalTerminationOfTheProgram() {
+		return processedException.isNormalTerminationOfTheProgram();
+	}
+	//
 	public Term createTerm() {
 		return processedException.createTerm();
 	}

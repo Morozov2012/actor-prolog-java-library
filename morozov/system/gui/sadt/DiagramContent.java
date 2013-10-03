@@ -4,7 +4,8 @@ package morozov.system.gui.sadt;
 
 import target.*;
 
-import java.awt.Graphics;
+import morozov.system.gui.sadt.signals.*;
+
 import java.awt.Graphics2D;
 import java.awt.Dimension;
 import java.awt.Font;
@@ -29,9 +30,11 @@ public class DiagramContent {
 		boxes= boxList;
 		paths= pathList;
 	}
-	public void draw(Graphics g0, Dimension size, DiagramColors diagramColors, Map<String,ComponentState> componentSuccess) {
-		Graphics2D g2= (Graphics2D)g0;
-		int fontSize= adjustFont(g0,size,diagramColors);
+	public void draw(Graphics2D g2, Dimension size, DiagramColors diagramColors, Map<String,ComponentState> componentSuccess) {
+		// Graphics2D g2= (Graphics2D)g0;
+		// DesktopUtils.setRenderingHints(g2);
+		//
+		int fontSize= adjustFont(g2,size,diagramColors);
 		//
 		Color backgroundDrawingColor= Color.WHITE;
 		Color hatchColor= null;
@@ -56,13 +59,13 @@ public class DiagramContent {
 			}
 		};
 		for (int n=0; n < paths.length; n++) {
-			paths[n].drawLine(g0,size);
+			paths[n].drawLine(g2,size);
 		};
 		for (int n=0; n < paths.length; n++) {
-			paths[n].drawLabel(g0,size,diagramColors);
+			paths[n].drawLabel(g2,size,diagramColors);
 		};
 		for (int n=0; n < boxes.length; n++) {
-			boxes[n].draw(g0,size,componentSuccess,diagramColors,fontSize);
+			boxes[n].draw(g2,size,componentSuccess,diagramColors,fontSize);
 		}
 	}
 	public long getInnerBlock(Point point, Dimension size) throws NoBlockIsPointed {
@@ -71,12 +74,12 @@ public class DiagramContent {
 				return boxes[n].number;
 			}
 		};
-		throw new NoBlockIsPointed();
+		throw NoBlockIsPointed.instance;
 	}
 	//
-	private int adjustFont(Graphics g0, Dimension size, DiagramColors diagramColors) {
-		g0.setFont(diagramColors.initialFont);
-		if (fontHasAppropriateSize(g0,size,diagramColors.initialFont)) {
+	private int adjustFont(Graphics2D g2, Dimension size, DiagramColors diagramColors) {
+		g2.setFont(diagramColors.initialFont);
+		if (fontHasAppropriateSize(g2,size,diagramColors.initialFont)) {
 			// System.out.printf("return diagramColors.fontSize=%s\n",diagramColors.fontSize);
 			return diagramColors.fontSize;
 		} else {
@@ -88,10 +91,10 @@ public class DiagramContent {
 					break;
 				};
 				DiagramBox currentBox= boxes[n];
-				if (currentBox.fontSizeIsSuitable(currentFont,g0,size)) {
+				if (currentBox.fontSizeIsSuitable(currentFont,g2,size)) {
 					continue;
 				} else {
-					if (currentBox.fontSizeIsSuitable(diagramColors.minimalFont,g0,size)) {
+					if (currentBox.fontSizeIsSuitable(diagramColors.minimalFont,g2,size)) {
 						Font lowerFont= diagramColors.minimalFont;
 						int lowerFontSize= diagramColors.minimalFontSize;
 						int upperFontSize= currentFontSize;
@@ -103,9 +106,9 @@ public class DiagramContent {
 								break;
 							};
 							if (upperFontSize > lowerFontSize + 1) {
-								int newFontSize= (upperFontSize + lowerFontSize) / 2;
+								int newFontSize= (int)StrictMath.round((upperFontSize + lowerFontSize) / 2);
 								Font newFont= DiagramUtils.computeFont(diagramColors,newFontSize);
-								if (currentBox.fontSizeIsSuitable(newFont,g0,size)) {
+								if (currentBox.fontSizeIsSuitable(newFont,g2,size)) {
 									lowerFont= newFont;
 									lowerFontSize= newFontSize;
 								} else {
@@ -123,14 +126,14 @@ public class DiagramContent {
 					}
 				}
 			};
-			g0.setFont(currentFont);
+			g2.setFont(currentFont);
 			return currentFontSize;
 		}
 	}
 	//
-	private boolean fontHasAppropriateSize(Graphics g0, Dimension size, Font font) {
+	private boolean fontHasAppropriateSize(Graphics2D g2, Dimension size, Font font) {
 		for (int n=0; n < boxes.length; n++) {
-			if(!boxes[n].fontSizeIsSuitable(font,g0,size)) {
+			if(!boxes[n].fontSizeIsSuitable(font,g2,size)) {
 				return false;
 			}
 		};

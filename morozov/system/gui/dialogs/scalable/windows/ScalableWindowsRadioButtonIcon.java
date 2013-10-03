@@ -8,11 +8,16 @@ package morozov.system.gui.dialogs.scalable.windows;
 
 import morozov.system.gui.dialogs.scalable.common.*;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.UIManager;
+import javax.swing.ButtonModel;
+import javax.swing.JToggleButton;
+import java.awt.Graphics2D;
+import java.awt.Color;
+import java.awt.Component;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Arc2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.RenderingHints;
 
 /*
  * ScalableWindowsRadioButtonIcon implementation for the Actor Prolog language
@@ -29,9 +34,11 @@ public class ScalableWindowsRadioButtonIcon extends ScalableToggleButtonIcon {
 		return 2;
 	}
 	//
-	protected void drawEye(JToggleButton tb, Graphics g0, int x, int y, int controlSize) {
+	protected void drawEye(JToggleButton tb, Graphics2D g2, int x, int y, int controlSize) {
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+		// g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 		ButtonModel model= tb.getModel();
-		Graphics2D g2= (Graphics2D)g0;
+		// Graphics2D g2= (Graphics2D)g0;
 		Color controlHighlight= UIManager.getColor("RadioButton.light");
 		Color controlLightHighlight= UIManager.getColor("RadioButton.highlight");
 		Color controlShadow= UIManager.getColor("RadioButton.shadow");
@@ -74,45 +81,45 @@ public class ScalableWindowsRadioButtonIcon extends ScalableToggleButtonIcon {
 		g2.draw(new Ellipse2D.Double(x+2,y+2,controlSize-5,controlSize-5));
 	}
 	//
-	protected void drawMarker(JToggleButton tb, Graphics g, int x, int y, int controlSize) {
+	protected void drawMarker(JToggleButton tb, Graphics2D g2, int x, int y, int controlSize) {
 		ButtonModel model1= tb.getModel();
 		if (model1 instanceof ScalableToggleButtonModel) {
 			ScalableToggleButtonModel model2= (ScalableToggleButtonModel)model1;
 			if(model2.isUncertain()) {
 				if (model2.isEnabled()) {
-					drawUncertainMarker(tb,g,x,y,controlSize,failureBackgroundColor);
+					drawUncertainMarker(tb,g2,x,y,controlSize,failureBackgroundColor);
 				} else {
-					drawUncertainMarker(tb,g,x,y,controlSize,UIManager.getColor("RadioButton.shadow"));
+					drawUncertainMarker(tb,g2,x,y,controlSize,UIManager.getColor("RadioButton.shadow"));
 				}
 			} else if(model2.isSelected()) {
 				if (model2.isEnabled()) {
-					drawCheck(tb,g,x,y,controlSize,UIManager.getColor("RadioButton.foreground"));
+					drawCheck(tb,g2,x,y,controlSize,UIManager.getColor("RadioButton.foreground"));
 				} else {
-					drawCheck(tb,g,x,y,controlSize,UIManager.getColor("RadioButton.shadow"));
+					drawCheck(tb,g2,x,y,controlSize,UIManager.getColor("RadioButton.shadow"));
 				}
 			}
 		} else {
 			if(model1.isSelected()) {
 				if (model1.isEnabled()) {
-					drawCheck(tb,g,x,y,controlSize,UIManager.getColor("RadioButton.foreground"));
+					drawCheck(tb,g2,x,y,controlSize,UIManager.getColor("RadioButton.foreground"));
 				} else {
-					drawCheck(tb,g,x,y,controlSize,UIManager.getColor("RadioButton.shadow"));
+					drawCheck(tb,g2,x,y,controlSize,UIManager.getColor("RadioButton.shadow"));
 				}
 			}
 		}
 	}
 	//
-	protected void drawCheck(Component relatedComponent, Graphics g, int x, int y, int controlSize, Color markerColor) {
-		drawColoredMarker(relatedComponent,g,x,y,controlSize,markerColor);
+	protected void drawCheck(Component relatedComponent, Graphics2D g2, int x, int y, int controlSize, Color markerColor) {
+		drawColoredMarker(relatedComponent,g2,x,y,controlSize,markerColor);
 	}
 	//
-	protected void drawUncertainMarker(Component relatedComponent, Graphics g, int x, int y, int controlSize, Color markerColor) {
-		drawColoredMarker(relatedComponent,g,x,y,controlSize,markerColor);
+	protected void drawUncertainMarker(Component relatedComponent, Graphics2D g2, int x, int y, int controlSize, Color markerColor) {
+		drawColoredMarker(relatedComponent,g2,x,y,controlSize,markerColor);
 	}
 	//
-	protected void drawColoredMarker(Component relatedComponent, Graphics g, int x, int y, int controlSize, Color markerColor) {
+	protected void drawColoredMarker(Component relatedComponent, Graphics2D g2, int x, int y, int controlSize, Color markerColor) {
 		float diameter= (float) ((controlSize - 4) * 0.41);
-		Graphics2D g2= (Graphics2D)g;
+		// Graphics2D g2= (Graphics2D)g;
 		int deltaW= (int)StrictMath.round((controlSize - diameter)/2);
 		int doubleDeltaW= deltaW * 2;
 		int deltaH= (int)StrictMath.round((controlSize - diameter)/2);

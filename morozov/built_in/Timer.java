@@ -4,15 +4,17 @@ package morozov.built_in;
 
 import target.*;
 
-import morozov.system.*;
 import morozov.classes.*;
+import morozov.system.*;
+import morozov.system.errors.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
 import morozov.run.*;
 
-import java.math.BigInteger;
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.util.*;
+import java.util.Calendar;
+import java.util.TimerTask;
 
 public abstract class Timer extends Alpha {
 	//
@@ -26,6 +28,21 @@ public abstract class Timer extends Alpha {
 	// private static final BigInteger constant_MinLong= BigInteger.valueOf(Long.MIN_VALUE);
 	//
 	public abstract long entry_s_Tick_0();
+	//
+	public void closeFiles() {
+		closeTimer();
+		super.closeFiles();
+	}
+	protected void closeTimer() {
+		if (scheduler != null) {
+			if (currentTask != null) {
+				currentTask.cancel();
+				scheduler.purge();
+				currentProcess.cancelTimerMessage(this);
+				currentTask= null;
+			}
+		}
+	}
 	//
 	public void activate0s(ChoisePoint iX) {
 		if (currentTask==null) {
@@ -56,6 +73,7 @@ public abstract class Timer extends Alpha {
 			scheduler.schedule(new LocalTask(currentProcess,this),delay);
 		} else {
 			currentTask.cancel();
+			scheduler.purge();
 			currentProcess.cancelTimerMessage(this);
 			currentTask= new LocalTask(currentProcess,this);
 			if (isRepeatedAction) {
@@ -86,6 +104,7 @@ public abstract class Timer extends Alpha {
 			if (scheduler != null) {
 				if (currentTask != null) {
 					currentTask.cancel();
+					scheduler.purge();
 					currentTask= new LocalTask(currentProcess,this);
 					long correctedPeriod= currentPeriod;
 					// long correctedFirstDelay= currentFirstDelay;
@@ -106,17 +125,11 @@ public abstract class Timer extends Alpha {
 	}
 	//
 	public void suspend0s(ChoisePoint iX) {
-		if (scheduler != null) {
-			if (currentTask != null) {
-				currentTask.cancel();
-				currentProcess.cancelTimerMessage(this);
-				currentTask= null;
-			}
-		}
+		closeTimer();
 	}
 	//
 	public void tick0s(ChoisePoint iX) {
-        }
+	}
 	//
 	public class Tick0s extends Continuation {
 		// private Continuation c0;
@@ -178,6 +191,16 @@ public abstract class Timer extends Alpha {
 		// iX.pushTrail(argument);
 	}
 	public static void time0fs(ChoisePoint iX) {
+	}
+	//
+	public static void milliseconds0ff(ChoisePoint iX, PrologVariable argument) {
+		// Calendar calendar= new GregorianCalendar();
+		Calendar calendar= Calendar.getInstance();
+		long milliseconds= calendar.getTimeInMillis();
+		argument.value= new PrologInteger(milliseconds);
+		// iX.pushTrail(argument);
+	}
+	public static void milliseconds0fs(ChoisePoint iX) {
 	}
 	//
 	public static void date4s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3, PrologVariable a4) {
@@ -255,6 +278,21 @@ public abstract class Timer extends Alpha {
 			throw new WrongArgumentIsNotTimeInterval(n1);
 		} catch (InterruptedException e2) {
 		}
+	}
+	//
+	public void setPriority1s(ChoisePoint iX, Term n1) {
+		try {
+			int priority= Converters.termToProcessPriority(n1,iX);
+			currentProcess.thread.setPriority(priority);
+		} catch (TermIsNotProcessPriority e) {
+			throw new WrongArgumentIsNotProcessPriority(n1);
+		}
+	}
+	//
+	public void getPriority0ff(ChoisePoint iX, PrologVariable n1) {
+		n1.value= new PrologInteger(currentProcess.thread.getPriority());
+	}
+	public void getPriority0fs(ChoisePoint iX) {
 	}
 }
 

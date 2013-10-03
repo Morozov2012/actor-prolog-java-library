@@ -1,8 +1,12 @@
 // (c) 2010 IRE RAS Alexei A. Morozov
-package morozov.domains;
 
+package morozov.domains;
+
+import morozov.run.*;
 import morozov.terms.*;
-public class DomainRealRange extends DomainAlternative {
+import morozov.terms.signals.*;
+
+public class DomainRealRange extends DomainAlternative {
 	protected double leftBound;
 	protected double rightBound;
 	public DomainRealRange(double left, double right) {

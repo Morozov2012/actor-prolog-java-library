@@ -20,7 +20,7 @@ public class ScalableTableColumnDescription {
 	public TextAlignment horizontalAlignment;
 	public Term foregroundColor;
 	public Term backgroundColor;
-	public ScalableTableColumnDescription(String text, double size, TextAlignment hAlign, Term foreground, Term background) {
+	public ScalableTableColumnDescription(String text, int size, TextAlignment hAlign, Term foreground, Term background) {
 		name= text;
 		width= size;
 		horizontalAlignment= hAlign;

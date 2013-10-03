@@ -2,6 +2,9 @@
 
 package morozov.terms;
 
+import morozov.run.*;
+import morozov.terms.errors.*;
+
 import java.nio.charset.CharsetEncoder;
 
 public class ArgumentNumber extends Term {
@@ -30,11 +33,11 @@ public class ArgumentNumber extends Term {
 	}
 	public void isArityEqualTo(long v, ChoisePoint cp) throws Backtracking {
 		if (value != v)
-			throw new Backtracking();
+			throw Backtracking.instance;
 	}
 	public void isArityMoreOrEqualTo(long v, ChoisePoint cp) throws Backtracking {
 		if (value < v)
-			throw new Backtracking();
+			throw Backtracking.instance;
 	}
 	// public void verifyListOfRestValues(long deltaN, Term list, ChoisePoint cp) {
 	//	System.out.printf("long deltaN=%s, counter=%s; list=%s\n",deltaN,value,list);

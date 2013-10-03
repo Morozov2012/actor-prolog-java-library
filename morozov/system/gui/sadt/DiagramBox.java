@@ -4,7 +4,8 @@ package morozov.system.gui.sadt;
 
 import target.*;
 
-import java.awt.Graphics;
+import morozov.system.gui.sadt.signals.*;
+
 import java.awt.Graphics2D;
 import java.awt.Dimension;
 import java.awt.geom.Rectangle2D;
@@ -59,8 +60,9 @@ public class DiagramBox {
 			}
 		}
 	}
-	public void draw(Graphics g0, Dimension size, Map<String,ComponentState> componentSuccess, DiagramColors diagramColors, int fontSize) {
-		Graphics2D g2= (Graphics2D)g0;
+	public void draw(Graphics2D g2, Dimension size, Map<String,ComponentState> componentSuccess, DiagramColors diagramColors, int fontSize) {
+		// Graphics2D g2= (Graphics2D)g0;
+		// DesktopUtils.setRenderingHints(g2);
 		double x= StrictMath.round(size.width * x1);
 		double y= StrictMath.round(size.height * y2);
 		double boxWidth= StrictMath.round(size.width * (x2-x1));
@@ -143,8 +145,8 @@ public class DiagramBox {
 		DiagramUtils.drawText(g2,x,y,boxWidth,boxHeight,boxText);
 	}
 	//
-	public boolean fontSizeIsSuitable(Font font, Graphics g0, Dimension size) {
-		Graphics2D g2= (Graphics2D)g0;
+	public boolean fontSizeIsSuitable(Font font, Graphics2D g2, Dimension size) {
+		// Graphics2D g2= (Graphics2D)g0;
 		//
 		double boxWidth= StrictMath.round(size.width * (x2-x1));
 		double boxHeight= StrictMath.round(size.height * (y1-y2));

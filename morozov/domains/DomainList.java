@@ -2,7 +2,10 @@
 
 package morozov.domains;
 
+import morozov.domains.signals.*;
+import morozov.run.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 public class DomainList extends MonoArgumentDomainItem {
 	public DomainList(String entry) {
@@ -11,7 +14,7 @@ public class DomainList extends MonoArgumentDomainItem {
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
 		initiateDomainItemIfNecessary();
 		Term nextHead;
-		Term currentTail= t;  // t.dereferenceValue(cp);
+		Term currentTail= t; // t.dereferenceValue(cp);
 		try {
 			while (true) {
 				currentTail= currentTail.dereferenceValue(cp);
@@ -39,7 +42,7 @@ public class DomainList extends MonoArgumentDomainItem {
 				domainItem.checkAndOptimizeTerm(t.getNextListHead(cp),cp),
 				baseDomain.checkAndOptimizeTerm(t.getNextListTail(cp),cp));
 		} catch (EndOfList e) {
-			return new PrologEmptyList();
+			return PrologEmptyList.instance;
 		} catch (TermIsNotAList e) {
 			throw new DomainAlternativeDoesNotCoverTerm(t.getPosition());
 		}
@@ -52,7 +55,7 @@ public class DomainList extends MonoArgumentDomainItem {
 				domainItem.checkTerm(t.getNextListHead(cp),cp),
 				baseDomain.checkTerm(t.getNextListTail(cp),cp));
 		} catch (EndOfList e) {
-			return new PrologEmptyList();
+			return PrologEmptyList.instance;
 		} catch (TermIsNotAList e) {
 			throw new DomainAlternativeDoesNotCoverTerm(t.getPosition());
 		}

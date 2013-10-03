@@ -1,8 +1,11 @@
 // (c) 2010 IRE RAS Alexei A. Morozov
-package morozov.domains;
 
+package morozov.domains;
+
+import morozov.run.*;
 import morozov.terms.*;
-public class DomainWorld extends DomainAlternative {
+
+public class DomainWorld extends DomainAlternative {
 	protected long constantCode;
 	public DomainWorld(long code) {
 		constantCode= code;

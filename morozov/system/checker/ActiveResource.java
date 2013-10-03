@@ -3,6 +3,7 @@
 package morozov.system.checker;
 
 import morozov.classes.*;
+import morozov.classes.errors.*;
 import morozov.run.*;
 import morozov.terms.*;
 

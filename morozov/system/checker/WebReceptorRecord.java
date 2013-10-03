@@ -3,7 +3,7 @@
 package morozov.system.checker;
 
 import morozov.classes.*;
-import morozov.terms.*;
+import morozov.run.*;
 
 import java.math.BigDecimal;
 
@@ -32,7 +32,7 @@ public class WebReceptorRecord extends PredefinedClassRecord {
 					boolean ok= attributes.connectionWasSuccessful();
 					if (r.attributes.connectionWasSuccessful()==ok) {
 						// if (	( ok && r.revisionPeriod.equals(revisionPeriod) ) ||
-						// 	( !ok && r.attemptPeriod.equals(attemptPeriod) ) ) {
+						//	( !ok && r.attemptPeriod.equals(attemptPeriod) ) ) {
 						if (ok) {
 							if (r.revisionPeriod.compareTo(revisionPeriod)==0) {
 								return true;

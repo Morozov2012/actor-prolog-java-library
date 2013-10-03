@@ -6,7 +6,7 @@ import morozov.terms.*;
 
 public class FailureTermination extends Continuation {
 	public void execute(ChoisePoint iX) throws Backtracking {
-		throw new Backtracking();
+		throw Backtracking.instance;
 	}
 	public String toString() {
 		return "FailureTermination;";

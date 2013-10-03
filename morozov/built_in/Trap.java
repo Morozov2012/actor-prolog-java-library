@@ -5,6 +5,7 @@ package morozov.built_in;
 import target.*;
 
 import morozov.run.*;
+import morozov.run.errors.*;
 import morozov.terms.*;
 
 public abstract class Trap extends Lambda {
@@ -51,7 +52,8 @@ public abstract class Trap extends Lambda {
 				targetArguments[i+1]= args[i];
 			}
 		} else {
-			targetArguments= (Term[])args;
+			// targetArguments= (Term[])args;
+			targetArguments= args;
 		};
 		Continuation c1= new DomainSwitch(c0,worldDomainSignatureNumber,targetWorld,Trap.this,targetArguments);
 		ChoisePoint newIndex= new ChoisePoint(iX);
@@ -91,28 +93,28 @@ public abstract class Trap extends Lambda {
 			alarmArguments[1]= new PrologSymbol(predicateNameCode);
 			if (subgoalIsCallOfFunction) {
 				for(int i= 1; i < args.length; i++) {
-					 alarmArguments[i+1]= args[i];
+					alarmArguments[i+1]= args[i];
 				}
 			} else {
 				for(int i= 0; i < args.length; i++) {
-					 alarmArguments[i+2]= args[i];
+					alarmArguments[i+2]= args[i];
 				}
 			};
 			Continuation c2= new DomainSwitch(success,handlerDomainSignatureNumber,targetWorld,Trap.this,alarmArguments);
 			c2.execute(newIndex);
 			// newIndex.freeTrail();
-			// throw new Backtracking();
+			// throw Backtracking.instance;
 		} catch (Backtracking b) {
 			// newIndex.freeTrail();
 			throw new ProcessedErrorExit(ee,c0);
 			// throw ee;
-			// throw new Backtracking();
+			// throw Backtracking.instance;
 		} catch (ErrorExit e2) {
 			throw new ProcessedErrorExit(e2,c0);
 		} catch (Throwable e2) {
 			throw new ProcessedErrorExit(new LowLevelErrorExit(newIndex,e2),c0);
 		};
-		throw new Backtracking();
+		throw Backtracking.instance;
 	}
 	//
 	public long domainSignatureOfSubgoal_1_InClause_1(long predicateSignatureNumber) {

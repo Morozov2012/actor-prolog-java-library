@@ -2,11 +2,9 @@
 
 package morozov.system.gui;
 
-import morozov.terms.*;
+import morozov.system.gui.signals.*;
 
 public class ExtendedSize {
-	//
-	public class UseDefaultSize extends LightweightException {}
 	//
 	private boolean useDefaultSize= true;
 	private double value= 0;
@@ -30,7 +28,7 @@ public class ExtendedSize {
 	}
 	public double getValue() throws UseDefaultSize {
 		if (useDefaultSize) {
-			throw new UseDefaultSize();
+			throw UseDefaultSize.instance;
 		} else {
 			return value;
 		}

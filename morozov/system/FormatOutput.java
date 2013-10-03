@@ -2,7 +2,10 @@
 
 package morozov.system;
 
+import morozov.run.*;
+import morozov.system.errors.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.nio.charset.CharsetEncoder;
 import java.math.BigInteger;
@@ -59,7 +62,7 @@ public class FormatOutput {
 							throw new WrongArgumentIsNotAString(extraItem);
 						};
 						formatStringIsAccepted= true;
-					};
+					}
 				};
 				break;
 			} else {
@@ -72,8 +75,8 @@ public class FormatOutput {
 						throw new WrongArgumentIsNotAString(item);
 					};
 					formatStringIsAccepted= true;
-				};
-			};
+				}
+			}
 		};
 		if (argumentTable.size() > 0) {
 			Term[] argumentArray= new Term[argumentTable.size()];

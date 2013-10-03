@@ -12,10 +12,13 @@ package morozov.system.gui.dialogs.scalable;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.run.*;
 import morozov.system.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
+import morozov.system.gui.dialogs.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.math.BigInteger;
 
@@ -33,7 +36,7 @@ public class IntegerField extends ActiveTextField {
 			BigInteger number= Converters.termToRoundInteger(value,iX,false);
 			return new PrologInteger(number);
 		} catch (TermIsNotAnInteger e) {
-			throw new RejectValue();
+			throw RejectValue.instance;
 		}
 	}
 }

@@ -2,7 +2,7 @@
 
 package morozov.system.gui.sadt;
 
-import java.awt.Graphics;
+// import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Dimension;
 import java.awt.geom.Rectangle2D;
@@ -32,16 +32,16 @@ public class DiagramPath {
 			arcs[nArcs-1].correctEndPoint(boxes);
 		}
 	}
-	public void drawLine(Graphics g0, Dimension size) {
+	public void drawLine(Graphics2D g2, Dimension size) {
 		for (int n=0; n < arcs.length; n++) {
-			arcs[n].draw(g0,size);
+			arcs[n].draw(g2,size);
 		};
 	}
-	public void drawLabel(Graphics g0, Dimension size, DiagramColors diagramColors) {
+	public void drawLabel(Graphics2D g2, Dimension size, DiagramColors diagramColors) {
 		if (x <= Double.MIN_VALUE && y <= Double.MIN_VALUE) {
 			return;
 		} else if (label.length > 0) {
-			Graphics2D g2= (Graphics2D)g0;
+			// Graphics2D g2= (Graphics2D)g0;
 			double realX= StrictMath.round(size.width * x);
 			double realY= StrictMath.round(size.height * y);
 			//
@@ -79,4 +79,4 @@ public class DiagramPath {
 			DiagramUtils.drawText(g2,textX,textY,0,0,label);
 		}
 	}
-}      	
+}

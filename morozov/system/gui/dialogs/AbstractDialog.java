@@ -7,12 +7,14 @@ import target.*;
 import morozov.built_in.*;
 import morozov.classes.*;
 import morozov.run.*;
-import morozov.system.*;
 import morozov.system.gui.*;
+import morozov.system.gui.dialogs.errors.*;
 import morozov.system.gui.dialogs.scalable.*;
+import morozov.system.gui.signals.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
-import java.math.BigInteger;
 import javax.swing.JDesktopPane;
 import javax.swing.WindowConstants;
 import javax.swing.UIManager;
@@ -22,6 +24,7 @@ import java.awt.event.ActionListener;
 import java.awt.Font;
 import java.awt.font.TextAttribute;
 import java.awt.Dimension;
+import java.awt.Rectangle;
 import java.awt.GridBagLayout;
 import java.awt.Window;
 import java.awt.event.ComponentListener;
@@ -29,10 +32,15 @@ import java.awt.event.ComponentEvent;
 import java.awt.Point;
 import java.awt.Color;
 import java.awt.Dialog.ModalityType;
+import java.beans.PropertyVetoException;
 
+import java.math.BigInteger;
 import java.lang.reflect.InvocationTargetException;
 
-import java.util.*;
+import java.util.Map;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -59,6 +67,7 @@ public abstract class AbstractDialog
 	protected StaticContext staticContext;
 	protected DialogEntry[] controlTable= new DialogEntry[0];
 	protected boolean isDraftMode= false;
+	protected AtomicBoolean insideDoLayout= new AtomicBoolean(false);
 	//
 	protected ChoisePoint modalChoisePoint= null;
 	protected BigInteger insideModalDialog= BigInteger.ZERO;
@@ -75,6 +84,8 @@ public abstract class AbstractDialog
 	protected AtomicReference<Dimension> previousActualSize= new AtomicReference<Dimension>(new Dimension(0,0));
 	// protected AtomicInteger previousActualWidth= new AtomicInteger(0);
 	// protected AtomicInteger previousActualHeight= new AtomicInteger(0);
+	//
+	public AtomicBoolean insideThePutOperation= new AtomicBoolean(false);
 	//
 	protected static final Color defaultDialogTextColor= null;
 	protected static final Color defaultDialogSpaceColor= null;
@@ -98,7 +109,7 @@ public abstract class AbstractDialog
 	protected AtomicInteger currentFontStyle= new AtomicInteger(defaultDialogFontStyle);
 	protected AtomicBoolean currentFontUnderline= new AtomicBoolean(defaultDialogFontUnderline);
 	//
-	private Map<Integer,ApprovedFont> approvedFonts= Collections.synchronizedMap(new Hashtable<Integer,ApprovedFont>());
+	private Map<Integer,ApprovedFont> approvedFonts= Collections.synchronizedMap(new HashMap<Integer,ApprovedFont>());
 	//
 	private static final int maximalNumberOfIterations= 10000;
 	//
@@ -126,7 +137,7 @@ public abstract class AbstractDialog
 		scheduler= new java.util.Timer(true);
 	}
 	//
-	protected boolean isToBeModal() {
+	public boolean isToBeModal() {
 		return false;
 	}
 	protected String getPredefinedTitle() {
@@ -211,7 +222,7 @@ public abstract class AbstractDialog
 		// boolean isSensitive= Converters.term2OnOff(sensitiveness,iX);
 		String initialTitle= null;
 		try {
-			initialTitle= DialogUtils.termToDialogTitleSafe(title,iX);
+			initialTitle= GUI_Utils.termToFrameTitleSafe(title,iX);
 		} catch (TermIsSymbolDefault e) {
 			initialTitle= getPredefinedTitle();
 		};
@@ -345,7 +356,7 @@ public abstract class AbstractDialog
 	//
 	public void positionMainPanel() {
 		if (isDisposed.get()) {
-                	acceptNewPositionOfDialog();
+			acceptNewPositionOfDialog();
 		};
 		try {
 			Point point= dialogContainer.computePosition(actualCoordinates);
@@ -353,7 +364,7 @@ public abstract class AbstractDialog
 			// previousX.set(point.x);
 			// previousY.set(point.y);
 			safelySetLocation(point);
-		} catch (ExtendedCoordinate.UseDefaultLocation e) {
+		} catch (UseDefaultLocation e) {
 			if (!dialogContainer.isShowing()) {
 				// <DEBUG:2010.08.19>
 				dialogContainer.setLocationByPlatform(true);
@@ -368,7 +379,7 @@ public abstract class AbstractDialog
 			if (actualCoordinates.get().areCentered()) {
 				positionMainPanel();
 			}
-		} catch (ExtendedCoordinate.UseDefaultLocation e) {
+		} catch (UseDefaultLocation e) {
 		}
 	}
 	public void safelySetLocation(final Point p) {
@@ -393,6 +404,10 @@ public abstract class AbstractDialog
 	}
 	//
 	public void implementPreferredSize() {
+		//
+		if (dialogContainer.isMaximum()) {
+			return;
+		};
 		//
 		Font initialFont= create_new_font();
 		setNewFont(initialFont);
@@ -443,18 +458,14 @@ public abstract class AbstractDialog
 		int numberOfUserDefinedSlots= userDefinedSlots.length;
 		int numberOfSystemSlots= systemSlots.length;
 		long numberOfEntries= userDefinedSlots.length + numberOfSystemSlots;
-		// if (numberOfEntries > Integer.MAX_VALUE) {
-		//	throw new IntegerValueIsTooBig();
-		// } else {
-			controlTable= new DialogEntry[PrologInteger.toInteger(numberOfEntries)];
-			for (int n=0; n < numberOfUserDefinedSlots; n++) {
-				controlTable[n]= userDefinedSlots[n];
-			};
-			for (int n=0; n < numberOfSystemSlots; n++) {
-				controlTable[numberOfUserDefinedSlots+n]= systemSlots[n];
-			};
-			specialProcess.registerPortsAndRecoverPortValues(dialog,targetWorld,userDefinedSlots,systemSlots);
-		// }
+		controlTable= new DialogEntry[PrologInteger.toInteger(numberOfEntries)];
+		for (int n=0; n < numberOfUserDefinedSlots; n++) {
+			controlTable[n]= userDefinedSlots[n];
+		};
+		for (int n=0; n < numberOfSystemSlots; n++) {
+			controlTable[numberOfUserDefinedSlots+n]= systemSlots[n];
+		};
+		specialProcess.registerPortsAndRecoverPortValues(dialog,targetWorld,userDefinedSlots,systemSlots);
 	}
 	//
 	public void start() {
@@ -479,7 +490,7 @@ public abstract class AbstractDialog
 	}
 	public void addAndDisplay(JDesktopPane desktop, ChoisePoint iX) {
 		// insideModalDialog.incrementAndGet();
-		// <DEBUG:2010.08.19> 
+		// <DEBUG:2010.08.19>
 		// StaticDesktopAttributes staticAttributes= DesktopUtils.retrieveStaticDesktopAttributes(staticContext);
 		// staticAttributes.desktop.add(this,JLayeredPane.MODAL_LAYER);
 		dialogContainer.setClosable(true);
@@ -511,7 +522,7 @@ public abstract class AbstractDialog
 	}
 	//
 	public void receiveInitiatingMessage() {
-		specialProcess.receiveUserInterfaceMessage(null);
+		specialProcess.receiveUserInterfaceMessage(null,true,DialogEventType.NONE);
 	}
 	//
 	public void safelyDisplay(final JDesktopPane desktop, final ChoisePoint iX) {
@@ -590,6 +601,45 @@ public abstract class AbstractDialog
 	}
 	public void setInvisible() {
 		dialogContainer.setVisible(false);
+	}
+	//
+	public void safelyDispose() {
+		if (SwingUtilities.isEventDispatchThread()) {
+			dispose();
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						dispose();
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	public void dispose() {
+		dialogContainer.dispose();
+	}
+	//
+	public void safelyMaximize() {
+		dialogContainer.safelyMaximize();
+	}
+	public void safelyMinimize() {
+		dialogContainer.safelyMinimize();
+	}
+	public void safelyRestore() {
+		dialogContainer.safelyRestore();
+	}
+	//
+	public boolean safelyIsMaximized() {
+		return dialogContainer.safelyIsMaximized();
+	}
+	public boolean safelyIsMinimized() {
+		return dialogContainer.safelyIsMinimized();
+	}
+	public boolean safelyIsRestored() {
+		return dialogContainer.safelyIsRestored();
 	}
 	//
 	protected void defineDefaultButton() {
@@ -704,7 +754,7 @@ public abstract class AbstractDialog
 	public void putFieldValue(Term identifier, Term fieldValue, ChoisePoint iX) {
 		fieldValue= fieldValue.dereferenceValue(iX);
 		if (fieldValue.thisIsFreeVariable()) {	// || fieldValue.thisIsUnknownValue()) {
-			// throw new Backtracking();
+			// throw Backtracking.instance;
 			return;
 		};
 		try {
@@ -715,7 +765,7 @@ public abstract class AbstractDialog
 				if (entry.isSlotName) {
 					if (entry.name.equals(slotName)) {
 						entry.putValue(fieldValue,iX);
-						specialProcess.receiveUserInterfaceMessage(entry);
+						specialProcess.receiveUserInterfaceMessage(entry,true,DialogEventType.NONE);
 						return;
 					}
 				}
@@ -725,10 +775,10 @@ public abstract class AbstractDialog
 			try {
 				long number= identifier.getSmallIntegerValue(iX);
 				for (int i= 0; i < controlTable.length; i++) {
-					DialogEntry e= controlTable[i];
-					if (!e.isSlotName && e.isNumericCode) {
-						if (e.code==number) {
-							e.putValue(fieldValue,iX);
+					DialogEntry entry= controlTable[i];
+					if (!entry.isSlotName && entry.isNumericCode) {
+						if (entry.code==number) {
+							entry.putValue(fieldValue,iX);
 							return;
 						}
 					}
@@ -738,10 +788,10 @@ public abstract class AbstractDialog
 				try {
 					String name= identifier.getStringValue(iX);
 					for (int i= 0; i < controlTable.length; i++) {
-						DialogEntry e= controlTable[i];
-						if (!e.isSlotName && !e.isNumericCode) {
-							if (e.name.equals(name)) {
-								e.putValue(fieldValue,iX);
+						DialogEntry entry= controlTable[i];
+						if (!entry.isSlotName && !entry.isNumericCode) {
+							if (entry.name.equals(name)) {
+								entry.putValue(fieldValue,iX);
 								return;
 							}
 						}
@@ -754,19 +804,31 @@ public abstract class AbstractDialog
 		}
 	}
 	public void reportValueUpdate(ActiveComponent currentComponent) {
-		boolean sendDialogValues= false;
+		boolean entryIsFound= false;
+		boolean sendFlowMessage= false;
 		DialogEntry entry= null;
 		for (int i= 0; i < controlTable.length; i++) {
 			entry= controlTable[i];
-			if (entry.isSlotName) {
-				if (entry.component==currentComponent && entry.entryType==DialogEntryType.VALUE) {
-					sendDialogValues= true;
-					break;
-				}
+			if (entry.component==currentComponent && entry.entryType==DialogEntryType.VALUE) {
+				entryIsFound= true;
+				if (entry.isSlotName) {
+					sendFlowMessage= true;
+				};
+				break;
 			}
 		};
-		if (sendDialogValues) {
-			specialProcess.receiveUserInterfaceMessage(entry);
+		if (entryIsFound) {
+			if (sendFlowMessage) {
+				if (!insideThePutOperation.get()) {
+					specialProcess.receiveUserInterfaceMessage(entry,true,DialogEventType.MODIFIED_CONTROL);
+				} else {
+					specialProcess.receiveUserInterfaceMessage(entry,true,DialogEventType.NONE);
+				}
+			} else {
+				if (!insideThePutOperation.get()) {
+					specialProcess.receiveUserInterfaceMessage(entry,false,DialogEventType.MODIFIED_CONTROL);
+				}
+			}
 		}
 	}
 	public void transmitEntryValue(DialogEntry entry, ChoisePoint iX) {
@@ -811,6 +873,47 @@ public abstract class AbstractDialog
 		specialProcess.freeTrail();
 	}
 	//
+	public void sendCreatedControlMessage(DialogEntry entry, ChoisePoint iX) {
+		if (entry!=null) {
+			Term predicateArgument= entry.toTerm();
+			Term[] arguments= new Term[]{predicateArgument};
+			long domainSignature= targetWorld.entry_s_CreatedControl_1_i();
+			if (isToBeModal()) {
+				ChoisePoint newIx= new ChoisePoint(modalChoisePoint);
+				Continuation c1= new DomainSwitch(new SuccessTermination(),domainSignature,targetWorld,targetWorld,arguments);
+				try {
+					c1.execute(newIx);
+				} catch (Backtracking b) {
+				};
+				newIx.freeTrail();
+			} else {
+				AsyncCall call= null;
+				call= new AsyncCall(domainSignature,targetWorld,true,true,arguments,true);
+				targetWorld.receiveAsyncCall(call);
+			}
+		}
+	}
+	public void sendModifiedControlMessage(DialogEntry entry, ChoisePoint iX) {
+		if (entry!=null) {
+			Term predicateArgument= entry.toTerm();
+			Term[] arguments= new Term[]{predicateArgument};
+			long domainSignature= targetWorld.entry_s_ModifiedControl_1_i();
+			if (isToBeModal()) {
+				ChoisePoint newIx= new ChoisePoint(modalChoisePoint);
+				Continuation c1= new DomainSwitch(new SuccessTermination(),domainSignature,targetWorld,targetWorld,arguments);
+				try {
+					c1.execute(newIx);
+				} catch (Backtracking b) {
+				};
+				newIx.freeTrail();
+			} else {
+				AsyncCall call= null;
+				call= new AsyncCall(domainSignature,targetWorld,true,true,arguments,true);
+				targetWorld.receiveAsyncCall(call);
+			}
+		}
+	}
+	//
 	// public void doLayout() {
 	//	dialogContainer.doSuperLayout();
 	// }
@@ -818,6 +921,15 @@ public abstract class AbstractDialog
 		doLayout(false);
 	}
 	public void doLayout(boolean forceCheck) {
+		if (insideDoLayout.compareAndSet(false,true)) {
+			try {
+				do_layout(forceCheck);
+			} finally {
+				insideDoLayout.set(false);
+			}
+		}
+	}
+	public void do_layout(boolean forceCheck) {
 		if (previousActualSize.get().width==0) {
 			return;
 		};
@@ -825,6 +937,9 @@ public abstract class AbstractDialog
 		dialogContainer.getSize(dimension);
 		int givenWidth= dimension.width;
 		int givenHeight= dimension.height;
+		if (givenWidth <= 0 || givenHeight <= 0) {
+			return;
+		};
 		Dimension minimumSize= dialogContainer.getRealMinimumSize();
 		int correctedGivenWidth= StrictMath.max(0,givenWidth-minimumSize.width);
 		int correctedGivenHeight= StrictMath.max(0,givenHeight-minimumSize.height);
@@ -840,7 +955,7 @@ public abstract class AbstractDialog
 			int preferredWidth= 0;
 			int preferredHeight= 0;
 			// prefLS= dialogContainer.getRealPreferredSize();
-			int maximalRefusedSize= 0;
+			double maximalRefusedSize= 0;
 			for (int i= 1; i <= maximalNumberOfIterations; i++) {
 				preferredWidth= StrictMath.max(0,prefLS.width-minimumSize.width);
 				preferredHeight= StrictMath.max(0,prefLS.height-minimumSize.height);
@@ -867,14 +982,16 @@ public abstract class AbstractDialog
 					} else {
 						maximalRefusedSize= prospectiveFontSize;
 					};
-					prospectiveFontSize= (int)StrictMath.floor((double)prospectiveFontSize * increaseCoefficient1);
+					// prospectiveFontSize= prospectiveFontSize * increaseCoefficient1;
+					prospectiveFontSize= (int)StrictMath.round(prospectiveFontSize * increaseCoefficient1);
 				} else {
-					prospectiveFontSize= (int)StrictMath.ceil((double)prospectiveFontSize * increaseCoefficient1);
+					// prospectiveFontSize= prospectiveFontSize * increaseCoefficient1;
+					prospectiveFontSize= (int)StrictMath.round(prospectiveFontSize * increaseCoefficient1);
 					if (maximalRefusedSize > 0) {
-						prospectiveFontSize= StrictMath.min(prospectiveFontSize,maximalRefusedSize-1);
+						prospectiveFontSize= (int)StrictMath.min(prospectiveFontSize,maximalRefusedSize-1);
 					}
 				};
-				prospectiveFontSize= Math.max(prospectiveFontSize,1);
+				prospectiveFontSize= StrictMath.max(prospectiveFontSize,1);
 				currentFontSize.set(prospectiveFontSize);
 				if (approvedFonts.containsKey(prospectiveFontSize)) {
 					prefLS= approvedFonts.get(prospectiveFontSize).preferredSize;
@@ -910,7 +1027,7 @@ public abstract class AbstractDialog
 		return create_new_font(currentFontName.get(),currentFontStyle.get(),currentFontUnderline.get(),currentFontSize.get());
 	}
 	protected Font create_new_font(String fontName, int fontStyle, boolean fontUnderline, int fontSize) {
-		Map<TextAttribute,Object> map= new Hashtable<TextAttribute,Object>();
+		Map<TextAttribute,Object> map= new HashMap<TextAttribute,Object>();
 		map.put(TextAttribute.FAMILY,fontName);
 		boolean isBold= (fontStyle & Font.BOLD) != 0;
 		boolean isItalic= (fontStyle & Font.ITALIC) != 0;
@@ -930,7 +1047,8 @@ public abstract class AbstractDialog
 		// map.put(TextAttribute.WIDTH,TextAttribute.WIDTH_EXTENDED);
 		// map.put(TextAttribute.WIDTH,TextAttribute.WIDTH_SEMI_EXTENDED);
 		// map.put(TextAttribute.WIDTH,TextAttribute.WIDTH_REGULAR);
-		map.put(TextAttribute.SIZE,currentFontSize.get());
+		// map.put(TextAttribute.SIZE,currentFontSize.get());
+		map.put(TextAttribute.SIZE,fontSize);
 		return new Font(map);
 	}
 	//
@@ -944,46 +1062,43 @@ public abstract class AbstractDialog
 	public void componentResized(ComponentEvent event) {
 		dialogContainer.repaintParent();
 		acceptNewPositionOfDialog();
-		specialProcess.receiveUserInterfaceMessage(findDialogEntryFontSize());
+		specialProcess.receiveUserInterfaceMessage(findDialogEntryFontSize(),true,DialogEventType.NONE);
 	}
 	public void componentShown(ComponentEvent event) {
 		// Invoked when the component has been made visible.
 	}
 	//
 	public void acceptNewPositionOfDialog() {
-		// try {
-			Dimension parentLayoutSize= dialogContainer.computeParentLayoutSize();
-			Point p= dialogContainer.getLocation();
-			Point previousPoint= previousCoordinates.get();
-			if (previousPoint==null) {
+		Rectangle parentLayoutSize= dialogContainer.computeParentLayoutSize();
+		Point p= dialogContainer.getLocation();
+		Point previousPoint= previousCoordinates.get();
+		if (previousPoint==null) {
+			double gridX= DefaultOptions.gridWidth;
+			double newX= (double)p.x / ( ((double)(parentLayoutSize.width-parentLayoutSize.x)) / gridX );
+			double gridY= DefaultOptions.gridHeight;
+			double newY= (double)p.y / ( ((double)(parentLayoutSize.height-parentLayoutSize.y)) / gridY );
+			actualCoordinates.set(new ExtendedCoordinates(newX,newY));
+			specialProcess.receiveUserInterfaceMessage(findDialogEntryX(),true,DialogEventType.NONE);
+			specialProcess.receiveUserInterfaceMessage(findDialogEntryY(),true,DialogEventType.NONE);
+		} else if (previousPoint.x!=p.x || previousPoint.y!=p.y) {
+			double newX= previousPoint.x;
+			double newY= previousPoint.y;
+			if (p.x!=previousPoint.x) {
 				double gridX= DefaultOptions.gridWidth;
-				double newX= (double)p.x / ( (double)parentLayoutSize.width / gridX );
+				newX= (double)p.x / ( (double)parentLayoutSize.width / gridX );
+			};
+			if (p.y!=previousPoint.y) {
 				double gridY= DefaultOptions.gridHeight;
-				double newY= (double)p.y / ( (double)parentLayoutSize.height / gridY );
-				actualCoordinates.set(new ExtendedCoordinates(newX,newY));
-				specialProcess.receiveUserInterfaceMessage(findDialogEntryX());
-				specialProcess.receiveUserInterfaceMessage(findDialogEntryY());
-			} else if (previousPoint.x!=p.x || previousPoint.y!=p.y) {
-				double newX= previousPoint.x;
-				double newY= previousPoint.y;
-				if (p.x!=previousPoint.x) {
-					double gridX= DefaultOptions.gridWidth;
-					newX= (double)p.x / ( (double)parentLayoutSize.width / gridX );
-				};
-				if (p.y!=previousPoint.y) {
-					double gridY= DefaultOptions.gridHeight;
-					newY= (double)p.y / ( (double)parentLayoutSize.height / gridY );
-				};
-				actualCoordinates.set(new ExtendedCoordinates(newX,newY));
-				if (p.x!=previousPoint.x) {
-					specialProcess.receiveUserInterfaceMessage(findDialogEntryX());
-				};
-				if (p.y!=previousPoint.y) {
-					specialProcess.receiveUserInterfaceMessage(findDialogEntryY());
-				}
+				newY= (double)p.y / ( (double)parentLayoutSize.height / gridY );
+			};
+			actualCoordinates.set(new ExtendedCoordinates(newX,newY));
+			if (p.x!=previousPoint.x) {
+				specialProcess.receiveUserInterfaceMessage(findDialogEntryX(),true,DialogEventType.NONE);
+			};
+			if (p.y!=previousPoint.y) {
+				specialProcess.receiveUserInterfaceMessage(findDialogEntryY(),true,DialogEventType.NONE);
 			}
-		// } catch (CannotComputeDesktopSize e) {
-		// }
+		}
 	}
 	//
 	public DialogEntry findDialogEntryX() {
@@ -1135,12 +1250,22 @@ public abstract class AbstractDialog
 		synchronized(this) {
 			if (currentTask != null) {
 				currentTask.cancel();
+				scheduler.purge();
 			};
-			currentTask= new LocalTask(this);
+			currentTask= new LocalTask(this,scheduler);
 			scheduler.schedule(currentTask,0,1);
 		}
 	}
-	public Dimension computeParentLayoutSize() {
+	public void skipDelayedRepainting() {
+		synchronized(this) {
+			if (currentTask != null) {
+				currentTask.cancel();
+				scheduler.purge();
+			};
+			currentTask= null;
+		}
+	}
+	public Rectangle computeParentLayoutSize() {
 		return dialogContainer.computeParentLayoutSize();
 	}
 	public void sendResidentRequest(Resident resident, String tableName, ChoisePoint iX) {
@@ -1163,16 +1288,19 @@ public abstract class AbstractDialog
 
 class LocalTask extends TimerTask {
 	private AbstractDialog targetDialog;
+	private java.util.Timer scheduler;
 	private AtomicInteger counter= new AtomicInteger(100);
 	//
-	public LocalTask(AbstractDialog target) {
+	public LocalTask(AbstractDialog target, java.util.Timer s) {
 		targetDialog= target;
+		scheduler= s;
 	}
 	//
 	public void run() {
 		int c= counter.getAndDecrement();
 		if (c <= 0) {
 			cancel();
+			scheduler.purge();
 		} else {
 			// targetDialog.doLayout(true);
 			targetDialog.repaint();

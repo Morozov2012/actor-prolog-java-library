@@ -2,6 +2,8 @@
 
 package morozov.syntax.scanner;
 
+import morozov.syntax.scanner.errors.*;
+
 import java.math.BigInteger;
 
 public abstract class PrologToken {

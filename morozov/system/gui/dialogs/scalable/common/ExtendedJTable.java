@@ -12,8 +12,9 @@ package morozov.system.gui.dialogs.scalable.common;
  * @author IRE RAS Alexei A. Morozov
 */
 
-import morozov.system.*;
+import morozov.run.*;
 import morozov.system.gui.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
 
 import java.awt.Font;

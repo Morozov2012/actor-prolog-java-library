@@ -4,6 +4,10 @@ package morozov.terms;
 
 import morozov.classes.*;
 import morozov.domains.*;
+import morozov.domains.signals.*;
+import morozov.run.*;
+import morozov.system.*;
+import morozov.terms.signals.*;
 
 import java.nio.charset.CharsetEncoder;
 import java.math.BigInteger;
@@ -206,9 +210,13 @@ public class TermPosition extends Term {
 		return value.internalWorld(cp);
 	}
 	//
-	public AbstractWorld world(ChoisePoint cp) {
-		return value.world(cp);
+	public Term internalWorldOrTerm(ChoisePoint cp) {
+		return value.internalWorldOrTerm(cp);
 	}
+	//
+	// public AbstractWorld world(ChoisePoint cp) {
+	//	return value.world(cp);
+	// }
 	public long[] getClassHierarchy() {
 		return value.getClassHierarchy();
 	}
@@ -297,6 +305,9 @@ public class TermPosition extends Term {
 	public Term copyValue(ChoisePoint cp, TermCircumscribingMode mode) {
 		return new TermPosition(value.copyValue(cp,mode),position);
 	}
+	public Term copyGroundValue(ChoisePoint cp) throws TermIsUnboundVariable {
+		return new TermPosition(value.copyGroundValue(cp),position);
+	}
 	public Term substituteWorlds(HashMap<AbstractWorld,Term> map, ChoisePoint cp) {
 		return new TermPosition(value.substituteWorlds(map,cp),position);
 	}
@@ -306,6 +317,118 @@ public class TermPosition extends Term {
 	}
 	public Term checkSetTerm(long functor, PrologDomain headDomain, Term initialValue, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
 		return value.checkSetTerm(functor,headDomain,initialValue,cp,baseDomain);
+	}
+	// Comparison operations
+	public void compareWithTerm(Term a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		value.compareWithTerm(a,iX,op);
+	}
+	public void compareWithBigInteger(BigInteger a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		value.compareWithBigInteger(a,iX,op);
+	}
+	public void compareWithLong(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		value.compareWithLong(a,iX,op);
+	}
+	public void compareWithDouble(double a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		value.compareWithDouble(a,iX,op);
+	}
+	public void compareWithString(String a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		value.compareWithString(a,iX,op);
+	}
+	public void compareWithDate(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		value.compareWithDate(a,iX,op);
+	}
+	public void compareTermWith(Term a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		value.compareTermWith(a,iX,op);
+	}
+	public void compareBigIntegerWith(BigInteger a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		value.compareBigIntegerWith(a,iX,op);
+	}
+	public void compareLongWith(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		value.compareLongWith(a,iX,op);
+	}
+	public void compareDoubleWith(double a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		value.compareDoubleWith(a,iX,op);
+	}
+	public void compareStringWith(String a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		value.compareStringWith(a,iX,op);
+	}
+	public void compareDateWith(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		value.compareDateWith(a,iX,op);
+	}
+	public void compareListWith(Term aHead, Term aTail, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		value.compareListWith(aHead,aTail,iX,op);
+	}
+	// Arithmetic operations
+	public Term reactWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
+		return value.reactWithTerm(a,iX,op);
+	}
+	public Term reactWithBigInteger(BigInteger a, ChoisePoint iX, BinaryOperation op) {
+		return value.reactWithBigInteger(a,iX,op);
+	}
+	public Term reactWithLong(long a, ChoisePoint iX, BinaryOperation op) {
+		return value.reactWithLong(a,iX,op);
+	}
+	public Term reactWithDouble(double a, ChoisePoint iX, BinaryOperation op) {
+		return value.reactWithDouble(a,iX,op);
+	}
+	public Term reactWithString(String a, ChoisePoint iX, BinaryOperation op) {
+		return value.reactWithString(a,iX,op);
+	}
+	public Term reactWithDate(long a, ChoisePoint iX, BinaryOperation op) {
+		return value.reactWithDate(a,iX,op);
+	}
+	public Term reactWithTime(long a, ChoisePoint iX, BinaryOperation op) {
+		return value.reactWithTime(a,iX,op);
+	}
+	public Term reactBigIntegerWith(BigInteger a, ChoisePoint iX, BinaryOperation op) {
+		return value.reactBigIntegerWith(a,iX,op);
+	}
+	public Term reactLongWith(long a, ChoisePoint iX, BinaryOperation op) {
+		return value.reactLongWith(a,iX,op);
+	}
+	public Term reactDoubleWith(double a, ChoisePoint iX, BinaryOperation op) {
+		return value.reactDoubleWith(a,iX,op);
+	}
+	public Term reactStringWith(String a, ChoisePoint iX, BinaryOperation op) {
+		return value.reactStringWith(a,iX,op);
+	}
+	public Term reactDateWith(long a, ChoisePoint iX, BinaryOperation op) {
+		return value.reactDateWith(a,iX,op);
+	}
+	public Term reactTimeWith(long a, ChoisePoint iX, BinaryOperation op) {
+		return value.reactTimeWith(a,iX,op);
+	}
+	public Term reactListWith(Term aHead, Term aTail, ChoisePoint iX, BinaryOperation op) {
+		return value.reactListWith(aHead,aTail,iX,op);
+	}
+	// Bitwise operations
+	public Term blitWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
+		return value.blitWithTerm(a,iX,op);
+	}
+	public Term blitWithBigInteger(BigInteger a, ChoisePoint iX, BinaryOperation op) {
+		return value.blitWithBigInteger(a,iX,op);
+	}
+	public Term blitWithLong(long a, ChoisePoint iX, BinaryOperation op) {
+		return value.blitWithLong(a,iX,op);
+	}
+	public Term blitWithDouble(double a, ChoisePoint iX, BinaryOperation op) {
+		return value.blitWithDouble(a,iX,op);
+	}
+	public Term blitBigIntegerWith(BigInteger a, ChoisePoint iX, BinaryOperation op) {
+		return value.blitBigIntegerWith(a,iX,op);
+	}
+	public Term blitLongWith(long a, ChoisePoint iX, BinaryOperation op) {
+		return value.blitLongWith(a,iX,op);
+	}
+	public Term blitDoubleWith(double a, ChoisePoint iX, BinaryOperation op) {
+		return value.blitDoubleWith(a,iX,op);
+	}
+	public Term blitListWith(Term aHead, Term aTail, ChoisePoint iX, BinaryOperation op) {
+		return value.blitListWith(aHead,aTail,iX,op);
+	}
+	// Unary operations
+	public Term evaluate(ChoisePoint iX, UnaryOperation op) {
+		return value.evaluate(iX,op);
 	}
 	// Converting Term to String
 	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, CharsetEncoder encoder) {

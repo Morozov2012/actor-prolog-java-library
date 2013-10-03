@@ -6,8 +6,8 @@
 
 package morozov.system.gui.dialogs.scalable.metal;
 
-import javax.swing.*;
-import javax.swing.plaf.metal.*;
+import javax.swing.UIDefaults;
+import javax.swing.plaf.metal.MetalLookAndFeel;
 
 public class ActorPrologMetalLookAndFeel extends MetalLookAndFeel {
 	static final String metalPackageName= "morozov.system.gui.dialogs.scalable.metal.";

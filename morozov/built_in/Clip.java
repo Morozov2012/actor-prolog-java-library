@@ -4,29 +4,24 @@ package morozov.built_in;
 
 import target.*;
 
-//import morozov.domains.*;
-//import morozov.run.*;
+import morozov.run.*;
 import morozov.system.*;
 import morozov.system.checker.*;
+import morozov.system.checker.signals.*;
+import morozov.system.errors.*;
 import morozov.system.files.*;
-//import morozov.system.records.*;
-//import morozov.syntax.*;
-//import morozov.syntax.scanner.*;
+import morozov.system.files.errors.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.AudioInputStream;
-// import javax.sound.sampled.Clip;
-// import java.io.File;
 import java.io.InputStream;
-// import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.sound.sampled.LineUnavailableException;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.lang.Thread;
-import java.lang.InterruptedException;
 import java.net.URI;
 
 import java.math.BigInteger;
@@ -40,7 +35,14 @@ public abstract class Clip extends Alpha {
 	abstract protected Term getBuiltInSlot_E_name();
 	abstract protected Term getBuiltInSlot_E_extension();
 	abstract protected Term getBuiltInSlot_E_max_waiting_time();
-	abstract protected Term getBuiltInSlot_E_backslash_is_separator_always();
+	abstract protected Term getBuiltInSlot_E_backslash_always_is_separator();
+	//
+	public void closeFiles() {
+		if (commonClip != null) {
+			commonClip.close();
+		};
+		super.closeFiles();
+	}
 	//
 	public void open1s(ChoisePoint iX, Term name) {
 		URI uri= retrieveLocationURI(name,iX);
@@ -76,19 +78,15 @@ public abstract class Clip extends Alpha {
 	}
 	//
 	public void loop1s(ChoisePoint iX, Term value) {
-		try {
-			BigInteger number= Converters.termToRoundInteger(value,iX,false);
-			int count= PrologInteger.toInteger(number);
-			if (count < 0) {
-				count= javax.sound.sampled.Clip.LOOP_CONTINUOUSLY;
-			};
-			if (commonClip != null) {
-				commonClip.loop(count);
-			} else {
-				throw new ClipIsNotOpen();
-			}
-		} catch (TermIsNotAnInteger e) {
-			throw new WrongArgumentIsNotAnInteger(value);
+		BigInteger number= Converters.argumentToRoundInteger(value,iX);
+		int count= PrologInteger.toInteger(number);
+		if (count < 0) {
+			count= javax.sound.sampled.Clip.LOOP_CONTINUOUSLY;
+		};
+		if (commonClip != null) {
+			commonClip.loop(count);
+		} else {
+			throw new ClipIsNotOpen();
 		}
 	}
 	//
@@ -116,7 +114,7 @@ public abstract class Clip extends Alpha {
 	}
 	protected javax.sound.sampled.Clip openContent(URI uri, ChoisePoint iX, boolean useCommonClip) {
 		int timeout= retrieveMaxWaitingTime(iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		InputStream stream;
 		try {
 			byte[] array= URL_Utils.getContentOfResource(uri,null,timeout,staticContext,backslashIsSeparator);
@@ -215,80 +213,64 @@ public abstract class Clip extends Alpha {
 	}
 	//
 	public void setFramePosition1s(ChoisePoint iX, Term value) {
-		try {
-			BigInteger number= Converters.termToRoundInteger(value,iX,false);
-			int frames= PrologInteger.toInteger(number);
-			if (commonClip != null) {
-				commonClip.setFramePosition(frames);
-			} else {
-				throw new ClipIsNotOpen();
-			}
-		} catch (TermIsNotAnInteger e) {
-			throw new WrongArgumentIsNotAnInteger(value);
+		BigInteger number= Converters.argumentToRoundInteger(value,iX);
+		int frames= PrologInteger.toInteger(number);
+		if (commonClip != null) {
+			commonClip.setFramePosition(frames);
+		} else {
+			throw new ClipIsNotOpen();
 		}
 	}
 	//
 	public void setMicrosecondPosition1s(ChoisePoint iX, Term value) {
-		try {
-			BigInteger number= Converters.termToRoundInteger(value,iX,false);
-			long microseconds= PrologInteger.toLong(number);
-			if (commonClip != null) {
-				commonClip.setMicrosecondPosition(microseconds);
-			} else {
-				throw new ClipIsNotOpen();
-			}
-		} catch (TermIsNotAnInteger e) {
-			throw new WrongArgumentIsNotAnInteger(value);
+		BigInteger number= Converters.argumentToRoundInteger(value,iX);
+		long microseconds= PrologInteger.toLong(number);
+		if (commonClip != null) {
+			commonClip.setMicrosecondPosition(microseconds);
+		} else {
+			throw new ClipIsNotOpen();
 		}
 	}
 	//
 	public void setLoopPoints2s(ChoisePoint iX, Term a1, Term a2) {
-		try {
-			BigInteger number1= Converters.termToRoundInteger(a1,iX,false);
-			try {
-				BigInteger number2= Converters.termToRoundInteger(a2,iX,false);
-				int start= PrologInteger.toInteger(number1);
-				int end= PrologInteger.toInteger(number2);
-				if (commonClip != null) {
-					commonClip.setLoopPoints(start,end);
-				} else {
-					throw new ClipIsNotOpen();
-				}
-			} catch (TermIsNotAnInteger e) {
-				throw new WrongArgumentIsNotAnInteger(a2);
-			}
-		} catch (TermIsNotAnInteger e) {
-			throw new WrongArgumentIsNotAnInteger(a1);
+		BigInteger number1= Converters.argumentToRoundInteger(a1,iX);
+		BigInteger number2= Converters.argumentToRoundInteger(a2,iX);
+		int start= PrologInteger.toInteger(number1);
+		int end= PrologInteger.toInteger(number2);
+		if (commonClip != null) {
+			commonClip.setLoopPoints(start,end);
+		} else {
+			throw new ClipIsNotOpen();
 		}
 	}
 	//
 	public void isOpen0s(ChoisePoint iX) throws Backtracking {
 		if (commonClip != null) {
 			if (!commonClip.isOpen()) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			}
 		} else {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
 	public void isActive0s(ChoisePoint iX) throws Backtracking {
 		if (commonClip != null) {
 			if (!commonClip.isActive()) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			}
 		} else {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
 	public void isRunning0s(ChoisePoint iX) throws Backtracking {
 		if (commonClip != null) {
 			if (!commonClip.isRunning()) {
-				throw new Backtracking();
+				throw Backtracking.instance;
 			}
 		} else {
-			throw new Backtracking();
+			throw Backtracking.instance;
 		}
 	}
 	//
@@ -300,7 +282,7 @@ public abstract class Clip extends Alpha {
 		try {
 			String textName= name.getStringValue(iX);
 			textName= appendExtensionIfNecessary(textName,iX);
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_is_separator_always(),iX);
+			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 			// System.out.printf("textName=>>>%s<<<\n",textName);
 			URI uri= URL_Utils.create_URI(textName,staticContext,backslashIsSeparator);
 			return uri;
