@@ -145,4 +145,39 @@ public class ScalableButtonGroup extends ActiveComponent {
 			}
 		}
 	}
+	//
+	public void setIsEnabled(boolean mode) {
+		if (buttonGroup!=null) {
+			Enumeration<AbstractButton> buttons= buttonGroup.getElements();
+			while (buttons.hasMoreElements()) {
+				AbstractButton currentButton= buttons.nextElement();
+				currentButton.setEnabled(mode);
+			}
+		}
+	}
+	//
+	public boolean isEnabled(boolean mode) {
+		if (buttonGroup!=null) {
+			Enumeration<AbstractButton> buttons= buttonGroup.getElements();
+			if (mode) {
+				while (buttons.hasMoreElements()) {
+					AbstractButton currentButton= buttons.nextElement();
+					if (!currentButton.isEnabled()) {
+						return false;
+					}
+				};
+				return true;
+			} else {
+				while (buttons.hasMoreElements()) {
+					AbstractButton currentButton= buttons.nextElement();
+					if (currentButton.isEnabled()) {
+						return false;
+					}
+				};
+				return true;
+			}
+		} else {
+			return false;
+		}
+	}
 }

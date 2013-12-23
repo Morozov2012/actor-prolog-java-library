@@ -6,6 +6,9 @@ import target.*;
 
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.checker.*;
+import morozov.system.checker.errors.*;
+import morozov.system.errors.*;
 import morozov.system.files.*;
 import morozov.system.files.errors.*;
 import morozov.system.gui.*;
@@ -18,6 +21,13 @@ import morozov.terms.signals.*;
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.awt.GraphicsConfiguration;
+import java.net.URI;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.FileSystem;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.DirectoryNotEmptyException;
 
 public abstract class BufferedImage extends ImageConsumer {
 	//
@@ -29,6 +39,10 @@ public abstract class BufferedImage extends ImageConsumer {
 	protected static final Term symbolDefault= new PrologSymbol(SymbolCodes.symbolCode_E_default);
 	protected static final Term noValue= new PrologInteger(-1);
 	//
+	protected static final FileSystem fileSystem= FileSystems.getDefault();
+	//
+	abstract protected Term getBuiltInSlot_E_name();
+	abstract protected Term getBuiltInSlot_E_extension();
 	abstract protected Term getBuiltInSlot_E_width();
 	abstract protected Term getBuiltInSlot_E_height();
 	abstract protected Term getBuiltInSlot_E_image_type();
@@ -107,6 +121,9 @@ public abstract class BufferedImage extends ImageConsumer {
 		};
 		return bufferedImage;
 	}
+	public void setImage(java.awt.image.BufferedImage image) {
+		bufferedImage= image;
+	}
 	//
 	public void getSize2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
 		if (bufferedImage != null) {
@@ -153,13 +170,16 @@ public abstract class BufferedImage extends ImageConsumer {
 		bufferedImage.setRGB(x,y,color);
 	}
 	//
+	public void save0s(ChoisePoint iX) {
+		String fileName= retrieveFileName(iX);
+		saveContent(fileName,null,iX);
+	}
 	public void save1s(ChoisePoint iX, Term a1) {
 		String fileName= retrieveFileName(a1,iX);
 		saveContent(fileName,null,iX);
 	}
 	public void save2s(ChoisePoint iX, Term a1, Term a2) {
 		String fileName= retrieveFileName(a1,iX);
-		// System.out.printf("(1) %s\n",fileName);
 		saveContent(fileName,a2,iX);
 	}
 	protected void saveContent(String fileName, Term attributes, ChoisePoint iX) {
@@ -170,18 +190,179 @@ public abstract class BufferedImage extends ImageConsumer {
 		Tools2D.write(fileName,backslashIsSeparator,bufferedImage,attributes,iX);
 	}
 	//
+	public void load0s(ChoisePoint iX) {
+		URI uri= retrieveLocationURI(iX);
+		bufferedImage= readImage(uri,iX);
+	}
 	public void load1s(ChoisePoint iX, Term a1) {
 		bufferedImage= readImage(a1,iX);
 	}
 	//
-	protected String retrieveFileName(Term name, ChoisePoint iX) {
+	public void doesExist0s(ChoisePoint iX) throws Backtracking {
+		try {
+			URI uri= retrieveLocationURI(iX);
+			doesExist(uri,iX);
+		} catch (Throwable e) {
+			throw Backtracking.instance;
+		}
+	}
+	public void doesExist1s(ChoisePoint iX, Term name) throws Backtracking {
+		try {
+			URI uri= retrieveLocationURI(name,iX);
+			doesExist(uri,iX);
+		} catch (Throwable e) {
+			throw Backtracking.instance;
+		}
+	}
+	protected void doesExist(URI uri, ChoisePoint iX) throws Backtracking {
+		CharacterSet characterSet= new CharacterSet(CharacterSetType.DEFAULT);
+		int timeout= retrieveMaxWaitingTime(iX);
 		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		try {
+			URL_Utils.installCookieManagerIfNecessary(staticContext);
+			URL_Attributes attributes= URL_Utils.getResourceAttributes(uri,characterSet,timeout,staticContext,backslashIsSeparator);
+			if (!attributes.connectionWasSuccessful()) {
+				throw Backtracking.instance;
+			}
+		} catch (Throwable e1) {
+			throw Backtracking.instance;
+		}
+	}
+	//
+	public void isLocalResource0s(ChoisePoint iX) throws Backtracking {
+		String fileName= retrieveFileName(iX);
+		isLocalResource(fileName,iX);
+	}
+	public void isLocalResource1s(ChoisePoint iX, Term a1) throws Backtracking {
+		String fileName= retrieveFileName(a1,iX);
+		isLocalResource(fileName,iX);
+	}
+	protected void isLocalResource(String fileName, ChoisePoint iX) throws Backtracking {
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+		if (!URL_Utils.isLocalResource(fileName,backslashIsSeparator)) {
+			throw Backtracking.instance;
+		}
+	}
+	//
+	public void getFullName0ff(ChoisePoint iX, PrologVariable a1) {
+		String resolvedName= getFullName(iX);
+		a1.value= new PrologString(resolvedName);
+	}
+	public void getFullName0fs(ChoisePoint iX) {
+	}
+	public void getFullName1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
+		String resolvedName= getFullName(iX,a2);
+		a1.value= new PrologString(resolvedName);
+	}
+	public void getFullName1fs(ChoisePoint iX, Term a1) {
+	}
+	protected String getFullName(ChoisePoint iX) {
+		String location= retrieveLocationString(iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+		return URL_Utils.getFullName(location,staticContext,backslashIsSeparator);
+	}
+	protected String getFullName(ChoisePoint iX, Term a1) {
+		try {
+			String fileName= a1.getStringValue(iX);
+			fileName= appendExtensionIfNecessary(fileName,iX);
+			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+			return URL_Utils.getFullName(fileName,staticContext,backslashIsSeparator);
+		} catch (TermIsNotAString e1) {
+			throw new WrongArgumentIsNotAString(a1);
+		}
+	}
+	//
+	public void getURL0ff(ChoisePoint iX, PrologVariable a1) {
+		String resolvedName= getFullName(iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+		a1.value= new PrologString(URL_Utils.get_URL_string(resolvedName,staticContext,backslashIsSeparator));
+	}
+	public void getURL0fs(ChoisePoint iX) {
+	}
+	public void getURL1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
+		String resolvedName= getFullName(iX,a2);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+		a1.value= new PrologString(URL_Utils.get_URL_string(resolvedName,staticContext,backslashIsSeparator));
+	}
+	public void getURL1fs(ChoisePoint iX, Term a1) {
+	}
+	//
+	public void delete0s(ChoisePoint iX) {
+		String fileName= retrieveFileName(iX);
+		deleteFile(fileName);
+	}
+	public void delete1s(ChoisePoint iX, Term name) {
+		String fileName= retrieveFileName(name,iX);
+		deleteFile(fileName);
+	}
+	protected void deleteFile(String fileName) {
+		Path path= fileSystem.getPath(fileName);
+		try {
+			Files.deleteIfExists(path);
+		} catch (DirectoryNotEmptyException e) {
+		} catch (IOException e) {
+		}
+	}
+	//
+	protected String retrieveFileName(ChoisePoint iX) {
+		Term name= getBuiltInSlot_E_name();
+		try {
 			String textName= name.getStringValue(iX);
+			textName= appendExtensionIfNecessary(textName,iX);
+			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 			textName= FileUtils.replaceBackslashes(textName,backslashIsSeparator);
 			return FileUtils.makeRealName(textName);
 		} catch (TermIsNotAString e) {
 			throw new WrongTermIsNotFileName(name);
 		}
+	}
+	protected String retrieveFileName(Term name, ChoisePoint iX) {
+		try {
+			String textName= name.getStringValue(iX);
+			textName= appendExtensionIfNecessary(textName,iX);
+			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+			textName= FileUtils.replaceBackslashes(textName,backslashIsSeparator);
+			return FileUtils.makeRealName(textName);
+		} catch (TermIsNotAString e) {
+			throw new WrongTermIsNotFileName(name);
+		}
+	}
+	protected URI retrieveLocationURI(ChoisePoint iX) {
+		Term name= getBuiltInSlot_E_name();
+		return retrieveLocationURI(name,iX);
+	}
+	protected URI retrieveLocationURI(Term name, ChoisePoint iX) {
+		try {
+			String textName= name.getStringValue(iX);
+			textName= appendExtensionIfNecessary(textName,iX);
+			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+			URI uri= URL_Utils.create_URI(textName,staticContext,backslashIsSeparator);
+			return uri;
+		} catch (TermIsNotAString e) {
+			throw new WrongArgumentIsNotAString(name);
+		}
+	}
+	protected String retrieveLocationString(ChoisePoint iX) {
+		Term location= getBuiltInSlot_E_name();
+		try {
+			String textName= location.getStringValue(iX);
+			textName= appendExtensionIfNecessary(textName,iX);
+			return textName;
+		} catch (TermIsNotAString e) {
+			throw new WrongArgumentIsNotAString(location);
+		}
+	}
+	protected String appendExtensionIfNecessary(String textName, ChoisePoint iX) {
+		if (textName.indexOf('.') == -1) {
+			Term extension= getBuiltInSlot_E_extension();
+			String textExtension= null;
+			try {
+				textExtension= extension.getStringValue(iX);
+			} catch (TermIsNotAString e2) {
+				throw new WrongArgumentIsNotAString(extension);
+			};
+			textName= textName + textExtension;
+		};
+		return textName;
 	}
 }

@@ -65,6 +65,7 @@ public abstract class Canvas2D extends ImageConsumer {
 	protected List<Java2DCommand> actualCommands= Collections.synchronizedList(new ArrayList<Java2DCommand>());
 	protected List<Java2DCommand> retractedCommands= Collections.synchronizedList(new ArrayList<Java2DCommand>());
 	protected boolean implementDelayedCleaning= false;
+	protected boolean suspendRedrawing= false;
 	//
 	protected AtomicReference<Canvas2DScalingFactor> scalingFactor= new AtomicReference<Canvas2DScalingFactor>(Canvas2DScalingFactor.INDEPENDENT);
 	protected Canvas2DScalingFactor redefinedScalingFactor= null;
@@ -107,7 +108,6 @@ public abstract class Canvas2D extends ImageConsumer {
 			actualCommands.clear();
 			retractedCommands.clear();
 			implementDelayedCleaning= false;
-			// recentDrawingModeIsXOR= false;
 		};
 		repaintAfterDelay(iX);
 		show0s(iX);
@@ -157,9 +157,9 @@ public abstract class Canvas2D extends ImageConsumer {
 	}
 	//
 	public void hide0s(ChoisePoint iX) {
-		if (desktopDoesNotExist()) {
-			return;
-		} else if (space2DDoesNotExist()) {
+		// if (desktopDoesNotExist()) {
+		//	return;
+		if (space2DDoesNotExist()) {
 			return;
 		} else {
 			createGraphicWindowIfNecessary(iX,false);
@@ -198,10 +198,42 @@ public abstract class Canvas2D extends ImageConsumer {
 		}
 	}
 	//
-	public void isMaximized0s(ChoisePoint iX) throws Backtracking {
-		if (desktopDoesNotExist()) {
+	public void isVisible0s(ChoisePoint iX) throws Backtracking {
+		// if (desktopDoesNotExist()) {
+		//	throw Backtracking.instance;
+		if (space2DDoesNotExist()) {
 			throw Backtracking.instance;
-		} else if (space2DDoesNotExist()) {
+		} else {
+			synchronized(this) {
+				if (graphicWindow != null) {
+					if (!DesktopUtils.safelyIsVisible(graphicWindow)) {
+						throw Backtracking.instance;
+					}
+				} else {
+					throw Backtracking.instance;
+				}
+			}
+		}
+	}
+	//
+	public void isHidden0s(ChoisePoint iX) throws Backtracking {
+		// if (desktopDoesNotExist()) {
+		if (space2DDoesNotExist()) {
+		} else {
+			synchronized(this) {
+				if (graphicWindow != null) {
+					if (!DesktopUtils.safelyIsHidden(graphicWindow)) {
+						throw Backtracking.instance;
+					}
+				}
+			}
+		}
+	}
+	//
+	public void isMaximized0s(ChoisePoint iX) throws Backtracking {
+		// if (desktopDoesNotExist()) {
+		//	throw Backtracking.instance;
+		if (space2DDoesNotExist()) {
 			throw Backtracking.instance;
 		} else {
 			synchronized(this) {
@@ -217,9 +249,9 @@ public abstract class Canvas2D extends ImageConsumer {
 	}
 	//
 	public void isMinimized0s(ChoisePoint iX) throws Backtracking {
-		if (desktopDoesNotExist()) {
-			throw Backtracking.instance;
-		} else if (space2DDoesNotExist()) {
+		// if (desktopDoesNotExist()) {
+		//	throw Backtracking.instance;
+		if (space2DDoesNotExist()) {
 			throw Backtracking.instance;
 		} else {
 			synchronized(this) {
@@ -235,9 +267,9 @@ public abstract class Canvas2D extends ImageConsumer {
 	}
 	//
 	public void isRestored0s(ChoisePoint iX) throws Backtracking {
-		if (desktopDoesNotExist()) {
-			throw Backtracking.instance;
-		} else if (space2DDoesNotExist()) {
+		// if (desktopDoesNotExist()) {
+		//	throw Backtracking.instance;
+		if (space2DDoesNotExist()) {
 			throw Backtracking.instance;
 		} else {
 			synchronized(this) {
@@ -737,19 +769,42 @@ public abstract class Canvas2D extends ImageConsumer {
 		}
 	}
 	//
-	public void drawNow0s(ChoisePoint iX) {
-		if (desktopDoesNotExist()) {
-			return;
-		} else if (space2DDoesNotExist()) {
+	public void suspendRedrawing0s(ChoisePoint iX) {
+		// if (desktopDoesNotExist()) {
+		//	return;
+		if (space2DDoesNotExist()) {
 			return;
 		} else {
 			createGraphicWindowIfNecessary(iX,false);
 			synchronized(this) {
+				suspendRedrawing= true;
+				skipDelayedRepainting(iX);
+				if (space2D != null) {
+					space2D.suspendRedrawing();
+				}
+			}
+		}
+	}
+	public void drawNow0s(ChoisePoint iX) {
+		// if (desktopDoesNotExist()) {
+		//	return;
+		if (space2DDoesNotExist()) {
+			return;
+		} else {
+			createGraphicWindowIfNecessary(iX,false);
+			synchronized(this) {
+				suspendRedrawing= false;
 				implementDelayedCleaning= false;
 				if (graphicWindow != null) {
+					if (space2D != null) {
+						space2D.releaseRedrawing();
+					};
 					graphicWindow.safelyRepaint();
 				} else if (space2D != null) {
-					DesktopUtils.safelyRepaint(space2D);
+					space2D.releaseRedrawing();
+					// 2013.11.16: Inner Canvas2D repainting problem
+					// DesktopUtils.safelyRepaint(space2D);
+					space2D.repaintAfterDelay();
 				}
 			}
 		}
@@ -971,14 +1026,14 @@ public abstract class Canvas2D extends ImageConsumer {
 		callInternalProcedure(domainSignature2,dialogIsModal,modalChoisePoint);
 	}
 	// Auxiliary operations
-	protected boolean desktopDoesNotExist() {
-		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
-		if (desktop==null) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+	// protected boolean desktopDoesNotExist() {
+	//	MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
+	//	if (desktop==null) {
+	//		return true;
+	//	} else {
+	//		return false;
+	//	}
+	// }
 	public boolean space2DDoesNotExist() {
 		// Map<AbstractWorld,InternalFrame2D> innerWindows= StaticAttributes2D.retrieveInnerWindows(staticContext);
 		// return !innerWindows.containsKey(this);
@@ -993,10 +1048,12 @@ public abstract class Canvas2D extends ImageConsumer {
 				graphicWindow= createInternalFrameIfNecessary(iX,enableMovingWindowToFront);
 				space2D= graphicWindow.space;
 			} else if (graphicWindow != null) {
-				if (enableMovingWindowToFront) {
-					DesktopUtils.safelyMoveToFront(graphicWindow);
-				};
-				DesktopUtils.safelySetVisible(true,graphicWindow);
+				if (!suspendRedrawing) {
+					if (enableMovingWindowToFront) {
+						DesktopUtils.safelyMoveToFront(graphicWindow);
+					};
+					DesktopUtils.safelySetVisible(true,graphicWindow);
+				}
 			}
 		}
 	}
@@ -1200,9 +1257,9 @@ public abstract class Canvas2D extends ImageConsumer {
 		}
 	}
 	public void reviseCanvas2DListenersStatus(ChoisePoint iX) {
-		if (desktopDoesNotExist()) {
-			return;
-		} else if (space2DDoesNotExist()) {
+		// if (desktopDoesNotExist()) {
+		//	return;
+		if (space2DDoesNotExist()) {
 			return;
 		} else {
 			createGraphicWindowIfNecessary(iX,false);
@@ -1263,25 +1320,27 @@ public abstract class Canvas2D extends ImageConsumer {
 	}
 	//
 	public void repaintAfterDelay(ChoisePoint iX) {
-		if (desktopDoesNotExist()) {
-			return;
-		} else if (space2DDoesNotExist()) {
+		// if (desktopDoesNotExist()) {
+		//	return;
+		if (space2DDoesNotExist()) {
 			return;
 		} else {
-			createGraphicWindowIfNecessary(iX,false);
-			synchronized(this) {
-				if (graphicWindow != null) {
-					graphicWindow.repaintAfterDelay();
-				} else if (space2D != null) {
-					space2D.repaintAfterDelay();
+			if (!suspendRedrawing) {
+				createGraphicWindowIfNecessary(iX,false);
+				synchronized(this) {
+					if (graphicWindow != null) {
+						graphicWindow.repaintAfterDelay();
+					} else if (space2D != null) {
+						space2D.repaintAfterDelay();
+					}
 				}
 			}
 		}
 	}
 	public void skipDelayedRepainting(ChoisePoint iX) {
-		if (desktopDoesNotExist()) {
-			return;
-		} else if (space2DDoesNotExist()) {
+		// if (desktopDoesNotExist()) {
+		//	return;
+		if (space2DDoesNotExist()) {
 			return;
 		} else {
 			createGraphicWindowIfNecessary(iX,false);

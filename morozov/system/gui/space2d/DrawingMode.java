@@ -80,6 +80,9 @@ public class DrawingMode {
 	}
 	//
 	public void drawString(Graphics2D g2, double x, double y, String text) {
+		if (text.length() <= 0) {
+			return;
+		};
 		if (	(	horizontalAlignment==Canvas2DHorizontalAlignment.DEFAULT ||
 				horizontalAlignment==Canvas2DHorizontalAlignment.LEFT ) &&
 			(	verticalAlignment==Canvas2DVerticalAlignment.DEFAULT ||
@@ -88,11 +91,8 @@ public class DrawingMode {
 		} else {
 			Font font= g2.getFont();
 			FontRenderContext fRC= g2.getFontRenderContext();
-			// Rectangle2D rect= g2.getFont().getStringBounds(text,fRC);
-			//// Rectangle rect= r2D.getBounds();
 			TextLayout layout= new TextLayout(text,font,fRC);
 			Rectangle2D rect= layout.getBounds();
-			// Rectangle rect= layout.getPixelBounds(null,(float)x,(float)y);
 			double baseX= rect.getX();
 			double baseY= rect.getY();
 			double width= rect.getWidth();

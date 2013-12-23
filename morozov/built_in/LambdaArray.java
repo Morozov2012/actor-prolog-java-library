@@ -23,46 +23,7 @@ public abstract class LambdaArray extends Lambda {
 	abstract public Term getBuiltInSlot_E_index_checking();
 	//
 	public void element1mff(ChoisePoint iX, PrologVariable result, Term... givenIndices) {
-		Term bounds= getBuiltInSlot_E_indices_range();
-		IndexRange[] indexRanges= ArrayUtils.termsToIndexRanges(iX,bounds);
-		if (givenIndices.length != indexRanges.length) {
-			throw new IllegalNumberOfIndices(givenIndices.length,indexRanges.length);
-		};
-		// boolean[] instantiateIndex= new boolean[givenIndices.length];
-		// int numberOfIndicesToBeInstantiated= 0;
-		BigInteger[] currentIndexValue= new BigInteger[givenIndices.length];
-		Term index= null;
-		// BigInteger maximumRadius= BigInteger.ZERO;
-		try {
-			for (int n=0; n < givenIndices.length; n++) {
-				// if (indexRanges[n].leftBound.compareTo(indexRanges[n].rightBound) > 0) {
-				//	if (DefaultOptions.integerOverflowCheck) {
-				//		throw new IllegalIndexRange(indexRanges[n].leftBound,indexRanges[n].rightBound);
-				//	} else {
-				//		BigInteger leftBound= indexRanges[n].leftBound;
-				//		indexRanges[n].leftBound= indexRanges[n].rightBound;
-				//		indexRanges[n].rightBound= leftBound;
-				//	}
-				// };
-				// BigInteger localRadius= indexRanges[n].rightBound.subtract(indexRanges[n].leftBound);
-				// if (maximumRadius.compareTo(localRadius) < 0) {
-				//	maximumRadius= localRadius;
-				// };
-				index= givenIndices[n].dereferenceValue(iX);
-				if (index.thisIsFreeVariable()) {
-					throw new UninstantiatedIndexInDeterministicAccessProcedure();
-				} else {
-					// instantiateIndex[n]= false;
-					BigInteger indexValue= index.getIntegerValue(iX);
-					indexRanges[n].checkIndexValue(indexValue);
-					currentIndexValue[n]= indexValue;
-				}
-			}
-		} catch (TermIsNotAnInteger e) {
-			throw new WrongArgumentIsNotAnInteger(index);
-		};
-		// ChoisePoint newIx= new ChoisePoint(iX);
-		ArrayIndices arrayIndices= new ArrayIndices(currentIndexValue);
+		ArrayIndices arrayIndices= collectArrayIndices((Term[])givenIndices,iX);
 		try {
 			Term value= accessArrayElement(arrayIndices,iX);
 			result.value= value;
@@ -71,6 +32,32 @@ public abstract class LambdaArray extends Lambda {
 		}
 	}
 	public void element1mfs(ChoisePoint iX, Term... givenIndices) {
+	}
+	//
+	protected ArrayIndices collectArrayIndices(Term[] givenIndices, ChoisePoint iX) {
+		Term bounds= getBuiltInSlot_E_indices_range();
+		IndexRange[] indexRanges= ArrayUtils.termsToIndexRanges(iX,bounds);
+		if (givenIndices.length != indexRanges.length) {
+			throw new IllegalNumberOfIndices(givenIndices.length,indexRanges.length);
+		};
+		BigInteger[] currentIndexValue= new BigInteger[givenIndices.length];
+		Term index= null;
+		try {
+			for (int n=0; n < givenIndices.length; n++) {
+				index= givenIndices[n].dereferenceValue(iX);
+				if (index.thisIsFreeVariable()) {
+					throw new UninstantiatedIndexInDeterministicAccessProcedure();
+				} else {
+					BigInteger indexValue= index.getIntegerValue(iX);
+					indexRanges[n].checkIndexValue(indexValue);
+					currentIndexValue[n]= indexValue;
+				}
+			}
+		} catch (TermIsNotAnInteger e) {
+			throw new WrongArgumentIsNotAnInteger(index);
+		};
+		ArrayIndices arrayIndices= new ArrayIndices(currentIndexValue);
+		return arrayIndices;
 	}
 	//
 	public class Element1mff extends Element {
@@ -231,15 +218,6 @@ public abstract class LambdaArray extends Lambda {
 		public void execute(ChoisePoint iX) throws Backtracking {
 			Term bounds= getBuiltInSlot_E_indices_range();
 			IndexRange[] indexRanges= ArrayUtils.termsToIndexRanges(iX,bounds);
-			// long maximumRadius;
-			// try {
-			//	maximumRadius= bound.getLongIntegerValue(iX);
-			// } catch (TermIsNotAnInteger b) {
-			//	throw new WrongArgumentIsNotMaximalIndex();
-			// };
-			// if (maximumRadius < 0) {
-			//	maximumRadius= Long.MAX_VALUE;
-			// };
 			boolean checkIndicesRange= Converters.term2OnOff(getBuiltInSlot_E_index_checking(),iX);
 			if (givenIndices.length != indexRanges.length) {
 				if (checkIndicesRange) {
@@ -455,13 +433,13 @@ throw Backtracking.instance;
 		}
 	}
 	protected Term accessArrayElement(ArrayIndices arrayIndices, ChoisePoint cp) throws Backtracking {
-		SlotVariable value= volume.get(arrayIndices);
-		if (value==null) {
+		SlotVariable variable= volume.get(arrayIndices);
+		if (variable==null) {
 			SlotVariable newSlot= new SlotVariable();
-			value= newSlot;
-			volume.put(arrayIndices,value);
+			variable= newSlot;
+			volume.put(arrayIndices,variable);
 			cp.pushTrail(new HashMapState(volume,arrayIndices,newSlot));
 		};
-		return value;
+		return variable;
 	}
 }

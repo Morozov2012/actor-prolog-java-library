@@ -65,17 +65,10 @@ public class DiagramPath {
 			//
 			double textX= realX;
 			double textY= realY - textHeight;
-			// g2.setColor(diagramColors.labelTextColor);
-			// g2.setColor(Color.RED);
-			// g2.setBackground(Color.CYAN);
-			// g2.setPaint(Color.CYAN);
-			// StringCharacterIterator ta= new StringCharacterIterator();
-			// g2.drawString(ta,100,100);
 			HashMap<TextAttribute,Object> map= new HashMap<TextAttribute,Object>();
 			map.put(TextAttribute.FOREGROUND,diagramColors.labelTextColor);
 			Font font= g2.getFont().deriveFont(map);
 			g2.setFont(font);
-			// g2.drawString("BoxText[0]",100,100);
 			DiagramUtils.drawText(g2,textX,textY,0,0,label);
 		}
 	}

@@ -156,52 +156,57 @@ public abstract class Application extends Alpha {
 			AppletContext ac= applet.getAppletContext();
 			try {
 				URL codeBase= applet.getCodeBase();
-				URL url= new URL(codeBase,arguments);
-				ac.showDocument(url,"_blank");
+				if (codeBase != null) {
+					URL url= new URL(codeBase,arguments);
+					ac.showDocument(url,"_blank");
+				} else { // A probable bug in JDK 1.7.0_40
+					activateDesktopApplication(arguments,iX);
+				}
 			} catch (MalformedURLException e) {
 				throw new WrongTermIsMalformedURL(e);
 			}
 		} else {
-			if (Desktop.isDesktopSupported()) {
-				Desktop desktop= Desktop.getDesktop();
-				boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-				if (URL_Utils.isLocalResource(arguments,backslashIsSeparator)) {
-					try {
-						arguments= FileUtils.replaceBackslashes(arguments,backslashIsSeparator);
-						java.io.File file= new java.io.File(arguments);
+			activateDesktopApplication(arguments,iX);
+		}
+	}
+	protected void activateDesktopApplication(String arguments, ChoisePoint iX) {
+		if (Desktop.isDesktopSupported()) {
+			Desktop desktop= Desktop.getDesktop();
+			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+			if (URL_Utils.isLocalResource(arguments,backslashIsSeparator)) {
+				try {
+					arguments= FileUtils.replaceBackslashes(arguments,backslashIsSeparator);
+					java.io.File file= new java.io.File(arguments);
+					if (file.exists()) {
+						desktop.open(file);
+					} else {
+						String truncatedName= FileUtils.deleteQuotationMarks(arguments);
+						file= new java.io.File(truncatedName);
 						if (file.exists()) {
 							desktop.open(file);
 						} else {
-							String truncatedName= FileUtils.deleteQuotationMarks(arguments);
-							file= new java.io.File(truncatedName);
-							if (file.exists()) {
-								desktop.open(file);
-							} else {
-								browseResource(desktop,arguments);
-							}
+							browseResource(desktop,arguments);
 						}
-					} catch (NullPointerException e) {
-						// File is null.
-						throw new WrongTermIsNotFileName(new PrologString(arguments));
-					} catch (IllegalArgumentException e) {
-						// The specified file doesn't exist.
-						throw new FileIsNotFound();
-					} catch (UnsupportedOperationException e) {
-						// The current platform does not support the Desktop.Action.OPEN action.
-						throw new ApplicationIsNotSupported();
-					} catch (IOException e) {
-						// The specified file has no associated application or the associated application fails to be launched.
-						throw new FileInputOutputError(arguments,e);
-					// } catch (SecurityException e) {
-						// A security manager exists and its SecurityManager.checkRead(java.lang.String) method
-						// denies read access to the file, or it denies the AWTPermission("showWindowWithoutWarningBanner")
-						// permission, or the calling thread is not allowed to create a subprocess.
 					}
-				} else {
-					browseResource(desktop,arguments);
+				} catch (NullPointerException e) {
+					// File is null.
+					throw new WrongTermIsNotFileName(new PrologString(arguments));
+				} catch (IllegalArgumentException e) {
+					// The specified file doesn't exist.
+					throw new FileIsNotFound();
+				} catch (UnsupportedOperationException e) {
+					// The current platform does not support the Desktop.Action.OPEN action.
+					throw new ApplicationIsNotSupported();
+				} catch (IOException e) {
+					// The specified file has no associated application or the associated application fails to be launched.
+					throw new FileInputOutputError(arguments,e);
+				// } catch (SecurityException e) {
+					// A security manager exists and its SecurityManager.checkRead(java.lang.String) method
+					// denies read access to the file, or it denies the AWTPermission("showWindowWithoutWarningBanner")
+					// permission, or the calling thread is not allowed to create a subprocess.
 				}
 			} else {
-				throw new ApplicationIsNotSupported();
+				browseResource(desktop,arguments);
 			}
 		}
 	}

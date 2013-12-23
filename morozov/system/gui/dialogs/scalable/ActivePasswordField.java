@@ -30,8 +30,10 @@ public class ActivePasswordField extends ActiveComponent {
 	}
 	public ActivePasswordField(AbstractDialog target, String text, int columns) {
 		super(target);
-		component= new APasswordField(target,this,text,columns);
-		((APasswordField)component).setEditable(isEditable);
+		APasswordField textFiled= new APasswordField(target,this,text,columns);
+		component= textFiled;
+		textFiled.setEditable(isEditable);
+		textFiled.addFocusListener(this);
 	}
 	//
 	// protected int getInitialTopBorder() {return 5;}

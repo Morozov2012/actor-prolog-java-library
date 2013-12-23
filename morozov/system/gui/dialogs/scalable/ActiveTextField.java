@@ -30,8 +30,10 @@ public class ActiveTextField extends ActiveComponent {
 	}
 	public ActiveTextField(AbstractDialog target, String text, int columns) {
 		super(target);
-		component= new ATextField(target,this,text,columns);
-		((ATextField)component).setEditable(isEditable);
+		ATextField textFiled= new ATextField(target,this,text,columns);
+		component= textFiled;
+		textFiled.setEditable(isEditable);
+		textFiled.addFocusListener(this);
 	}
 	public ActiveTextField(AbstractDialog target) {
 		super(target);

@@ -79,6 +79,14 @@ public class Converters {
 		}
 	}
 	//
+	public static Term boolean2YesNoTerm(boolean value) {
+		if (value) {
+			return new PrologSymbol(SymbolCodes.symbolCode_E_yes);
+		} else {
+			return new PrologSymbol(SymbolCodes.symbolCode_E_no);
+		}
+	}
+	//
 	public static boolean termToCollectingMode(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -132,6 +140,14 @@ public class Converters {
 	public static BigInteger argumentToRoundInteger(Term value, ChoisePoint iX) {
 		try {
 			return termToRoundInteger(value,iX,false);
+		} catch (TermIsNotAnInteger e) {
+			throw new WrongArgumentIsNotAnInteger(value);
+		}
+	}
+	//
+	public static int argumentToSmallRoundInteger(Term value, ChoisePoint iX) {
+		try {
+			return PrologInteger.toInteger(termToRoundInteger(value,iX,false));
 		} catch (TermIsNotAnInteger e) {
 			throw new WrongArgumentIsNotAnInteger(value);
 		}
@@ -869,6 +885,43 @@ public class Converters {
 			}
 		};
 		return argumentList.toArray(new Term[0]);
+	}
+	//
+	public static double[][] argumentToMatrix(Term value, ChoisePoint iX) {
+		Term[] termArray= Converters.listToArray(value,iX);
+		int numberOfRows= termArray.length;
+		double[][] rows= new double[numberOfRows][];
+		int numberOfColumns= -1;
+		for (int n=0; n < numberOfRows; n++) {
+			Term[] columnArray= Converters.listToArray(termArray[n],iX);
+			if (numberOfColumns >= 0) {
+				if (numberOfColumns != columnArray.length) {
+					throw new WrongArgumentIsNotAMatrix(value);
+				}
+			} else {
+				numberOfColumns= columnArray.length;
+			};
+			rows[n]= new double[numberOfColumns];
+			for (int m=0; m < numberOfColumns; m++) {
+				rows[n][m]= Converters.argumentToReal(columnArray[m],iX);
+			}
+		};
+		return rows;
+	}
+	//
+	public static Term doubleMatrixToListOfList(double[][] matrix) {
+		Term result= PrologEmptyList.instance;
+		for (int n=matrix.length-1; n >= 0; n--) {
+			result= new PrologList(doubleArrayToList(matrix[n]),result);
+		};
+		return result;
+	}
+	public static Term doubleArrayToList(double[] array) {
+		Term result= PrologEmptyList.instance;
+		for (int n=array.length-1; n >= 0; n--) {
+			result= new PrologList(new PrologReal(array[n]),result);
+		};
+		return result;
 	}
 	//
 	public static int termToProcessPriority(Term value, ChoisePoint iX) throws TermIsNotProcessPriority {

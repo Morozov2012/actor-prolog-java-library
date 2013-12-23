@@ -5,8 +5,6 @@ package morozov.system.gui;
 import morozov.classes.*;
 import morozov.system.gui.dialogs.*;
 
-import javax.swing.JFrame;
-import javax.swing.JApplet;
 import javax.swing.JInternalFrame;
 import javax.swing.JLayeredPane;
 import javax.swing.JDesktopPane;
@@ -14,6 +12,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JMenuItem;
 import javax.swing.SwingUtilities;
 import javax.swing.JApplet;
+import java.awt.Frame;
 import java.awt.Component;
 import java.awt.Point;
 import java.awt.Dimension;
@@ -27,7 +26,6 @@ import java.awt.BorderLayout;
 import java.awt.Window;
 import java.awt.RenderingHints;
 import java.awt.Graphics2D;
-import java.beans.PropertyVetoException;
 
 import java.lang.reflect.InvocationTargetException;
 import java.beans.PropertyVetoException;
@@ -53,11 +51,12 @@ public class DesktopUtils {
 			try {
 				desktop= StaticDesktopAttributes.retrieveDesktopPane(context);
 				if (desktop==null) {
-					LookAndFeelUtils.assignLookAndFeel();
+					// LookAndFeelUtils.assignLookAndFeel();
 					JApplet applet= StaticContext.retrieveApplet(context);
 					if (applet==null) {
-						Window mainWindow= new MainWindow(context);
+						Frame mainWindow= new MainWindow(context);
 						StaticDesktopAttributes.setMainWindow(mainWindow,context);
+						mainWindow.setExtendedState(Frame.MAXIMIZED_BOTH);
 						mainWindow.setVisible(true);
 					} else {
 						Window mainWindow= StaticContext.retrieveSystemWindow(context);
@@ -100,25 +99,6 @@ public class DesktopUtils {
 		}
 	}
 	// Auxiliary operations
-	static class MainWindow extends JFrame {
-		MainWindow(StaticContext context) {
-			GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
-			// Rectangle bounds= env.getMaximumWindowBounds();
-			GraphicsDevice device= env.getDefaultScreenDevice();
-			GraphicsConfiguration gc= device.getDefaultConfiguration();
-			Rectangle bounds= gc.getBounds();
-			setSize(bounds.width,bounds.height);
-			MainDesktopPane desktop= new MainDesktopPane(context);
-			StaticDesktopAttributes.setDesktopPane(desktop,context);
-			setContentPane(desktop);
-			try {
-				setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			} catch (SecurityException e) {
-				setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			}
-		}
-	}
-	//
 	public static Rectangle getCurrentDeviceBounds(StaticContext context) {
 		ReentrantLock lock= StaticDesktopAttributes.retrieveDesktopGuard(context);
 		lock.lock();
@@ -228,7 +208,7 @@ public class DesktopUtils {
 					endFrame= StrictMath.max(i,beginningFrame+1);
 					break;
 				};
-				margin= margin + currentShift; 
+				margin= margin + currentShift;
 			};
 			int width= dBounds.width - margin;
 			int height= dBounds.height - margin;
@@ -369,7 +349,6 @@ public class DesktopUtils {
 	}
 	//
 	public static void selectNextInternalFrame(StaticContext context) {
-		// System.out.printf("DesktopUtils::selectNextInternalFrame\n");
 		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(context);
 		JInternalFrame[] frames= desktop.getAllFramesInLayer(JLayeredPane.DEFAULT_LAYER);
 		// Arrays.sort(frames,new ZOrderComparator(desktop));
@@ -379,7 +358,6 @@ public class DesktopUtils {
 			JInternalFrame frame= frames[i];
 			if (frame.isShowing()) {
 				try {
-					// System.out.printf("DesktopUtils::selectNextInternalFrame: %s\n",frame);
 					frame.setSelected(true);
 					break;
 				} catch (PropertyVetoException e) {
@@ -600,7 +578,22 @@ public class DesktopUtils {
 			}
 		}
 	}
-	protected static void maximize(final JInternalFrame window) {
+	public static void safelyMaximize(final Frame window) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			maximize(window);
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						maximize(window);
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	protected static void maximize(JInternalFrame window) {
 		if (window.isIcon()) {
 			try {
 				window.setIcon(false);
@@ -611,6 +604,9 @@ public class DesktopUtils {
 			window.setMaximum(true);
 		} catch (PropertyVetoException e) {
 		}
+	}
+	protected static void maximize(Frame window) {
+		window.setExtendedState(Frame.MAXIMIZED_BOTH);
 	}
 	public static void safelyMinimize(final JInternalFrame window) {
 		if (SwingUtilities.isEventDispatchThread()) {
@@ -627,7 +623,22 @@ public class DesktopUtils {
 			}
 		}
 	}
-	protected static void minimize(final JInternalFrame window) {
+	public static void safelyMinimize(final Frame window) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			minimize(window);
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						minimize(window);
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	protected static void minimize(JInternalFrame window) {
 		if (window.isMaximum()) {
 			try {
 				window.setMaximum(false);
@@ -638,6 +649,9 @@ public class DesktopUtils {
 			window.setIcon(true);
 		} catch (PropertyVetoException e) {
 		}
+	}
+	protected static void minimize(Frame window) {
+		window.setExtendedState(Frame.ICONIFIED);
 	}
 	public static void safelyRestore(final JInternalFrame window) {
 		if (SwingUtilities.isEventDispatchThread()) {
@@ -654,7 +668,22 @@ public class DesktopUtils {
 			}
 		}
 	}
-	protected static void restore(final JInternalFrame window) {
+	public static void safelyRestore(final Frame window) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			restore(window);
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						restore(window);
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	protected static void restore(JInternalFrame window) {
 		if (window.isMaximum()) {
 			try {
 				window.setMaximum(false);
@@ -667,6 +696,89 @@ public class DesktopUtils {
 			} catch (PropertyVetoException e) {
 			}
 		}
+	}
+	protected static void restore(Frame window) {
+		window.setExtendedState(Frame.NORMAL);
+	}
+	public static boolean safelyIsVisible(final JInternalFrame window) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			return isVisible(window);
+		} else {
+			final AtomicBoolean state= new AtomicBoolean(false);
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						state.set(isVisible(window));
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			};
+			return state.get();
+		}
+	}
+	public static boolean safelyIsVisible(final Window window) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			return isVisible(window);
+		} else {
+			final AtomicBoolean state= new AtomicBoolean(false);
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						state.set(isVisible(window));
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			};
+			return state.get();
+		}
+	}
+	protected static boolean isVisible(JInternalFrame window) {
+		return window.isVisible();
+	}
+	protected static boolean isVisible(Window window) {
+		return window.isVisible();
+	}
+	public static boolean safelyIsHidden(final JInternalFrame window) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			return isHidden(window);
+		} else {
+			final AtomicBoolean state= new AtomicBoolean(false);
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						state.set(isHidden(window));
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			};
+			return state.get();
+		}
+	}
+	public static boolean safelyIsHidden(final Window window) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			return isHidden(window);
+		} else {
+			final AtomicBoolean state= new AtomicBoolean(false);
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						state.set(isHidden(window));
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			};
+			return state.get();
+		}
+	}
+	protected static boolean isHidden(JInternalFrame window) {
+		return !window.isVisible();
+	}
+	protected static boolean isHidden(Window window) {
+		return !window.isVisible();
 	}
 	public static boolean safelyIsMaximized(final JInternalFrame window) {
 		if (SwingUtilities.isEventDispatchThread()) {
@@ -683,6 +795,31 @@ public class DesktopUtils {
 			} catch (InvocationTargetException e) {
 			};
 			return state.get();
+		}
+	}
+	public static boolean safelyIsMaximized(final Frame window) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			return isMaximized(window);
+		} else {
+			final AtomicBoolean state= new AtomicBoolean(false);
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						state.set(isMaximized(window));
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			};
+			return state.get();
+		}
+	}
+	protected static boolean isMaximized(Frame window) {
+		int state= window.getExtendedState();
+		if (state == Frame.MAXIMIZED_BOTH) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 	public static boolean safelyIsMinimized(final JInternalFrame window) {
@@ -702,6 +839,31 @@ public class DesktopUtils {
 			return state.get();
 		}
 	}
+	public static boolean safelyIsMinimized(final Frame window) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			return isMinimized(window);
+		} else {
+			final AtomicBoolean state= new AtomicBoolean(false);
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						state.set(isMinimized(window));
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			};
+			return state.get();
+		}
+	}
+	protected static boolean isMinimized(Frame window) {
+		int state= window.getExtendedState();
+		if (state == Frame.ICONIFIED) {
+			return true;
+		} else {
+			return false;
+		}
+	}
 	public static boolean safelyIsRestored(final JInternalFrame window) {
 		if (SwingUtilities.isEventDispatchThread()) {
 			return !window.isMaximum() && !window.isIcon();
@@ -717,6 +879,31 @@ public class DesktopUtils {
 			} catch (InvocationTargetException e) {
 			};
 			return state.get();
+		}
+	}
+	public static boolean safelyIsRestored(final Frame window) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			return isRestored(window);
+		} else {
+			final AtomicBoolean state= new AtomicBoolean(false);
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						state.set(isRestored(window));
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			};
+			return state.get();
+		}
+	}
+	protected static boolean isRestored(Frame window) {
+		int state= window.getExtendedState();
+		if (state == Frame.NORMAL) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 	public static void safelyMoveToFront(final InnerPage window) {

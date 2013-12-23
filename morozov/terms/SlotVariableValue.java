@@ -31,6 +31,16 @@ public class SlotVariableValue {
 		isProtectingPort= flag2;
 	}
 	//
+	public boolean isPlainPort() {
+		return !isProtectingPort && !isSuspendingPort;
+	}
+	public boolean isProtectingPort() {
+		return isProtectingPort && !isSuspendingPort;
+	}
+	public boolean isSuspendingPort() {
+		return isSuspendingPort;
+	}
+	//
 	public int hashCode() {
 		if (actualValue==null) {
 			return super.hashCode();

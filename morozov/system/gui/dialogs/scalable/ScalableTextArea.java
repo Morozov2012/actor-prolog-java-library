@@ -34,6 +34,8 @@ public class ScalableTextArea extends ActiveComponent {
 		area= new ATextArea(tD,this,text,visibleRowCount,visibleColumnCount);
 		area.setEditable(isEditable);
 		scrollPane.setViewportView(area);
+		// System.out.printf("%s.addFocusListener(%s)\n",area,this);
+		area.addFocusListener(this);
 	}
 	//
 	// protected int getInitialTopBorder() {return 5;}
@@ -83,6 +85,27 @@ public class ScalableTextArea extends ActiveComponent {
 			}
 		} else {
 			return super.standardizeValue(value,iX);
+		}
+	}
+	//
+	public void setIsEnabled(boolean mode) {
+		if (component != null && area != null) {
+			if (mode) {
+				component.setEnabled(true);
+				area.setEnabled(true);
+			} else {
+				component.setEnabled(false);
+				area.setEnabled(false);
+			}
+		}
+	}
+	//
+	public boolean isEnabled(boolean mode1) {
+		if (component != null && area != null) {
+			boolean mode2= component.isEnabled() && area.isEnabled();
+			return mode1 == mode2;
+		} else {
+			return false;
 		}
 	}
 }

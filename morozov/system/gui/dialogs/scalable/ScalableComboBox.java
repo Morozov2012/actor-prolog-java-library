@@ -72,6 +72,7 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 		// comboBox.addItemListener(this);
 		// comboBox.addListSelectionListener(component);
 		comboBox.setEditable(isEditable);
+		comboBox.addFocusListener(this);
 	}
 	//
 	public void changedUpdate(DocumentEvent e) {

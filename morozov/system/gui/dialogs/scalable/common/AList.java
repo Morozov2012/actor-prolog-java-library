@@ -237,6 +237,26 @@ public class AList extends JScrollPane {
 		}
 	}
 	//
+	public void setEnabled(boolean mode) {
+		if (list != null) {
+			if (mode) {
+				super.setEnabled(true);
+				list.setEnabled(true);
+			} else {
+				super.setEnabled(false);
+				list.setEnabled(false);
+			}
+		}
+	}
+	//
+	public boolean isEnabled() {
+		if (list != null) {
+			return super.isEnabled() && list.isEnabled();
+		} else {
+			return false;
+		}
+	}
+	//
 	// Auxiliary function
 	//
 	protected void implementMultipleSelection(Term tail, ChoisePoint iX, ListModel model) {

@@ -9,8 +9,6 @@ import morozov.classes.*;
 import javax.swing.JInternalFrame;
 import javax.swing.WindowConstants;
 import javax.swing.SwingUtilities;
-
-import java.awt.Component;
 import java.awt.Dimension;
 
 import java.util.TimerTask;
@@ -28,6 +26,7 @@ public class InnerPage extends JInternalFrame {
 	protected TimerTask currentTask;
 	//
 	protected long repaintingDelay= 10; // ms
+	// protected long repaintingDelay= 10000; // ms
 	// protected long repaintingDelay= 1; // ms
 	// protected long repaintingDelay= 100; // ms
 	//
@@ -123,6 +122,7 @@ public class InnerPage extends JInternalFrame {
 		}
 	}
 	public void restoreSize(int x, int y, int width, int height) {
+//System.out.printf("INNERPAGE.setLocation\n");
 		setLocation(x,y);
 		setSize(width,height);
 	}

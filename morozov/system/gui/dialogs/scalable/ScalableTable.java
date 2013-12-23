@@ -29,8 +29,10 @@ public class ScalableTable extends ActiveComponent {
 	//
 	public ScalableTable(AbstractDialog tD, double length, double height, ScalableTableColors colors, ScalableTableColumnDescription[] columnDescriptions, Term initialValue, ChoisePoint iX) {
 		super(tD);
-		component= new ATable(tD,this,length,height,colors,columnDescriptions,initialValue,iX);
-		((ATable)component).setMultipleSelection(enableMultiselection);
+		ATable table= new ATable(tD,this,length,height,colors,columnDescriptions,initialValue,iX);
+		component= table;
+		table.setMultipleSelection(enableMultiselection);
+		table.addFocusListener(this);
 	}
 	//
 	// protected int getInitialTopBorder() {return 5;}

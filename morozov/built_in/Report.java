@@ -148,9 +148,9 @@ public abstract class Report
 	}
 	//
 	public void hide0s(ChoisePoint iX) {
-		if (desktopDoesNotExist()) {
-			return;
-		} else if (spaceDoesNotExist()) {
+		// if (desktopDoesNotExist()) {
+		//	return;
+		if (spaceDoesNotExist()) {
 			return;
 		} else {
 			createGraphicWindowIfNecessary(iX,false);
@@ -189,10 +189,42 @@ public abstract class Report
 		}
 	}
 	//
-	public void isMaximized0s(ChoisePoint iX) throws Backtracking {
-		if (desktopDoesNotExist()) {
+	public void isVisible0s(ChoisePoint iX) throws Backtracking {
+		// if (desktopDoesNotExist()) {
+		//	throw Backtracking.instance;
+		if (spaceDoesNotExist()) {
 			throw Backtracking.instance;
-		} else if (spaceDoesNotExist()) {
+		} else {
+			synchronized(this) {
+				if (graphicWindow != null) {
+					if (!DesktopUtils.safelyIsVisible(graphicWindow)) {
+						throw Backtracking.instance;
+					}
+				} else {
+					throw Backtracking.instance;
+				}
+			}
+		}
+	}
+	//
+	public void isHidden0s(ChoisePoint iX) throws Backtracking {
+		// if (desktopDoesNotExist()) {
+		if (spaceDoesNotExist()) {
+		} else {
+			synchronized(this) {
+				if (graphicWindow != null) {
+					if (!DesktopUtils.safelyIsHidden(graphicWindow)) {
+						throw Backtracking.instance;
+					}
+				}
+			}
+		}
+	}
+	//
+	public void isMaximized0s(ChoisePoint iX) throws Backtracking {
+		// if (desktopDoesNotExist()) {
+		//	throw Backtracking.instance;
+		if (spaceDoesNotExist()) {
 			throw Backtracking.instance;
 		} else {
 			synchronized(this) {
@@ -208,9 +240,9 @@ public abstract class Report
 	}
 	//
 	public void isMinimized0s(ChoisePoint iX) throws Backtracking {
-		if (desktopDoesNotExist()) {
-			throw Backtracking.instance;
-		} else if (spaceDoesNotExist()) {
+		// if (desktopDoesNotExist()) {
+		//	throw Backtracking.instance;
+		if (spaceDoesNotExist()) {
 			throw Backtracking.instance;
 		} else {
 			synchronized(this) {
@@ -226,9 +258,9 @@ public abstract class Report
 	}
 	//
 	public void isRestored0s(ChoisePoint iX) throws Backtracking {
-		if (desktopDoesNotExist()) {
-			throw Backtracking.instance;
-		} else if (spaceDoesNotExist()) {
+		// if (desktopDoesNotExist()) {
+		//	throw Backtracking.instance;
+		if (spaceDoesNotExist()) {
 			throw Backtracking.instance;
 		} else {
 			synchronized(this) {
@@ -371,14 +403,14 @@ public abstract class Report
 		callInternalProcedure(domainSignature2,dialogIsModal,modalChoisePoint);
 	}
 	// Auxiliary operations
-	protected boolean desktopDoesNotExist() {
-		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
-		if (desktop==null) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+	// protected boolean desktopDoesNotExist() {
+	//	MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
+	//	if (desktop==null) {
+	//		return true;
+	//	} else {
+	//		return false;
+	//	}
+	// }
 	public boolean spaceDoesNotExist() {
 		// Map<AbstractWorld,InternalTextFrame> innerWindows= StaticReportAttributes.retrieveInnerWindows(staticContext);
 		// return !innerWindows.containsKey(this);
@@ -801,14 +833,6 @@ public abstract class Report
 		};
 		updateRootTextStyleUnderline(isUnderlined);
 		synchronized(this) {
-			// if (graphicWindow != null) {
-			//	int integerSize= (int)size;
-			//	Font font= new Font(name,style,integerSize);
-			//	if (size != (double)integerSize) {
-			//		font= font.deriveFont((float)size);
-			//	};
-			//	ReportUtils.safelySetFont(font,textWindow);
-			// } else
 			if (space != null) {
 				space.setPanelFont(name,style,size);
 			}

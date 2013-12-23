@@ -32,7 +32,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.Point;
 import java.awt.Color;
 import java.awt.Dialog.ModalityType;
-import java.beans.PropertyVetoException;
+import java.awt.GraphicsConfiguration;
+// import java.beans.PropertyVetoException;
 
 import java.math.BigInteger;
 import java.lang.reflect.InvocationTargetException;
@@ -124,13 +125,22 @@ public abstract class AbstractDialog
 	protected java.util.Timer scheduler;
 	protected TimerTask currentTask;
 	//
-	public AbstractDialog(Window w) {
+	public AbstractDialog(boolean isTopLevelWindow, Window parent) {
 		if (isToBeModal()) {
-			dialogContainer= new ExtendedJDialog(this,w,ModalityType.DOCUMENT_MODAL);
-			// dialogContainer.setModalityType(ModalityType.DOCUMENT_MODAL);
+			if (isTopLevelWindow) {
+				// dialogContainer= new ExtendedJFrame(this);
+				dialogContainer= new ExtendedJDialog(this,null,ModalityType.DOCUMENT_MODAL);
+			} else {
+				dialogContainer= new ExtendedJDialog(this,parent,ModalityType.DOCUMENT_MODAL);
+				// dialogContainer.setModalityType(ModalityType.DOCUMENT_MODAL);
+			}
 		} else {
-			dialogContainer= new ExtendedJInternalFrame(this);
-			// dialogContainer.setModalityType(ModalityType.MODELESS);
+			if (isTopLevelWindow) {
+				dialogContainer= new ExtendedJFrame(this);
+			} else {
+				dialogContainer= new ExtendedJInternalFrame(this);
+				// dialogContainer.setModalityType(ModalityType.MODELESS);
+			}
 		};
 		// <DEBUG:2010.08.19> super(w);
 		// setOpaque(false);
@@ -315,13 +325,17 @@ public abstract class AbstractDialog
 				}
 			}
 		};
+//System.out.printf("AbstractDialog::[0]x=%s;\n",x);
 		ExtendedCoordinate eX= GUI_Utils.termToCoordinateSafe(x,iX);
+//System.out.printf("AbstractDialog::[1]eX=%s;\n",eX);
 		if (eX.isDefault()) {
 			eX= GUI_Utils.termToCoordinateSafe(getPredefinedX(),iX);
+//System.out.printf("AbstractDialog::[2]eX=%s;\n",eX);
 			if (eX.isDefault()) {
 				eX= defaultDialogX;
 			}
 		};
+//System.out.printf("AbstractDialog::[3]eX=%s;\n",eX);
 		ExtendedCoordinate eY= GUI_Utils.termToCoordinateSafe(y,iX);
 		if (eY.isDefault()) {
 			eY= GUI_Utils.termToCoordinateSafe(getPredefinedY(),iX);
@@ -329,6 +343,7 @@ public abstract class AbstractDialog
 				eY= defaultDialogY;
 			}
 		};
+//System.out.printf("AbstractDialog::[3]eY=%s;\n",eY);
 		actualCoordinates.set(new ExtendedCoordinates(eX,eY));
 		// actualX.set(eX);
 		// actualY.set(eY);
@@ -344,6 +359,7 @@ public abstract class AbstractDialog
 		//
 		assemble(iX);
 		mainPanel.setTransparency(false);
+		// dialogContainer.setIsTopLevelWindow(isTopLevel);
 		dialogContainer.setTitle(initialTitle);
 		setNewAlarmColors(initialFailureForegroundColor,initialFailureBackgroundColor);
 		Color refinedBackgroundColor= refineBackgroundColor(initialSuccessBackgroundColor);
@@ -355,11 +371,14 @@ public abstract class AbstractDialog
 	public abstract void assemble(ChoisePoint iX);
 	//
 	public void positionMainPanel() {
-		if (isDisposed.get()) {
+//System.out.printf("AbstractDialog::[-1]dialogContainer=%s;actualCoordinates.get().x=%s;\n",dialogContainer,actualCoordinates.get().x);
+		if (isInitiated.get() && isDisposed.get()) {
 			acceptNewPositionOfDialog();
 		};
 		try {
+//System.out.printf("AbstractDialog::[0]dialogContainer=%s;actualCoordinates.get().x=%s;\n",dialogContainer,actualCoordinates.get().x);
 			Point point= dialogContainer.computePosition(actualCoordinates);
+//System.out.printf("AbstractDialog::[0]point=%s;\n",point);
 			previousCoordinates.set(point);
 			// previousX.set(point.x);
 			// previousY.set(point.y);
@@ -368,6 +387,7 @@ public abstract class AbstractDialog
 			if (!dialogContainer.isShowing()) {
 				// <DEBUG:2010.08.19>
 				dialogContainer.setLocationByPlatform(true);
+//System.out.printf("AbstractDialog::positionMainPanel:isDisposed.set(true);\n");
 				isDisposed.set(true);
 			}
 		// } catch (CannotComputeDesktopSize e) {
@@ -385,12 +405,14 @@ public abstract class AbstractDialog
 	public void safelySetLocation(final Point p) {
 		if (SwingUtilities.isEventDispatchThread()) {
 			dialogContainer.setLocation(p);
+//System.out.printf("AbstractDialog::[1]safelySetLocation:isDisposed.set(true);\n");
 			isDisposed.set(true);
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
 						dialogContainer.setLocation(p);
+//System.out.printf("AbstractDialog::[2]safelySetLocation:isDisposed.set(true);\n");
 						isDisposed.set(true);
 					}
 				});
@@ -405,7 +427,8 @@ public abstract class AbstractDialog
 	//
 	public void implementPreferredSize() {
 		//
-		if (dialogContainer.isMaximum()) {
+		// if (dialogContainer.isMaximum()) {
+		if (dialogContainer.safelyIsMaximized()) {
 			return;
 		};
 		//
@@ -474,6 +497,7 @@ public abstract class AbstractDialog
 	}
 	//
 	public void safelyAddAndDisplay(final JDesktopPane desktop, final ChoisePoint iX) {
+		// modalChoisePoint= iX;
 		if (SwingUtilities.isEventDispatchThread()) {
 			addAndDisplay(desktop,iX);
 		} else {
@@ -489,6 +513,7 @@ public abstract class AbstractDialog
 		}
 	}
 	public void addAndDisplay(JDesktopPane desktop, ChoisePoint iX) {
+//System.out.printf("AbstractDialog.addAndDisplay\n");
 		// insideModalDialog.incrementAndGet();
 		// <DEBUG:2010.08.19>
 		// StaticDesktopAttributes staticAttributes= DesktopUtils.retrieveStaticDesktopAttributes(staticContext);
@@ -504,8 +529,8 @@ public abstract class AbstractDialog
 		//
 		// desktop.add(this,DIALOG_LAYER);
 		dialogContainer.addToDesktop(desktop);
-		isInitiated.set(true);
 		//
+		// isInitiated.set(true);
 		modalChoisePoint= iX;
 		// if (isToBeModal()) {
 		//	setModalityType(ModalityType.DOCUMENT_MODAL);
@@ -517,6 +542,8 @@ public abstract class AbstractDialog
 		implementPreferredSize();
 		// dialogContainer.setVisible(true);
 		positionMainPanel();
+		isInitiated.set(true);
+		start();
 		dialogContainer.setVisible(true);
 		// insideModalDialog.decrementAndGet();
 	}
@@ -632,6 +659,12 @@ public abstract class AbstractDialog
 		dialogContainer.safelyRestore();
 	}
 	//
+	public boolean safelyIsVisible() {
+		return dialogContainer.safelyIsVisible();
+	}
+	public boolean safelyIsHidden() {
+		return dialogContainer.safelyIsHidden();
+	}
 	public boolean safelyIsMaximized() {
 		return dialogContainer.safelyIsMaximized();
 	}
@@ -649,11 +682,19 @@ public abstract class AbstractDialog
 	// }
 	//
 	public void actionPerformed(ActionEvent e) {
+		// 2013.12.07: Без этих двух комманд
+		// происходят престранные вещи. Нажимаю кнопку,
+		// открывается новый (модальный) диалог, закрываю
+		// диалог, и потом текущий диалог некорректно
+		// перерисовывается.
+		// См. пример test_117_45_enable_disable_01_jdk.a.
+		// revalidate();
+		// repaint();
+		//
 		boolean isSystemCommand= false;
 		boolean isTheResetCommand= false;
 		boolean isTheVerifyCommand= false;
 		String name= e.getActionCommand();
-		// String predicateName= null;
 		long domainSignature= -1;
 		Term[] arguments= null;
 		if (name.equals("close")) {
@@ -752,6 +793,7 @@ public abstract class AbstractDialog
 		}
 	}
 	public void putFieldValue(Term identifier, Term fieldValue, ChoisePoint iX) {
+//System.out.printf("AbstrD.putFieldValue\n");
 		fieldValue= fieldValue.dereferenceValue(iX);
 		if (fieldValue.thisIsFreeVariable()) {	// || fieldValue.thisIsUnknownValue()) {
 			// throw Backtracking.instance;
@@ -803,6 +845,142 @@ public abstract class AbstractDialog
 			}
 		}
 	}
+	public void putSymbolicFieldValue(long code, Term fieldValue, ChoisePoint iX) {
+		SymbolName name= SymbolNames.retrieveSymbolName(code);
+		String slotName= name.identifier;
+		for (int i= 0; i < controlTable.length; i++) {
+			DialogEntry entry= controlTable[i];
+			if (entry.isSlotName) {
+				if (entry.name.equals(slotName)) {
+					entry.putValue(fieldValue,iX);
+					specialProcess.receiveUserInterfaceMessage(entry,true,DialogEventType.NONE);
+					return;
+				}
+			}
+		};
+		throw new UnknownDialogSlotName();
+	}
+	public void setFieldIsEnabled(Term identifier, boolean mode, ChoisePoint iX) {
+		try {
+			long code= identifier.getSymbolValue(iX);
+			String slotOrActionName= identifier.toString(iX);
+			for (int i= 0; i < controlTable.length; i++) {
+				DialogEntry entry= controlTable[i];
+				if (entry.isSlotName) {
+					if (entry.name.equals(slotOrActionName)) {
+						entry.setFieldIsEnabled(mode);
+						// specialProcess.receiveUserInterfaceMessage(entry,true,DialogEventType.NONE);
+						return;
+					}
+				}
+			};
+			for (int i= 0; i < controlTable.length; i++) {
+				DialogEntry entry= controlTable[i];
+				if (entry.isBuiltInAction()) {
+					if (entry.name.equals(slotOrActionName)) {
+						entry.setFieldIsEnabled(mode);
+						return;
+					}
+				}
+			};
+			throw new UnknownDialogSlotName();
+		} catch (TermIsNotASymbol e1) {
+			try {
+				long number= identifier.getSmallIntegerValue(iX);
+				for (int i= 0; i < controlTable.length; i++) {
+					DialogEntry entry= controlTable[i];
+					if (!entry.isSlotName && entry.isNumericCode) {
+						if (entry.code==number) {
+							entry.setFieldIsEnabled(mode);
+							return;
+						}
+					}
+				};
+				throw new UnknownDialogEntryCode();
+			} catch (TermIsNotAnInteger e2) {
+				try {
+					String name= identifier.getStringValue(iX);
+					for (int i= 0; i < controlTable.length; i++) {
+						DialogEntry entry= controlTable[i];
+						if (!entry.isSlotName && !entry.isNumericCode) {
+							if (entry.name.equals(name)) {
+								entry.setFieldIsEnabled(mode);
+								return;
+							}
+						}
+					};
+					throw new UnknownDialogEntryName();
+				} catch (TermIsNotAString e3) {
+					throw new WrongTermIsNotDialogEntry(identifier);
+				}
+			}
+		}
+	}
+	public void checkIfFieldIsEnabled(Term identifier, boolean mode, ChoisePoint iX) throws Backtracking {
+//System.out.printf("checkIfFieldIsEnabled::this=%s;mode=%s;\n",this,mode);
+		try {
+			long code= identifier.getSymbolValue(iX);
+			String slotOrActionName= identifier.toString(iX);
+			for (int i= 0; i < controlTable.length; i++) {
+				DialogEntry entry= controlTable[i];
+				if (entry.isSlotName) {
+					if (entry.name.equals(slotOrActionName)) {
+						if (!entry.fieldIsEnabled(mode)) {
+							throw Backtracking.instance;
+						};
+						// specialProcess.receiveUserInterfaceMessage(entry,true,DialogEventType.NONE);
+						return;
+					}
+				}
+			};
+			for (int i= 0; i < controlTable.length; i++) {
+				DialogEntry entry= controlTable[i];
+				if (entry.isBuiltInAction()) {
+					if (entry.name.equals(slotOrActionName)) {
+						if (!entry.fieldIsEnabled(mode)) {
+							throw Backtracking.instance;
+						};
+						return;
+					}
+				}
+			};
+			throw new UnknownDialogSlotName();
+		} catch (TermIsNotASymbol e1) {
+			try {
+				long number= identifier.getSmallIntegerValue(iX);
+				for (int i= 0; i < controlTable.length; i++) {
+					DialogEntry entry= controlTable[i];
+					if (!entry.isSlotName && entry.isNumericCode) {
+						if (entry.code==number) {
+							if (!entry.fieldIsEnabled(mode)) {
+								throw Backtracking.instance;
+							};
+							return;
+						}
+					}
+				};
+				throw new UnknownDialogEntryCode();
+			} catch (TermIsNotAnInteger e2) {
+				try {
+					String name= identifier.getStringValue(iX);
+					for (int i= 0; i < controlTable.length; i++) {
+						DialogEntry entry= controlTable[i];
+						if (!entry.isSlotName && !entry.isNumericCode) {
+							if (entry.name.equals(name)) {
+								if (!entry.fieldIsEnabled(mode)) {
+									throw Backtracking.instance;
+								};
+								return;
+							}
+						}
+					};
+					throw new UnknownDialogEntryName();
+				} catch (TermIsNotAString e3) {
+					throw new WrongTermIsNotDialogEntry(identifier);
+				}
+			}
+		}
+	}
 	public void reportValueUpdate(ActiveComponent currentComponent) {
 		boolean entryIsFound= false;
 		boolean sendFlowMessage= false;
@@ -820,18 +998,21 @@ public abstract class AbstractDialog
 		if (entryIsFound) {
 			if (sendFlowMessage) {
 				if (!insideThePutOperation.get()) {
+					entry.requestValueRefreshing();
 					specialProcess.receiveUserInterfaceMessage(entry,true,DialogEventType.MODIFIED_CONTROL);
 				} else {
 					specialProcess.receiveUserInterfaceMessage(entry,true,DialogEventType.NONE);
 				}
 			} else {
 				if (!insideThePutOperation.get()) {
+					entry.requestValueRefreshing();
 					specialProcess.receiveUserInterfaceMessage(entry,false,DialogEventType.MODIFIED_CONTROL);
 				}
 			}
 		}
 	}
 	public void transmitEntryValue(DialogEntry entry, ChoisePoint iX) {
+//System.out.printf("AbstrD.transmitEValue\n");
 		if (entry!=null && entry.isSlotName) {
 			try {
 				Term value= entry.refreshAndGetValue();
@@ -1048,7 +1229,8 @@ public abstract class AbstractDialog
 		// map.put(TextAttribute.WIDTH,TextAttribute.WIDTH_SEMI_EXTENDED);
 		// map.put(TextAttribute.WIDTH,TextAttribute.WIDTH_REGULAR);
 		// map.put(TextAttribute.SIZE,currentFontSize.get());
-		map.put(TextAttribute.SIZE,fontSize);
+		int realFontSize= DefaultOptions.fontSystemSimulationMode.simulate(fontSize);
+		map.put(TextAttribute.SIZE,realFontSize);
 		return new Font(map);
 	}
 	//
@@ -1077,6 +1259,7 @@ public abstract class AbstractDialog
 			double newX= (double)p.x / ( ((double)(parentLayoutSize.width-parentLayoutSize.x)) / gridX );
 			double gridY= DefaultOptions.gridHeight;
 			double newY= (double)p.y / ( ((double)(parentLayoutSize.height-parentLayoutSize.y)) / gridY );
+//System.out.printf("AbstractDialog::[acceptNewPositionOfDialog()]newX=%s;\n",newX);
 			actualCoordinates.set(new ExtendedCoordinates(newX,newY));
 			specialProcess.receiveUserInterfaceMessage(findDialogEntryX(),true,DialogEventType.NONE);
 			specialProcess.receiveUserInterfaceMessage(findDialogEntryY(),true,DialogEventType.NONE);
@@ -1203,6 +1386,9 @@ public abstract class AbstractDialog
 		}
 	}
 	//
+	public GraphicsConfiguration getGraphicsConfiguration() {
+		return dialogContainer.getGraphicsConfiguration();
+	}
 	// public boolean isVisible() {
 	//	return dialogContainer.isVisible();
 	// }
@@ -1210,6 +1396,14 @@ public abstract class AbstractDialog
 		return dialogContainer.isShowing();
 	}
 	public void setLocation(Point p) {
+//if (true) {
+//try {
+//throw new RuntimeException();
+//} catch (Throwable ee) {
+//	ee.printStackTrace();
+//}
+//}
+//System.out.printf("!!!AbstractDialog::setLocation:isDisposed.set(true);point=%s\n",p);
 		dialogContainer.setLocation(p);
 		isDisposed.set(true);
 	}
@@ -1283,6 +1477,11 @@ public abstract class AbstractDialog
 		if (targetWorld!=null) {
 			targetWorld.withdrawRequest(resident);
 		}
+	}
+	//
+	public void revalidateAndRepaint() {
+		revalidate();
+		repaint();
 	}
 }
 

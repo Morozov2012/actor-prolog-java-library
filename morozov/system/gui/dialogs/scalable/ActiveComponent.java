@@ -31,11 +31,18 @@ import java.awt.font.TextAttribute;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Color;
+import java.awt.event.FocusListener;
+import java.awt.event.FocusEvent;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class ActiveComponent implements ActionListener, ChangeListener, ListSelectionListener {
+public abstract class ActiveComponent
+		implements
+			ActionListener,
+			ChangeListener,
+			ListSelectionListener,
+			FocusListener {
 	//
 	// public JComponent component;
 	public Component component;
@@ -71,6 +78,25 @@ public abstract class ActiveComponent implements ActionListener, ChangeListener,
 	public Term getRange() {
 		// return PrologEmptyList.instance;
 		return PrologUnknownValue.instance;
+	}
+	//
+	public void setIsEnabled(boolean mode) {
+		if (component != null) {
+			if (mode) {
+				component.setEnabled(true);
+			} else {
+				component.setEnabled(false);
+			}
+		}
+	}
+	//
+	public boolean isEnabled(boolean mode) {
+		if (component != null) {
+//System.out.printf("component.isEnabled()=%s;mode=%s;\n",component.isEnabled(),mode);
+			return (component.isEnabled() == mode);
+		} else {
+			return false;
+		}
 	}
 	//
 	public void setPadding(
@@ -141,6 +167,20 @@ public abstract class ActiveComponent implements ActionListener, ChangeListener,
 		} else {
 			return false;
 		}
+	}
+	//
+	public void focusGained(FocusEvent e) {
+	}
+	public void focusLost(FocusEvent e) {
+		// area.revalidate();
+		// area.repaint();
+		// revalidateAndRepaint();
+		// 2013.12.07: Без этих комманд происходят престранные
+		// вещи. Нажимаю кнопку, открывается новый (модальный)
+		// диалог, закрываю диалог, и потом текущий диалог
+		// некорректно перерисовывается.
+		// См. пример test_117_45_enable_disable_01_jdk.a.
+		targetDialog.revalidateAndRepaint();
 	}
 	//
 	public void setForeground(Color c) {

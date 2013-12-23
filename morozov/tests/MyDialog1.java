@@ -59,8 +59,8 @@ public class MyDialog1 extends AbstractDialog {
 	ScalableLabel control_1_0_2;
 	ScalableLabel control_1_0_1;
 	ScalablePanel panel1;
-	public MyDialog1(Window w) {
-		super(w);
+	public MyDialog1(boolean isTopLevelWindow, Window parent) {
+		super(isTopLevelWindow,parent);
 	}
 	protected String getPredefinedTitle() {
 		return "Demo Panel";

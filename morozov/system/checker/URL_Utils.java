@@ -73,7 +73,6 @@ public class URL_Utils {
 	}
 	//
 	public static URL_Attributes getResourceAttributes(URI uri, CharacterSet characterSet, int timeout, StaticContext staticContext, boolean backslashIsSeparator) throws URISyntaxException, MalformedURLException, IOException {
-//System.out.printf("100:URL_Utils::uri %s\n",uri);
 		boolean isLocalResource= isLocalResource(uri);
 		boolean isDirectoryName= isDirectoryURI(uri);
 		if (isDirectoryName) {
@@ -86,24 +85,16 @@ public class URL_Utils {
 		};
 		URL url= uri.toURL();
 		try {
-//System.out.printf("101:URL_Utils::uri %s\n",uri);
 			URLConnection connection= url.openConnection();
-//System.out.printf("102:URL_Utils::connection %s\n",connection);
 			try {
 				if (timeout >= 0) {
-//System.out.printf("103:URL_Utils::connection %s\n",connection);
 					connection.setConnectTimeout(timeout);
-//System.out.printf("104:URL_Utils::connection %s\n",connection);
 					connection.setReadTimeout(timeout);
-//System.out.printf("105:URL_Utils::connection %s\n",connection);
 				};
 				connection.setUseCaches(false);
-//System.out.printf("106:URL_Utils::connection %s\n",connection);
 				InputStream stream= connection.getInputStream();
-//System.out.printf("107:URL_Utils::stream %s\n",stream);
 				boolean has_UTF_Coding= has_UTF_Coding(stream);
 				try {
-//System.out.printf("108[0]:URL_Utils::connection %s\n",connection);
 					long lastModificationTime;
 					try {
 						lastModificationTime= connection.getLastModified();
@@ -116,8 +107,6 @@ public class URL_Utils {
 					} catch (Throwable e1) {
 						contentLength= -1;
 					};
-//System.out.printf("108[1]:URL_Utils::lastModificationTime %s\n",lastModificationTime);
-//System.out.printf("108[2]:URL_Utils::contentLength %s\n",contentLength);
 					return new URL_Attributes(
 						uri,
 						url,
@@ -128,14 +117,10 @@ public class URL_Utils {
 						isDirectoryName,
 						lastModificationTime,
 						contentLength);
-//System.out.printf("108[3]:URL_Utils::connection %s\n",connection);
 				} finally {
-//System.out.printf("109:URL_Utils::stream %s\n",stream);
 					stream.close();
-//System.out.printf("110:URL_Utils::stream %s\n",stream);
 				}
 			} catch (Throwable e1) {
-//System.out.printf("111:URL_Utils::e1= %s\n",e1);
 				Term exceptionName= getChannelExceptionName(e1,connection);
 				return new URL_Attributes(
 					uri,
@@ -149,7 +134,6 @@ public class URL_Utils {
 					isDirectoryName);
 			}
 		} catch (Throwable e1) {
-//System.out.printf("112:URL_Utils::e1= %s\n",e1);
 			return new URL_Attributes(
 				uri,
 				url,
@@ -232,17 +216,17 @@ public class URL_Utils {
 		}
 	}
 	//
-	public static boolean isLocalResource(String path, boolean backslashIsSeparator) {
+	public static boolean isResolvedNameOfLocalResource(String path) {
 		try {
-			path= replaceSlashesAndSpaces(path,backslashIsSeparator);
 			URI uri= new URI(path);
 			return isLocalResource(uri);
 		} catch (URISyntaxException e) {
 		};
 		return true;
 	}
-	public static boolean isResolvedNameOfLocalResource(String path) {
+	public static boolean isLocalResource(String path, boolean backslashIsSeparator) {
 		try {
+			path= replaceSlashesAndSpaces(path,backslashIsSeparator);
 			URI uri= new URI(path);
 			return isLocalResource(uri);
 		} catch (URISyntaxException e) {
@@ -422,8 +406,14 @@ public class URL_Utils {
 					return path.toUri();
 				} else {
 					URL codeBase= applet.getCodeBase();
-					location= addFilePrefixToAbsolutePath(location);
-					return codeBase.toURI().resolve(location);
+					if (codeBase != null) {
+						location= addFilePrefixToAbsolutePath(location);
+						return codeBase.toURI().resolve(location);
+					} else { // A probable bug in JDK 1.7.0_40
+						location= deleteFilePrefixAndDecodeLocalFileName(location);
+						Path path= FileUtils.resolveFileName(location);
+						return path.toUri();
+					}
 				}
 			} else {
 				return new URI(location);
@@ -485,12 +475,17 @@ public class URL_Utils {
 					return FileUtils.resolveAndEncodeLocalFileNameAddFilePrefix(location);
 				} else {
 					URL codeBase= applet.getCodeBase();
-					try {
-						location= addFilePrefixToAbsolutePath(location);
-						URI uri= codeBase.toURI().resolve(location);
-						return uri.toASCIIString();
-					} catch (URISyntaxException e) {
-						throw new WrongTermIsMalformedURL(e);
+					if (codeBase != null) {
+						try {
+							location= addFilePrefixToAbsolutePath(location);
+							URI uri= codeBase.toURI().resolve(location);
+							return uri.toASCIIString();
+						} catch (URISyntaxException e) {
+							throw new WrongTermIsMalformedURL(e);
+						}
+					} else { // A probable bug in JDK 1.7.0_40
+						location= deleteFilePrefixAndDecodeLocalFileName(location);
+						return FileUtils.resolveAndEncodeLocalFileNameAddFilePrefix(location);
 					}
 				}
 			} else {
@@ -625,27 +620,34 @@ public class URL_Utils {
 		fileName= deleteFilePrefixAndDecodeLocalFileName(fileName);
 		JApplet applet= StaticContext.retrieveApplet(staticContext);
 		if (applet==null) {
-			Path base= fileSystem.getPath(location);
-			if (!isDirectoryPath(base)) {
-				base= base.getParent();
-				if (base != null) {
-					Path file= base.resolve(fileName);
-					return FileUtils.tryToMakeRealName(file).toUri();
-				} else {
-					Path file= fileSystem.getPath(fileName);
-					return FileUtils.tryToMakeRealName(file).toUri();
-				}
-			} else {
+			return getFileSystemFullLocalURI(location,fileName,staticContext,backslashIsSeparator);
+		} else {
+			URL codeBase= applet.getCodeBase();
+			if (codeBase != null) {
+				location= addFilePrefixToAbsolutePath(location);
+				URI uri1= codeBase.toURI().resolve(location);
+				fileName= addFilePrefixToAbsolutePath(fileName);
+				URI uri2= uri1.resolve(fileName);
+				return uri2;
+			} else { // A probable bug in JDK 1.7.0_40
+				return getFileSystemFullLocalURI(location,fileName,staticContext,backslashIsSeparator);
+			}
+		}
+	}
+	public static URI getFileSystemFullLocalURI(String location, String fileName, StaticContext staticContext, boolean backslashIsSeparator) throws URISyntaxException {
+		Path base= fileSystem.getPath(location);
+		if (!isDirectoryPath(base)) {
+			base= base.getParent();
+			if (base != null) {
 				Path file= base.resolve(fileName);
+				return FileUtils.tryToMakeRealName(file).toUri();
+			} else {
+				Path file= fileSystem.getPath(fileName);
 				return FileUtils.tryToMakeRealName(file).toUri();
 			}
 		} else {
-			URL codeBase= applet.getCodeBase();
-			location= addFilePrefixToAbsolutePath(location);
-			URI uri1= codeBase.toURI().resolve(location);
-			fileName= addFilePrefixToAbsolutePath(fileName);
-			URI uri2= uri1.resolve(fileName);
-			return uri2;
+			Path file= base.resolve(fileName);
+			return FileUtils.tryToMakeRealName(file).toUri();
 		}
 	}
 	public static URI getFullLocalURI(String location, StaticContext staticContext, boolean backslashIsSeparator) throws URISyntaxException {
@@ -660,9 +662,14 @@ public class URL_Utils {
 			return FileUtils.tryToMakeRealName(file).toUri();
 		} else {
 			URL codeBase= applet.getCodeBase();
-			location= addFilePrefixToAbsolutePath(location);
-			URI uri= codeBase.toURI().resolve(location);
-			return uri;
+			if (codeBase != null) {
+				location= addFilePrefixToAbsolutePath(location);
+				URI uri= codeBase.toURI().resolve(location);
+				return uri;
+			} else { // A probable bug in JDK 1.7.0_40
+				Path file= fileSystem.getPath(location);
+				return FileUtils.tryToMakeRealName(file).toUri();
+			}
 		}
 	}
 	//
@@ -677,30 +684,37 @@ public class URL_Utils {
 		try {
 			JApplet applet= StaticContext.retrieveApplet(staticContext);
 			if (applet==null) {
-				Path base= fileSystem.getPath(location);
-				if (!isDirectoryPath(base)) {
-					base= base.getParent();
-					if (base != null) {
-						Path file= base.resolve(fileName);
-						return FileUtils.tryToMakeRealName(file).toString();
-					} else {
-						Path file= fileSystem.getPath(fileName);
-						return FileUtils.tryToMakeRealName(file).toString();
-					}
-				} else {
-					Path file= base.resolve(fileName);
-					return FileUtils.tryToMakeRealName(file).toString();
-				}
+				return getFileSystemFullLocalName(location,fileName,staticContext,backslashIsSeparator);
 			} else {
 				URL codeBase= applet.getCodeBase();
-				location= addFilePrefixToAbsolutePath(location);
-				URI uri1= codeBase.toURI().resolve(location);
-				fileName= addFilePrefixToAbsolutePath(fileName);
-				URI uri2= uri1.resolve(fileName);
-				return uri2.toASCIIString();
+				if (codeBase != null) {
+					location= addFilePrefixToAbsolutePath(location);
+					URI uri1= codeBase.toURI().resolve(location);
+					fileName= addFilePrefixToAbsolutePath(fileName);
+					URI uri2= uri1.resolve(fileName);
+					return uri2.toASCIIString();
+				} else { // A probable bug in JDK 1.7.0_40
+					return getFileSystemFullLocalName(location,fileName,staticContext,backslashIsSeparator);
+				}
 			}
 		} catch (Throwable e) {
 			return fileName;
+		}
+	}
+	public static String getFileSystemFullLocalName(String location, String fileName, StaticContext staticContext, boolean backslashIsSeparator) {
+		Path base= fileSystem.getPath(location);
+		if (!isDirectoryPath(base)) {
+			base= base.getParent();
+			if (base != null) {
+				Path file= base.resolve(fileName);
+				return FileUtils.tryToMakeRealName(file).toString();
+			} else {
+				Path file= fileSystem.getPath(fileName);
+				return FileUtils.tryToMakeRealName(file).toString();
+			}
+		} else {
+			Path file= base.resolve(fileName);
+			return FileUtils.tryToMakeRealName(file).toString();
 		}
 	}
 	public static String getFullLocalName(String location, StaticContext staticContext, boolean backslashIsSeparator) {
@@ -716,9 +730,14 @@ public class URL_Utils {
 				return FileUtils.tryToMakeRealName(file).toString();
 			} else {
 				URL codeBase= applet.getCodeBase();
-				location= addFilePrefixToAbsolutePath(location);
-				URI uri= codeBase.toURI().resolve(location);
-				return uri.toASCIIString();
+				if (codeBase != null) {
+					location= addFilePrefixToAbsolutePath(location);
+					URI uri= codeBase.toURI().resolve(location);
+					return uri.toASCIIString();
+				} else { // A probable bug in JDK 1.7.0_40
+					Path file= fileSystem.getPath(location);
+					return FileUtils.tryToMakeRealName(file).toString();
+				}
 			}
 		} catch (Throwable e) {
 			return location;
@@ -728,7 +747,7 @@ public class URL_Utils {
 	public static String readTextFile(URL_Attributes attributes) throws Throwable {
 		if (attributes.isLocalResource) {
 			CharacterSet requestedCharacterSet= attributes.characterSet;
-			if (requestedCharacterSet.isDummy() || requestedCharacterSet.isDefault()) {
+			if (requestedCharacterSet.isDummyOrDefault()) {
 				if (attributes.has_UTF_Coding) {
 					String fileName= deleteFilePrefixAndDecodeLocalFileName(attributes.url.toExternalForm());
 					return FileUtils.readLocalTextFile(fileName,new CharacterSet(CharacterSetType.UTF_16));
@@ -769,28 +788,22 @@ public class URL_Utils {
 	//
 	public static byte[] readBytesFromFile(URL_Attributes attributes) throws Throwable {
 		if (attributes.isLocalResource) {
-//System.out.printf("[1.2.1] URL_Utils::fileName: %s\n",attributes);
 			String fileName= deleteFilePrefixAndDecodeLocalFileName(attributes.url.toExternalForm());
-//System.out.printf("[1.2.2] URL_Utils::fileName: %s\n",fileName);
 			return FileUtils.readBytesFromLocalFile(fileName);
 		} else {
-//System.out.printf("[1.2.3] URL_Utils::fileName: %s\n",attributes);
 			URLConnection connection= attributes.url.openConnection();
-//System.out.printf("[1.2.4] URL_Utils::fileName: %s\n",connection);
 			int timeout= attributes.maxWaitingInterval;
 			if (timeout >= 0) {
 				connection.setConnectTimeout(timeout);
 				connection.setReadTimeout(timeout);
 			};
 			InputStream stream= connection.getInputStream();
-//System.out.printf("[1.2.5] URL_Utils::fileName: %s\n",stream);
 			try {
 				int length= StrictMath.max(stream.available(),0xFFFF);
 				byte[] readingBuffer= new byte[length];
 				ArrayList<Byte> totalBuffer= new ArrayList<Byte>();
 				while(true) {
 					int k= stream.read(readingBuffer,0,length);
-//System.out.printf("[1.2.6] URL_Utils::k: %s\n",k);
 					if (k < 0) {
 						break;
 					};
@@ -798,18 +811,14 @@ public class URL_Utils {
 						totalBuffer.add(readingBuffer[n]);
 					}
 				};
-//System.out.printf("[1.2.7] URL_Utils::totalBuffer=%s\n",totalBuffer.size());
 				Byte[] totalArray= totalBuffer.toArray(new Byte[0]);
 				byte[] result= new byte[totalArray.length];
 				for (int n=0; n < totalArray.length; n++) {
 					result[n]= totalArray[n];
 				};
-//System.out.printf("[1.2.RET] URL_Utils::result=%s\n",result.length);
 				return result;
 			} finally {
-//System.out.printf("[1.2.8] URL_Utils::stream=%s\n",stream);
 				stream.close();
-//System.out.printf("[1.2.9] URL_Utils::CLOSED::stream=%s\n",stream);
 			}
 		}
 	}
@@ -819,7 +828,6 @@ public class URL_Utils {
 			installCookieManagerIfNecessary(staticContext);
 			URL_Attributes attributes= getResourceAttributes(uri,characterSet,timeout,staticContext,backslashIsSeparator);
 			try {
-//System.out.printf("[1.2] URL_Utils::fileName: %s\n",attributes);
 				byte[] array= readBytesFromFile(attributes);
 				if (attributes.connectionWasSuccessful()) {
 					return array;

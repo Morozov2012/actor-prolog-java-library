@@ -32,6 +32,12 @@ public enum DialogEntryType {
 		Term getValue(AbstractDialog dialog) {
 			throw new IllegalCallOfInternalMethod();
 		}
+		public boolean isValueOrAction() {
+			return true;
+		}
+		public boolean isValueActionOrRange() {
+			return true;
+		}
 	},
 	RANGE {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
@@ -39,6 +45,37 @@ public enum DialogEntryType {
 		}
 		Term getValue(AbstractDialog dialog) {
 			throw new IllegalCallOfInternalMethod();
+		}
+		public boolean isValueActionOrRange() {
+			return true;
+		}
+	},
+	ACTION {
+		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
+			throw new IllegalCallOfInternalMethod();
+		}
+		Term getValue(AbstractDialog dialog) {
+			throw new IllegalCallOfInternalMethod();
+		}
+		public boolean isValueOrAction() {
+			return true;
+		}
+		public boolean isValueActionOrRange() {
+			return true;
+		}
+	},
+	BUILT_IN_ACTION {
+		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
+			throw new IllegalCallOfInternalMethod();
+		}
+		Term getValue(AbstractDialog dialog) {
+			throw new IllegalCallOfInternalMethod();
+		}
+		public boolean isValueOrAction() {
+			return true;
+		}
+		public boolean isValueActionOrRange() {
+			return true;
 		}
 	},
 	TITLE {
@@ -235,8 +272,6 @@ public enum DialogEntryType {
 			dialog.validate();
 		}
 		Term getValue(AbstractDialog dialog) {
-			// Font oldFont= dialog.getFont();
-			// return new PrologString(oldFont.getFamily());
 			return new PrologString(dialog.currentFontName.get());
 		}
 		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
@@ -270,9 +305,9 @@ public enum DialogEntryType {
 			dialog.validate();
 		}
 		Term getValue(AbstractDialog dialog) {
-			// Font oldFont= dialog.getFont();
-			// return new PrologInteger(oldFont.getSize());
-			return new PrologReal(dialog.currentFontSize.get());
+			int size2= dialog.currentFontSize.get();
+			int size1= DefaultOptions.fontSystemSimulationMode.reconstruct(size2);
+			return new PrologReal(size2);
 		}
 		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 			return DialogUtils.standardizeFontSizeValue(value,iX);
@@ -309,7 +344,6 @@ public enum DialogEntryType {
 			dialog.invalidate(); // 2012.03.05
 		}
 		Term getValue(AbstractDialog dialog) {
-			// Font oldFont= dialog.getFont();
 			int fontStyle= dialog.currentFontStyle.get();
 			boolean isBold= (fontStyle & Font.BOLD) != 0;
 			boolean isItalic= (fontStyle & Font.ITALIC) != 0;
@@ -324,5 +358,11 @@ public enum DialogEntryType {
 	abstract Term getValue(AbstractDialog dialog);
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		return value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
+	}
+	public boolean isValueOrAction() {
+		return false;
+	}
+	public boolean isValueActionOrRange() {
+		return false;
 	}
 }

@@ -283,7 +283,6 @@ public abstract class Clip extends Alpha {
 			String textName= name.getStringValue(iX);
 			textName= appendExtensionIfNecessary(textName,iX);
 			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-			// System.out.printf("textName=>>>%s<<<\n",textName);
 			URI uri= URL_Utils.create_URI(textName,staticContext,backslashIsSeparator);
 			return uri;
 		} catch (TermIsNotAString e) {

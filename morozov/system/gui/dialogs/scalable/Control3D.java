@@ -38,9 +38,9 @@ public class Control3D extends ActiveComponent {
 		dialog= tD;
 		height= rows;
 		width= columns;
-		MainDesktopPane mainPane= dialog.targetWorld.getMainPane();
-		GraphicsConfiguration config= Canvas3D.getGraphicsConfiguration(mainPane);
-		ExtendedSpace3D s3d= new ExtendedSpace3D(config);
+		GraphicsConfiguration dialogGraphicsConfiguration= dialog.targetWorld.getGraphicsConfiguration();
+		GraphicsConfiguration canvas3DGraphicsConfig= Canvas3D.getGraphicsConfiguration(dialogGraphicsConfiguration);
+		ExtendedSpace3D s3d= new ExtendedSpace3D(canvas3DGraphicsConfig);
 		component= s3d;
 	}
 	//

@@ -168,7 +168,8 @@ public class DiagramUtils {
 			map.put(TextAttribute.POSTURE,TextAttribute.POSTURE_REGULAR);
 		};
 		map.put(TextAttribute.WIDTH,TextAttribute.WIDTH_REGULAR);
-		map.put(TextAttribute.SIZE,fontSize);
+		int realFontSize= DefaultOptions.fontSystemSimulationMode.simulate(fontSize);
+		map.put(TextAttribute.SIZE,realFontSize);
 		map.put(TextAttribute.FOREGROUND,foreground);
 		if (background!=null) {
 			map.put(TextAttribute.BACKGROUND,background);
@@ -196,7 +197,6 @@ public class DiagramUtils {
 		FontRenderContext frc= metrics.getFontRenderContext();
 		double textHeight= 0;
 		if (boxText.length > 0) {
-			// TextLayout layout= new TextLayout(boxText[0],font,frc);
 			Rectangle2D rectangle2D= font.getMaxCharBounds(frc);
 			textHeight= rectangle2D.getHeight();
 			if (boxText.length > 1) {
@@ -213,7 +213,6 @@ public class DiagramUtils {
 		Font font= g2.getFont();
 		FontMetrics metrics= g2.getFontMetrics();
 		FontRenderContext frc= metrics.getFontRenderContext();
-		// TextLayout layout= new TextLayout(textLine,font,frc);
 		Rectangle2D rectangle2D= font.getMaxCharBounds(frc);
 		double textHeight= rectangle2D.getHeight();
 		return textHeight;

@@ -7,6 +7,7 @@ import morozov.system.gui.*;
 import morozov.system.gui.signals.*;
 
 import javax.swing.JDesktopPane;
+import java.awt.GraphicsConfiguration;
 import java.awt.Component;
 import java.awt.event.ComponentListener;
 import java.awt.Dimension;
@@ -34,9 +35,12 @@ public interface DialogOperations {
 	public void safelyMaximize();
 	public void safelyMinimize();
 	public void safelyRestore();
+	public boolean safelyIsVisible();
+	public boolean safelyIsHidden();
 	public boolean safelyIsMaximized();
 	public boolean safelyIsMinimized();
 	public boolean safelyIsRestored();
+	public GraphicsConfiguration getGraphicsConfiguration();
 	// public boolean isVisible();
 	public boolean isShowing();
 	public void toFront();
@@ -50,7 +54,7 @@ public interface DialogOperations {
 	public Point getLocation();
 	public void setLocationByPlatform(boolean locationByPlatform);
 	public void setSize(Dimension d);
-	public boolean isMaximum();
+	// public boolean isMaximum();
 	public Dimension getSize();
 	public Dimension getSize(Dimension rv);
 	public Dimension getRealMinimumSize();

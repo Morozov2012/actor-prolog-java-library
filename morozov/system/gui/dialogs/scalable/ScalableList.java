@@ -28,8 +28,10 @@ public class ScalableList extends ActiveComponent {
 	//
 	public ScalableList(AbstractDialog tD, String[] stringList, double visibleRowCount, double visibleColumnCount, boolean enableSorting, boolean useTabStops) {
 		super(tD);
-		component= new AList(tD,this,stringList,visibleRowCount,visibleColumnCount,enableSorting,useTabStops);
-		((AList)component).setMultipleSelection(enableMultiselection);
+		AList list= new AList(tD,this,stringList,visibleRowCount,visibleColumnCount,enableSorting,useTabStops);
+		component= list;
+		list.setMultipleSelection(enableMultiselection);
+		list.addFocusListener(this);
 	}
 	//
 	// protected int getInitialTopBorder() {return 5;}

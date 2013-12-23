@@ -2,6 +2,8 @@
 
 package morozov.system.gui.reports;
 
+import target.*;
+
 import morozov.classes.*;
 import morozov.system.gui.*;
 
@@ -74,7 +76,8 @@ public class ExtendedReportSpace extends JScrollPane implements MouseListener, A
 					attributes.setTheKeepFontSizeFlag(true);
 					attributes.setFontSize(size);
 					int integerSize= (int)size;
-					Font font= new Font(name,style,integerSize);
+					int realFontSize= DefaultOptions.fontSystemSimulationMode.simulate(integerSize);
+					Font font= new Font(name,style,realFontSize);
 					if (size != (double)integerSize) {
 						font= font.deriveFont((float)size);
 					};

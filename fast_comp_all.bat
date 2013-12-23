@@ -368,6 +368,21 @@
 @cd ..
 @cd ..
 @cd ..
+@cd morozov\system\vision
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\vision\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
 @cd morozov\terms
 @dir /b *.java > dir.txt
 @javac -Xlint:fallthrough @dir.txt

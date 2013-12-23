@@ -13,6 +13,7 @@ import javax.swing.JInternalFrame;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Point;
+import java.awt.Container;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -54,6 +55,7 @@ public class ExtendedJInternalFrame
 		Rectangle parentLayoutSize= computeParentLayoutSize();
 		//
 		ExtendedCoordinates actualPoint= actualCoordinates.get();
+//System.out.printf("JInternalFrame::[0]actualPoint.x=%s,parentLayoutSize.x=%s,parentLayoutSize.width=%s,gridX=%s,initialWidth=%s;\n",actualPoint.x,parentLayoutSize.x,parentLayoutSize.width,gridX,initialWidth);
 		x= DialogUtils.calculateRealCoordinate(actualPoint.x,parentLayoutSize.x,parentLayoutSize.width,gridX,initialWidth);
 		y= DialogUtils.calculateRealCoordinate(actualPoint.y,parentLayoutSize.y,parentLayoutSize.height,gridY,initialHeight);
 		//
@@ -91,7 +93,10 @@ public class ExtendedJInternalFrame
 	}
 	//
 	public void repaintParent() {
-		getParent().repaint();
+		Container container= getParent();
+		if (container != null) {
+			container.repaint();
+		}
 	}
 	public void doSuperLayout() {
 		super.doLayout();
@@ -104,11 +109,16 @@ public class ExtendedJInternalFrame
 		DesktopUtils.safelyMinimize(this);
 	}
 	public void safelyRestore() {
-		// safelyRestoreSize();
 		DesktopUtils.safelyRestore(this);
 	}
 	public void safelyRestoreSize() {
 		dialog.safelyRestoreSize();
+	}
+	public boolean safelyIsVisible() {
+		return DesktopUtils.safelyIsVisible(this);
+	}
+	public boolean safelyIsHidden() {
+		return DesktopUtils.safelyIsHidden(this);
 	}
 	public boolean safelyIsMaximized() {
 		return DesktopUtils.safelyIsMaximized(this);
@@ -151,8 +161,10 @@ public class ExtendedJInternalFrame
 				try {
 					if (isMaximum()) {
 						setMaximum(false);
+						// safelyRestore();
 					} else {
 						setMaximum(true);
+						// safelyMaximize();
 					}
 				} catch (PropertyVetoException e) {
 				}

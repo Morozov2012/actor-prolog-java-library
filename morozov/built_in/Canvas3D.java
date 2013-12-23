@@ -54,6 +54,8 @@ import java.math.BigDecimal;
 import java.math.MathContext;
 import java.lang.reflect.InvocationTargetException;
 
+// import javax.media.opengl.GLProfile;
+
 public abstract class Canvas3D
 		extends ImageConsumer
 		implements ComponentListener {
@@ -116,6 +118,7 @@ public abstract class Canvas3D
 		// the vecmath.jar library before the start
 		// of rendering:
 		Color3f color3d= new Color3f(0,0,0);
+		// GLProfile.initSingleton();
 	}
 	//
 	public void closeFiles() {
@@ -143,12 +146,20 @@ public abstract class Canvas3D
 		createGraphicWindowIfNecessary(iX,true);
 	}
 	//
-	public static GraphicsConfiguration getGraphicsConfiguration(Component component) {
+	public static GraphicsConfiguration getGraphicsConfiguration(Component c) {
+		return getGraphicsConfiguration(c.getGraphicsConfiguration());
+	}
+	public static GraphicsConfiguration getGraphicsConfiguration(GraphicsConfiguration dialogGraphicsConfiguration) {
 		GraphicsConfigTemplate3D gct3D= new GraphicsConfigTemplate3D();
 		gct3D.setSceneAntialiasing(GraphicsConfigTemplate3D.REQUIRED);
-		GraphicsDevice device= component.getGraphicsConfiguration().getDevice();
-		GraphicsConfiguration config= device.getBestConfiguration(gct3D);
-		return config;
+		GraphicsDevice device;
+		if (dialogGraphicsConfiguration==null) {
+			device= java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
+		} else {
+			device= dialogGraphicsConfiguration.getDevice();
+		};
+		GraphicsConfiguration bestGraphicsConfiguration= device.getBestConfiguration(gct3D);
+		return bestGraphicsConfiguration;
 	}
 	//
 	protected void showCanvasAndSaveTree(Term value, ChoisePoint iX) {
@@ -318,9 +329,9 @@ public abstract class Canvas3D
 	}
 	//
 	public void hide0s(ChoisePoint iX) {
-		if (desktopDoesNotExist()) {
-			return;
-		} else if (space3DDoesNotExist()) {
+		// if (desktopDoesNotExist()) {
+		//	return;
+		if (space3DDoesNotExist()) {
 			return;
 		} else {
 			createGraphicWindowIfNecessary(iX,false);
@@ -359,10 +370,42 @@ public abstract class Canvas3D
 		}
 	}
 	//
-	public void isMaximized0s(ChoisePoint iX) throws Backtracking {
-		if (desktopDoesNotExist()) {
+	public void isVisible0s(ChoisePoint iX) throws Backtracking {
+		// if (desktopDoesNotExist()) {
+		//	throw Backtracking.instance;
+		if (space3DDoesNotExist()) {
 			throw Backtracking.instance;
-		} else if (space3DDoesNotExist()) {
+		} else {
+			synchronized(this) {
+				if (graphicWindow != null) {
+					if (!DesktopUtils.safelyIsVisible(graphicWindow)) {
+						throw Backtracking.instance;
+					}
+				} else {
+					throw Backtracking.instance;
+				}
+			}
+		}
+	}
+	//
+	public void isHidden0s(ChoisePoint iX) throws Backtracking {
+		// if (desktopDoesNotExist()) {
+		if (space3DDoesNotExist()) {
+		} else {
+			synchronized(this) {
+				if (graphicWindow != null) {
+					if (!DesktopUtils.safelyIsHidden(graphicWindow)) {
+						throw Backtracking.instance;
+					}
+				}
+			}
+		}
+	}
+	//
+	public void isMaximized0s(ChoisePoint iX) throws Backtracking {
+		// if (desktopDoesNotExist()) {
+		//	throw Backtracking.instance;
+		if (space3DDoesNotExist()) {
 			throw Backtracking.instance;
 		} else {
 			synchronized(this) {
@@ -378,9 +421,9 @@ public abstract class Canvas3D
 	}
 	//
 	public void isMinimized0s(ChoisePoint iX) throws Backtracking {
-		if (desktopDoesNotExist()) {
-			throw Backtracking.instance;
-		} else if (space3DDoesNotExist()) {
+		// if (desktopDoesNotExist()) {
+		//	throw Backtracking.instance;
+		if (space3DDoesNotExist()) {
 			throw Backtracking.instance;
 		} else {
 			synchronized(this) {
@@ -396,9 +439,9 @@ public abstract class Canvas3D
 	}
 	//
 	public void isRestored0s(ChoisePoint iX) throws Backtracking {
-		if (desktopDoesNotExist()) {
-			throw Backtracking.instance;
-		} else if (space3DDoesNotExist()) {
+		// if (desktopDoesNotExist()) {
+		//	throw Backtracking.instance;
+		if (space3DDoesNotExist()) {
 			throw Backtracking.instance;
 		} else {
 			synchronized(this) {
@@ -679,14 +722,14 @@ public abstract class Canvas3D
 		callInternalProcedure(domainSignature2,dialogIsModal,modalChoisePoint);
 	}
 	// Auxiliary operations
-	protected boolean desktopDoesNotExist() {
-		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
-		if (desktop==null) {
-			return true;
-		} else {
-			return false;
-		}
-	}
+	// protected boolean desktopDoesNotExist() {
+	//	MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
+	//	if (desktop==null) {
+	//		return true;
+	//	} else {
+	//		return false;
+	//	}
+	// }
 	public boolean space3DDoesNotExist() {
 		// Map<AbstractWorld,InternalFrame3D> innerWindows= StaticAttributes3D.retrieveInnerWindows(staticContext);
 		// return !innerWindows.containsKey(this);

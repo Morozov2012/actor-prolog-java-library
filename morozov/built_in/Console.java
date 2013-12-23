@@ -53,7 +53,7 @@ public abstract class Console extends Report {
 		askUser(question.toString(iX),"",buttons);
 	}
 	protected Term askUser(String question, String title, String[] buttons) throws Backtracking {
-		DesktopUtils.createPaneIfNecessary(staticContext);
+		// DesktopUtils.createPaneIfNecessary(staticContext);
 		int answer= JOptionPane.showOptionDialog(
 			StaticDesktopAttributes.retrieveDesktopPane(staticContext),
 			question,
@@ -70,7 +70,7 @@ public abstract class Console extends Report {
 		}
 	}
 	protected void askUser(String question, String title) throws Backtracking {
-		DesktopUtils.createPaneIfNecessary(staticContext);
+		// DesktopUtils.createPaneIfNecessary(staticContext);
 		int answer= JOptionPane.showConfirmDialog(
 			StaticDesktopAttributes.retrieveDesktopPane(staticContext),
 			question,
@@ -96,7 +96,7 @@ public abstract class Console extends Report {
 		note(iX,"",message);
 	}
 	protected void note(ChoisePoint iX, String title, Term message) {
-		DesktopUtils.createPaneIfNecessary(staticContext);
+		// DesktopUtils.createPaneIfNecessary(staticContext);
 		JOptionPane.showMessageDialog(
 			StaticDesktopAttributes.retrieveDesktopPane(staticContext),
 			message.toString(iX),
@@ -116,7 +116,7 @@ public abstract class Console extends Report {
 		warning(iX,"",message);
 	}
 	protected void warning(ChoisePoint iX, String title, Term message) {
-		DesktopUtils.createPaneIfNecessary(staticContext);
+		// DesktopUtils.createPaneIfNecessary(staticContext);
 		JOptionPane.showMessageDialog(
 			StaticDesktopAttributes.retrieveDesktopPane(staticContext),
 			message.toString(iX),
@@ -136,7 +136,7 @@ public abstract class Console extends Report {
 		error(iX,"",message);
 	}
 	protected void error(ChoisePoint iX, String title, Term message) {
-		DesktopUtils.createPaneIfNecessary(staticContext);
+		// DesktopUtils.createPaneIfNecessary(staticContext);
 		JOptionPane.showMessageDialog(
 			StaticDesktopAttributes.retrieveDesktopPane(staticContext),
 			message.toString(iX),
@@ -162,7 +162,7 @@ public abstract class Console extends Report {
 		inputString2ff(iX,null,prompt,initialValue);
 	}
 	protected void inputString(ChoisePoint iX, PrologVariable functionOutput, String title, Term prompt, Term initialValue) throws Backtracking {
-		DesktopUtils.createPaneIfNecessary(staticContext);
+		// DesktopUtils.createPaneIfNecessary(staticContext);
 		String text= (String)JOptionPane.showInputDialog(
 			StaticDesktopAttributes.retrieveDesktopPane(staticContext),
 			prompt.toString(iX),
@@ -205,7 +205,7 @@ public abstract class Console extends Report {
 		inputInteger2ff(iX,null,prompt,initialValue);
 	}
 	protected void inputInteger(ChoisePoint iX, PrologVariable functionOutput, String title, Term prompt, Term initialValue, Term errorMessage) throws Backtracking {
-		DesktopUtils.createPaneIfNecessary(staticContext);
+		// DesktopUtils.createPaneIfNecessary(staticContext);
 		String warning;
 		if (errorMessage==null) {
 			warning= "It isn't a valid integer!";
@@ -258,7 +258,7 @@ public abstract class Console extends Report {
 		inputReal2ff(iX,null,prompt,initialValue);
 	}
 	protected void inputReal(ChoisePoint iX, PrologVariable functionOutput, String title, Term prompt, Term initialValue, Term errorMessage) throws Backtracking {
-		DesktopUtils.createPaneIfNecessary(staticContext);
+		// DesktopUtils.createPaneIfNecessary(staticContext);
 		String warning;
 		if (errorMessage==null) {
 			warning= "It isn't a valid real!";
@@ -376,7 +376,7 @@ public abstract class Console extends Report {
 			String initialMask= mask.getStringValue(iX);
 			FileNameMask[] masks= FileUtils.termToFileNameMasks(types,iX);
 			//
-			DesktopUtils.createPaneIfNecessary(staticContext);
+			// DesktopUtils.createPaneIfNecessary(staticContext);
 			//
 			JFileChooser chooser= new ExtendedFileChooser();
 			chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -509,7 +509,7 @@ public abstract class Console extends Report {
 	}
 	//
 	protected void inputDirectoryName(ChoisePoint iX, PrologVariable directoryName, String dialogTitle, String initialPath) throws Backtracking {
-		DesktopUtils.createPaneIfNecessary(staticContext);
+		// DesktopUtils.createPaneIfNecessary(staticContext);
 		JFileChooser chooser= new ExtendedFileChooser();
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		chooser.setDialogTitle(dialogTitle);
@@ -541,7 +541,7 @@ public abstract class Console extends Report {
 		} catch (TermIsSymbolDefault e) {
 			initialColor= Color.WHITE;
 		};
-		DesktopUtils.createPaneIfNecessary(staticContext);
+		// DesktopUtils.createPaneIfNecessary(staticContext);
 		Color newColor= JColorChooser.showDialog(
 			StaticDesktopAttributes.retrieveDesktopPane(staticContext),
 			"", // title.toString(iX),
@@ -569,6 +569,7 @@ public abstract class Console extends Report {
 			} else {
 				String fontName= StyleConstants.getFontFamily(a2);
 				int fontSize= StyleConstants.getFontSize(a2);
+				
 				outputVariable1.value= new PrologString(fontName);
 				outputVariable2.value= new PrologInteger(fontSize);
 				iX.pushTrail(outputVariable1);
@@ -590,7 +591,7 @@ public abstract class Console extends Report {
 	}
 	//
 	protected FontDialog showFontDialog() {
-		DesktopUtils.createPaneIfNecessary(staticContext);
+		// DesktopUtils.createPaneIfNecessary(staticContext);
 		GraphicsEnvironment ge= GraphicsEnvironment.getLocalGraphicsEnvironment();
 		String[] m_fontNames= ge.getAvailableFontFamilyNames();
 		String[] m_fontSizes= new String[] {

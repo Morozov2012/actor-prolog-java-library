@@ -143,18 +143,18 @@ public abstract class File extends Text {
 		}
 	}
 	//
+	public void getString0ff(ChoisePoint iX, PrologVariable outputText) {
+		ExtendedFileName fileName= retrieveRealFileName(iX);
+		getString(iX,outputText,fileName);
+	}
+	public void getString0fs(ChoisePoint iX) {
+	}
 	public void getString1ff(ChoisePoint iX, PrologVariable outputText, Term name) {
 		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		ExtendedFileName fileName= FileUtils.termToExtendedFileName(name,iX,backslashIsSeparator);
 		getString(iX,outputText,fileName);
 	}
 	public void getString1fs(ChoisePoint iX, PrologVariable outputText, Term name) {
-	}
-	public void getString0ff(ChoisePoint iX, PrologVariable outputText) {
-		ExtendedFileName fileName= retrieveRealFileName(iX);
-		getString(iX,outputText,fileName);
-	}
-	public void getString0fs(ChoisePoint iX) {
 	}
 	protected void getString(ChoisePoint iX, PrologVariable outputText, ExtendedFileName fileName) {
 		if (!fileName.isSystemFile) {
@@ -177,14 +177,11 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void open2s(ChoisePoint iX, Term name, Term mode) {
-		// String fileName= name.getStringValue(iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-		ExtendedFileName fileName= FileUtils.termToExtendedFileName(name,iX,backslashIsSeparator);
-		FileAccessMode requiredMode= FileUtils.termToFileAccessMode(mode,iX);
+	public void open0s(ChoisePoint iX) {
+		ExtendedFileName fileName= retrieveRealFileName(iX);
 		boolean requiredRandomAccessMode= Converters.term2OnOff(getBuiltInSlot_E_random_access(),iX);
 		CharacterSet requiredCharacterSet= FileUtils.term2CharacterSet(getBuiltInSlot_E_character_set(),iX);
-		openFile(fileName,requiredMode,requiredRandomAccessMode,requiredCharacterSet);
+		openFile(fileName,FileAccessMode.MODIFYING,requiredRandomAccessMode,requiredCharacterSet);
 	}
 	public void open1s(ChoisePoint iX, Term mode) {
 		ExtendedFileName fileName= retrieveRealFileName(iX);
@@ -193,11 +190,14 @@ public abstract class File extends Text {
 		CharacterSet requiredCharacterSet= FileUtils.term2CharacterSet(getBuiltInSlot_E_character_set(),iX);
 		openFile(fileName,requiredMode,requiredRandomAccessMode,requiredCharacterSet);
 	}
-	public void open0s(ChoisePoint iX) {
-		ExtendedFileName fileName= retrieveRealFileName(iX);
+	public void open2s(ChoisePoint iX, Term name, Term mode) {
+		// String fileName= name.getStringValue(iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+		ExtendedFileName fileName= FileUtils.termToExtendedFileName(name,iX,backslashIsSeparator);
+		FileAccessMode requiredMode= FileUtils.termToFileAccessMode(mode,iX);
 		boolean requiredRandomAccessMode= Converters.term2OnOff(getBuiltInSlot_E_random_access(),iX);
 		CharacterSet requiredCharacterSet= FileUtils.term2CharacterSet(getBuiltInSlot_E_character_set(),iX);
-		openFile(fileName,FileAccessMode.MODIFYING,requiredRandomAccessMode,requiredCharacterSet);
+		openFile(fileName,requiredMode,requiredRandomAccessMode,requiredCharacterSet);
 	}
 	protected void openFile(ExtendedFileName fileName, FileAccessMode requiredMode, boolean requiredRandomAccessMode, CharacterSet requiredCharacterSet) {
 		if (!(currentMode==null)) {
@@ -219,10 +219,8 @@ public abstract class File extends Text {
 							bufferedReader= Files.newBufferedReader(path,requiredCharacterSet.toCharSet());
 						}
 					} else {
-						if (requiredCharacterSet.isDummy()) {
+						if (requiredCharacterSet.isDummyOrDefault()) {
 							randomAccessFile= new RandomAccessFile(textName,"r");
-							// Path path= fileSystem.getPath(textName);
-							// SeekableByteChannel channel= Files.newByteChannel(path,EnumSet.of(StandardOpenOption.READ,StandardOpenOption.WRITE));
 						} else {
 							throw new RandomAccessRequiresTheNoneCharacterSet();
 						}
@@ -233,12 +231,11 @@ public abstract class File extends Text {
 						if (requiredCharacterSet.isDummy()) {
 							outputStream= new DataOutputStream(new BufferedOutputStream(new FileOutputStream(textName)));
 						} else {
-							// bufferedWriter= new BufferedWriter(new OutputStreamWriter(new FileOutputStream(textName),requiredCharacterSet.toCharSet()));
 							Path path= fileSystem.getPath(textName);
 							bufferedWriter= Files.newBufferedWriter(path,requiredCharacterSet.toCharSet());
 						}
 					} else {
-						if (requiredCharacterSet.isDummy()) {
+						if (requiredCharacterSet.isDummyOrDefault()) {
 							FileUtils.createDirectories(textName);
 							randomAccessFile= new RandomAccessFile(textName,"rw");
 							randomAccessFile.setLength(0);
@@ -252,7 +249,6 @@ public abstract class File extends Text {
 						if (requiredCharacterSet.isDummy()) {
 							outputStream= new DataOutputStream(new BufferedOutputStream(new FileOutputStream(textName,true)));
 						} else {
-							// bufferedWriter= new BufferedWriter(new OutputStreamWriter(new FileOutputStream(textName,true),requiredCharacterSet.toCharSet()));
 							Path path= fileSystem.getPath(textName);
 							bufferedWriter= Files.newBufferedWriter(
 								path,
@@ -262,7 +258,7 @@ public abstract class File extends Text {
 								StandardOpenOption.APPEND);
 						}
 					} else {
-						if (requiredCharacterSet.isDummy()) {
+						if (requiredCharacterSet.isDummyOrDefault()) {
 							FileUtils.createDirectories(textName);
 							randomAccessFile= new RandomAccessFile(textName,"rw");
 							randomAccessFile.seek(randomAccessFile.length());
@@ -271,7 +267,7 @@ public abstract class File extends Text {
 						}
 					}
 				} else {
-					if (requiredCharacterSet.isDummy()) {
+					if (requiredCharacterSet.isDummyOrDefault()) {
 						FileUtils.createDirectories(textName);
 						randomAccessFile= new RandomAccessFile(textName,"rw");
 					} else {
@@ -290,8 +286,6 @@ public abstract class File extends Text {
 								inputStream= new DataInputStream(new BufferedInputStream(System.in));
 							} else {
 								bufferedReader= new BufferedReader(new InputStreamReader(System.in,requiredCharacterSet.toCharSet()));
-								// Path path= fileSystem.getPath(textName);
-								// bufferedReader= Files.newBufferedReader(path,requiredCharacterSet.toCharSet());
 							}
 						}
 					} else if (currentMode==FileAccessMode.WRITING) {
@@ -409,25 +403,6 @@ public abstract class File extends Text {
 	//
 	public void writeF2ms(ChoisePoint iX, Term... args) {
 		StringBuilder textBuffer= FormatOutput.termsToFormattedString(iX,(Term[])args);
-		// for (int n=0; n < textBuffer.length(); n++) {
-		//	int c= textBuffer.charAt(n);
-		//	System.out.printf("%d) %d\n",n,c);
-		// };
-		// String s= textBuffer.toString();
-		// for (int n=0; n < s.length(); n++) {
-		//	int c= s.charAt(n);
-		//	System.out.printf("STRING: %d) %d\n",n,c);
-		// };
-		// byte[] b= s.getBytes(StandardCharsets.ISO_8859_1);
-		// for (int n=0; n < b.length; n++) {
-		//	int c= b[n];
-		//	System.out.printf("BYTES: %d) %d\n",n,c);
-		// };
-		// char[] ca= s.toCharArray();
-		// for (int n=0; n < ca.length; n++) {
-		//	int c= ca[n];
-		//	System.out.printf("CHAR: %d) %d\n",n,c);
-		// };
 		write_string_buffer(textBuffer);
 	}
 	//
@@ -458,15 +433,11 @@ public abstract class File extends Text {
 					if (currentFileName.systemName==SystemFileName.STDIN) {
 						throw new StandardInputStreamDoesNotSupportThisOperation();
 					} else {
-						// if (currentFileName.systemName==SystemFileName.STDOUT) {
-						// stdout.print(textBuffer.toString());
 						if (currentCharacterSet.isDummy()) {
 							outputStream.writeBytes(textBuffer.toString());
 						} else {
 							bufferedWriter.write(textBuffer.toString(),0,textBuffer.length());
 						}
-					// } else if (currentFileName.systemName==SystemFileName.STDERR) {
-					//	stderr.print(textBuffer.toString());
 					}
 				}
 			} catch (java.io.IOException e) {
@@ -964,17 +935,17 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void doesExist1s(ChoisePoint iX, Term name) throws Backtracking {
+	public void doesExist0s(ChoisePoint iX) throws Backtracking {
 		try {
-			ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
+			ExtendedFileName fileName= retrieveRealFileName(iX);
 			doesExist(fileName);
 		} catch (Throwable e) {
 			throw Backtracking.instance;
 		}
 	}
-	public void doesExist0s(ChoisePoint iX) throws Backtracking {
+	public void doesExist1s(ChoisePoint iX, Term name) throws Backtracking {
 		try {
-			ExtendedFileName fileName= retrieveRealFileName(iX);
+			ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
 			doesExist(fileName);
 		} catch (Throwable e) {
 			throw Backtracking.instance;
@@ -989,12 +960,29 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void isDirectory1s(ChoisePoint iX, Term name) throws Backtracking {
-		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
-		isDirectory(fileName);
-	}
+	// public void isLocalResource0s(ChoisePoint iX) throws Backtracking {
+	//	ExtendedFileName fileName= retrieveRealFileName(iX);
+	//	isLocalResource(fileName,iX);
+	// }
+	// public void isLocalResource1s(ChoisePoint iX, Term a1) throws Backtracking {
+	//	ExtendedFileName fileName= retrieveRealFileName(a1,iX);
+	//	isLocalResource(fileName,iX);
+	// }
+	// protected void isLocalResource(ExtendedFileName fileName, ChoisePoint iX) throws Backtracking {
+	//	if (!fileName.isSystemFile) {
+	//		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+	//		if (!URL_Utils.isLocalResource(fileName.textName,backslashIsSeparator)) {
+	//			throw Backtracking.instance;
+	//		}
+	//	}
+	// }
+	//
 	public void isDirectory0s(ChoisePoint iX) throws Backtracking {
 		ExtendedFileName fileName= retrieveRealFileName(false,iX);
+		isDirectory(fileName);
+	}
+	public void isDirectory1s(ChoisePoint iX, Term name) throws Backtracking {
+		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
 		isDirectory(fileName);
 	}
 	protected void isDirectory(ExtendedFileName fileName) throws Backtracking {
@@ -1014,12 +1002,12 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void isNormal1s(ChoisePoint iX, Term name) throws Backtracking {
-		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
-		isNormal(fileName);
-	}
 	public void isNormal0s(ChoisePoint iX) throws Backtracking {
 		ExtendedFileName fileName= retrieveRealFileName(iX);
+		isNormal(fileName);
+	}
+	public void isNormal1s(ChoisePoint iX, Term name) throws Backtracking {
+		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
 		isNormal(fileName);
 	}
 	protected void isNormal(ExtendedFileName fileName) throws Backtracking {
@@ -1061,12 +1049,12 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void isArchive1s(ChoisePoint iX, Term name) throws Backtracking {
-		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
-		isArchive(fileName);
-	}
 	public void isArchive0s(ChoisePoint iX) throws Backtracking {
 		ExtendedFileName fileName= retrieveRealFileName(iX);
+		isArchive(fileName);
+	}
+	public void isArchive1s(ChoisePoint iX, Term name) throws Backtracking {
+		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
 		isArchive(fileName);
 	}
 	protected void isArchive(ExtendedFileName fileName) throws Backtracking {
@@ -1088,12 +1076,12 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void isHidden1s(ChoisePoint iX, Term name) throws Backtracking {
-		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
-		isHidden(fileName);
-	}
 	public void isHidden0s(ChoisePoint iX) throws Backtracking {
 		ExtendedFileName fileName= retrieveRealFileName(iX);
+		isHidden(fileName);
+	}
+	public void isHidden1s(ChoisePoint iX, Term name) throws Backtracking {
+		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
 		isHidden(fileName);
 	}
 	protected void isHidden(ExtendedFileName fileName) throws Backtracking {
@@ -1112,12 +1100,12 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void isReadOnly1s(ChoisePoint iX, Term name) throws Backtracking {
-		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
-		isReadOnly(fileName);
-	}
 	public void isReadOnly0s(ChoisePoint iX) throws Backtracking {
 		ExtendedFileName fileName= retrieveRealFileName(iX);
+		isReadOnly(fileName);
+	}
+	public void isReadOnly1s(ChoisePoint iX, Term name) throws Backtracking {
+		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
 		isReadOnly(fileName);
 	}
 	protected void isReadOnly(ExtendedFileName fileName) throws Backtracking {
@@ -1126,22 +1114,6 @@ public abstract class File extends Text {
 			if (!file.exists() || file.canWrite()) {
 				throw Backtracking.instance;
 			}
-		//	Path path= fileSystem.getPath(fileName.textName);
-		//	try {
-		//		if (path.notExists()) {
-		//			throw Backtracking.instance;
-		//		} else {
-		//			path.checkAccess(AccessMode.WRITE);
-		//		}
-		//	} catch (UnsupportedOperationException e) {
-		//		throw Backtracking.instance;
-		//	} catch (NoSuchFileException e) {
-		//		throw Backtracking.instance;
-		//	} catch (AccessDeniedException e) {
-		//		throw Backtracking.instance;
-		//	} catch (IOException e) {
-		//		throw Backtracking.instance;
-		//	}
 		} else {
 			if (fileName.systemName != SystemFileName.STDIN) {
 				throw Backtracking.instance;
@@ -1149,12 +1121,12 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void isSystem1s(ChoisePoint iX, Term name) throws Backtracking {
-		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
-		isSystem(fileName);
-	}
 	public void isSystem0s(ChoisePoint iX) throws Backtracking {
 		ExtendedFileName fileName= retrieveRealFileName(iX);
+		isSystem(fileName);
+	}
+	public void isSystem1s(ChoisePoint iX, Term name) throws Backtracking {
+		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
 		isSystem(fileName);
 	}
 	protected void isSystem(ExtendedFileName fileName) throws Backtracking {
@@ -1176,12 +1148,12 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void makeDirectory1s(ChoisePoint iX, Term name) {
-		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
-		makeDirectory(fileName);
-	}
 	public void makeDirectory0s(ChoisePoint iX) {
 		ExtendedFileName fileName= retrieveRealFileName(false,iX);
+		makeDirectory(fileName);
+	}
+	public void makeDirectory1s(ChoisePoint iX, Term name) {
+		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
 		makeDirectory(fileName);
 	}
 	protected void makeDirectory(ExtendedFileName fileName) {
@@ -1193,13 +1165,13 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void setArchive2s(ChoisePoint iX, Term name, Term mode) {
-		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
+	public void setArchive1s(ChoisePoint iX, Term mode) {
+		ExtendedFileName fileName= retrieveRealFileName(iX);
 		boolean flag= Converters.term2OnOff(mode,iX);
 		setArchive(fileName,flag);
 	}
-	public void setArchive1s(ChoisePoint iX, Term mode) {
-		ExtendedFileName fileName= retrieveRealFileName(iX);
+	public void setArchive2s(ChoisePoint iX, Term name, Term mode) {
+		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
 		boolean flag= Converters.term2OnOff(mode,iX);
 		setArchive(fileName,flag);
 	}
@@ -1222,13 +1194,13 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void setHidden2s(ChoisePoint iX, Term name, Term mode) {
-		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
+	public void setHidden1s(ChoisePoint iX, Term mode) {
+		ExtendedFileName fileName= retrieveRealFileName(iX);
 		boolean flag= Converters.term2OnOff(mode,iX);
 		setHidden(fileName,flag);
 	}
-	public void setHidden1s(ChoisePoint iX, Term mode) {
-		ExtendedFileName fileName= retrieveRealFileName(iX);
+	public void setHidden2s(ChoisePoint iX, Term name, Term mode) {
+		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
 		boolean flag= Converters.term2OnOff(mode,iX);
 		setHidden(fileName,flag);
 	}
@@ -1251,13 +1223,13 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void setReadOnly2s(ChoisePoint iX, Term name, Term mode) {
-		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
+	public void setReadOnly1s(ChoisePoint iX, Term mode) {
+		ExtendedFileName fileName= retrieveRealFileName(iX);
 		boolean flag= Converters.term2OnOff(mode,iX);
 		setReadOnly(fileName,flag);
 	}
-	public void setReadOnly1s(ChoisePoint iX, Term mode) {
-		ExtendedFileName fileName= retrieveRealFileName(iX);
+	public void setReadOnly2s(ChoisePoint iX, Term name, Term mode) {
+		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
 		boolean flag= Converters.term2OnOff(mode,iX);
 		setReadOnly(fileName,flag);
 	}
@@ -1271,16 +1243,6 @@ public abstract class File extends Text {
 					file.setWritable(true);
 				}
 			}
-			// Path path= fileSystem.getPath(fileName.textName);
-			// try {
-			//	if (path.exists()) {
-			//		path.setAttribute("dos:readonly",flag);
-			//	}
-			// } catch (UnsupportedOperationException e) {
-			// // } catch (IllegalArgumentException e) {
-			// // } catch (ClassCastException e) {
-			// } catch (IOException e) {
-			// }
 		} else {
 			if (fileName.systemName==SystemFileName.STDIN) {
 				if (!flag) {
@@ -1300,13 +1262,13 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void setSystem2s(ChoisePoint iX, Term name, Term mode) {
-		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
+	public void setSystem1s(ChoisePoint iX, Term mode) {
+		ExtendedFileName fileName= retrieveRealFileName(iX);
 		boolean flag= Converters.term2OnOff(mode,iX);
 		setSystem(fileName,flag);
 	}
-	public void setSystem1s(ChoisePoint iX, Term mode) {
-		ExtendedFileName fileName= retrieveRealFileName(iX);
+	public void setSystem2s(ChoisePoint iX, Term name, Term mode) {
+		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
 		boolean flag= Converters.term2OnOff(mode,iX);
 		setSystem(fileName,flag);
 	}
@@ -1329,14 +1291,14 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void rename2s(ChoisePoint iX, Term source, Term destination) {
-		ExtendedFileName fileName1= retrieveRealFileName(source,false,iX);
-		ExtendedFileName fileName2= retrieveRealFileName(destination,false,iX);
-		renameFile(fileName1,fileName2);
-	}
 	public void rename1s(ChoisePoint iX, Term destination) {
 		ExtendedFileName fileName2= retrieveRealFileName(destination,false,iX);
 		ExtendedFileName fileName1= retrieveRealFileName(iX);
+		renameFile(fileName1,fileName2);
+	}
+	public void rename2s(ChoisePoint iX, Term source, Term destination) {
+		ExtendedFileName fileName1= retrieveRealFileName(source,false,iX);
+		ExtendedFileName fileName2= retrieveRealFileName(destination,false,iX);
 		renameFile(fileName1,fileName2);
 	}
 	protected void renameFile(ExtendedFileName fileName1, ExtendedFileName fileName2) {
@@ -1357,14 +1319,14 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void copy2s(ChoisePoint iX, Term source, Term destination) {
-		ExtendedFileName fileName1= retrieveRealFileName(source,false,iX);
-		ExtendedFileName fileName2= retrieveRealFileName(destination,false,iX);
-		copyFile(fileName1,fileName2);
-	}
 	public void copy1s(ChoisePoint iX, Term destination) {
 		ExtendedFileName fileName2= retrieveRealFileName(destination,false,iX);
 		ExtendedFileName fileName1= retrieveRealFileName(iX);
+		copyFile(fileName1,fileName2);
+	}
+	public void copy2s(ChoisePoint iX, Term source, Term destination) {
+		ExtendedFileName fileName1= retrieveRealFileName(source,false,iX);
+		ExtendedFileName fileName2= retrieveRealFileName(destination,false,iX);
 		copyFile(fileName1,fileName2);
 	}
 	protected void copyFile(ExtendedFileName fileName1, ExtendedFileName fileName2) {
@@ -1378,28 +1340,6 @@ public abstract class File extends Text {
 			} catch (IOException e) {
 				throw new FileInputOutputError(fileName1.toString(),fileName2.toString(),e);
 			// } catch (SecurityException e) {
-			}
-		} else {
-			throw new StandardStreamIsNotAllowedInThisOperation();
-		}
-	}
-	//
-	public void delete1s(ChoisePoint iX, Term name) {
-		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
-		deleteFile(fileName);
-	}
-	public void delete0s(ChoisePoint iX) {
-		ExtendedFileName fileName= retrieveRealFileName(iX);
-		deleteFile(fileName);
-	}
-	protected void deleteFile(ExtendedFileName fileName) {
-		if (!fileName.isSystemFile) {
-			Path path= fileSystem.getPath(fileName.textName);
-			try {
-				// path.deleteIfExists();
-				Files.deleteIfExists(path);
-			} catch (DirectoryNotEmptyException e) {
-			} catch (IOException e) {
 			}
 		} else {
 			throw new StandardStreamIsNotAllowedInThisOperation();
@@ -1433,6 +1373,11 @@ public abstract class File extends Text {
 	public void getCurrentDirectory0fs(ChoisePoint iX) {
 	}
 	//
+	public void listDirectory0ff(ChoisePoint iX, PrologVariable a1) {
+		a1.value= listDirectory(null);
+	}
+	public void listDirectory0fs(ChoisePoint iX) {
+	}
 	public void listDirectory1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
 		try {
 			String mask= a2.getStringValue(iX);
@@ -1443,11 +1388,6 @@ public abstract class File extends Text {
 	}
 	public void listDirectory1fs(ChoisePoint iX, Term a1) {
 	}
-	public void listDirectory0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= listDirectory(null);
-	}
-	public void listDirectory0fs(ChoisePoint iX) {
-	}
 	protected Term listDirectory(String mask) {
 		List<Path> list= FileUtils.listSourceFiles(currentDirectory,mask);
 		Term result= PrologEmptyList.instance;
@@ -1457,29 +1397,22 @@ public abstract class File extends Text {
 		return result;
 	}
 	//
-	public void getFullName1ff(ChoisePoint iX, PrologVariable a1, Term name) {
-		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
-		a1.value= getFullName(fileName);
-	}
-	public void getFullName1fs(ChoisePoint iX, Term name) {
-	}
 	public void getFullName0ff(ChoisePoint iX, PrologVariable a1) {
 		ExtendedFileName fileName= retrieveRealFileName(iX);
 		a1.value= getFullName(fileName);
 	}
 	public void getFullName0fs(ChoisePoint iX) {
 	}
+	public void getFullName1ff(ChoisePoint iX, PrologVariable a1, Term name) {
+		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
+		a1.value= getFullName(fileName);
+	}
+	public void getFullName1fs(ChoisePoint iX, Term name) {
+	}
 	protected Term getFullName(ExtendedFileName fileName) {
 		return fileName.toTerm();
 	}
 	//
-	public void getURL1ff(ChoisePoint iX, PrologVariable a1, Term name) {
-		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-		a1.value= getURL(fileName,backslashIsSeparator);
-	}
-	public void getURL1fs(ChoisePoint iX, Term name) {
-	}
 	public void getURL0ff(ChoisePoint iX, PrologVariable a1) {
 		ExtendedFileName fileName= retrieveRealFileName(iX);
 		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
@@ -1487,9 +1420,38 @@ public abstract class File extends Text {
 	}
 	public void getURL0fs(ChoisePoint iX) {
 	}
+	public void getURL1ff(ChoisePoint iX, PrologVariable a1, Term name) {
+		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+		a1.value= getURL(fileName,backslashIsSeparator);
+	}
+	public void getURL1fs(ChoisePoint iX, Term name) {
+	}
 	protected Term getURL(ExtendedFileName fileName, boolean backslashIsSeparator) {
 		if (!fileName.isSystemFile) {
 			return new PrologString(URL_Utils.get_URL_string(fileName.textName,staticContext,backslashIsSeparator));
+		} else {
+			throw new StandardStreamIsNotAllowedInThisOperation();
+		}
+	}
+	//
+	public void delete0s(ChoisePoint iX) {
+		ExtendedFileName fileName= retrieveRealFileName(iX);
+		deleteFile(fileName);
+	}
+	public void delete1s(ChoisePoint iX, Term name) {
+		ExtendedFileName fileName= retrieveRealFileName(name,false,iX);
+		deleteFile(fileName);
+	}
+	protected void deleteFile(ExtendedFileName fileName) {
+		if (!fileName.isSystemFile) {
+			Path path= fileSystem.getPath(fileName.textName);
+			try {
+				// path.deleteIfExists();
+				Files.deleteIfExists(path);
+			} catch (DirectoryNotEmptyException e) {
+			} catch (IOException e) {
+			}
 		} else {
 			throw new StandardStreamIsNotAllowedInThisOperation();
 		}
@@ -1538,13 +1500,13 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void extractExtension3s(ChoisePoint iX, Term a1, PrologVariable a2, PrologVariable a3) {
-		ExtendedFileName fileName= retrieveRelativeFileName(a1,iX);
-		extractFileExtension(iX,fileName,a2,a3);
-	}
 	public void extractExtension2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
 		ExtendedFileName fileName= retrieveRelativeFileName(iX);
 		extractFileExtension(iX,fileName,a1,a2);
+	}
+	public void extractExtension3s(ChoisePoint iX, Term a1, PrologVariable a2, PrologVariable a3) {
+		ExtendedFileName fileName= retrieveRelativeFileName(a1,iX);
+		extractFileExtension(iX,fileName,a2,a3);
 	}
 	protected void extractFileExtension(ChoisePoint iX, ExtendedFileName fileName, PrologVariable a1, PrologVariable a2) {
 		if (!fileName.isSystemFile) {
@@ -1591,18 +1553,6 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void replaceExtension2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
-		ExtendedFileName fileName= retrieveRelativeFileName(a1,iX);
-		try {
-			String newExtension= a2.getStringValue(iX);
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-			result.value= replaceFileExtension(fileName,newExtension,backslashIsSeparator);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a2);
-		}
-	}
-	public void replaceExtension2fs(ChoisePoint iX, Term a1, Term a2) {
-	}
 	public void replaceExtension1ff(ChoisePoint iX, PrologVariable result, Term a1) {
 		ExtendedFileName fileName= retrieveRelativeFileName(iX);
 		try {
@@ -1614,6 +1564,18 @@ public abstract class File extends Text {
 		}
 	}
 	public void replaceExtension1fs(ChoisePoint iX, Term a1) {
+	}
+	public void replaceExtension2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
+		ExtendedFileName fileName= retrieveRelativeFileName(a1,iX);
+		try {
+			String newExtension= a2.getStringValue(iX);
+			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+			result.value= replaceFileExtension(fileName,newExtension,backslashIsSeparator);
+		} catch (TermIsNotAString e) {
+			throw new WrongArgumentIsNotAString(a2);
+		}
+	}
+	public void replaceExtension2fs(ChoisePoint iX, Term a1, Term a2) {
 	}
 	protected Term replaceFileExtension(ExtendedFileName fileName, String newExtension, boolean backslashIsSeparator) {
 		if (!fileName.isSystemFile) {

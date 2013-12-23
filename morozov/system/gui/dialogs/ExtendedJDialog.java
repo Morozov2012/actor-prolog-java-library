@@ -11,7 +11,9 @@ import morozov.system.gui.signals.*;
 import javax.swing.JDesktopPane;
 import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
+import java.awt.Dialog.ModalityType;
 import java.awt.Window;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Rectangle;
@@ -38,6 +40,7 @@ public class ExtendedJDialog
 	//
 	public ExtendedJDialog(AbstractDialog d, Window w, ModalityType type) {
 		super(w,type);
+		// super(null,type);
 		dialog= d;
 		addMouseListener(this);
 	}
@@ -88,6 +91,12 @@ public class ExtendedJDialog
 	}
 	public void safelyRestore() {
 	}
+	public boolean safelyIsVisible() {
+		return isVisible();
+	}
+	public boolean safelyIsHidden() {
+		return !isVisible();
+	}
 	public boolean safelyIsMaximized() {
 		return false;
 	}
@@ -99,8 +108,8 @@ public class ExtendedJDialog
 	}
 	public void addToDesktop(JDesktopPane desktop) {
 	}
-	public void setMaximum(boolean b) {
-	}
+	// public void setMaximum(boolean b) {
+	// }
 	//
 	public Dimension getRealMinimumSize() {
 		// return getUI().getMinimumSize(this);
@@ -117,7 +126,10 @@ public class ExtendedJDialog
 	}
 	//
 	public void repaintParent() {
-		getParent().repaint();
+		Container container= getParent();
+		if (container != null) {
+			container.repaint();
+		}
 	}
 	public void doSuperLayout() {
 		super.doLayout();

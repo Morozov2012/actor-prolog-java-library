@@ -27,4 +27,7 @@ public class CharacterSet {
 	public boolean isDefault() {
 		return type==CharacterSetType.DEFAULT;
 	}
+	public boolean isDummyOrDefault() {
+		return type==CharacterSetType.NONE || type==CharacterSetType.DEFAULT;
+	}
 }

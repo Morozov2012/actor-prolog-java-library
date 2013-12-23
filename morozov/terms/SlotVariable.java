@@ -346,13 +346,15 @@ public class SlotVariable extends Term {
 	}
 	// Operations on slot variables
 	public void registerVariables(ActiveWorld process, boolean isSuspending, boolean isProtecting) {
+		registerVariables(process,false,isSuspending,isProtecting);
+	}
+	public void registerVariables(ActiveWorld process, boolean rewriteOldDefinition, boolean isSuspending, boolean isProtecting) {
 		process.registerVariable(this);
 		//
 		SlotVariableValue slotValue= null;
 		processTableLock.readLock().lock();
 		try {
 			slotValue= processTable.get(process);
-			// processTableLock.readLock().unlock();
 		} finally {
 			processTableLock.readLock().unlock();
 		};
@@ -372,22 +374,37 @@ public class SlotVariable extends Term {
 					processTable.put(process,slotValue);
 				} else {
 					if (isProtecting) {
+						if (rewriteOldDefinition) {
+							slotValue.isSuspendingPort= false;
+						};
 						slotValue.isProtectingPort= true;
 					} else if (isSuspending) {
 						slotValue.isSuspendingPort= true;
 						slotValue.isProtectingPort= false;
+					} else {
+						if (rewriteOldDefinition) {
+							slotValue.isSuspendingPort= false;
+							slotValue.isProtectingPort= false;
+						}
 					}
 				}
-				// processTableLock.writeLock().unlock();
 			} finally {
 				processTableLock.writeLock().unlock();
 			}
 		} else {
 			if (isProtecting) {
+				if (rewriteOldDefinition) {
+					slotValue.isSuspendingPort= false;
+				};
 				slotValue.isProtectingPort= true;
 			} else if (isSuspending) {
 				slotValue.isSuspendingPort= true;
 				slotValue.isProtectingPort= false;
+			} else {
+				if (rewriteOldDefinition) {
+					slotValue.isSuspendingPort= false;
+					slotValue.isProtectingPort= false;
+				}
 			}
 		}
 	}

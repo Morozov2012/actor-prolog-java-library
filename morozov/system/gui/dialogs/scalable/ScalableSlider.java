@@ -37,8 +37,10 @@ public class ScalableSlider extends ActiveComponent {
 		super(tD);
 		orientation= direction;
 		length= n;
-		component= new JSlider(orientation,min,max,value);
-		((JSlider)component).addChangeListener(this);
+		JSlider slider= new JSlider(orientation,min,max,value);
+		component= slider;
+		slider.addChangeListener(this);
+		slider.addFocusListener(this);
 	}
 	// protected int getInitialTopBorder() {return 5;}
 	// protected int getInitialLeftBorder() {return 5;}

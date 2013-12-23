@@ -69,6 +69,7 @@ public class ActiveUser extends ActiveWorld {
 	// ACCEPT MESSAGES
 	// Process Flow Messages
 	protected void processFlowMessages(ChoisePoint iX) {
+//System.out.printf("ActU.processFM\n");
 		Iterator<SlotVariable> slotVariablesIterator= slotVariables.iterator();
 		while (slotVariablesIterator.hasNext()) {
 			SlotVariable slotVariable= slotVariablesIterator.next();
@@ -147,6 +148,7 @@ public class ActiveUser extends ActiveWorld {
 		throw new AnAttemptToExtractDomainSignatureFromActiveUser();
 	}
 	public void registerPortsAndRecoverPortValues(AbstractDialog dialog, Dialog targetWorld, DialogEntry[] userDefinedSlots, DialogEntry[] systemSlots) {
+//System.out.printf("AbstrD.regP&Reco\n");
 		phaseInitiation();
 		targetDialog= dialog;
 		initiateSlotValues(targetWorld,userDefinedSlots);
@@ -190,6 +192,7 @@ public class ActiveUser extends ActiveWorld {
 		}
 	}
 	protected void initiateDialogEntries(Dialog targetWorld, DialogEntry[] slots) {
+//System.out.printf("ActiveUser.initiateDialogEntries\n");
 		for (int i= 0; i < slots.length; i++) {
 			DialogEntry item= slots[i];
 			if (item.isSlotName) {

@@ -2,6 +2,8 @@
 
 package morozov.classes;
 
+import morozov.system.gui.*;
+
 import java.awt.Window;
 import javax.swing.JApplet;
 
@@ -25,6 +27,7 @@ public class StaticContext {
 		rootProcess= self;
 		applet= program;
 		arguments= args;
+		LookAndFeelUtils.assignLookAndFeel();
 		if (windows.length > 0) {
 			for (int i=windows.length-1; i >= 0; i--) {
 				if (!ownerlessWindows.contains(windows[i])) {

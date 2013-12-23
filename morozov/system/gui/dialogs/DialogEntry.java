@@ -26,7 +26,9 @@ public class DialogEntry {
 	Term currentRange= null;
 	private Term intermediateValue= null;
 	private Term intermediateRange= null;
+	private boolean intermediateMode= false;
 	private AtomicBoolean isInitiated= new AtomicBoolean(false);
+	private AtomicBoolean isToBeRefreshed= new AtomicBoolean(false);
 	//
 	public DialogEntry(AbstractDialog td, String slotName, boolean flag2, DialogEntryType type) {
 		dialog= td;
@@ -69,8 +71,17 @@ public class DialogEntry {
 		entryType= type;
 	}
 	//
+	public boolean isBuiltInAction() {
+		if (entryType == DialogEntryType.BUILT_IN_ACTION) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	//
 	public void putValue(Term value, final ChoisePoint iX) {
-		if (entryType==DialogEntryType.VALUE) {
+//System.out.printf("DialogEntry::(%s)putValue=%s\n",this,value);
+		if (entryType.isValueOrAction()) {
 			synchronized(currentValueGuard) {
 				Term newValue;
 				try {
@@ -79,7 +90,8 @@ public class DialogEntry {
 					return;
 				};
 				boolean skipOperation= false;
-				if (currentValue==null) {
+				// System.out.printf("currentValue=%s,newValue=%s\n",currentValue,newValue);
+				if (currentValue==null || isToBeRefreshed.get()) {
 					currentValue= newValue;
 				} else {
 					try {
@@ -97,6 +109,7 @@ public class DialogEntry {
 						} finally {
 							dialog.insideThePutOperation.set(false);
 							isInitiated.set(true);
+							isToBeRefreshed.set(false);
 						}
 					} else {
 						try {
@@ -108,6 +121,7 @@ public class DialogEntry {
 									} finally {
 										dialog.insideThePutOperation.set(false);
 										isInitiated.set(true);
+										isToBeRefreshed.set(false);
 									}
 								}
 							});
@@ -126,7 +140,7 @@ public class DialogEntry {
 					return;
 				};
 				boolean skipOperation= false;
-				if (currentRange==null) {
+				if (currentRange==null || isToBeRefreshed.get()) {
 					currentRange= newRange;
 				} else {
 					try {
@@ -144,6 +158,7 @@ public class DialogEntry {
 						} finally {
 							dialog.insideThePutOperation.set(false);
 							isInitiated.set(true);
+							isToBeRefreshed.set(false);
 						}
 					} else {
 						try {
@@ -155,6 +170,7 @@ public class DialogEntry {
 									} finally {
 										dialog.insideThePutOperation.set(false);
 										isInitiated.set(true);
+										isToBeRefreshed.set(false);
 									}
 								}
 							});
@@ -174,7 +190,7 @@ public class DialogEntry {
 					return;
 				};
 				boolean skipOperation= false;
-				if (currentValue==null) {
+				if (currentValue==null || isToBeRefreshed.get()) {
 					currentValue= newValue;
 				} else {
 					try {
@@ -215,6 +231,9 @@ public class DialogEntry {
 			}
 		}
 	}
+	public void requestValueRefreshing() {
+		isToBeRefreshed.set(true);
+	}
 	public Term refreshAndGetValue() throws Backtracking {
 		return getExistedValue(true);
 	}
@@ -222,9 +241,9 @@ public class DialogEntry {
 		return getExistedValue(false);
 	}
 	public Term getExistedValue(boolean refreshValue) throws Backtracking {
-		if (entryType==DialogEntryType.VALUE) {
+		if (entryType.isValueOrAction()) {
 			synchronized(currentValueGuard) {
-				if (currentValue==null || refreshValue) {
+				if (currentValue==null || refreshValue || isToBeRefreshed.get()) {
 					if (SwingUtilities.isEventDispatchThread()) {
 						currentValue= component.getValue();
 					} else {
@@ -244,13 +263,14 @@ public class DialogEntry {
 						} else {
 							throw Backtracking.instance;
 						}
-					}
+					};
+					isToBeRefreshed.set(false);
 				};
 				return currentValue;
 			}
 		} else if (entryType==DialogEntryType.RANGE) {
 			synchronized(currentRangeGuard) {
-				if (currentRange==null || refreshValue) {
+				if (currentRange==null || refreshValue || isToBeRefreshed.get()) {
 					if (SwingUtilities.isEventDispatchThread()) {
 						currentRange= component.getRange();
 					} else {
@@ -270,7 +290,8 @@ public class DialogEntry {
 						} else {
 							throw Backtracking.instance;
 						}
-					}
+					};
+					isToBeRefreshed.set(false);
 				};
 				return currentRange;
 			}
@@ -280,7 +301,7 @@ public class DialogEntry {
 			};
 			synchronized(currentValueGuard) {
 				// try {
-					if (currentValue==null || refreshValue) {
+					if (currentValue==null || refreshValue || isToBeRefreshed.get()) {
 						if (SwingUtilities.isEventDispatchThread()) {
 							currentValue= entryType.getValue(dialog);
 						} else {
@@ -303,7 +324,8 @@ public class DialogEntry {
 							} else {
 								throw Backtracking.instance;
 							}
-						}
+						};
+						isToBeRefreshed.set(false);
 					};
 					return currentValue;
 				// } catch (CannotComputeDesktopSize e) {
@@ -313,7 +335,7 @@ public class DialogEntry {
 		}
 	}
 	public Term getVisibleValue() {
-		if (entryType==DialogEntryType.VALUE) {
+		if (entryType.isValueOrAction()) {
 			synchronized(currentValueGuard) {
 				if (SwingUtilities.isEventDispatchThread()) {
 					return component.getValue();
@@ -393,6 +415,51 @@ public class DialogEntry {
 				//	return PrologUnknownValue.instance;
 				// }
 			}
+		}
+	}
+	//
+	public void setFieldIsEnabled(final boolean mode) {
+		if (entryType.isValueActionOrRange()) {
+			synchronized(currentValueGuard) {
+				if (SwingUtilities.isEventDispatchThread()) {
+					component.setIsEnabled(mode);
+				} else {
+					try {
+						SwingUtilities.invokeAndWait(new Runnable() {
+							public void run() {
+								component.setIsEnabled(mode);
+							}
+						});
+					} catch (InterruptedException e) {
+					} catch (InvocationTargetException e) {
+					}
+				}
+			}
+		}
+	}
+	//
+	public boolean fieldIsEnabled(final boolean mode) {
+		if (entryType.isValueActionOrRange()) {
+			synchronized(currentValueGuard) {
+				if (SwingUtilities.isEventDispatchThread()) {
+					return component.isEnabled(mode);
+				} else {
+					try {
+						SwingUtilities.invokeAndWait(new Runnable() {
+							public void run() {
+								intermediateMode= component.isEnabled(mode);
+							}
+						});
+					} catch (InterruptedException e) {
+						intermediateMode= false;
+					} catch (InvocationTargetException e) {
+						intermediateMode= false;
+					};
+					return intermediateMode;
+				}
+			}
+		} else {
+			return true;
 		}
 	}
 	//

@@ -5,12 +5,15 @@ package morozov.built_in;
 import target.*;
 
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.gui.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.errors.*;
 import morozov.system.gui.dialogs.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
+import java.awt.GraphicsConfiguration;
 import java.awt.Window;
 
 public abstract class Dialog extends ImageConsumer {
@@ -19,6 +22,7 @@ public abstract class Dialog extends ImageConsumer {
 	//
 	abstract protected Term getBuiltInSlot_E_identifier();
 	// abstract protected Term getBuiltInSlot_E_sensitiveness();
+	abstract protected Term getBuiltInSlot_E_is_top_level_window();
 	abstract protected Term getBuiltInSlot_E_title();
 	abstract protected Term getBuiltInSlot_E_text_color();
 	abstract protected Term getBuiltInSlot_E_space_color();
@@ -89,6 +93,26 @@ public abstract class Dialog extends ImageConsumer {
 		}
 	}
 	//
+	public void isVisible0s(ChoisePoint iX) throws Backtracking {
+		if (targetObject != null) {
+			if (!targetObject.safelyIsVisible()) {
+				throw Backtracking.instance;
+			}
+		} else {
+			throw Backtracking.instance;
+		}
+	}
+	//
+	public void isHidden0s(ChoisePoint iX) throws Backtracking {
+		if (targetObject != null) {
+			if (!targetObject.safelyIsHidden()) {
+				throw Backtracking.instance;
+			}
+		// } else {
+		//	throw Backtracking.instance;
+		}
+	}
+	//
 	public void isMaximized0s(ChoisePoint iX) throws Backtracking {
 		if (targetObject != null) {
 			if (!targetObject.safelyIsMaximized()) {
@@ -119,6 +143,11 @@ public abstract class Dialog extends ImageConsumer {
 		}
 	}
 	//
+	public void put2s(ChoisePoint iX, Term fieldName, Term fieldValue) {
+		prepareDialogIfNecessary(false,iX);
+		targetObject.putFieldValue(fieldName,fieldValue,iX);
+	}
+	//
 	public void get1ff(ChoisePoint iX, PrologVariable fieldValue, Term fieldName) {
 		prepareDialogIfNecessary(false,iX);
 		fieldValue.value= targetObject.getFieldValue(fieldName,iX);
@@ -129,9 +158,41 @@ public abstract class Dialog extends ImageConsumer {
 		targetObject.getFieldValue(fieldName,iX);
 	}
 	//
-	public void put2s(ChoisePoint iX, Term fieldName, Term fieldValue) {
+	public void enable1s(ChoisePoint iX, Term fieldName) {
 		prepareDialogIfNecessary(false,iX);
-		targetObject.putFieldValue(fieldName,fieldValue,iX);
+		targetObject.setFieldIsEnabled(fieldName,true,iX);
+	}
+	//
+	public void disable1s(ChoisePoint iX, Term fieldName) {
+		prepareDialogIfNecessary(false,iX);
+		targetObject.setFieldIsEnabled(fieldName,false,iX);
+	}
+	//
+	public void isEnabled1s(ChoisePoint iX, Term fieldName) throws Backtracking {
+		prepareDialogIfNecessary(false,iX);
+		targetObject.checkIfFieldIsEnabled(fieldName,true,iX);
+	}
+	//
+	public void isDisabled1s(ChoisePoint iX, Term fieldName) throws Backtracking {
+		prepareDialogIfNecessary(false,iX);
+		targetObject.checkIfFieldIsEnabled(fieldName,false,iX);
+	}
+	//
+	public void changeBackgroundColor1s(ChoisePoint iX, Term backgroundColor) {
+		try {
+			long code= backgroundColor.getSymbolValue(iX);
+			if (code==SymbolCodes.symbolCode_E_default) {
+				Term color= getBuiltInSlot_E_background_color();
+				prepareDialogIfNecessary(false,iX);
+				targetObject.putSymbolicFieldValue(SymbolCodes.symbolCode_E_background_color,color,iX);
+			} else {
+				prepareDialogIfNecessary(false,iX);
+				targetObject.putSymbolicFieldValue(SymbolCodes.symbolCode_E_background_color,backgroundColor,iX);
+			}
+		} catch (TermIsNotASymbol e1) {
+			prepareDialogIfNecessary(false,iX);
+			targetObject.putSymbolicFieldValue(SymbolCodes.symbolCode_E_background_color,backgroundColor,iX);
+		}
 	}
 	//
 	public void action1s(ChoisePoint iX, Term actionName) {
@@ -156,10 +217,16 @@ public abstract class Dialog extends ImageConsumer {
 	}
 	//
 	protected void prepareDialogIfNecessary(boolean showDialog, ChoisePoint iX) {
-		DesktopUtils.createPaneIfNecessary(staticContext);
+		boolean isTopLevelWindow= Converters.term2YesNo(getBuiltInSlot_E_is_top_level_window(),iX);
+		if (!isTopLevelWindow) {
+			DesktopUtils.createPaneIfNecessary(staticContext);
+		};
 		if (targetObject==null) {
-			Window mainWindow= StaticDesktopAttributes.retrieveMainWindow(staticContext);
-			targetObject= createDialog(mainWindow,iX);
+			Window mainWindow= null;
+			if (!isTopLevelWindow) {
+				mainWindow= StaticDesktopAttributes.retrieveMainWindow(staticContext);
+			};
+			targetObject= createDialog(isTopLevelWindow,mainWindow,iX);
 			targetObject.initiate(currentProcess,staticContext);
 			targetObject.increaseDepthCounter();
 			targetObject.prepare(
@@ -177,7 +244,7 @@ public abstract class Dialog extends ImageConsumer {
 				iX);
 			// boolean IsSensitive= DialogUtils.termToDialogSensitiveness(getBuiltInSlot_E_sensitiveness(),iX);
 			targetObject.registerSlotVariables();
-			targetObject.start();
+			// targetObject.start();
 			if (showDialog) {
 				MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
 				targetObject.safelyAddAndDisplay(desktop,iX);
@@ -185,6 +252,7 @@ public abstract class Dialog extends ImageConsumer {
 			// targetObject.registerSlotVariables(); // DEBUG 2011.12.15
 			targetObject.decreaseDepthCounter();
 			targetObject.receiveInitiatingMessage();
+			// targetObject.start();
 		} else if (showDialog) {
 			MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
 			targetObject.increaseDepthCounter();
@@ -193,12 +261,12 @@ public abstract class Dialog extends ImageConsumer {
 		}
 	}
 	//
-	protected AbstractDialog createDialog(Window window, ChoisePoint iX) {
+	protected AbstractDialog createDialog(boolean isTopLevel, Window window, ChoisePoint iX) {
 		Term identifier= getBuiltInSlot_E_identifier();
 		try {
 			String name= DialogUtils.termToDialogIdentifier(identifier,iX);
 			try {
-				return DialogTable.createDialog(name,window);
+				return DialogTable.createDialog(name,isTopLevel,window);
 			} catch (UndefinedDialogTableEntry e) {
 				throw new ClassNotFound(name);
 			}
@@ -211,7 +279,7 @@ public abstract class Dialog extends ImageConsumer {
 					packageNumber,
 					classCode);
 				try {
-					return DialogTable.createDialog(name,window);
+					return DialogTable.createDialog(name,isTopLevel,window);
 				} catch (UndefinedDialogTableEntry e2) {
 				}
 			};
@@ -250,7 +318,11 @@ public abstract class Dialog extends ImageConsumer {
 		}
 	}
 	//
-	public MainDesktopPane getMainPane() {
-		return DesktopUtils.createPaneIfNecessary(staticContext);
+	public GraphicsConfiguration getGraphicsConfiguration() {
+		if (targetObject != null) {
+			return targetObject.getGraphicsConfiguration();
+		} else {
+		}
+			return null;
 	}
 }

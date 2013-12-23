@@ -1,6 +1,6 @@
 // (c) 2013 IRE RAS Alexei A. Morozov
 
-package morozov.system.gui.space2d.errors;
+package morozov.system.errors;
 
 import morozov.terms.*;
 import morozov.terms.errors.*;

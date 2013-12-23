@@ -36,10 +36,12 @@ public class ExtendedSpace2D
 	protected AbstractDialog dialog;
 	// protected String identifier;
 	// protected StaticContext staticContext;
-	protected List<Java2DCommand> commands= null;
+	protected List<Java2DCommand> currentCommands= null;
+	protected Java2DCommand[] oldCommands= null;
 	protected AtomicReference<Canvas2DScalingFactor> scalingFactor;
 	// protected boolean enableSceneAntialiasing= false;
 	protected AtomicBoolean sceneAntialiasingIsEnabled;
+	protected boolean redrawingIsSuspended= false;
 	//
 	public ExtendedSpace2D(boolean keepProportions) {
 		Canvas2DScalingFactor scaling;
@@ -53,7 +55,7 @@ public class ExtendedSpace2D
 	}
 	public ExtendedSpace2D(Canvas2D target, List<Java2DCommand> commandList, AtomicReference<Canvas2DScalingFactor> scaling, AtomicBoolean enableAntialiasing) {
 		targetWorld= target;
-		commands= commandList;
+		currentCommands= commandList;
 		scalingFactor= scaling;
 		sceneAntialiasingIsEnabled= enableAntialiasing;
 	}
@@ -71,7 +73,7 @@ public class ExtendedSpace2D
 		sceneAntialiasingIsEnabled= enableAntialiasing;
 	}
 	public void setCommands(List<Java2DCommand> commandList) {
-		commands= commandList;
+		currentCommands= commandList;
 	}
 	//
 	public void enableMouseListener() {
@@ -103,23 +105,62 @@ public class ExtendedSpace2D
 		}
 	}
 	//
+	public void suspendRedrawing() {
+		synchronized (currentCommands) {
+			if (redrawingIsSuspended) {
+				return;
+			} else {
+				redrawingIsSuspended= true;
+				oldCommands= new Java2DCommand[currentCommands.size()];
+				oldCommands= currentCommands.toArray(oldCommands);
+			}
+		}
+	}
+	public void releaseRedrawing() {
+		synchronized (currentCommands) {
+			if (!redrawingIsSuspended) {
+				return;
+			} else {
+				oldCommands= null;
+				redrawingIsSuspended= false;
+			}
+		}
+	}
+	//
 	public void paintComponent(Graphics g) {
-		if (commands != null) {
+		if (currentCommands != null) {
 			Graphics2D g2= (Graphics2D)g;
 			boolean enableSceneAntialiasing= sceneAntialiasingIsEnabled.get();
 			if (enableSceneAntialiasing) {
 				RenderingHints rh = new RenderingHints(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 				g2.setRenderingHints(rh);
 			};
+			correctSizeIfNecessary();
+//System.out.printf("ExtendedSpace2D::currentCommands.size()%s redrawingIsSuspended=%s\n",currentCommands.size(),redrawingIsSuspended);
+//System.out.printf("ExtendedSpace2D::getSize()%s\n",getSize());
+//System.out.printf("ExtendedSpace2D::getPreferredSize()%s\n",getPreferredSize());
+//System.out.printf("ExtendedSpace2D::getMaximumSize()%s\n",getMaximumSize());
+//System.out.printf("ExtendedSpace2D::getMinimumSize()%s\n",getMinimumSize());
 			Dimension size= getSize();
+			// Dimension size= getMinimumSize();
+			// setSize(size);
 			Canvas2DScalingFactor currentScalingFactor= scalingFactor.get();
-			synchronized (commands) {
+			synchronized (currentCommands) {
 				super.paintComponent(g);
 				DrawingMode drawingMode= new DrawingMode(size,currentScalingFactor);
-				ListIterator<Java2DCommand> iterator= commands.listIterator();
-				while (iterator.hasNext()) {
-					Java2DCommand command= iterator.next();
-					command.execute(g2,drawingMode);
+				if (redrawingIsSuspended) {
+					if (oldCommands != null) {
+						for (int n=0; n < oldCommands.length; n++) {
+							Java2DCommand command= oldCommands[n];
+							command.execute(g2,drawingMode);
+						}
+					}
+				} else {
+					ListIterator<Java2DCommand> iterator= currentCommands.listIterator();
+					while (iterator.hasNext()) {
+						Java2DCommand command= iterator.next();
+						command.execute(g2,drawingMode);
+					}
 				}
 			}
 		}
@@ -214,6 +255,16 @@ public class ExtendedSpace2D
 	public void skipDelayedRepainting() {
 		if (dialog != null) {
 			dialog.skipDelayedRepainting();
+		}
+	}
+	protected void correctSizeIfNecessary() {
+		if (owner != null) {
+			Dimension currentSize= getSize();
+			Dimension minimumSize= getMinimumSize();
+			if (currentSize.width != minimumSize.width || currentSize.height != minimumSize.height) {
+//System.out.printf("W.H.: currentSize=%s,minimumSize=%s\n",currentSize,minimumSize);
+				setSize(minimumSize);
+			}
 		}
 	}
 }

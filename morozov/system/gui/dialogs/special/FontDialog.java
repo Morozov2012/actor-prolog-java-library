@@ -7,6 +7,8 @@
 
 package morozov.system.gui.dialogs.special;
 
+import target.*;
+
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.text.MutableAttributeSet;
@@ -238,7 +240,8 @@ public class FontDialog extends JDialog {
 		if (size <= 0) {
 			return;
 		};
-		map.put(TextAttribute.SIZE,size);
+		int realFontSize= DefaultOptions.fontSystemSimulationMode.simulate(size);
+		map.put(TextAttribute.SIZE,realFontSize);
 		// int style= Font.PLAIN;
 		if (m_chkBold.isSelected()) {
 			// style |= Font.BOLD;

@@ -7,16 +7,16 @@ import morozov.system.indices.*;
 import morozov.terms.*;
 
 import java.nio.charset.CharsetEncoder;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.HashSet;
 
 public class HashMapState extends Term {
 	//
-	protected HashMap<ArrayIndices,SlotVariable> volume;
+	protected Map<ArrayIndices,SlotVariable> volume;
 	protected ArrayIndices indices;
 	protected SlotVariable slotVariable;
 	//
-	public HashMapState(HashMap<ArrayIndices,SlotVariable> v, ArrayIndices list, SlotVariable slot) {
+	public HashMapState(Map<ArrayIndices,SlotVariable> v, ArrayIndices list, SlotVariable slot) {
 		volume= v;
 		indices= list;
 		slotVariable= slot;

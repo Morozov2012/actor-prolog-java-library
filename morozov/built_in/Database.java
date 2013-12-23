@@ -278,13 +278,6 @@ public abstract class Database extends DataAbstraction {
 		}
 	}
 	//
-	// public void clear0s(ChoisePoint iX) {
-	//	if (content != null) {
-	//		content.retractAll();
-	//		content= null;
-	//		ultimateRecord= null;
-	//	}
-	// }
 	public void retractAll0s(ChoisePoint iX) {
 		if (content != null) {
 			content.retractAll();
@@ -425,12 +418,12 @@ public abstract class Database extends DataAbstraction {
 		}
 	}
 	//
-	public void save1s(ChoisePoint iX, Term name) {
-		String fileName= retrieveDatabaseName(name,iX);
-		saveContent(fileName,iX);
-	}
 	public void save0s(ChoisePoint iX) {
 		String fileName= retrieveDatabaseName(iX);
+		saveContent(fileName,iX);
+	}
+	public void save1s(ChoisePoint iX, Term name) {
+		String fileName= retrieveDatabaseName(name,iX);
 		saveContent(fileName,iX);
 	}
 	public void saveContent(String fileName, ChoisePoint iX) {
@@ -455,14 +448,12 @@ public abstract class Database extends DataAbstraction {
 		}
 	}
 	//
-	public void load1s(ChoisePoint iX, Term name) {
-		// String fileName= retrieveDatabaseName(name,iX);
-		URI uri= retrieveLocationURI(name,iX);
+	public void load0s(ChoisePoint iX) {
+		URI uri= retrieveLocationURI(iX);
 		loadContent(uri,iX);
 	}
-	public void load0s(ChoisePoint iX) {
-		// String fileName= retrieveDatabaseName(iX);
-		URI uri= retrieveLocationURI(iX);
+	public void load1s(ChoisePoint iX, Term name) {
+		URI uri= retrieveLocationURI(name,iX);
 		loadContent(uri,iX);
 	}
 	public void loadContent(URI uri, ChoisePoint iX) {
@@ -590,15 +581,21 @@ public abstract class Database extends DataAbstraction {
 		}
 	}
 	//
-	public void doesExist1s(ChoisePoint iX, Term name) throws Backtracking {
-		// String fileName= retrieveDatabaseName(name,iX);
-		URI uri= retrieveLocationURI(name,iX);
-		doesExist(uri,iX);
-	}
 	public void doesExist0s(ChoisePoint iX) throws Backtracking {
-		// String fileName= retrieveDatabaseName(iX);
-		URI uri= retrieveLocationURI(iX);
-		doesExist(uri,iX);
+		try {
+			URI uri= retrieveLocationURI(iX);
+			doesExist(uri,iX);
+		} catch (Throwable e) {
+			throw Backtracking.instance;
+		}
+	}
+	public void doesExist1s(ChoisePoint iX, Term name) throws Backtracking {
+		try {
+			URI uri= retrieveLocationURI(name,iX);
+			doesExist(uri,iX);
+		} catch (Throwable e) {
+			throw Backtracking.instance;
+		}
 	}
 	protected void doesExist(URI uri, ChoisePoint iX) throws Backtracking {
 		CharacterSet characterSet= FileUtils.term2CharacterSet(getBuiltInSlot_E_character_set(),iX);
@@ -615,60 +612,49 @@ public abstract class Database extends DataAbstraction {
 		}
 	}
 	//
-	public void delete1s(ChoisePoint iX, Term name) {
-		String fileName= retrieveDatabaseName(name,iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-		fileName= FileUtils.replaceBackslashes(fileName,backslashIsSeparator);
-		deleteFile(fileName);
-	}
-	public void delete0s(ChoisePoint iX) {
+	public void isLocalResource0s(ChoisePoint iX) throws Backtracking {
 		String fileName= retrieveDatabaseName(iX);
-		deleteFile(fileName);
+		isLocalResource(fileName,iX);
 	}
-	protected void deleteFile(String fileName) {
-		Path path= fileSystem.getPath(fileName);
-		try {
-			// path.deleteIfExists();
-			Files.deleteIfExists(path);
-		} catch (DirectoryNotEmptyException e) {
-		} catch (IOException e) {
+	public void isLocalResource1s(ChoisePoint iX, Term a1) throws Backtracking {
+		String fileName= retrieveDatabaseName(a1,iX);
+		isLocalResource(fileName,iX);
+	}
+	protected void isLocalResource(String fileName, ChoisePoint iX) throws Backtracking {
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+		if (!URL_Utils.isLocalResource(fileName,backslashIsSeparator)) {
+			throw Backtracking.instance;
 		}
 	}
 	//
-	public void getFullName1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
-		String resolvedName= getFullName(iX,a2);
-		a1.value= new PrologString(resolvedName);
-	}
-	public void getFullName1fs(ChoisePoint iX, Term a1) {
-	}
 	public void getFullName0ff(ChoisePoint iX, PrologVariable a1) {
 		String resolvedName= getFullName(iX);
 		a1.value= new PrologString(resolvedName);
 	}
 	public void getFullName0fs(ChoisePoint iX) {
 	}
-	protected String getFullName(ChoisePoint iX, Term a1) {
-		try {
-			String fileName= a1.getStringValue(iX);
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-			return URL_Utils.getFullName(fileName,staticContext,backslashIsSeparator);
-		} catch (TermIsNotAString e1) {
-			throw new WrongArgumentIsNotAString(a1);
-		}
+	public void getFullName1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
+		String resolvedName= getFullName(iX,a2);
+		a1.value= new PrologString(resolvedName);
+	}
+	public void getFullName1fs(ChoisePoint iX, Term a1) {
 	}
 	protected String getFullName(ChoisePoint iX) {
 		String location= retrieveLocationString(iX);
 		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 		return URL_Utils.getFullName(location,staticContext,backslashIsSeparator);
 	}
+	protected String getFullName(ChoisePoint iX, Term a1) {
+		try {
+			String fileName= a1.getStringValue(iX);
+			fileName= appendExtensionIfNecessary(fileName,iX);
+			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+			return URL_Utils.getFullName(fileName,staticContext,backslashIsSeparator);
+		} catch (TermIsNotAString e1) {
+			throw new WrongArgumentIsNotAString(a1);
+		}
+	}
 	//
-	public void getURL1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
-		String resolvedName= getFullName(iX,a2);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-		a1.value= new PrologString(URL_Utils.get_URL_string(resolvedName,staticContext,backslashIsSeparator));
-	}
-	public void getURL1fs(ChoisePoint iX, Term a1) {
-	}
 	public void getURL0ff(ChoisePoint iX, PrologVariable a1) {
 		String resolvedName= getFullName(iX);
 		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
@@ -676,45 +662,48 @@ public abstract class Database extends DataAbstraction {
 	}
 	public void getURL0fs(ChoisePoint iX) {
 	}
+	public void getURL1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
+		String resolvedName= getFullName(iX,a2);
+		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+		a1.value= new PrologString(URL_Utils.get_URL_string(resolvedName,staticContext,backslashIsSeparator));
+	}
+	public void getURL1fs(ChoisePoint iX, Term a1) {
+	}
 	//
-	public void isLocalResource1s(ChoisePoint iX, Term a1) throws Backtracking {
+	public void delete0s(ChoisePoint iX) {
+		String fileName= retrieveDatabaseName(iX);
+		deleteFile(fileName);
+	}
+	public void delete1s(ChoisePoint iX, Term name) {
+		String fileName= retrieveDatabaseName(name,iX);
+		deleteFile(fileName);
+	}
+	protected void deleteFile(String fileName) {
+		Path path= fileSystem.getPath(fileName);
 		try {
-			String path= a1.getStringValue(iX);
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-			String resolvedName= URL_Utils.getFullName(path,staticContext,backslashIsSeparator);
-			if (!URL_Utils.isResolvedNameOfLocalResource(resolvedName)) {
-				throw Backtracking.instance;
-			}
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a1);
-		} catch (WrongTermIsMalformedURL e) {
-		}
-	}
-	public void isLocalResource0s(ChoisePoint iX) throws Backtracking {
-		String path= getFullName(iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-		if (!URL_Utils.isLocalResource(path,backslashIsSeparator)) {
-			throw Backtracking.instance;
+			Files.deleteIfExists(path);
+		} catch (DirectoryNotEmptyException e) {
+		} catch (IOException e) {
 		}
 	}
 	//
-	protected String retrieveDatabaseName(Term name, ChoisePoint iX) {
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+	protected String retrieveDatabaseName(ChoisePoint iX) {
+		Term name= getBuiltInSlot_E_name();
 		try {
 			String textName= name.getStringValue(iX);
 			textName= appendExtensionIfNecessary(textName,iX);
+			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 			textName= FileUtils.replaceBackslashes(textName,backslashIsSeparator);
 			return FileUtils.makeRealName(textName);
 		} catch (TermIsNotAString e) {
 			throw new WrongTermIsNotFileName(name);
 		}
 	}
-	protected String retrieveDatabaseName(ChoisePoint iX) {
-		Term name= getBuiltInSlot_E_name();
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
+	protected String retrieveDatabaseName(Term name, ChoisePoint iX) {
 		try {
 			String textName= name.getStringValue(iX);
 			textName= appendExtensionIfNecessary(textName,iX);
+			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 			textName= FileUtils.replaceBackslashes(textName,backslashIsSeparator);
 			return FileUtils.makeRealName(textName);
 		} catch (TermIsNotAString e) {

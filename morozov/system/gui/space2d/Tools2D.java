@@ -867,7 +867,8 @@ public class Tools2D {
 				} else if (pairName==SymbolCodes.symbolCode_E_size) {
 					try {
 						int size= GUI_Utils.termToFontSize(pairValue,iX);
-						fontAttributes.put(TextAttribute.SIZE,size);
+						int realFontSize= DefaultOptions.fontSystemSimulationMode.simulate(size);
+						fontAttributes.put(TextAttribute.SIZE,realFontSize);
 					} catch (TermIsSymbolDefault e) {
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_weight) {

@@ -23,11 +23,13 @@ import javax.swing.table.TableModel;
 import javax.swing.table.JTableHeader;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.border.Border;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Dimension;
-import javax.swing.border.Border;
 import java.awt.Insets;
+import java.awt.event.FocusListener;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ATable extends JScrollPane {
@@ -57,6 +59,12 @@ public class ATable extends JScrollPane {
 		table.getSelectionModel().addListSelectionListener(targetComponent);
 		// targetDialog.sendResidentRequest(new ScalableTableResident(),"TABLE1",iX);
 		// setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+	}
+	//
+	public void addFocusListener(FocusListener l) {
+		if (table!=null) {
+			table.addFocusListener(l);
+		}
 	}
 	//
 	public void setMultipleSelection(boolean flag) {
@@ -279,6 +287,40 @@ public class ATable extends JScrollPane {
 	}
 	public void addRowSelectionInterval(int index0, int index1) {
 		table.addRowSelectionInterval(index0,index1);
+	}
+	//
+	public void setEnabled(boolean mode) {
+		if (table != null) {
+			if (mode) {
+				table.setEnabled(true);
+				table.getTableHeader().setEnabled(true);
+				super.setEnabled(true);
+				if (verticalScrollBar != null) {
+					verticalScrollBar.setEnabled(true);
+				};
+				if (horizontalScrollBar != null) {
+					horizontalScrollBar.setEnabled(true);
+				}
+			} else {
+				table.setEnabled(false);
+				table.getTableHeader().setEnabled(false);
+				super.setEnabled(false);
+				if (verticalScrollBar != null) {
+					verticalScrollBar.setEnabled(false);
+				};
+				if (horizontalScrollBar != null) {
+					horizontalScrollBar.setEnabled(false);
+				}
+			}
+		}
+	}
+	//
+	public boolean isEnabled() {
+		if (table != null) {
+			return super.isEnabled() && table.isEnabled();
+		} else {
+			return false;
+		}
 	}
 	//
 	// Auxiliary function
