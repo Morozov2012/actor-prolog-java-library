@@ -26,12 +26,13 @@ public abstract class ImageSubtractor extends Alpha {
 	abstract public Term getBuiltInSlot_E_extract_blobs();
 	abstract public Term getBuiltInSlot_E_track_blobs();
 	abstract public Term getBuiltInSlot_E_minimal_training_interval();
+	abstract public Term getBuiltInSlot_E_maximal_training_interval();
 	abstract public Term getBuiltInSlot_E_use_grayscale_colors();
 	abstract public Term getBuiltInSlot_E_apply_gaussian_filtering_to_background();
 	abstract public Term getBuiltInSlot_E_background_gaussian_filter_radius();
 	abstract public Term getBuiltInSlot_E_apply_median_filtering_to_background();
 	abstract public Term getBuiltInSlot_E_background_median_filter_threshold();
-	abstract public Term getBuiltInSlot_E_background_dispersion_factor();
+	abstract public Term getBuiltInSlot_E_background_standard_deviation_factor();
 	abstract public Term getBuiltInSlot_E_horizontal_blob_border();
 	abstract public Term getBuiltInSlot_E_vertical_blob_border();
 	abstract public Term getBuiltInSlot_E_minimal_blob_intersection_area();
@@ -72,13 +73,14 @@ public abstract class ImageSubtractor extends Alpha {
 		if (imageSubtractor.get()==null) {
 			boolean extractBlobs= Converters.term2YesNo(getBuiltInSlot_E_extract_blobs(),iX);
 			boolean trackBlobs= Converters.term2YesNo(getBuiltInSlot_E_track_blobs(),iX);
-			int trainingInterval= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_training_interval(),iX);
+			int minimalTrainingInterval= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_training_interval(),iX);
+			int maximalTrainingInterval= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_training_interval(),iX);
 			boolean useGrayscaleColors= Converters.term2YesNo(getBuiltInSlot_E_use_grayscale_colors(),iX);
 			boolean applyGaussian_2D_Filtering= Converters.term2YesNo(getBuiltInSlot_E_apply_gaussian_filtering_to_background(),iX);
 			int gaussian_2D_FilterRadius= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_background_gaussian_filter_radius(),iX);
 			boolean applyMedian_2D_Filtering= Converters.term2YesNo(getBuiltInSlot_E_apply_median_filtering_to_background(),iX);
 			int median_2D_FilterThreshold= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_background_median_filter_threshold(),iX);
-			double backgroundDispersionFactor= Converters.argumentToReal(getBuiltInSlot_E_background_dispersion_factor(),iX);
+			double backgroundStandardDeviationFactor= Converters.argumentToReal(getBuiltInSlot_E_background_standard_deviation_factor(),iX);
 			int horizontalBlobBorder= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_horizontal_blob_border(),iX);
 			int verticalBlobBorder= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_vertical_blob_border(),iX);
 			int minimalBlobIntersectionArea= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_blob_intersection_area(),iX);
@@ -102,13 +104,14 @@ public abstract class ImageSubtractor extends Alpha {
 				new PlainImageSubtractor(
 					extractBlobs,
 					trackBlobs,
-					trainingInterval,
+					minimalTrainingInterval,
+					maximalTrainingInterval,
 					useGrayscaleColors,
 					applyGaussian_2D_Filtering,
 					gaussian_2D_FilterRadius,
 					applyMedian_2D_Filtering,
 					median_2D_FilterThreshold,
-					backgroundDispersionFactor,
+					backgroundStandardDeviationFactor,
 					horizontalBlobBorder,
 					verticalBlobBorder,
 					minimalBlobIntersectionArea,
@@ -171,13 +174,14 @@ public abstract class ImageSubtractor extends Alpha {
 		if (!createImageSubtractorIfNecessary(iX)) {
 			boolean extractBlobs= Converters.term2YesNo(getBuiltInSlot_E_extract_blobs(),iX);
 			boolean trackBlobs= Converters.term2YesNo(getBuiltInSlot_E_track_blobs(),iX);
-			int trainingInterval= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_training_interval(),iX);
+			int minimalTrainingInterval= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_training_interval(),iX);
+			int maximalTrainingInterval= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_training_interval(),iX);
 			boolean useGrayscaleColors= Converters.term2YesNo(getBuiltInSlot_E_use_grayscale_colors(),iX);
 			boolean applyGaussian_2D_Filtering= Converters.term2YesNo(getBuiltInSlot_E_apply_gaussian_filtering_to_background(),iX);
 			int gaussian_2D_FilterRadius= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_background_gaussian_filter_radius(),iX);
 			boolean applyMedian_2D_Filtering= Converters.term2YesNo(getBuiltInSlot_E_apply_median_filtering_to_background(),iX);
 			int median_2D_FilterThreshold= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_background_median_filter_threshold(),iX);
-			double backgroundDispersionFactor= Converters.argumentToReal(getBuiltInSlot_E_background_dispersion_factor(),iX);
+			double backgroundStandardDeviationFactor= Converters.argumentToReal(getBuiltInSlot_E_background_standard_deviation_factor(),iX);
 			int horizontalBlobBorder= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_horizontal_blob_border(),iX);
 			int verticalBlobBorder= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_vertical_blob_border(),iX);
 			int minimalBlobIntersectionArea= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_blob_intersection_area(),iX);
@@ -203,13 +207,14 @@ public abstract class ImageSubtractor extends Alpha {
 				forgetResults,
 				extractBlobs,
 				trackBlobs,
-				trainingInterval,
+				minimalTrainingInterval,
+				maximalTrainingInterval,
 				useGrayscaleColors,
 				applyGaussian_2D_Filtering,
 				gaussian_2D_FilterRadius,
 				applyMedian_2D_Filtering,
 				median_2D_FilterThreshold,
-				backgroundDispersionFactor,
+				backgroundStandardDeviationFactor,
 				horizontalBlobBorder,
 				verticalBlobBorder,
 				minimalBlobIntersectionArea,
@@ -339,6 +344,19 @@ public abstract class ImageSubtractor extends Alpha {
 	}
 	public void getMinimalTrainingInterval0fs(ChoisePoint iX) {
 	}
+	// MaximalTrainingInterval
+	public void setMaximalTrainingInterval1s(ChoisePoint iX, Term value) {
+		int interval= Converters.argumentToSmallRoundInteger(value,iX);
+		createImageSubtractorIfNecessary(iX);
+		imageSubtractor.get().setMaximalTrainingInterval(interval);
+	}
+	//
+	public void getMaximalTrainingInterval0ff(ChoisePoint iX, PrologVariable result) {
+		createImageSubtractorIfNecessary(iX);
+		result.value= new PrologInteger(imageSubtractor.get().getMaximalTrainingInterval());
+	}
+	public void getMaximalTrainingInterval0fs(ChoisePoint iX) {
+	}
 	// GrayscaleMode
 	public void setGrayscaleMode1s(ChoisePoint iX, Term value) {
 		boolean mode= Converters.term2YesNo(value,iX);
@@ -404,18 +422,18 @@ public abstract class ImageSubtractor extends Alpha {
 	}
 	public void getBackgroundMedianFilterThreshold0fs(ChoisePoint iX) {
 	}
-	// BackgroundDispersionFactor
-	public void setBackgroundDispersionFactor1s(ChoisePoint iX, Term value) {
+	// BackgroundStandardDeviationFactor
+	public void setBackgroundStandardDeviationFactor1s(ChoisePoint iX, Term value) {
 		double factor= Converters.argumentToReal(value,iX);
 		createImageSubtractorIfNecessary(iX);
-		imageSubtractor.get().setBackgroundDispersionFactor(factor);
+		imageSubtractor.get().setBackgroundStandardDeviationFactor(factor);
 	}
 	//
-	public void getBackgroundDispersionFactor0ff(ChoisePoint iX, PrologVariable result) {
+	public void getBackgroundStandardDeviationFactor0ff(ChoisePoint iX, PrologVariable result) {
 		createImageSubtractorIfNecessary(iX);
-		result.value= new PrologReal(imageSubtractor.get().getBackgroundDispersionFactor());
+		result.value= new PrologReal(imageSubtractor.get().getBackgroundStandardDeviationFactor());
 	}
-	public void getBackgroundDispersionFactor0fs(ChoisePoint iX) {
+	public void getBackgroundStandardDeviationFactor0fs(ChoisePoint iX) {
 	}
 	// HorizontalBlobBorder
 	public void setHorizontalBlobBorder1s(ChoisePoint iX, Term value) {

@@ -240,6 +240,28 @@ public abstract class SynchronizedImageSubtractor extends ImageSubtractor {
 	}
 	public void getMinimalTrainingInterval0fs(ChoisePoint iX) {
 	}
+	// MaximalTrainingInterval
+	public void setMaximalTrainingInterval1s(ChoisePoint iX, Term value) {
+		Term subtractor= getBuiltInSlot_E_image_subtractor();
+		if (subtractor instanceof ImageSubtractor) {
+			ImageSubtractor server= (ImageSubtractor)subtractor;
+			server.setMaximalTrainingInterval1s(iX,value);
+		} else {
+			throw new WrongArgumentIsNotImageSubtractor(subtractor);
+		}
+	}
+	//
+	public void getMaximalTrainingInterval0ff(ChoisePoint iX, PrologVariable result) {
+		Term subtractor= getBuiltInSlot_E_image_subtractor();
+		if (subtractor instanceof ImageSubtractor) {
+			ImageSubtractor server= (ImageSubtractor)subtractor;
+			server.getMaximalTrainingInterval0ff(iX,result);
+		} else {
+			throw new WrongArgumentIsNotImageSubtractor(subtractor);
+		}
+	}
+	public void getMaximalTrainingInterval0fs(ChoisePoint iX) {
+	}
 	// GrayscaleMode
 	public void setGrayscaleMode1s(ChoisePoint iX, Term value) {
 		Term subtractor= getBuiltInSlot_E_image_subtractor();
@@ -350,27 +372,27 @@ public abstract class SynchronizedImageSubtractor extends ImageSubtractor {
 	}
 	public void getBackgroundMedianFilterThreshold0fs(ChoisePoint iX) {
 	}
-	// BackgroundDispersionFactor
-	public void setBackgroundDispersionFactor1s(ChoisePoint iX, Term value) {
+	// BackgroundStandardDeviationFactor
+	public void setBackgroundStandardDeviationFactor1s(ChoisePoint iX, Term value) {
 		Term subtractor= getBuiltInSlot_E_image_subtractor();
 		if (subtractor instanceof ImageSubtractor) {
 			ImageSubtractor server= (ImageSubtractor)subtractor;
-			server.setBackgroundDispersionFactor1s(iX,value);
+			server.setBackgroundStandardDeviationFactor1s(iX,value);
 		} else {
 			throw new WrongArgumentIsNotImageSubtractor(subtractor);
 		}
 	}
 	//
-	public void getBackgroundDispersionFactor0ff(ChoisePoint iX, PrologVariable result) {
+	public void getBackgroundStandardDeviationFactor0ff(ChoisePoint iX, PrologVariable result) {
 		Term subtractor= getBuiltInSlot_E_image_subtractor();
 		if (subtractor instanceof ImageSubtractor) {
 			ImageSubtractor server= (ImageSubtractor)subtractor;
-			server.getBackgroundDispersionFactor0ff(iX,result);
+			server.getBackgroundStandardDeviationFactor0ff(iX,result);
 		} else {
 			throw new WrongArgumentIsNotImageSubtractor(subtractor);
 		}
 	}
-	public void getBackgroundDispersionFactor0fs(ChoisePoint iX) {
+	public void getBackgroundStandardDeviationFactor0fs(ChoisePoint iX) {
 	}
 	// HorizontalBlobBorder
 	public void setHorizontalBlobBorder1s(ChoisePoint iX, Term value) {

@@ -80,53 +80,66 @@ class VisionUtils {
 	}
 	public static double median(double[] vector, int from, int to) {
 		int initialLength= vector.length;
-		if (from < 0) {
-			from= 0;
-		};
-		if (to > initialLength) {
-			to= initialLength;
-		};
-		double[] array= Arrays.copyOfRange(vector,from,to);
-		int actualLength= array.length;
-		Arrays.sort(array);
-		double result;
-		if (actualLength % 2 == 0) {
-			int index= actualLength / 2;
-			result= (array[index-1] + array[index]) / 2;
+		int windowLength= to - from + 1;
+		if (initialLength < windowLength) {
+			return 0;
+		} else if (initialLength <= 0 || windowLength <= 0) {
+			return 0;
 		} else {
-			int index= actualLength / 2;
-			result= array[index];
-		};
-		return result;
+			if (from < 0) {
+				from= 0;
+				to= windowLength - 1;
+			} else if (to > initialLength - 1) {
+				to= initialLength - 1;
+				from= initialLength - windowLength;
+			};
+			double[] array= Arrays.copyOfRange(vector,from,to);
+			int actualLength= array.length;
+			Arrays.sort(array);
+			double result;
+			if (actualLength % 2 == 0) {
+				int index= actualLength / 2;
+				result= (array[index-1] + array[index]) / 2;
+			} else {
+				int index= actualLength / 2;
+				result= array[index];
+			};
+			return result;
+		}
 	}
 	public static double medianAbs(double[] vector, int from, int to) {
 		int initialLength= vector.length;
-		if (initialLength * 2 < to - from) {
+		int windowLength= to - from + 1;
+		if (initialLength < windowLength) {
 			return 0;
-		};
-		if (from < 0) {
-			from= 0;
-		};
-		if (to > initialLength) {
-			to= initialLength;
-		};
-		double[] array= Arrays.copyOfRange(vector,from,to);
-		int actualLength= array.length;
-		for (int n=0; n < actualLength; n++) {
-			if (array[n] < 0) {
-				array[n]= - array[n];
-			}
-		};
-		Arrays.sort(array);
-		double result;
-		if (actualLength % 2 == 0) {
-			int index= actualLength / 2;
-			result= (array[index-1] + array[index]) / 2;
+		} else if (initialLength <= 0 || windowLength <= 0) {
+			return 0;
 		} else {
-			int index= actualLength / 2;
-			result= array[index];
-		};
-		return result;
+			if (from < 0) {
+				from= 0;
+				to= windowLength - 1;
+			} else if (to > initialLength - 1) {
+				to= initialLength - 1;
+				from= initialLength - windowLength;
+			};
+			double[] array= Arrays.copyOfRange(vector,from,to);
+			int actualLength= array.length;
+			for (int n=0; n < actualLength; n++) {
+				if (array[n] < 0) {
+					array[n]= - array[n];
+				}
+			};
+			Arrays.sort(array);
+			double result;
+			if (actualLength % 2 == 0) {
+				int index= actualLength / 2;
+				result= (array[index-1] + array[index]) / 2;
+			} else {
+				int index= actualLength / 2;
+				result= array[index];
+			};
+			return result;
+		}
 	}
 	public static double metrics(double x, double threshold, double halfwidth) {
 		if (x >= threshold + halfwidth) {

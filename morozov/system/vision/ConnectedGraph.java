@@ -50,8 +50,8 @@ class ConnectedGraph {
 			double distanceHalfwidth= distanceThreshold * fuzzyThresholdBorder;
 			double metrics1= VisionUtils.metrics(velocity,velocityThreshold,velosityHalfwidth);
 			double metrics2= VisionUtils.metrics(distance,distanceThreshold,distanceHalfwidth);
-			// double commonMetrics= 1 - (1-metrics1) * (1-metrics2);
-			double commonMetrics= metrics1 * metrics2;
+			double commonMetrics= 1 - (1-metrics1) * (1-metrics2);
+			// double commonMetrics= metrics1 * metrics2;
 			if (commonMetrics < 0.5) {
 				refusedTracks.add(identifier);
 			}

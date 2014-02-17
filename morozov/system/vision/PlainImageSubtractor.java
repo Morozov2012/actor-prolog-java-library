@@ -23,12 +23,13 @@ public class PlainImageSubtractor {
 	protected boolean extractBlobs= false;
 	protected boolean trackBlobs= false;
 	protected int minimalTrainingInterval= 7;
+	protected int maximalTrainingInterval= -1;
 	protected boolean useGrayscaleColors= true;
 	protected boolean useGaussianFiltering= true;
 	protected int gaussianFilterRadius= 1;
 	protected boolean useMedianFiltering= true;
 	protected int medianFilterThreshold= 3;
-	protected double backgroundDispersionFactor= 2.0;
+	protected double backgroundVarianceFactor= 4.0;
 	protected int horizontalBlobBorder= 3;
 	protected int verticalBlobBorder= 3;
 	protected int minimalBlobIntersectionArea= 1;
@@ -99,13 +100,14 @@ public class PlainImageSubtractor {
 	public PlainImageSubtractor(
 			boolean extractBlobsFlag,
 			boolean trackBlobsFlag,
-			int trainingIntervalValue,
+			int minimalTrainingIntervalValue,
+			int maximalTrainingIntervalValue,
 			boolean useGrayscaleColorsFlag,
 			boolean useGaussianFilter,
 			int radiusOfGaussianFilter,
 			boolean useMedianFilter,
 			int thresholdOfMedianFilter,
-			double backgroundDispersionFactorValue,
+			double backgroundStandardDeviationFactorValue,
 			int horizontalBlobBorderValue,
 			int verticalBlobBorderValue,
 			int minimalBlobIntersectionAreaValue,
@@ -125,13 +127,14 @@ public class PlainImageSubtractor {
 			boolean makeSquareBlobsInSynthesizedImageValue) {
 		extractBlobs= extractBlobsFlag;
 		trackBlobs= trackBlobsFlag;
-		minimalTrainingInterval= trainingIntervalValue;
+		minimalTrainingInterval= minimalTrainingIntervalValue;
+		maximalTrainingInterval= maximalTrainingIntervalValue;
 		useGrayscaleColors= useGrayscaleColorsFlag;
 		useGaussianFiltering= useGaussianFilter;
 		gaussianFilterRadius= radiusOfGaussianFilter;
 		useMedianFiltering= useMedianFilter;
 		medianFilterThreshold= thresholdOfMedianFilter;
-		backgroundDispersionFactor= backgroundDispersionFactorValue;
+		backgroundVarianceFactor= backgroundStandardDeviationFactorValue*backgroundStandardDeviationFactorValue;
 		horizontalBlobBorder= horizontalBlobBorderValue;
 		verticalBlobBorder= verticalBlobBorderValue;
 		minimalBlobIntersectionArea= minimalBlobIntersectionAreaValue;
@@ -170,6 +173,17 @@ public class PlainImageSubtractor {
 			invisibleBlobDelays= new int[0];
 		};
 		recentImage= image;
+		if (maximalTrainingInterval >= 0) {
+			if (maximalTrainingInterval >= minimalTrainingInterval) {
+				if (backgroundN > maximalTrainingInterval) {
+					takeImageIntoAccount= false;
+				}
+			} else {
+				if (backgroundN > minimalTrainingInterval) {
+					takeImageIntoAccount= false;
+				}
+			}
+		};
 		subtractImage(image,takeImageIntoAccount);
 		if (backgroundN >= minimalTrainingInterval) {
 			if (extractBlobs) {
@@ -230,13 +244,14 @@ public class PlainImageSubtractor {
 			boolean forgetResults,
 			boolean extractBlobsFlag,
 			boolean trackBlobsFlag,
-			int trainingIntervalValue,
+			int minimalTrainingIntervalValue,
+			int maximalTrainingIntervalValue,
 			boolean useGrayscaleColorsFlag,
 			boolean useGaussianFilter,
 			int radiusOfGaussianFilter,
 			boolean useMedianFilter,
 			int thresholdOfMedianFilter,
-			double backgroundDispersionFactorValue,
+			double backgroundStandardDeviationFactorValue,
 			int horizontalBlobBorderValue,
 			int verticalBlobBorderValue,
 			int minimalBlobIntersectionAreaValue,
@@ -262,13 +277,14 @@ public class PlainImageSubtractor {
 		if (forgetSettings) {
 			extractBlobs= extractBlobsFlag;
 			trackBlobs= trackBlobsFlag;
-			minimalTrainingInterval= trainingIntervalValue;
+			minimalTrainingInterval= minimalTrainingIntervalValue;
+			maximalTrainingInterval= maximalTrainingIntervalValue;
 			useGrayscaleColors= useGrayscaleColorsFlag;
 			useGaussianFiltering= useGaussianFilter;
 			gaussianFilterRadius= radiusOfGaussianFilter;
 			useMedianFiltering= useMedianFilter;
 			medianFilterThreshold= thresholdOfMedianFilter;
-			backgroundDispersionFactor= backgroundDispersionFactorValue;
+			backgroundVarianceFactor= backgroundStandardDeviationFactorValue*backgroundStandardDeviationFactorValue;
 			horizontalBlobBorder= horizontalBlobBorderValue;
 			verticalBlobBorder= verticalBlobBorderValue;
 			minimalBlobIntersectionArea= minimalBlobIntersectionAreaValue;
@@ -417,6 +433,13 @@ public class PlainImageSubtractor {
 		return minimalTrainingInterval;
 	}
 	//
+	synchronized public void setMaximalTrainingInterval(int value) {
+		maximalTrainingInterval= value;
+	}
+	synchronized public int getMaximalTrainingInterval() {
+		return maximalTrainingInterval;
+	}
+	//
 	synchronized public void setGrayscaleMode(boolean mode) {
 		if (useGrayscaleColors != mode) {
 			useGrayscaleColors= mode;
@@ -464,11 +487,11 @@ public class PlainImageSubtractor {
 		return medianFilterThreshold;
 	}
 	//
-	synchronized public void setBackgroundDispersionFactor(double value) {
-		backgroundDispersionFactor= value;
+	synchronized public void setBackgroundStandardDeviationFactor(double value) {
+		backgroundVarianceFactor= value*value;
 	}
-	synchronized public double getBackgroundDispersionFactor() {
-		return backgroundDispersionFactor;
+	synchronized public double getBackgroundStandardDeviationFactor() {
+		return StrictMath.sqrt(backgroundVarianceFactor);
 	}
 	//
 	synchronized public void setHorizontalBlobBorder(int value) {
@@ -662,7 +685,7 @@ public class PlainImageSubtractor {
 				// int delta1= (value - mean) / 2;
 				int delta2= delta1 * delta1;
 				// if (delta2 < dispersion) {	// BUG#2
-				if (delta2 <= dispersion * backgroundDispersionFactor) {
+				if (delta2 <= dispersion * backgroundVarianceFactor) {
 					deltaPixels[k+numberOfExtraBands][n]= noDifferenceMarker;
 				} else {
 					if (delta1 < 0) {
@@ -1347,8 +1370,18 @@ InnerLoop: while (repeatSearch) {
 			GrowingTrack track= tracks.get(identifier);
 			if (deletedBlobs[k]) {
 				if (track.isStrong) {
+//System.out.printf("MAKE INVISIBLE TRACT %s, req.Br.Points.length()= %s, deferr.Coll.length()= %s\n",
+//	identifier,
+//	track.requestedBreakPoints.size(),
+//	track.deferredCollisions.size());
 					track.makeInsensible(time);
+//				} else if (track.deferredCollisions.size() > 0) {
+//					track.makeInsensible(time);
 				} else {
+//System.out.printf("DEPODE TRACT %s, req.Br.Points.length()= %s, deferr.Coll.length()= %s\n",
+//	identifier,
+//	track.requestedBreakPoints.size(),
+//	track.deferredCollisions.size());
 					track.depose();
 					tracks.remove(identifier);
 				}

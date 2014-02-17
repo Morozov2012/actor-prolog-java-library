@@ -132,26 +132,27 @@ class TrackSegment {
 				if (absDeltaY22 < 0) {
 					absDeltaY22= - absDeltaY22;
 				};
-				double dX= deltaX11;
+				double dX= absDeltaX11;
 				if (dX > absDeltaX12) {
-					dX= deltaX12;
+					dX= absDeltaX12;
 				};
 				if (dX > absDeltaX21) {
-					dX= deltaX21;
+					dX= absDeltaX21;
 				};
 				if (dX > absDeltaX22) {
-					dX= deltaX22;
+					dX= absDeltaX22;
 				};
-				double dY= deltaY11;
+				double dY= absDeltaY11;
 				if (dY > absDeltaY12) {
-					dY= deltaY12;
+					dY= absDeltaY12;
 				};
 				if (dY > absDeltaY21) {
-					dY= deltaY21;
+					dY= absDeltaY21;
 				};
 				if (dY > absDeltaY22) {
-					dY= deltaY22;
+					dY= absDeltaY22;
 				};
+// System.out.printf("dX= %s dY= %s\n",dX,dY);
 				double velocityX;
 				double velocityY;
 				if (samplingRate > 0.0) {

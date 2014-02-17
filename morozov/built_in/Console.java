@@ -21,6 +21,7 @@ import javax.swing.text.SimpleAttributeSet;
 import javax.swing.text.StyleConstants;
 import java.awt.Color;
 import java.awt.GraphicsEnvironment;
+import java.nio.file.Path;
 
 import java.math.BigInteger;
 
@@ -416,13 +417,20 @@ public abstract class Console extends Report {
 			};
 			if(returnVal == JFileChooser.APPROVE_OPTION) {
 				selectedFile= chooser.getSelectedFile();
+				if (selectedFile==null) {
+					throw Backtracking.instance;
+				};
 				FileFilter currentFilter= chooser.getFileFilter();
 				FileNameMask currentMask= null;
 				if (currentFilter instanceof FileNameMask) {
 					currentMask= (FileNameMask)currentFilter;
 				};
 				// String selectedName= FileUtils.tryToMakeRealName(selectedFile.toPath()).toString();
-				String selectedName= selectedFile.toPath().toString();
+				Path selectedPath= selectedFile.toPath();
+				if (selectedPath==null) {
+					throw Backtracking.instance;
+				};
+				String selectedName= selectedPath.toString();
 				if (currentMask != null) {
 					selectedName= currentMask.appendExtensionIfNecessary(selectedName);
 				};

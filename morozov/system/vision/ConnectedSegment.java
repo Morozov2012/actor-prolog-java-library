@@ -54,12 +54,15 @@ class ConnectedSegment {
 			};
 			if (inspectedTracks.add(neighbour)) {
 				StableTrack track= tracks.get(neighbour);
-				TrackSegment linkedSegment= track.getLinkedSegment(trackSegment.breakPointTime);
-				if (linkedSegment != null) {
-					HashMap<Integer,ConnectedSegment> hash2= hash1.get(linkedSegment.owner);
-					ConnectedSegment connectedSegment= hash2.get(linkedSegment.number);
-					entries.add(connectedSegment);
-					connectedSegment.addEntry(this);
+				if (track != null) {
+					long breakPointTime= trackSegment.breakPointTime;
+					TrackSegment linkedSegment= track.getLinkedSegment(breakPointTime);
+					if (linkedSegment != null) {
+						HashMap<Integer,ConnectedSegment> hash2= hash1.get(linkedSegment.owner);
+						ConnectedSegment connectedSegment= hash2.get(linkedSegment.number);
+						entries.add(connectedSegment);
+						connectedSegment.addEntry(this);
+					}
 				}
 			}
 		}

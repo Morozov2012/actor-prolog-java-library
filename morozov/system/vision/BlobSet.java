@@ -193,6 +193,62 @@ class BlobSet {
 		}
 	}
 	synchronized public Term getBlobs() {
+/*
+System.out.printf("TIME=%d\n",recentFrameNumber);
+// if (recentFrameNumber==400) {
+if (recentFrameNumber>=408) {
+ConnectedGraph[] graphs= formAndGetConnectedGraphs();
+// if (recentFrameNumber==450) {
+//System.out.printf("!!! TIME=551\n\n\n\n\n");
+Collection<StableTrack> trackValues= tracks.values();
+Iterator<StableTrack> iterator1= trackValues.iterator();
+while (iterator1.hasNext()) {
+	StableTrack track= iterator1.next();
+	if (track != null) {
+		//if (track.duration > 70) {
+			try {
+				String fileName= String.format("log\\track_%05d.txt",track.identifier);
+				PrintStream stream= new PrintStream(fileName);
+				try {
+					track.dump(stream);
+				} finally {
+					stream.close();
+				};
+				fileName= String.format("log\\track_%05d.m",track.identifier);
+				stream= new PrintStream(fileName);
+				try {
+					track.createMatlab(stream);
+				} finally {
+					stream.close();
+				}
+			} catch (FileNotFoundException e) {
+				System.out.printf("FileNotFoundException: %s",e);
+			}
+		//}
+	}
+}
+for (int n=0; n < graphs.length; n++) {
+	try {
+		String fileName= String.format("log\\graph_%05d.txt",n);
+		PrintStream stream= new PrintStream(fileName);
+		try {
+			graphs[n].dump(stream);
+		} finally {
+			stream.close();
+		};
+		fileName= String.format("log\\graph_%05d.m",n);
+		stream= new PrintStream(fileName);
+		try {
+			graphs[n].createMatlab(stream);
+		} finally {
+			stream.close();
+		}
+	} catch (FileNotFoundException e) {
+		System.out.printf("FileNotFoundException: %s",e);
+	}
+}
+}
+*/
 		Term result= PrologEmptyList.instance;
 		for (int n=blobRectangles.length-1; n >= 0; n--) {
 			Term prologIdentifier= new PrologInteger(blobIdentifiers[n]);
@@ -455,60 +511,6 @@ class BlobSet {
 	}
 	synchronized public Term getConnectedGraphs() {
 		ConnectedGraph[] graphs= formAndGetConnectedGraphs();
-/*
-System.out.printf("TIME=%d\n",recentFrameNumber);
-if (recentFrameNumber==550) {
-// if (recentFrameNumber==450) {
-//System.out.printf("!!! TIME=551\n\n\n\n\n");
-Collection<StableTrack> trackValues= tracks.values();
-Iterator<StableTrack> iterator1= trackValues.iterator();
-while (iterator1.hasNext()) {
-	StableTrack track= iterator1.next();
-	if (track != null) {
-		//if (track.duration > 70) {
-			try {
-				String fileName= String.format("log\\track_%05d.txt",track.identifier);
-				PrintStream stream= new PrintStream(fileName);
-				try {
-					track.dump(stream);
-				} finally {
-					stream.close();
-				};
-				fileName= String.format("log\\track_%05d.m",track.identifier);
-				stream= new PrintStream(fileName);
-				try {
-					track.createMatlab(stream);
-				} finally {
-					stream.close();
-				}
-			} catch (FileNotFoundException e) {
-				System.out.printf("FileNotFoundException: %s",e);
-			}
-		//}
-	}
-}
-for (int n=0; n < graphs.length; n++) {
-	try {
-		String fileName= String.format("log\\graph_%05d.txt",n);
-		PrintStream stream= new PrintStream(fileName);
-		try {
-			graphs[n].dump(stream);
-		} finally {
-			stream.close();
-		};
-		fileName= String.format("log\\graph_%05d.m",n);
-		stream= new PrintStream(fileName);
-		try {
-			graphs[n].createMatlab(stream);
-		} finally {
-			stream.close();
-		}
-	} catch (FileNotFoundException e) {
-		System.out.printf("FileNotFoundException: %s",e);
-	}
-}
-}
-*/
 		Term list1= PrologEmptyList.instance;
 		for (int n=graphs.length-1; n >= 0; n--) {
 			ConnectedGraph graph= graphs[n];
