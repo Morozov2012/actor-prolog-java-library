@@ -17,12 +17,17 @@ class DeferredCollision {
 		sender= track2;
 		entryType= mode;
 	}
-	public void implement() {
+	public boolean implement() {
 		if (sender.isStrong && receiver.isStrong) {
 			if (!sender.isRarefied && !receiver.isRarefied) {
 				sender.requestBreakPoint(requestedTime,receiver.identifier,entryType);
 				receiver.requestBreakPoint(requestedTime,sender.identifier,entryType.computeComplementaryType());
-			}
+			};
+			return true;
+		} else if (sender.isDeposed || receiver.isDeposed) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 }

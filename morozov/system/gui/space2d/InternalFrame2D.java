@@ -39,6 +39,13 @@ public class InternalFrame2D
 		add(space);
 	}
 	//
+	// public Canvas2DScalingFactor getScalingFactor() {
+	//	return scalingFactor.get();
+	// }
+	public DrawingMode getDrawingMode() {
+		return space.getDrawingMode();
+	}
+	//
 	public void enableMouseListener() {
 		if (space != null) {
 			space.addMouseListener(this);

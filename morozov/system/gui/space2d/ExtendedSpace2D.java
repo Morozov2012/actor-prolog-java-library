@@ -75,6 +75,14 @@ public class ExtendedSpace2D
 	public void setCommands(List<Java2DCommand> commandList) {
 		currentCommands= commandList;
 	}
+	// public Canvas2DScalingFactor getScalingFactor() {
+	//	return scalingFactor.get();
+	// }
+	public DrawingMode getDrawingMode() {
+		Dimension size= getSize();
+		Canvas2DScalingFactor currentScalingFactor= scalingFactor.get();
+		return new DrawingMode(size,currentScalingFactor);
+	}
 	//
 	public void enableMouseListener() {
 		if (owner != null) {

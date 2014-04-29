@@ -120,8 +120,9 @@ class GrowingTrack {
 			for (int n=deferredCollisions.size()-1; n >= 0; n--) {
 				DeferredCollision c= deferredCollisions.get(n);
 				if (c.implementationTime < time) {
-					c.implement();
-					deferredCollisions.remove(n);
+					if (c.implement()) {
+						deferredCollisions.remove(n);
+					}
 				}
 			}
 		}
@@ -140,6 +141,7 @@ class GrowingTrack {
 				point.addBranch(neighbour,entryType);
 			};
 			requestedBreakPoints.put(time,point);
+//System.out.printf("! [B]:%s put Req.Br.P.: %s<-%s\n",identifier,time,point.time);
 		}
 	}
 	protected void createSegments(long time, boolean emptyBuffer) {
@@ -164,6 +166,7 @@ class GrowingTrack {
 		while (iterator.hasNext()) {
 			BreakPoint breakPoint= iterator.next();
 			long breakTime= breakPoint.time;
+//System.out.printf("! [1]%s: USE Br.P.: %s\n",identifier,breakTime);
 			firstRequestedBreakPoint= breakTime;
 			if (breakTime > criticalTime && !emptyBuffer) {
 				break;
@@ -196,6 +199,7 @@ class GrowingTrack {
 				segmentBeginning= breakTime;
 				bandNumber= 0;
 			};
+//System.out.printf("! [2] USE Br.P.: %s\n",breakTime);
 			long segmentEnd= segmentBeginning;
 			double[][] spectrumSumX= new double[bandNumber][nBins+3];
 			double[][] spectrumSumX2= new double[bandNumber][nBins];
@@ -292,6 +296,7 @@ class GrowingTrack {
 		}
 	}
 	protected TrackSegment assembleRecentSegment() {
+//System.out.printf("! %s: assembleRecentSegment()\n",identifier);
 		int numberOfPoints= recentPoints.size();
 		int[][] rectangles= new int[numberOfPoints][5];
 		BlobAttributes p0= recentPoints.get(0);
@@ -352,25 +357,29 @@ class GrowingTrack {
 	}
 	//
 	public void makeInsensible(long time) {
+//System.out.printf("! %s: makeInsensible(%s)\n",identifier,time);
 		prolong(time,true);
 		isInsensible= true;
 	}
 	public void complete(long time) {
-		if (!isCompleted && !isDeposed) {
+		if (!isDeposed && isInsensible && !isCompleted) {
 			if (isMature(time)) {
-				if (!isStrong) {
-					isStrong= true;
-				};
+				// if (!isStrong) {
+				//	isStrong= true;
+				// };
 				implementDeferredOperations(time);
+				if (deferredCollisions.isEmpty()) {
+					// deferredCollisions.clear();
+					isCompleted= true;
+				}
 			}
-		};
-		isCompleted= true;
-		deferredCollisions.clear();
+		}
 	}
 	public boolean isMature(long time) {
 		return time >= beginningTime + minimalTrackDuration;
 	}
 	public void depose() {
+//System.out.printf("! %s: depose()\n",identifier);
 		isDeposed= true;
 		recentPoints.clear();
 		requestedBreakPoints.clear();

@@ -35,6 +35,8 @@ public abstract class ImageSubtractor extends Alpha {
 	abstract public Term getBuiltInSlot_E_background_standard_deviation_factor();
 	abstract public Term getBuiltInSlot_E_horizontal_blob_border();
 	abstract public Term getBuiltInSlot_E_vertical_blob_border();
+	abstract public Term getBuiltInSlot_E_horizontal_extra_border_coefficient();
+	abstract public Term getBuiltInSlot_E_vertical_extra_border_coefficient();
 	abstract public Term getBuiltInSlot_E_minimal_blob_intersection_area();
 	abstract public Term getBuiltInSlot_E_minimal_blob_size();
 	abstract public Term getBuiltInSlot_E_minimal_track_duration();
@@ -83,6 +85,8 @@ public abstract class ImageSubtractor extends Alpha {
 			double backgroundStandardDeviationFactor= Converters.argumentToReal(getBuiltInSlot_E_background_standard_deviation_factor(),iX);
 			int horizontalBlobBorder= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_horizontal_blob_border(),iX);
 			int verticalBlobBorder= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_vertical_blob_border(),iX);
+			double horizontalExtraBorderCoefficient= Converters.argumentToReal(getBuiltInSlot_E_horizontal_extra_border_coefficient(),iX);
+			double verticalExtraBorderCoefficient= Converters.argumentToReal(getBuiltInSlot_E_vertical_extra_border_coefficient(),iX);
 			int minimalBlobIntersectionArea= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_blob_intersection_area(),iX);
 			int minimalBlobSize= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_blob_size(),iX);
 			int minimalTrackDuration= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_track_duration(),iX);
@@ -114,6 +118,8 @@ public abstract class ImageSubtractor extends Alpha {
 					backgroundStandardDeviationFactor,
 					horizontalBlobBorder,
 					verticalBlobBorder,
+					horizontalExtraBorderCoefficient,
+					verticalExtraBorderCoefficient,
 					minimalBlobIntersectionArea,
 					minimalBlobSize,
 					minimalTrackDuration,
@@ -184,6 +190,8 @@ public abstract class ImageSubtractor extends Alpha {
 			double backgroundStandardDeviationFactor= Converters.argumentToReal(getBuiltInSlot_E_background_standard_deviation_factor(),iX);
 			int horizontalBlobBorder= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_horizontal_blob_border(),iX);
 			int verticalBlobBorder= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_vertical_blob_border(),iX);
+			double horizontalExtraBorderCoefficient= Converters.argumentToReal(getBuiltInSlot_E_horizontal_extra_border_coefficient(),iX);
+			double verticalExtraBorderCoefficient= Converters.argumentToReal(getBuiltInSlot_E_vertical_extra_border_coefficient(),iX);
 			int minimalBlobIntersectionArea= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_blob_intersection_area(),iX);
 			int minimalBlobSize= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_blob_size(),iX);
 			int minimalTrackDuration= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_track_duration(),iX);
@@ -217,6 +225,8 @@ public abstract class ImageSubtractor extends Alpha {
 				backgroundStandardDeviationFactor,
 				horizontalBlobBorder,
 				verticalBlobBorder,
+				horizontalExtraBorderCoefficient,
+				verticalExtraBorderCoefficient,
 				minimalBlobIntersectionArea,
 				minimalBlobSize,
 				minimalTrackDuration,
@@ -460,6 +470,32 @@ public abstract class ImageSubtractor extends Alpha {
 		result.value= new PrologInteger(imageSubtractor.get().getVerticalBlobBorder());
 	}
 	public void getVerticalBlobBorder0fs(ChoisePoint iX) {
+	}
+	// HorizontalExtraBorderCoefficient
+	public void setHorizontalExtraBorderCoefficient1s(ChoisePoint iX, Term value) {
+		double coefficient= Converters.argumentToReal(value,iX);
+		createImageSubtractorIfNecessary(iX);
+		imageSubtractor.get().setHorizontalExtraBorderCoefficient(coefficient);
+	}
+	//
+	public void getHorizontalExtraBorderCoefficient0ff(ChoisePoint iX, PrologVariable result) {
+		createImageSubtractorIfNecessary(iX);
+		result.value= new PrologReal(imageSubtractor.get().getHorizontalExtraBorderCoefficient());
+	}
+	public void getHorizontalExtraBorderCoefficient0fs(ChoisePoint iX) {
+	}
+	// VerticalExtraBorderCoefficient
+	public void setVerticalExtraBorderCoefficient1s(ChoisePoint iX, Term value) {
+		double coefficient= Converters.argumentToReal(value,iX);
+		createImageSubtractorIfNecessary(iX);
+		imageSubtractor.get().setVerticalExtraBorderCoefficient(coefficient);
+	}
+	//
+	public void getVerticalExtraBorderCoefficient0ff(ChoisePoint iX, PrologVariable result) {
+		createImageSubtractorIfNecessary(iX);
+		result.value= new PrologReal(imageSubtractor.get().getVerticalExtraBorderCoefficient());
+	}
+	public void getVerticalExtraBorderCoefficient0fs(ChoisePoint iX) {
 	}
 	// MinimalBlobIntersectionArea
 	public void setMinimalBlobIntersectionArea1s(ChoisePoint iX, Term value) {

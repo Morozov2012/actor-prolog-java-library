@@ -438,6 +438,50 @@ public abstract class SynchronizedImageSubtractor extends ImageSubtractor {
 	}
 	public void getVerticalBlobBorder0fs(ChoisePoint iX) {
 	}
+	// HorizontalExtraBorderCoefficient
+	public void setHorizontalExtraBorderCoefficient1s(ChoisePoint iX, Term value) {
+		Term subtractor= getBuiltInSlot_E_image_subtractor();
+		if (subtractor instanceof ImageSubtractor) {
+			ImageSubtractor server= (ImageSubtractor)subtractor;
+			server.setHorizontalExtraBorderCoefficient1s(iX,value);
+		} else {
+			throw new WrongArgumentIsNotImageSubtractor(subtractor);
+		}
+	}
+	//
+	public void getHorizontalExtraBorderCoefficient0ff(ChoisePoint iX, PrologVariable result) {
+		Term subtractor= getBuiltInSlot_E_image_subtractor();
+		if (subtractor instanceof ImageSubtractor) {
+			ImageSubtractor server= (ImageSubtractor)subtractor;
+			server.getHorizontalExtraBorderCoefficient0ff(iX,result);
+		} else {
+			throw new WrongArgumentIsNotImageSubtractor(subtractor);
+		}
+	}
+	public void getHorizontalExtraBorderCoefficient0fs(ChoisePoint iX) {
+	}
+	// VerticalExtraBorderCoefficient
+	public void setVerticalExtraBorderCoefficient1s(ChoisePoint iX, Term value) {
+		Term subtractor= getBuiltInSlot_E_image_subtractor();
+		if (subtractor instanceof ImageSubtractor) {
+			ImageSubtractor server= (ImageSubtractor)subtractor;
+			server.setVerticalExtraBorderCoefficient1s(iX,value);
+		} else {
+			throw new WrongArgumentIsNotImageSubtractor(subtractor);
+		}
+	}
+	//
+	public void getVerticalExtraBorderCoefficient0ff(ChoisePoint iX, PrologVariable result) {
+		Term subtractor= getBuiltInSlot_E_image_subtractor();
+		if (subtractor instanceof ImageSubtractor) {
+			ImageSubtractor server= (ImageSubtractor)subtractor;
+			server.getVerticalExtraBorderCoefficient0ff(iX,result);
+		} else {
+			throw new WrongArgumentIsNotImageSubtractor(subtractor);
+		}
+	}
+	public void getVerticalExtraBorderCoefficient0fs(ChoisePoint iX) {
+	}
 	// MinimalBlobIntersectionArea
 	public void setMinimalBlobIntersectionArea1s(ChoisePoint iX, Term value) {
 		Term subtractor= getBuiltInSlot_E_image_subtractor();

@@ -32,6 +32,8 @@ public class PlainImageSubtractor {
 	protected double backgroundVarianceFactor= 4.0;
 	protected int horizontalBlobBorder= 3;
 	protected int verticalBlobBorder= 3;
+	protected double horizontalExtraBorderCoefficient= 0.10;
+	protected double verticalExtraBorderCoefficient= 0.10;
 	protected int minimalBlobIntersectionArea= 1;
 	protected int minimalBlobSize= 10;
 	protected int minimalTrackDuration= 30;
@@ -110,6 +112,8 @@ public class PlainImageSubtractor {
 			double backgroundStandardDeviationFactorValue,
 			int horizontalBlobBorderValue,
 			int verticalBlobBorderValue,
+			double horizontalExtraBorderCoefficientValue,
+			double verticalExtraBorderCoefficientValue,
 			int minimalBlobIntersectionAreaValue,
 			int minimalBlobSizeValue,
 			int minimalTrackDurationValue,
@@ -137,6 +141,8 @@ public class PlainImageSubtractor {
 		backgroundVarianceFactor= backgroundStandardDeviationFactorValue*backgroundStandardDeviationFactorValue;
 		horizontalBlobBorder= horizontalBlobBorderValue;
 		verticalBlobBorder= verticalBlobBorderValue;
+		horizontalExtraBorderCoefficient= horizontalExtraBorderCoefficientValue;
+		verticalExtraBorderCoefficient= verticalExtraBorderCoefficientValue;
 		minimalBlobIntersectionArea= minimalBlobIntersectionAreaValue;
 		minimalBlobSize= minimalBlobSizeValue;
 		minimalTrackDuration= minimalTrackDurationValue;
@@ -254,6 +260,8 @@ public class PlainImageSubtractor {
 			double backgroundStandardDeviationFactorValue,
 			int horizontalBlobBorderValue,
 			int verticalBlobBorderValue,
+			double horizontalExtraBorderCoefficientValue,
+			double verticalExtraBorderCoefficientValue,
 			int minimalBlobIntersectionAreaValue,
 			int minimalBlobSizeValue,
 			int minimalTrackDurationValue,
@@ -287,6 +295,8 @@ public class PlainImageSubtractor {
 			backgroundVarianceFactor= backgroundStandardDeviationFactorValue*backgroundStandardDeviationFactorValue;
 			horizontalBlobBorder= horizontalBlobBorderValue;
 			verticalBlobBorder= verticalBlobBorderValue;
+			horizontalExtraBorderCoefficient= horizontalExtraBorderCoefficientValue;
+			verticalExtraBorderCoefficient= verticalExtraBorderCoefficientValue;
 			minimalBlobIntersectionArea= minimalBlobIntersectionAreaValue;
 			minimalBlobSize= minimalBlobSizeValue;
 			minimalTrackDuration= minimalTrackDurationValue;
@@ -508,6 +518,20 @@ public class PlainImageSubtractor {
 		return verticalBlobBorder;
 	}
 	//
+	synchronized public void setHorizontalExtraBorderCoefficient(double value) {
+		horizontalExtraBorderCoefficient= value;
+	}
+	synchronized public double getHorizontalExtraBorderCoefficient() {
+		return horizontalExtraBorderCoefficient;
+	}
+	//
+	synchronized public void setVerticalExtraBorderCoefficient(double value) {
+		verticalExtraBorderCoefficient= value;
+	}
+	synchronized public double getVerticalExtraBorderCoefficient() {
+		return verticalExtraBorderCoefficient;
+	}
+	//
 	synchronized public void setMinimalBlobIntersectionArea(int value) {
 		minimalBlobIntersectionArea= value;
 	}
@@ -688,10 +712,11 @@ public class PlainImageSubtractor {
 				if (delta2 <= dispersion * backgroundVarianceFactor) {
 					deltaPixels[k+numberOfExtraBands][n]= noDifferenceMarker;
 				} else {
-					if (delta1 < 0) {
-						delta1= - delta1;
-					};
-					deltaPixels[k+numberOfExtraBands][n]= 255 - delta1;
+					// if (delta1 < 0) {
+					//	delta1= - delta1;
+					// };
+					// deltaPixels[k+numberOfExtraBands][n]= 255 - delta1;
+					deltaPixels[k+numberOfExtraBands][n]= differenceMarker;
 				}
 			}
 		};
@@ -900,29 +925,53 @@ InnerLoop: while (repeatSearch) {
 				break InnerLoop;
 			}
 		};
+		int width1= x12 - x11;
+		int horizontalBorder1= 0;
+		if (horizontalExtraBorderCoefficient > 0.0) {
+			horizontalBorder1= (int)(width1 * horizontalExtraBorderCoefficient);
+		};
+		int x31= x11 - horizontalBorder1;
+		int x32= x12 + horizontalBorder1;
 		int x21= blobRectangles[k][0];
 		int x22= blobRectangles[k][1];
-		int x31= x11;
-		int x32= x12;
-		if (x31 < x21) {
-			x31= x21;
+		int width2= x22 - x21;
+		int horizontalBorder2= 0;
+		if (horizontalExtraBorderCoefficient > 0.0) {
+			horizontalBorder2= (int)(width2 * horizontalExtraBorderCoefficient);
 		};
-		if (x32 > x22) {
-			x32= x22;
+		int x41= x21 - horizontalBorder2;
+		int x42= x22 + horizontalBorder2;
+		if (x31 < x41) {
+			x31= x41;
+		};
+		if (x32 > x42) {
+			x32= x42;
 		};
 		int width3= x32 - x31;
 		if (width3 < 0) {
 			continue;
 		};
+		int height1= y12 - y11;
+		int vertivalBorder1= 0;
+		if (verticalExtraBorderCoefficient > 0.0) {
+			vertivalBorder1= (int)(height1 * verticalExtraBorderCoefficient);
+		};
+		int y31= y11 - vertivalBorder1;
+		int y32= y12 + vertivalBorder1;
 		int y21= blobRectangles[k][2];
 		int y22= blobRectangles[k][3];
-		int y31= y11;
-		int y32= y12;
-		if (y31 < y21) {
-			y31= y21;
+		int height2= y22 - y21;
+		int vertivalBorder2= 0;
+		if (verticalExtraBorderCoefficient > 0.0) {
+			vertivalBorder2= (int)(height2 * verticalExtraBorderCoefficient);
 		};
-		if (y32 > y22) {
-			y32= y22;
+		int y41= y21 - vertivalBorder2;
+		int y42= y22 + vertivalBorder2;
+		if (y31 < y41) {
+			y31= y41;
+		};
+		if (y32 > y42) {
+			y32= y42;
 		};
 		int height3= y32 - y31;
 		if (height3 < 0) {
@@ -1042,6 +1091,7 @@ InnerLoop: while (repeatSearch) {
 				// };
 				// System.out.printf("ratio=%s\n",ratio);
 				if (size < minimalBlobSize || size >= imageSize) {
+// if (size < 1000 || size >= imageSize) {
 					blobFlag[k]= false;
 				// } else if (density < 0.1) {
 				//	blobFlag[k]= false;
@@ -1274,6 +1324,7 @@ InnerLoop: while (repeatSearch) {
 				recentBlobIdentifier= recentBlobIdentifier.add(BigInteger.ONE);
 				currentBlobIdentifiers[k]= recentBlobIdentifier;
 				GrowingTrack track= new GrowingTrack(recentBlobIdentifier,time,minimalTrackDuration,maximalRarefactionOfObject,inverseMatrix,samplingRate,applyMedianFiltering,medianFilterHalfwidth);
+// System.out.printf("! new growing track is created: %s\n",recentBlobIdentifier);
 				tracks.put(recentBlobIdentifier,track);
 			}
 		};
@@ -1297,6 +1348,7 @@ InnerLoop: while (repeatSearch) {
 					BigInteger identifier2b= previousBlobIdentifiers[index2b];
 					GrowingTrack track2b= tracks.get(identifier2b);
 					track2b.registerCollision(track2a,time,TrackSegmentEntryType.INPUT);
+// System.out.printf("! (1)register collision: %s<-%s,INPUT,%s\n",identifier2b,identifier2a,time);
 				}
 			}
 		};
@@ -1311,6 +1363,7 @@ InnerLoop: while (repeatSearch) {
 					GrowingTrack track1= tracks.get(identifier1);
 					GrowingTrack track2= tracks.get(identifier2);
 					track2.registerCollision(track1,time,TrackSegmentEntryType.OUTPUT);
+// System.out.printf("! (2)register collision: %s<-%s,OUTPUT,%s\n",identifier2,identifier1,time);
 				}
 			}
 		};
@@ -1370,18 +1423,8 @@ InnerLoop: while (repeatSearch) {
 			GrowingTrack track= tracks.get(identifier);
 			if (deletedBlobs[k]) {
 				if (track.isStrong) {
-//System.out.printf("MAKE INVISIBLE TRACT %s, req.Br.Points.length()= %s, deferr.Coll.length()= %s\n",
-//	identifier,
-//	track.requestedBreakPoints.size(),
-//	track.deferredCollisions.size());
 					track.makeInsensible(time);
-//				} else if (track.deferredCollisions.size() > 0) {
-//					track.makeInsensible(time);
 				} else {
-//System.out.printf("DEPODE TRACT %s, req.Br.Points.length()= %s, deferr.Coll.length()= %s\n",
-//	identifier,
-//	track.requestedBreakPoints.size(),
-//	track.deferredCollisions.size());
 					track.depose();
 					tracks.remove(identifier);
 				}

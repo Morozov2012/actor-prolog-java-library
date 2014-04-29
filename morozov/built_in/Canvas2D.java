@@ -512,6 +512,7 @@ public abstract class Canvas2D extends ImageConsumer {
 		repaintAfterDelay(iX);
 	}
 	protected void drawImage(Term a1, ChoisePoint iX) {
+		a1= a1.dereferenceValue(iX);
 		if (a1 instanceof BufferedImage) {
 			BufferedImage image= (BufferedImage)a1;
 			append_command(new Java2DDrawImage(image.getImage(iX)));
@@ -521,6 +522,7 @@ public abstract class Canvas2D extends ImageConsumer {
 		}
 	}
 	protected void drawImage(Term a1, Color color, ChoisePoint iX) {
+		a1= a1.dereferenceValue(iX);
 		if (a1 instanceof BufferedImage) {
 			BufferedImage image= (BufferedImage)a1;
 			append_command(new Java2DDrawImage(image.getImage(iX),color));
@@ -532,6 +534,7 @@ public abstract class Canvas2D extends ImageConsumer {
 	protected void drawImage(Term a1, Term a2, Term a3, ChoisePoint iX) {
 		double x1= Converters.argumentToReal(a2,iX);
 		double y1= Converters.argumentToReal(a3,iX);
+		a1= a1.dereferenceValue(iX);
 		if (a1 instanceof BufferedImage) {
 			BufferedImage image= (BufferedImage)a1;
 			append_command(new Java2DDrawImage(image.getImage(iX),x1,y1));
@@ -543,6 +546,7 @@ public abstract class Canvas2D extends ImageConsumer {
 	protected void drawImage(Term a1, Term a2, Term a3, Color color, ChoisePoint iX) {
 		double x1= Converters.argumentToReal(a2,iX);
 		double y1= Converters.argumentToReal(a3,iX);
+		a1= a1.dereferenceValue(iX);
 		if (a1 instanceof BufferedImage) {
 			BufferedImage image= (BufferedImage)a1;
 			append_command(new Java2DDrawImage(image.getImage(iX),x1,y1,color));
@@ -556,6 +560,7 @@ public abstract class Canvas2D extends ImageConsumer {
 		double y1= Converters.argumentToReal(a3,iX);
 		double width= Converters.argumentToReal(a4,iX);
 		double height= Converters.argumentToReal(a5,iX);
+		a1= a1.dereferenceValue(iX);
 		if (a1 instanceof BufferedImage) {
 			BufferedImage image= (BufferedImage)a1;
 			append_command(new Java2DScaleAndDrawImage(image.getImage(iX),x1,y1,width,height));
@@ -569,6 +574,7 @@ public abstract class Canvas2D extends ImageConsumer {
 		double y1= Converters.argumentToReal(a3,iX);
 		double width= Converters.argumentToReal(a4,iX);
 		double height= Converters.argumentToReal(a5,iX);
+		a1= a1.dereferenceValue(iX);
 		if (a1 instanceof BufferedImage) {
 			BufferedImage image= (BufferedImage)a1;
 			append_command(new Java2DScaleAndDrawImage(image.getImage(iX),x1,y1,width,height,color));
@@ -586,6 +592,7 @@ public abstract class Canvas2D extends ImageConsumer {
 		double sourceY1= Converters.argumentToReal(a7,iX);
 		double sourceX2= Converters.argumentToReal(a8,iX);
 		double sourceY2= Converters.argumentToReal(a9,iX);
+		a1= a1.dereferenceValue(iX);
 		if (a1 instanceof BufferedImage) {
 			BufferedImage image= (BufferedImage)a1;
 			append_command(new Java2DPickOutAndDrawImage(
@@ -621,6 +628,7 @@ public abstract class Canvas2D extends ImageConsumer {
 		double sourceY1= Converters.argumentToReal(a7,iX);
 		double sourceX2= Converters.argumentToReal(a8,iX);
 		double sourceY2= Converters.argumentToReal(a9,iX);
+		a1= a1.dereferenceValue(iX);
 		if (a1 instanceof BufferedImage) {
 			BufferedImage image= (BufferedImage)a1;
 			append_command(new Java2DPickOutAndDrawImage(
@@ -791,20 +799,54 @@ public abstract class Canvas2D extends ImageConsumer {
 		if (space2DDoesNotExist()) {
 			return;
 		} else {
-			createGraphicWindowIfNecessary(iX,false);
-			synchronized(this) {
-				suspendRedrawing= false;
-				implementDelayedCleaning= false;
-				if (graphicWindow != null) {
-					if (space2D != null) {
-						space2D.releaseRedrawing();
-					};
-					graphicWindow.safelyRepaint();
-				} else if (space2D != null) {
+			createWindowAndDrawNow(iX);
+		}
+	}
+	protected void createWindowAndDrawNow(ChoisePoint iX) {
+		createGraphicWindowIfNecessary(iX,false);
+		synchronized(this) {
+			suspendRedrawing= false;
+			implementDelayedCleaning= false;
+			if (graphicWindow != null) {
+				if (space2D != null) {
 					space2D.releaseRedrawing();
-					// 2013.11.16: Inner Canvas2D repainting problem
-					// DesktopUtils.safelyRepaint(space2D);
-					space2D.repaintAfterDelay();
+				};
+				graphicWindow.safelyRepaint();
+			} else if (space2D != null) {
+				space2D.releaseRedrawing();
+				// 2013.11.16: Inner Canvas2D repainting problem
+				// DesktopUtils.safelyRepaint(space2D);
+				space2D.repaintAfterDelay();
+			}
+		}
+	}
+	//
+	public void getImage1s(ChoisePoint iX, Term a1) {
+		a1= a1.dereferenceValue(iX);
+		if (a1 instanceof BufferedImage) {
+			BufferedImage image= (BufferedImage)a1;
+			createWindowAndDrawNow(iX);
+			synchronized(this) {
+				java.awt.image.BufferedImage bufferedImage= getBufferedImage();
+				if (bufferedImage != null) {
+					image.setImage(bufferedImage);
+				}
+			}
+		}
+	}
+	public void getImage5s(ChoisePoint iX, Term a1, Term a2, Term a3, Term a4, Term a5) {
+		double x1= Converters.argumentToReal(a2,iX);
+		double y1= Converters.argumentToReal(a3,iX);
+		double width= Converters.argumentToReal(a4,iX);
+		double height= Converters.argumentToReal(a5,iX);
+		a1= a1.dereferenceValue(iX);
+		if (a1 instanceof BufferedImage) {
+			BufferedImage image= (BufferedImage)a1;
+			createWindowAndDrawNow(iX);
+			synchronized(this) {
+				java.awt.image.BufferedImage bufferedImage= getBufferedImage(x1,y1,width,height);
+				if (bufferedImage != null) {
+					image.setImage(bufferedImage);
 				}
 			}
 		}
@@ -819,46 +861,111 @@ public abstract class Canvas2D extends ImageConsumer {
 		saveContent(fileName,a2,iX);
 	}
 	protected void saveContent(String fileName, Term attributes, ChoisePoint iX) {
-		createGraphicWindowIfNecessary(iX,false);
+		createWindowAndDrawNow(iX);
 		synchronized(this) {
-			if (graphicWindow != null) {
-				Rectangle bounds= graphicWindow.getBounds(null);
-				Insets insents= graphicWindow.getInsets();
-				Dimension size= new Dimension();
-				graphicWindow.getSize(size);
-				GraphicsConfiguration gc= graphicWindow.getGraphicsConfiguration();
-				java.awt.image.BufferedImage bufferedImage= gc.createCompatibleImage(
-					size.width,
-					size.height);
-				Graphics g= bufferedImage.getGraphics();
-				int x0= - (bounds.width - size.width - insents.right);
-				int y0= - (bounds.height - size.height - insents.bottom);
-				g.translate(x0,y0);
-				graphicWindow.print(g);
-				g.dispose();
+			java.awt.image.BufferedImage bufferedImage= getBufferedImage();
+			if (bufferedImage != null) {
 				boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
 				Tools2D.write(fileName,backslashIsSeparator,bufferedImage,attributes,iX);
-			} else if (space2D != null) {
-				Rectangle bounds= space2D.getBounds(null);
-				Insets insents= space2D.getInsets();
-				Dimension size= new Dimension();
-				space2D.getSize(size);
-				GraphicsConfiguration gc= space2D.getGraphicsConfiguration();
-				if (gc != null) {
-					java.awt.image.BufferedImage bufferedImage= gc.createCompatibleImage(
-						size.width,
-						size.height);
-					Graphics g= bufferedImage.getGraphics();
-					int x0= - (bounds.width - size.width - insents.right);
-					int y0= - (bounds.height - size.height - insents.bottom);
-					g.translate(x0,y0);
-					space2D.print(g);
-					g.dispose();
-					boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-					Tools2D.write(fileName,backslashIsSeparator,bufferedImage,attributes,iX);
-				}
 			}
 		}
+	}
+	//
+	protected java.awt.image.BufferedImage getBufferedImage() {
+		java.awt.image.BufferedImage bufferedImage= null;
+		if (graphicWindow != null) {
+			Rectangle bounds= graphicWindow.getBounds(null);
+			Insets insents= graphicWindow.getInsets();
+			Dimension size= new Dimension();
+			graphicWindow.getSize(size);
+			int x0= - (bounds.width - size.width - insents.right);
+			int y0= - (bounds.height - size.height - insents.bottom);
+			GraphicsConfiguration gc= graphicWindow.getGraphicsConfiguration();
+			if (gc != null) {
+				bufferedImage= gc.createCompatibleImage(size.width,size.height);
+				Graphics g= bufferedImage.getGraphics();
+				try {
+					g.translate(x0,y0);
+					graphicWindow.print(g);
+				} finally {
+					g.dispose();
+				}
+			}
+		} else if (space2D != null) {
+			Rectangle bounds= space2D.getBounds(null);
+			Insets insents= space2D.getInsets();
+			Dimension size= new Dimension();
+			space2D.getSize(size);
+			int x0= - (bounds.width - size.width - insents.right);
+			int y0= - (bounds.height - size.height - insents.bottom);
+			GraphicsConfiguration gc= space2D.getGraphicsConfiguration();
+			if (gc != null) {
+				bufferedImage= gc.createCompatibleImage(size.width,size.height);
+				Graphics g= bufferedImage.getGraphics();
+				try {
+					g.translate(x0,y0);
+					space2D.print(g);
+				} finally {
+					g.dispose();
+				}
+			}
+		};
+		return bufferedImage;
+	}
+	protected java.awt.image.BufferedImage getBufferedImage(double x1, double y1, double width, double height) {
+		java.awt.image.BufferedImage bufferedImage= null;
+		if (graphicWindow != null) {
+			Rectangle bounds= graphicWindow.getBounds(null);
+			Insets insents= graphicWindow.getInsets();
+			Dimension size= new Dimension();
+			graphicWindow.getSize(size);
+			DrawingMode drawingMode= graphicWindow.getDrawingMode();
+			double factorX= drawingMode.getFactorX();
+			double factorY= drawingMode.getFactorY();
+			int integerX= (int)StrictMath.round(x1*factorX);
+			int integerY= (int)StrictMath.round(y1*factorY);
+			int integerWidth= (int)StrictMath.round(width*factorX);
+			int integerHeight= (int)StrictMath.round(height*factorY);
+			int x0= - (bounds.width - size.width - insents.right + integerX);
+			int y0= - (bounds.height - size.height - insents.bottom + integerY);
+			GraphicsConfiguration gc= graphicWindow.getGraphicsConfiguration();
+			if (gc != null) {
+				bufferedImage= gc.createCompatibleImage(integerWidth,integerHeight);
+				Graphics g= bufferedImage.getGraphics();
+				try {
+					g.translate(x0,y0);
+					graphicWindow.print(g);
+				} finally {
+					g.dispose();
+				}
+			}
+		} else if (space2D != null) {
+			Rectangle bounds= space2D.getBounds(null);
+			Insets insents= space2D.getInsets();
+			Dimension size= new Dimension();
+			space2D.getSize(size);
+			DrawingMode drawingMode= space2D.getDrawingMode();
+			double factorX= drawingMode.getFactorX();
+			double factorY= drawingMode.getFactorY();
+			int integerX= (int)StrictMath.round(x1*factorX);
+			int integerY= (int)StrictMath.round(y1*factorY);
+			int integerWidth= (int)StrictMath.round(width*factorX);
+			int integerHeight= (int)StrictMath.round(height*factorY);
+			int x0= - (bounds.width - size.width - insents.right + integerX);
+			int y0= - (bounds.height - size.height - insents.bottom + integerY);
+			GraphicsConfiguration gc= space2D.getGraphicsConfiguration();
+			if (gc != null) {
+				bufferedImage= gc.createCompatibleImage(integerWidth,integerHeight);
+				Graphics g= bufferedImage.getGraphics();
+				try {
+					g.translate(x0,y0);
+					space2D.print(g);
+				} finally {
+					g.dispose();
+				}
+			}
+		};
+		return bufferedImage;
 	}
 	//
 	public void action1s(ChoisePoint iX, Term actionName) {

@@ -36,6 +36,7 @@ class BlobSet {
 	private int synthesizedImageTransparency;
 	//
 	private long recentFrameNumber;
+	// private static boolean recentFrameNumberIsPrinted= false;
 	private String title= "";
 	private int imageWidth;
 	private int imageHeight;
@@ -196,7 +197,13 @@ class BlobSet {
 /*
 System.out.printf("TIME=%d\n",recentFrameNumber);
 // if (recentFrameNumber==400) {
-if (recentFrameNumber>=408) {
+// if (recentFrameNumber>=408) {
+// if (recentFrameNumber>=251) {
+if (recentFrameNumber>=500) {
+recentFrameNumberIsPrinted= false;
+};
+if (recentFrameNumber>=232 && recentFrameNumber < 500 && !recentFrameNumberIsPrinted) {
+recentFrameNumberIsPrinted= true;
 ConnectedGraph[] graphs= formAndGetConnectedGraphs();
 // if (recentFrameNumber==450) {
 //System.out.printf("!!! TIME=551\n\n\n\n\n");
@@ -207,14 +214,14 @@ while (iterator1.hasNext()) {
 	if (track != null) {
 		//if (track.duration > 70) {
 			try {
-				String fileName= String.format("log\\track_%05d.txt",track.identifier);
+				String fileName= String.format("log\\track_%05d_(%05d).txt",track.identifier,recentFrameNumber);
 				PrintStream stream= new PrintStream(fileName);
 				try {
 					track.dump(stream);
 				} finally {
 					stream.close();
 				};
-				fileName= String.format("log\\track_%05d.m",track.identifier);
+				fileName= String.format("log\\track_%05d_(%05d).m",track.identifier,recentFrameNumber);
 				stream= new PrintStream(fileName);
 				try {
 					track.createMatlab(stream);
@@ -229,14 +236,14 @@ while (iterator1.hasNext()) {
 }
 for (int n=0; n < graphs.length; n++) {
 	try {
-		String fileName= String.format("log\\graph_%05d.txt",n);
+		String fileName= String.format("log\\graph_%05d_(%05d).txt",n,recentFrameNumber);
 		PrintStream stream= new PrintStream(fileName);
 		try {
 			graphs[n].dump(stream);
 		} finally {
 			stream.close();
 		};
-		fileName= String.format("log\\graph_%05d.m",n);
+		fileName= String.format("log\\graph_%05d_(%05d).m",n,recentFrameNumber);
 		stream= new PrintStream(fileName);
 		try {
 			graphs[n].createMatlab(stream);
@@ -510,6 +517,70 @@ for (int n=0; n < graphs.length; n++) {
 		}
 	}
 	synchronized public Term getConnectedGraphs() {
+/*
+System.out.printf("TIME=%d\n",recentFrameNumber);
+// if (recentFrameNumber==400) {
+// if (recentFrameNumber>=408) {
+// if (recentFrameNumber>=251) {
+if (recentFrameNumber>=500) {
+recentFrameNumberIsPrinted= false;
+};
+// if (recentFrameNumber>=232 && recentFrameNumber < 500 && !recentFrameNumberIsPrinted) {
+// if (recentFrameNumber>=400 && recentFrameNumber < 500 && !recentFrameNumberIsPrinted) {
+if (false && recentFrameNumber>=275 && recentFrameNumber < 500 && !recentFrameNumberIsPrinted) {
+recentFrameNumberIsPrinted= true;
+ConnectedGraph[] graphs= formAndGetConnectedGraphs();
+// if (recentFrameNumber==450) {
+System.out.printf("!!! TIME=%s\n\n\n\n\n",recentFrameNumber);
+Collection<StableTrack> trackValues= tracks.values();
+Iterator<StableTrack> iterator1= trackValues.iterator();
+while (iterator1.hasNext()) {
+	StableTrack track= iterator1.next();
+	if (track != null) {
+		//if (track.duration > 70) {
+			try {
+				String fileName= String.format("log\\track_%05d_(%05d).txt",track.identifier,recentFrameNumber);
+				PrintStream stream= new PrintStream(fileName);
+				try {
+					track.dump(stream);
+				} finally {
+					stream.close();
+				};
+				fileName= String.format("log\\track_%05d_(%05d).m",track.identifier,recentFrameNumber);
+				stream= new PrintStream(fileName);
+				try {
+					track.createMatlab(stream);
+				} finally {
+					stream.close();
+				}
+			} catch (FileNotFoundException e) {
+				System.out.printf("FileNotFoundException: %s",e);
+			}
+		//}
+	}
+}
+for (int n=0; n < graphs.length; n++) {
+	try {
+		String fileName= String.format("log\\graph_%05d_(%05d).txt",n,recentFrameNumber);
+		PrintStream stream= new PrintStream(fileName);
+		try {
+			graphs[n].dump(stream);
+		} finally {
+			stream.close();
+		};
+		fileName= String.format("log\\graph_%05d_(%05d).m",n,recentFrameNumber);
+		stream= new PrintStream(fileName);
+		try {
+			graphs[n].createMatlab(stream);
+		} finally {
+			stream.close();
+		}
+	} catch (FileNotFoundException e) {
+		System.out.printf("FileNotFoundException: %s",e);
+	}
+}
+}
+*/
 		ConnectedGraph[] graphs= formAndGetConnectedGraphs();
 		Term list1= PrologEmptyList.instance;
 		for (int n=graphs.length-1; n >= 0; n--) {
