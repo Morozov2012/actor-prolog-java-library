@@ -23,11 +23,11 @@ import java.util.Collection;
 
 class BlobSet {
 	//
+//
+private boolean recentFrameNumberIsPrinted= false;
+//
 	private int minimalTrackDuration;
-	// private double[][] inverseMatrix;
-	// private double samplingRate;
-	// private boolean applyMedianFiltering;
-	// private int medianFilterHalfwidth;
+	//
 	private boolean refuseSlowTracks;
 	private double velocityThreshold;
 	private double distanceThreshold;
@@ -36,7 +36,6 @@ class BlobSet {
 	private int synthesizedImageTransparency;
 	//
 	private long recentFrameNumber;
-	// private static boolean recentFrameNumberIsPrinted= false;
 	private String title= "";
 	private int imageWidth;
 	private int imageHeight;
@@ -45,7 +44,7 @@ class BlobSet {
 	private int[][] backgroundSum;
 	private int[][] backgroundSumX2;
 	private int backgroundN;
-	private int[][] deltaPixels;
+	private int[] contourPixels;
 	private BufferedImage recentImage;
 	private BufferedImage backgroundImage;
 	private BufferedImage sigmaImage;
@@ -71,7 +70,7 @@ class BlobSet {
 			int[][] sum,
 			int[][] sumX2,
 			int number,
-			int[][] delta,
+			int[] contour,
 			int marker1,
 			int marker2,
 			int[] currentBlobSize,
@@ -80,10 +79,6 @@ class BlobSet {
 			int[] currentTrackDurations,
 			HashMap<BigInteger,GrowingTrack> currentTracks,
 			int minimalDuration,
-			// double[][] iMatrix,
-			// double rate,
-			// boolean applyFilterToVelocity,
-			// int filterHalfwidth,
 			boolean refuseTracks,
 			double minimalVelocity,
 			double minimalDistance,
@@ -108,10 +103,7 @@ class BlobSet {
 			backgroundSumX2[n]= Arrays.copyOf(sumX2[n],vectorLength);
 		};
 		backgroundN= number;
-		deltaPixels= new int[numberOfBands+numberOfExtraBands][0];
-		for (int n=0; n < numberOfBands+numberOfExtraBands; n++) {
-			deltaPixels[n]= Arrays.copyOf(delta[n],vectorLength);
-		};
+		contourPixels= Arrays.copyOf(contour,vectorLength);
 		differenceMarker= marker1;
 		noDifferenceMarker= marker2;
 		blobSize= Arrays.copyOf(currentBlobSize,currentBlobSize.length);
@@ -133,10 +125,6 @@ class BlobSet {
 			tracks.put(blobIdentifier,track.createStableTrack());
 		};
 		minimalTrackDuration= minimalDuration;
-		// inverseMatrix= iMatrix;
-		// samplingRate= rate;
-		// applyMedianFiltering= applyFilterToVelocity;
-		// medianFilterHalfwidth= filterHalfwidth;
 		refuseSlowTracks= refuseTracks;
 		velocityThreshold= minimalVelocity;
 		distanceThreshold= minimalDistance;
@@ -264,13 +252,6 @@ for (int n=0; n < graphs.length; n++) {
 			Term prologY= new PrologInteger(StrictMath.round((rectangle[2]+rectangle[3])/2));
 			Term prologWidth= new PrologInteger(rectangle[1]-rectangle[0]);
 			Term prologHeight= new PrologInteger(rectangle[3]-rectangle[2]);
-			// Term[] arguments= new Term[]{
-			//	prologIdentifier,
-			//	prologX,
-			//	prologY,
-			//	prologWidth,
-			//	prologHeight};
-			// Term prologBlob= new PrologStructure(SymbolCodes.symbolCode_E_blob,arguments);
 			Term prologBlob= new PrologSet(
 				- SymbolCodes.symbolCode_E_identifier,
 				prologIdentifier,
@@ -304,60 +285,22 @@ for (int n=0; n < graphs.length; n++) {
 			Term list2= PrologEmptyList.instance;
 			while (segmentListIterator.hasPrevious()) {
 				TrackSegment segment= segmentListIterator.previous();
-				long beginningTime= segment.beginningTime;
 				int[][] rectangles= segment.rectangles;
-				double[][] velocity= segment.velocity;
 				if (rectangles.length <= 0) {
 					continue;
 				};
+				long beginningTime= segment.beginningTime;
 				int[] firstRectangle= rectangles[0];
-				Term prologFrame1= new PrologInteger(beginningTime+firstRectangle[0]);
-				Term prologX1= new PrologInteger(StrictMath.round((firstRectangle[1]+firstRectangle[2])/2.0));
-				Term prologY1= new PrologInteger(StrictMath.round((firstRectangle[3]+firstRectangle[4])/2.0));
+				long frameNumber1= beginningTime+firstRectangle[0];
+				long x1= StrictMath.round((firstRectangle[1]+firstRectangle[2])/2.0);
+				long y1= StrictMath.round((firstRectangle[3]+firstRectangle[4])/2.0);
 				int[] lastRectangle= rectangles[rectangles.length-1];
-				Term prologFrame2= new PrologInteger(beginningTime+lastRectangle[0]);
-				Term prologX2= new PrologInteger(StrictMath.round((lastRectangle[1]+lastRectangle[2])/2.0));
-				Term prologY2= new PrologInteger(StrictMath.round((lastRectangle[3]+lastRectangle[4])/2.0));
-				Term list3= formTrackOfBlob(beginningTime,rectangles,velocity);
-				Term prologMeanVelocity= new PrologReal(getMeanVelocity(velocity));
-				// Term[] internalArguments= new Term[]{
-				//	prologFrame1,
-				//	prologX1,
-				//	prologY1,
-				//	prologFrame2,
-				//	prologX2,
-				//	prologY2,
-				//	list3};
-				// Term prologSegment= new PrologStructure(SymbolCodes.symbolCode_E_ts,internalArguments);
-				Term prologSegment= new PrologSet(
-					- SymbolCodes.symbolCode_E_frame1,
-					prologFrame1,
-					new PrologSet(
-					- SymbolCodes.symbolCode_E_x1,
-					prologX1,
-					new PrologSet(
-					- SymbolCodes.symbolCode_E_y1,
-					prologY1,
-					new PrologSet(
-					- SymbolCodes.symbolCode_E_frame2,
-					prologFrame2,
-					new PrologSet(
-					- SymbolCodes.symbolCode_E_x2,
-					prologX2,
-					new PrologSet(
-					- SymbolCodes.symbolCode_E_y2,
-					prologY2,
-					new PrologSet(
-					- SymbolCodes.symbolCode_E_coordinates,
-					list3,
-					new PrologSet(
-					- SymbolCodes.symbolCode_E_mean_velocity,
-					prologMeanVelocity,
-					PrologEmptySet.instance))))))));
+				long frameNumber2= beginningTime+lastRectangle[0];
+				long x2= StrictMath.round((lastRectangle[1]+lastRectangle[2])/2.0);
+				long y2= StrictMath.round((lastRectangle[3]+lastRectangle[4])/2.0);
+				Term prologSegment= assembleTrackSegment(frameNumber1,x1,y1,frameNumber2,x2,y2,segment);
 				list2= new PrologList(prologSegment,list2);
 			};
-			// Term[] mainArguments= new Term[]{prologIdentifier,list2};
-			// Term prologTrack= new PrologStructure(SymbolCodes.symbolCode_E_track,mainArguments);
 			Term prologTrack= new PrologSet(
 				- SymbolCodes.symbolCode_E_identifier,
 				prologIdentifier,
@@ -369,24 +312,28 @@ for (int n=0; n < graphs.length; n++) {
 		};
 		return list1;
 	}
-	protected Term formTrackOfBlob(long beginningTime, int[][] rectangles, double[][] velocity) {
+	protected Term formTrackOfBlob(TrackSegment segment) {
+		long beginningTime= segment.beginningTime;
+		int[][] rectangles= segment.rectangles;
+		double[] windowedR2ReferentValues= segment.getWindowedR2ReferentValues();
 		Term list3= PrologEmptyList.instance;
 		for (int n=rectangles.length-1; n >= 0; n--) {
 			int[] currentRectangle= rectangles[n];
-			double[] currentVelocity= velocity[n];
+			long currentForegroundArea= segment.foregroundAreaValues[n];
+			double currentCharacteristicLength= segment.characteristicLengthValues[n];
+			long currentContourLength= segment.contourLengthValues[n];
+			double currentR2= windowedR2ReferentValues[n];
+			double currentVelocity= segment.velocityValues[n];
 			Term prologFrameN= new PrologInteger(beginningTime+currentRectangle[0]);
 			Term prologXn= new PrologInteger(StrictMath.round((currentRectangle[1]+currentRectangle[2])/2.0));
 			Term prologYn= new PrologInteger(StrictMath.round((currentRectangle[3]+currentRectangle[4])/2.0));
 			Term prologWidthN= new PrologInteger(currentRectangle[2]-currentRectangle[1]);
 			Term prologHeightN= new PrologInteger(currentRectangle[4]-currentRectangle[3]);
-			Term prologVelocityN= new PrologReal(currentVelocity[2]);
-			// Term[] prologBlobCoordinates= new Term[]{
-			//	prologFrameN,
-			//	prologXn,
-			//	prologYn,
-			//	prologWidthN,
-			//	prologHeightN};
-			// Term prologRectangle= new PrologStructure(SymbolCodes.symbolCode_E_bc,prologBlobCoordinates);
+			Term prologForegroundAreaN= new PrologInteger(currentForegroundArea);
+			Term prologCharacteristicLengthN= new PrologReal(currentCharacteristicLength);
+			Term prologContourLengthN= new PrologInteger(currentContourLength);
+			Term prologR2N= new PrologReal(currentR2);
+			Term prologVelocityN= new PrologReal(currentVelocity);
 			Term prologRectangle= new PrologSet(
 				- SymbolCodes.symbolCode_E_frame,
 				prologFrameN,
@@ -403,19 +350,24 @@ for (int n=0; n < graphs.length; n++) {
 				- SymbolCodes.symbolCode_E_height,
 				prologHeightN,
 				new PrologSet(
+				- SymbolCodes.symbolCode_E_foreground_area,
+				prologForegroundAreaN,
+				new PrologSet(
+				- SymbolCodes.symbolCode_E_characteristic_length,
+				prologCharacteristicLengthN,
+				new PrologSet(
+				- SymbolCodes.symbolCode_E_contour_length,
+				prologContourLengthN,
+				new PrologSet(
+				- SymbolCodes.symbolCode_E_r2,
+				prologR2N,
+				new PrologSet(
 				- SymbolCodes.symbolCode_E_velocity,
 				prologVelocityN,
-				PrologEmptySet.instance))))));
+				PrologEmptySet.instance))))))))));
 			list3= new PrologList(prologRectangle,list3);
 		};
 		return list3;
-	}
-	protected double getMeanVelocity(double[][] velocity) {
-		if (velocity.length > 0) {
-			return velocity[velocity.length-1][2];
-		} else {
-			return 0.0;
-		}
 	}
 	synchronized public java.awt.image.BufferedImage getRecentImage() {
 		if (recentImage != null) {
@@ -527,7 +479,8 @@ recentFrameNumberIsPrinted= false;
 };
 // if (recentFrameNumber>=232 && recentFrameNumber < 500 && !recentFrameNumberIsPrinted) {
 // if (recentFrameNumber>=400 && recentFrameNumber < 500 && !recentFrameNumberIsPrinted) {
-if (false && recentFrameNumber>=275 && recentFrameNumber < 500 && !recentFrameNumberIsPrinted) {
+// if (false && recentFrameNumber>=275 && recentFrameNumber < 500 && !recentFrameNumberIsPrinted) {
+if (recentFrameNumber>=499 && recentFrameNumber < 500 && !recentFrameNumberIsPrinted) {
 recentFrameNumberIsPrinted= true;
 ConnectedGraph[] graphs= formAndGetConnectedGraphs();
 // if (recentFrameNumber==450) {
@@ -593,63 +546,23 @@ for (int n=0; n < graphs.length; n++) {
 			Term list2= PrologEmptyList.instance;
 			for (int k=numberOfSegments-1; k >= 0; k--) {
 				ConnectedSegment connectedSegment= connectedSegments.get(k);
-				// BigInteger connectedSegmentOwner= connectedSegment.getOwner();
 				int connectedSegmentNumber= connectedSegments.indexOf(connectedSegment);
-				// if (refusedTracks.contains(segment.getOwner())) {
-				//	continue;
-				// };
 				TrackSegment trackSegment= connectedSegment.trackSegment;
-				long beginningTime= trackSegment.beginningTime;
-				int[][] rectangles= trackSegment.rectangles;
-				double[][] velocity= trackSegment.velocity;
-				// if (rectangles.length <= 0) {
-				//	continue;
-				// };
-				int[] firstRectangle= rectangles[0];
-				Term prologFrame1= new PrologInteger(beginningTime+firstRectangle[0]);
-				Term prologX1= new PrologInteger(StrictMath.round((firstRectangle[1]+firstRectangle[2])/2.0));
-				Term prologY1= new PrologInteger(StrictMath.round((firstRectangle[3]+firstRectangle[4])/2.0));
-				int[] lastRectangle= rectangles[rectangles.length-1];
-				Term prologFrame2= new PrologInteger(beginningTime+lastRectangle[0]);
-				Term prologX2= new PrologInteger(StrictMath.round((lastRectangle[1]+lastRectangle[2])/2.0));
-				Term prologY2= new PrologInteger(StrictMath.round((lastRectangle[3]+lastRectangle[4])/2.0));
 				Term prologOriginEdges= collectOriginEdges(connectedSegment,connectedSegmentNumber,connectedSegments);
-				// Term prologMergedEdges= collectMergedEdges(connectedSegment,connectedSegments);
 				Term prologBrachEdges= collectBranchEdges(connectedSegment,connectedSegmentNumber,connectedSegments);
 				Term prologIdentifier= new PrologInteger(trackSegment.owner);
-				Term list3= formTrackOfBlob(beginningTime,rectangles,velocity);
-				Term prologMeanVelocity= new PrologReal(getMeanVelocity(velocity));
-				// Term[] mainArguments= new Term[]{
-				//	prologFrame1,
-				//	prologX1,
-				//	prologY1,
-				//	prologFrame2,
-				//	prologX2,
-				//	prologY2,
-				//	prologOriginEdges,
-				//	prologBrachEdges,
-				//	prologIdentifier,
-				//	list3};
-				// Term prologEdge= new PrologStructure(SymbolCodes.symbolCode_E_edge,mainArguments);
+				long beginningTime= trackSegment.beginningTime;
+				int[][] rectangles= trackSegment.rectangles;
+				int[] firstRectangle= rectangles[0];
+				long frameNumber1= beginningTime+firstRectangle[0];
+				long x1= StrictMath.round((firstRectangle[1]+firstRectangle[2])/2.0);
+				long y1= StrictMath.round((firstRectangle[3]+firstRectangle[4])/2.0);
+				int[] lastRectangle= rectangles[rectangles.length-1];
+				long frameNumber2= beginningTime+lastRectangle[0];
+				long x2= StrictMath.round((lastRectangle[1]+lastRectangle[2])/2.0);
+				long y2= StrictMath.round((lastRectangle[3]+lastRectangle[4])/2.0);
+				Term prologSegment= assembleTrackSegment(frameNumber1,x1,y1,frameNumber2,x2,y2,trackSegment);
 				Term prologEdge= new PrologSet(
-					- SymbolCodes.symbolCode_E_frame1,
-					prologFrame1,
-					new PrologSet(
-					- SymbolCodes.symbolCode_E_x1,
-					prologX1,
-					new PrologSet(
-					- SymbolCodes.symbolCode_E_y1,
-					prologY1,
-					new PrologSet(
-					- SymbolCodes.symbolCode_E_frame2,
-					prologFrame2,
-					new PrologSet(
-					- SymbolCodes.symbolCode_E_x2,
-					prologX2,
-					new PrologSet(
-					- SymbolCodes.symbolCode_E_y2,
-					prologY2,
-					new PrologSet(
 					- SymbolCodes.symbolCode_E_inputs,
 					prologOriginEdges,
 					new PrologSet(
@@ -658,18 +571,96 @@ for (int n=0; n < graphs.length; n++) {
 					new PrologSet(
 					- SymbolCodes.symbolCode_E_identifier,
 					prologIdentifier,
-					new PrologSet(
-					- SymbolCodes.symbolCode_E_coordinates,
-					list3,
-					new PrologSet(
-					- SymbolCodes.symbolCode_E_mean_velocity,
-					prologMeanVelocity,
-					PrologEmptySet.instance)))))))))));
+					prologSegment)));
 				list2= new PrologList(prologEdge,list2);
 			};
 			list1= new PrologList(list2,list1);
 		};
 		return list1;
+	}
+	protected Term assembleTrackSegment(
+			long frameNumber1,
+			long x1,
+			long y1,
+			long frameNumber2,
+			long x2,
+			long y2,
+			TrackSegment trackSegment
+			) {
+		Term prologFrame1= new PrologInteger(frameNumber1);
+		Term prologX1= new PrologInteger(x1);
+		Term prologY1= new PrologInteger(y1);
+		Term prologFrame2= new PrologInteger(frameNumber2);
+		Term prologX2= new PrologInteger(x2);
+		Term prologY2= new PrologInteger(y2);
+		Term list3= formTrackOfBlob(trackSegment);
+		Term prologMeanBlobArea= new PrologReal(trackSegment.meanBlobArea);
+		Term prologMeanForegroundArea= new PrologReal(trackSegment.meanForegroundArea);
+		Term prologMeanCharacteristicLength= new PrologReal(trackSegment.meanCharacteristicLength);
+		Term prologMeanSquaredCharacteristicLength= new PrologReal(trackSegment.meanSquaredCharacteristicLength);
+		Term prologMeanContourLength= new PrologReal(trackSegment.meanContourLength);
+		Term prologWR2Mean= new PrologReal(trackSegment.getWindowedR2Mean());
+		Term prologWR2StandardDeviation= new PrologReal(trackSegment.getWindowedR2StandardDeviation());
+		Term prologWR2Skewness= new PrologReal(trackSegment.getWindowedR2Skewness());
+		Term prologWR2Kurtosis= new PrologReal(trackSegment.getWindowedR2Kurtosis());
+		Term prologWR2Cardinality= new PrologInteger(trackSegment.getWindowedR2Cardinality());
+		Term prologMeanVelocity= new PrologReal(trackSegment.meanVelocity);
+		Term prologTrackSegment= new PrologSet(
+			- SymbolCodes.symbolCode_E_frame1,
+			prologFrame1,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_x1,
+			prologX1,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_y1,
+			prologY1,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_frame2,
+			prologFrame2,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_x2,
+			prologX2,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_y2,
+			prologY2,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_coordinates,
+			list3,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_mean_blob_area,
+			prologMeanBlobArea,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_mean_foreground_area,
+			prologMeanForegroundArea,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_mean_characteristic_length,
+			prologMeanCharacteristicLength,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_mean_squared_characteristic_length,
+			prologMeanSquaredCharacteristicLength,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_mean_contour_length,
+			prologMeanContourLength,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_wr2_mean,
+			prologWR2Mean,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_wr2_standard_deviation,
+			prologWR2StandardDeviation,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_wr2_skewness,
+			prologWR2Skewness,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_wr2_kurtosis,
+			prologWR2Kurtosis,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_wr2_cardinality,
+			prologWR2Cardinality,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_mean_velocity,
+			prologMeanVelocity,
+			PrologEmptySet.instance))))))))))))))))));
+		return prologTrackSegment;
 	}
 	protected Term collectOriginEdges(ConnectedSegment connectedSegment, int connectedSegmentNumber, ArrayList<ConnectedSegment> connectedSegments) {
 		HashSet<ConnectedSegment> origins= connectedSegment.origins;
@@ -713,11 +704,7 @@ for (int n=0; n < graphs.length; n++) {
 		} else {
 			graphs= formConnectedGraphs();
 			if (refuseSlowTracks) {
-//if (recentFrameNumber==550) {
-//				refuseSlowTracksAndReport(velocityThreshold,distanceThreshold,fuzzyThresholdBorder,graphs);
-//} else {
 				refuseSlowTracks(velocityThreshold,distanceThreshold,fuzzyThresholdBorder,graphs);
-//}
 			};
 			alloyConnectedGraphs(graphs);
 			return graphs;
@@ -760,7 +747,7 @@ for (int n=0; n < graphs.length; n++) {
 		}
 	}
 	protected BufferedImage applyMaskAndCreateImage(BufferedImage image, boolean[] bitMask) {
-		int[] deltaMatrix= Arrays.copyOf(deltaPixels[0],deltaPixels[0].length);
+		int[] deltaMatrix= Arrays.copyOf(contourPixels,contourPixels.length);
 		if (makeSquareBlobsInSynthesizedImage) {
 			for (int n=0; n < deltaMatrix.length; n++) {
 				deltaMatrix[n]= differenceMarker; // Прямоугольники вместо блобов

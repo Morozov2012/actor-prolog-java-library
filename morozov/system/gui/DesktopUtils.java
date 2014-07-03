@@ -79,8 +79,19 @@ public class DesktopUtils {
 			} finally {
 				lock.unlock();
 			}
+		} else {
+			Window mainWindow= StaticDesktopAttributes.retrieveMainWindow(context);
+			mainWindow.setVisible(true);
+			desktop.setVisible(true);
 		};
 		return desktop;
+	}
+	//
+	public static void makeExistedMainWindowVisible(StaticContext context) {
+		Window mainWindow= StaticDesktopAttributes.retrieveMainWindow(context);
+		if (mainWindow != null) {
+			mainWindow.setVisible(true);
+		}
 	}
 	//
 	public static GraphicsConfiguration getGraphicsConfiguration(StaticContext context) {

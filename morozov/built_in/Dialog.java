@@ -225,6 +225,7 @@ public abstract class Dialog extends ImageConsumer {
 			Window mainWindow= null;
 			if (!isTopLevelWindow) {
 				mainWindow= StaticDesktopAttributes.retrieveMainWindow(staticContext);
+				DesktopUtils.safelySetVisible(true,mainWindow);
 			};
 			targetObject= createDialog(isTopLevelWindow,mainWindow,iX);
 			targetObject.initiate(currentProcess,staticContext);

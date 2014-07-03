@@ -42,8 +42,7 @@ class ConnectedGraph {
 		while (iterator1.hasNext()) {
 			BigInteger identifier= iterator1.next();
 			StableTrack track= tracks.get(identifier);
-			boolean averageAbsoluteValues= true;
-			double velocity= track.computeMeanVelocity(averageAbsoluteValues);
+			double velocity= track.computeMeanVelocity();
 			// double velocity= track.computeTotalVelocity();
 			double distance= track.computeTotalDistance();
 			double velosityHalfwidth= velocityThreshold * fuzzyThresholdBorder;
@@ -62,8 +61,7 @@ class ConnectedGraph {
 		while (iterator1.hasNext()) {
 			BigInteger identifier= iterator1.next();
 			StableTrack track= tracks.get(identifier);
-			boolean averageAbsoluteValues= true;
-			double velocity= track.computeMeanVelocity(averageAbsoluteValues);
+			double velocity= track.computeMeanVelocity();
 			double distance= track.computeTotalDistance();
 			double velosityHalfwidth= velocityThreshold * fuzzyThresholdBorder;
 			double distanceHalfwidth= distanceThreshold * fuzzyThresholdBorder;
@@ -124,7 +122,7 @@ System.out.printf("refuseSlowTracks: NO, commonMetrics=%s\n",commonMetrics);
 		int numberOfSegments= connectedSegments.size();
 		for (int n=numberOfSegments-1; n >= 0; n--) {
 			ConnectedSegment c= connectedSegments.get(n);
-			if (c.trackSegment.rectangles.length <= 0) {
+			if (c.isEmpty()) {
 				connectedSegments.remove(n);
 			}
 		}

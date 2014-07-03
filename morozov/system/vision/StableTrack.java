@@ -105,7 +105,7 @@ class StableTrack {
 			return (double)distance / deltaTime;
 		}
 	}
-	public double computeMeanVelocity(boolean averageAbsoluteValues) {
+	public double computeMeanVelocity() {
 		MeanVelocity mean= new MeanVelocity();
 		int numberOfSegments= segments.size();
 		if (numberOfSegments > 0) {
@@ -114,26 +114,7 @@ class StableTrack {
 				s.computeMeanVelocity(mean);
 			}
 		};
-		if (averageAbsoluteValues) {
-			return mean.getVelocityXY();
-		} else {
-			return StrictMath.hypot(mean.getAccumulatedVelocityX(),mean.getAccumulatedVelocityY());
-		}
-	}
-	public double computeMeanAcceleration(boolean averageAbsoluteValues) {
-		MeanAcceleration mean= new MeanAcceleration();
-		int numberOfSegments= segments.size();
-		if (numberOfSegments > 0) {
-			for (int n=numberOfSegments-1; n >= 0; n--) {
-				TrackSegment s= segments.get(n);
-				s.computeMeanAcceleration(mean);
-			}
-		};
-		if (averageAbsoluteValues) {
-			return mean.getAccelerationXY();
-		} else {
-			return StrictMath.hypot(mean.getAccelerationX(),mean.getAccelerationY());
-		}
+		return mean.getMeanVelocity();
 	}
 	//
 	public int[] getCurrentRectangle(long time) {
@@ -176,10 +157,7 @@ class StableTrack {
 		stream.printf("segments:                   %s items\n",segments.size());
 		stream.printf("computeTotalDistance():     %s\n",computeTotalDistance());
 		stream.printf("totalDistance / Time:       %s\n",computeTotalVelocity());
-		stream.printf("computeMeanVelocity(T):     %s\n",computeMeanVelocity(true));
-		stream.printf("computeMeanVelocity(F):     %s\n",computeMeanVelocity(false));
-		stream.printf("computeMeanAcceleration(T): %s\n",computeMeanAcceleration(true));
-		stream.printf("computeMeanAcceleration(F): %s\n",computeMeanAcceleration(false));
+		stream.printf("computeMeanVelocity():      %s\n",computeMeanVelocity());
 		stream.printf("minimalTrackDuration:       %s\n",minimalTrackDuration);
 		stream.printf("isStrong:                   %s\n",isStrong);
 		//stream.printf("numberOfPoints:             %s\n",numberOfPoints);
@@ -210,16 +188,13 @@ class StableTrack {
 		stream.printf("%% segments:                   %s items\n",segments.size());
 		stream.printf("%% computeTotalDistance():     %s\n",computeTotalDistance());
 		stream.printf("%% totalDistance / Time:       %s\n",computeTotalVelocity());
-		stream.printf("%% computeMeanVelocity(T):     %s\n",computeMeanVelocity(true));
-		stream.printf("%% computeMeanVelocity(F):     %s\n",computeMeanVelocity(false));
+		stream.printf("%% computeMeanVelocity():      %s\n",computeMeanVelocity());
 		//stream.printf("N_%s_%s_%s= %s;\n",identifier,beginningTime,endTime,spectrumN);
 		//stream.printf("T%s{%s}.owner= %s;\n",identifier,index+1,owner);
 		//for (int w=1; w < 50; w++) {
 		//	double c= computeVelocityCoefficient(w);
 		//	stream.printf("VelocityCoefficient(%s)= %s;\n",w,c);
 		//};
-		stream.printf("%% computeMeanAcceleration(T): %s\n",computeMeanAcceleration(true));
-		stream.printf("%% computeMeanAcceleration(F): %s\n",computeMeanAcceleration(false));
 		stream.printf("%% minimalTrackDuration:       %s\n",minimalTrackDuration);
 		stream.printf("%% isStrong:                   %s\n",isStrong);
 		//stream.printf("%% numberOfPoints:             %s\n",numberOfPoints);

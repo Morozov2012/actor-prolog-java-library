@@ -328,49 +328,49 @@ public abstract class SynchronizedImageSubtractor extends ImageSubtractor {
 	}
 	public void getBackgroundGaussianFilterRadius0fs(ChoisePoint iX) {
 	}
-	// BackgroundMedianFilteringMode
-	public void setBackgroundMedianFilteringMode1s(ChoisePoint iX, Term value) {
+	// BackgroundRankFilteringMode
+	public void setBackgroundRankFilteringMode1s(ChoisePoint iX, Term value) {
 		Term subtractor= getBuiltInSlot_E_image_subtractor();
 		if (subtractor instanceof ImageSubtractor) {
 			ImageSubtractor server= (ImageSubtractor)subtractor;
-			server.setBackgroundMedianFilteringMode1s(iX,value);
+			server.setBackgroundRankFilteringMode1s(iX,value);
 		} else {
 			throw new WrongArgumentIsNotImageSubtractor(subtractor);
 		}
 	}
 	//
-	public void getBackgroundMedianFilteringMode0ff(ChoisePoint iX, PrologVariable result) {
+	public void getBackgroundRankFilteringMode0ff(ChoisePoint iX, PrologVariable result) {
 		Term subtractor= getBuiltInSlot_E_image_subtractor();
 		if (subtractor instanceof ImageSubtractor) {
 			ImageSubtractor server= (ImageSubtractor)subtractor;
-			server.getBackgroundMedianFilteringMode0ff(iX,result);
+			server.getBackgroundRankFilteringMode0ff(iX,result);
 		} else {
 			throw new WrongArgumentIsNotImageSubtractor(subtractor);
 		}
 	}
-	public void getBackgroundMedianFilteringMode0fs(ChoisePoint iX) {
+	public void getBackgroundRankFilteringMode0fs(ChoisePoint iX) {
 	}
-	// BackgroundMedianFilterThreshold
-	public void setBackgroundMedianFilterThreshold1s(ChoisePoint iX, Term value) {
+	// BackgroundRankFilterThreshold
+	public void setBackgroundRankFilterThreshold1s(ChoisePoint iX, Term value) {
 		Term subtractor= getBuiltInSlot_E_image_subtractor();
 		if (subtractor instanceof ImageSubtractor) {
 			ImageSubtractor server= (ImageSubtractor)subtractor;
-			server.setBackgroundMedianFilterThreshold1s(iX,value);
+			server.setBackgroundRankFilterThreshold1s(iX,value);
 		} else {
 			throw new WrongArgumentIsNotImageSubtractor(subtractor);
 		}
 	}
 	//
-	public void getBackgroundMedianFilterThreshold0ff(ChoisePoint iX, PrologVariable result) {
+	public void getBackgroundRankFilterThreshold0ff(ChoisePoint iX, PrologVariable result) {
 		Term subtractor= getBuiltInSlot_E_image_subtractor();
 		if (subtractor instanceof ImageSubtractor) {
 			ImageSubtractor server= (ImageSubtractor)subtractor;
-			server.getBackgroundMedianFilterThreshold0ff(iX,result);
+			server.getBackgroundRankFilterThreshold0ff(iX,result);
 		} else {
 			throw new WrongArgumentIsNotImageSubtractor(subtractor);
 		}
 	}
-	public void getBackgroundMedianFilterThreshold0fs(ChoisePoint iX) {
+	public void getBackgroundRankFilterThreshold0fs(ChoisePoint iX) {
 	}
 	// BackgroundStandardDeviationFactor
 	public void setBackgroundStandardDeviationFactor1s(ChoisePoint iX, Term value) {
@@ -393,6 +393,50 @@ public abstract class SynchronizedImageSubtractor extends ImageSubtractor {
 		}
 	}
 	public void getBackgroundStandardDeviationFactor0fs(ChoisePoint iX) {
+	}
+	// ForegroundContouringMode
+	public void setForegroundContouringMode1s(ChoisePoint iX, Term value) {
+		Term subtractor= getBuiltInSlot_E_image_subtractor();
+		if (subtractor instanceof ImageSubtractor) {
+			ImageSubtractor server= (ImageSubtractor)subtractor;
+			server.setForegroundContouringMode1s(iX,value);
+		} else {
+			throw new WrongArgumentIsNotImageSubtractor(subtractor);
+		}
+	}
+	//
+	public void getForegroundContouringMode0ff(ChoisePoint iX, PrologVariable result) {
+		Term subtractor= getBuiltInSlot_E_image_subtractor();
+		if (subtractor instanceof ImageSubtractor) {
+			ImageSubtractor server= (ImageSubtractor)subtractor;
+			server.getForegroundContouringMode0ff(iX,result);
+		} else {
+			throw new WrongArgumentIsNotImageSubtractor(subtractor);
+		}
+	}
+	public void getForegroundContouringMode0fs(ChoisePoint iX) {
+	}
+	// R2WindowHalfwidth
+	public void setR2WindowHalfwidth1s(ChoisePoint iX, Term value) {
+		Term subtractor= getBuiltInSlot_E_image_subtractor();
+		if (subtractor instanceof ImageSubtractor) {
+			ImageSubtractor server= (ImageSubtractor)subtractor;
+			server.setR2WindowHalfwidth1s(iX,value);
+		} else {
+			throw new WrongArgumentIsNotImageSubtractor(subtractor);
+		}
+	}
+	//
+	public void getR2WindowHalfwidth0ff(ChoisePoint iX, PrologVariable result) {
+		Term subtractor= getBuiltInSlot_E_image_subtractor();
+		if (subtractor instanceof ImageSubtractor) {
+			ImageSubtractor server= (ImageSubtractor)subtractor;
+			server.getR2WindowHalfwidth0ff(iX,result);
+		} else {
+			throw new WrongArgumentIsNotImageSubtractor(subtractor);
+		}
+	}
+	public void getR2WindowHalfwidth0fs(ChoisePoint iX) {
 	}
 	// HorizontalBlobBorder
 	public void setHorizontalBlobBorder1s(ChoisePoint iX, Term value) {
@@ -635,6 +679,50 @@ public abstract class SynchronizedImageSubtractor extends ImageSubtractor {
 		}
 	}
 	public void getSamplingRate0fs(ChoisePoint iX) {
+	}
+	// CharacteristicLengthMedianFilteringMode
+	public void setCharacteristicLengthMedianFilteringMode1s(ChoisePoint iX, Term value) {
+		Term subtractor= getBuiltInSlot_E_image_subtractor();
+		if (subtractor instanceof ImageSubtractor) {
+			ImageSubtractor server= (ImageSubtractor)subtractor;
+			server.setCharacteristicLengthMedianFilteringMode1s(iX,value);
+		} else {
+			throw new WrongArgumentIsNotImageSubtractor(subtractor);
+		}
+	}
+	//
+	public void getCharacteristicLengthMedianFilteringMode0ff(ChoisePoint iX, PrologVariable result) {
+		Term subtractor= getBuiltInSlot_E_image_subtractor();
+		if (subtractor instanceof ImageSubtractor) {
+			ImageSubtractor server= (ImageSubtractor)subtractor;
+			server.getCharacteristicLengthMedianFilteringMode0ff(iX,result);
+		} else {
+			throw new WrongArgumentIsNotImageSubtractor(subtractor);
+		}
+	}
+	public void getCharacteristicLengthMedianFilteringMode0fs(ChoisePoint iX) {
+	}
+	// CharacteristicLengthMedianFilterHalfwidth
+	public void setCharacteristicLengthMedianFilterHalfwidth1s(ChoisePoint iX, Term value) {
+		Term subtractor= getBuiltInSlot_E_image_subtractor();
+		if (subtractor instanceof ImageSubtractor) {
+			ImageSubtractor server= (ImageSubtractor)subtractor;
+			server.setCharacteristicLengthMedianFilterHalfwidth1s(iX,value);
+		} else {
+			throw new WrongArgumentIsNotImageSubtractor(subtractor);
+		}
+	}
+	//
+	public void getCharacteristicLengthMedianFilterHalfwidth0ff(ChoisePoint iX, PrologVariable result) {
+		Term subtractor= getBuiltInSlot_E_image_subtractor();
+		if (subtractor instanceof ImageSubtractor) {
+			ImageSubtractor server= (ImageSubtractor)subtractor;
+			server.getCharacteristicLengthMedianFilterHalfwidth0ff(iX,result);
+		} else {
+			throw new WrongArgumentIsNotImageSubtractor(subtractor);
+		}
+	}
+	public void getCharacteristicLengthMedianFilterHalfwidth0fs(ChoisePoint iX) {
 	}
 	// VelocityMedianFilteringMode
 	public void setVelocityMedianFilteringMode1s(ChoisePoint iX, Term value) {

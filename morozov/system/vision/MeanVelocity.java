@@ -3,61 +3,19 @@
 package morozov.system.vision;
 
 class MeanVelocity {
-	public double totalVelocityX= 0;
-	public double totalVelocityY= 0;
-	public double totalVelocityXY= 0;
 	public int totalQuantity= 0;
-	// public int maximalLocalQuantity= 12;
-	public double accumulatedVelocityX= 0;
-	public double accumulatedVelocityY= 0;
-	public int accumulatedQuantity;
+	public double totalSum= 0;
 	public MeanVelocity() {
 	}
-	// public MeanVelocity(int windowWidth) {
-	//	maximalLocalQuantity= windowWidth;
-	// }
-	public void add(double[][] velocity) {
-		int length= velocity.length;
-		int number= length - 1;
-		double[] averagedValue= velocity[length-1];
+	public void add(int number, double velocitySum) {
 		if (number > 1) {
-			totalVelocityX+= averagedValue[0] * number;
-			totalVelocityY+= averagedValue[1] * number;
-			totalVelocityXY+= averagedValue[2] * number;
 			totalQuantity+= number;
+			totalSum+= velocitySum;
 		}
 	}
-	public double getVelocityX() {
+	public double getMeanVelocity() {
 		if (totalQuantity > 0) {
-			return totalVelocityX / totalQuantity;
-		} else {
-			return 0;
-		}
-	}
-	public double getVelocityY() {
-		if (totalQuantity > 0) {
-			return totalVelocityY / totalQuantity;
-		} else {
-			return 0;
-		}
-	}
-	public double getVelocityXY() {
-		if (totalQuantity > 0) {
-			return totalVelocityXY / totalQuantity;
-		} else {
-			return 0;
-		}
-	}
-	public double getAccumulatedVelocityX() {
-		if (accumulatedQuantity > 0) {
-			return accumulatedVelocityX / accumulatedQuantity;
-		} else {
-			return 0;
-		}
-	}
-	public double getAccumulatedVelocityY() {
-		if (accumulatedQuantity > 0) {
-			return accumulatedVelocityY / accumulatedQuantity;
+			return totalSum / totalQuantity;
 		} else {
 			return 0;
 		}

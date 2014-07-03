@@ -428,6 +428,7 @@ public abstract class Report
 					DesktopUtils.safelyMoveToFront(graphicWindow);
 				};
 				DesktopUtils.safelySetVisible(true,graphicWindow);
+				DesktopUtils.makeExistedMainWindowVisible(staticContext);
 			}
 		}
 	}

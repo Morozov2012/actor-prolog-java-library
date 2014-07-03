@@ -83,6 +83,7 @@ public class ThreadHolder extends Thread {
 			long debugUnit= currentProcess.debugUnit;
 			int debugFileNumber= currentProcess.debugFileNumber;
 			Window mainWindow= StaticDesktopAttributes.retrieveMainWindow(currentProcess.staticContext);
+			DesktopUtils.safelySetVisible(true,mainWindow);
 			RunTimeErrorDialog dialog= new RunTimeErrorDialog(this,mainWindow,e,debugPosition,debugUnit,debugFileNumber);
 			dialog.activate();
 		}

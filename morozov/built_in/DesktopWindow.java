@@ -89,10 +89,11 @@ public abstract class DesktopWindow extends Alpha {
 		};
 		Window mainWindow= StaticDesktopAttributes.retrieveMainWindow(staticContext);
 		if (mainWindow != null) {
-			if (mainWindow instanceof Frame) {
-				Frame frame= (Frame)mainWindow;
-				DesktopUtils.safelySetVisible(true,frame);
-			}
+			// if (mainWindow instanceof Frame) {
+			//	Frame frame= (Frame)mainWindow;
+			//	DesktopUtils.safelySetVisible(true,frame);
+			// }
+			DesktopUtils.safelySetVisible(true,mainWindow);
 		}
 	}
 	//
@@ -104,6 +105,7 @@ public abstract class DesktopWindow extends Alpha {
 		Window mainWindow= StaticDesktopAttributes.retrieveMainWindow(staticContext);
 		if (mainWindow != null) {
 			DesktopUtils.safelyRepaint(mainWindow);
+			DesktopUtils.safelySetVisible(true,mainWindow);
 		}
 	}
 	//
@@ -125,7 +127,8 @@ public abstract class DesktopWindow extends Alpha {
 			if (mainWindow instanceof Frame) {
 				Frame frame= (Frame)mainWindow;
 				DesktopUtils.safelyMaximize(frame);
-			}
+			};
+			DesktopUtils.safelySetVisible(true,mainWindow);
 		}
 	}
 	//
@@ -136,7 +139,8 @@ public abstract class DesktopWindow extends Alpha {
 			if (mainWindow instanceof Frame) {
 				Frame frame= (Frame)mainWindow;
 				DesktopUtils.safelyMinimize(frame);
-			}
+			};
+			DesktopUtils.safelySetVisible(true,mainWindow);
 		}
 	}
 	//
@@ -147,7 +151,8 @@ public abstract class DesktopWindow extends Alpha {
 			if (mainWindow instanceof Frame) {
 				Frame frame= (Frame)mainWindow;
 				DesktopUtils.safelyRestore(frame);
-			}
+			};
+			DesktopUtils.safelySetVisible(true,mainWindow);
 		}
 	}
 	//

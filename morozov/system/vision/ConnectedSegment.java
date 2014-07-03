@@ -20,6 +20,7 @@ class ConnectedSegment {
 	public HashSet<ConnectedSegment> entries= new HashSet<>();
 	public HashSet<ConnectedSegment> origins= new HashSet<>();
 	public HashSet<ConnectedSegment> branches= new HashSet<>();
+	public static final int minimalSegmentLength= 2;
 	public static final int nBins= 256;
 	public ConnectedSegment(TrackSegment s, boolean first, boolean last) {
 		trackSegment= s;
@@ -71,7 +72,7 @@ class ConnectedSegment {
 		entries.add(segment);
 	}
 	public void collectOriginsAndBranches() {
-		if (trackSegment.rectangles.length > 0) {
+		if (trackSegment.rectangles.length >= minimalSegmentLength) {
 			if (previousSegment != null) {
 				long beginningTime= trackSegment.beginningTime;
 				HashSet<ConnectedSegment> emptySegments= new HashSet<ConnectedSegment>();
@@ -81,7 +82,7 @@ class ConnectedSegment {
 	}
 	public void registerOriginsAndBranches(HashSet<ConnectedSegment> nextSegmentOrigins, ConnectedSegment virtualNextSegment, long virtualBeginningTime, HashSet<ConnectedSegment> emptySegments) {
 		if (trackSegment.breakPointTime <= virtualBeginningTime) {
-			if (trackSegment.rectangles.length > 1) {
+			if (trackSegment.rectangles.length >= minimalSegmentLength) {
 				nextSegmentOrigins.add(this);
 				branches.add(virtualNextSegment);
 			} else {
@@ -101,6 +102,9 @@ class ConnectedSegment {
 	}
 	public BigInteger getOwner() {
 		return trackSegment.owner;
+	}
+	public boolean isEmpty() {
+		return trackSegment.rectangles.length < minimalSegmentLength;
 	}
 	public boolean isInputEntry() {
 		if (isFirst && !isBeginningOfBranch()) {

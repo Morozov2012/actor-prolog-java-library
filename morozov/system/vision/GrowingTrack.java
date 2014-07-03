@@ -27,8 +27,12 @@ class GrowingTrack {
 	public int maximalRarefactionOfObject;
 	public double[][] inverseMatrix;
 	public double samplingRate;
-	public boolean applyMedianFiltering;
-	public int medianFilterHalfwidth;
+	public int r2WindowHalfwidth;
+	public double[][] characteristicMatrix;
+	public boolean applyCharacteristicLengthMedianFiltering;
+	public int characteristicLengthMedianFilterHalfwidth;
+	public boolean applyVelocityMedianFiltering;
+	public int velocityMedianFilterHalfwidth;
 	public boolean isStrong= false;
 	public int numberOfPoints= 0;
 	public int numberOfRarefiedHistograms= 0;
@@ -39,7 +43,7 @@ class GrowingTrack {
 	public ArrayList<DeferredCollision> deferredCollisions= new ArrayList<>();
 	public static final int nBins= 256;
 	//
-	public GrowingTrack(BigInteger id, long time, int duration, int maximalRarefaction, double[][] iMatrix, double rate, boolean applyFilterToVelocity, int filterHalfwidth) {
+	public GrowingTrack(BigInteger id, long time, int duration, int maximalRarefaction, double[][] iMatrix, double rate, int r2Halfwidth, double[][] cMatrix, boolean applyFilterToCharacteristicLength, int characteristicLengthFilterHalfwidth, boolean applyFilterToVelocity, int velocityFilterHalfwidth) {
 		identifier= id;
 		beginningTime= time;
 		endTime= time;
@@ -48,8 +52,12 @@ class GrowingTrack {
 		maximalRarefactionOfObject= maximalRarefaction;
 		inverseMatrix= iMatrix;
 		samplingRate= rate;
-		applyMedianFiltering= applyFilterToVelocity;
-		medianFilterHalfwidth= filterHalfwidth;
+		r2WindowHalfwidth= r2Halfwidth;
+		characteristicMatrix= cMatrix;
+		applyCharacteristicLengthMedianFiltering= applyFilterToCharacteristicLength;
+		characteristicLengthMedianFilterHalfwidth= characteristicLengthFilterHalfwidth;
+		applyVelocityMedianFiltering= applyFilterToVelocity;
+		velocityMedianFilterHalfwidth= velocityFilterHalfwidth;
 	}
 	//
 	public long getCriticalTime() {
@@ -141,7 +149,6 @@ class GrowingTrack {
 				point.addBranch(neighbour,entryType);
 			};
 			requestedBreakPoints.put(time,point);
-//System.out.printf("! [B]:%s put Req.Br.P.: %s<-%s\n",identifier,time,point.time);
 		}
 	}
 	protected void createSegments(long time, boolean emptyBuffer) {
@@ -166,7 +173,6 @@ class GrowingTrack {
 		while (iterator.hasNext()) {
 			BreakPoint breakPoint= iterator.next();
 			long breakTime= breakPoint.time;
-//System.out.printf("! [1]%s: USE Br.P.: %s\n",identifier,breakTime);
 			firstRequestedBreakPoint= breakTime;
 			if (breakTime > criticalTime && !emptyBuffer) {
 				break;
@@ -199,10 +205,12 @@ class GrowingTrack {
 				segmentBeginning= breakTime;
 				bandNumber= 0;
 			};
-//System.out.printf("! [2] USE Br.P.: %s\n",breakTime);
 			long segmentEnd= segmentBeginning;
 			double[][] spectrumSumX= new double[bandNumber][nBins+3];
 			double[][] spectrumSumX2= new double[bandNumber][nBins];
+			long[] frameNumbers= new long[length];
+			long[] foregroundPixelNumber= new long[length];
+			long[] contourPixelNumber= new long[length];
 			int spectrumN= 0;
 			int index= 0;
 			for (int n=firstIndex; n <= lastIndex; n++) {
@@ -214,6 +222,9 @@ class GrowingTrack {
 				rectangles[index][2]= p1.x2;
 				rectangles[index][3]= p1.y1;
 				rectangles[index][4]= p1.y2;
+				frameNumbers[index]= p1.time;
+				foregroundPixelNumber[index]= p1.foregroundArea;
+				contourPixelNumber[index]= p1.contourLength;
 				for (int band=0; band < bandNumber; band++) {
 					for (int k=0; k < nBins; k++) {
 						double value= p1.spectrum[band][k];
@@ -234,7 +245,7 @@ class GrowingTrack {
 					if (spectrumN > 0) {
 						double mean= spectrumSumX[band][k] / spectrumN;
 						spectrumMean[band][k]= mean;
-						spectrumDispersion[band][k]= (spectrumSumX2[band][k] / spectrumN) + mean*mean;
+						spectrumDispersion[band][k]= (spectrumSumX2[band][k] / spectrumN) - mean*mean;
 					} else {
 						spectrumMean[band][k]= -1;
 						spectrumDispersion[band][k]= -1;
@@ -257,6 +268,9 @@ class GrowingTrack {
 				segmentEnd,
 				breakTime,
 				rectangles,
+				frameNumbers,
+				foregroundPixelNumber,
+				contourPixelNumber,
 				spectrumMean,
 				spectrumDispersion,
 				spectrumN,
@@ -264,8 +278,12 @@ class GrowingTrack {
 				maximalRarefactionOfObject,
 				inverseMatrix,
 				samplingRate,
-				applyMedianFiltering,
-				medianFilterHalfwidth);
+				r2WindowHalfwidth,
+				characteristicMatrix,
+				applyCharacteristicLengthMedianFiltering,
+				characteristicLengthMedianFilterHalfwidth,
+				applyVelocityMedianFiltering,
+				velocityMedianFilterHalfwidth);
 			segments.add(newSegment);
 			if (firstIndex <= lastIndex) {
 				firstIndex= lastIndex + 1;
@@ -296,7 +314,6 @@ class GrowingTrack {
 		}
 	}
 	protected TrackSegment assembleRecentSegment() {
-//System.out.printf("! %s: assembleRecentSegment()\n",identifier);
 		int numberOfPoints= recentPoints.size();
 		int[][] rectangles= new int[numberOfPoints][5];
 		BlobAttributes p0= recentPoints.get(0);
@@ -305,6 +322,9 @@ class GrowingTrack {
 		long segmentEnd= segmentBeginning;
 		double[][] spectrumSumX= new double[bandNumber][nBins+3];
 		double[][] spectrumSumX2= new double[bandNumber][nBins];
+		long[] frameNumbers= new long[numberOfPoints];
+		long[] foregroundPixelNumber= new long[numberOfPoints];
+		long[] contourPixelNumber= new long[numberOfPoints];
 		for (int n=0; n < numberOfPoints; n++) {
 			BlobAttributes p1= recentPoints.get(n);
 			segmentEnd= p1.time;
@@ -314,6 +334,9 @@ class GrowingTrack {
 			rectangles[n][2]= p1.x2;
 			rectangles[n][3]= p1.y1;
 			rectangles[n][4]= p1.y2;
+			frameNumbers[n]= p1.time;
+			foregroundPixelNumber[n]= p1.foregroundArea;
+			contourPixelNumber[n]= p1.contourLength;
 			for (int band=0; band < bandNumber; band++) {
 				for (int k=0; k < nBins; k++) {
 					double value= p1.spectrum[band][k];
@@ -344,6 +367,9 @@ class GrowingTrack {
 				segmentEnd,
 				segmentEnd,
 				rectangles,
+				frameNumbers,
+				foregroundPixelNumber,
+				contourPixelNumber,
 				spectrumMean,
 				spectrumDispersion,
 				numberOfPoints,
@@ -351,13 +377,16 @@ class GrowingTrack {
 				maximalRarefactionOfObject,
 				inverseMatrix,
 				samplingRate,
-				applyMedianFiltering,
-				medianFilterHalfwidth);
+				r2WindowHalfwidth,
+				characteristicMatrix,
+				applyCharacteristicLengthMedianFiltering,
+				characteristicLengthMedianFilterHalfwidth,
+				applyVelocityMedianFiltering,
+				velocityMedianFilterHalfwidth);
 		return newSegment;
 	}
 	//
 	public void makeInsensible(long time) {
-//System.out.printf("! %s: makeInsensible(%s)\n",identifier,time);
 		prolong(time,true);
 		isInsensible= true;
 	}
@@ -379,7 +408,6 @@ class GrowingTrack {
 		return time >= beginningTime + minimalTrackDuration;
 	}
 	public void depose() {
-//System.out.printf("! %s: depose()\n",identifier);
 		isDeposed= true;
 		recentPoints.clear();
 		requestedBreakPoints.clear();

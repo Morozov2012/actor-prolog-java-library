@@ -30,9 +30,11 @@ public abstract class ImageSubtractor extends Alpha {
 	abstract public Term getBuiltInSlot_E_use_grayscale_colors();
 	abstract public Term getBuiltInSlot_E_apply_gaussian_filtering_to_background();
 	abstract public Term getBuiltInSlot_E_background_gaussian_filter_radius();
-	abstract public Term getBuiltInSlot_E_apply_median_filtering_to_background();
-	abstract public Term getBuiltInSlot_E_background_median_filter_threshold();
+	abstract public Term getBuiltInSlot_E_apply_rank_filtering_to_background();
+	abstract public Term getBuiltInSlot_E_background_rank_filter_threshold();
 	abstract public Term getBuiltInSlot_E_background_standard_deviation_factor();
+	abstract public Term getBuiltInSlot_E_contour_foreground();
+	abstract public Term getBuiltInSlot_E_r2_window_halfwidth();
 	abstract public Term getBuiltInSlot_E_horizontal_blob_border();
 	abstract public Term getBuiltInSlot_E_vertical_blob_border();
 	abstract public Term getBuiltInSlot_E_horizontal_extra_border_coefficient();
@@ -44,6 +46,8 @@ public abstract class ImageSubtractor extends Alpha {
 	abstract public Term getBuiltInSlot_E_maximal_track_retention_interval();
 	abstract public Term getBuiltInSlot_E_inverse_transformation_matrix();
 	abstract public Term getBuiltInSlot_E_sampling_rate();
+	abstract public Term getBuiltInSlot_E_apply_median_filtering_to_characteristic_length();
+	abstract public Term getBuiltInSlot_E_characteristic_length_median_filter_halfwidth();
 	abstract public Term getBuiltInSlot_E_apply_median_filtering_to_velocity();
 	abstract public Term getBuiltInSlot_E_velocity_median_filter_halfwidth();
 	abstract public Term getBuiltInSlot_E_refuse_slow_tracks();
@@ -80,9 +84,11 @@ public abstract class ImageSubtractor extends Alpha {
 			boolean useGrayscaleColors= Converters.term2YesNo(getBuiltInSlot_E_use_grayscale_colors(),iX);
 			boolean applyGaussian_2D_Filtering= Converters.term2YesNo(getBuiltInSlot_E_apply_gaussian_filtering_to_background(),iX);
 			int gaussian_2D_FilterRadius= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_background_gaussian_filter_radius(),iX);
-			boolean applyMedian_2D_Filtering= Converters.term2YesNo(getBuiltInSlot_E_apply_median_filtering_to_background(),iX);
-			int median_2D_FilterThreshold= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_background_median_filter_threshold(),iX);
+			boolean applyRank_2D_Filtering= Converters.term2YesNo(getBuiltInSlot_E_apply_rank_filtering_to_background(),iX);
+			int rank_2D_FilterThreshold= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_background_rank_filter_threshold(),iX);
 			double backgroundStandardDeviationFactor= Converters.argumentToReal(getBuiltInSlot_E_background_standard_deviation_factor(),iX);
+			boolean contourForeground= Converters.term2YesNo(getBuiltInSlot_E_contour_foreground(),iX);
+			int r2WindowHalfwidth= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_r2_window_halfwidth(),iX);
 			int horizontalBlobBorder= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_horizontal_blob_border(),iX);
 			int verticalBlobBorder= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_vertical_blob_border(),iX);
 			double horizontalExtraBorderCoefficient= Converters.argumentToReal(getBuiltInSlot_E_horizontal_extra_border_coefficient(),iX);
@@ -96,8 +102,10 @@ public abstract class ImageSubtractor extends Alpha {
 			double[][] inverseMatrix= Converters.argumentToMatrix(matrixValue,iX);
 			checkMatrix(inverseMatrix,matrixValue);
 			double samplingRate= Converters.argumentToReal(getBuiltInSlot_E_sampling_rate(),iX);
-			boolean applyMedianFiltering= Converters.term2YesNo(getBuiltInSlot_E_apply_median_filtering_to_velocity(),iX);
-			int medianFilterHalfwidth= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_velocity_median_filter_halfwidth(),iX);
+			boolean applyCharacteristicLengthMedianFiltering= Converters.term2YesNo(getBuiltInSlot_E_apply_median_filtering_to_characteristic_length(),iX);
+			int characteristicLengthMedianFilterHalfwidth= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_characteristic_length_median_filter_halfwidth(),iX);
+			boolean applyVelocityMedianFiltering= Converters.term2YesNo(getBuiltInSlot_E_apply_median_filtering_to_velocity(),iX);
+			int velocityMedianFilterHalfwidth= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_velocity_median_filter_halfwidth(),iX);
 			boolean refuseSlowTracks= Converters.term2YesNo(getBuiltInSlot_E_refuse_slow_tracks(),iX);
 			double velocityThreshold= Converters.argumentToReal(getBuiltInSlot_E_fuzzy_velocity_threshold(),iX);
 			double distanceThreshold= Converters.argumentToReal(getBuiltInSlot_E_fuzzy_distance_threshold(),iX);
@@ -113,9 +121,11 @@ public abstract class ImageSubtractor extends Alpha {
 					useGrayscaleColors,
 					applyGaussian_2D_Filtering,
 					gaussian_2D_FilterRadius,
-					applyMedian_2D_Filtering,
-					median_2D_FilterThreshold,
+					applyRank_2D_Filtering,
+					rank_2D_FilterThreshold,
 					backgroundStandardDeviationFactor,
+					contourForeground,
+					r2WindowHalfwidth,
 					horizontalBlobBorder,
 					verticalBlobBorder,
 					horizontalExtraBorderCoefficient,
@@ -127,8 +137,10 @@ public abstract class ImageSubtractor extends Alpha {
 					maximalTrackRetentionInterval,
 					inverseMatrix,
 					samplingRate,
-					applyMedianFiltering,
-					medianFilterHalfwidth,
+					applyCharacteristicLengthMedianFiltering,
+					characteristicLengthMedianFilterHalfwidth,
+					applyVelocityMedianFiltering,
+					velocityMedianFilterHalfwidth,
 					refuseSlowTracks,
 					velocityThreshold,
 					distanceThreshold,
@@ -185,9 +197,11 @@ public abstract class ImageSubtractor extends Alpha {
 			boolean useGrayscaleColors= Converters.term2YesNo(getBuiltInSlot_E_use_grayscale_colors(),iX);
 			boolean applyGaussian_2D_Filtering= Converters.term2YesNo(getBuiltInSlot_E_apply_gaussian_filtering_to_background(),iX);
 			int gaussian_2D_FilterRadius= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_background_gaussian_filter_radius(),iX);
-			boolean applyMedian_2D_Filtering= Converters.term2YesNo(getBuiltInSlot_E_apply_median_filtering_to_background(),iX);
-			int median_2D_FilterThreshold= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_background_median_filter_threshold(),iX);
+			boolean applyRank_2D_Filtering= Converters.term2YesNo(getBuiltInSlot_E_apply_rank_filtering_to_background(),iX);
+			int rank_2D_FilterThreshold= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_background_rank_filter_threshold(),iX);
 			double backgroundStandardDeviationFactor= Converters.argumentToReal(getBuiltInSlot_E_background_standard_deviation_factor(),iX);
+			boolean contourForeground= Converters.term2YesNo(getBuiltInSlot_E_contour_foreground(),iX);
+			int r2WindowHalfwidth= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_r2_window_halfwidth(),iX);
 			int horizontalBlobBorder= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_horizontal_blob_border(),iX);
 			int verticalBlobBorder= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_vertical_blob_border(),iX);
 			double horizontalExtraBorderCoefficient= Converters.argumentToReal(getBuiltInSlot_E_horizontal_extra_border_coefficient(),iX);
@@ -201,8 +215,10 @@ public abstract class ImageSubtractor extends Alpha {
 			double[][] inverseMatrix= Converters.argumentToMatrix(matrixValue,iX);
 			checkMatrix(inverseMatrix,matrixValue);
 			double samplingRate= Converters.argumentToReal(getBuiltInSlot_E_sampling_rate(),iX);
-			boolean applyMedianFiltering= Converters.term2YesNo(getBuiltInSlot_E_apply_median_filtering_to_velocity(),iX);
-			int medianFilterHalfwidth= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_velocity_median_filter_halfwidth(),iX);
+			boolean applyCharacteristicLengthMedianFiltering= Converters.term2YesNo(getBuiltInSlot_E_apply_median_filtering_to_characteristic_length(),iX);
+			int characteristicLengthMedianFilterHalfwidth= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_characteristic_length_median_filter_halfwidth(),iX);
+			boolean applyVelocityMedianFiltering= Converters.term2YesNo(getBuiltInSlot_E_apply_median_filtering_to_velocity(),iX);
+			int velocityMedianFilterHalfwidth= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_velocity_median_filter_halfwidth(),iX);
 			boolean refuseSlowTracks= Converters.term2YesNo(getBuiltInSlot_E_refuse_slow_tracks(),iX);
 			double velocityThreshold= Converters.argumentToReal(getBuiltInSlot_E_fuzzy_velocity_threshold(),iX);
 			double distanceThreshold= Converters.argumentToReal(getBuiltInSlot_E_fuzzy_distance_threshold(),iX);
@@ -220,9 +236,11 @@ public abstract class ImageSubtractor extends Alpha {
 				useGrayscaleColors,
 				applyGaussian_2D_Filtering,
 				gaussian_2D_FilterRadius,
-				applyMedian_2D_Filtering,
-				median_2D_FilterThreshold,
+				applyRank_2D_Filtering,
+				rank_2D_FilterThreshold,
 				backgroundStandardDeviationFactor,
+				contourForeground,
+				r2WindowHalfwidth,
 				horizontalBlobBorder,
 				verticalBlobBorder,
 				horizontalExtraBorderCoefficient,
@@ -234,8 +252,10 @@ public abstract class ImageSubtractor extends Alpha {
 				maximalTrackRetentionInterval,
 				inverseMatrix,
 				samplingRate,
-				applyMedianFiltering,
-				medianFilterHalfwidth,
+				applyCharacteristicLengthMedianFiltering,
+				characteristicLengthMedianFilterHalfwidth,
+				applyVelocityMedianFiltering,
+				velocityMedianFilterHalfwidth,
 				refuseSlowTracks,
 				velocityThreshold,
 				distanceThreshold,
@@ -406,31 +426,31 @@ public abstract class ImageSubtractor extends Alpha {
 	}
 	public void getBackgroundGaussianFilterRadius0fs(ChoisePoint iX) {
 	}
-	// BackgroundMedianFilteringMode
-	public void setBackgroundMedianFilteringMode1s(ChoisePoint iX, Term value) {
+	// BackgroundRankFilteringMode
+	public void setBackgroundRankFilteringMode1s(ChoisePoint iX, Term value) {
 		boolean mode= Converters.term2YesNo(value,iX);
 		createImageSubtractorIfNecessary(iX);
-		imageSubtractor.get().setBackgroundMedianFilteringMode(mode);
+		imageSubtractor.get().setBackgroundRankFilteringMode(mode);
 	}
 	//
-	public void getBackgroundMedianFilteringMode0ff(ChoisePoint iX, PrologVariable result) {
+	public void getBackgroundRankFilteringMode0ff(ChoisePoint iX, PrologVariable result) {
 		createImageSubtractorIfNecessary(iX);
-		result.value= Converters.boolean2YesNoTerm(imageSubtractor.get().getBackgroundMedianFilteringMode());
+		result.value= Converters.boolean2YesNoTerm(imageSubtractor.get().getBackgroundRankFilteringMode());
 	}
-	public void getBackgroundMedianFilteringMode0fs(ChoisePoint iX) {
+	public void getBackgroundRankFilteringMode0fs(ChoisePoint iX) {
 	}
-	// BackgroundMedianFilterThreshold
-	public void setBackgroundMedianFilterThreshold1s(ChoisePoint iX, Term value) {
+	// BackgroundRankFilterThreshold
+	public void setBackgroundRankFilterThreshold1s(ChoisePoint iX, Term value) {
 		int threshold= Converters.argumentToSmallRoundInteger(value,iX);
 		createImageSubtractorIfNecessary(iX);
-		imageSubtractor.get().setBackgroundMedianFilterThreshold(threshold);
+		imageSubtractor.get().setBackgroundRankFilterThreshold(threshold);
 	}
 	//
-	public void getBackgroundMedianFilterThreshold0ff(ChoisePoint iX, PrologVariable result) {
+	public void getBackgroundRankFilterThreshold0ff(ChoisePoint iX, PrologVariable result) {
 		createImageSubtractorIfNecessary(iX);
-		result.value= new PrologInteger(imageSubtractor.get().getBackgroundMedianFilterThreshold());
+		result.value= new PrologInteger(imageSubtractor.get().getBackgroundRankFilterThreshold());
 	}
-	public void getBackgroundMedianFilterThreshold0fs(ChoisePoint iX) {
+	public void getBackgroundRankFilterThreshold0fs(ChoisePoint iX) {
 	}
 	// BackgroundStandardDeviationFactor
 	public void setBackgroundStandardDeviationFactor1s(ChoisePoint iX, Term value) {
@@ -444,6 +464,32 @@ public abstract class ImageSubtractor extends Alpha {
 		result.value= new PrologReal(imageSubtractor.get().getBackgroundStandardDeviationFactor());
 	}
 	public void getBackgroundStandardDeviationFactor0fs(ChoisePoint iX) {
+	}
+	// ForegroundContouringMode
+	public void setForegroundContouringMode1s(ChoisePoint iX, Term value) {
+		boolean mode= Converters.term2YesNo(value,iX);
+		createImageSubtractorIfNecessary(iX);
+		imageSubtractor.get().setForegroundContouringMode(mode);
+	}
+	//
+	public void getForegroundContouringMode0ff(ChoisePoint iX, PrologVariable result) {
+		createImageSubtractorIfNecessary(iX);
+		result.value= Converters.boolean2YesNoTerm(imageSubtractor.get().getForegroundContouringMode());
+	}
+	public void getForegroundContouringMode0fs(ChoisePoint iX) {
+	}
+	// R2WindowHalfwidth
+	public void setR2WindowHalfwidth1s(ChoisePoint iX, Term value) {
+		int halfwidth= Converters.argumentToSmallRoundInteger(value,iX);
+		createImageSubtractorIfNecessary(iX);
+		imageSubtractor.get().setR2WindowHalfwidth(halfwidth);
+	}
+	//
+	public void getR2WindowHalfwidth0ff(ChoisePoint iX, PrologVariable result) {
+		createImageSubtractorIfNecessary(iX);
+		result.value= new PrologInteger(imageSubtractor.get().getR2WindowHalfwidth());
+	}
+	public void getR2WindowHalfwidth0fs(ChoisePoint iX) {
 	}
 	// HorizontalBlobBorder
 	public void setHorizontalBlobBorder1s(ChoisePoint iX, Term value) {
@@ -589,6 +635,32 @@ public abstract class ImageSubtractor extends Alpha {
 		result.value= new PrologReal(imageSubtractor.get().getSamplingRate());
 	}
 	public void getSamplingRate0fs(ChoisePoint iX) {
+	}
+	// CharacteristicLengthMedianFilteringMode
+	public void setCharacteristicLengthMedianFilteringMode1s(ChoisePoint iX, Term value) {
+		boolean mode= Converters.term2YesNo(value,iX);
+		createImageSubtractorIfNecessary(iX);
+		imageSubtractor.get().setCharacteristicLengthMedianFilteringMode(mode);
+	}
+	//
+	public void getCharacteristicLengthMedianFilteringMode0ff(ChoisePoint iX, PrologVariable result) {
+		createImageSubtractorIfNecessary(iX);
+		result.value= Converters.boolean2YesNoTerm(imageSubtractor.get().getCharacteristicLengthMedianFilteringMode());
+	}
+	public void getCharacteristicLengthMedianFilteringMode0fs(ChoisePoint iX) {
+	}
+	// CharacteristicLengthMedianFilterHalfwidth
+	public void setCharacteristicLengthMedianFilterHalfwidth1s(ChoisePoint iX, Term value) {
+		int halfwidth= Converters.argumentToSmallRoundInteger(value,iX);
+		createImageSubtractorIfNecessary(iX);
+		imageSubtractor.get().setCharacteristicLengthMedianFilterHalfwidth(halfwidth);
+	}
+	//
+	public void getCharacteristicLengthMedianFilterHalfwidth0ff(ChoisePoint iX, PrologVariable result) {
+		createImageSubtractorIfNecessary(iX);
+		result.value= new PrologInteger(imageSubtractor.get().getCharacteristicLengthMedianFilterHalfwidth());
+	}
+	public void getCharacteristicLengthMedianFilterHalfwidth0fs(ChoisePoint iX) {
 	}
 	// VelocityMedianFilteringMode
 	public void setVelocityMedianFilteringMode1s(ChoisePoint iX, Term value) {

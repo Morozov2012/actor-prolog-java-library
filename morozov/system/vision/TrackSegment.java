@@ -23,12 +23,26 @@ class TrackSegment {
 	public int maximalRarefactionOfObject;
 	public double[][] inverseMatrix;
 	public double samplingRate;
-	public boolean applyMedianFiltering;
-	public int medianFilterHalfwidth;
+	public int r2WindowHalfwidth;
+	public boolean applyCharacteristicLengthMedianFiltering;
+	public int characteristicLengthMedianFilterHalfwidth;
+	public boolean applyVelocityMedianFiltering;
+	public int velocityMedianFilterHalfwidth;
 	public int[][] rectangles;
-	public double[][] velocity;
-	public double[][] acceleration;
+	public long[] foregroundAreaValues;
+	public double[] characteristicLengthValues;
+	public double meanCharacteristicLength= 0.0;
+	public double meanSquaredCharacteristicLength= 0.0;
+	public long[] contourLengthValues;
+	public double meanBlobArea= 0.0;
+	public double meanForegroundArea= 0.0;
+	public double meanContourLength= 0.0;
+	public WindowedR2 windowedR2= null;
+	public double[] velocityValues;
+	protected double velocitySum= 0.0;
+	public double meanVelocity= 0.0;
 	public BigInteger[] entries;
+	public long[] frameNumbers;
 	public double[][] spectrumMean;
 	public double[][] spectrumDispersion;
 	public int spectrumN;
@@ -37,7 +51,7 @@ class TrackSegment {
 	public static final int nBins= 256;
 	public static final int radius= 5;
 	//
-	public TrackSegment(BigInteger ownerIdentifier, int serialNumber, long t1, long t2, long t3, int[][] r, double[][] mean, double[][] dispersion, int numberOfItems, HashSet<BigInteger> list1, int maximalRarefaction, double[][] iMatrix, double rate, boolean applyFilterToVelocity, int filterHalfwidth) {
+	public TrackSegment(BigInteger ownerIdentifier, int serialNumber, long t1, long t2, long t3, int[][] r, long[] fN, long[] fPN, long[] cPN, double[][] mean, double[][] dispersion, int numberOfItems, HashSet<BigInteger> list1, int maximalRarefaction, double[][] iMatrix, double rate, int r2Halfwidth, double[][] characteristicMatrix, boolean applyFilterToCharacteristicLength, int characteristicLengthFilterHalfwidth, boolean applyFilterToVelocity, int velocityFilterHalfwidth) {
 		owner= ownerIdentifier;
 		number= serialNumber;
 		beginningTime= t1;
@@ -46,16 +60,99 @@ class TrackSegment {
 		maximalRarefactionOfObject= maximalRarefaction;
 		inverseMatrix= iMatrix;
 		samplingRate= rate;
-		applyMedianFiltering= applyFilterToVelocity;
-		medianFilterHalfwidth= filterHalfwidth;
+		r2WindowHalfwidth= r2Halfwidth;
+		applyCharacteristicLengthMedianFiltering= applyFilterToCharacteristicLength;
+		characteristicLengthMedianFilterHalfwidth= characteristicLengthFilterHalfwidth;
+		applyVelocityMedianFiltering= applyFilterToVelocity;
+		velocityMedianFilterHalfwidth= velocityFilterHalfwidth;
 		rectangles= r;
+		frameNumbers= fN;
+		foregroundAreaValues= fPN;
+		contourLengthValues= cPN;
 		int length= rectangles.length;
-		velocity= new double[length+1][3];
-		acceleration= new double[length+1][3];
+		characteristicLengthValues= new double[length];
+		velocityValues= new double[length];
 		double[] velocityVectorX= new double[length];
 		double[] velocityVectorY= new double[length];
 		if (length > 0) {
-			int time1= rectangles[0][0];
+			double blobArea= 0.0;
+			double foregroundArea= 0.0;
+			double contourLength= 0.0;
+			for (int n=0; n < length; n++) {
+				int x1= rectangles[n][1];
+				int x2= rectangles[n][2];
+				int y1= rectangles[n][3];
+				int y2= rectangles[n][4];
+				int width= x2 - x1 + 1;
+				int height= y2 - y1 + 1;
+				blobArea= blobArea + width*height;
+				foregroundArea= foregroundArea + foregroundAreaValues[n];
+				contourLength= contourLength + contourLengthValues[n];
+				int x3= (x1 + x2) / 2;
+				int y3= (y1 + y2) / 2;
+				double d1= characteristicMatrix[y1][x1];
+				double d2= characteristicMatrix[y1][x2];
+				double d3= characteristicMatrix[y1][x3];
+				double d4= characteristicMatrix[y2][x1];
+				double d5= characteristicMatrix[y2][x2];
+				double d6= characteristicMatrix[y2][x3];
+				double d7= characteristicMatrix[y3][x1];
+				double d8= characteristicMatrix[y3][x2];
+				double d0= d1;
+				if (d2 > d0) {
+					d0= d2;
+				};
+				if (d3 > d0) {
+					d0= d3;
+				};
+				if (d4 > d0) {
+					d0= d4;
+				};
+				if (d5 > d0) {
+					d0= d5;
+				};
+				if (d6 > d0) {
+					d0= d6;
+				};
+				if (d7 > d0) {
+					d0= d7;
+				};
+				if (d8 > d0) {
+					d0= d8;
+				};
+				characteristicLengthValues[n]= d0;
+			};
+			meanBlobArea= blobArea / length;
+			meanForegroundArea= foregroundArea / length;
+			meanContourLength= contourLength / length;
+			//
+			if (applyCharacteristicLengthMedianFiltering) {
+				double[] temporaryVector= new double[length];
+				for (int n=0; n < length; n++) {
+					temporaryVector[n]= VisionUtils.medianAbs(characteristicLengthValues,n-characteristicLengthMedianFilterHalfwidth,n+characteristicLengthMedianFilterHalfwidth);
+				};
+				characteristicLengthValues= temporaryVector;
+			} else {
+				for (int n=0; n < length; n++) {
+					if (characteristicLengthValues[n] < 0) {
+						characteristicLengthValues[n]= -characteristicLengthValues[n];
+					}
+				}
+			};
+			//
+			double characteristicLength= 0.0;
+			double squaredCharacteristicLength= 0.0;
+			for (int n=0; n < length; n++) {
+				double value= characteristicLengthValues[n];
+				characteristicLength= characteristicLength + value;
+				squaredCharacteristicLength= squaredCharacteristicLength + value*value;
+			};
+			//
+			meanCharacteristicLength= characteristicLength / length;
+			meanSquaredCharacteristicLength= squaredCharacteristicLength / length;
+			//
+			windowedR2= VisionUtils.fastWindowedR2(frameNumbers,contourLengthValues,r2WindowHalfwidth);
+			//
 			double[] xy;
 			int x11= rectangles[0][1];
 			int x12= rectangles[0][2];
@@ -73,8 +170,23 @@ class TrackSegment {
 			xy= VisionUtils.project(x12,y12,inverseMatrix);
 			double rX122= xy[0];
 			double rY122= xy[1];
+			double[] deltaX11= new double[length];
+			double[] deltaX12= new double[length];
+			double[] deltaX21= new double[length];
+			double[] deltaX22= new double[length];
+			double[] deltaY11= new double[length];
+			double[] deltaY12= new double[length];
+			double[] deltaY21= new double[length];
+			double[] deltaY22= new double[length];
+			deltaX11[0]= 0;
+			deltaX12[0]= 0;
+			deltaX21[0]= 0;
+			deltaX22[0]= 0;
+			deltaY11[0]= 0;
+			deltaY12[0]= 0;
+			deltaY21[0]= 0;
+			deltaY22[0]= 0;
 			for (int n=1; n < length; n++) {
-				int time2= rectangles[n][0];
 				int x21= rectangles[n][1];
 				int x22= rectangles[n][2];
 				int y21= rectangles[n][3];
@@ -91,47 +203,88 @@ class TrackSegment {
 				xy= VisionUtils.project(x22,y22,inverseMatrix);
 				double rX222= xy[0];
 				double rY222= xy[1];
-				int deltaTime= time2 - time1;
-				double deltaX11= rX211 - rX111;
-				double deltaX12= rX212 - rX112;
-				double deltaX21= rX221 - rX121;
-				double deltaX22= rX222 - rX122;
-				double deltaY11= rY211 - rY111;
-				double deltaY12= rY212 - rY112;
-				double deltaY21= rY221 - rY121;
-				double deltaY22= rY222 - rY122;
-				double absDeltaX11= deltaX11;
-				if (absDeltaX11 < 0) {
-					absDeltaX11= - absDeltaX11;
+				deltaX11[n]= rX211 - rX111;
+				deltaX12[n]= rX212 - rX112;
+				deltaX21[n]= rX221 - rX121;
+				deltaX22[n]= rX222 - rX122;
+				deltaY11[n]= rY211 - rY111;
+				deltaY12[n]= rY212 - rY112;
+				deltaY21[n]= rY221 - rY121;
+				deltaY22[n]= rY222 - rY122;
+				rX111= rX211;
+				rX112= rX212;
+				rX121= rX221;
+				rX122= rX222;
+				rY111= rY211;
+				rY112= rY212;
+				rY121= rY221;
+				rY122= rY222;
+			};
+			if (applyVelocityMedianFiltering) {
+				double[] temporaryVectorX11= new double[length];
+				double[] temporaryVectorX12= new double[length];
+				double[] temporaryVectorX21= new double[length];
+				double[] temporaryVectorX22= new double[length];
+				double[] temporaryVectorY11= new double[length];
+				double[] temporaryVectorY12= new double[length];
+				double[] temporaryVectorY21= new double[length];
+				double[] temporaryVectorY22= new double[length];
+				for (int n=0; n < length; n++) {
+					temporaryVectorX11[n]= VisionUtils.medianWnd(deltaX11,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth);
+					temporaryVectorX12[n]= VisionUtils.medianWnd(deltaX12,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth);
+					temporaryVectorX21[n]= VisionUtils.medianWnd(deltaX21,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth);
+					temporaryVectorX22[n]= VisionUtils.medianWnd(deltaX22,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth);
+					temporaryVectorY11[n]= VisionUtils.medianWnd(deltaY11,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth);
+					temporaryVectorY12[n]= VisionUtils.medianWnd(deltaY12,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth);
+					temporaryVectorY21[n]= VisionUtils.medianWnd(deltaY21,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth);
+					temporaryVectorY22[n]= VisionUtils.medianWnd(deltaY22,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth);
 				};
-				double absDeltaX12= deltaX12;
-				if (absDeltaX12 < 0) {
-					absDeltaX12= - absDeltaX12;
+				deltaX11= temporaryVectorX11;
+				deltaX12= temporaryVectorX12;
+				deltaX21= temporaryVectorX21;
+				deltaX22= temporaryVectorX22;
+				deltaY11= temporaryVectorY11;
+				deltaY12= temporaryVectorY12;
+				deltaY21= temporaryVectorY21;
+				deltaY22= temporaryVectorY22;
+			};
+			for (int n=0; n < length; n++) {
+				if (deltaX11[n] < 0) {
+					deltaX11[n]= -deltaX11[n];
 				};
-				double absDeltaX21= deltaX21;
-				if (absDeltaX21 < 0) {
-					absDeltaX21= - absDeltaX21;
+				if (deltaX12[n] < 0) {
+					deltaX12[n]= -deltaX12[n];
 				};
-				double absDeltaX22= deltaX22;
-				if (absDeltaX22 < 0) {
-					absDeltaX22= - absDeltaX22;
+				if (deltaX21[n] < 0) {
+					deltaX21[n]= -deltaX21[n];
 				};
-				double absDeltaY11= deltaY11;
-				if (absDeltaY11 < 0) {
-					absDeltaY11= - absDeltaY11;
+				if (deltaX22[n] < 0) {
+					deltaX22[n]= -deltaX22[n];
 				};
-				double absDeltaY12= deltaY12;
-				if (absDeltaY12 < 0) {
-					absDeltaY12= - absDeltaY12;
+				if (deltaY11[n] < 0) {
+					deltaY11[n]= -deltaY11[n];
 				};
-				double absDeltaY21= deltaY21;
-				if (absDeltaY21 < 0) {
-					absDeltaY21= - absDeltaY21;
+				if (deltaY12[n] < 0) {
+					deltaY12[n]= -deltaY12[n];
 				};
-				double absDeltaY22= deltaY22;
-				if (absDeltaY22 < 0) {
-					absDeltaY22= - absDeltaY22;
+				if (deltaY21[n] < 0) {
+					deltaY21[n]= -deltaY21[n];
 				};
+				if (deltaY22[n] < 0) {
+					deltaY22[n]= -deltaY22[n];
+				}
+			};
+			int time1= rectangles[0][0];
+			for (int n=1; n < length; n++) {
+				int time2= rectangles[n][0];
+				double absDeltaX11= deltaX11[n];
+				double absDeltaX12= deltaX12[n];
+				double absDeltaX21= deltaX21[n];
+				double absDeltaX22= deltaX22[n];
+				double absDeltaY11= deltaY11[n];
+				double absDeltaY12= deltaY12[n];
+				double absDeltaY21= deltaY21[n];
+				double absDeltaY22= deltaY22[n];
 				double dX= absDeltaX11;
 				if (dX > absDeltaX12) {
 					dX= absDeltaX12;
@@ -152,7 +305,7 @@ class TrackSegment {
 				if (dY > absDeltaY22) {
 					dY= absDeltaY22;
 				};
-// System.out.printf("dX= %s dY= %s\n",dX,dY);
+				int deltaTime= time2 - time1;
 				double velocityX;
 				double velocityY;
 				if (samplingRate > 0.0) {
@@ -165,118 +318,43 @@ class TrackSegment {
 				velocityVectorX[n]= velocityX;
 				velocityVectorY[n]= velocityY;
 				time1= time2;
-				rX111= rX211;
-				rX112= rX212;
-				rX121= rX221;
-				rX122= rX222;
-				rY111= rY211;
-				rY112= rY212;
-				rY121= rY221;
-				rY122= rY222;
 			};
-			if (length > 1) {
-				// velocityVectorX[0]= velocityVectorX[1];
-				// velocityVectorY[0]= velocityVectorY[1];
-				velocityVectorX[0]= 0;
-				velocityVectorY[0]= 0;
-			};
-			// int halfWindow= 12;
-			// int halfWindow= 1;
-			// int halfWindow= 5;
-			// int halfWindow= 3;
-			// int halfWindow= 0;
-			// int halfWindow= 1;
-			// int halfWindow= 2;
-			// int halfWindow= 3;
-			// int halfWindow= 4;
-			// int halfWindow= 5;
-			if (applyMedianFiltering) {
+			velocityVectorX[0]= 0;
+			velocityVectorY[0]= 0;
+			if (applyVelocityMedianFiltering) {
+				double[] temporaryVectorX= new double[length];
+				double[] temporaryVectorY= new double[length];
 				for (int n=0; n < length; n++) {
-					velocityVectorX[n]= VisionUtils.medianAbs(velocityVectorX,n-medianFilterHalfwidth,n+medianFilterHalfwidth+1);
-					velocityVectorY[n]= VisionUtils.medianAbs(velocityVectorY,n-medianFilterHalfwidth,n+medianFilterHalfwidth+1);
-				}
-			} else {
-				for (int n=0; n < length; n++) {
-					if (velocityVectorX[n] < 0) {
-						velocityVectorX[n]= -velocityVectorX[n];
-					};
-					if (velocityVectorY[n] < 0) {
-						velocityVectorY[n]= -velocityVectorY[n];
-					}
-				}
+					// Fixed 2014-05-13: 
+					// velocityVectorX[n]= VisionUtils.medianAbs(velocityVectorX,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth+1);
+					// velocityVectorY[n]= VisionUtils.medianAbs(velocityVectorY,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth+1);
+					temporaryVectorX[n]= VisionUtils.medianAbs(velocityVectorX,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth);
+					temporaryVectorY[n]= VisionUtils.medianAbs(velocityVectorY,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth);
+				};
+				velocityVectorX= temporaryVectorX;
+				velocityVectorY= temporaryVectorY;
 			};
-			double meanVelocityX= 0;
-			double meanVelocityY= 0;
-			double meanVelocityXY= 0;
 			for (int n=0; n < length; n++) {
 				double velocityX= velocityVectorX[n];
 				double velocityY= velocityVectorY[n];
 				double velocityXY= StrictMath.hypot(velocityX,velocityY);
-				velocity[n][0]= velocityX;
-				velocity[n][1]= velocityY;
-				velocity[n][2]= velocityXY;
-				meanVelocityX= meanVelocityX + velocityX;
-				meanVelocityY= meanVelocityY + velocityY;
-				meanVelocityXY= meanVelocityXY + velocityXY;
+				velocityValues[n]= velocityXY;
 			};
 			if (length > 1) {
-				velocity[0][0]= velocity[1][0];
-				velocity[0][1]= velocity[1][1];
-				velocity[0][2]= velocity[1][2];
-				meanVelocityX= meanVelocityX / length;
-				meanVelocityY= meanVelocityY / length;
-				meanVelocityXY= meanVelocityXY / length;
+				velocityValues[0]= velocityValues[1];
 			};
-			velocity[length][0]= meanVelocityX;
-			velocity[length][1]= meanVelocityY;
-			velocity[length][2]= meanVelocityXY;
-			double meanAccelerationX= 0;
-			double meanAccelerationY= 0;
-			double meanAccelerationXY= 0;
-			time1= rectangles[0][0];
-			double velocityX1= velocity[0][0];
-			double velocityY1= velocity[0][1];
-			for (int n=1; n < length; n++) {
-				int time2= rectangles[n][0];
-				double velocityX2= velocity[n][0];
-				double velocityY2= velocity[n][1];
-				int deltaTime= time2 - time1;
-				double accelerationX;
-				double accelerationY;
-				if (samplingRate > 0) {
-					accelerationX= (velocityX2 - velocityX1) * samplingRate / deltaTime;
-					accelerationY= (velocityY2 - velocityY1) * samplingRate / deltaTime;
-				} else {
-					accelerationX= (velocityX2 - velocityX1) / deltaTime;
-					accelerationY= (velocityY2 - velocityY1) / deltaTime;
+			if (applyVelocityMedianFiltering) {
+				double[] temporaryVector= new double[length];
+				for (int n=0; n < length; n++) {
+					temporaryVector[n]= VisionUtils.medianAbs(velocityValues,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth);
 				};
-				double accelerationXY= StrictMath.hypot(accelerationX,accelerationY);
-				acceleration[n][0]= accelerationX;
-				acceleration[n][1]= accelerationY;
-				acceleration[n][2]= accelerationXY;
-				meanAccelerationX= meanAccelerationX + accelerationX;
-				meanAccelerationY= meanAccelerationY + accelerationY;
-				meanAccelerationXY= meanAccelerationXY + accelerationXY;
-				time1= time2;
-				velocityX1= velocityX2;
-				velocityY1= velocityY2;
+				velocityValues= temporaryVector;
 			};
-			if (length > 1) {
-				if (length > 2) {
-					acceleration[1][0]= acceleration[2][0];
-					acceleration[1][1]= acceleration[2][1];
-					acceleration[1][2]= acceleration[2][2];
-				};
-				acceleration[0][0]= acceleration[1][0];
-				acceleration[0][1]= acceleration[1][1];
-				acceleration[0][2]= acceleration[1][2];
-				meanAccelerationX= meanAccelerationX / length;
-				meanAccelerationY= meanAccelerationY / length;
-				meanAccelerationXY= meanAccelerationXY / length;
+			velocitySum= 0.0;
+			for (int n=0; n < length; n++) {
+				velocitySum+= velocityValues[n];
 			};
-			acceleration[length][0]= meanAccelerationX;
-			acceleration[length][1]= meanAccelerationY;
-			acceleration[length][2]= meanAccelerationXY;
+			meanVelocity= velocitySum / length;
 		};
 		if (list1 != null) {
 			int length1= list1.size();
@@ -324,6 +402,48 @@ class TrackSegment {
 			}
 		}
 	}
+	public long getWindowedR2Cardinality() {
+		if (windowedR2 != null) {
+			return windowedR2.cardinality;
+		} else {
+			return 0;
+		}
+	}
+	public double getWindowedR2Mean() {
+		if (windowedR2 != null) {
+			return windowedR2.mean;
+		} else {
+			return WindowedR2.noValue;
+		}
+	}
+	public double getWindowedR2StandardDeviation() {
+		if (windowedR2 != null) {
+			return windowedR2.standardDeviation;
+		} else {
+			return 0;
+		}
+	}
+	public double getWindowedR2Skewness() {
+		if (windowedR2 != null) {
+			return windowedR2.skewness;
+		} else {
+			return 0;
+		}
+	}
+	public double getWindowedR2Kurtosis() {
+		if (windowedR2 != null) {
+			return windowedR2.kurtosis;
+		} else {
+			return 0;
+		}
+	}
+	public double[] getWindowedR2ReferentValues() {
+		if (windowedR2 != null) {
+			return windowedR2.referentValues;
+		} else {
+			return new double[0];
+		}
+	}
 	public void computeMeanArea(MeanArea mean) {
 		int length= rectangles.length;
 		for (int n=0; n < length; n++) {
@@ -331,7 +451,7 @@ class TrackSegment {
 			int x2= rectangles[n][2];
 			int y1= rectangles[n][3];
 			int y2= rectangles[n][4];
-			mean.add(x1,x2,y1,y2,inverseMatrix);
+			mean.add(x1,x2,y1,y2);
 		}
 	}
 	public double computeTotalDistance() {
@@ -350,30 +470,13 @@ class TrackSegment {
 			return distance / deltaTime;
 		}
 	}
-	public double computeMeanVelocity(boolean averageAbsoluteValues) {
+	public double computeMeanVelocity() {
 		MeanVelocity mean= new MeanVelocity();
 		computeMeanVelocity(mean);
-		if (averageAbsoluteValues) {
-			return mean.getVelocityXY();
-		} else {
-			return StrictMath.hypot(mean.getAccumulatedVelocityX(),mean.getAccumulatedVelocityY());
-		}
+		return mean.getMeanVelocity();
 	}
 	public void computeMeanVelocity(MeanVelocity mean) {
-		mean.add(velocity);
-	}
-	public double computeMeanAcceleration(boolean averageAbsoluteValues) {
-		MeanAcceleration mean= new MeanAcceleration();
-		computeMeanAcceleration(mean);
-		if (averageAbsoluteValues) {
-			return mean.getAccelerationXY();
-		} else {
-			return StrictMath.hypot(mean.getAccelerationX(),mean.getAccelerationY());
-		}
-	}
-	public void computeMeanAcceleration(MeanAcceleration mean) {
-		int length= acceleration.length;
-		mean.add(acceleration[length-1],length-1);
+		mean.add(velocityValues.length,velocitySum);
 	}
 	//
 	public void dump(PrintStream stream) {
@@ -387,10 +490,7 @@ class TrackSegment {
 		stream.printf("rectangles:                 %s items\n",rectangles.length);
 		stream.printf("computeTotalDistance():     %s\n",computeTotalDistance());
 		stream.printf("totalDistance / Time:       %s\n",computeTotalVelocity());
-		stream.printf("computeMeanVelocity(T):     %s\n",computeMeanVelocity(true));
-		stream.printf("computeMeanVelocity(F):     %s\n",computeMeanVelocity(false));
-		stream.printf("computeMeanAcceleration(T): %s\n",computeMeanAcceleration(true));
-		stream.printf("computeMeanAcceleration(F): %s\n",computeMeanAcceleration(false));
+		stream.printf("computeMeanVelocity():      %s\n",computeMeanVelocity());
 		stream.printf("entries:           ");
 		for (int n=0; n < entries.length; n++) {
 			stream.printf(" %s",entries[n]);
@@ -412,10 +512,7 @@ class TrackSegment {
 		stream.printf("%% rectangles:                 %s items\n",rectangles.length);
 		stream.printf("%% computeTotalDistance():     %s\n",computeTotalDistance());
 		stream.printf("%% totalDistance / Time:       %s\n",computeTotalVelocity());
-		stream.printf("%% computeMeanVelocity(T):     %s\n",computeMeanVelocity(true));
-		stream.printf("%% computeMeanVelocity(F):     %s\n",computeMeanVelocity(false));
-		stream.printf("%% computeMeanAcceleration(T): %s\n",computeMeanAcceleration(true));
-		stream.printf("%% computeMeanAcceleration(F): %s\n",computeMeanAcceleration(false));
+		stream.printf("%% computeMeanVelocity():      %s\n",computeMeanVelocity());
 		stream.printf("R_%s_%s_%s= [...\n",identifier,beginningTime,endTime);
 		for (int n=0; n < rectangles.length; n++) {
 			int shift= rectangles[n][0];
@@ -430,21 +527,19 @@ class TrackSegment {
 			stream.printf("...\n");
 		};
 		stream.printf("];\n");
-		stream.printf("V_%s_%s_%s= [...\n",identifier,beginningTime,endTime);
-		for (int n=0; n < velocity.length-1; n++) {
-			// int shift= rectangles[n][0];
-			double vX= velocity[n][0];
-			double vY= velocity[n][1];
-			double vXY= velocity[n][2];
-			stream.printf(" [ %s %s %s ]",vX,vY,vXY);
-			stream.printf(";");
-			stream.printf("...\n");
+		stream.printf("R2_mean_%s_%s_%s= %s;\n",identifier,beginningTime,endTime,getWindowedR2Mean());
+		stream.printf("R2_standard_deviation_%s_%s_%s= %s;\n",identifier,beginningTime,endTime,getWindowedR2StandardDeviation());
+		stream.printf("R2_skewness_%s_%s_%s= %s;\n",identifier,beginningTime,endTime,getWindowedR2Skewness());
+		stream.printf("R2_Kurtosis_%s_%s_%s= %s;\n",identifier,beginningTime,endTime,getWindowedR2Kurtosis());
+		stream.printf("V_%s_%s_%s= [",identifier,beginningTime,endTime);
+		for (int n=0; n < velocityValues.length; n++) {
+			double vXY= velocityValues[n];
+			stream.printf(" %s",vXY);
+			// stream.printf(";");
+			// stream.printf("...\n");
 		};
-		double vX= velocity[velocity.length-1][0];
-		double vY= velocity[velocity.length-1][1];
-		double vXY= velocity[velocity.length-1][2];
-		stream.printf(" [ %s %s %s ]",vX,vY,vXY);
-		stream.printf("];\n");
+		stream.printf(" ];\n");
+		stream.printf("V_mean_%s_%s_%s= %s;\n",identifier,beginningTime,endTime,meanVelocity);
 		stream.printf("%% entries:      ");
 		for (int n=0; n < entries.length; n++) {
 			stream.printf(" %s",entries[n]);

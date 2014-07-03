@@ -23,7 +23,9 @@ public class MainWindow extends JFrame {
 		StaticDesktopAttributes.setDesktopPane(desktop,context);
 		setContentPane(desktop);
 		try {
-			setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			// setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			// setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
 		} catch (SecurityException e) {
 			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		}

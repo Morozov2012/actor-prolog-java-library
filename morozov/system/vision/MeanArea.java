@@ -21,17 +21,7 @@ class MeanArea {
 	public int totalQuantity= 0;
 	public MeanArea() {
 	}
-	public void add(int x1, int x2, int y1, int y2, double[][] inverseMatrix) {
-		// double[] xy= VisionUtils.project(x1,y1,inverseMatrix);
-		// double rX1= xy[0];
-		// double rY1= xy[1];
-		// xy= VisionUtils.project(x2,y2,inverseMatrix);
-		// double rX2= xy[0];
-		// double rY2= xy[1];
-		// double centerX= (rX1 + rX2) / 2;
-		// double centerY= (rY1 + rY2) / 2;
-		// double width= rX2 - rX1 + 1;
-		// double height= rY2 - rY1 + 1;
+	public void add(int x1, int x2, int y1, int y2) {
 		double centerX= (x1 + x2) / 2;
 		double centerY= (y1 + y2) / 2;
 		int width= x2 - x1 + 1;

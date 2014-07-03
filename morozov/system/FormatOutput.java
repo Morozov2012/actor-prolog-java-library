@@ -10,24 +10,24 @@ import morozov.terms.signals.*;
 import java.nio.charset.CharsetEncoder;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class FormatOutput {
+	static {
+		Locale.setDefault(Locale.ENGLISH);
+	};
 	// Output operations
 	public static StringBuilder termsToString(ChoisePoint cp, Term... args) {
 		StringBuilder textBuffer= new StringBuilder();
 		for(int i= 0; i < args.length; i++) {
 			Term item= args[i];
 			if (item.thisIsArgumentNumber()) {
-				// System.out.printf("FormatOutput:: i=%s; thisIsArgumentNumber: %s\n",i,item);
 				Term extraItems= args[i+1];
-				// try {
 				for (int j= 0; j < item.getNumber(); j++) {
 					if (j > 0) {
 						extraItems= extraItems.getExistentTail();
 					};
-					// System.out.printf("FormatOutput:: extraItems= %s; j=%s; Size=%s\n",extraItems,j,item.getNumber());
 					Term extraItem= extraItems.getExistentHead();
-					// System.out.printf("FormatOutput:: extraItem= %s\n",extraItem);
 					textBuffer.append(extraItem.toString(cp));
 				};
 				break;
@@ -47,7 +47,6 @@ public class FormatOutput {
 			Term item= args[i];
 			if (item.thisIsArgumentNumber()) {
 				Term extraItems= args[i+1];
-				// try {
 				for (int j= 0; j < item.getNumber(); j++) {
 					if (j > 0) {
 						extraItems= extraItems.getExistentTail();
@@ -88,7 +87,6 @@ public class FormatOutput {
 	}
 	//
 	public static StringBuilder implementFormat(StringBuilder textBuffer, String format, ChoisePoint cp, Term... args) {
-		// System.out.printf("FormatOutput::format=>>>%s<<<\n",format);
 		if (args.length > 0) {
 			for(int i= 0; i < args.length; i++) {
 				int end= format_length(format);
@@ -97,12 +95,9 @@ public class FormatOutput {
 					throw new WrongNumberOfArgumentsInTheFormatString();
 				};
 				textBuffer= output_item(textBuffer,front,cp,args[i]);
-				// if (end+1 > format.length() )
-				//	break;
 				format= format.substring(end);
 			};
 			int end= format_length(format);
-			// System.out.printf("FormatOutput::END::format=>>>%s<<< end=%d %% \n",format,end);
 			if (end > 0) {
 				throw new WrongNumberOfArgumentsInTheFormatString();
 			}
@@ -119,7 +114,6 @@ public class FormatOutput {
 		int counter= 0;
 		for (int n=0; n < commands.length(); n++) {
 			if (counter < commands.length()) {
-				// System.out.printf("FormatOutput:: %d: %s flag=%s\n",counter,commands.substring(counter),flag);
 				if (	counter+1 < commands.length() &&
 					commands.codePointAt(counter)=='%' &&
 					commands.codePointAt(counter+1)=='%' ) {
@@ -181,7 +175,6 @@ public class FormatOutput {
 					double n= v.getRealValue(cp);
 					textBuffer.append(String.format(formatString,n));
 				} catch (TermIsNotAReal e2) {
-					// System.out.printf("FormatOutput::formatString=|%s|,v=|%s|\n",formatString,v);
 					textBuffer.append(String.format(formatString,v.toString(cp)));
 				}
 			}
@@ -190,21 +183,17 @@ public class FormatOutput {
 	}
 	//
 	private static boolean is_format_c(String format) {
-		// System.out.printf("is_format_c:>>>%s<<<\n",format);
 		boolean isFormatString= false;
 		int counter= 0;
 		for (int i= 0; i < format.length(); i++) {
-			// System.out.printf("%d: is_format_c:>>>%s<<<\n",i,format.substring(counter));
 			if (counter < format.length()) {
 				if (isFormatString) {
 					if (format.codePointAt(counter)=='-') {
 					} else if (Character.isDigit(format.codePointAt(counter))) {
 					} else if (format.codePointAt(counter)=='.') {
 					} else if (Character.toLowerCase(format.codePointAt(counter))=='c') {
-						// System.out.printf("TRUE: is_format_c:>>>%s<<<\n",format);
 						return true;
 					} else {
-						// System.out.printf("FALSE: is_format_c:>>>%s<<<\n",format);
 						return false;
 					}
 				} else if (
@@ -217,12 +206,10 @@ public class FormatOutput {
 					isFormatString= true;
 				}
 			} else {
-				// System.out.printf("ERROR: is_format_c:>>>%s<<<\n",format);
 				return false;
 			};
 			counter++;
 		};
-		// System.out.printf("FALSE: is_format_c:>>>%s<<<\n",format);
 		return false;
 	}
 	//
@@ -234,44 +221,7 @@ public class FormatOutput {
 	}
 	//
 	public static String realToString(double value) {
-		return truncZeros(String.format("%G",value));
-	}
-	private static String truncZeros(String s1) {
-		s1= s1.replace(',','.');
-		int length= s1.length();
-		int lastZeroPosition= 0;
-		boolean hasZeroEnd= false;
-		boolean hasPoint= false;
-		for (int i= 0; i<length; i++) {
-			int currentCharacter= s1.codePointAt(i);
-			if (currentCharacter=='.') {
-				hasPoint= true;
-			} else if (currentCharacter=='e') {
-				return s1;
-			} else if (currentCharacter=='E') {
-				return s1;
-			}
-		};
-		if (hasPoint) {
-			for (int i=length-1; i>=0; i--) {
-				if (s1.codePointAt(i)=='0') {
-					lastZeroPosition= i;
-					hasZeroEnd= true;
-				} else {
-					break;
-				}
-			};
-			if (	lastZeroPosition > 0 &&
-				s1.codePointAt(lastZeroPosition-1)=='.') {
-				lastZeroPosition= lastZeroPosition + 1;
-			};
-			if (	hasZeroEnd &&
-				lastZeroPosition > 0 &&
-				lastZeroPosition <= length-1) {
-				return s1.substring(0,lastZeroPosition);
-			}
-		};
-		return s1;
+		return String.format("%G",value);
 	}
 	public static String encodeString(String text, boolean isSymbol, CharsetEncoder encoder) {
 		int length= text.length();
@@ -311,7 +261,6 @@ public class FormatOutput {
 			StringBuilder buffer= new StringBuilder();
 			int beginningOfSegment= 0;
 			for (int p1=0; p1 < length; p1++) {
-				// System.out.printf("p=%s; buffer=>>>%s<<<\n",p1,buffer.toString());
 				int c= text.codePointAt(p1);
 				if (c >= 8 && c <= 13) {
 					buffer.append(text.substring(beginningOfSegment,p1));

@@ -27,9 +27,11 @@ public class PlainImageSubtractor {
 	protected boolean useGrayscaleColors= true;
 	protected boolean useGaussianFiltering= true;
 	protected int gaussianFilterRadius= 1;
-	protected boolean useMedianFiltering= true;
-	protected int medianFilterThreshold= 3;
+	protected boolean useRank_2D_Filtering= true;
+	protected int rankFilterThreshold= 3;
 	protected double backgroundVarianceFactor= 4.0;
+	protected boolean contourForeground= false;
+	protected int r2WindowHalfwidth= 5;
 	protected int horizontalBlobBorder= 3;
 	protected int verticalBlobBorder= 3;
 	protected double horizontalExtraBorderCoefficient= 0.10;
@@ -41,8 +43,14 @@ public class PlainImageSubtractor {
 	protected int maximalTrackRetentionInterval= 10000;
 	protected double[][] inverseMatrix= null;
 	protected double samplingRate= -1;
-	protected boolean applyMedianFiltering= true;
-	protected int medianFilterHalfwidth= 5;
+	protected PhiInterpolator2D phiMatrixInterpolator= new PhiInterpolator2D();
+	protected SizeInterpolator2D characteristicLengthInterpolator= new SizeInterpolator2D();
+	protected double[][] phiMatrix= null;
+	protected double[][] characteristicMatrix= null;
+	protected boolean applyCharacteristicLengthMedianFiltering= true;
+	protected int characteristicLengthMedianFilterHalfwidth= 5;
+	protected boolean applyVelocityMedianFiltering= true;
+	protected int velocityMedianFilterHalfwidth= 5;
 	protected boolean refuseSlowTracks= false;
 	protected double velocityThreshold= 0.4;
 	protected double distanceThreshold= 40.0;
@@ -82,6 +90,7 @@ public class PlainImageSubtractor {
 	protected int[][] backgroundSum;
 	protected int[][] backgroundSumX2;
 	protected int[][] deltaPixels;
+	protected int[] contourPixels;
 	//
 	protected BigInteger recentBlobIdentifier= BigInteger.ZERO;
 	public HashMap<BigInteger,GrowingTrack> tracks= new HashMap<>();
@@ -107,9 +116,11 @@ public class PlainImageSubtractor {
 			boolean useGrayscaleColorsFlag,
 			boolean useGaussianFilter,
 			int radiusOfGaussianFilter,
-			boolean useMedianFilter,
-			int thresholdOfMedianFilter,
+			boolean useRank_2D_FilteringFlag,
+			int thresholdOfRankFilter,
 			double backgroundStandardDeviationFactorValue,
+			boolean contourForegroundFlag,
+			int r2WindowHalfwidthValue,
 			int horizontalBlobBorderValue,
 			int verticalBlobBorderValue,
 			double horizontalExtraBorderCoefficientValue,
@@ -121,8 +132,10 @@ public class PlainImageSubtractor {
 			int maximalTrackRetentionIntervalValue,
 			double[][] iMatrix,
 			double rate,
+			boolean applyFilterToCharacteristicLength,
+			int characteristicLengthFilterHalfwidth,
 			boolean applyFilterToVelocity,
-			int filterHalfwidth,
+			int velocityFilterHalfwidth,
 			boolean refuseTracks,
 			double velocityThresholdValue,
 			double distanceThresholdValue,
@@ -136,9 +149,11 @@ public class PlainImageSubtractor {
 		useGrayscaleColors= useGrayscaleColorsFlag;
 		useGaussianFiltering= useGaussianFilter;
 		gaussianFilterRadius= radiusOfGaussianFilter;
-		useMedianFiltering= useMedianFilter;
-		medianFilterThreshold= thresholdOfMedianFilter;
+		useRank_2D_Filtering= useRank_2D_FilteringFlag;
+		rankFilterThreshold= thresholdOfRankFilter;
 		backgroundVarianceFactor= backgroundStandardDeviationFactorValue*backgroundStandardDeviationFactorValue;
+		contourForeground= contourForegroundFlag;
+		r2WindowHalfwidth= r2WindowHalfwidthValue;
 		horizontalBlobBorder= horizontalBlobBorderValue;
 		verticalBlobBorder= verticalBlobBorderValue;
 		horizontalExtraBorderCoefficient= horizontalExtraBorderCoefficientValue;
@@ -150,8 +165,10 @@ public class PlainImageSubtractor {
 		maximalTrackRetentionInterval= maximalTrackRetentionIntervalValue;
 		inverseMatrix= iMatrix;
 		samplingRate= rate;
-		applyMedianFiltering= applyFilterToVelocity;
-		medianFilterHalfwidth= filterHalfwidth;
+		applyCharacteristicLengthMedianFiltering= applyFilterToCharacteristicLength;
+		characteristicLengthMedianFilterHalfwidth= characteristicLengthFilterHalfwidth;
+		applyVelocityMedianFiltering= applyFilterToVelocity;
+		velocityMedianFilterHalfwidth= velocityFilterHalfwidth;
 		refuseSlowTracks= refuseTracks;
 		velocityThreshold= velocityThresholdValue;
 		distanceThreshold= distanceThresholdValue;
@@ -161,6 +178,9 @@ public class PlainImageSubtractor {
 	}
 	//
 	synchronized public void subtractImageAndAnalyseBlobs(long t, java.awt.image.BufferedImage image, boolean takeImageIntoAccount) {
+		if (t <= time) {
+			forgetResults();
+		};
 		time= t;
 		if (trackBlobs) {
 			previousBlobSize= currentBlobSize;
@@ -209,7 +229,7 @@ public class PlainImageSubtractor {
 		Graphics2D g2= (Graphics2D)extractedImage.getGraphics();
 		g2.drawImage(recentImage,0,0,null);
 		WritableRaster imageRaster= extractedImage.getRaster();
-		imageRaster.setSamples(0,0,imageWidth,imageHeight,3,deltaPixels[0]);
+		imageRaster.setSamples(0,0,imageWidth,imageHeight,3,contourPixels);
 		BlobSet blobs= new BlobSet(
 			time,
 			imageWidth,
@@ -221,7 +241,7 @@ public class PlainImageSubtractor {
 			backgroundSum,
 			backgroundSumX2,
 			backgroundN,
-			deltaPixels,
+			contourPixels,
 			differenceMarker,
 			noDifferenceMarker,
 			currentBlobSize,
@@ -232,8 +252,8 @@ public class PlainImageSubtractor {
 			minimalTrackDuration,
 			// inverseMatrix,
 			// samplingRate,
-			// applyMedianFiltering,
-			// medianFilterHalfwidth,
+			// applyVelocityMedianFiltering,
+			// velocityMedianFilterHalfwidth,
 			refuseSlowTracks,
 			velocityThreshold,
 			distanceThreshold,
@@ -255,9 +275,11 @@ public class PlainImageSubtractor {
 			boolean useGrayscaleColorsFlag,
 			boolean useGaussianFilter,
 			int radiusOfGaussianFilter,
-			boolean useMedianFilter,
-			int thresholdOfMedianFilter,
+			boolean useRank_2D_FilteringFlag,
+			int thresholdOfRankFilter,
 			double backgroundStandardDeviationFactorValue,
+			boolean contourForegroundFlag,
+			int r2WindowHalfwidthValue,
 			int horizontalBlobBorderValue,
 			int verticalBlobBorderValue,
 			double horizontalExtraBorderCoefficientValue,
@@ -269,8 +291,10 @@ public class PlainImageSubtractor {
 			int maximalTrackRetentionIntervalValue,
 			double[][] iMatrix,
 			double rate,
+			boolean applyFilterToCharacteristicLength,
+			int characteristicLengthFilterHalfwidth,
 			boolean applyFilterToVelocity,
-			int filterHalfwidth,
+			int velocityFilterHalfwidth,
 			boolean refuseTracks,
 			double velocityThresholdValue,
 			double distanceThresholdValue,
@@ -290,9 +314,11 @@ public class PlainImageSubtractor {
 			useGrayscaleColors= useGrayscaleColorsFlag;
 			useGaussianFiltering= useGaussianFilter;
 			gaussianFilterRadius= radiusOfGaussianFilter;
-			useMedianFiltering= useMedianFilter;
-			medianFilterThreshold= thresholdOfMedianFilter;
+			useRank_2D_Filtering= useRank_2D_FilteringFlag;
+			rankFilterThreshold= thresholdOfRankFilter;
 			backgroundVarianceFactor= backgroundStandardDeviationFactorValue*backgroundStandardDeviationFactorValue;
+			contourForeground= contourForegroundFlag;
+			r2WindowHalfwidth= r2WindowHalfwidthValue;
 			horizontalBlobBorder= horizontalBlobBorderValue;
 			verticalBlobBorder= verticalBlobBorderValue;
 			horizontalExtraBorderCoefficient= horizontalExtraBorderCoefficientValue;
@@ -304,8 +330,10 @@ public class PlainImageSubtractor {
 			maximalTrackRetentionInterval= maximalTrackRetentionIntervalValue;
 			inverseMatrix= iMatrix;
 			samplingRate= rate;
-			applyMedianFiltering= applyFilterToVelocity;
-			medianFilterHalfwidth= filterHalfwidth;
+			applyCharacteristicLengthMedianFiltering= applyFilterToCharacteristicLength;
+			characteristicLengthMedianFilterHalfwidth= characteristicLengthFilterHalfwidth;
+			applyVelocityMedianFiltering= applyFilterToVelocity;
+			velocityMedianFilterHalfwidth= velocityFilterHalfwidth;
 			refuseSlowTracks= refuseTracks;
 			velocityThreshold= velocityThresholdValue;
 			distanceThreshold= distanceThresholdValue;
@@ -314,6 +342,8 @@ public class PlainImageSubtractor {
 			makeSquareBlobsInSynthesizedImage= makeSquareBlobsInSynthesizedImageValue;
 			title= "";
 			gaussianMatrix= null;
+			phiMatrix= null;
+			characteristicMatrix= null;
 		};
 		//
 		if (forgetStatistics) {
@@ -321,22 +351,7 @@ public class PlainImageSubtractor {
 		};
 		//
 		if (forgetResults) {
-			currentBlobSize= null;
-			currentTrackDurations= null;
-			currentBlobRectangles= null;
-			currentBlobIdentifiers= null;
-			previousBlobSize= null;
-			previousTrackDurations= null;
-			previousBlobRectangles= null;
-			previousBlobIdentifiers= null;
-			invisibleBlobSize= new int[0];
-			invisibleTrackDurations= new int[0];
-			invisibleBlobRectangles= new int[0][4];
-			invisibleBlobIdentifiers= new BigInteger[0];
-			invisibleBlobDelays= new int[0];
-			recentBlobIdentifier= BigInteger.ZERO;
-			tracks.clear();
-			time= 0;
+			forgetResults();
 		}
 	}
 	protected void forgetStatistics() {
@@ -345,6 +360,27 @@ public class PlainImageSubtractor {
 		backgroundSum= null;
 		backgroundSumX2= null;
 		deltaPixels= null;
+		contourPixels= null;
+		phiMatrix= null;
+		characteristicMatrix= null;
+	}
+	protected void forgetResults() {
+		currentBlobSize= null;
+		currentTrackDurations= null;
+		currentBlobRectangles= null;
+		currentBlobIdentifiers= null;
+		previousBlobSize= null;
+		previousTrackDurations= null;
+		previousBlobRectangles= null;
+		previousBlobIdentifiers= null;
+		invisibleBlobSize= new int[0];
+		invisibleTrackDurations= new int[0];
+		invisibleBlobRectangles= new int[0][4];
+		invisibleBlobIdentifiers= new BigInteger[0];
+		invisibleBlobDelays= new int[0];
+		recentBlobIdentifier= BigInteger.ZERO;
+		tracks.clear();
+		time= 0;
 	}
 	//
 	public long getFrameNumber() {
@@ -480,21 +516,21 @@ public class PlainImageSubtractor {
 		return gaussianFilterRadius;
 	}
 	//
-	synchronized public void setBackgroundMedianFilteringMode(boolean mode) {
-		if (useMedianFiltering != mode) {
-			useMedianFiltering= mode;
+	synchronized public void setBackgroundRankFilteringMode(boolean mode) {
+		if (useRank_2D_Filtering != mode) {
+			useRank_2D_Filtering= mode;
 			forgetStatistics();
 		}
 	}
-	synchronized public boolean getBackgroundMedianFilteringMode() {
-		return useMedianFiltering;
+	synchronized public boolean getBackgroundRankFilteringMode() {
+		return useRank_2D_Filtering;
 	}
 	//
-	synchronized public void setBackgroundMedianFilterThreshold(int value) {
-		medianFilterThreshold= value;
+	synchronized public void setBackgroundRankFilterThreshold(int value) {
+		rankFilterThreshold= value;
 	}
-	synchronized public int getBackgroundMedianFilterThreshold() {
-		return medianFilterThreshold;
+	synchronized public int getBackgroundRankFilterThreshold() {
+		return rankFilterThreshold;
 	}
 	//
 	synchronized public void setBackgroundStandardDeviationFactor(double value) {
@@ -502,6 +538,23 @@ public class PlainImageSubtractor {
 	}
 	synchronized public double getBackgroundStandardDeviationFactor() {
 		return StrictMath.sqrt(backgroundVarianceFactor);
+	}
+	//
+	synchronized public void setForegroundContouringMode(boolean mode) {
+		if (contourForeground != mode) {
+			contourForeground= mode;
+			// forgetStatistics();
+		}
+	}
+	synchronized public boolean getForegroundContouringMode() {
+		return contourForeground;
+	}
+	//
+	synchronized public void setR2WindowHalfwidth(int value) {
+		r2WindowHalfwidth= value;
+	}
+	synchronized public int getR2WindowHalfwidth() {
+		return r2WindowHalfwidth;
 	}
 	//
 	synchronized public void setHorizontalBlobBorder(int value) {
@@ -581,18 +634,32 @@ public class PlainImageSubtractor {
 		return samplingRate;
 	}
 	//
+	synchronized public void setCharacteristicLengthMedianFilteringMode(boolean mode) {
+		applyCharacteristicLengthMedianFiltering= mode;
+	}
+	synchronized public boolean getCharacteristicLengthMedianFilteringMode() {
+		return applyCharacteristicLengthMedianFiltering;
+	}
+	//
+	synchronized public void setCharacteristicLengthMedianFilterHalfwidth(int value) {
+		characteristicLengthMedianFilterHalfwidth= value;
+	}
+	synchronized public int getCharacteristicLengthMedianFilterHalfwidth() {
+		return characteristicLengthMedianFilterHalfwidth;
+	}
+	//
 	synchronized public void setVelocityMedianFilteringMode(boolean mode) {
-		applyMedianFiltering= mode;
+		applyVelocityMedianFiltering= mode;
 	}
 	synchronized public boolean getVelocityMedianFilteringMode() {
-		return applyMedianFiltering;
+		return applyVelocityMedianFiltering;
 	}
 	//
 	synchronized public void setVelocityMedianFilterHalfwidth(int value) {
-		medianFilterHalfwidth= value;
+		velocityMedianFilterHalfwidth= value;
 	}
 	synchronized public int getVelocityMedianFilterHalfwidth() {
-		return medianFilterHalfwidth;
+		return velocityMedianFilterHalfwidth;
 	}
 	//
 	synchronized public void setSlowTracksDeletionMode(boolean mode) {
@@ -712,17 +779,13 @@ public class PlainImageSubtractor {
 				if (delta2 <= dispersion * backgroundVarianceFactor) {
 					deltaPixels[k+numberOfExtraBands][n]= noDifferenceMarker;
 				} else {
-					// if (delta1 < 0) {
-					//	delta1= - delta1;
-					// };
-					// deltaPixels[k+numberOfExtraBands][n]= 255 - delta1;
 					deltaPixels[k+numberOfExtraBands][n]= differenceMarker;
 				}
 			}
 		};
-		if (useMedianFiltering) {
+		if (useRank_2D_Filtering) {
 			for (int k=0; k < numberOfBands; k++) {
-				deltaPixels[k+numberOfExtraBands]= median2D(noDifferenceMarker,deltaPixels[k+numberOfExtraBands],imageWidth,imageHeight,medianFilterThreshold);
+				deltaPixels[k+numberOfExtraBands]= VisionUtils.rankFilter2D(noDifferenceMarker,deltaPixels[k+numberOfExtraBands],imageWidth,imageHeight,rankFilterThreshold,false);
 			}
 		};
 		if (numberOfExtraBands > 0) {
@@ -736,9 +799,14 @@ public class PlainImageSubtractor {
 				};
 				deltaPixels[0][n]= value;
 			};
-			if (useMedianFiltering) {
-				deltaPixels[0]= median2D(noDifferenceMarker,deltaPixels[0],imageWidth,imageHeight,medianFilterThreshold);
+			if (useRank_2D_Filtering) {
+				deltaPixels[0]= VisionUtils.rankFilter2D(noDifferenceMarker,deltaPixels[0],imageWidth,imageHeight,rankFilterThreshold,false);
 			}
+		};
+		if (contourForeground) {
+			contourPixels= VisionUtils.contourForeground(noDifferenceMarker,deltaPixels[0],imageWidth,imageHeight);
+		} else {
+			contourPixels= deltaPixels[0];
 		};
 		if (takeImageIntoAccount) {
 			if (backgroundN >= maximalN) {
@@ -798,79 +866,12 @@ public class PlainImageSubtractor {
 		};
 		return b;
 	}
-	public static int[] median2D(int noDifferenceMarker, int[] pixels, int width, int height, int threshold) {
-		int[] result= Arrays.copyOf(pixels,pixels.length);
-		for (int w=0; w < width; w++) {
-			int h1= 0;
-			int point1= width * h1 + w;
-			result[point1]= noDifferenceMarker;
-			int h2= height-1;
-			int point2= width * h2 + w;
-			result[point2]= noDifferenceMarker;
-		};
-		for (int h=0; h < height; h++) {
-			int w1= 0;
-			int point1= width * h + w1;
-			result[point1]= noDifferenceMarker;
-			int w2= width-1;
-			int point2= width * h + w2;
-			result[point2]= noDifferenceMarker;
-		};
-		for (int w=1; w < width-1; w++) {
-			for (int h=1; h < height-1; h++) {
-				int point= width * h + w;
-				int value= pixels[point];
-				if (value == noDifferenceMarker) {
-					continue;
-				} else {
-					int counter= 0;
-					int north= width * (h - 1) + w;
-					if (pixels[north] == noDifferenceMarker) {
-						counter++;
-					};
-					int northEast= width * (h - 1) + (w + 1);
-					if (pixels[northEast] == noDifferenceMarker) {
-						counter++;
-					};
-					int east= width * h + (w + 1);
-					if (pixels[east] == noDifferenceMarker) {
-						counter++;
-					};
-					int southEast= width * (h + 1) + (w + 1);
-					if (pixels[southEast] == noDifferenceMarker) {
-						counter++;
-					};
-					int south= width * (h + 1) + w;
-					if (pixels[south] == noDifferenceMarker) {
-						counter++;
-					};
-					int southWest= width * (h + 1) + (w - 1);
-					if (pixels[southWest] == noDifferenceMarker) {
-						counter++;
-					};
-					int west= width * h + (w - 1);
-					if (pixels[west] == noDifferenceMarker) {
-						counter++;
-					};
-					int northWest= width * (h - 1) + (w - 1);
-					if (pixels[northWest] == noDifferenceMarker) {
-						counter++;
-					};
-					if (counter > threshold) {
-						result[point]= noDifferenceMarker;
-					}
-				}
-			}
-		};
-		return result;
-	}
 	// CLUSTER IMAGE
 	protected void extractBlobs() {
 		int maxRadius= imageWidth;
 		if (maxRadius < imageHeight) {
 			maxRadius= imageHeight;
 		};
-		int[] inputPixels= deltaPixels[0];
 		int blobCounter= 0;
 		boolean[] blobFlag= new boolean[vectorLength];
 		int[][] blobRectangles= new int[vectorLength][4];
@@ -902,7 +903,7 @@ while (globalCounter1 < totalDistance) {
 	if (r1 <= rows && r1 > 0 && c1 <= columns && c1 > 0) {
 		globalCounter1++;
 		int point= imageWidth*(r1+1) + (c1+1);
-		int currentValue= inputPixels[point];
+		int currentValue= contourPixels[point];
 		if (currentValue != noDifferenceMarker) {
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::://
 int x11= c1 - horizontalBlobBorder;
@@ -1078,7 +1079,7 @@ InnerLoop: while (repeatSearch) {
 				for (int xx=x1; xx <= x2; xx++) {
 					for (int yy=y1; yy <= y2; yy++) {
 						int index1= imageWidth * yy + xx;
-						if (inputPixels[index1] != noDifferenceMarker) {
+						if (contourPixels[index1] != noDifferenceMarker) {
 							numberOfModifiedPixels++;
 						}
 					}
@@ -1091,7 +1092,6 @@ InnerLoop: while (repeatSearch) {
 				// };
 				// System.out.printf("ratio=%s\n",ratio);
 				if (size < minimalBlobSize || size >= imageSize) {
-// if (size < 1000 || size >= imageSize) {
 					blobFlag[k]= false;
 				// } else if (density < 0.1) {
 				//	blobFlag[k]= false;
@@ -1319,12 +1319,15 @@ InnerLoop: while (repeatSearch) {
 			}
 		};
 		// CREATE NEW TRACKS
+		if (characteristicMatrix==null) {
+			phiMatrix= phiMatrixInterpolator.computeMatrix(imageHeight,imageWidth,inverseMatrix,null);
+			characteristicMatrix= characteristicLengthInterpolator.computeMatrix(imageHeight,imageWidth,inverseMatrix,phiMatrix);
+		};
 		for (int k=0; k < numberOfActiveBlobs; k++) {
 			if (currentBlobIdentifiers[k].compareTo(BigInteger.ZERO) <= 0) {
 				recentBlobIdentifier= recentBlobIdentifier.add(BigInteger.ONE);
 				currentBlobIdentifiers[k]= recentBlobIdentifier;
-				GrowingTrack track= new GrowingTrack(recentBlobIdentifier,time,minimalTrackDuration,maximalRarefactionOfObject,inverseMatrix,samplingRate,applyMedianFiltering,medianFilterHalfwidth);
-// System.out.printf("! new growing track is created: %s\n",recentBlobIdentifier);
+				GrowingTrack track= new GrowingTrack(recentBlobIdentifier,time,minimalTrackDuration,maximalRarefactionOfObject,inverseMatrix,samplingRate,r2WindowHalfwidth,characteristicMatrix,applyCharacteristicLengthMedianFiltering,characteristicLengthMedianFilterHalfwidth,applyVelocityMedianFiltering,velocityMedianFilterHalfwidth);
 				tracks.put(recentBlobIdentifier,track);
 			}
 		};
@@ -1348,7 +1351,6 @@ InnerLoop: while (repeatSearch) {
 					BigInteger identifier2b= previousBlobIdentifiers[index2b];
 					GrowingTrack track2b= tracks.get(identifier2b);
 					track2b.registerCollision(track2a,time,TrackSegmentEntryType.INPUT);
-// System.out.printf("! (1)register collision: %s<-%s,INPUT,%s\n",identifier2b,identifier2a,time);
 				}
 			}
 		};
@@ -1363,7 +1365,6 @@ InnerLoop: while (repeatSearch) {
 					GrowingTrack track1= tracks.get(identifier1);
 					GrowingTrack track2= tracks.get(identifier2);
 					track2.registerCollision(track1,time,TrackSegmentEntryType.OUTPUT);
-// System.out.printf("! (2)register collision: %s<-%s,OUTPUT,%s\n",identifier2,identifier1,time);
 				}
 			}
 		};
@@ -1461,71 +1462,10 @@ InnerLoop: while (repeatSearch) {
 			int x2= currentBlobRectangles[k][1];
 			int y1= currentBlobRectangles[k][2];
 			int y2= currentBlobRectangles[k][3];
+			BlobAttributes blobAttributes= VisionUtils.computeHistogram(recentImage,deltaPixels[0],contourPixels,time,x1,x2,y1,y2,imageWidth,noDifferenceMarker);
 			GrowingTrack track= tracks.get(identifier);
-			int[] inputPixels= deltaPixels[0];
-			double[][] histograms= computeHistogram(recentImage,inputPixels,x1,x2,y1,y2);
-			track.appendPoint(new BlobAttributes(time,x1,x2,y1,y2,histograms));
+			track.appendPoint(blobAttributes);
 			tracks.put(identifier,track);
 		}
-	}
-	protected double[][] computeHistogram(java.awt.image.BufferedImage image, int[] inputPixels, int x1, int x2, int y1, int y2) {
-		int nBins= 256;
-		WritableRaster raster= image.getRaster();
-		int bandNumber= raster.getNumBands();
-		int maximalWidth= raster.getWidth();
-		int maximalHeight= raster.getHeight();
-		if (x1 < 0) {
-			x1= 0;
-		} else if (x1 >= maximalWidth) {
-			x1= maximalWidth - 1;
-		};
-		if (x2 < 0) {
-			x2= 0;
-		} else if (x2 >= maximalWidth) {
-			x2= maximalWidth - 1;
-		};
-		if (y1 < 0) {
-			y1= 0;
-		} else if (y1 >= maximalHeight) {
-			y1= maximalHeight - 1;
-		};
-		if (y2 < 0) {
-			y2= 0;
-		} else if (y2 >= maximalHeight) {
-			y2= maximalHeight - 1;
-		};
-		int width= x2 - x1 + 1;
-		int height= y2 - y1 + 1;
-		int[] pixels= new int[width*height];
-		double[][] frequencyCounts= new double[bandNumber][nBins+3];
-		for (int k=0; k < bandNumber; k++) {
-			pixels= raster.getSamples(x1,y1,width,height,k,pixels);
-			int counter= 0;
-			for (int xx=x1; xx <= x2; xx++) {
-				for (int yy=y1; yy <= y2; yy++) {
-					int index1= imageWidth * yy + xx;
-					if (inputPixels[index1]==noDifferenceMarker) {
-						continue;
-					};
-					int index2= width * (yy-y1) + (xx-x1);
-					int pixel= pixels[index2];
-					if (pixel < nBins-1) {
-						counter++;
-					};
-					frequencyCounts[k][pixel]++;
-				}
-			};
-			// for (int n=0; n < nBins; n++) {
-			//	frequencyCounts[k][n]= frequencyCounts[k][n] / counter;
-			// };
-			frequencyCounts[k][nBins]= counter;
-			frequencyCounts[k][nBins+1]= pixels.length;
-			if (counter > 0) {
-				frequencyCounts[k][nBins+2]= pixels.length / counter;
-			} else {
-				frequencyCounts[k][nBins+2]= -1;
-			}
-		};
-		return frequencyCounts;
 	}
 }
