@@ -2,9 +2,10 @@
 
 package morozov.system.gui;
 
-import morozov.classes.*;
+import morozov.run.*;
 
 import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 import java.awt.GraphicsEnvironment;
 import java.awt.GraphicsDevice;
@@ -22,12 +23,17 @@ public class MainWindow extends JFrame {
 		MainDesktopPane desktop= new MainDesktopPane(context);
 		StaticDesktopAttributes.setDesktopPane(desktop,context);
 		setContentPane(desktop);
+		boolean exitOnClose= StaticDesktopAttributes.retrieveExitOnClose(context);
 		try {
-			// setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-			// setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-			setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+			if (exitOnClose) {
+				setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+			} else {
+				// setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+				setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+			}
 		} catch (SecurityException e) {
-			setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+			// setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+			setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 		}
 	}
 }

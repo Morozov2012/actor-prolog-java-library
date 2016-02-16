@@ -10,7 +10,7 @@ import morozov.run.*;
 import morozov.system.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
-import morozov.system.gui.dialogs.signals.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 
@@ -103,7 +103,6 @@ public class ScalableButtonGroup extends ActiveComponent {
 			while (buttons.hasMoreElements()) {
 				AbstractButton currentButton= buttons.nextElement();
 				ScalableToggleButtonModel model= (ScalableToggleButtonModel)currentButton.getModel();
-				// System.out.printf("ScalableButtonGroup::2::getValue(%s)\n",model);
 				if (model.isUncertain()) {
 					return new PrologInteger(0);
 				} else if (model.isSelected()) {

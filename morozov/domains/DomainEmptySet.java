@@ -7,9 +7,13 @@ import morozov.run.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 
+import java.nio.charset.CharsetEncoder;
+import java.util.HashSet;
+
 public class DomainEmptySet extends DomainAlternative {
 	public DomainEmptySet() {
 	}
+	//
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
 		// t= t.dereferenceValue(cp);
 		t= t.dereferenceValue(cp);
@@ -24,7 +28,6 @@ public class DomainEmptySet extends DomainAlternative {
 		}
 	}
 	public boolean coversOptimizedSet(long[] keys, Term[] elements, Term tail, PrologDomain baseDomain, ChoisePoint cp, boolean ignoreFreeVariables) {
-		// initiateDomainItemsIfNecessary();
 		if (keys.length == 0) {
 			return true;
 		} else {
@@ -65,5 +68,28 @@ public class DomainEmptySet extends DomainAlternative {
 				throw new DomainAlternativeDoesNotCoverTerm(initialValue.getPosition());
 			}
 		}
+	}
+	//
+	public boolean isEqualTo(DomainAlternative a, HashSet<PrologDomainPair> stack) {
+		return a.isEqualToEmptySet();
+	}
+	public boolean isEqualToEmptySet() {
+		return true;
+	}
+	public boolean coversAlternative(DomainAlternative a, PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) {
+		return false;
+	}
+	public boolean isCoveredBySetAny() {
+		return true;
+	}
+	public boolean isCoveredByOptimizedSet(long[] names, PrologDomain[] domains, HashSet<PrologDomainPair> stack) {
+		return true;
+	}
+	public boolean isCoveredBySet(PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) {
+		return true;
+	}
+	//
+	public String toString(CharsetEncoder encoder) {
+		return PrologDomainName.tagDomainAlternative_EmptySet;
 	}
 }

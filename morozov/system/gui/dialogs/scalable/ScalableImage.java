@@ -13,13 +13,11 @@ package morozov.system.gui.dialogs.scalable;
 */
 
 import morozov.run.*;
-//import morozov.system.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
-import morozov.system.gui.dialogs.signals.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
 
-import java.awt.image.BufferedImage;
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import java.awt.Dimension;
@@ -43,12 +41,12 @@ public class ScalableImage extends ActiveComponent {
 		width= columns;
 		// keepProportions= flag;
 		// anchor= a;
-		// boolean enableAntialiasing= dialog.targetWorld.antialiasingIsEnabled(iX);
+		// boolean enableAntialiasing= dialog.getTargetWorld().antialiasingIsEnabled(iX);
 		String label= "";
-		BufferedImage image= null;
+		java.awt.image.BufferedImage image= null;
 		if (!address.isEmpty()) {
 			try {
-				image= dialog.targetWorld.readImage(address,iX);
+				image= dialog.getTargetWorld().readImage(address,iX);
 			} catch (Throwable e) {
 				label= e.toString();
 			}
@@ -81,7 +79,7 @@ public class ScalableImage extends ActiveComponent {
 				((JLabel)component).setText("");
 			} else {
 				try {
-					BufferedImage image= dialog.targetWorld.readImage(address,iX);
+					java.awt.image.BufferedImage image= dialog.getTargetWorld().readImage(address,iX);
 					scalableIcon.setImage(image);
 					((JLabel)component).setText("");
 				} catch (Throwable e) {
@@ -90,11 +88,12 @@ public class ScalableImage extends ActiveComponent {
 					((JLabel)component).setText(label);
 				}
 			};
-			dialog.invalidate();
+			// dialog.invalidate();
 			// Без команды repaint не меняется фотография
 			// в примере test_117_26_image_01_jdk, если
 			// диалоговое окно максимизировано.
-			dialog.repaint(); // 2013.09.04
+			// dialog.repaint(); // 2013.09.04
+			dialog.safelyInvalidateAndRepaint();
 		}
 	}
 	//

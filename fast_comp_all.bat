@@ -6,19 +6,6 @@
 @erase dir.txt
 @cd ..
 @cd ..
-@cd morozov\classes
-@dir /b *.java > dir.txt
-@javac -Xlint:fallthrough @dir.txt
-@erase dir.txt
-@cd ..
-@cd ..
-@cd morozov\classes\errors
-@dir /b *.java > dir.txt
-@javac -Xlint:fallthrough @dir.txt
-@erase dir.txt
-@cd ..
-@cd ..
-@cd ..
 @cd morozov\domains
 @dir /b *.java > dir.txt
 @javac -Xlint:fallthrough @dir.txt
@@ -110,6 +97,21 @@
 @cd ..
 @cd ..
 @cd morozov\system\checker\signals
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\command
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\command\errors
 @dir /b *.java > dir.txt
 @javac -Xlint:fallthrough @dir.txt
 @erase dir.txt
@@ -346,14 +348,22 @@
 @cd ..
 @cd ..
 @cd ..
-@cd morozov\system\records
+@cd morozov\system\datum
 @dir /b *.java > dir.txt
 @javac -Xlint:fallthrough @dir.txt
 @erase dir.txt
 @cd ..
 @cd ..
 @cd ..
-@cd morozov\system\records\errors
+@cd morozov\system\datum\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\datum\signals
 @dir /b *.java > dir.txt
 @javac -Xlint:fallthrough @dir.txt
 @erase dir.txt
@@ -376,6 +386,21 @@
 @cd ..
 @cd ..
 @cd morozov\system\vision\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\webcam
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\webcam\errors
 @dir /b *.java > dir.txt
 @javac -Xlint:fallthrough @dir.txt
 @erase dir.txt
@@ -407,5 +432,41 @@
 @dir /b *.java > dir.txt
 @javac -Xlint:fallthrough @dir.txt
 @erase dir.txt
+@cd ..
+@cd ..
+@cd morozov\worlds
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd morozov\worlds\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\worlds\remote
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\worlds\remote\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\worlds\remote\signals
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
 @cd ..
 @cd ..

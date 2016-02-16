@@ -6,7 +6,6 @@ import target.*;
 
 import morozov.terms.*;
 
-import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,15 +16,8 @@ import java.util.Iterator;
 import java.util.ListIterator;
 import java.math.BigInteger;
 
-import java.io.PrintStream;
-import java.io.FileNotFoundException;
-import java.util.Collection;
-
 class BlobSet {
 	//
-//
-private boolean recentFrameNumberIsPrinted= false;
-//
 	private int minimalTrackDuration;
 	//
 	private boolean refuseSlowTracks;
@@ -45,11 +37,11 @@ private boolean recentFrameNumberIsPrinted= false;
 	private int[][] backgroundSumX2;
 	private int backgroundN;
 	private int[] contourPixels;
-	private BufferedImage recentImage;
-	private BufferedImage backgroundImage;
-	private BufferedImage sigmaImage;
-	private BufferedImage foregroundImage;
-	private BufferedImage synthesizedImage;
+	private java.awt.image.BufferedImage recentImage;
+	private java.awt.image.BufferedImage backgroundImage;
+	private java.awt.image.BufferedImage sigmaImage;
+	private java.awt.image.BufferedImage foregroundImage;
+	private java.awt.image.BufferedImage synthesizedImage;
 	private ConnectedGraph[] graphs;
 	private int differenceMarker;
 	private int noDifferenceMarker;
@@ -63,8 +55,8 @@ private boolean recentFrameNumberIsPrinted= false;
 	public BlobSet(	long t,
 			int width,
 			int height,
-			BufferedImage sourceImage,
-			BufferedImage extractedImage,
+			java.awt.image.BufferedImage sourceImage,
+			java.awt.image.BufferedImage extractedImage,
 			int bandNumber,
 			int extraBands,
 			int[][] sum,
@@ -182,68 +174,6 @@ private boolean recentFrameNumberIsPrinted= false;
 		}
 	}
 	synchronized public Term getBlobs() {
-/*
-System.out.printf("TIME=%d\n",recentFrameNumber);
-// if (recentFrameNumber==400) {
-// if (recentFrameNumber>=408) {
-// if (recentFrameNumber>=251) {
-if (recentFrameNumber>=500) {
-recentFrameNumberIsPrinted= false;
-};
-if (recentFrameNumber>=232 && recentFrameNumber < 500 && !recentFrameNumberIsPrinted) {
-recentFrameNumberIsPrinted= true;
-ConnectedGraph[] graphs= formAndGetConnectedGraphs();
-// if (recentFrameNumber==450) {
-//System.out.printf("!!! TIME=551\n\n\n\n\n");
-Collection<StableTrack> trackValues= tracks.values();
-Iterator<StableTrack> iterator1= trackValues.iterator();
-while (iterator1.hasNext()) {
-	StableTrack track= iterator1.next();
-	if (track != null) {
-		//if (track.duration > 70) {
-			try {
-				String fileName= String.format("log\\track_%05d_(%05d).txt",track.identifier,recentFrameNumber);
-				PrintStream stream= new PrintStream(fileName);
-				try {
-					track.dump(stream);
-				} finally {
-					stream.close();
-				};
-				fileName= String.format("log\\track_%05d_(%05d).m",track.identifier,recentFrameNumber);
-				stream= new PrintStream(fileName);
-				try {
-					track.createMatlab(stream);
-				} finally {
-					stream.close();
-				}
-			} catch (FileNotFoundException e) {
-				System.out.printf("FileNotFoundException: %s",e);
-			}
-		//}
-	}
-}
-for (int n=0; n < graphs.length; n++) {
-	try {
-		String fileName= String.format("log\\graph_%05d_(%05d).txt",n,recentFrameNumber);
-		PrintStream stream= new PrintStream(fileName);
-		try {
-			graphs[n].dump(stream);
-		} finally {
-			stream.close();
-		};
-		fileName= String.format("log\\graph_%05d_(%05d).m",n,recentFrameNumber);
-		stream= new PrintStream(fileName);
-		try {
-			graphs[n].createMatlab(stream);
-		} finally {
-			stream.close();
-		}
-	} catch (FileNotFoundException e) {
-		System.out.printf("FileNotFoundException: %s",e);
-	}
-}
-}
-*/
 		Term result= PrologEmptyList.instance;
 		for (int n=blobRectangles.length-1; n >= 0; n--) {
 			Term prologIdentifier= new PrologInteger(blobIdentifiers[n]);
@@ -395,18 +325,17 @@ for (int n=0; n < graphs.length; n++) {
 				pixels[k][n]= mean;
 			}
 		};
-		BufferedImage resultImage;
+		java.awt.image.BufferedImage resultImage;
 		if (numberOfBands==1) {
-			resultImage= new BufferedImage(imageWidth,imageHeight,BufferedImage.TYPE_BYTE_GRAY);
+			resultImage= new java.awt.image.BufferedImage(imageWidth,imageHeight,java.awt.image.BufferedImage.TYPE_BYTE_GRAY);
 		} else {
-			resultImage= new BufferedImage(imageWidth,imageHeight,BufferedImage.TYPE_3BYTE_BGR);
+			resultImage= new java.awt.image.BufferedImage(imageWidth,imageHeight,java.awt.image.BufferedImage.TYPE_3BYTE_BGR);
 		};
 		WritableRaster resultRaster= resultImage.getRaster();
 		for (int k=0; k < numberOfBands; k++) {
 			resultRaster.setSamples(0,0,imageWidth,imageHeight,k,pixels[k]);
 		};
 		backgroundImage= resultImage;
-		// bufferedImage.setData(backgroundImage.getData());
 		return resultImage;
 	}
 	synchronized public java.awt.image.BufferedImage getSigmaImage() {
@@ -429,18 +358,17 @@ for (int n=0; n < graphs.length; n++) {
 				}
 			}
 		};
-		BufferedImage resultImage;
+		java.awt.image.BufferedImage resultImage;
 		if (numberOfBands==1) {
-			resultImage= new BufferedImage(imageWidth,imageHeight,BufferedImage.TYPE_BYTE_GRAY);
+			resultImage= new java.awt.image.BufferedImage(imageWidth,imageHeight,java.awt.image.BufferedImage.TYPE_BYTE_GRAY);
 		} else {
-			resultImage= new BufferedImage(imageWidth,imageHeight,BufferedImage.TYPE_3BYTE_BGR);
+			resultImage= new java.awt.image.BufferedImage(imageWidth,imageHeight,java.awt.image.BufferedImage.TYPE_3BYTE_BGR);
 		};
 		WritableRaster resultRaster= resultImage.getRaster();
 		for (int k=0; k < numberOfBands; k++) {
 			resultRaster.setSamples(0,0,imageWidth,imageHeight,k,pixels[k]);
 		};
 		sigmaImage= resultImage;
-		// bufferedImage.setData(sigmaImage.getData());
 		return resultImage;
 	}
 	synchronized public java.awt.image.BufferedImage getForegroundImage() {
@@ -457,83 +385,17 @@ for (int n=0; n < graphs.length; n++) {
 			for (int n=0; n < graphs.length; n++) {
 				graphs[n].enablePixels(recentFrameNumber,bitMask,imageWidth,imageHeight,tracks);
 			};
-			BufferedImage extractedImage= new BufferedImage(imageWidth,imageHeight,BufferedImage.TYPE_4BYTE_ABGR);
+			java.awt.image.BufferedImage extractedImage= new java.awt.image.BufferedImage(imageWidth,imageHeight,java.awt.image.BufferedImage.TYPE_4BYTE_ABGR);
 			WritableRaster raster= extractedImage.getRaster();
 			raster.setDataElements(0,0,foregroundImage.getRaster());
-			BufferedImage resultImage= applyMaskAndCreateImage(extractedImage,bitMask);
+			java.awt.image.BufferedImage resultImage= applyMaskAndCreateImage(extractedImage,bitMask);
 			synthesizedImage= resultImage;
-			// bufferedImage.setData(synthesizedImage.getData());
 			return synthesizedImage;
 		} else {
 			return null;
 		}
 	}
 	synchronized public Term getConnectedGraphs() {
-/*
-System.out.printf("TIME=%d\n",recentFrameNumber);
-// if (recentFrameNumber==400) {
-// if (recentFrameNumber>=408) {
-// if (recentFrameNumber>=251) {
-if (recentFrameNumber>=500) {
-recentFrameNumberIsPrinted= false;
-};
-// if (recentFrameNumber>=232 && recentFrameNumber < 500 && !recentFrameNumberIsPrinted) {
-// if (recentFrameNumber>=400 && recentFrameNumber < 500 && !recentFrameNumberIsPrinted) {
-// if (false && recentFrameNumber>=275 && recentFrameNumber < 500 && !recentFrameNumberIsPrinted) {
-if (recentFrameNumber>=499 && recentFrameNumber < 500 && !recentFrameNumberIsPrinted) {
-recentFrameNumberIsPrinted= true;
-ConnectedGraph[] graphs= formAndGetConnectedGraphs();
-// if (recentFrameNumber==450) {
-System.out.printf("!!! TIME=%s\n\n\n\n\n",recentFrameNumber);
-Collection<StableTrack> trackValues= tracks.values();
-Iterator<StableTrack> iterator1= trackValues.iterator();
-while (iterator1.hasNext()) {
-	StableTrack track= iterator1.next();
-	if (track != null) {
-		//if (track.duration > 70) {
-			try {
-				String fileName= String.format("log\\track_%05d_(%05d).txt",track.identifier,recentFrameNumber);
-				PrintStream stream= new PrintStream(fileName);
-				try {
-					track.dump(stream);
-				} finally {
-					stream.close();
-				};
-				fileName= String.format("log\\track_%05d_(%05d).m",track.identifier,recentFrameNumber);
-				stream= new PrintStream(fileName);
-				try {
-					track.createMatlab(stream);
-				} finally {
-					stream.close();
-				}
-			} catch (FileNotFoundException e) {
-				System.out.printf("FileNotFoundException: %s",e);
-			}
-		//}
-	}
-}
-for (int n=0; n < graphs.length; n++) {
-	try {
-		String fileName= String.format("log\\graph_%05d_(%05d).txt",n,recentFrameNumber);
-		PrintStream stream= new PrintStream(fileName);
-		try {
-			graphs[n].dump(stream);
-		} finally {
-			stream.close();
-		};
-		fileName= String.format("log\\graph_%05d_(%05d).m",n,recentFrameNumber);
-		stream= new PrintStream(fileName);
-		try {
-			graphs[n].createMatlab(stream);
-		} finally {
-			stream.close();
-		}
-	} catch (FileNotFoundException e) {
-		System.out.printf("FileNotFoundException: %s",e);
-	}
-}
-}
-*/
 		ConnectedGraph[] graphs= formAndGetConnectedGraphs();
 		Term list1= PrologEmptyList.instance;
 		for (int n=graphs.length-1; n >= 0; n--) {
@@ -598,6 +460,7 @@ for (int n=0; n < graphs.length; n++) {
 		Term prologMeanForegroundArea= new PrologReal(trackSegment.meanForegroundArea);
 		Term prologMeanCharacteristicLength= new PrologReal(trackSegment.meanCharacteristicLength);
 		Term prologMeanSquaredCharacteristicLength= new PrologReal(trackSegment.meanSquaredCharacteristicLength);
+		Term prologMeanStandardizedArea= new PrologReal(trackSegment.meanStandardizedArea);
 		Term prologMeanContourLength= new PrologReal(trackSegment.meanContourLength);
 		Term prologWR2Mean= new PrologReal(trackSegment.getWindowedR2Mean());
 		Term prologWR2StandardDeviation= new PrologReal(trackSegment.getWindowedR2StandardDeviation());
@@ -639,6 +502,9 @@ for (int n=0; n < graphs.length; n++) {
 			- SymbolCodes.symbolCode_E_mean_squared_characteristic_length,
 			prologMeanSquaredCharacteristicLength,
 			new PrologSet(
+			- SymbolCodes.symbolCode_E_mean_standardized_area,
+			prologMeanStandardizedArea,
+			new PrologSet(
 			- SymbolCodes.symbolCode_E_mean_contour_length,
 			prologMeanContourLength,
 			new PrologSet(
@@ -659,7 +525,7 @@ for (int n=0; n < graphs.length; n++) {
 			new PrologSet(
 			- SymbolCodes.symbolCode_E_mean_velocity,
 			prologMeanVelocity,
-			PrologEmptySet.instance))))))))))))))))));
+			PrologEmptySet.instance)))))))))))))))))));
 		return prologTrackSegment;
 	}
 	protected Term collectOriginEdges(ConnectedSegment connectedSegment, int connectedSegmentNumber, ArrayList<ConnectedSegment> connectedSegments) {
@@ -746,7 +612,7 @@ for (int n=0; n < graphs.length; n++) {
 			array[n].deleteEmptySegments();
 		}
 	}
-	protected BufferedImage applyMaskAndCreateImage(BufferedImage image, boolean[] bitMask) {
+	protected java.awt.image.BufferedImage applyMaskAndCreateImage(java.awt.image.BufferedImage image, boolean[] bitMask) {
 		int[] deltaMatrix= Arrays.copyOf(contourPixels,contourPixels.length);
 		if (makeSquareBlobsInSynthesizedImage) {
 			for (int n=0; n < deltaMatrix.length; n++) {
@@ -774,14 +640,14 @@ for (int n=0; n < graphs.length; n++) {
 		};
 		return extractSelectedPixels(image,deltaMatrix,noDifferenceMarker);
 	}
-	protected BufferedImage extractSelectedPixels(BufferedImage image, int[] deltaMatrix, int noDifferenceMarker) {
+	protected java.awt.image.BufferedImage extractSelectedPixels(java.awt.image.BufferedImage image, int[] deltaMatrix, int noDifferenceMarker) {
 		int type= image.getType();
 		WritableRaster imageRaster= image.getRaster();
 		switch (type) {
-			case BufferedImage.TYPE_INT_ARGB:
-			case BufferedImage.TYPE_INT_ARGB_PRE:
-			case BufferedImage.TYPE_4BYTE_ABGR:
-			case BufferedImage.TYPE_4BYTE_ABGR_PRE:
+			case java.awt.image.BufferedImage.TYPE_INT_ARGB:
+			case java.awt.image.BufferedImage.TYPE_INT_ARGB_PRE:
+			case java.awt.image.BufferedImage.TYPE_4BYTE_ABGR:
+			case java.awt.image.BufferedImage.TYPE_4BYTE_ABGR_PRE:
 				imageRaster.setSamples(0,0,imageWidth,imageHeight,3,deltaMatrix);
 				break;
 			default:

@@ -7,6 +7,7 @@
 package morozov.system.gui.dialogs.scalable.windows;
 
 import morozov.system.gui.dialogs.scalable.common.*;
+import morozov.terms.*;
 
 import javax.swing.UIManager;
 import javax.swing.ButtonModel;
@@ -120,9 +121,9 @@ public class ScalableWindowsRadioButtonIcon extends ScalableToggleButtonIcon {
 	protected void drawColoredMarker(Component relatedComponent, Graphics2D g2, int x, int y, int controlSize, Color markerColor) {
 		float diameter= (float) ((controlSize - 4) * 0.41);
 		// Graphics2D g2= (Graphics2D)g;
-		int deltaW= (int)StrictMath.round((controlSize - diameter)/2);
+		int deltaW= PrologInteger.toInteger((controlSize - diameter)/2);
 		int doubleDeltaW= deltaW * 2;
-		int deltaH= (int)StrictMath.round((controlSize - diameter)/2);
+		int deltaH= PrologInteger.toInteger((controlSize - diameter)/2);
 		int doubleDeltaH= deltaH * 2;
 		g2.setPaint(markerColor);
 		g2.fill(new Ellipse2D.Float(x+deltaW,y+deltaH,controlSize-doubleDeltaW-1,controlSize-doubleDeltaH-1));

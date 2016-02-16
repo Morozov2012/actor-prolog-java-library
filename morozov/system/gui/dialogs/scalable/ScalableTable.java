@@ -16,7 +16,7 @@ import morozov.run.*;
 import morozov.system.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
-import morozov.system.gui.dialogs.signals.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 
@@ -61,8 +61,8 @@ public class ScalableTable extends ActiveComponent {
 		super.setFont(font);
 		if (component!=null) {
 			component.setFont(font);
-			// Dimension size= component.getPreferredSize();
-			// component.setMinimumSize(size);
+// Dimension size= component.getPreferredSize();
+// component.setMinimumSize(size);
 		}
 	}
 	//

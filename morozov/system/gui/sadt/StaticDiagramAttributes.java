@@ -2,7 +2,7 @@
 
 package morozov.system.gui.sadt;
 
-import morozov.classes.*;
+import morozov.run.*;
 
 import java.util.Collections;
 import java.util.HashMap;

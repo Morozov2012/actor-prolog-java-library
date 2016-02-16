@@ -2,10 +2,10 @@
 
 package morozov.built_in;
 
-import morozov.classes.*;
 import morozov.run.*;
 import morozov.system.indices.*;
 import morozov.terms.*;
+import morozov.worlds.*;
 
 import java.util.HashMap;
 import java.util.Collection;
@@ -15,15 +15,18 @@ import java.util.ArrayList;
 public abstract class DynamicWorlds extends LambdaArray {
 	//
 	protected HashMap<ArrayIndices,AbstractWorld> createdWorlds= new HashMap<ArrayIndices,AbstractWorld>();
-	// protected Map<ArrayIndices,AbstractWorld> createdWorlds= Collections.synchronizedMap(new HashMap<ArrayIndices,AbstractWorld>());
-	protected ArrayList<AbstractWorld> specialWorlds= null;
+	protected ArrayList<AbstractInternalWorld> specialWorlds= null;
+	//
+	public DynamicWorlds() {
+	}
+	public DynamicWorlds(GlobalWorldIdentifier id) {
+		super(id);
+	}
 	//
 	abstract public Term getBuiltInSlot_E_prototype();
 	//
 	protected Term accessArrayElement(ArrayIndices arrayIndices, ChoisePoint cp) throws Backtracking {
-		// System.out.printf("ArrayIndices:: createdWorlds(%s) ?\n\n",arrayIndices);
 		AbstractWorld staticValue= createdWorlds.get(arrayIndices);
-		// System.out.printf("ArrayIndices:: createdWorlds(%s) == %s\n\n",arrayIndices,staticValue);
 		SlotVariable dynamicValue;
 		if (staticValue==null) {
 			// Create and initialize new world
@@ -32,34 +35,29 @@ public abstract class DynamicWorlds extends LambdaArray {
 			array.initiateWorld(staticValue);
 			if (staticValue.isSpecialWorld()) {
 				if (specialWorlds==null) {
-					specialWorlds= new ArrayList<AbstractWorld>();
+					specialWorlds= new ArrayList<AbstractInternalWorld>();
 				};
-				specialWorlds.add(staticValue);
+				AbstractInternalWorld internalWorld= (AbstractInternalWorld)staticValue;
+				specialWorlds.add(internalWorld);
 			};
 			staticValue.startProcesses();
 			// Remember new world
-			// System.out.printf("ArrayIndices:: createdWorlds(%s):=%s\n\n",arrayIndices,staticValue);
 			createdWorlds.put(arrayIndices,staticValue);
 			// Create new backtrackable array item
 			dynamicValue= new SlotVariable();
-			// System.out.printf("ArrayIndices(2):: volume(%s):=%s\n\n",arrayIndices,dynamicValue);
 			volume.put(arrayIndices,dynamicValue);
 			cp.pushTrail(new HashMapState(volume,arrayIndices,dynamicValue));
 		} else {
-			// System.out.printf("ArrayIndices:: volume(%s) ?\n\n",arrayIndices);
 			dynamicValue= volume.get(arrayIndices);
-			// System.out.printf("ArrayIndices:: volume(%s) == %s\n\n",arrayIndices,dynamicValue);
 			if (dynamicValue==null) {
 				// Create new backtrackable array item
 				dynamicValue= new SlotVariable();
-				// System.out.printf("ArrayIndices(3):: volume(%s):=%s\n\n",arrayIndices,dynamicValue);
 				volume.put(arrayIndices,dynamicValue);
 				cp.pushTrail(new HashMapState(volume,arrayIndices,dynamicValue));
 			}
 		};
 		// Unify array item
 		dynamicValue.unifyWith(staticValue,cp);
-		// System.out.printf("ArrayItem: value=%s\n",dynamicValue);
 		return staticValue;
 	}
 	//
@@ -71,6 +69,7 @@ public abstract class DynamicWorlds extends LambdaArray {
 			world.startProcesses();
 		}
 	}
+	//
 	public void closeFiles() {
 		Collection<AbstractWorld> allWorlds= createdWorlds.values();
 		Iterator<AbstractWorld> allWorldsIterator= allWorlds.iterator();
@@ -80,6 +79,7 @@ public abstract class DynamicWorlds extends LambdaArray {
 		};
 		super.closeFiles();
 	}
+	//
 	public void stopProcesses() {
 		Collection<AbstractWorld> allWorlds= createdWorlds.values();
 		Iterator<AbstractWorld> allWorldsIterator= allWorlds.iterator();
@@ -95,9 +95,9 @@ public abstract class DynamicWorlds extends LambdaArray {
 	//
 	public void finishPhaseSuccessfully() {
 		if (specialWorlds != null) {
-			Iterator<AbstractWorld> iterator= specialWorlds.iterator();
+			Iterator<AbstractInternalWorld> iterator= specialWorlds.iterator();
 			while (iterator.hasNext()) {
-				AbstractWorld specialWorld= iterator.next();
+				AbstractInternalWorld specialWorld= iterator.next();
 				specialWorld.finishPhaseSuccessfully();
 			}
 		}
@@ -105,9 +105,9 @@ public abstract class DynamicWorlds extends LambdaArray {
 	//
 	public void finishPhaseUnsuccessfully() {
 		if (specialWorlds != null) {
-			Iterator<AbstractWorld> iterator= specialWorlds.iterator();
+			Iterator<AbstractInternalWorld> iterator= specialWorlds.iterator();
 			while (iterator.hasNext()) {
-				AbstractWorld specialWorld= iterator.next();
+				AbstractInternalWorld specialWorld= iterator.next();
 				specialWorld.finishPhaseUnsuccessfully();
 			}
 		}

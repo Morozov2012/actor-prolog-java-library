@@ -14,7 +14,7 @@ package morozov.system.gui.dialogs.scalable;
 
 import morozov.run.*;
 import morozov.system.gui.dialogs.*;
-import morozov.system.gui.dialogs.signals.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 
@@ -57,13 +57,13 @@ public class ScalableSlider extends ActiveComponent {
 			int currentWidth= size.width;
 			if (orientation==JSlider.HORIZONTAL) {
 				int charWidth= metrics.charWidth('M');
-				currentWidth= (int)StrictMath.round(length*charWidth);
+				currentWidth= PrologInteger.toInteger(length*charWidth);
 			} else {
 				FontRenderContext frc= metrics.getFontRenderContext();
 				TextLayout layout= new TextLayout("M",font,frc);
 				Rectangle rectangle= layout.getPixelBounds(null,0,0);
 				double charHeight= rectangle.getHeight();
-				currentHeight= (int)StrictMath.round(length*charHeight);
+				currentHeight= PrologInteger.toInteger(length*charHeight);
 			};
 			component.setMinimumSize(new Dimension(currentWidth,currentHeight));
 			component.setPreferredSize(new Dimension(currentWidth,currentHeight));
@@ -81,7 +81,7 @@ public class ScalableSlider extends ActiveComponent {
 				// ((JSlider)component).setValue(position);
 			} catch (TermIsNotAnInteger e1) {
 				try {
-					int position= (int)StrictMath.round(value.getRealValue(iX));
+					int position= PrologInteger.toInteger(value.getRealValue(iX));
 					((JSlider)component).setValue(position);
 				} catch (TermIsNotAReal e2) {
 				}
@@ -130,7 +130,7 @@ public class ScalableSlider extends ActiveComponent {
 			int minimum= 0;
 			int maximum= 0;
 			try {
-				minimum= (int)StrictMath.round(number1.getRealValue(iX));
+				minimum= PrologInteger.toInteger(number1.getRealValue(iX));
 			} catch (TermIsNotAReal e1) {
 				try {
 					minimum= number1.getSmallIntegerValue(iX);
@@ -141,7 +141,7 @@ public class ScalableSlider extends ActiveComponent {
 				}
 			};
 			try {
-				maximum= (int)StrictMath.round(number2.getRealValue(iX));
+				maximum= PrologInteger.toInteger(number2.getRealValue(iX));
 			} catch (TermIsNotAReal e1) {
 				try {
 					maximum= number2.getSmallIntegerValue(iX);
@@ -161,7 +161,7 @@ public class ScalableSlider extends ActiveComponent {
 	}
 	//
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-		return new PrologInteger(DialogUtils.termToSmallInteger(value,iX));
+		return new PrologInteger(DialogUtils.termToSmallIntegerOrReject(value,iX));
 	}
 	public Term standardizeRange(Term value, ChoisePoint iX) throws RejectRange {
 		try {
@@ -193,8 +193,8 @@ public class ScalableSlider extends ActiveComponent {
 				// return PrologUnknownValue.instance;
 				throw RejectRange.instance;
 			};
-			int minimum= DialogUtils.termToSmallInteger(number1,iX);
-			int maximum= DialogUtils.termToSmallInteger(number2,iX);
+			int minimum= DialogUtils.termToSmallIntegerOrReject(number1,iX);
+			int maximum= DialogUtils.termToSmallIntegerOrReject(number2,iX);
 			Term result= PrologEmptyList.instance;
 			result= new PrologList(new PrologInteger(maximum),result);
 			result= new PrologList(new PrologInteger(minimum),result);

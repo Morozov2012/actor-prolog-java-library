@@ -4,7 +4,11 @@ package morozov.system.gui.space2d;
 
 import morozov.system.gui.space2d.errors.*;
 
-import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import javax.imageio.stream.ImageOutputStream;
+import javax.imageio.stream.MemoryCacheImageOutputStream;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
 import javax.imageio.ImageTypeSpecifier;
@@ -13,8 +17,6 @@ import javax.imageio.metadata.IIOMetadata;
 import javax.imageio.metadata.IIOMetadataNode;
 import javax.imageio.metadata.IIOInvalidTreeException;
 import javax.imageio.IIOImage;
-import javax.imageio.stream.FileImageOutputStream;
-import java.io.IOException;
 import org.w3c.dom.Node;
 
 import java.util.Iterator;
@@ -25,12 +27,39 @@ public class Space2DWriter {
 	protected ImageWriteParam iwp;
 	protected IIOMetadata metadata;
 	//
+	protected static String defaultImageTransferFormat= "png";
+	// protected static String defaultImageTransferFormat= "jpg";
+	//
+	static {
+		try {
+			ImageIO.setUseCache(false);
+		} catch (SecurityException e) {
+		}
+	};
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Space2DWriter(String defaultFormatName, ImageTypeSpecifier its) {
 		Iterator<ImageWriter> iterator= ImageIO.getImageWritersByFormatName(defaultFormatName);
 		writer= iterator.next();
 		iwp= writer.getDefaultWriteParam();
 		metadata= writer.getDefaultImageMetadata(its,iwp);
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public static Space2DWriter createSpace2DWriter(java.awt.image.BufferedImage image, GenericImageEncodingAttributes attributes) {
+		return createSpace2DWriter(defaultImageTransferFormat,image,attributes);
+	}
+	public static Space2DWriter createSpace2DWriter(String defaultFormatName, java.awt.image.BufferedImage image, GenericImageEncodingAttributes attributes) {
+		ImageFileFormat format= attributes.getFormat();
+		ImageTypeSpecifier its= new ImageTypeSpecifier(image);
+		Space2DWriter writer= format.createWriter(defaultFormatName,its);
+		attributes.setWriterAttributes(writer);
+		return writer;
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void setCompressionQuality(double compressionQuality) {
 	}
@@ -76,11 +105,13 @@ public class Space2DWriter {
 		}
 	}
 	//
-	public void setOutput(FileImageOutputStream output) {
+	///////////////////////////////////////////////////////////////
+	//
+	public void setOutput(ImageOutputStream output) {
 		writer.setOutput(output);
 	}
 	//
-	public void write(BufferedImage image) throws IOException {
+	public void write(java.awt.image.BufferedImage image) throws IOException {
 		IIOImage iioImage= new IIOImage(image,null,metadata);
 		writer.write(null,iioImage,iwp);
 	}
@@ -103,5 +134,43 @@ public class Space2DWriter {
 			}
 		};
 		return null;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public byte[] imageToBytes(java.awt.image.BufferedImage nativeImage) {
+		ByteArrayOutputStream outputStream= new ByteArrayOutputStream();
+		MemoryCacheImageOutputStream imageStream= new MemoryCacheImageOutputStream(outputStream);
+		try {
+			setOutput(imageStream);
+			write(nativeImage);
+			imageStream.flush();
+			return outputStream.toByteArray();
+		} catch (IOException e) {
+			throw new ImageConversionError(e);
+		} finally {
+			try {
+				imageStream.close();
+				// outputStream.close();
+			} catch (IOException e) {
+			}
+			// writer.dispose();
+		}
+	}
+	//
+	public static java.awt.image.BufferedImage bytesToImage(byte[] bytes) {
+		ByteArrayInputStream inputStream= new ByteArrayInputStream(bytes);
+		java.awt.image.BufferedImage nativeImage;
+		try {
+			nativeImage= ImageIO.read(inputStream);
+			return nativeImage;
+		} catch (IOException e) {
+			throw new ImageConversionError(e);
+		} finally {
+			try {
+				inputStream.close();
+			} catch (IOException e) {
+			}
+		}
 	}
 }

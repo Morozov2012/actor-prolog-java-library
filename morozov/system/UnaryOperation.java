@@ -153,7 +153,7 @@ public enum UnaryOperation {
 				BigInteger value= Converters.doubleToBigInteger(n1);
 				return new PrologInteger(value.not());
 			} catch (TermIsNotAReal e) {
-				throw new WrongArgumentIsNotNumeric(new PrologReal(n1));
+				throw new WrongArgumentIsNotNumerical(new PrologReal(n1));
 			}
 		}
 	};

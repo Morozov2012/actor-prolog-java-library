@@ -9,16 +9,19 @@ import java.nio.charset.CharsetEncoder;
 
 public class ArgumentNumber extends Term {
 	private long value;
+	//
 	public ArgumentNumber(long v) {
 		value= v;
 	}
-	public int hashCode() {
-		return (int)value;
-	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
-		throw new WrongTermIsArgumentNumber(t);
+		throw new WrongArgumentIsArgumentNumber(t);
 	}
-	// Internal operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public boolean thisIsArgumentNumber() {
 		return true;
 	}
@@ -39,23 +42,19 @@ public class ArgumentNumber extends Term {
 		if (value < v)
 			throw Backtracking.instance;
 	}
-	// public void verifyListOfRestValues(long deltaN, Term list, ChoisePoint cp) {
-	//	System.out.printf("long deltaN=%s, counter=%s; list=%s\n",deltaN,value,list);
-	// }
 	public void verifyListOfRestValues(long deltaN, Term list, ChoisePoint cp) {
 		long counter= value + deltaN;
-		// System.out.printf("counter=%d, (deltaN=%d + value=%d) list=%s\n",counter,deltaN,value,list);
 		Term tail= list;
 		while (counter > 0) {
-			// System.out.printf("counter=%s; tail=%s\n",counter,tail);
 			tail= tail.getOutputTail(cp);
 			counter= counter - 1;
 		};
 		tail.isOutputEmptyList(cp);
 	}
-	// Converting Term to String
-	// public String toString() {
-	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, CharsetEncoder encoder) {
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		return String.format("%d",value);
 	}
 }

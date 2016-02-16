@@ -6,21 +6,21 @@
 
 package morozov.system.gui.dialogs.scalable.common;
 
-import morozov.classes.*;
-import morozov.run.*;
-import morozov.system.gui.dialogs.*;
-import morozov.terms.*;
-
-import javax.swing.SwingUtilities;
-
-import java.lang.reflect.InvocationTargetException;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /*
  * ScalableTableResident implementation for the Actor Prolog language
  * @version 1.0 2012/08/31
  * @author IRE RAS Alexei A. Morozov
 */
+
+import morozov.run.*;
+import morozov.system.gui.dialogs.*;
+import morozov.terms.*;
+import morozov.worlds.*;
+
+import javax.swing.SwingUtilities;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ScalableTableResident extends Resident {
 	//
@@ -30,7 +30,7 @@ public class ScalableTableResident extends Resident {
 	protected Term previousResult= null;
 	//
 	public ScalableTableResident(AbstractDialog dialog, ATable control) {
-		target= dialog.targetWorld;
+		target= dialog.getTargetWorld();
 		table= control;
 		// tableModel= model;
 	}
@@ -44,7 +44,6 @@ public class ScalableTableResident extends Resident {
 			domainSignature= signature;
 			// functor= aFunctor;
 			arguments= (Term[])args;
-			// System.out.printf("Resident::initiate/3(%s,%s,%s)\n",target,this,domainSignature,arguments[0]);
 			requestIsToBeSend.set(true);
 			wakeUp();
 		}
@@ -77,38 +76,13 @@ public class ScalableTableResident extends Resident {
 	}
 	//
 	public void acceptFlowMessages() {
-		// System.out.printf("Resident::[1]acceptFlowMessages\n");
 		if (!requestIsToBeSend.compareAndSet(true,false)) {
 			return;
 		};
-		// System.out.printf("Resident::[2]acceptFlowMessages\n");
-		// phaseInitiation();
-		// boolean hasUpdatedPorts= acceptPortValues();
-		//
-		// prepareTargetWorlds(target,iX);
-		// Term[] argumentList= prepareArguments(iX);
-		//
-		// fixSlotVariables(true);
-		// storeSlotVariables();
-		//
-		// Iterator<AbstractWorld> targetWorldsIterator= targetWorlds.iterator();
-		// while (targetWorldsIterator.hasNext()) {
-			// AbstractWorld world= targetWorldsIterator.next();
-			// System.out.printf("Resident::%s.sendResidentRequest(%s,%s,%s)\n",world,this,get_domain_signature(),get_arguments());
-		get_target().sendResidentRequest(this,get_domain_signature(),get_arguments(),false,rootCP);
-		// };
-		// hasNewResults.set(true);
-		// System.out.printf("Resident::[3]acceptFlowMessages:wakeUp()\n");
-		// wakeUp();
+		get_target().sendResidentRequest(this,get_domain_signature(),get_arguments(),false);
 	}
 	//
-	// public void returnResultList(AbstractWorld target, Term list) {
-	//	System.out.printf("%s\n",list);
-	//	tableModel.setTableValues(list,null);
-	// }
-	//
 	public void acceptDirectMessage() {
-		// System.out.printf("Resident::acceptDirectMessage()\n");
 		if (!hasNewResults.compareAndSet(true,false)) {
 			return;
 		};
@@ -143,7 +117,6 @@ public class ScalableTableResident extends Resident {
 		rootCP.freeTrail();
 	}
 	public void sendResults(final Term resultValue, final ChoisePoint iX) {
-		// System.out.printf("Resident::%s\n",resultValue);
 		if (SwingUtilities.isEventDispatchThread()) {
 			table.putRange(resultValue,true,iX);
 		} else {

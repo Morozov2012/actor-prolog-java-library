@@ -15,7 +15,7 @@ package morozov.system.gui.dialogs.scalable;
 import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
-import morozov.system.gui.dialogs.signals.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
 
 import java.awt.Font;

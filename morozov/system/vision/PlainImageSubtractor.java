@@ -2,7 +2,6 @@
 
 package morozov.system.vision;
 
-import morozov.system.vision.errors.*;
 import morozov.terms.*;
 
 import java.awt.image.WritableRaster;
@@ -101,11 +100,6 @@ public class PlainImageSubtractor {
 	//
 	protected static final int overcrowdedMatrixReductionCoefficient= 3;
 	//
-	// protected static final float[] gaussWindow= {0.367879f, 0.444858f, 0.527292f, 0.612626f, 0.697676f, 0.778801f, 0.852144f, 0.913931f, 0.960789f, 0.990050f, 1.000000f, 0.990050f, 0.960789f, 0.913931f, 0.852144f, 0.778801f, 0.697676f, 0.612626f, 0.527292f, 0.444858f, 0.367879f};
-	// protected static final float[] gaussWindow11= {0.367879f, 0.527292f, 0.697676f, 0.852144f, 0.960789f, 1.000000f, 0.960789f, 0.852144f, 0.697676f, 0.527292f, 0.367879f};
-	// protected static final float[] gaussWindow7= {0.367879f, 0.641180f, 0.894839f, 1.000000f, 0.894839f, 0.641180f, 0.367879f};
-	// protected static final float[] gaussWindow5= {0.367879f, 0.778801f, 1.000000f, 0.778801f, 0.367879f};
-	// protected static final float[] gaussWindow3= {0.367879f, 1.000000f, 0.367879f};
 	protected static float[] gaussianMatrix;
 	//
 	public PlainImageSubtractor(
@@ -217,6 +211,10 @@ public class PlainImageSubtractor {
 			};
 			if (trackBlobs) {
 				identifyBlobs();
+			} else {
+				for (int k=0; k < currentBlobIdentifiers.length; k++) {
+					currentBlobIdentifiers[k]= BigInteger.valueOf(k+1);
+				}
 			}
 		}
 	}
@@ -224,6 +222,12 @@ public class PlainImageSubtractor {
 	synchronized public void commit() {
 		if (backgroundN <= 0 || currentBlobSize==null) {
 			return;
+		};
+		BlobSet recentSet= recentBlobSet.get();
+		if (recentSet != null) {
+			if (recentSet.getRecentFrameNumber() >= time) {
+				return;
+			}
 		};
 		java.awt.image.BufferedImage extractedImage= new java.awt.image.BufferedImage(imageWidth,imageHeight,java.awt.image.BufferedImage.TYPE_4BYTE_ABGR);
 		Graphics2D g2= (Graphics2D)extractedImage.getGraphics();
@@ -380,6 +384,7 @@ public class PlainImageSubtractor {
 		invisibleBlobDelays= new int[0];
 		recentBlobIdentifier= BigInteger.ZERO;
 		tracks.clear();
+		recentBlobSet.set(null);
 		time= 0;
 	}
 	//
@@ -543,7 +548,6 @@ public class PlainImageSubtractor {
 	synchronized public void setForegroundContouringMode(boolean mode) {
 		if (contourForeground != mode) {
 			contourForeground= mode;
-			// forgetStatistics();
 		}
 	}
 	synchronized public boolean getForegroundContouringMode() {
@@ -835,7 +839,7 @@ public class PlainImageSubtractor {
 			if (gaussianMatrix==null) {
 				gaussianMatrix= VisionUtils.gaussianMatrix(gaussianFilterRadius);
 			};
-			int length= (int)StrictMath.round(StrictMath.sqrt(gaussianMatrix.length));
+			int length= PrologInteger.toInteger(StrictMath.sqrt(gaussianMatrix.length));
 			ConvolveOp cop= new ConvolveOp(
 				new Kernel(length,length,gaussianMatrix),
 				// ConvolveOp.EDGE_NO_OP,
@@ -854,10 +858,9 @@ public class PlainImageSubtractor {
 			if (gaussianMatrix==null) {
 				gaussianMatrix= VisionUtils.gaussianMatrix(gaussianFilterRadius);
 			};
-			int length= (int)StrictMath.round(StrictMath.sqrt(gaussianMatrix.length));
+			int length= PrologInteger.toInteger(StrictMath.sqrt(gaussianMatrix.length));
 			ConvolveOp cop= new ConvolveOp(
 				new Kernel(length,length,gaussianMatrix),
-				// ConvolveOp.EDGE_NO_OP,
 				ConvolveOp.EDGE_ZERO_FILL,
 				null);
 			g2.drawImage(a,cop,0,0);
@@ -1084,13 +1087,6 @@ InnerLoop: while (repeatSearch) {
 						}
 					}
 				};
-				// double density= 1.0*numberOfModifiedPixels/size;
-				// System.out.printf("density=%s\n",density);
-				// double ratio= (x2 - x1 + 1.0) / (y2 - y1 + 1.0);
-				// if (ratio > 1) {
-				//	ratio= 1 / ratio;
-				// };
-				// System.out.printf("ratio=%s\n",ratio);
 				if (size < minimalBlobSize || size >= imageSize) {
 					blobFlag[k]= false;
 				// } else if (density < 0.1) {
@@ -1117,6 +1113,7 @@ InnerLoop: while (repeatSearch) {
 		int[] trackDurations= new int[numberOfActiveBlobs];
 		BigInteger[] blobIdentifiers= new BigInteger[numberOfActiveBlobs];
 		for (int k=0; k < numberOfActiveBlobs; k++) {
+			// blobIdentifiers[k]= BigInteger.valueOf(k);
 			int x1= activeBlobRectangles[k][0];
 			int x2= activeBlobRectangles[k][1];
 			int y1= activeBlobRectangles[k][2];
@@ -1462,7 +1459,7 @@ InnerLoop: while (repeatSearch) {
 			int x2= currentBlobRectangles[k][1];
 			int y1= currentBlobRectangles[k][2];
 			int y2= currentBlobRectangles[k][3];
-			BlobAttributes blobAttributes= VisionUtils.computeHistogram(recentImage,deltaPixels[0],contourPixels,time,x1,x2,y1,y2,imageWidth,noDifferenceMarker);
+			BlobAttributes blobAttributes= BlobAttributes.computeHistogram(recentImage,deltaPixels[0],contourPixels,time,x1,x2,y1,y2,imageWidth,noDifferenceMarker);
 			GrowingTrack track= tracks.get(identifier);
 			track.appendPoint(blobAttributes);
 			tracks.put(identifier,track);

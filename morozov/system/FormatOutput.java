@@ -14,7 +14,10 @@ import java.util.Locale;
 
 public class FormatOutput {
 	static {
-		Locale.setDefault(Locale.ENGLISH);
+		try {
+			Locale.setDefault(Locale.ENGLISH);
+		} catch (SecurityException e) {
+		}
 	};
 	// Output operations
 	public static StringBuilder termsToString(ChoisePoint cp, Term... args) {
@@ -221,7 +224,29 @@ public class FormatOutput {
 	}
 	//
 	public static String realToString(double value) {
-		return String.format("%G",value);
+		String text= String.format("%G",value);
+		int p1= text.lastIndexOf('.');
+		if (p1 > -1 ) {
+			if (text.indexOf('E') > -1 || text.indexOf('e') > -1) {
+				return text;
+			} else {
+				int textLength= text.length();
+				int lastZero= textLength;
+				for (int n=textLength-1; n >= 0; n--) {
+					if (text.codePointAt(n) == '0') {
+						lastZero= n;
+					} else {
+						if (text.codePointAt(n) == '.' && n <= textLength-2) {
+							lastZero= n + 2;
+						};
+						break;
+					}
+				};
+				return text.substring(0,lastZero);
+			}
+		} else {
+			return text;
+		}
 	}
 	public static String encodeString(String text, boolean isSymbol, CharsetEncoder encoder) {
 		int length= text.length();
@@ -232,6 +257,9 @@ public class FormatOutput {
 			for (int p1=0; p1 < length; p1++) {
 				int c= text.codePointAt(p1);
 				if (c >= 8 && c <= 13) {
+					containsSpecialCharacters= true;
+					break;
+				} else if (Character.isISOControl(c)) {
 					containsSpecialCharacters= true;
 					break;
 				} else if (c=='\\') {
@@ -304,7 +332,8 @@ public class FormatOutput {
 						buffer.append("\\\"");
 					};
 					continue;
-				} else if (encoder!=null && !encoder.canEncode(text.charAt(p1))) {
+				} else if (	Character.isISOControl(c) ||
+						( encoder!=null && !encoder.canEncode(text.charAt(p1)) ) ) {
 					buffer.append(text.substring(beginningOfSegment,p1));
 					beginningOfSegment= p1 + 1;
 					buffer.append("\\16#");
@@ -318,6 +347,5 @@ public class FormatOutput {
 		} else {
 			return text;
 		}
-
 	}
 }

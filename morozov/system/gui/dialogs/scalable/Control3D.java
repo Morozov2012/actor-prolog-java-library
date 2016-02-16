@@ -14,10 +14,9 @@ package morozov.system.gui.dialogs.scalable;
 
 import morozov.built_in.*;
 import morozov.run.*;
-import morozov.system.gui.*;
 import morozov.system.gui.dialogs.*;
-import morozov.system.gui.dialogs.signals.*;
 import morozov.system.gui.space3d.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
 
 import java.awt.Dimension;
@@ -29,6 +28,7 @@ public class Control3D extends ActiveComponent {
 	protected AbstractDialog dialog;
 	protected double width= 0;
 	protected double height= 0;
+	protected ExtendedSpace3D space;
 	protected morozov.built_in.Canvas3D currentValue= null;
 	//
 	protected int minimalSafeSize= 35; // Wintel7: > 31, <= 32
@@ -38,10 +38,11 @@ public class Control3D extends ActiveComponent {
 		dialog= tD;
 		height= rows;
 		width= columns;
-		GraphicsConfiguration dialogGraphicsConfiguration= dialog.targetWorld.getGraphicsConfiguration();
-		GraphicsConfiguration canvas3DGraphicsConfig= Canvas3D.getGraphicsConfiguration(dialogGraphicsConfiguration);
-		ExtendedSpace3D s3d= new ExtendedSpace3D(canvas3DGraphicsConfig);
-		component= s3d;
+		GraphicsConfiguration dialogGraphicsConfiguration= dialog.safelyGetGraphicsConfiguration();
+		GraphicsConfiguration canvas3DGraphicsConfig= Canvas3D.refineGraphicsConfiguration(dialogGraphicsConfiguration);
+		space= new ExtendedSpace3D(null,canvas3DGraphicsConfig);
+		space.setDialog(dialog);
+		component= space.getControl();
 	}
 	//
 	// protected int getInitialTopBorder() {return 5;}
@@ -64,13 +65,14 @@ public class Control3D extends ActiveComponent {
 			value= value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 			if (value instanceof morozov.built_in.Canvas3D) {
 				if (currentValue != null) {
-					currentValue.release(dialog.isToBeModal(),iX);
+					currentValue.release(dialog.isModal,iX);
 				};
 				currentValue= (morozov.built_in.Canvas3D)value;
-				currentValue.registerCanvas3D((ExtendedSpace3D)component,iX);
-				currentValue.draw(dialog.isToBeModal(),iX);
-				dialog.invalidate();
-				dialog.repaint();
+				currentValue.registerCanvasSpace(space,iX);
+				currentValue.draw(dialog.isModal,iX);
+				// dialog.invalidate();
+				// dialog.repaint();
+				dialog.safelyInvalidateAndRepaint();
 			}
 		}
 	}

@@ -25,7 +25,6 @@ public abstract class SymbolTable {
 			for (int n=0; n<initialContent.length; n++) {
 				symbolNameHash.put(n,initialContent[n]);
 				symbolCodeHash.put(initialContent[n].identifier,n);
-				// System.out.printf("%d) %s\n",n,initialContent[n].identifier);
 			};
 			staticTableSize= initialContent.length;
 			totalTableSize= initialContent.length;
@@ -33,14 +32,11 @@ public abstract class SymbolTable {
 	}
 	// public abstract SymbolName[] getStaticSymbolNames();
 	public static SymbolName retrieveSymbolName(long value) {
-		// System.out.printf("code: %s\n",value);
 		if (value - firstSymbolCode > Integer.MAX_VALUE) {
 			throw new IncorrecSymbolCode();
 		};
 		int absoluteCode= (int)(value-firstSymbolCode);
-		// System.out.printf("absoluteCode: %s\n",absoluteCode);
 		if (SymbolNames.staticTableSize > absoluteCode) {
-			// System.out.printf("staticTableSize:%s > absoluteCode:%s\n",staticTableSize,absoluteCode);
 			return initialContent[absoluteCode];
 		} else {
 			SymbolName name= symbolNameHash.get(absoluteCode);

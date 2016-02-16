@@ -2,8 +2,6 @@
 
 package morozov.run;
 
-import morozov.terms.*;
-
 public class DummyContinuation extends Continuation {
 	public void execute(ChoisePoint iX) throws Backtracking {
 	}

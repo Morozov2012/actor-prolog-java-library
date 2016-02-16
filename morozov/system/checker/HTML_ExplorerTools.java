@@ -5,7 +5,6 @@ package morozov.system.checker;
 import morozov.run.*;
 import morozov.terms.*;
 
-import java.net.URI;
 import java.util.regex.Pattern;
 import java.util.ArrayList;
 import java.util.Stack;
@@ -31,6 +30,34 @@ public class HTML_ExplorerTools {
 				stack.set(stackPosition,p1);
 				return;
 			}
+		}
+	}
+	//
+	public static String replaceAmpersands(String path) {
+		if (path.toLowerCase().contains("&amp")) {
+			int length= path.length();
+			StringBuilder buffer= new StringBuilder();
+			int beginningOfSegment= 0;
+			int p= 0;
+			while(p < length) {
+				if (path.regionMatches(true,p,"&amp;",0,5)) {
+					buffer.append(path.substring(beginningOfSegment,p));
+					buffer.append("&");
+					beginningOfSegment= p + 5;
+					p= p + 5;
+				} else if (path.regionMatches(true,p,"&amp",0,4)) {
+					buffer.append(path.substring(beginningOfSegment,p));
+					buffer.append("&");
+					beginningOfSegment= p + 4;
+					p= p + 4;
+				} else {
+					p= p + 1;
+				}
+			};
+			buffer.append(path.substring(beginningOfSegment));
+			return buffer.toString();
+		} else {
+			return path;
 		}
 	}
 	//
@@ -267,11 +294,11 @@ public class HTML_ExplorerTools {
 		};
 		return resultList;
 	}
-	public static boolean isEnabledReference(String path, Pattern pattern, boolean backslashIsSeparator) {
+	public static boolean isEnabledReference(String path, Pattern pattern) {
 		int length= path.length();
 		for (int n= length-1; n >= 0; n--) {
 			int c= path.codePointAt(n);
-			if (c==':' || c=='/' || (backslashIsSeparator && c=='\\')) {
+			if (c==':' || c=='/' || c=='\\') {
 				path= path.substring(n+1);
 				break;
 			}

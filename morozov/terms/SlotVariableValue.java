@@ -2,8 +2,8 @@
 
 package morozov.terms;
 
-import morozov.classes.*;
 import morozov.run.*;
+import morozov.worlds.*;
 
 import java.nio.charset.CharsetEncoder;
 import java.util.HashSet;
@@ -31,6 +31,19 @@ public class SlotVariableValue {
 		isProtectingPort= flag2;
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
+	public int hashCode() {
+		if (actualValue==null) {
+			// The hash code for the null reference is zero.
+			return 0;
+		} else {
+			return actualValue.hashCode();
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public boolean isPlainPort() {
 		return !isProtectingPort && !isSuspendingPort;
 	}
@@ -41,22 +54,16 @@ public class SlotVariableValue {
 		return isSuspendingPort;
 	}
 	//
-	public int hashCode() {
-		if (actualValue==null) {
-			return super.hashCode();
-		} else {
-			return actualValue.hashCode();
-		}
-	}
-	// Converting Term to String
-	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, CharsetEncoder encoder) {
+	///////////////////////////////////////////////////////////////
+	//
+	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		if (cp==null) {
 			return toString();
 		} else {
 			if (actualValue==null) {
 				return null;
 			} else {
-				return	actualValue.toString(cp,isInner,provideStrictSyntax,encoder) +
+				return	actualValue.toString(cp,isInner,provideStrictSyntax,encodeWorlds,encoder) +
 					isSuspendingPort +
 					isProtectingPort +
 					newActors.toString();

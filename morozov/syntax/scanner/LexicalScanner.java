@@ -35,10 +35,6 @@ public class LexicalScanner {
 		braceLevel= 0;
 		afterComment= true;
 		char[] characters= text.toCharArray();
-		// System.out.printf(">>>%s<<<\n",text);
-		// for (int nn=0; nn < characters.length; nn++) {
-		//	System.out.printf("%d) %4x (%d) %s\n",nn,(int)characters[nn],(int)characters[nn],characters[nn]);
-		// }
 		int textLength= characters.length;
 		ArrayList<PrologToken> tokens= new ArrayList<PrologToken>();
 		char c1;
@@ -379,7 +375,6 @@ while (true) { // Loop: Scan extended number
 	}
 }; // End of loop: Scan extended number
 // ====================================================================
-			// System.out.printf("%d: End of loop: Scan extended number: %c\nafterDigit=%s,afterDot=%s\n",position,(char)c,afterDigit,afterDot);
 			if (afterDigit) {
 				break;
 			} else {
@@ -770,11 +765,9 @@ if (afterDot) {
 				BigInteger bigMaxPoveredRadix= bigRadix.pow(increment);
 				BigInteger bigMaxInteger= BigInteger.valueOf(increment);
 				while(positiveScale.compareTo(bigMaxInteger) >= 0) {
-					// System.out.printf("(i)bigExponent=%s; positiveScale=%s\n",bigExponent,positiveScale);
 					bigExponent= bigExponent.multiply(bigMaxPoveredRadix);
 					positiveScale= positiveScale.subtract(bigMaxInteger);
 				};
-				// System.out.printf("(*)bigExponent=%s; positiveScale=%s\n",bigExponent,positiveScale);
 				bigExponent= bigExponent.multiply(bigRadix.pow(positiveScale.intValue()));
 			};
 			integerRepresentation= integerRepresentation.multiply(bigExponent);
@@ -907,7 +900,6 @@ while(true) { // Loop: Scan string segment token
 				// int scale= 0;
 				boolean afterDigit= false;
 				// boolean afterDot= false;
-				// System.out.printf("%d: %c >= '0' && %c <= '9'\n",position,(char)c,(char)c);
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // ::: NUMERICAL LITERAL INSIDE STRING / SYMBOL (BEGINNING)         :::
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1282,7 +1274,6 @@ if (numericalValue.compareTo(BigInteger.valueOf(Character.MAX_VALUE)) > 0) {
 		if (robustMode) {
 			throw TokenIsNotRecognized.instance;
 		} else {
-			// System.out.printf("ControlCharactersAreNotAllowedHere=%4x (%d)\n",code,code);
 			throw new ControlCharactersAreNotAllowedHere(position);
 		}
 	} else {

@@ -3,6 +3,7 @@
 package morozov.system.gui;
 
 import morozov.system.gui.signals.*;
+import morozov.terms.*;
 
 public class CoordinateAndSize {
 	//
@@ -13,25 +14,25 @@ public class CoordinateAndSize {
 	public static CoordinateAndSize calculate(ExtendedCoordinate lZ, ExtendedSize lDZ, int spaceLimit, double gridZ) {
 		CoordinateAndSize result= new CoordinateAndSize();
 		try {
-			double logicalCoordinate= lZ.getValue();
-			result.coordinate= (int)StrictMath.round( logicalCoordinate * spaceLimit / gridZ );
+			double logicalCoordinate= lZ.getDoubleValue();
+			result.coordinate= PrologInteger.toInteger( logicalCoordinate * spaceLimit / gridZ );
 			try {
-				double logicalSize= lDZ.getValue();
+				double logicalSize= lDZ.getDoubleValue();
 				if (logicalSize < 0) {
-					result.size= (int)StrictMath.round( (1 - (result.coordinate - logicalSize) / gridZ) * spaceLimit );
+					result.size= PrologInteger.toInteger( (1 - (logicalCoordinate - logicalSize) / gridZ) * spaceLimit );
 				} else {
-					result.size= (int)StrictMath.round( logicalSize * spaceLimit / gridZ );
+					result.size= PrologInteger.toInteger( logicalSize * spaceLimit / gridZ );
 				}
 			} catch (UseDefaultSize e2) {
-				result.size= (int)StrictMath.round( (1 - logicalCoordinate / gridZ) * spaceLimit );
+				result.size= PrologInteger.toInteger( (1 - logicalCoordinate / gridZ) * spaceLimit );
 			}
 		} catch (CentreFigure e1) {
 			try {
-				double logicalSize= lDZ.getValue();
+				double logicalSize= lDZ.getDoubleValue();
 				if (logicalSize < 0) {
-					result.size= (int)StrictMath.round( (1 + logicalSize / gridZ) * spaceLimit );
+					result.size= PrologInteger.toInteger( (1 + logicalSize / gridZ) * spaceLimit );
 				} else {
-					result.size= (int)StrictMath.round( logicalSize * spaceLimit / gridZ );
+					result.size= PrologInteger.toInteger( logicalSize * spaceLimit / gridZ );
 				};
 				result.coordinate= (spaceLimit - result.size) / 2;
 			} catch (UseDefaultSize e2) {
@@ -41,16 +42,19 @@ public class CoordinateAndSize {
 		} catch (UseDefaultLocation e1) {
 			result.coordinateIsToBeCalculatedAutomatically= true;
 			try {
-				double logicalSize= lDZ.getValue();
+				double logicalSize= lDZ.getDoubleValue();
 				if (logicalSize < 0) {
-					result.size= (int)StrictMath.round( (1 + logicalSize / gridZ) * spaceLimit );
+					result.size= PrologInteger.toInteger( (1 + logicalSize / gridZ) * spaceLimit );
 				} else {
-					result.size= (int)StrictMath.round( logicalSize * spaceLimit / gridZ );
+					result.size= PrologInteger.toInteger( logicalSize * spaceLimit / gridZ );
 				}
 			} catch (UseDefaultSize e2) {
 				result.size= spaceLimit;
 			}
 		};
 		return result;
+	}
+	public static double reconstruct(double actualSize, double desktopSize, double gridSize) {
+		return actualSize * gridSize / desktopSize;
 	}
 }

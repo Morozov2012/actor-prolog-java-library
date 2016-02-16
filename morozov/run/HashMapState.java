@@ -2,9 +2,9 @@
 
 package morozov.run;
 
-import morozov.classes.errors.*;
 import morozov.system.indices.*;
 import morozov.terms.*;
+import morozov.worlds.errors.*;
 
 import java.nio.charset.CharsetEncoder;
 import java.util.Map;
@@ -22,7 +22,6 @@ public class HashMapState extends Term {
 		slotVariable= slot;
 	}
 	public void clear() {
-		// System.out.printf("HashMapState:: remove(%s)\n\n",indices);
 		volume.remove(indices);
 	}
 	public void registerNewSlotVariable(HashSet<SlotVariable> slotVariables) {
@@ -33,7 +32,7 @@ public class HashMapState extends Term {
 		throw new SpecialTermCannotBeUnified();
 	}
 	// Converting Term to String
-	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, CharsetEncoder encoder) {
+	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		return "HashMapState:" + indices.toString();
 	}
 }

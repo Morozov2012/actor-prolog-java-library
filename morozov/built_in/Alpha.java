@@ -1,25 +1,229 @@
-// (c) 2010 IRE RAS Alexei A. Morozov
+// (c) 2010-2015 IRE RAS Alexei A. Morozov
 
 package morozov.built_in;
 
 import target.*;
 
-import morozov.classes.*;
 import morozov.syntax.errors.*;
 import morozov.syntax.scanner.errors.*;
 import morozov.syntax.*;
-import morozov.system.errors.*;
 import morozov.system.*;
+import morozov.system.errors.*;
+import morozov.system.files.*;
+import morozov.system.gui.*;
 import morozov.run.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
+import morozov.worlds.*;
 
 import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicReference;
 
-public abstract class Alpha extends AbstractWorld {
+public abstract class Alpha extends AbstractInternalWorld {
 	//
-	public void goal0s(ChoisePoint iX) {
+	public Boolean backslashAlwaysIsSeparator= null;
+	public Boolean acceptOnlyUniformResourceIdentifiers= null;
+	public WaitingInterval maxWaitingTime= null;
+	public CharacterSet characterSet= null;
+	public AtomicReference<ExtendedSize> width= new AtomicReference<>();
+	public AtomicReference<ExtendedSize> height= new AtomicReference<>();
+	//
+	protected static long defaultMaxWaitingTime= 12; // [sec]
+	protected static Term termDefaultMaxWaitingTime= new PrologInteger(defaultMaxWaitingTime);
+	protected static Term termYes= new PrologSymbol(SymbolCodes.symbolCode_E_yes);
+	protected static Term termNo= new PrologSymbol(SymbolCodes.symbolCode_E_no);
+	protected static Term termNone= new PrologSymbol(SymbolCodes.symbolCode_E_none);
+	protected static Term termDefault= new PrologSymbol(SymbolCodes.symbolCode_E_default);
+	// protected static Term termEmptyString= new PrologString("");
+	//
+	public Alpha() {
+	}
+	public Alpha(GlobalWorldIdentifier id) {
+		super(id);
+	}
+	//
+	protected Term getBuiltInSlot_E_backslash_always_is_separator() {
+		return termYes;
+	}
+	protected Term getBuiltInSlot_E_accept_only_uniform_resource_identifiers() {
+		return termNo;
+	}
+	protected Term getBuiltInSlot_E_max_waiting_time() {
+		return termDefaultMaxWaitingTime;
+	}
+	protected Term getBuiltInSlot_E_character_set() {
+		return termNone;
+	}
+	protected Term getBuiltInSlot_E_width() {
+		return termDefault;
+	}
+	protected Term getBuiltInSlot_E_height() {
+		return termDefault;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	// get/set backslashAlwaysIsSeparator
+	//
+	public void setBackslashAlwaysIsSeparator1s(ChoisePoint iX, Term a1) {
+		setBackslashAlwaysIsSeparator(YesNo.termYesNo2Boolean(a1,iX));
+	}
+	public void setBackslashAlwaysIsSeparator(boolean value) {
+		backslashAlwaysIsSeparator= value;
+	}
+	public void getBackslashAlwaysIsSeparator0ff(ChoisePoint iX, PrologVariable a1) {
+		boolean value= getBackslashAlwaysIsSeparator(iX);
+		a1.value= YesNo.boolean2TermYesNo(value);
+	}
+	public void getBackslashAlwaysIsSeparator0fs(ChoisePoint iX) {
+	}
+	public boolean getBackslashAlwaysIsSeparator(ChoisePoint iX) {
+		if (backslashAlwaysIsSeparator != null) {
+			return backslashAlwaysIsSeparator;
+		} else {
+			Term value= getBuiltInSlot_E_backslash_always_is_separator();
+			return YesNo.termYesNo2Boolean(value,iX);
+		}
+	}
+	//
+	// get/set acceptOnlyUniformResourceIdentifiers
+	//
+	public void setAcceptOnlyUniformResourceIdentifiers1s(ChoisePoint iX, Term a1) {
+		setAcceptOnlyUniformResourceIdentifiers(YesNo.termYesNo2Boolean(a1,iX));
+	}
+	public void setAcceptOnlyUniformResourceIdentifiers(boolean value) {
+		acceptOnlyUniformResourceIdentifiers= value;
+	}
+	public void getAcceptOnlyUniformResourceIdentifiers0ff(ChoisePoint iX, PrologVariable a1) {
+		boolean value= getAcceptOnlyUniformResourceIdentifiers(iX);
+		a1.value= YesNo.boolean2TermYesNo(value);
+	}
+	public void getAcceptOnlyUniformResourceIdentifiers0fs(ChoisePoint iX) {
+	}
+	public boolean getAcceptOnlyUniformResourceIdentifiers(ChoisePoint iX) {
+		if (acceptOnlyUniformResourceIdentifiers != null) {
+			return acceptOnlyUniformResourceIdentifiers;
+		} else {
+			Term value= getBuiltInSlot_E_accept_only_uniform_resource_identifiers();
+			return YesNo.termYesNo2Boolean(value,iX);
+		}
+	}
+	//
+	// get/set maxWaitingTime
+	//
+	public void setMaxWaitingTime1s(ChoisePoint iX, Term a1) {
+		setMaxWaitingTime(WaitingInterval.termToWaitingInterval(a1,iX));
+	}
+	public void setMaxWaitingTime(WaitingInterval value) {
+		maxWaitingTime= value;
+	}
+	public void getMaxWaitingTime0ff(ChoisePoint iX, PrologVariable a1) {
+		WaitingInterval value= getMaxWaitingTime(iX);
+		a1.value= value.toTerm();
+	}
+	public void getMaxWaitingTime0fs(ChoisePoint iX) {
+	}
+	public WaitingInterval getMaxWaitingTime(ChoisePoint iX) {
+		if (maxWaitingTime != null) {
+			return maxWaitingTime;
+		} else {
+			Term value= getBuiltInSlot_E_max_waiting_time();
+			return WaitingInterval.termToWaitingInterval(value,iX);
+		}
+	}
+	public int getMaxWaitingTimeInMilliseconds(ChoisePoint iX) {
+		WaitingInterval value= getMaxWaitingTime(iX);
+		return value.toMillisecondsIntegerOrDefault(DefaultOptions.waitingInterval,iX);
+	}
+	//
+	// get/set characterSet
+	//
+	public void setCharacterSet1s(ChoisePoint iX, Term a1) {
+		setCharacterSet(CharacterSet.term2CharacterSet(a1,iX));
+	}
+	public void setCharacterSet(CharacterSet value) {
+		characterSet= value;
+	}
+	public void getCharacterSet0ff(ChoisePoint iX, PrologVariable a1) {
+		CharacterSet value= getCharacterSet(iX);
+		a1.value= value.toTerm();
+	}
+	public void getCharacterSet0fs(ChoisePoint iX) {
+	}
+	public CharacterSet getCharacterSet(ChoisePoint iX) {
+		if (characterSet != null) {
+			return characterSet;
+		} else {
+			Term value= getBuiltInSlot_E_character_set();
+			return CharacterSet.term2CharacterSet(value,iX);
+		}
+	}
+	//
+	// get/set width
+	//
+	public void setWidth1s(ChoisePoint iX, Term a1) {
+		setWidth(ExtendedSize.termToExtendedSize(a1,iX));
+	}
+	public void setWidth(ExtendedSize value) {
+		width.set(value);
+	}
+	public void getWidth0ff(ChoisePoint iX, PrologVariable a1) {
+		a1.value= getWidth(iX).toTerm();
+	}
+	public void getWidth0fs(ChoisePoint iX) {
+	}
+	public ExtendedSize getWidth(ChoisePoint iX) {
+		ExtendedSize size= width.get();
+		if (size != null) {
+			return size;
+		} else {
+			Term value= getBuiltInSlot_E_width();
+			return ExtendedSize.termToExtendedSizeSafe(value,iX);
+		}
+	}
+	//
+	// get/set height
+	//
+	public void setHeight1s(ChoisePoint iX, Term a1) {
+		setHeight(ExtendedSize.termToExtendedSize(a1,iX));
+	}
+	public void setHeight(ExtendedSize value) {
+		height.set(value);
+	}
+	public void getHeight0ff(ChoisePoint iX, PrologVariable a1) {
+		a1.value= getHeight(iX).toTerm();
+	}
+	public void getHeight0fs(ChoisePoint iX) {
+	}
+	public ExtendedSize getHeight(ChoisePoint iX) {
+		ExtendedSize size= height.get();
+		if (size != null) {
+			return size;
+		} else {
+			Term value= getBuiltInSlot_E_height();
+			return ExtendedSize.termToExtendedSizeSafe(value,iX);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	// get/set Default Size
+	//
+	public void setDefaultSize2s(ChoisePoint iX, Term a1, Term a2) {
+		setWidth(ExtendedSize.termToExtendedSize(a1,iX));
+		setHeight(ExtendedSize.termToExtendedSize(a2,iX));
+	}
+	public void getDefaultSize2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
+		a1.value= getWidth(iX).toTerm();
+		a2.value= getHeight(iX).toTerm();
+		iX.pushTrail(a1);
+		iX.pushTrail(a2);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void goal0s(ChoisePoint iX) throws Backtracking {
 	}
 	//
 	public class Goal0s extends Continuation {
@@ -128,6 +332,19 @@ public abstract class Alpha extends AbstractWorld {
 	public void odd1ms(ChoisePoint iX, Term... args) throws Backtracking {
 		Term[] array= Converters.termsToArray(iX,(Term[])args);
 		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.ODD);
+	}
+	//
+	public void nan1ms(ChoisePoint iX, Term... args) throws Backtracking {
+		Term[] array= Converters.termsToArray(iX,(Term[])args);
+		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.NAN);
+	}
+	public void infinite1ms(ChoisePoint iX, Term... args) throws Backtracking {
+		Term[] array= Converters.termsToArray(iX,(Term[])args);
+		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.INFINITE);
+	}
+	public void finite1ms(ChoisePoint iX, Term... args) throws Backtracking {
+		Term[] array= Converters.termsToArray(iX,(Term[])args);
+		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.FINITE);
 	}
 	//
 	public void lt2s(ChoisePoint iX, Term a1, Term a2) throws Backtracking {
@@ -431,7 +648,6 @@ public abstract class Alpha extends AbstractWorld {
 	}
 	//
 	public void convertToInteger1ff(ChoisePoint iX, PrologVariable a1, Term a2) throws Backtracking {
-		// a2= a2.dereferenceValue(iX);
 		try {
 			a1.value= new PrologInteger(Converters.termToStrictInteger(a2,iX,true));
 			// iX.pushTrail(a1);
@@ -440,7 +656,6 @@ public abstract class Alpha extends AbstractWorld {
 		}
 	}
 	public void convertToInteger1fs(ChoisePoint iX, Term a1) throws Backtracking {
-		// a1= a1.dereferenceValue(iX);
 		try {
 			// Converters.termToRoundInteger(a1,iX,true);
 			Converters.termToStrictInteger(a1,iX,true);
@@ -575,7 +790,7 @@ public abstract class Alpha extends AbstractWorld {
 			newIx.freeTrail();
 		} else {
 			AsyncCall call= new AsyncCall(domainSignature,this,true,false/*true*/,arguments,true);
-			receiveAsyncCall(call);
+			transmitAsyncCall(call,modalChoisePoint);
 		}
 	}
 }

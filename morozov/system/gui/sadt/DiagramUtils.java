@@ -4,10 +4,11 @@ package morozov.system.gui.sadt;
 
 import target.*;
 
-import morozov.classes.*;
+import morozov.run.*;
 import morozov.system.gui.*;
 import morozov.system.gui.sadt.signals.*;
 import morozov.terms.*;
+import morozov.worlds.*;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -54,14 +55,14 @@ public class DiagramUtils {
 		} catch (DiagramTableEntryDoesNotExist e) {
 			AbstractProcess process= components.get(identifier);
 			if (process!=null) {
-				AbstractWorld world= process.getMainWorld();
+				AbstractInternalWorld world= process.getMainWorld();
 				if (world!=null) {
 					long domainSignature= world.entry_s_Show_2_ii();
 					String title= formDiagramTitle(identifier);
 					Term predicateArgument1= new PrologString(identifier);
 					Term predicateArgument2= new PrologString(title);
 					AsyncCall call= new AsyncCall(domainSignature,world,true,true,new Term[]{predicateArgument1,predicateArgument2},true);
-					world.receiveAsyncCall(call);
+					world.transmitAsyncCall(call,null);
 				}
 			}
 		}
@@ -97,11 +98,13 @@ public class DiagramUtils {
 		Map<String,InternalDiagramFrame> innerWindows= StaticDiagramAttributes.retrieveInnerWindows(context);
 		innerWindows.put(identifier,diagramWindow);
 		if (identifier.isEmpty()) {
-			diagramWindow.setClosable(false);
+			diagramWindow.getInternalFrame().setClosable(false);
 		};
 		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(context);
-		desktop.add(diagramWindow);
-		diagramWindow.setVisible(true);
+		desktop.safelyAdd(diagramWindow.getInternalFrame());
+		// diagramWindow.setVisible(true);
+		// DesktopUtils.safelySetVisible(true,diagramWindow);
+		diagramWindow.safelySetVisible(true);
 		diagramWindow.safelyRestoreSize(context);
 	}
 	//
@@ -137,13 +140,15 @@ public class DiagramUtils {
 	}
 	private static void makeInternalFrameVisible(InternalDiagramFrame diagramWindow) {
 		try {
-			diagramWindow.setIcon(false);
+			diagramWindow.getInternalFrame().setIcon(false);
 		} catch (PropertyVetoException e) {
 		};
-		if (!diagramWindow.isShowing()) {
-			diagramWindow.setVisible(true);
+		if (!diagramWindow.getInternalFrame().isShowing()) {
+			// diagramWindow.setVisible(true);
+			// DesktopUtils.safelySetVisible(true,diagramWindow);
+			diagramWindow.safelySetVisible(true);
 		};
-		diagramWindow.toFront();
+		diagramWindow.getInternalFrame().toFront();
 	}
 	//
 	public static Font computeFont(DiagramColors colors, int size) {
@@ -247,7 +252,7 @@ public class DiagramUtils {
 						textX= x;
 					};
 					if (boxText[n].length() > 0) {
-						g2.drawString(boxText[n],(int)StrictMath.round(textX),(int)StrictMath.round(textY));
+						g2.drawString(boxText[n],PrologInteger.toInteger(textX),PrologInteger.toInteger(textY));
 					};
 					textY= textY + lineHeight + extraLeading;
 				}
@@ -264,7 +269,7 @@ public class DiagramUtils {
 					textY= y + firstLineHeight - descent;
 				};
 				if (boxText[0].length() > 0) {
-					g2.drawString(boxText[0],(int)StrictMath.round(textX),(int)StrictMath.round(textY));
+					g2.drawString(boxText[0],PrologInteger.toInteger(textX),PrologInteger.toInteger(textY));
 				}
 			}
 		}
@@ -288,7 +293,8 @@ public class DiagramUtils {
 		JDialog dialog= panel.createDialog(parent,title);
 		dialog.setModal(true);
 		dialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
-		dialog.setVisible(true);
+		// dialog.setVisible(true);
+		DesktopUtils.safelySetVisible(true,dialog);
 	}
 	//
 	public static void safelyRepaintAllDiagrams(StaticContext context) {
@@ -311,7 +317,7 @@ public class DiagramUtils {
 	}
 	public static void repaintDiagrams(InternalDiagramFrame[] frames) {
 		for (int n=0; n <= frames.length; n++) {
-			frames[n].repaint();
+			frames[n].quicklyRepaint();
 		}
 	}
 	//
@@ -335,7 +341,7 @@ public class DiagramUtils {
 	}
 	public static void disposeDiagrams(InternalDiagramFrame[] frames) {
 		for (int n=0; n <= frames.length; n++) {
-			frames[n].dispose();
+			frames[n].getInternalFrame().dispose();
 		}
 	}
 }

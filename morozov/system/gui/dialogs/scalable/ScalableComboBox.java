@@ -16,7 +16,7 @@ import morozov.run.*;
 import morozov.system.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
-import morozov.system.gui.dialogs.signals.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 
@@ -33,12 +33,12 @@ import java.awt.Font;
 import java.awt.Color;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class ScalableComboBox extends ActiveComponent implements ActionListener, DocumentListener {
 	//
 	protected boolean isEditable= false;
 	protected boolean enableSorting= false;
+	protected SortedStrings sortedStrings;
 	//
 	public ScalableComboBox(AbstractDialog tD, String[] items, double visibleRowCount, double visibleColumnCount, boolean enableSorting) {
 		this(tD,items,visibleRowCount,visibleColumnCount,true,enableSorting);
@@ -48,12 +48,14 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 		isEditable= useEditor;
 		enableSorting= sortList;
 		if (enableSorting) {
-			Arrays.sort(items,new AlphabeticComparator());
+			// Arrays.sort(items,new AlphabeticComparator());
+			sortedStrings= new SortedStrings(items);
+			items= sortedStrings.sortedArray;
 		};
 		JComboBox<String> comboBox= new JComboBox<String>(items);
 		component= comboBox; // new JComboBox<String>(items);
-		comboBox.setPrototypeDisplayValue(createPrototypeString((int)StrictMath.round(visibleColumnCount)));
-		comboBox.setMaximumRowCount((int)StrictMath.round(visibleRowCount));
+		comboBox.setPrototypeDisplayValue(createPrototypeString(PrologInteger.toInteger(visibleColumnCount)));
+		comboBox.setMaximumRowCount(PrologInteger.toInteger(visibleRowCount));
 		// if (useTabStops) {
 		//	TabListCellRenderer renderer= new TabListCellRenderer(items);
 		//	comboBox.setRenderer(renderer);
@@ -77,21 +79,18 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 	//
 	public void changedUpdate(DocumentEvent e) {
 		// Gives notification that an attribute or set of attributes changed.
-		// System.out.printf("changedUpdate(%s)\n",e);
 		if (targetDialog!=null) {
 			targetDialog.reportValueUpdate(this);
 		}
 	}
 	public void insertUpdate(DocumentEvent e) {
 		// Gives notification that there was an insert into the document.
-		// System.out.printf("insertUpdate(%s)\n",e);
 		if (targetDialog!=null) {
 			targetDialog.reportValueUpdate(this);
 		}
 	}
 	public void removeUpdate(DocumentEvent e) {
 		// Gives notification that a portion of the document has been removed.
-		// System.out.printf("removeUpdate(%s)\n",e);
 		if (targetDialog!=null) {
 			targetDialog.reportValueUpdate(this);
 		}
@@ -126,6 +125,9 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 	}
 	public void setSelectedIndex(int index) {
 		if (component!=null) {
+			if (enableSorting) {
+				index= sortedStrings.resolveIndex(index);
+			};
 			((JComboBox)component).setSelectedIndex(index);
 		}
 	}
@@ -138,7 +140,7 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 	//
 	protected String createPrototypeString(int delta) {
 		StringBuilder buffer= new StringBuilder(0);
-		for (int j= 0; j<delta; j++) {
+		for (int j=0; j < delta; j++) {
 			buffer= buffer.append("M");
 		};
 		return buffer.toString();
@@ -151,7 +153,11 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 				try {
 					int number= value.getSmallIntegerValue(iX);
 					if (number > 0 && number <= model.getSize()) {
-						((JComboBox)component).setSelectedIndex(number-1);
+						int index= number-1;
+						if (enableSorting) {
+							index= sortedStrings.resolveIndex(index);
+						};
+						((JComboBox)component).setSelectedIndex(index);
 					} else if (number <= 0) {
 						((JComboBox)component).setSelectedIndex(-1);
 					}
@@ -219,7 +225,6 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 						}
 					} else {
 						Object selectedValue= ((JComboBox)component).getSelectedItem();
-						// System.out.printf("selectedValue: %s\n",selectedValue);
 						if (selectedValue==null) {
 							// return PrologEmptyList.instance;
 							// return PrologUnknownValue.instance;
@@ -230,7 +235,6 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 					}
 				} else {
 					Object selectedValue= ((JComboBox)component).getSelectedItem();
-					// System.out.printf("selectedValue: %s\n",selectedValue);
 					if (selectedValue==null) {
 						// return PrologUnknownValue.instance;
 						return PrologEmptyList.instance;
@@ -266,7 +270,9 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 	protected void addListOfItems(Term list, ChoisePoint iX) {
 		String[] items= Converters.termToStrings(list,iX);
 		if (enableSorting) {
-			Arrays.sort(items,new AlphabeticComparator());
+			// Arrays.sort(items,new AlphabeticComparator());
+			sortedStrings= new SortedStrings(items);
+			items= sortedStrings.sortedArray;
 		};
 		JComboBox<String> comboBox= (JComboBox<String>)component;
 		// ((JComboBox)component).removeAllItems();

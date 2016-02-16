@@ -4,9 +4,10 @@ package morozov.run;
 
 import morozov.system.*;
 
+import java.io.Serializable;
 import java.nio.charset.CharsetEncoder;
 
-public class SymbolName {
+public class SymbolName implements Serializable {
 	public String identifier;
 	public boolean isSafe;
 	public SymbolName(String name, boolean flag) {
@@ -19,9 +20,6 @@ public class SymbolName {
 		} else {
 			char[] characters= identifier.toCharArray();
 			int textLength= characters.length;
-			// for (int n=0; n < textLength; n++) {
-			//	System.out.printf("%d) %d %c\n",n,(int)characters[n],characters[n]);
-			// }
 			if (characters[0]==20) {
 				for (int n=0; n < textLength; n++) {
 					if (characters[n]==21) {
@@ -36,18 +34,21 @@ public class SymbolName {
 			return identifier;
 		}
 	}
-	public String toString(CharsetEncoder encoder) {
+	public String toSafeString(CharsetEncoder encoder) {
 		if (isSafe) {
-			return identifier;
+			return FormatOutput.encodeString(identifier,true,encoder);
 		} else {
 			return "'" + FormatOutput.encodeString(identifier,true,encoder) + "'";
 		}
 	}
-	public String toString() {
+	public String toSafeString() {
 		if (isSafe) {
 			return identifier;
 		} else {
 			return "'" + FormatOutput.encodeString(identifier,true,null) + "'";
 		}
+	}
+	public String toRawString(CharsetEncoder encoder) {
+		return FormatOutput.encodeString(identifier,true,encoder);
 	}
 }

@@ -2,11 +2,20 @@
 
 package morozov.domains;
 
+import target.*;
+
 import morozov.domains.signals.*;
 import morozov.run.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
-public class PrologDomain {
+import java.nio.charset.CharsetEncoder;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.HashMap;
+
+public class PrologDomain implements Serializable {
 	//
 	protected PrologDomainName name;
 	protected DomainAlternative[] alternatives;
@@ -15,9 +24,15 @@ public class PrologDomain {
 		name= n;
 		alternatives= list;
 	}
+	//
+	public void initiate() {
+		for (int i= 0; i < alternatives.length; i++) {
+			alternatives[i].initiate();
+		}
+	}
+	//
 	public boolean coversTerm(Term t, ChoisePoint cp, boolean ignoreFreeVariables) {
 		for (int i= 0; i < alternatives.length; i++) {
-			// System.out.printf("PrologDomain:alternatives[%s]: %s = %s\n",i,alternatives[i],t);
 			if (alternatives[i].coversTerm(t,cp,this,ignoreFreeVariables)) {
 				return true;
 			}
@@ -31,7 +46,6 @@ public class PrologDomain {
 		long maximalPosition= -1;
 		for (int i= 0; i < alternatives.length; i++) {
 			try {
-				// System.out.printf("PrologDomain::%s.checkAndOptimizeTerm:t=%s\n",alternatives[i],t);
 				return alternatives[i].checkAndOptimizeTerm(t,cp,this);
 			} catch (DomainAlternativeDoesNotCoverTerm e) {
 				long p= e.getPosition();
@@ -96,10 +110,145 @@ public class PrologDomain {
 			try {
 				PrologDomain pairDomain= alternatives[i].getPairDomain(key);
 				return pairDomain;
-			} catch (IsNotPairDomainAlternative e) {
+			} catch (TermIsNotPairDomainAlternative e) {
 				continue;
 			}
 		};
 		throw UnknownPairName.instance;
+	}
+	//
+	public void collectLocalDomainTable(HashMap<String,PrologDomain> localDomainTable) {
+		if (alternatives.length > 0) {
+			for (int n=0; n < alternatives.length; n++) {
+				alternatives[n].collectLocalDomainTable(localDomainTable);
+			}
+		}
+	}
+	public void acceptLocalDomainTable(HashMap<String,PrologDomain> localDomainTable) {
+		if (alternatives.length > 0) {
+			for (int n=0; n < alternatives.length; n++) {
+				alternatives[n].acceptLocalDomainTable(localDomainTable);
+			}
+		}
+	}
+	//
+	public void isEqualTo(PrologDomain domain, HashSet<PrologDomainPair> stack) throws PrologDomainsAreNotEqual {
+		PrologDomainPair newPair= new PrologDomainPair(this,domain);
+		if (!stack.add(newPair)) {
+			return;
+		} else {
+			try {
+				boolean[] checkList= new boolean[domain.alternatives.length];
+				for (int n= 0; n < alternatives.length; n++) {
+					checkList[domain.hasEqualAlternative(alternatives[n],stack)]= true;
+				};
+				for (int k= 0; k < domain.alternatives.length; k++) {
+					if (!checkList[k]) {
+						hasEqualAlternative(domain.alternatives[k],stack);
+					}
+				}
+			} catch (PrologDomainsAreNotEqual e1) {
+				try {
+					for (int n= 0; n < alternatives.length; n++) {
+						domain.coversAlternative(alternatives[n],this,stack);
+					};
+					for (int k= 0; k < domain.alternatives.length; k++) {
+						coversAlternative(domain.alternatives[k],domain,stack);
+					}
+				} catch (PrologDomainsAreNotEqual e2) {
+					stack.remove(newPair);
+					throw e2;
+				}
+			}
+		}
+	}
+	public int hasEqualAlternative(DomainAlternative a, HashSet<PrologDomainPair> stack) throws PrologDomainsAreNotEqual {
+		for (int i= 0; i < alternatives.length; i++) {
+			if (alternatives[i].isEqualTo(a,stack)) {
+				return i;
+			}
+		};
+		throw PrologDomainsAreNotEqual.instance;
+	}
+	public void coversAlternative(DomainAlternative a, PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) throws PrologDomainsAreNotEqual {
+		for (int i= 0; i < alternatives.length; i++) {
+			if (alternatives[i].coversAlternative(a,ownerDomain,stack)) {
+				return;
+			}
+		};
+		throw PrologDomainsAreNotEqual.instance;
+	}
+	public void isCoveredByDomain(PrologDomain domain, HashSet<PrologDomainPair> stack) throws PrologDomainsAreNotEqual {
+		for (int k= 0; k < domain.alternatives.length; k++) {
+			domain.coversAlternative(alternatives[k],this,stack);
+		}
+	}
+	//
+	public static PrologDomain termToPrologDomain(Term value, ChoisePoint iX) throws TermIsNotPrologDomain {
+		try {
+			long functor= value.getStructureFunctor(iX);
+			if (functor==SymbolCodes.symbolCode_E_domain) {
+				Term[] arguments= value.getStructureArguments(iX);
+				if (arguments.length==2) {
+					PrologDomainName domainName= PrologDomainName.termToPrologDomainName(arguments[0],iX);
+					ArrayList<DomainAlternative> alternatives= new ArrayList<DomainAlternative>();
+					Term nextHead;
+					Term currentTail= arguments[1];
+					try {
+						while (true) {
+							currentTail= currentTail.dereferenceValue(iX);
+							nextHead= currentTail.getNextListHead(iX);
+							alternatives.add(DomainAlternative.termToDomainAlternative(nextHead,iX));
+							currentTail= currentTail.getNextListTail(iX);
+						}
+					} catch (EndOfList e) {
+					} catch (TermIsNotAList e) {
+						throw TermIsNotPrologDomain.instance;
+					};
+					DomainAlternative[] array= alternatives.toArray(new DomainAlternative[0]);
+					return new PrologDomain(domainName,array);
+				} else {
+					throw TermIsNotPrologDomain.instance;
+				}
+			} else {
+				throw TermIsNotPrologDomain.instance;
+			}
+		} catch (TermIsNotAStructure e1) {
+			try {
+				long code= value.getSymbolValue(iX);
+				if (code==SymbolCodes.symbolCode_E_any) {
+					return new PrologAnyDomain();
+				} else {
+					throw TermIsNotPrologDomain.instance;
+				}
+			} catch (TermIsNotASymbol e2) {
+				throw TermIsNotPrologDomain.instance;
+			}
+		} catch (TermIsNotPrologDomainName e1) {
+			throw TermIsNotPrologDomain.instance;
+		} catch (TermIsNotDomainAlternative e1) {
+			throw TermIsNotPrologDomain.instance;
+		}
+	}
+	//
+	public String toString(CharsetEncoder encoder) {
+		StringBuffer buffer= new StringBuffer();
+		buffer.append(PrologDomainName.tagDomainItem_Domain);
+		buffer.append("(");
+		buffer.append(name.toString(encoder));
+		buffer.append(",[");
+		if (alternatives.length > 0) {
+			buffer.append(alternatives[0].toString(encoder));
+			for (int n=1; n < alternatives.length; n++) {
+				buffer.append(",");
+				buffer.append(alternatives[n].toString(encoder));
+			}
+		};
+		buffer.append("])");
+		return buffer.toString();
+	}
+	//
+	public String toString() {
+		return toString(null);
 	}
 }

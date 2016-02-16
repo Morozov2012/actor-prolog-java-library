@@ -24,9 +24,9 @@ import javax.swing.ListSelectionModel;
 import javax.swing.JList;
 import java.awt.Font;
 import java.awt.FontMetrics;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Arrays;
 
 public class AList extends JScrollPane {
 	//
@@ -35,23 +35,24 @@ public class AList extends JScrollPane {
 	protected ActiveComponent targetComponent= null;
 	protected int length;
 	protected boolean enableSorting;
+	protected SortedStrings sortedStrings;
 	protected boolean useTabStops;
 	protected TabListCellRenderer renderer;
 	//
 	public AList(AbstractDialog tD, ActiveComponent tC, String[] stringList, double visibleRowCount, double visibleColumnCount, boolean mode1, boolean mode2) {
 		targetDialog= tD;
 		targetComponent= tC;
-		length= (int)StrictMath.round(visibleColumnCount);
+		length= PrologInteger.toInteger(visibleColumnCount);
 		enableSorting= mode1;
 		useTabStops= mode2;
 		if (enableSorting) {
-			Arrays.sort(stringList,new AlphabeticComparator());
+			// Arrays.sort(stringList,new AlphabeticComparator());
+			sortedStrings= new SortedStrings(stringList);
+			stringList= sortedStrings.sortedArray;
 		};
 		list= new JList<String>(stringList);
-		// list.setModel(new DefaultListModel());
-		// list= new JJList(stringList);
 		setFixedWidth(list.getFont());
-		list.setVisibleRowCount((int)StrictMath.round(visibleRowCount));
+		list.setVisibleRowCount(PrologInteger.toInteger(visibleRowCount));
 		list.setLayoutOrientation(JList.VERTICAL);
 		setViewportView(list);
 		if (useTabStops) {
@@ -76,11 +77,17 @@ public class AList extends JScrollPane {
 	}
 	public void setSelectedIndex(int index) {
 		if (list!=null) {
+			if (enableSorting) {
+				index= sortedStrings.resolveIndex(index);
+			};
 			list.setSelectedIndex(index);
 		}
 	}
 	public void setSelectedIndices(int[] indices) {
 		if (list!=null) {
+			if (enableSorting) {
+				indices= sortedStrings.resolveIndices(indices);
+			};
 			list.setSelectedIndices(indices);
 		}
 	}
@@ -105,7 +112,7 @@ public class AList extends JScrollPane {
 	public void setFixedWidth(Font font) {
 		FontMetrics metrics= list.getFontMetrics(font);
 		int charWidth= metrics.charWidth('M');
-		int currentWidth= (int)StrictMath.round(length*charWidth);
+		int currentWidth= PrologInteger.toInteger(length*charWidth);
 		list.setFixedCellWidth(currentWidth);
 	}
 	//
@@ -128,7 +135,11 @@ public class AList extends JScrollPane {
 						int number= value.getSmallIntegerValue(iX);
 						if (number > 0 && number <= model.getSize()) {
 							// list.clearSelection(); 2012.08.29
-							list.setSelectedIndex(number-1);
+							int index= number-1;
+							if (enableSorting) {
+								index= sortedStrings.resolveIndex(index);
+							};
+							list.setSelectedIndex(index);
 						} else if (number <= 0) {
 							list.clearSelection();
 						}
@@ -171,7 +182,9 @@ public class AList extends JScrollPane {
 			ArrayList<String> stringVector= DialogUtils.listToStringVector(value,iX);
 			String[] stringList= stringVector.toArray(new String[0]);
 			if (enableSorting) {
-				Arrays.sort(stringList,new AlphabeticComparator());
+				// Arrays.sort(stringList,new AlphabeticComparator());
+				sortedStrings= new SortedStrings(stringList);
+				stringList= sortedStrings.sortedArray;
 			};
 			synchronized(list) {
 				try {
@@ -185,7 +198,7 @@ public class AList extends JScrollPane {
 				} finally {
 					list.setValueIsAdjusting(false);
 				};
-				targetDialog.repaint();
+				targetDialog.safelyRepaint();
 				targetDialog.repaintAfterDelay();
 			}
 		}
@@ -266,7 +279,11 @@ public class AList extends JScrollPane {
 				try {
 					int number= value.getSmallIntegerValue(iX);
 					if (number > 0 && number <= model.getSize()) {
-						list.addSelectionInterval(number-1,number-1);
+						int index= number-1;
+						if (enableSorting) {
+							index= sortedStrings.resolveIndex(index);
+						};
+						list.addSelectionInterval(index,index);
 					}
 				} catch (TermIsNotAnInteger e1) {
 					try {

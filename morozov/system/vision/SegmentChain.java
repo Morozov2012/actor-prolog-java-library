@@ -2,11 +2,6 @@
 
 package morozov.system.vision;
 
-import java.util.HashMap;
-import java.util.Set;
-import java.util.Iterator;
-import java.io.PrintStream;
-
 class SegmentChain {
 	public ConnectedSegment unit;
 	public SegmentChain rest;

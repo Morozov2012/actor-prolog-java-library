@@ -7,7 +7,14 @@ public class ParserError extends RuntimeException {
 	public ParserError(int p) {
 		position= p;
 	}
+	public ParserError(int p, Throwable e) {
+		super(e);
+		position= p;
+	}
 	public int getPosition() {
 		return position;
+	}
+	public String toString() {
+		return this.getClass().toString() + "(position:" + Integer.toString(position) + ")";
 	}
 }

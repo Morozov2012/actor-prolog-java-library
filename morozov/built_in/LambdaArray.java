@@ -1,4 +1,4 @@
-// (c) 2012 IRE RAS Alexei A. Morozov
+// (c) 2012-2015 IRE RAS Alexei A. Morozov
 
 package morozov.built_in;
 
@@ -10,6 +10,7 @@ import morozov.system.indices.*;
 import morozov.system.indices.errors.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
+import morozov.worlds.*;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -17,10 +18,68 @@ import java.util.HashMap;
 public abstract class LambdaArray extends Lambda {
 	//
 	protected HashMap<ArrayIndices,SlotVariable> volume= new HashMap<ArrayIndices,SlotVariable>();
-	// protected Map<ArrayIndices,SlotVariable> volume= Collections.synchronizedMap(new HashMap<ArrayIndices,SlotVariable>());
+	//
+	protected IndexRange[] indicesRange= null;
+	protected Boolean indexChecking= null;
+	//
+	public LambdaArray() {
+	}
+	public LambdaArray(GlobalWorldIdentifier id) {
+		super(id);
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	abstract public Term getBuiltInSlot_E_indices_range();
 	abstract public Term getBuiltInSlot_E_index_checking();
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	// get/set indicesRange
+	//
+	public void setIndicesRange1s(ChoisePoint iX, Term a1) {
+		setIndicesRange(ArrayUtils.termsToIndexRanges(a1,iX));
+	}
+	public void setIndicesRange(IndexRange[] value) {
+		indicesRange= value;
+	}
+	public void getIndicesRange0ff(ChoisePoint iX, PrologVariable a1) {
+		IndexRange[] value= getIndicesRange(iX);
+		a1.value= ArrayUtils.indexRangesToTerm(value);
+	}
+	public void getIndicesRange0fs(ChoisePoint iX) {
+	}
+	public IndexRange[] getIndicesRange(ChoisePoint iX) {
+		if (indicesRange != null) {
+			return indicesRange;
+		} else {
+			return ArrayUtils.termsToIndexRanges(getBuiltInSlot_E_indices_range(),iX);
+		}
+	}
+	//
+	// get/set indexChecking
+	//
+	public void setIndexChecking1s(ChoisePoint iX, Term a1) {
+		setIndexChecking(OnOff.termOnOff2Boolean(a1,iX));
+	}
+	public void setIndexChecking(boolean value) {
+		indexChecking= value;
+	}
+	public void getIndexChecking0ff(ChoisePoint iX, PrologVariable a1) {
+		boolean value= getIndexChecking(iX);
+		a1.value= OnOff.boolean2TermOnOff(value);
+	}
+	public void getIndexChecking0fs(ChoisePoint iX) {
+	}
+	public boolean getIndexChecking(ChoisePoint iX) {
+		if (indexChecking != null) {
+			return indexChecking;
+		} else {
+			return OnOff.termOnOff2Boolean(getBuiltInSlot_E_index_checking(),iX);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void element1mff(ChoisePoint iX, PrologVariable result, Term... givenIndices) {
 		ArrayIndices arrayIndices= collectArrayIndices((Term[])givenIndices,iX);
@@ -35,8 +94,7 @@ public abstract class LambdaArray extends Lambda {
 	}
 	//
 	protected ArrayIndices collectArrayIndices(Term[] givenIndices, ChoisePoint iX) {
-		Term bounds= getBuiltInSlot_E_indices_range();
-		IndexRange[] indexRanges= ArrayUtils.termsToIndexRanges(iX,bounds);
+		IndexRange[] indexRanges= getIndicesRange(iX);
 		if (givenIndices.length != indexRanges.length) {
 			throw new IllegalNumberOfIndices(givenIndices.length,indexRanges.length);
 		};
@@ -205,7 +263,6 @@ public abstract class LambdaArray extends Lambda {
 		}
 	}
 	public class Element extends Continuation {
-		// private Continuation c0;
 		protected PrologVariable result;
 		protected Term[] givenIndices;
 		protected boolean isFunctionCall= true;
@@ -216,14 +273,12 @@ public abstract class LambdaArray extends Lambda {
 		}
 		//
 		public void execute(ChoisePoint iX) throws Backtracking {
-			Term bounds= getBuiltInSlot_E_indices_range();
-			IndexRange[] indexRanges= ArrayUtils.termsToIndexRanges(iX,bounds);
-			boolean checkIndicesRange= Converters.term2OnOff(getBuiltInSlot_E_index_checking(),iX);
+			IndexRange[] indexRanges= getIndicesRange(iX);
+			boolean checkIndicesRange= getIndexChecking(iX);
 			if (givenIndices.length != indexRanges.length) {
 				if (checkIndicesRange) {
 					throw new IllegalNumberOfIndices(givenIndices.length,indexRanges.length);
 				} else {
-					// return;
 					throw Backtracking.instance;
 				}
 			};
@@ -242,7 +297,6 @@ public abstract class LambdaArray extends Lambda {
 						currentIndexValue[n]= BigInteger.ZERO;
 					} else {
 						instantiateIndex[n]= false;
-						// currentIndexValue[n]= index.getLongIntegerValue(iX);
 						BigInteger indexValue= index.getIntegerValue(iX);
 						if (checkIndicesRange) {
 							indexRanges[n].checkIndexValue(indexValue);
@@ -287,26 +341,19 @@ for (int n=0; n < givenIndices.length; n++) {
 	}
 };
 BigInteger radius= BigInteger.ONE.negate();
-// for (int radius= 0; radius <= maximumRadius; radius++) {
 radiusLoop: while(true) {
 	if (radius.compareTo(maximumRadius) >= 0) {
 		break radiusLoop;
 	};
 	radius= radius.add(BigInteger.ONE);
-	// System.out.printf("radiusLoop: radius=%s\n",radius);
 	for (int numberOfSelectedIndices= numberOfIndicesToBeInstantiated; numberOfSelectedIndices > 0; numberOfSelectedIndices--) {
 		if (radius.compareTo(BigInteger.ZERO) == 0) {
 			if (numberOfSelectedIndices < numberOfIndicesToBeInstantiated) {
 				continue;
 			}
 		};
-		// int[] allIndices= new int[numberOfIndicesToBeInstantiated];
-		// for (int n=0; n < numberOfIndicesToBeInstantiated; n++) {
-		//	allIndices[n]= n;
-		// };
 		boolean[] bits= new boolean[numberOfIndicesToBeInstantiated];
 		mainLoop: while(true) {
-			// System.out.printf("mainLoop: radius=%s\n",radius);
 			for (int n=0; n <= numberOfIndicesToBeInstantiated; n++) {
 				if (n==numberOfIndicesToBeInstantiated) {
 					break mainLoop;
@@ -330,21 +377,13 @@ radiusLoop: while(true) {
 			BigInteger[] indices= new BigInteger[numberOfIndicesToBeInstantiated];
 			for (int n=0; n < numberOfIndicesToBeInstantiated; n++) {
 				if (bits[n]) {
-					// indices[n]= - radius;
 					indices[n]= rangesOfIndicesToBeInstantiated[n].center.subtract(radius);
 				} else {
-					// indices[n]= - (radius-1);
 					indices[n]= rangesOfIndicesToBeInstantiated[n].center.subtract(radius).add(BigInteger.ONE);
 				}
 			};
 			shellCoveringLoop: while(true) {
 // ====================================================================
-// int counter0= 0;
-// for (int n=0; n < givenIndices.length; n++) {
-//	if (instantiateIndex[n]) {
-//		System.out.printf("> indices[%s]=%s\n",counter0,indices[counter0++]);
-//	}
-// };
 boolean skipPass= false;
 int counter2= 0;
 for (int n=0; n < givenIndices.length; n++) {
@@ -387,14 +426,11 @@ if (processBacktracking || skipPass) {
 			break shellCoveringLoop;
 		};
 		for (int n=0; n <= numberOfIndicesToBeInstantiated; n++) {
-			// System.out.printf("shellCoveringLoop: n=%s\n",n);
 			if (n==numberOfIndicesToBeInstantiated) {
 				break shellCoveringLoop;
 			};
 			BigInteger previousValue= indices[n];
-			// System.out.printf("shellCoveringLoop: bits[n]=%s, previousValue=%s, rangesOfIndicesToBeInstantiated[n].center=%s\n",bits[n],previousValue,rangesOfIndicesToBeInstantiated[n].center);
 			if (bits[n]) {
-				// indices[n]= previousValue.negate();
 				indices[n]= rangesOfIndicesToBeInstantiated[n].reflectValue(previousValue);
 				if (previousValue.compareTo(rangesOfIndicesToBeInstantiated[n].center) < 0) {
 					break;
@@ -405,10 +441,8 @@ if (processBacktracking || skipPass) {
 				BigInteger newValue= previousValue.add(BigInteger.ONE);
 				if (newValue.compareTo(rangesOfIndicesToBeInstantiated[n].center.add(radius)) < 0) {
 					indices[n]= newValue;
-					// System.out.printf("indices[n]= newValue;= %s;\n",indices[n]);
 					break;
 				} else {
-					// indices[n]= - (radius-1);
 					indices[n]= rangesOfIndicesToBeInstantiated[n].center.subtract(radius).add(BigInteger.ONE);
 					continue;
 				}
@@ -420,8 +454,6 @@ if (processBacktracking || skipPass) {
 		throw Backtracking.instance;
 	}
 }
-// return;
-// throw Backtracking.instance;
 // ====================================================================
 			}
 		}

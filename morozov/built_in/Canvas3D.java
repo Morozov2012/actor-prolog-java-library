@@ -2,26 +2,21 @@
 
 package morozov.built_in;
 
-import target.*;
-
-import morozov.classes.*;
 import morozov.run.*;
 import morozov.system.*;
-import morozov.system.errors.*;
 import morozov.system.gui.*;
+import morozov.system.gui.signals.*;
 import morozov.system.gui.space3d.*;
 import morozov.system.gui.space3d.errors.*;
-import morozov.system.signals.*;
+import morozov.system.gui.space3d.signals.*;
 import morozov.terms.*;
-import morozov.terms.signals.*;
+import morozov.worlds.*;
 
 import java.awt.Color;
-import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.Component;
-import javax.swing.SwingUtilities;
 
 import javax.media.j3d.Shape3D;
 import javax.media.j3d.BranchGroup;
@@ -44,47 +39,74 @@ import com.sun.j3d.utils.universe.SimpleUniverse;
 import com.sun.j3d.utils.universe.Viewer;
 
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Iterator;
 import java.util.Enumeration;
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.lang.reflect.InvocationTargetException;
 
-// import javax.media.opengl.GLProfile;
-
-public abstract class Canvas3D
-		extends ImageConsumer
-		implements ComponentListener {
+public abstract class Canvas3D extends DataResourceConsumer {
 	//
 	protected HashMap<NodeLabel,NodeContainer> localMemory= new HashMap<NodeLabel,NodeContainer>();
 	protected HashMap<Node,NodeLabel> inverseTable= new HashMap<Node,NodeLabel>();
 	//
 	protected HashSet<CustomizedPickCanvas> customizedPickCanvasList= new HashSet<CustomizedPickCanvas>();
 	//
-	protected static final Color defaultBackgroundColor= Color.BLACK;
-	//
-	protected AtomicReference<Color> backgroundColor= new AtomicReference<Color>();
-	//
 	protected AtomicBoolean controlIsInitialized= new AtomicBoolean(false);
-	protected ExtendedSpace3D space3D= null;
-	protected InternalFrame3D graphicWindow= null;
+	// protected ExtendedSpace3D space3D= null;
+	// protected InternalFrame3D graphicWindow= null;
 	protected SimpleUniverse simpleUniverse= null;
 	protected TransformGroup spin= null;
 	protected Term currentSceneTree= null;
 	//
+	protected Integer projectionPolicy= null;
+	protected Integer windowResizePolicy= null;
+	protected Integer windowMovementPolicy= null;
+	protected Integer visibilityPolicy= null;
+	protected Integer transparencySortingPolicy= null;
+	protected WaitingInterval minimumFrameCycleTime= null;
+	protected FieldOfView fieldOfView= null;
+	protected ClipDistance frontClipDistance= null;
+	protected ClipDistance backClipDistance= null;
+	// protected Boolean enableSceneAntialiasing= null;
+	protected Boolean enableDepthBufferFreezing= null;
+	protected Boolean enableLocalEyeLighting= null;
+	//
+	// protected BigDecimal decimalDefaultMinimumFrameCycleTimeInSeconds= BigDecimal.ZERO;
+	// protected BigDecimal decimalDefaultMinimumFrameCycleTimeInNanos= decimalDefaultMinimumFrameCycleTimeInSeconds.multiply(Converters.oneNanoBig);
+	protected long longDefaultMinimumFrameCycleTimeInMilliseconds= 0;
+	protected double defaultFieldOfView= Math.PI/4.0;
+	protected double defaultFrontClipDistance= 0.1;
+	protected double defaultBackClipDistance= 10.0;
+	//
 	// protected int redrawingPeriod= 31; // [ms]
 	protected int redrawingPeriod= 310; // [ms]
 	//
-	abstract protected Term getBuiltInSlot_E_title();
-	abstract protected Term getBuiltInSlot_E_x();
-	abstract protected Term getBuiltInSlot_E_y();
-	abstract protected Term getBuiltInSlot_E_width();
-	abstract protected Term getBuiltInSlot_E_height();
-	abstract protected Term getBuiltInSlot_E_background_color();
+	public Canvas3D() {
+		loadVectmath();
+		spaceAttributes= new CanvasSpaceAttributes();
+	}
+	public Canvas3D(GlobalWorldIdentifier id) {
+		super(id);
+		loadVectmath();
+		spaceAttributes= new CanvasSpaceAttributes();
+	}
+	protected void loadVectmath() {
+		// This dummy call is necessary to load
+		// the vecmath.jar library before the start
+		// of rendering:
+		Color3f color3d= new Color3f(0,0,0);
+		// GLProfile.initSingleton();
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	// abstract protected Term getBuiltInSlot_E_title();
+	// abstract protected Term getBuiltInSlot_E_x();
+	// abstract protected Term getBuiltInSlot_E_y();
+	// abstract protected Term getBuiltInSlot_E_width();
+	// abstract protected Term getBuiltInSlot_E_height();
+	// abstract protected Term getBuiltInSlot_E_background_color();
 	//
 	abstract protected Term getBuiltInSlot_E_projection_policy();
 	abstract protected Term getBuiltInSlot_E_window_resize_policy();
@@ -97,7 +119,7 @@ public abstract class Canvas3D
 	abstract protected Term getBuiltInSlot_E_front_clip_distance();
 	abstract protected Term getBuiltInSlot_E_back_clip_distance();
 	//
-	abstract protected Term getBuiltInSlot_E_enable_scene_antialiasing();
+	// abstract protected Term getBuiltInSlot_E_enable_scene_antialiasing();
 	abstract protected Term getBuiltInSlot_E_enable_depth_buffer_freezing();
 	abstract protected Term getBuiltInSlot_E_enable_local_eye_lighting();
 	//
@@ -109,29 +131,367 @@ public abstract class Canvas3D
 	abstract public long entry_s_MouseReleased_1_i();
 	abstract public long entry_s_MouseDragged_1_i();
 	abstract public long entry_s_MouseMoved_1_i();
-	abstract public long entry_s_Initialize_0();
-	abstract public long entry_s_Start_0();
-	abstract public long entry_s_Stop_0();
+	// abstract public long entry_s_Initialize_0();
+	// abstract public long entry_s_Start_0();
+	// abstract public long entry_s_Stop_0();
 	//
-	public Canvas3D() {
-		// This dummy call is necessary to load
-		// the vecmath.jar library before the start
-		// of rendering:
-		Color3f color3d= new Color3f(0,0,0);
-		// GLProfile.initSingleton();
+	///////////////////////////////////////////////////////////////
+	//
+	protected Color getDefaultBackgroundColor() {
+		return Color.BLACK;
 	}
+	//
+	public void changeBackgroundColor(ExtendedColor eColor, ChoisePoint iX) {
+		Color color;
+		try {
+			color= eColor.getValue();
+		} catch (UseDefaultColor e) {
+			color= getDefaultBackgroundColor();
+		};
+		synchronized(this) {
+			if (graphicWindow != null) {
+				graphicWindow.safelySetBackground(color);
+			} else if (canvasSpace != null) {
+				canvasSpace.safelySetBackground(color);
+			}
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	// get/set projectionPolicy
+	//
+	public void setProjectionPolicy1s(ChoisePoint iX, Term a1) {
+		setProjectionPolicy(Utils3D.termToProjectionPolicy(a1,iX));
+		View view= getCurrentView();
+		if (view != null) {
+			view.setProjectionPolicy(getProjectionPolicy(iX));
+		}
+	}
+	public void setProjectionPolicy(int value) {
+		projectionPolicy= value;
+	}
+	public void getProjectionPolicy0ff(ChoisePoint iX, PrologVariable a1) {
+		a1.value= Utils3D.projectionPolicyToTerm(getProjectionPolicy(iX));
+	}
+	public void getProjectionPolicy0fs(ChoisePoint iX) {
+	}
+	public int getProjectionPolicy(ChoisePoint iX) {
+		if (projectionPolicy != null) {
+			return projectionPolicy;
+		} else {
+			Term value= getBuiltInSlot_E_projection_policy();
+			return Utils3D.termToProjectionPolicy(value,iX);
+		}
+	}
+	//
+	// get/set windowResizePolicy
+	//
+	public void setWindowResizePolicy1s(ChoisePoint iX, Term a1) {
+		setWindowResizePolicy(Utils3D.termToWindowResizePolicy(a1,iX));
+		View view= getCurrentView();
+		if (view != null) {
+			view.setWindowResizePolicy(getWindowResizePolicy(iX));
+		}
+	}
+	public void setWindowResizePolicy(int value) {
+		windowResizePolicy= value;
+	}
+	public void getWindowResizePolicy0ff(ChoisePoint iX, PrologVariable a1) {
+		a1.value= Utils3D.windowResizePolicyToTerm(getWindowResizePolicy(iX));
+	}
+	public void getWindowResizePolicy0fs(ChoisePoint iX) {
+	}
+	public int getWindowResizePolicy(ChoisePoint iX) {
+		if (windowResizePolicy != null) {
+			return windowResizePolicy;
+		} else {
+			Term value= getBuiltInSlot_E_window_resize_policy();
+			return Utils3D.termToWindowResizePolicy(value,iX);
+		}
+	}
+	//
+	// get/set windowMovementPolicy
+	//
+	public void setWindowMovementPolicy1s(ChoisePoint iX, Term a1) {
+		setWindowMovementPolicy(Utils3D.termToWindowMovementPolicy(a1,iX));
+		View view= getCurrentView();
+		if (view != null) {
+			view.setWindowMovementPolicy(getWindowMovementPolicy(iX));
+		}
+	}
+	public void setWindowMovementPolicy(int value) {
+		windowMovementPolicy= value;
+	}
+	public void getWindowMovementPolicy0ff(ChoisePoint iX, PrologVariable a1) {
+		a1.value= Utils3D.windowMovementPolicyToTerm(getWindowMovementPolicy(iX));
+	}
+	public void getWindowMovementPolicy0fs(ChoisePoint iX) {
+	}
+	public int getWindowMovementPolicy(ChoisePoint iX) {
+		if (windowMovementPolicy != null) {
+			return windowMovementPolicy;
+		} else {
+			Term value= getBuiltInSlot_E_window_movement_policy();
+			return Utils3D.termToWindowMovementPolicy(value,iX);
+		}
+	}
+	//
+	// get/set visibilityPolicy
+	//
+	public void setVisibilityPolicy1s(ChoisePoint iX, Term a1) {
+		setVisibilityPolicy(Utils3D.termToVisibilityPolicy(a1,iX));
+		View view= getCurrentView();
+		if (view != null) {
+			view.setVisibilityPolicy(getVisibilityPolicy(iX));
+		}
+	}
+	public void setVisibilityPolicy(int value) {
+		visibilityPolicy= value;
+	}
+	public void getVisibilityPolicy0ff(ChoisePoint iX, PrologVariable a1) {
+		a1.value= Utils3D.visibilityPolicyToTerm(getVisibilityPolicy(iX));
+	}
+	public void getVisibilityPolicy0fs(ChoisePoint iX) {
+	}
+	public int getVisibilityPolicy(ChoisePoint iX) {
+		if (visibilityPolicy != null) {
+			return visibilityPolicy;
+		} else {
+			Term value= getBuiltInSlot_E_visibility_policy();
+			return Utils3D.termToVisibilityPolicy(value,iX);
+		}
+	}
+	//
+	// get/set transparencySortingPolicy
+	//
+	public void setTransparencySortingPolicy1s(ChoisePoint iX, Term a1) {
+		setTransparencySortingPolicy(Utils3D.termToTransparencySortingPolicy(a1,iX));
+		View view= getCurrentView();
+		if (view != null) {
+			view.setTransparencySortingPolicy(getTransparencySortingPolicy(iX));
+		}
+	}
+	public void setTransparencySortingPolicy(int value) {
+		transparencySortingPolicy= value;
+	}
+	public void getTransparencySortingPolicy0ff(ChoisePoint iX, PrologVariable a1) {
+		a1.value= Utils3D.transparencySortingPolicyToTerm(getTransparencySortingPolicy(iX));
+	}
+	public void getTransparencySortingPolicy0fs(ChoisePoint iX) {
+	}
+	public int getTransparencySortingPolicy(ChoisePoint iX) {
+		if (transparencySortingPolicy != null) {
+			return transparencySortingPolicy;
+		} else {
+			Term value= getBuiltInSlot_E_transparency_sorting_policy();
+			return Utils3D.termToTransparencySortingPolicy(value,iX);
+		}
+	}
+	//
+	// get/set minimumFrameCycleTime
+	//
+	public void setMinimumFrameCycleTime1s(ChoisePoint iX, Term a1) {
+		setMinimumFrameCycleTime(WaitingInterval.termToWaitingInterval(a1,iX));
+		View view= getCurrentView();
+		if (view != null) {
+			changeMinimumFrameCycleTimeInNanos(getMinimumFrameCycleTime(iX),view);
+		}
+	}
+	public void setMinimumFrameCycleTime(WaitingInterval value) {
+		minimumFrameCycleTime= value;
+	}
+	public void getMinimumFrameCycleTime0ff(ChoisePoint iX, PrologVariable a1) {
+		a1.value= getMinimumFrameCycleTime(iX).toTerm();
+	}
+	public void getMinimumFrameCycleTime0fs(ChoisePoint iX) {
+	}
+	public WaitingInterval getMinimumFrameCycleTime(ChoisePoint iX) {
+		if (minimumFrameCycleTime != null) {
+			return minimumFrameCycleTime;
+		} else {
+			Term value= getBuiltInSlot_E_minimum_frame_cycle_time();
+			return WaitingInterval.termToWaitingInterval(value,iX);
+		}
+	}
+	//
+	// get/set fieldOfView
+	//
+	public void setFieldOfView1s(ChoisePoint iX, Term a1) {
+		setFieldOfView(FieldOfView.termToFieldOfView(a1,iX));
+		View view= getCurrentView();
+		if (view != null) {
+			changeFieldOfView(getFieldOfView(iX),view);
+		}
+	}
+	public void setFieldOfView(FieldOfView value) {
+		fieldOfView= value;
+	}
+	public void getFieldOfView0ff(ChoisePoint iX, PrologVariable a1) {
+		FieldOfView value= getFieldOfView(iX);
+		a1.value= value.toTerm();
+	}
+	public void getFieldOfView0fs(ChoisePoint iX) {
+	}
+	public FieldOfView getFieldOfView(ChoisePoint iX) {
+		if (fieldOfView != null) {
+			return fieldOfView;
+		} else {
+			Term value= getBuiltInSlot_E_field_of_view();
+			return FieldOfView.termToFieldOfView(value,iX);
+		}
+	}
+	//
+	// get/set frontClipDistance
+	//
+	public void setFrontClipDistance1s(ChoisePoint iX, Term a1) {
+		setFrontClipDistance(ClipDistance.termToClipDistance(a1,iX));
+		View view= getCurrentView();
+		if (view != null) {
+			changeFrontClipDistance(getFrontClipDistance(iX),view);
+		}
+	}
+	public void setFrontClipDistance(ClipDistance value) {
+		frontClipDistance= value;
+	}
+	public void getFrontClipDistance0ff(ChoisePoint iX, PrologVariable a1) {
+		ClipDistance value= getFrontClipDistance(iX);
+		a1.value= value.toTerm();
+	}
+	public void getFrontClipDistance0fs(ChoisePoint iX) {
+	}
+	public ClipDistance getFrontClipDistance(ChoisePoint iX) {
+		if (frontClipDistance != null) {
+			return frontClipDistance;
+		} else {
+			Term value= getBuiltInSlot_E_front_clip_distance();
+			return ClipDistance.termToClipDistance(value,iX);
+		}
+	}
+	//
+	// get/set backClipDistance
+	//
+	public void setBackClipDistance1s(ChoisePoint iX, Term a1) {
+		setBackClipDistance(ClipDistance.termToClipDistance(a1,iX));
+		View view= getCurrentView();
+		if (view != null) {
+			changeBackClipDistance(getBackClipDistance(iX),view);
+		}
+	}
+	public void setBackClipDistance(ClipDistance value) {
+		backClipDistance= value;
+	}
+	public void getBackClipDistance0ff(ChoisePoint iX, PrologVariable a1) {
+		ClipDistance value= getBackClipDistance(iX);
+		a1.value= value.toTerm();
+	}
+	public void getBackClipDistance0fs(ChoisePoint iX) {
+	}
+	public ClipDistance getBackClipDistance(ChoisePoint iX) {
+		if (backClipDistance != null) {
+			return backClipDistance;
+		} else {
+			Term value= getBuiltInSlot_E_back_clip_distance();
+			return ClipDistance.termToClipDistance(value,iX);
+		}
+	}
+	//
+	// get/set enableDepthBufferFreezing
+	//
+	public void setEnableDepthBufferFreezing1s(ChoisePoint iX, Term a1) {
+		setEnableDepthBufferFreezing(YesNo.termYesNo2Boolean(a1,iX));
+		View view= getCurrentView();
+		if (view != null) {
+			view.setDepthBufferFreezeTransparent(getEnableDepthBufferFreezing(iX));
+		}
+	}
+	public void setEnableDepthBufferFreezing(boolean value) {
+		enableDepthBufferFreezing= value;
+	}
+	public void getEnableDepthBufferFreezing0ff(ChoisePoint iX, PrologVariable a1) {
+		boolean value= getEnableDepthBufferFreezing(iX);
+		a1.value= YesNo.boolean2TermYesNo(value);
+	}
+	public void getEnableDepthBufferFreezing0fs(ChoisePoint iX) {
+	}
+	public boolean getEnableDepthBufferFreezing(ChoisePoint iX) {
+		if (enableDepthBufferFreezing != null) {
+			return enableDepthBufferFreezing;
+		} else {
+			Term value= getBuiltInSlot_E_enable_depth_buffer_freezing();
+			return YesNo.termYesNo2Boolean(value,iX);
+		}
+	}
+	//
+	// get/set enableLocalEyeLighting
+	//
+	public void setEnableLocalEyeLighting1s(ChoisePoint iX, Term a1) {
+		setEnableLocalEyeLighting(YesNo.termYesNo2Boolean(a1,iX));
+		View view= getCurrentView();
+		if (view != null) {
+			view.setLocalEyeLightingEnable(getEnableLocalEyeLighting(iX));
+		}
+	}
+	public void setEnableLocalEyeLighting(boolean value) {
+		enableLocalEyeLighting= value;
+	}
+	public void getEnableLocalEyeLighting0ff(ChoisePoint iX, PrologVariable a1) {
+		boolean value= getEnableLocalEyeLighting(iX);
+		a1.value= YesNo.boolean2TermYesNo(value);
+	}
+	public void getEnableLocalEyeLighting0fs(ChoisePoint iX) {
+	}
+	public boolean getEnableLocalEyeLighting(ChoisePoint iX) {
+		if (enableLocalEyeLighting != null) {
+			return enableLocalEyeLighting;
+		} else {
+			Term value= getBuiltInSlot_E_enable_local_eye_lighting();
+			return YesNo.termYesNo2Boolean(value,iX);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	// get/set enableSceneAntialiasing
+	//
+	public void setEnableSceneAntialiasing1s(ChoisePoint iX, Term a1) {
+		super.setEnableSceneAntialiasing1s(iX,a1);
+		View view= getCurrentView();
+		if (view != null) {
+			view.setSceneAntialiasingEnable(getEnableSceneAntialiasing(iX));
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	protected View getCurrentView() {
+		if (simpleUniverse != null) {
+			Viewer viewer= simpleUniverse.getViewer();
+			if (viewer != null) {
+				View view= viewer.getView();
+				if (view != null) {
+					return view;
+				}
+			}
+		};
+		return null;
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void closeFiles() {
 		if (graphicWindow != null) {
-			DesktopUtils.safelyDispose(graphicWindow);
+			graphicWindow.safelyDispose();
 		};
 		super.closeFiles();
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void clear0s(ChoisePoint iX) {
 		// if (desktopDoesNotExist()) {
 		//	return;
-		// } else if (space3DDoesNotExist()) {
+		// } else if (canvasSpaceDoesNotExist()) {
 		//	return;
 		// } else {
 		show1s(iX,PrologEmptyList.instance);
@@ -142,14 +502,23 @@ public abstract class Canvas3D
 		createGraphicWindowIfNecessary(iX,true);
 		showCanvasAndSaveTree(a1,iX);
 	}
-	public void show0s(ChoisePoint iX) {
+	// public void show0s(ChoisePoint iX) {
+	//	createGraphicWindowIfNecessary(iX,true);
+	// }
+	public void show1ms(ChoisePoint iX, Term... args) {
 		createGraphicWindowIfNecessary(iX,true);
+		Term[] terms= (Term[])args;
+		if (terms.length >= 1) {
+			showCanvasAndSaveTree(terms[0],iX);
+		}
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public static GraphicsConfiguration getGraphicsConfiguration(Component c) {
-		return getGraphicsConfiguration(c.getGraphicsConfiguration());
+		return refineGraphicsConfiguration(c.getGraphicsConfiguration());
 	}
-	public static GraphicsConfiguration getGraphicsConfiguration(GraphicsConfiguration dialogGraphicsConfiguration) {
+	public static GraphicsConfiguration refineGraphicsConfiguration(GraphicsConfiguration dialogGraphicsConfiguration) {
 		GraphicsConfigTemplate3D gct3D= new GraphicsConfigTemplate3D();
 		gct3D.setSceneAntialiasing(GraphicsConfigTemplate3D.REQUIRED);
 		GraphicsDevice device;
@@ -170,23 +539,21 @@ public abstract class Canvas3D
 		}
 	}
 	protected void showCanvas(Term a1, ChoisePoint iX) {
-		if (space3D==null) {
+		if (canvasSpaceDoesNotExist()) {
 			if (graphicWindow != null) {
 				// GraphicsConfiguration config=
 				//	SimpleUniverse.getPreferredConfiguration();
 				// GraphicsConfiguration config=
 				//	java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getBestConfiguration(gct3D);
-				GraphicsConfiguration config= getGraphicsConfiguration(graphicWindow);
-				space3D= new ExtendedSpace3D(config);
-				graphicWindow.add(space3D,0);
+				GraphicsConfiguration config= getGraphicsConfiguration(graphicWindow.getInternalFrame());
+				canvasSpace= new ExtendedSpace3D(this,config);
+				graphicWindow.safelyAdd(canvasSpace.getControl(),0);
 			} else {
 				return;
 			}
 		};
-		Color background= backgroundColor.get();
-		if (background != null) {
-			space3D.setBackground(background);
-		};
+		// canvasSpace.safelySetBackground(getBackgroundColor(iX));
+		changeBackgroundColor(iX);
 		localMemory.clear();
 		inverseTable.clear();
 		if (spin==null) {
@@ -203,9 +570,9 @@ public abstract class Canvas3D
 			spin.addChild(specialBehavior);
 		};
 		if (simpleUniverse==null) {
-			simpleUniverse= new SimpleUniverse(space3D,0);
+			simpleUniverse= new SimpleUniverse((javax.media.j3d.Canvas3D)canvasSpace.getControl(),0);
 			setViewAttributes(simpleUniverse,iX);
-			BranchGroup scene= Utils3D.termToBranchGroupOrNodeList(a1,this,simpleUniverse,space3D,iX);
+			BranchGroup scene= Utils3D.termToBranchGroupOrNodeList(a1,this,simpleUniverse,(javax.media.j3d.Canvas3D)canvasSpace.getControl(),iX);
 			scene.setCapability(BranchGroup.ALLOW_DETACH);
 			spin.setChild(scene,0);
 			BranchGroup branchGroup= new BranchGroup();
@@ -217,7 +584,7 @@ public abstract class Canvas3D
 			// simpleUniverse.removeAllLocales();
 			// simpleUniverse.cleanup();
 			setViewAttributes(simpleUniverse,iX);
-			BranchGroup scene= Utils3D.termToBranchGroupOrNodeList(a1,this,simpleUniverse,space3D,iX);
+			BranchGroup scene= Utils3D.termToBranchGroupOrNodeList(a1,this,simpleUniverse,(javax.media.j3d.Canvas3D)canvasSpace.getControl(),iX);
 			scene.setCapability(BranchGroup.ALLOW_DETACH);
 			spin.setChild(scene,0);
 		};
@@ -225,64 +592,60 @@ public abstract class Canvas3D
 		// objects in the scene can be viewed.
 		simpleUniverse.getViewingPlatform().setNominalViewingTransform();
 		if (graphicWindow != null) {
-			graphicWindow.revalidate();
+			graphicWindow.safelyRevalidate();
 		}
 	}
 	protected void setViewAttributes(SimpleUniverse simpleU, ChoisePoint iX) {
 		//
-		Viewer viewer= simpleU.getViewer();
+		Viewer viewer= simpleUniverse.getViewer();
 		View view= viewer.getView();
 		//
-		int projectionPolicy= Utils3D.termToProjectionPolicy(getBuiltInSlot_E_projection_policy(),iX);
-		view.setProjectionPolicy(projectionPolicy);
-		int windowResizePolicy= Utils3D.termToWindowResizePolicy(getBuiltInSlot_E_window_resize_policy(),iX);
-		view.setWindowResizePolicy(windowResizePolicy);
-		int windowMovementPolicy= Utils3D.termToWindowMovementPolicy(getBuiltInSlot_E_window_movement_policy(),iX);
-		view.setWindowMovementPolicy(windowMovementPolicy);
-		int visibilityPolicy= Utils3D.termToVisibilityPolicy(getBuiltInSlot_E_visibility_policy(),iX);
-		view.setVisibilityPolicy(visibilityPolicy);
-		int transparencySortingPolicy= Utils3D.termToTransparencySortingPolicy(getBuiltInSlot_E_transparency_sorting_policy(),iX);
-		view.setTransparencySortingPolicy(transparencySortingPolicy);
-		Term minimumFrameCycleTime= getBuiltInSlot_E_minimum_frame_cycle_time();
-		try {
-			BigDecimal nanos= Converters.termToTimeInterval(minimumFrameCycleTime,iX);
-			BigDecimal milliseconds= nanos.divideToIntegralValue(Converters.oneMillionBig,MathContext.DECIMAL128);
-			long delayInMilliseconds= PrologInteger.toLong(milliseconds);
-			view.setMinimumFrameCycleTime(delayInMilliseconds);
-		} catch (TermIsNotTimeInterval e1) {
-			try {
-				long code= minimumFrameCycleTime.getSymbolValue(iX);
-				if (code==SymbolCodes.symbolCode_E_default) {
-				} else {
-					throw new WrongArgumentIsNotTimeInterval(minimumFrameCycleTime);
-				}
-			} catch (TermIsNotASymbol e2) {
-				throw new WrongArgumentIsNotTimeInterval(minimumFrameCycleTime);
-			}
-		}
-		//
-		try {
-			double fieldOfView= Utils3D.termToFieldOfView(getBuiltInSlot_E_field_of_view(),iX);
-			view.setFieldOfView(fieldOfView);
-		} catch (TermIsSymbolDefault e) {
+		view.setProjectionPolicy(getProjectionPolicy(iX));
+		view.setWindowResizePolicy(getWindowResizePolicy(iX));
+		view.setWindowMovementPolicy(getWindowMovementPolicy(iX));
+		view.setVisibilityPolicy(getVisibilityPolicy(iX));
+		view.setTransparencySortingPolicy(getTransparencySortingPolicy(iX));
+		changeMinimumFrameCycleTimeInNanos(getMinimumFrameCycleTime(iX),view);
+		changeFieldOfView(getFieldOfView(iX),view);
+		changeFrontClipDistance(getFrontClipDistance(iX),view);
+		changeBackClipDistance(getBackClipDistance(iX),view);
+		view.setSceneAntialiasingEnable(getEnableSceneAntialiasing(iX));
+		view.setDepthBufferFreezeTransparent(getEnableDepthBufferFreezing(iX));
+		view.setLocalEyeLightingEnable(getEnableLocalEyeLighting(iX));
+	}
+	protected void changeMinimumFrameCycleTimeInNanos(WaitingInterval minimumFrameCycle, View view) {
+		long delayInMilliseconds= minimumFrameCycle.toMillisecondsLongOrDefault(longDefaultMinimumFrameCycleTimeInMilliseconds);
+		if (delayInMilliseconds < 0) {
+			delayInMilliseconds= longDefaultMinimumFrameCycleTimeInMilliseconds;
 		};
+		view.setMinimumFrameCycleTime(delayInMilliseconds);
+	}
+	protected void changeFieldOfView(FieldOfView fv, View view) {
+		double value;
 		try {
-			double frontClipDistance= Utils3D.termToFrontClipDistance(getBuiltInSlot_E_front_clip_distance(),iX);
-			view.setFrontClipDistance(frontClipDistance);
-		} catch (TermIsSymbolDefault e) {
+			value= fv.getValue();
+		} catch (UseDefaultFieldOfView e) {
+			value= defaultFieldOfView;
 		};
+		view.setFieldOfView(value);
+	}
+	protected void changeFrontClipDistance(ClipDistance fcd, View view) {
+		double value;
 		try {
-			double backClipDistance= Utils3D.termToBackClipDistance(getBuiltInSlot_E_back_clip_distance(),iX);
-			view.setBackClipDistance(backClipDistance);
-		} catch (TermIsSymbolDefault e) {
+			value= fcd.getValue();
+		} catch (UseDefaultClipDistance e) {
+			value= defaultFrontClipDistance;
 		};
-		//
-		boolean enableSceneAntialiasing= Converters.term2YesNo(getBuiltInSlot_E_enable_scene_antialiasing(),iX);
-		view.setSceneAntialiasingEnable(enableSceneAntialiasing);
-		boolean enableDepthBufferFreezing= Converters.term2YesNo(getBuiltInSlot_E_enable_depth_buffer_freezing(),iX);
-		view.setDepthBufferFreezeTransparent(enableDepthBufferFreezing);
-		boolean enableLocalEyeLighting= Converters.term2YesNo(getBuiltInSlot_E_enable_local_eye_lighting(),iX);
-		view.setLocalEyeLightingEnable(enableLocalEyeLighting);
+		view.setFrontClipDistance(value);
+	}
+	protected void changeBackClipDistance(ClipDistance bcd, View view) {
+		double value;
+		try {
+			value= bcd.getValue();
+		} catch (UseDefaultClipDistance e) {
+			value= defaultBackClipDistance;
+		};
+		view.setBackClipDistance(value);
 	}
 	//
 	public class SpecialBehavior extends Behavior {
@@ -314,164 +677,159 @@ public abstract class Canvas3D
 		}
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void redraw0s(ChoisePoint iX) {
 		createGraphicWindowIfNecessary(iX,false);
 		synchronized(this) {
 			if (graphicWindow != null) {
-				redrawInternalFrame(graphicWindow,iX);
+				refreshAttributesOfInternalFrame(graphicWindow,iX);
 				graphicWindow.safelyRestoreSize(staticContext);
-				DesktopUtils.safelyRepaint(graphicWindow);
-			} else if (space3D != null) {
-				changeBackgroundColor(iX,getBuiltInSlot_E_background_color());
-				DesktopUtils.safelyRepaint(space3D);
+				graphicWindow.safelyRepaint();
+			} else if (canvasSpace != null) {
+				changeBackgroundColor(iX);
+				canvasSpace.safelyRepaint();
 			}
 		}
 	}
 	//
-	public void hide0s(ChoisePoint iX) {
-		// if (desktopDoesNotExist()) {
-		//	return;
-		if (space3DDoesNotExist()) {
-			return;
-		} else {
-			createGraphicWindowIfNecessary(iX,false);
-			synchronized(this) {
-				if (graphicWindow != null) {
-					DesktopUtils.safelySetVisible(false,graphicWindow);
-				}
-			}
-		}
-	}
+	// public void hide0s(ChoisePoint iX) {
+	//	if (canvasSpaceDoesNotExist()) {
+	//		return;
+	//	} else {
+	//		createGraphicWindowIfNecessary(iX,false);
+	//		synchronized(this) {
+	//			if (graphicWindow != null) {
+	//				graphicWindow.safelySetVisible(false);
+	//			}
+	//		}
+	//	}
+	// }
 	//
-	public void maximize0s(ChoisePoint iX) {
-		createGraphicWindowIfNecessary(iX,true);
-		synchronized(this) {
-			if (graphicWindow != null) {
-				DesktopUtils.safelyMaximize(graphicWindow);
-			}
-		}
-	}
+	// public void maximize0s(ChoisePoint iX) {
+	//	createGraphicWindowIfNecessary(iX,true);
+	//	synchronized(this) {
+	//		if (graphicWindow != null) {
+	//			DesktopUtils.safelyMaximize(graphicWindow);
+	//		}
+	//	}
+	// }
 	//
-	public void minimize0s(ChoisePoint iX) {
-		createGraphicWindowIfNecessary(iX,true);
-		synchronized(this) {
-			if (graphicWindow != null) {
-				DesktopUtils.safelyMinimize(graphicWindow);
-			}
-		}
-	}
+	// public void minimize0s(ChoisePoint iX) {
+	//	createGraphicWindowIfNecessary(iX,true);
+	//	synchronized(this) {
+	//		if (graphicWindow != null) {
+	//			DesktopUtils.safelyMinimize(graphicWindow);
+	//		}
+	//	}
+	// }
 	//
-	public void restore0s(ChoisePoint iX) {
-		createGraphicWindowIfNecessary(iX,true);
-		synchronized(this) {
-			if (graphicWindow != null) {
-				DesktopUtils.safelyRestore(graphicWindow);
-			}
-		}
-	}
+	// public void restore0s(ChoisePoint iX) {
+	//	createGraphicWindowIfNecessary(iX,true);
+	//	synchronized(this) {
+	//		if (graphicWindow != null) {
+	//			DesktopUtils.safelyRestore(graphicWindow);
+	//		}
+	//	}
+	// }
 	//
-	public void isVisible0s(ChoisePoint iX) throws Backtracking {
-		// if (desktopDoesNotExist()) {
-		//	throw Backtracking.instance;
-		if (space3DDoesNotExist()) {
-			throw Backtracking.instance;
-		} else {
-			synchronized(this) {
-				if (graphicWindow != null) {
-					if (!DesktopUtils.safelyIsVisible(graphicWindow)) {
-						throw Backtracking.instance;
-					}
-				} else {
-					throw Backtracking.instance;
-				}
-			}
-		}
-	}
+	// public void isVisible0s(ChoisePoint iX) throws Backtracking {
+	//	if (canvasSpaceDoesNotExist()) {
+	//		throw Backtracking.instance;
+	//	} else {
+	//		synchronized(this) {
+	//			if (graphicWindow != null) {
+	//				if (!DesktopUtils.safelyIsVisible(graphicWindow)) {
+	//					throw Backtracking.instance;
+	//				}
+	//			} else {
+	//				throw Backtracking.instance;
+	//			}
+	//		}
+	//	}
+	// }
 	//
-	public void isHidden0s(ChoisePoint iX) throws Backtracking {
-		// if (desktopDoesNotExist()) {
-		if (space3DDoesNotExist()) {
-		} else {
-			synchronized(this) {
-				if (graphicWindow != null) {
-					if (!DesktopUtils.safelyIsHidden(graphicWindow)) {
-						throw Backtracking.instance;
-					}
-				}
-			}
-		}
-	}
+	// public void isHidden0s(ChoisePoint iX) throws Backtracking {
+	//	if (canvasSpaceDoesNotExist()) {
+	//	} else {
+	//		synchronized(this) {
+	//			if (graphicWindow != null) {
+	//				if (!DesktopUtils.safelyIsHidden(graphicWindow)) {
+	//					throw Backtracking.instance;
+	//				}
+	//			}
+	//		}
+	//	}
+	// }
 	//
-	public void isMaximized0s(ChoisePoint iX) throws Backtracking {
-		// if (desktopDoesNotExist()) {
-		//	throw Backtracking.instance;
-		if (space3DDoesNotExist()) {
-			throw Backtracking.instance;
-		} else {
-			synchronized(this) {
-				if (graphicWindow != null) {
-					if (!DesktopUtils.safelyIsMaximized(graphicWindow)) {
-						throw Backtracking.instance;
-					}
-				} else {
-					throw Backtracking.instance;
-				}
-			}
-		}
-	}
+	// public void isMaximized0s(ChoisePoint iX) throws Backtracking {
+	//	if (canvasSpaceDoesNotExist()) {
+	//		throw Backtracking.instance;
+	//	} else {
+	//		synchronized(this) {
+	//			if (graphicWindow != null) {
+	//				if (!DesktopUtils.safelyIsMaximized(graphicWindow)) {
+	//					throw Backtracking.instance;
+	//				}
+	//			} else {
+	//				throw Backtracking.instance;
+	//			}
+	//		}
+	//	}
+	// }
 	//
-	public void isMinimized0s(ChoisePoint iX) throws Backtracking {
-		// if (desktopDoesNotExist()) {
-		//	throw Backtracking.instance;
-		if (space3DDoesNotExist()) {
-			throw Backtracking.instance;
-		} else {
-			synchronized(this) {
-				if (graphicWindow != null) {
-					if(!DesktopUtils.safelyIsMinimized(graphicWindow)) {
-						throw Backtracking.instance;
-					}
-				} else {
-					throw Backtracking.instance;
-				}
-			}
-		}
-	}
+	// public void isMinimized0s(ChoisePoint iX) throws Backtracking {
+	//	if (canvasSpaceDoesNotExist()) {
+	//		throw Backtracking.instance;
+	//	} else {
+	//		synchronized(this) {
+	//			if (graphicWindow != null) {
+	//				if(!DesktopUtils.safelyIsMinimized(graphicWindow)) {
+	//					throw Backtracking.instance;
+	//				}
+	//			} else {
+	//				throw Backtracking.instance;
+	//			}
+	//		}
+	//	}
+	// }
 	//
-	public void isRestored0s(ChoisePoint iX) throws Backtracking {
-		// if (desktopDoesNotExist()) {
-		//	throw Backtracking.instance;
-		if (space3DDoesNotExist()) {
-			throw Backtracking.instance;
-		} else {
-			synchronized(this) {
-				if (graphicWindow != null) {
-					if(!DesktopUtils.safelyIsRestored(graphicWindow)) {
-						throw Backtracking.instance;
-					}
-				} else {
-					throw Backtracking.instance;
-				}
-			}
-		}
-	}
+	// public void isRestored0s(ChoisePoint iX) throws Backtracking {
+	//	if (canvasSpaceDoesNotExist()) {
+	//		throw Backtracking.instance;
+	//	} else {
+	//		synchronized(this) {
+	//			if (graphicWindow != null) {
+	//				if(!DesktopUtils.safelyIsRestored(graphicWindow)) {
+	//					throw Backtracking.instance;
+	//				}
+	//			} else {
+	//				throw Backtracking.instance;
+	//			}
+	//		}
+	//	}
+	// }
 	//
-	public void changeBackgroundColor1s(ChoisePoint iX, Term backgroundColor) {
-		changeBackgroundColor(iX,backgroundColor);
-	}
+	// public void changeBackgroundColor1s(ChoisePoint iX, Term backgroundColor) {
+	// 	changeBackgroundColor(iX,backgroundColor);
+	// }
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void setNode2s(ChoisePoint iX, Term a1, Term a2) {
-		NodeLabel nodeLabel= Tools3D.termToNodeLabel(a1,iX);
+		NodeLabel nodeLabel= NodeLabel.termToNodeLabel(a1,iX);
 		synchronized(this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
-				BranchGroup newNode= PrincipalNode3D.termToBranchGroup(a2,this,simpleUniverse,space3D,iX);
-				Node parent= c.getParent();
-				if (parent != null && parent instanceof Group) {
-					Group group= (Group)parent;
-					int index= group.indexOfChild(c.getNode());
-					if (index >= 0) {
-						group.setChild(newNode,index);
+				if (canvasSpace != null) {
+					BranchGroup newNode= PrincipalNode3D.termToBranchGroup(a2,this,simpleUniverse,(javax.media.j3d.Canvas3D)canvasSpace.getControl(),iX);
+					Node parent= c.getParent();
+					if (parent != null && parent instanceof Group) {
+						Group group= (Group)parent;
+						int index= group.indexOfChild(c.getNode());
+						if (index >= 0) {
+							group.setChild(newNode,index);
+						}
 					}
 				}
 			} else {
@@ -481,7 +839,7 @@ public abstract class Canvas3D
 	}
 	//
 	public void setTransform2s(ChoisePoint iX, Term a1, Term a2) {
-		NodeLabel nodeLabel= Tools3D.termToNodeLabel(a1,iX);
+		NodeLabel nodeLabel= NodeLabel.termToNodeLabel(a1,iX);
 		synchronized(this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
@@ -494,7 +852,7 @@ public abstract class Canvas3D
 	}
 	//
 	public void setTranslation2s(ChoisePoint iX, Term a1, Term a2) {
-		NodeLabel nodeLabel= Tools3D.termToNodeLabel(a1,iX);
+		NodeLabel nodeLabel= NodeLabel.termToNodeLabel(a1,iX);
 		synchronized(this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
@@ -508,7 +866,7 @@ public abstract class Canvas3D
 	}
 	//
 	public void setAppearance2s(ChoisePoint iX, Term a1, Term a2) {
-		NodeLabel nodeLabel= Tools3D.termToNodeLabel(a1,iX);
+		NodeLabel nodeLabel= NodeLabel.termToNodeLabel(a1,iX);
 		synchronized(this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
@@ -521,7 +879,7 @@ public abstract class Canvas3D
 	}
 	//
 	public void setColoringAttributes2s(ChoisePoint iX, Term a1, Term a2) {
-		NodeLabel nodeLabel= Tools3D.termToNodeLabel(a1,iX);
+		NodeLabel nodeLabel= NodeLabel.termToNodeLabel(a1,iX);
 		synchronized(this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
@@ -534,7 +892,7 @@ public abstract class Canvas3D
 	}
 	//
 	public void setFont3D2s(ChoisePoint iX, Term a1, Term a2) {
-		NodeLabel nodeLabel= Tools3D.termToNodeLabel(a1,iX);
+		NodeLabel nodeLabel= NodeLabel.termToNodeLabel(a1,iX);
 		synchronized(this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
@@ -547,7 +905,7 @@ public abstract class Canvas3D
 	}
 	//
 	public void setString2s(ChoisePoint iX, Term a1, Term a2) {
-		NodeLabel nodeLabel= Tools3D.termToNodeLabel(a1,iX);
+		NodeLabel nodeLabel= NodeLabel.termToNodeLabel(a1,iX);
 		synchronized(this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
@@ -558,160 +916,57 @@ public abstract class Canvas3D
 		}
 	}
 	//
-	public void action1s(ChoisePoint iX, Term actionName) {
-	}
+	///////////////////////////////////////////////////////////////
 	//
-	public class Action1s extends Continuation {
-		// private Continuation c0;
-		//
-		public Action1s(Continuation aC, Term actionName) {
-			c0= aC;
-		}
-		//
-		public void execute(ChoisePoint iX) throws Backtracking {
-			c0.execute(iX);
-		}
-	}
+	// public void registerCanvas3D(ExtendedSpace3D s, ChoisePoint iX) {
+	//	synchronized(this) {
+	//		if (canvasSpaceDoesNotExist()) {
+	//			canvasSpace= s;
+	//			if (currentSceneTree != null) {
+	//				showCanvas(currentSceneTree,iX);
+	//			}
+	//		}
+	//	}
+	// }
 	//
-	public void mouseClicked1s(ChoisePoint iX, Term NodeLabels) {
-	}
-	//
-	public class MouseClicked1s extends Continuation {
-		// private Continuation c0;
-		//
-		public MouseClicked1s(Continuation aC, Term NodeLabels) {
-			c0= aC;
-		}
-		//
-		public void execute(ChoisePoint iX) throws Backtracking {
-			c0.execute(iX);
+	protected void initiateRegisteredCanvasSpace(CanvasSpace s, ChoisePoint iX) {
+		if (currentSceneTree != null) {
+			showCanvas(currentSceneTree,iX);
 		}
 	}
 	//
-	public void mouseEntered1s(ChoisePoint iX, Term NodeLabels) {
-	}
+	// public void release(boolean dialogIsModal, ChoisePoint modalChoisePoint) {
+	//	synchronized(this) {
+	//		if (simpleUniverse!=null && graphicWindow==null) {
+	//			releasePickCanvas();
+	//			simpleUniverse.removeAllLocales();
+	//			simpleUniverse.cleanup();
+	//			simpleUniverse= null;
+	//			spin= null;
+	//			canvasSpace= null;
+	//		};
+	//		localMemory.clear();
+	//		inverseTable.clear();
+	//	};
+	//	long domainSignature= entry_s_Stop_0();
+	//	callInternalProcedure(domainSignature,dialogIsModal,modalChoisePoint);
+	// }
 	//
-	public class MouseEntered1s extends Continuation {
-		// private Continuation c0;
-		//
-		public MouseEntered1s(Continuation aC, Term NodeLabels) {
-			c0= aC;
-		}
-		//
-		public void execute(ChoisePoint iX) throws Backtracking {
-			c0.execute(iX);
-		}
+	public void saveCanvasSpaceAttributes() {
 	}
-	//
-	public void mouseExited1s(ChoisePoint iX, Term NodeLabels) {
-	}
-	//
-	public class MouseExited1s extends Continuation {
-		// private Continuation c0;
-		//
-		public MouseExited1s(Continuation aC, Term NodeLabels) {
-			c0= aC;
-		}
-		//
-		public void execute(ChoisePoint iX) throws Backtracking {
-			c0.execute(iX);
-		}
-	}
-	//
-	public void mousePressed1s(ChoisePoint iX, Term NodeLabels) {
-	}
-	//
-	public class MousePressed1s extends Continuation {
-		// private Continuation c0;
-		//
-		public MousePressed1s(Continuation aC, Term NodeLabels) {
-			c0= aC;
-		}
-		//
-		public void execute(ChoisePoint iX) throws Backtracking {
-			c0.execute(iX);
-		}
-	}
-	//
-	public void mouseReleased1s(ChoisePoint iX, Term NodeLabels) {
-	}
-	//
-	public class MouseReleased1s extends Continuation {
-		// private Continuation c0;
-		//
-		public MouseReleased1s(Continuation aC, Term NodeLabels) {
-			c0= aC;
-		}
-		//
-		public void execute(ChoisePoint iX) throws Backtracking {
-			c0.execute(iX);
-		}
-	}
-	//
-	public void mouseDragged1s(ChoisePoint iX, Term NodeLabels) {
-	}
-	//
-	public class MouseDragged1s extends Continuation {
-		// private Continuation c0;
-		//
-		public MouseDragged1s(Continuation aC, Term NodeLabels) {
-			c0= aC;
-		}
-		//
-		public void execute(ChoisePoint iX) throws Backtracking {
-			c0.execute(iX);
-		}
-	}
-	//
-	public void mouseMoved1s(ChoisePoint iX, Term NodeLabels) {
-	}
-	//
-	public class MouseMoved1s extends Continuation {
-		// private Continuation c0;
-		//
-		public MouseMoved1s(Continuation aC, Term NodeLabels) {
-			c0= aC;
-		}
-		//
-		public void execute(ChoisePoint iX) throws Backtracking {
-			c0.execute(iX);
-		}
-	}
-	//
-	public void initialize0s(ChoisePoint iX) {
-	}
-	public void start0s(ChoisePoint iX) {
-	}
-	public void stop0s(ChoisePoint iX) {
-	}
-	//
-	public void registerCanvas3D(ExtendedSpace3D s, ChoisePoint iX) {
-		synchronized(this) {
-			if (space3D==null) {
-				space3D= s;
-				if (currentSceneTree != null) {
-					showCanvas(currentSceneTree,iX);
-				}
-			}
-		}
-	}
-	//
-	public void release(boolean dialogIsModal, ChoisePoint modalChoisePoint) {
-		synchronized(this) {
-			if (simpleUniverse!=null && graphicWindow==null) {
-				releasePickCanvas();
-				simpleUniverse.removeAllLocales();
-				simpleUniverse.cleanup();
-				simpleUniverse= null;
-				spin= null;
-				space3D= null;
-			};
-			localMemory.clear();
-			inverseTable.clear();
+	public void clearCustomControlTables() {
+		if (simpleUniverse!=null && graphicWindow==null) {
+			releasePickCanvas();
+			simpleUniverse.removeAllLocales();
+			simpleUniverse.cleanup();
+			simpleUniverse= null;
+			spin= null;
 		};
-		long domainSignature= entry_s_Stop_0();
-		callInternalProcedure(domainSignature,dialogIsModal,modalChoisePoint);
+		localMemory.clear();
+		inverseTable.clear();
 	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void draw(boolean dialogIsModal, ChoisePoint modalChoisePoint) {
 		if (controlIsInitialized.compareAndSet(false,true)) {
@@ -721,7 +976,9 @@ public abstract class Canvas3D
 		long domainSignature2= entry_s_Start_0();
 		callInternalProcedure(domainSignature2,dialogIsModal,modalChoisePoint);
 	}
-	// Auxiliary operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	// protected boolean desktopDoesNotExist() {
 	//	MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
 	//	if (desktop==null) {
@@ -730,26 +987,24 @@ public abstract class Canvas3D
 	//		return false;
 	//	}
 	// }
-	public boolean space3DDoesNotExist() {
-		// Map<AbstractWorld,InternalFrame3D> innerWindows= StaticAttributes3D.retrieveInnerWindows(staticContext);
-		// return !innerWindows.containsKey(this);
-		synchronized(this) {
-			return (space3D==null);
-		}
-	}
-	protected void createGraphicWindowIfNecessary(ChoisePoint iX, boolean enableMovingWindowToFront) {
-		synchronized(this) {
-			if (space3D==null && !controlIsInitialized.get()) {
-				DesktopUtils.createPaneIfNecessary(staticContext);
-				graphicWindow= createInternalFrameIfNecessary(iX,enableMovingWindowToFront);
-			} else if (graphicWindow != null) {
-				if (enableMovingWindowToFront) {
-					DesktopUtils.safelyMoveToFront(graphicWindow);
-				};
-				DesktopUtils.safelySetVisible(true,graphicWindow);
-			}
-		}
-	}
+	// public boolean canvasSpaceDoesNotExist() {
+	//	synchronized(this) {
+	//		return (canvasSpace==null);
+	//	}
+	// }
+	// protected void createGraphicWindowIfNecessary(ChoisePoint iX, boolean enableMovingWindowToFront) {
+	//	synchronized(this) {
+	//		if (canvasSpaceDoesNotExist() && !controlIsInitialized.get()) {
+	//			DesktopUtils.createPaneIfNecessary(staticContext);
+	//			graphicWindow= createInternalFrameIfNecessary(iX,enableMovingWindowToFront);
+	//		} else if (graphicWindow != null) {
+	//			if (enableMovingWindowToFront) {
+	//				graphicWindow.safelyMoveToFront();
+	//			};
+	//			graphicWindow.safelySetVisible(true);
+	//		}
+	//	}
+	// }
 	//
 	protected InternalFrame3D createInternalFrameIfNecessary(ChoisePoint iX, boolean enableMovingWindowToFront) {
 		Map<AbstractWorld,InternalFrame3D> innerWindows= StaticAttributes3D.retrieveInnerWindows(staticContext);
@@ -760,7 +1015,7 @@ public abstract class Canvas3D
 			synchronized(this) {
 				graphicWindow= innerWindows.get(this);
 				if (graphicWindow==null) {
-					graphicWindow= createInternalFrame(iX);
+					graphicWindow= formInternalFrame(iX);
 					restoreWindow= true;
 				}
 			}
@@ -771,101 +1026,56 @@ public abstract class Canvas3D
 			graphicWindow.safelyRestoreSize(staticContext);
 		};
 		if (moveWindowToFront && enableMovingWindowToFront) {
-			DesktopUtils.safelyMoveToFront(graphicWindow);
+			graphicWindow.safelyMoveToFront();
 		};
-		DesktopUtils.safelySetVisible(true,graphicWindow);
+		graphicWindow.safelySetVisible(true);
 		return graphicWindow;
 	}
 	//
-	protected InternalFrame3D createInternalFrame(ChoisePoint iX) {
+	protected InternalFrame3D formInternalFrame(ChoisePoint iX) {
 		//
-		// String title= getBuiltInSlot_E_title().toString(iX);
-		String title= null;
-		try {
-			title= GUI_Utils.termToFrameTitleSafe(getBuiltInSlot_E_title(),iX);
-		} catch (TermIsSymbolDefault e) {
-			title= "";
-		};
+		String title= getTitle(iX).getValueOrDefaultText("");
 		//
-		InternalFrame3D graphicWindow= new InternalFrame3D(title,staticContext);
+		InternalFrame3D internalFrame3D= new InternalFrame3D(title,staticContext);
+		graphicWindow= internalFrame3D;
 		Map<AbstractWorld,InternalFrame3D> innerWindows= StaticAttributes3D.retrieveInnerWindows(staticContext);
-		innerWindows.put(this,graphicWindow);
+		innerWindows.put(this,internalFrame3D);
 		//
-		graphicWindow.addComponentListener(this);
+		internalFrame3D.safelyAddComponentListener(this);
 		//
 		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
-		desktop.add(graphicWindow);
+		desktop.safelyAdd(internalFrame3D.getInternalFrame());
 		//
-		redrawInternalFrame(graphicWindow,null,iX);
+		canvasSpace= internalFrame3D.getCanvasSpace();
+		refreshAttributesOfInternalFrame(internalFrame3D,null,iX);
 		//
-		return graphicWindow;
+		return internalFrame3D;
 	}
-	protected void redrawInternalFrame(InternalFrame3D container, ChoisePoint iX) {
-		// String title= getBuiltInSlot_E_title().toString(iX);
-		String title= null;
-		try {
-			title= GUI_Utils.termToFrameTitleSafe(getBuiltInSlot_E_title(),iX);
-		} catch (TermIsSymbolDefault e) {
-			title= "";
-		};
-		redrawInternalFrame(container,title,iX);
-	}
-	protected void redrawInternalFrame(InternalFrame3D graphicWindow, String title, ChoisePoint iX) {
-		//
-		if (title != null) {
-			DesktopUtils.safelySetTitle(title,graphicWindow);
-		};
-		//
-		Term x= getBuiltInSlot_E_x();
-		Term y= getBuiltInSlot_E_y();
-		Term width= getBuiltInSlot_E_width().copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
-		Term height= getBuiltInSlot_E_height().copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
-		//
-		graphicWindow.logicalWidth.set(GUI_Utils.termToSize(width,iX));
-		graphicWindow.logicalHeight.set(GUI_Utils.termToSize(height,iX));
-		graphicWindow.logicalX.set(GUI_Utils.termToCoordinate(x,iX));
-		graphicWindow.logicalY.set(GUI_Utils.termToCoordinate(y,iX));
-		//
-		changeBackgroundColor(iX,getBuiltInSlot_E_background_color());
-	}
+	// protected void refreshAttributesOfInternalFrame(InternalFrame3D container, ChoisePoint iX) {
+	//	String title= getTitle(iX).getValueOrDefaultText("");
+	//	refreshAttributesOfInternalFrame(container,title,iX);
+	// }
+	// protected void refreshAttributesOfInternalFrame(InternalFrame3D graphicWindow, String title, ChoisePoint iX) {
+	//	//
+	//	if (title != null) {
+	//		graphicWindow.safelySetTitle(title);
+	//	};
+	//	//
+	//	Term x= getBuiltInSlot_E_x();
+	//	Term y= getBuiltInSlot_E_y();
+	//	Term width= getBuiltInSlot_E_width().copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
+	//	Term height= getBuiltInSlot_E_height().copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
+	//	//
+	//	graphicWindow.logicalWidth.set(ExtendedSize.termToExtendedSize(width,iX));
+	//	graphicWindow.logicalHeight.set(ExtendedSize.termToExtendedSize(height,iX));
+	//	graphicWindow.logicalX.set(ExtendedCoordinate.termToExtendedCoordinate(x,iX));
+	//	graphicWindow.logicalY.set(ExtendedCoordinate.termToExtendedCoordinate(y,iX));
+	//	//
+	//	changeBackgroundColor(iX,getBuiltInSlot_E_background_color());
+	// }
 	//
-	public void changeBackgroundColor(ChoisePoint iX, Term requiredColor) {
-		Color color;
-		try {
-			// color= GUI_Utils.termToColor(requiredColor,iX);
-			Color3f color3d= Tools3D.term2Color3OrExit(requiredColor,iX);
-			color= color3d.get();
-		} catch (TermIsSymbolDefault e1) {
-			try {
-				requiredColor= getBuiltInSlot_E_background_color();
-				// color= GUI_Utils.termToColor(requiredColor,iX);
-				Color3f color3d= Tools3D.term2Color3OrExit(requiredColor,iX);
-				color= color3d.get();
-			} catch (TermIsSymbolDefault e2) {
-				color= defaultBackgroundColor;
-			}
-		};
-		backgroundColor.set(color);
-		safelySetBackground(color);
-	}
-	protected void safelySetBackground(final Color color) {
-		if (SwingUtilities.isEventDispatchThread()) {
-			if (space3D != null) {
-				space3D.setBackground(color);
-			}
-		} else {
-			try {
-				SwingUtilities.invokeAndWait(new Runnable() {
-					public void run() {
-						if (space3D != null) {
-							space3D.setBackground(color);
-						}
-					}
-				});
-			} catch (InterruptedException e) {
-			} catch (InvocationTargetException e) {
-			}
-		}
+	protected void refreshAttributesOfCanvasSpace(ChoisePoint iX) {
+		changeBackgroundColor(iX);
 	}
 	//
 	public void rememberNode(NodeLabel label, TransformGroup node) {
@@ -886,6 +1096,12 @@ public abstract class Canvas3D
 			inverseTable.put(node,label);
 		}
 	}
+	//public void rememberNode(NodeLabel label, Appearance node) {
+	//	synchronized(this) {
+	//		localMemory.put(label,new NodeContainer(node));
+	//		inverseTable.put(node,label);
+	//	}
+	//}
 	public Shape3D retrieveShape3D(NodeLabel label) {
 		synchronized(this) {
 			NodeContainer c= localMemory.get(label);
@@ -921,6 +1137,8 @@ public abstract class Canvas3D
 		}
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void componentHidden(ComponentEvent e) {
 		DesktopUtils.selectNextInternalFrame(staticContext);
 	}
@@ -930,6 +1148,8 @@ public abstract class Canvas3D
 	}
 	public void componentShown(ComponentEvent e) {
 	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void registerPickCanvas(CustomizedPickCanvas pc) {
 		customizedPickCanvasList.add(pc);

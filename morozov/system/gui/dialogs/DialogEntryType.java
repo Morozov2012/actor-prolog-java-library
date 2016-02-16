@@ -8,18 +8,15 @@ package morozov.system.gui.dialogs;
 
 import target.*;
 
+import morozov.built_in.*;
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.gui.*;
-import morozov.system.gui.dialogs.signals.*;
-import morozov.system.gui.signals.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 
 import java.awt.Color;
-import java.awt.Point;
-import java.awt.Dimension;
-import java.awt.Rectangle;
 import java.awt.Font;
 
 class IllegalCallOfInternalMethod extends RuntimeException {}
@@ -31,6 +28,9 @@ public enum DialogEntryType {
 		}
 		Term getValue(AbstractDialog dialog) {
 			throw new IllegalCallOfInternalMethod();
+		}
+		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
+			return targetWorld.getSlotByName(name);
 		}
 		public boolean isValueOrAction() {
 			return true;
@@ -46,6 +46,9 @@ public enum DialogEntryType {
 		Term getValue(AbstractDialog dialog) {
 			throw new IllegalCallOfInternalMethod();
 		}
+		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
+			return targetWorld.getSlotByName(name);
+		}
 		public boolean isValueActionOrRange() {
 			return true;
 		}
@@ -55,6 +58,9 @@ public enum DialogEntryType {
 			throw new IllegalCallOfInternalMethod();
 		}
 		Term getValue(AbstractDialog dialog) {
+			throw new IllegalCallOfInternalMethod();
+		}
+		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
 			throw new IllegalCallOfInternalMethod();
 		}
 		public boolean isValueOrAction() {
@@ -74,26 +80,31 @@ public enum DialogEntryType {
 		public boolean isValueOrAction() {
 			return true;
 		}
+		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
+			throw new IllegalCallOfInternalMethod();
+		}
 		public boolean isValueActionOrRange() {
 			return true;
 		}
 	},
 	TITLE {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			String title= null;
-			try {
-				title= GUI_Utils.termToFrameTitleSafe(value,iX);
-			} catch (TermIsSymbolDefault e1) {
-				title= dialog.getPredefinedTitle();
-			};
-			dialog.setTitle(title);
+			ExtendedTitle title= ExtendedTitle.termToExtendedTitleSafe(value,iX);
+			dialog.changeTitle(title);
 		}
 		Term getValue(AbstractDialog dialog) {
-			String title= dialog.getTitle();
+			String title= dialog.safelyGetTitle();
 			if (title==null) {
 				title= "";
 			};
 			return new PrologString(title);
+		}
+		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
+			try {
+				return targetWorld.getTitleOrFail(iX);
+			} catch (Backtracking b) {
+				return targetWorld.getSlotByName(name);
+			}
 		}
 		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 			value= value.dereferenceValue(iX);
@@ -118,124 +129,61 @@ public enum DialogEntryType {
 			}
 		}
 	},
-	X {
-		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			ExtendedCoordinate actualX= GUI_Utils.termToCoordinateSafe(value,iX);
-			try {
-				Rectangle bounds= dialog.computeParentLayoutSize();
-				double gridX= DefaultOptions.gridWidth;
-				Point p= dialog.getLocation();
-				Dimension size= dialog.getSize();
-				p.x= DialogUtils.calculateRealCoordinate(actualX,bounds.x,bounds.width,gridX,size.getWidth());
-				dialog.setLocation(p);
-			} catch (UseDefaultLocation e) {
-			}
-		}
-		Term getValue(AbstractDialog dialog) {
-			Rectangle bounds= dialog.computeParentLayoutSize();
-			double gridX= DefaultOptions.gridWidth;
-			Point p= dialog.getLocation();
-			return new PrologReal((double)p.x/(((double)(bounds.width-bounds.x))/gridX));
-		}
-		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-			return DialogUtils.standardizeCoordinateValue(value,iX);
-		}
-	},
-	Y {
-		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			ExtendedCoordinate actualY= GUI_Utils.termToCoordinateSafe(value,iX);
-			try {
-				Rectangle bounds= dialog.computeParentLayoutSize();
-				double gridY= DefaultOptions.gridHeight;
-				Point p= dialog.getLocation();
-				Dimension size= dialog.getSize();
-				p.y= DialogUtils.calculateRealCoordinate(actualY,bounds.y,bounds.height,gridY,size.getHeight());
-				dialog.setLocation(p);
-			} catch (UseDefaultLocation e) {
-			//} catch (Throwable eee) {
-			//	throw eee;
-			}
-		}
-		Term getValue(AbstractDialog dialog) {
-			Rectangle bounds= dialog.computeParentLayoutSize();
-			double gridY= DefaultOptions.gridHeight;
-			Point p= dialog.getLocation();
-			return new PrologReal((double)p.y/(((double)(bounds.height-bounds.y))/gridY));
-		}
-		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-			return DialogUtils.standardizeCoordinateValue(value,iX);
-		}
-	},
 	TEXT_COLOR {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			Color foregroundColor= null;
-			try {
-				foregroundColor= GUI_Utils.termToColorSafe(value,iX);
-			} catch (TermIsSymbolDefault e1) {
-				try {
-					foregroundColor= GUI_Utils.termToColorSafe(dialog.getPredefinedTextColor(),iX);
-				} catch (TermIsSymbolDefault e2) {
-					foregroundColor= dialog.defaultDialogTextColor;
-				}
-			};
-			dialog.setNewForeground(foregroundColor);
-			dialog.repaint();
+			ExtendedColor color= ExtendedColor.termToExtendedColorSafe(value,iX);
+			dialog.changeTextColor(color,true,iX);
+			// dialog.safelyRepaint();
 		}
 		Term getValue(AbstractDialog dialog) {
-			Color foregroundColor= dialog.getForeground();
+			Color foregroundColor= dialog.safelyGetForegroundColor();
 			if (foregroundColor==null) {
 				return new PrologSymbol(SymbolCodes.symbolCode_E_default);
 			} else {
 				return new PrologInteger(foregroundColor.getRGB());
 			}
 		}
+		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
+			try {
+				return targetWorld.getTextColorOrFail(iX);
+			} catch (Backtracking b) {
+				return targetWorld.getSlotByName(name);
+			}
+		}
 		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-			return DialogUtils.standardizeColorValue(value,iX);
+			return ExtendedColor.standardizeColorValue(value,iX);
 		}
 	},
 	SPACE_COLOR {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			Color spaceColor= null;
-			try {
-				spaceColor= GUI_Utils.termToColorSafe(value,iX);
-			} catch (TermIsSymbolDefault e1) {
-				try {
-					spaceColor= GUI_Utils.termToColorSafe(dialog.getPredefinedSpaceColor(),iX);
-				} catch (TermIsSymbolDefault e2) {
-					spaceColor= dialog.defaultDialogSpaceColor;
-				}
-			};
-			dialog.setNewSpaceColor(spaceColor);
-			dialog.repaint();
+			ExtendedColor color= ExtendedColor.termToExtendedColorSafe(value,iX);
+			dialog.changeSpaceColor(color,true,iX);
+			// dialog.safelyRepaint();
 		}
 		Term getValue(AbstractDialog dialog) {
-			Color spaceColor= dialog.getBackground();
+			Color spaceColor= dialog.safelyGetBackgroundColor();
 			if (spaceColor==null) {
 				return new PrologSymbol(SymbolCodes.symbolCode_E_default);
 			} else {
 				return new PrologInteger(spaceColor.getRGB());
 			}
 		}
+		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
+			try {
+				return targetWorld.getSpaceColorOrFail(iX);
+			} catch (Backtracking b) {
+				return targetWorld.getSlotByName(name);
+			}
+		}
 		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-			return DialogUtils.standardizeColorValue(value,iX);
+			return ExtendedColor.standardizeColorValue(value,iX);
 		}
 	},
 	BACKGROUND_COLOR {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			Color backgroundColor= null;
-			try {
-				backgroundColor= GUI_Utils.termToColorSafe(value,iX);
-			} catch (TermIsSymbolDefault e1) {
-				try {
-					backgroundColor= GUI_Utils.termToColorSafe(dialog.getPredefinedBackgroundColor(),iX);
-				} catch (TermIsSymbolDefault e2) {
-					backgroundColor= dialog.defaultDialogSuccessBackgroundColor;
-				}
-			};
-			dialog.currentSuccessBackgroundColor.set(backgroundColor);
-			Color refinedBackgroundColor= dialog.refineBackgroundColor(backgroundColor);
-			dialog.setNewBackground(refinedBackgroundColor);
-			dialog.repaint();
+			ExtendedColor color= ExtendedColor.termToExtendedColorSafe(value,iX);
+			dialog.changeBackgroundColor(color,true,iX);
+			// dialog.safelyRepaint();
 		}
 		Term getValue(AbstractDialog dialog) {
 			Color backgroundColor= dialog.currentSuccessBackgroundColor.get();
@@ -245,117 +193,180 @@ public enum DialogEntryType {
 				return new PrologInteger(backgroundColor.getRGB());
 			}
 		}
+		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
+			try {
+				return targetWorld.getBackgroundColorOrFail(iX);
+			} catch (Backtracking b) {
+				return targetWorld.getSlotByName(name);
+			}
+		}
 		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-			return DialogUtils.standardizeColorValue(value,iX);
+			return ExtendedColor.standardizeColorValue(value,iX);
 		}
 	},
 	FONT_NAME {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			String fontName= null;
-			try {
-				fontName= GUI_Utils.termToFontNameSafe(value,iX);
-			} catch (TermIsSymbolDefault e1) {
-				try {
-					fontName= GUI_Utils.termToFontName(dialog.getPredefinedFontName(),iX);
-				} catch (TermIsSymbolDefault e2) {
-					try {
-						fontName= GUI_Utils.termToFontName(DefaultOptions.dialogFontName,iX);
-					} catch (TermIsSymbolDefault e3) {
-						fontName= dialog.defaultDialogFontName;
-					}
-				}
-			};
-			dialog.setCurrentFontName(fontName);
-			Font newFont= dialog.create_new_font();
-			dialog.setNewFont(newFont);
-			dialog.implementPreferredSize();
-			dialog.validate();
+			ExtendedFontName fontName= ExtendedFontName.termToExtendedFontNameSafe(value,iX);
+			dialog.changeFontName(fontName,iX);
 		}
 		Term getValue(AbstractDialog dialog) {
-			return new PrologString(dialog.currentFontName.get());
+			return new PrologString(dialog.getCurrentFontName());
+		}
+		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
+			try {
+				return targetWorld.getFontNameOrFail(iX);
+			} catch (Backtracking b) {
+				return targetWorld.getSlotByName(name);
+			}
 		}
 		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-			return DialogUtils.standardizeFontNameValue(value,iX);
+			return ExtendedFontName.standardizeFontNameValue(value,iX);
 		}
 
 	},
 	FONT_SIZE {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			int fontSize= dialog.defaultDialogFontSize;
-			try {
-				fontSize= GUI_Utils.termToFontSizeSafe(value,iX);
-			} catch (TermIsSymbolDefault e1) {
-				try {
-					fontSize= GUI_Utils.termToFontSize(dialog.getPredefinedFontSize(),iX);
-				} catch (TermIsSymbolDefault e2) {
-					try {
-						fontSize= GUI_Utils.termToFontSize(DefaultOptions.dialogFontSize,iX);
-					} catch (TermIsSymbolDefault e3) {
-						fontSize= dialog.defaultDialogFontSize;
-					}
-				}
-			};
-			if (fontSize < 1) {
-				fontSize= 1;
-			};
-			dialog.setCurrentFontSize(fontSize);
-			Font newFont= dialog.create_new_font();
-			dialog.setNewFont(newFont);
-			dialog.implementPreferredSize();
-			dialog.validate();
+			ExtendedFontSize fontSize= ExtendedFontSize.termToExtendedFontSizeSafe(value,iX);
+			dialog.changeFontSize(fontSize,iX);
 		}
 		Term getValue(AbstractDialog dialog) {
-			int size2= dialog.currentFontSize.get();
+			int size2= dialog.getCurrentFontSize();
 			int size1= DefaultOptions.fontSystemSimulationMode.reconstruct(size2);
-			return new PrologReal(size2);
+			// return new PrologReal(size2);
+			return new PrologInteger(size2);
+		}
+		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
+			try {
+				return targetWorld.getFontSizeOrFail(iX);
+			} catch (Backtracking b) {
+				return targetWorld.getSlotByName(name);
+			}
 		}
 		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-			return DialogUtils.standardizeFontSizeValue(value,iX);
+			return ExtendedFontSize.standardizeFontSizeValue(value,iX);
 		}
 	},
 	FONT_STYLE {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			int fontStyle= Font.PLAIN;
-			boolean fontUnderline= false;
-			try {
-				fontStyle= GUI_Utils.termToFontStyleSafe(value,iX);
-				fontUnderline= GUI_Utils.fontIsUnderlined(value,iX);
-			} catch (TermIsSymbolDefault e1) {
-				try {
-					fontStyle= GUI_Utils.termToFontStyleSafe(dialog.getPredefinedFontStyle(),iX);
-					fontUnderline= GUI_Utils.fontIsUnderlined(dialog.getPredefinedFontStyle(),iX);
-				} catch (TermIsSymbolDefault e2) {
-					try {
-						fontStyle= GUI_Utils.termToFontStyleSafe(DefaultOptions.dialogFontStyle,iX);
-						fontUnderline= GUI_Utils.fontIsUnderlined(DefaultOptions.dialogFontStyle,iX);
-					} catch (TermIsSymbolDefault e3) {
-						fontStyle= dialog.defaultDialogFontStyle;
-						fontUnderline= dialog.defaultDialogFontUnderline;
-					}
-				}
-			};
-			dialog.setCurrentFontStyle(fontStyle);
-			dialog.setCurrentFontUnderline(fontUnderline);
-			Font newFont= dialog.create_new_font();
-			dialog.setNewFont(newFont);
-			dialog.implementPreferredSize();
-			// dialog.validate();
-			// dialog.repaint();
-			dialog.invalidate(); // 2012.03.05
+			ExtendedFontStyle fontStyle= ExtendedFontStyle.termToExtendedFontStyleSafe(value,iX);
+			dialog.changeFontStyle(fontStyle,iX);
 		}
 		Term getValue(AbstractDialog dialog) {
-			int fontStyle= dialog.currentFontStyle.get();
+			int fontStyle= dialog.getCurrentFontStyle();
 			boolean isBold= (fontStyle & Font.BOLD) != 0;
 			boolean isItalic= (fontStyle & Font.ITALIC) != 0;
-			boolean isUnderline= dialog.currentFontUnderline.get();
-			return GUI_Utils.fontStyleToTerm(isBold,isItalic,isUnderline);
+			boolean isUnderline= dialog.getCurrentFontUnderline();
+			return ExtendedFontStyle.fontStyleToTerm(isBold,isItalic,isUnderline);
+		}
+		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
+			try {
+				return targetWorld.getFontStyleOrFail(iX);
+			} catch (Backtracking b) {
+				return targetWorld.getSlotByName(name);
+			}
 		}
 		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-			return DialogUtils.standardizeFontStyleValue(value,iX);
+			return ExtendedFontStyle.standardizeFontStyleValue(value,iX);
+		}
+	},
+	X {
+		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
+			ExtendedCoordinate x= ExtendedCoordinate.termToExtendedCoordinateSafe(value,iX);
+			dialog.changeActualX(x,iX);
+		}
+		Term getValue(AbstractDialog dialog) {
+			return new PrologReal(dialog.getActualX());
+		}
+		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
+			try {
+				return targetWorld.getXOrFail(iX);
+			} catch (Backtracking b) {
+				return targetWorld.getSlotByName(name);
+			}
+		}
+		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
+			return ExtendedCoordinate.standardizeCoordinateValue(value,iX);
+		}
+	},
+	Y {
+		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
+			ExtendedCoordinate y= ExtendedCoordinate.termToExtendedCoordinateSafe(value,iX);
+			dialog.changeActualY(y,iX);
+		}
+		Term getValue(AbstractDialog dialog) {
+			return new PrologReal(dialog.getActualY());
+		}
+		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
+			try {
+				return targetWorld.getYOrFail(iX);
+			} catch (Backtracking b) {
+				return targetWorld.getSlotByName(name);
+			}
+		}
+		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
+			return ExtendedCoordinate.standardizeCoordinateValue(value,iX);
+		}
+	},
+	IDENTIFIER {
+		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
+			dialog.getTargetWorld().setIdentifier(DialogIdentifierOrAuto.termToDialogIdentifierOrAuto(value,iX));
+		}
+		Term getValue(AbstractDialog dialog) {
+			throw new IllegalCallOfInternalMethod();
+		}
+		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
+			return targetWorld.getIdentifier(iX).toTerm();
+		}
+		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
+			return DialogIdentifierOrAuto.standardizeValue(value,iX);
+		}
+	},
+	IS_MODAL {
+		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
+			dialog.getTargetWorld().setIsModal(YesNoDefault.term2YesNoDefault(value,iX));
+		}
+		Term getValue(AbstractDialog dialog) {
+			throw new IllegalCallOfInternalMethod();
+		}
+		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
+			return targetWorld.getIsModal(iX).toTerm();
+		}
+		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
+			return YesNoDefault.standardizeValue(value,iX);
+		}
+	},
+	IS_TOP_LEVEL_WINDOW {
+		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
+			dialog.getTargetWorld().setIsTopLevelWindow(YesNo.term2YesNo(value,iX));
+		}
+		Term getValue(AbstractDialog dialog) {
+			throw new IllegalCallOfInternalMethod();
+		}
+		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
+			return targetWorld.getIsTopLevelWindow(iX).toTerm();
+		}
+		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
+			return YesNo.standardizeValue(value,iX);
+		}
+	},
+	IS_EXIT_ON_CLOSE {
+		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
+			dialog.getTargetWorld().setExitOnClose(YesNoDefault.term2YesNoDefault(value,iX));
+		}
+		Term getValue(AbstractDialog dialog) {
+			throw new IllegalCallOfInternalMethod();
+		}
+		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
+			return targetWorld.getExitOnClose(iX).toTerm();
+		}
+		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
+			return YesNoDefault.standardizeValue(value,iX);
 		}
 	};
 	abstract void putValue(AbstractDialog dialog, Term value, ChoisePoint iX);
 	abstract Term getValue(AbstractDialog dialog);
+	abstract Term getSlotByName(String name, Dialog dialog, ChoisePoint iX);
+	// abstract Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue;
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		return value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 	}

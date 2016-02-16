@@ -16,6 +16,6 @@ public class UndefinedErrorExit extends ErrorExit {
 	}
 	public String toString() {
 		SymbolName name= SymbolNames.retrieveSymbolName(SymbolCodes.symbolCode_E_undefined_exception);
-		return "'" + name.toString(null) + "'";
+		return "'" + name.toRawString(null) + "'";
 	}
 }

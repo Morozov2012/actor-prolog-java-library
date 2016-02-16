@@ -6,16 +6,18 @@
 
 package morozov.system.gui;
 
+import morozov.terms.*;
+
 public enum FontSystemSimulationMode {
 	JAVA {
 	},
 	WINDOWS {
 		public int simulate(int size1) {
-			int size2= (int)StrictMath.round((size1 - regressionCoefficient0) / regressionCoefficient1);
+			int size2= PrologInteger.toInteger((size1 - regressionCoefficient0) / regressionCoefficient1);
 			return size2;
 		}
 		public int reconstruct(int size1) {
-			int size2= (int)StrictMath.round(size1 * regressionCoefficient1 + regressionCoefficient0);
+			int size2= PrologInteger.toInteger(size1 * regressionCoefficient1 + regressionCoefficient0);
 			return size2;
 		}
 	},

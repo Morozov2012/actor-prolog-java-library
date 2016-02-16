@@ -60,8 +60,8 @@ public class ScalableButton extends ScalableAbstractButton {
 				Dimension preferredSize= component.getPreferredSize();
 				double scaledWidth= preferredSize.getWidth() * horizontalScaling;
 				double scaledHeight= preferredSize.getHeight() * verticalScaling;
-				int deltaWidth= (int)StrictMath.round((scaledWidth - preferredSize.getWidth()) / 2);
-				int deltaHeight= (int)StrictMath.round((scaledHeight - preferredSize.getHeight()) / 2);
+				int deltaWidth= PrologInteger.toInteger((scaledWidth - preferredSize.getWidth()) / 2);
+				int deltaHeight= PrologInteger.toInteger((scaledHeight - preferredSize.getHeight()) / 2);
 				int topMargin= initialTopMargin + deltaHeight;
 				int leftMargin= initialLeftMargin + deltaWidth;
 				int bottomMargin= initialBottomMargin + deltaHeight;

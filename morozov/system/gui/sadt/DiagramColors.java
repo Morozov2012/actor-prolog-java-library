@@ -53,69 +53,69 @@ public class DiagramColors {
 	//
 	public DiagramColors() {
 		try {
-			fontName= GUI_Utils.termToFontName(DefaultOptions.diagramFontName,null);
+			fontName= ExtendedFontName.termToFontName(DefaultOptions.diagramFontName,null);
 		} catch (TermIsSymbolDefault e1) {
 			fontName= defaultDiagramFontName;
 		};
 		try {
-			fontSize= GUI_Utils.termToFontSize(DefaultOptions.diagramFontSize,null);
+			fontSize= ExtendedFontSize.termToFontSize(DefaultOptions.diagramFontSize,null);
 		} catch (TermIsSymbolDefault e1) {
 			fontSize= defaultDiagramFontSize;
 		};
 		try {
-			fontStyle= GUI_Utils.termToFontStyleSafe(DefaultOptions.diagramFontStyle,null);
+			fontStyle= ExtendedFontStyle.termToFontStyleSafe(DefaultOptions.diagramFontStyle,null);
 		} catch (TermIsSymbolDefault e1) {
 			fontStyle= defaultDiagramFontStyle;
 		};
 		try {
-			successDrawingForegroundColor= GUI_Utils.termToColorSafe(DefaultOptions.successDrawingForegroundColor,null);
+			successDrawingForegroundColor= ExtendedColor.termToColorSafe(DefaultOptions.successDrawingForegroundColor,null);
 		} catch (TermIsSymbolDefault e1) {
 			successDrawingForegroundColor= defaultSuccessDrawingForegroundColor;
 		};
 		try {
-			successDrawingBackgroundColor= GUI_Utils.termToColorSafe(DefaultOptions.successDrawingBackgroundColor,null);
+			successDrawingBackgroundColor= ExtendedColor.termToColorSafe(DefaultOptions.successDrawingBackgroundColor,null);
 		} catch (TermIsSymbolDefault e1) {
 			successDrawingBackgroundColor= defaultSuccessDrawingBackgroundColor;
 		};
 		try {
-			successTextForegroundColor= GUI_Utils.termToColorSafe(DefaultOptions.successTextForegroundColor,null);
+			successTextForegroundColor= ExtendedColor.termToColorSafe(DefaultOptions.successTextForegroundColor,null);
 		} catch (TermIsSymbolDefault e1) {
 			successTextForegroundColor= defaultSuccessTextForegroundColor;
 		};
 		try {
-			successTextBackgroundColor= GUI_Utils.termToColorSafe(DefaultOptions.successTextBackgroundColor,null);
+			successTextBackgroundColor= ExtendedColor.termToColorSafe(DefaultOptions.successTextBackgroundColor,null);
 		} catch (TermIsSymbolDefault e1) {
 			successTextBackgroundColor= defaultSuccessTextBackgroundColor;
 		};
 		initialFont= DiagramUtils.computeFont(fontName,fontSize,fontStyle,successTextForegroundColor,successTextBackgroundColor);
 		minimalFont= DiagramUtils.computeFont(fontName,minimalFontSize,fontStyle,successTextForegroundColor,successTextBackgroundColor);
 		try {
-			failureDrawingForegroundColor= GUI_Utils.termToColorSafe(DefaultOptions.failureDrawingForegroundColor,null);
+			failureDrawingForegroundColor= ExtendedColor.termToColorSafe(DefaultOptions.failureDrawingForegroundColor,null);
 		} catch (TermIsSymbolDefault e1) {
 			failureDrawingForegroundColor= defaultFailureDrawingForegroundColor;
 		};
 		try {
-			failureDrawingBackgroundColor= GUI_Utils.termToColorSafe(DefaultOptions.failureDrawingBackgroundColor,null);
+			failureDrawingBackgroundColor= ExtendedColor.termToColorSafe(DefaultOptions.failureDrawingBackgroundColor,null);
 		} catch (TermIsSymbolDefault e1) {
 			failureDrawingBackgroundColor= defaultFailureDrawingBackgroundColor;
 		};
 		try {
-			failureTextForegroundColor= GUI_Utils.termToColorSafe(DefaultOptions.failureTextForegroundColor,null);
+			failureTextForegroundColor= ExtendedColor.termToColorSafe(DefaultOptions.failureTextForegroundColor,null);
 		} catch (TermIsSymbolDefault e1) {
 			failureTextForegroundColor= defaultFailureTextForegroundColor;
 		};
 		try {
-			failureTextBackgroundColor= GUI_Utils.termToColorSafe(DefaultOptions.failureTextBackgroundColor,null);
+			failureTextBackgroundColor= ExtendedColor.termToColorSafe(DefaultOptions.failureTextBackgroundColor,null);
 		} catch (TermIsSymbolDefault e1) {
 			failureTextBackgroundColor= defaultFailureTextBackgroundColor;
 		};
 		try {
-			labelTextColor= GUI_Utils.termToColorSafe(DefaultOptions.textLabelForegroundColor,null);
+			labelTextColor= ExtendedColor.termToColorSafe(DefaultOptions.textLabelForegroundColor,null);
 		} catch (TermIsSymbolDefault e1) {
 			labelTextColor= defaultLabelTextColor;
 		};
 		try {
-			labelSpaceColor= GUI_Utils.termToColorSafe(DefaultOptions.textLabelBackgroundColor,null);
+			labelSpaceColor= ExtendedColor.termToColorSafe(DefaultOptions.textLabelBackgroundColor,null);
 		} catch (TermIsSymbolDefault e1) {
 			labelSpaceColor= defaultLabelSpaceColor;
 		};

@@ -4,14 +4,17 @@ package morozov.terms;
 
 import target.*;
 
-import morozov.classes.*;
 import morozov.domains.*;
 import morozov.domains.signals.*;
 import morozov.run.*;
 import morozov.run.errors.*;
 import morozov.terms.errors.*;
 import morozov.terms.signals.*;
+import morozov.worlds.*;
 
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
+import java.io.IOException;
 import java.nio.charset.CharsetEncoder;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,6 +26,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 	private Term[] elements;
 	private long[] keys;
 	// private Term tail;
+	//
 	public PrologOptimizedSet(long[] aKeys) {
 		elements= new Term[aKeys.length];
 		keys= aKeys;
@@ -134,6 +138,9 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 			}
 		}
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public int hashCode() {
 		int sum= 0;
 		for (int i= 0; i < elements.length; i++) {
@@ -141,9 +148,15 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 		};
 		return sum + tail.hashCode();
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	protected Object clone() {
 		try {
 			PrologOptimizedSet o= (PrologOptimizedSet)super.clone();
+			// Это необходимо, чтобы копию можно было
+			// использовать в качестве заготовки
+			// для изменённых версий терма.
 			o.elements= (Term[])o.elements.clone();
 			return o;
 		} catch (CloneNotSupportedException e) {
@@ -217,7 +230,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 				try {
 					return element.retrieveSetElementValue(cp);
 				} catch (TermIsNotSetElement e) {
-					throw new WrongTermIsNotSetElement(element);
+					throw new WrongArgumentIsNotSetElement(element);
 				}
 			}
 		};
@@ -230,7 +243,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 	//			try {
 	//				return element.retrieveSetElementValue(cp);
 	//			} catch (TermIsNotSetElement e) {
-	//				throw new WrongTermIsNotSetElement(element);
+	//				throw new WrongArgumentIsNotSetElement(element);
 	//			}
 	//		}
 	//	};
@@ -243,14 +256,9 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 		PrologOptimizedSet clone= (PrologOptimizedSet)this.clone();
 		Term noValue= PrologNoValue.instance;
 		HashSet<Long> extraElementsToBeExcluded= null;
-		// for (int j= 0; j < elements.length; j++) {
-		//	System.out.printf("%d) keys[i]: %s\n",j,keys[j]);
-		// }
 		for (int i= 0; i < aNames.length; i++) {
-			// System.out.printf("%d) aNames[i]: %s\n",i,aNames[i]);
 			boolean elementIsFound= false;
 			for (int j= 0; j < elements.length; j++) {
-				// System.out.printf("aNames[i](%s) ?== keys[j](%s)\n",aNames[i],keys[j]);
 				if (aNames[i]==keys[j]) {
 					clone.elements[j]= noValue;
 					elementIsFound= true;
@@ -258,7 +266,6 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 				};
 			};
 			if (!elementIsFound) {
-				// System.out.printf("NOT FOUND aNames[i](%s)\n",aNames[i]);
 				if (extraElementsToBeExcluded==null) {
 					extraElementsToBeExcluded= new HashSet<Long>();
 				};
@@ -319,7 +326,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 			} catch (Backtracking b) {
 				negativeMap.add(new Long(keys[i]));
 			} catch (TermIsNotSetElement e) {
-				throw new WrongTermIsNotOptimizedSetElement(element);
+				throw new WrongArgumentIsNotOptimizedSetElement(element);
 			}
 		}
 	}
@@ -331,7 +338,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 				positiveMap.put(new Long(keys[i]),value); // See DomainOptimizedSet
 			} catch (Backtracking b) {
 			} catch (TermIsNotSetElement e) {
-				throw new WrongTermIsNotOptimizedSetElement(element);
+				throw new WrongArgumentIsNotOptimizedSetElement(element);
 			}
 		}
 	}
@@ -368,9 +375,6 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 		// leftSetPositiveMap.put(name,value.dereferenceValue(cp));
 		exploreOptimizedElements(leftSetPositiveMap,leftSetNegativeMap,cp);
 		rightSetPositiveMap.put(aName,aValue.dereferenceValue(cp));
-		// System.out.printf("PrologOptimizedSet::aTail=%s\n",aTail);
-		// System.out.printf("PrologOptimizedSet::cp=%s\n",cp);
-		// System.out.printf("PrologOptimizedSet::tail=%s\n",tail);
 		unify_with_set(
 			aTail,cp,
 			leftSetPositiveMap,
@@ -396,7 +400,9 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		t.unifyWithOptimizedSet(this,cp);
 	}
-	// Special functions
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void registerVariables(ActiveWorld process, boolean isSuspending, boolean isProtecting) {
 		for (int i= 0; i < elements.length; i++) {
 			elements[i].registerVariables(process,isSuspending,isProtecting);
@@ -439,7 +445,9 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 		clone.tail= tail.substituteWorlds(map,cp);
 		return clone;
 	}
-	// Domain check
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public boolean isCoveredByDomain(PrologDomain baseDomain, ChoisePoint cp, boolean ignoreFreeVariables) {
 		for (int i= 0; i < elements.length; i++) {
 			Term element= elements[i].dereferenceValue(cp);
@@ -447,7 +455,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 				if (ignoreFreeVariables) {
 					continue;
 				} else {
-					throw new WrongTermIsNotBoundVariable(element);
+					throw new WrongArgumentIsNotBoundVariable(element);
 				}
 			} else {
 				try {
@@ -478,7 +486,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 				if (ignoreFreeVariables) {
 					continue;
 				} else {
-					throw new WrongTermIsNotBoundVariable(element);
+					throw new WrongArgumentIsNotBoundVariable(element);
 				}
 			} else {
 				try {
@@ -495,8 +503,29 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 	public Term checkSetTerm(long functor, PrologDomain headDomain, Term initialValue, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
 		return baseDomain.checkOptimizedSet(keys,elements,tail,initialValue,cp,baseDomain);
 	}
-	// Converting Term to String
-	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, CharsetEncoder encoder) {
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	private void writeObject(ObjectOutputStream stream) throws IOException {
+		stream.defaultWriteObject();
+		for (int i= 0; i < keys.length; i++) {
+			long currentKey= keys[i];
+			if (currentKey < 0) {
+				stream.writeObject(SymbolNames.retrieveSymbolName(-currentKey));
+			}
+		}
+	}
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		stream.defaultReadObject();
+		for (int i= 0; i < keys.length; i++) {
+			long currentKey= keys[i];
+			if (currentKey < 0) {
+				SymbolName symbolName= (SymbolName)stream.readObject();
+				keys[i]= - SymbolNames.insertSymbolName(symbolName.identifier);
+			}
+		}
+	}
+	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		StringBuilder buffer= new StringBuilder("{");
 		boolean writeComma= false;
 		for (int i= 0; i < elements.length; i++) {
@@ -511,11 +540,11 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 				long name= keys[i];
 				buffer.append(
 					(name < 0 ?
-						SymbolNames.retrieveSymbolName(-name).toString(encoder) :
+						SymbolNames.retrieveSymbolName(-name).toSafeString(encoder) :
 						String.format("%d",name) ) +
 					":");
 				if (value != null) {
-					buffer.append(value.toString(cp,true,provideStrictSyntax,encoder));
+					buffer.append(value.toString(cp,true,provideStrictSyntax,encodeWorlds,encoder));
 				} else {
 					buffer.append(PrologNoValue.namePrologNoValue);
 				}
@@ -528,7 +557,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 			buffer.append("}");
 		} else {
 			buffer.append("|");
-			buffer.append(extraTail.toString(cp,true,provideStrictSyntax,encoder));
+			buffer.append(extraTail.toString(cp,true,provideStrictSyntax,encodeWorlds,encoder));
 			buffer.append("}");
 		};
 		return buffer.toString();

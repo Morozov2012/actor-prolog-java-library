@@ -3,7 +3,7 @@
 package morozov.system.gui.space3d;
 
 import morozov.built_in.*;
-import morozov.classes.*;
+import morozov.run.*;
 import morozov.terms.*;
 
 import java.util.Enumeration;
@@ -34,12 +34,11 @@ public class CustomizedBehavior extends Behavior {
 	}
 	//
 	public void processStimulus(Enumeration criteria) {
-		// System.out.printf("CustomizedBehavior::processStimulus(%s)\n",criteria);
 		long domainSignature= targetWorld.entry_s_Action_1_i();
 		Term predicateArgument= name.toTerm();
 		Term[] arguments= new Term[]{predicateArgument};
 		AsyncCall call= new AsyncCall(domainSignature,targetWorld,true,true,arguments,true);
-		targetWorld.receiveAsyncCall(call);
+		targetWorld.transmitAsyncCall(call,null);
 		wakeupOn(wakeupCondition);
 	}
 }

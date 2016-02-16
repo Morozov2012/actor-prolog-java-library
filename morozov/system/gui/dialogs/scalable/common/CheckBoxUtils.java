@@ -12,6 +12,8 @@ package morozov.system.gui.dialogs.scalable.common;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.terms.*;
+
 import java.awt.Graphics2D;
 import java.awt.Color;
 import java.awt.Component;
@@ -40,12 +42,12 @@ public class CheckBoxUtils {
 			g2.draw(new Line2D.Double(left+2,bottom-2,right-2,top+2));
 		} else {
 			// DW= val(integer,round((R - L) / 10)),
-			int dW= (int)StrictMath.round((right - left) / 10);
+			int dW= PrologInteger.toInteger((right - left) / 10);
 			// DH= val(integer,round((B - T) / 10)),
-			int dH= (int)StrictMath.round((bottom - top) / 10);
+			int dH= PrologInteger.toInteger((bottom - top) / 10);
 			// X2= val(integer,round((L + R) * 0.4)),
-			// int x2= (int)StrictMath.round((left + right) * 0.4);
-			int x2= (int)StrictMath.round((left + right) * 0.4) + 1;
+			// int x2= PrologInteger.toInteger((left + right) * 0.4);
+			int x2= PrologInteger.toInteger((left + right) * 0.4) + 1;
 			// Y12= B - 3 - DH,
 			// int y12= bottom - 3 - dH;
 			int y12= bottom - 2 - dH;
@@ -91,10 +93,10 @@ public class CheckBoxUtils {
 		int top= y;
 		int bottom= y + controlSize - 1;
 		//
-		int deltaW= (int)StrictMath.round((right - left) * 0.27);
+		int deltaW= PrologInteger.toInteger((right - left) * 0.27);
 		int doubleDeltaW= deltaW * 2;
 		//
-		int deltaH= (int)StrictMath.round((bottom - top) * 0.27);
+		int deltaH= PrologInteger.toInteger((bottom - top) * 0.27);
 		int doubleDeltaH= deltaH * 2;
 		//
 		// Graphics2D g2= (Graphics2D)g0;

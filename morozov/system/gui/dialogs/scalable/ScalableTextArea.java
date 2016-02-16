@@ -15,7 +15,7 @@ package morozov.system.gui.dialogs.scalable;
 import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
-import morozov.system.gui.dialogs.signals.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
 
 import javax.swing.JScrollPane;
@@ -34,7 +34,6 @@ public class ScalableTextArea extends ActiveComponent {
 		area= new ATextArea(tD,this,text,visibleRowCount,visibleColumnCount);
 		area.setEditable(isEditable);
 		scrollPane.setViewportView(area);
-		// System.out.printf("%s.addFocusListener(%s)\n",area,this);
 		area.addFocusListener(this);
 	}
 	//

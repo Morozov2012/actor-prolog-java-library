@@ -2,8 +2,6 @@
 
 package morozov.run;
 
-import morozov.terms.*;
-
 public abstract class Continuation {
 	//
 	protected static Continuation dummy= new DummyContinuation();

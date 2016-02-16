@@ -2,6 +2,8 @@
 
 package morozov.system.gui.space2d;
 
+import morozov.terms.*;
+
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Color;
@@ -32,12 +34,10 @@ public class Java2DScaleAndDrawImage extends Java2DCommand {
 	public void execute(Graphics2D g2, DrawingMode drawingMode) {
 		double factorX= drawingMode.getFactorX();
 		double factorY= drawingMode.getFactorY();
-		int integerX= (int)StrictMath.round(x1*factorX);
-		int integerY= (int)StrictMath.round(y1*factorY);
-		int integerWidth= (int)StrictMath.round(width*factorX);
-		int integerHeight= (int)StrictMath.round(height*factorY);
-		// System.out.printf("W.H.: %s %s\n",width,height);
-		// System.out.printf("integer W.H.: %s %s\n",integerWidth,integerHeight);
+		int integerX= PrologInteger.toInteger(x1*factorX);
+		int integerY= PrologInteger.toInteger(y1*factorY);
+		int integerWidth= PrologInteger.toInteger(width*factorX);
+		int integerHeight= PrologInteger.toInteger(height*factorY);
 		if (color==null) {
 			g2.drawImage(image,integerX,integerY,integerWidth,integerHeight,null);
 		} else {

@@ -21,6 +21,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.Color;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class ScalablePanel extends JPanel {
 	//
@@ -41,8 +43,8 @@ public class ScalablePanel extends JPanel {
 	protected int getInitialBottomBorder() {return 0;}
 	protected int getInitialRightBorder() {return 0;}
 	//
-	public boolean isTransparent= true;
-	public Color hatchColor= null;
+	protected AtomicBoolean isTransparent= new AtomicBoolean(true);
+	protected AtomicReference<Color> hatchColor= new AtomicReference<Color>();
 	//
 	public ScalablePanel() {
 	}
@@ -96,36 +98,29 @@ public class ScalablePanel extends JPanel {
 		// setMinimumSize(getPreferredSize());
 	}
 	public void setTransparency(boolean flag) {
-		isTransparent= flag;
+		isTransparent.set(flag);
 	}
 	public void setHatchColor(Color c) {
-		hatchColor= c;
+		hatchColor.set(c);
 	}
 	public void setAlarmColors(Color fc, Color bc) {
 	}
 	public void paint(Graphics g0) {
-		if (!isTransparent) {
-			// setOpaque(true);
-			// Graphics gg= g0.create();
-			// try {
-				Graphics2D g2= (Graphics2D)g0;
-				Color bgColor= getBackground();
-				g2.setColor(bgColor);
-				// g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC));
-				int height= getHeight();
-				int width= getWidth();
-				g2.fillRect(0,0,width,height);
-				if (hatchColor!=null) {
-					g2.setColor(hatchColor);
-					int x= 0;
-					while(x <= width) {
-						g2.fill(new Rectangle2D.Double(x,0,3,height));
-						x= x + 10;
-					}
+		if (!isTransparent.get()) {
+			Graphics2D g2= (Graphics2D)g0;
+			Color bgColor= getBackground();
+			g2.setColor(bgColor);
+			int height= getHeight();
+			int width= getWidth();
+			g2.fillRect(0,0,width,height);
+			if (hatchColor!=null) {
+				g2.setColor(hatchColor.get());
+				int x= 0;
+				while(x <= width) {
+					g2.fill(new Rectangle2D.Double(x,0,3,height));
+					x= x + 10;
 				}
-			// } finally {
-			//	gg.dispose();
-			// }
+			}
 		};
 		paintBorder(g0);
 		super.paintComponents(g0);

@@ -5,6 +5,7 @@ package morozov.system.checker;
 import target.*;
 
 import morozov.run.*;
+import morozov.system.files.*;
 import morozov.terms.*;
 
 import java.net.URI;
@@ -13,7 +14,7 @@ import java.util.ArrayList;
 
 public class HTML_BasicExplorer extends HTML_ExplorerTools {
 	//
-	protected URI extractBaseURI(boolean backslashIsSeparator) throws Backtracking {
+	protected URI extractBaseURI() throws Backtracking {
 		while(stack.peek() < text.length()) {
 			skipSpaces();
 			if (text.regionMatches(stack.peek(),"<",0,1)) {
@@ -27,7 +28,7 @@ public class HTML_BasicExplorer extends HTML_ExplorerTools {
 				if (isFrontName("HTML")) {
 					shiftTextPosition(4);
 					skipCurrentTag();
-					return extractBaseURIFromHTML(backslashIsSeparator);
+					return extractBaseURIFromHTML();
 				} else {
 					throw Backtracking.instance;
 				}
@@ -38,7 +39,7 @@ public class HTML_BasicExplorer extends HTML_ExplorerTools {
 		throw Backtracking.instance;
 	}
 	//
-	protected URI extractBaseURIFromHTML(boolean backslashIsSeparator) throws Backtracking {
+	protected URI extractBaseURIFromHTML() throws Backtracking {
 		while(stack.peek() < text.length()) {
 			skipSpaces();
 			if (text.regionMatches(stack.peek(),"<",0,1)) {
@@ -52,7 +53,7 @@ public class HTML_BasicExplorer extends HTML_ExplorerTools {
 				if (isFrontName("HEAD")) {
 					shiftTextPosition(4);
 					skipCurrentTag();
-					return extractBaseURIFromHEAD(backslashIsSeparator);
+					return extractBaseURIFromHEAD();
 				} else {
 					if (headerIsOver()) {
 						throw Backtracking.instance;
@@ -69,7 +70,7 @@ public class HTML_BasicExplorer extends HTML_ExplorerTools {
 		throw Backtracking.instance;
 	}
 	//
-	protected URI extractBaseURIFromHEAD(boolean backslashIsSeparator) throws Backtracking {
+	protected URI extractBaseURIFromHEAD() throws Backtracking {
 		while(stack.peek() < text.length()) {
 			skipSpaces();
 			if (text.regionMatches(stack.peek(),"<",0,1)) {
@@ -83,8 +84,8 @@ public class HTML_BasicExplorer extends HTML_ExplorerTools {
 				if (isFrontName("BASE")) {
 					shiftTextPosition(4);
 					String path= extractPairValue("HREF");
-					path= URL_Utils.replaceSlashesAndSpaces(path,backslashIsSeparator);
-					path= URL_Utils.replaceAmpersands(path);
+					path= SimpleFileName.replaceBackslashesAndSpaces(path);
+					path= replaceAmpersands(path);
 					try {
 						return new URI(path);
 					} catch (URISyntaxException e) {

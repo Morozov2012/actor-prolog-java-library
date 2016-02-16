@@ -5,7 +5,6 @@ package morozov.system.checker;
 import target.*;
 
 import morozov.run.*;
-import morozov.system.checker.signals.*;
 import morozov.system.files.*;
 import morozov.terms.*;
 
@@ -46,13 +45,13 @@ public class HTML_Explorer extends HTML_BasicExplorer {
 		specialEntitiesTable= aSpecialEntitiesTable;
 	}
 	//
-	public Term textToTerm(String aText, URI baseURI, String mask, boolean backslashIsSeparator) {
+	public Term textToTerm(String aText, URI baseURI, String mask) {
 		text= aText;
 		stack.clear();
 		stack.push(0);
 		try {
 			stack.push(stack.peek());
-			URI uri= extractBaseURI(backslashIsSeparator);
+			URI uri= extractBaseURI();
 			baseURI= uri;
 		} catch (Backtracking b) {
 		} finally {
@@ -62,19 +61,19 @@ public class HTML_Explorer extends HTML_BasicExplorer {
 			stack.push(stack.peek());
 			char[] nativePattern= mask.toCharArray();
 			Pattern pattern= FileNameMask.wildcard2UnixPattern(nativePattern);
-			Term list= extractTagStructure(baseURI,pattern,backslashIsSeparator);
+			Term list= extractTagStructure(baseURI,pattern);
 			return list;
 		} finally {
 			stack.pop();
 		}
 	}
-	public Term textToReferences(String aText, String mask, URI baseURI, boolean backslashIsSeparator) {
+	public Term textToReferences(String aText, String mask, URI baseURI) {
 		text= aText;
 		stack.clear();
 		stack.push(0);
 		try {
 			stack.push(stack.peek());
-			URI uri= extractBaseURI(backslashIsSeparator);
+			URI uri= extractBaseURI();
 			baseURI= uri;
 		} catch (Backtracking b) {
 		} finally {
@@ -82,14 +81,14 @@ public class HTML_Explorer extends HTML_BasicExplorer {
 		};
 		try {
 			stack.push(stack.peek());
-			Term list= extractReferences(baseURI,mask,backslashIsSeparator);
+			Term list= extractReferences(baseURI,mask);
 			return list;
 		} finally {
 			stack.pop();
 		}
 	}
 	//
-	protected Term extractTagStructure(URI baseURI, Pattern pattern, boolean backslashIsSeparator) {
+	protected Term extractTagStructure(URI baseURI, Pattern pattern) {
 		ArrayList<Term> items= new ArrayList<Term>();
 		StringBuilder textBuffer= new StringBuilder();
 		while(stack.peek() < text.length()) {
@@ -101,14 +100,6 @@ public class HTML_Explorer extends HTML_BasicExplorer {
 				continue;
 			};
 			try {
-/*
-System.out.printf("[1]: %c%c%c%c%c\n",
-			text.codePointAt(stack.peek()),
-			text.codePointAt(stack.peek()+1),
-			text.codePointAt(stack.peek()+2),
-			text.codePointAt(stack.peek()+3),
-			text.codePointAt(stack.peek()+4));
-*/
 				// skipSpaces();
 				if (text.regionMatches(stack.peek(),"<",0,1)) {
 					if (text.regionMatches(stack.peek()+1,"!--",0,3)) {
@@ -116,14 +107,6 @@ System.out.printf("[1]: %c%c%c%c%c\n",
 						skipCurrentComment();
 						continue;
 					};
-/*
-System.out.printf("[2]: %c%c%c%c%c\n",
-			text.codePointAt(stack.peek()),
-			text.codePointAt(stack.peek()+1),
-			text.codePointAt(stack.peek()+2),
-			text.codePointAt(stack.peek()+3),
-			text.codePointAt(stack.peek()+4));
-*/
 					// skipSpaces();
 					if (isEndOfBlock()) {
 						break;
@@ -132,18 +115,10 @@ System.out.printf("[2]: %c%c%c%c%c\n",
 						if (text.regionMatches(stack.peek(),"/",0,1)) {
 							skipCurrentTag();
 							continue;
-						} else if (isHyperReference(baseURI,pattern,items,textBuffer,backslashIsSeparator)) {
+						} else if (isHyperReference(baseURI,pattern,items,textBuffer)) {
 							continue;
 						} else {
-/*
-System.out.printf("[5]: CALL acceptBlock %c%c%c%c%c\n",
-			text.codePointAt(stack.peek()),
-			text.codePointAt(stack.peek()+1),
-			text.codePointAt(stack.peek()+2),
-			text.codePointAt(stack.peek()+3),
-			text.codePointAt(stack.peek()+4));
-*/
-							acceptBlock(baseURI,pattern,items,textBuffer,backslashIsSeparator);
+							acceptBlock(baseURI,pattern,items,textBuffer);
 							continue;
 						}
 					}
@@ -184,9 +159,6 @@ System.out.printf("[5]: CALL acceptBlock %c%c%c%c%c\n",
 		return assembleResultList(items);
 	}
 	protected void appendString(String segment, ArrayList<Term> items, StringBuilder textBuffer) {
-/*
-System.out.printf("[Q.1]: IN appendString textBuffer:>>>%s<<<\n",textBuffer);
-*/
 		if (truncateStrings) {
 			int beginning= segment.length();
 			for (int n= 0; n < segment.length(); n++) {
@@ -208,11 +180,6 @@ System.out.printf("[Q.1]: IN appendString textBuffer:>>>%s<<<\n",textBuffer);
 					break;
 				}
 			};
-			// if (beginning >= end) {
-			//	return;
-			// } else if (beginning > 0 || end < segment.length() - 1) {
-			//	segment= segment.substring(beginning,end+1);
-			// }
 			if (beginning > end) {
 				return;
 			} else if (beginning > 0 || end < segment.length()-1) {
@@ -231,7 +198,7 @@ System.out.printf("[Q.1]: IN appendString textBuffer:>>>%s<<<\n",textBuffer);
 			}
 		}
 	}
-	protected Term extractReferences(URI baseURI, String mask, boolean backslashIsSeparator) {
+	protected Term extractReferences(URI baseURI, String mask) {
 		char[] nativePattern= mask.toCharArray();
 		Pattern pattern= FileNameMask.wildcard2UnixPattern(nativePattern);
 		ArrayList<String> items= new ArrayList<String>();
@@ -252,8 +219,8 @@ System.out.printf("[Q.1]: IN appendString textBuffer:>>>%s<<<\n",textBuffer);
 						if (isFrontName(containerName)) {
 							shiftTextPosition(containerName.length());
 							String path= extractPairValue(referenceContainersTable[n][1]);
-							path= scanURI(path,baseURI,backslashIsSeparator);
-							if (!items.contains(path) && isEnabledReference(path,pattern,backslashIsSeparator)) {
+							path= scanURI(path,baseURI);
+							if (!items.contains(path) && isEnabledReference(path,pattern)) {
 								items.add(path);
 							};
 							break;
@@ -315,7 +282,7 @@ System.out.printf("[Q.1]: IN appendString textBuffer:>>>%s<<<\n",textBuffer);
 			stack.pop();
 		}
 	}
-	protected boolean isHyperReference(URI baseURI, Pattern pattern, ArrayList<Term> items, StringBuilder textBuffer, boolean backslashIsSeparator) {
+	protected boolean isHyperReference(URI baseURI, Pattern pattern, ArrayList<Term> items, StringBuilder textBuffer) {
 		try {
 			stack.push(stack.peek());
 			skipSpaces();
@@ -331,9 +298,9 @@ System.out.printf("[Q.1]: IN appendString textBuffer:>>>%s<<<\n",textBuffer);
 					// shiftTextPosition(containerName.length());
 					int p1= stack.peek();
 					String path= extractPairValue(referenceContainersTable[n][1]);
-					path= scanURI(path,baseURI,backslashIsSeparator);
+					path= scanURI(path,baseURI);
 					// skipCurrentTag();
-					if (isEnabledReference(path,pattern,backslashIsSeparator)) {
+					if (isEnabledReference(path,pattern)) {
 						ArrayList<Term> tagAttributes= new ArrayList<Term>();
 						if (extractAttributes) {
 							stack.set(stack.size()-1,p1);
@@ -366,7 +333,7 @@ System.out.printf("[Q.1]: IN appendString textBuffer:>>>%s<<<\n",textBuffer);
 									textBuffer.setLength(0);
 								};
 								tagNesting.push(containerName);
-								Term internalStructure= extractTagStructure(baseURI,pattern,backslashIsSeparator);
+								Term internalStructure= extractTagStructure(baseURI,pattern);
 								for (int k= tagAttributes.size()-1; k >= 0; k--) {
 									internalStructure= new PrologList(tagAttributes.get(k),internalStructure);
 								};
@@ -393,7 +360,7 @@ System.out.printf("[Q.1]: IN appendString textBuffer:>>>%s<<<\n",textBuffer);
 		}
 	}
 	//
-	protected void acceptBlock(URI baseURI, Pattern pattern, ArrayList<Term> items, StringBuilder textBuffer, boolean backslashIsSeparator) throws Backtracking {
+	protected void acceptBlock(URI baseURI, Pattern pattern, ArrayList<Term> items, StringBuilder textBuffer) throws Backtracking {
 		String tag;
 		try {
 			tag= extractFrontName();
@@ -413,21 +380,7 @@ System.out.printf("[Q.1]: IN appendString textBuffer:>>>%s<<<\n",textBuffer);
 			if (extractAttributes) {
 				extractTagAttributes(tagAttributes);
 			};
-/*
-System.out.printf("[0]acceptBlock: >>>%s<<<\n",tag);
-System.out.printf("[1]: IN acceptBlock %c%c%c%c%c%c%c%c%c\n",
-			text.codePointAt(stack.peek()),
-			text.codePointAt(stack.peek()+1),
-			text.codePointAt(stack.peek()+2),
-			text.codePointAt(stack.peek()+3),
-			text.codePointAt(stack.peek()+4),
-			text.codePointAt(stack.peek()+5),
-			text.codePointAt(stack.peek()+6),
-			text.codePointAt(stack.peek()+7),
-			text.codePointAt(stack.peek()+8));
-*/
 			boolean tagIsUnpaired= skipCurrentTag();
-// System.out.printf("[2]tagIsUnpaired: >>>%s<<<\n",tagIsUnpaired);
 			if (!tagIsUnpaired) {
 				for (int n= 0; n < unpairedTagsTable.length; n++) {
 					if (tag.equals(unpairedTagsTable[n])) {
@@ -454,7 +407,7 @@ System.out.printf("[1]: IN acceptBlock %c%c%c%c%c%c%c%c%c\n",
 						textBuffer.setLength(0);
 					};
 					tagNesting.push(tag);
-					Term internalStructure= extractTagStructure(baseURI,pattern,backslashIsSeparator);
+					Term internalStructure= extractTagStructure(baseURI,pattern);
 					for (int k= tagAttributes.size()-1; k >= 0; k--) {
 						internalStructure= new PrologList(tagAttributes.get(k),internalStructure);
 					};
@@ -468,10 +421,10 @@ System.out.printf("[1]: IN acceptBlock %c%c%c%c%c%c%c%c%c\n",
 		}
 	}
 	//
-	protected String scanURI(String path, URI baseURI, boolean backslashIsSeparator) {
+	protected String scanURI(String path, URI baseURI) {
 		path= deleteControlCharacters(path,false);
-		path= URL_Utils.replaceSlashesAndSpaces(path,backslashIsSeparator);
-		path= URL_Utils.replaceAmpersands(path);
+		path= SimpleFileName.replaceBackslashesAndSpaces(path);
+		path= replaceAmpersands(path);
 		path= deleteSharpIfNecessary(path);
 		URI name= baseURI.resolve(path);
 		return name.toASCIIString();

@@ -2,4 +2,8 @@
 
 package morozov.system.files.errors;
 
-public class FileIsNotFound extends RuntimeException {}
+public class FileIsNotFound extends FileAccessError {
+	public FileIsNotFound(String name) {
+		super(name);
+	}
+}

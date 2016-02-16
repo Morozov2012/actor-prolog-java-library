@@ -2,8 +2,6 @@
 
 package morozov.system.vision;
 
-import java.awt.Graphics2D;
-import java.awt.Color;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.HashMap;
@@ -12,16 +10,17 @@ import java.math.BigInteger;
 import java.io.PrintStream;
 
 class ConnectedGraph {
+	//
 	public HashSet<BigInteger> referredTracks= new HashSet<>();
 	public HashSet<BigInteger> refusedTracks= new HashSet<>();
 	public ArrayList<TrackSegment> segments= new ArrayList<>();
 	public ArrayList<ConnectedSegment> connectedSegments= new ArrayList<>();
 	public HashMap<BigInteger,ConnectedSegment> inputEntries= new HashMap<>();
 	public HashMap<BigInteger,ConnectedSegment> outputEntries= new HashMap<>();
-	// public int halfwidthPercentage= 20;
-	// HashSet<SegmentChain> hypotheticPathes= new HashSet<>();
+	//
 	public ConnectedGraph() {
 	}
+	//
 	public void addTrack(BigInteger identifier, StableTrack track) {
 		referredTracks.add(identifier);
 	}
@@ -67,16 +66,9 @@ class ConnectedGraph {
 			double distanceHalfwidth= distanceThreshold * fuzzyThresholdBorder;
 			double metrics1= VisionUtils.metrics(velocity,velocityThreshold,velosityHalfwidth);
 			double metrics2= VisionUtils.metrics(distance,distanceThreshold,distanceHalfwidth);
-System.out.printf("\n? %s [beginningTime=%s, endTime=%s]\n",this,track.beginningTime,track.endTime);
-System.out.printf("[1] velocity=%s (velocityThreshold=%s, metrics1=%s)\n",velocity,velocityThreshold,metrics1);
-System.out.printf("[2] distance=%s (distanceThreshold=%s, metrics2=%s)\n",distance,distanceThreshold,metrics2);
-			// double commonMetrics= 1 - (1-metrics1) * (1-metrics2);
 			double commonMetrics= metrics1 * metrics2;
 			if (commonMetrics < 0.5) {
 				refusedTracks.add(identifier);
-System.out.printf("refuseSlowTracks: YES, commonMetrics=%s\n",commonMetrics);
-			} else {
-System.out.printf("refuseSlowTracks: NO, commonMetrics=%s\n",commonMetrics);
 			}
 		}
 	}

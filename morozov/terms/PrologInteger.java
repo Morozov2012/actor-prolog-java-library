@@ -15,15 +15,42 @@ import java.math.BigDecimal;
 
 public class PrologInteger extends Term {
 	private BigInteger value;
+	//
 	public PrologInteger(long v) {
 		value= BigInteger.valueOf(v);
 	}
 	public PrologInteger(BigInteger v) {
 		value= v;
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public int hashCode() {
-		return value.intValue();
+		return value.hashCode();
 	}
+	public boolean equals(Object o2) {
+		if (o2 instanceof Term) {
+			return ((Term)o2).isEqualToInteger(value);
+		} else {
+			return false;
+		}
+	}
+	public int compare(Object o2) {
+		if (o2 instanceof Term) {
+			return -((Term)o2).compareWithInteger(value);
+		} else {
+			return 1;
+		}
+	}
+	public boolean isEqualToInteger(BigInteger v2) {
+		return value.equals(v2);
+	}
+	public int compareWithInteger(BigInteger v2) {
+		return value.compareTo(v2);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void isInteger(int v, ChoisePoint cp) throws Backtracking {
 		if (!value.equals(BigInteger.valueOf(v)))
 			throw Backtracking.instance;
@@ -32,6 +59,9 @@ public class PrologInteger extends Term {
 		if (!value.equals(v))
 			throw Backtracking.instance;
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public BigInteger getIntegerValue(ChoisePoint cp) throws TermIsNotAnInteger {
 		return value;
 	}
@@ -41,6 +71,8 @@ public class PrologInteger extends Term {
 	public long getLongIntegerValue(ChoisePoint cp) throws TermIsNotAnInteger {
 		return toLong(value);
 	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public static int toInteger(BigInteger value) {
 		if (DefaultOptions.integerOverflowCheck) {
@@ -69,6 +101,20 @@ public class PrologInteger extends Term {
 		}
 	}
 	public static int toInteger(long value) {
+		if (DefaultOptions.integerOverflowCheck) {
+			if (value > Integer.MAX_VALUE) {
+				throw new IntegerValueIsTooBig();
+			} else if (value < Integer.MIN_VALUE) {
+				throw new IntegerValueIsTooSmall();
+			} else {
+				return (int)value;
+			}
+		} else {
+			return (int)value;
+		}
+	}
+	public static int toInteger(double value) {
+		value= StrictMath.round(value);
 		if (DefaultOptions.integerOverflowCheck) {
 			if (value > Integer.MAX_VALUE) {
 				throw new IntegerValueIsTooBig();
@@ -120,6 +166,20 @@ public class PrologInteger extends Term {
 			return value.longValue();
 		}
 	}
+	public static long toLong(double value) {
+		value= StrictMath.round(value);
+		if (DefaultOptions.integerOverflowCheck) {
+			if (value > Long.MAX_VALUE) {
+				throw new IntegerValueIsTooBig();
+			} else if (value < Long.MIN_VALUE) {
+				throw new IntegerValueIsTooSmall();
+			} else {
+				return (long)value;
+			}
+		} else {
+			return (long)value;
+		}
+	}
 	public static boolean isSmallInteger(BigInteger value) {
 		if (value.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
 			return false;
@@ -130,10 +190,14 @@ public class PrologInteger extends Term {
 		}
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		t.isInteger(value,cp);
 	}
-	// Comparison operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void compareWithTerm(Term a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		a.compareBigIntegerWith(value,iX,op);
 	}
@@ -153,7 +217,7 @@ public class PrologInteger extends Term {
 		}
 	}
 	public void compareWithDate(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		if (!op.eval(value.multiply(Converters.oneDayLengthBigInteger),BigInteger.valueOf(a))) {
+		if (!op.eval(value.multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(a))) {
 			throw Backtracking.instance;
 		}
 	}
@@ -176,7 +240,7 @@ public class PrologInteger extends Term {
 		}
 	}
 	public void compareDateWith(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		if (!op.eval(BigInteger.valueOf(a),value.multiply(Converters.oneDayLengthBigInteger))) {
+		if (!op.eval(BigInteger.valueOf(a),value.multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger))) {
 			throw Backtracking.instance;
 		}
 	}
@@ -184,7 +248,9 @@ public class PrologInteger extends Term {
 		aHead.compareWithBigInteger(value,iX,op);
 		aTail.compareWithBigInteger(value,iX,op);
 	}
-	// Arithmetic operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term reactWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
 		return a.reactBigIntegerWith(value,iX,op);
 	}
@@ -201,7 +267,7 @@ public class PrologInteger extends Term {
 		return op.eval(value,a);
 	}
 	public Term reactWithDate(long a, ChoisePoint iX, BinaryOperation op) {
-		return op.evalDate(value.multiply(Converters.oneDayLengthBigInteger),BigInteger.valueOf(a));
+		return op.evalDate(value.multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(a));
 	}
 	public Term reactWithTime(long a, ChoisePoint iX, BinaryOperation op) {
 		return op.evalTime(value,BigInteger.valueOf(a));
@@ -219,7 +285,7 @@ public class PrologInteger extends Term {
 		return op.eval(a,value);
 	}
 	public Term reactDateWith(long a, ChoisePoint iX, BinaryOperation op) {
-		return op.evalDate(BigInteger.valueOf(a),value.multiply(Converters.oneDayLengthBigInteger));
+		return op.evalDate(BigInteger.valueOf(a),value.multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger));
 	}
 	public Term reactTimeWith(long a, ChoisePoint iX, BinaryOperation op) {
 		return op.evalTime(BigInteger.valueOf(a),value);
@@ -229,7 +295,9 @@ public class PrologInteger extends Term {
 			aHead.reactWithBigInteger(value,iX,op),
 			aTail.reactWithBigInteger(value,iX,op));
 	}
-	// Bitwise operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term blitWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
 		return a.blitBigIntegerWith(value,iX,op);
 	}
@@ -256,12 +324,16 @@ public class PrologInteger extends Term {
 			aHead.blitWithBigInteger(value,iX,op),
 			aTail.blitWithBigInteger(value,iX,op));
 	}
-	// Unary operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term evaluate(ChoisePoint iX, UnaryOperation op) {
 		return op.eval(value);
 	}
-	// Converting Term to String
-	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, CharsetEncoder encoder) {
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		return FormatOutput.integerToString(value);
 	}
 	// public String toString() {

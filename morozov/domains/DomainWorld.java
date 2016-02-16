@@ -2,27 +2,32 @@
 
 package morozov.domains;
 
+import target.*;
+
 import morozov.run.*;
 import morozov.terms.*;
 
-public class DomainWorld extends DomainAlternative {
+import java.nio.charset.CharsetEncoder;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
+import java.io.IOException;
+import java.util.HashSet;
+
+public class DomainWorld extends DomainAbstractWorld {
 	protected long constantCode;
+	//
 	public DomainWorld(long code) {
 		constantCode= code;
 	}
+	//
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
 		t= t.dereferenceValue(cp);
-		// System.out.printf("(0) DomainWorld::domainAlternative: %s; term: %s\n",this,t);
 		if (ignoreFreeVariables && t.thisIsFreeVariable()) {
 			return true;
 		} else {
-			// System.out.printf("(1) DomainWorld::domainAlternative: %s; term: %s\n",this,t);
-			if (t.thisIsWorld()) {
-				// System.out.printf("(2) DomainWorld::domainAlternative: %s; term: %s (%s)\n",this,t,t.getClass());
+			if (t.thisIsOwnWorld()) {
 				long[] classes= t.getClassHierarchy();
-				// System.out.printf("(3) DomainWorld::classes.length: %s\n",classes.length);
 				for (int i= 0; i < classes.length; i++) {
-					// System.out.printf("(3i) DomainWorld::classes[%s]: %s\n",i,classes[i]);
 					if (constantCode == classes[i]) {
 						return true;
 					}
@@ -34,9 +39,33 @@ public class DomainWorld extends DomainAlternative {
 					}
 				};
 				return false;
+			} else if (t.thisIsForeignWorld()) {
+				return true; // Never compare worlds with foreign worlds.
 			} else {
 				return false;
 			}
 		}
+	}
+	//
+	public boolean isEqualTo(DomainAlternative a, HashSet<PrologDomainPair> stack) {
+		return a.isEqualToWorld(constantCode);
+	}
+	public boolean isEqualToWorld(long value) {
+		return constantCode == value;
+	}
+	// Converting Term to String
+	private void writeObject(ObjectOutputStream stream) throws IOException {
+		stream.defaultWriteObject();
+		stream.writeObject(SymbolNames.retrieveSymbolName(constantCode));
+	}
+	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
+		stream.defaultReadObject();
+		SymbolName symbolName= (SymbolName)stream.readObject();
+		constantCode= SymbolNames.insertSymbolName(symbolName.identifier);
+	}
+	//
+	public String toString(CharsetEncoder encoder) {
+		String text= SymbolNames.retrieveSymbolName(constantCode).toRawString(encoder);
+		return PrologDomainName.tagDomainAlternative_World + "(\'" + text + "\')";
 	}
 }

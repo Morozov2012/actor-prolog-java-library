@@ -2,7 +2,7 @@
 
 package morozov.system.checker;
 
-import morozov.classes.*;
+import morozov.run.*;
 
 import java.net.CookieHandler;
 import java.util.concurrent.locks.ReentrantLock;

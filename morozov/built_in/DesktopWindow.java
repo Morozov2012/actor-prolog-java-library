@@ -3,15 +3,25 @@
 package morozov.built_in;
 
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.errors.*;
 import morozov.system.gui.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
+import morozov.worlds.*;
 
 import java.awt.Window;
 import java.awt.Frame;
 
 public abstract class DesktopWindow extends Alpha {
+	//
+	public DesktopWindow() {
+	}
+	public DesktopWindow(GlobalWorldIdentifier id) {
+		super(id);
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void getEnvironmentVariable1ff(ChoisePoint iX, PrologVariable result, Term a1) throws Backtracking {
 		try {
@@ -82,17 +92,34 @@ public abstract class DesktopWindow extends Alpha {
 		}
 	}
 	//
+	public void setExitOnClose1s(ChoisePoint iX, Term a1) {
+		boolean mode= YesNo.termYesNo2Boolean(a1,iX);
+		StaticDesktopAttributes.setExitOnClose(mode,staticContext);
+	}
+	//
+	public void getExitOnClose0ff(ChoisePoint iX, PrologVariable a1) {
+		boolean mode= StaticDesktopAttributes.retrieveExitOnClose(staticContext);
+		a1.value= YesNo.boolean2TermYesNo(mode);
+	}
+	public void getExitOnClose0fs(ChoisePoint iX) {
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void show0s(ChoisePoint iX) {
+		showDesktopWindow(iX);
+	}
+	public void show1ms(ChoisePoint iX, Term... args) {
+		showDesktopWindow(iX);
+	}
+	//
+	protected void showDesktopWindow(ChoisePoint iX) {
 		MainDesktopPane desktop= DesktopUtils.createPaneIfNecessary(staticContext);
 		if (desktop != null) {
 			DesktopUtils.safelySetVisible(true,desktop);
 		};
 		Window mainWindow= StaticDesktopAttributes.retrieveMainWindow(staticContext);
 		if (mainWindow != null) {
-			// if (mainWindow instanceof Frame) {
-			//	Frame frame= (Frame)mainWindow;
-			//	DesktopUtils.safelySetVisible(true,frame);
-			// }
 			DesktopUtils.safelySetVisible(true,mainWindow);
 		}
 	}
@@ -110,15 +137,13 @@ public abstract class DesktopWindow extends Alpha {
 	}
 	//
 	public void hide0s(ChoisePoint iX) {
-		// MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
-		// if (desktop != null) {
-		//	DesktopUtils.safelySetVisible(false,desktop);
-		// };
 		Window mainWindow= StaticDesktopAttributes.retrieveMainWindow(staticContext);
 		if (mainWindow != null) {
 			DesktopUtils.safelySetVisible(false,mainWindow);
 		}
 	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void maximize0s(ChoisePoint iX) {
 		DesktopUtils.createPaneIfNecessary(staticContext);
@@ -155,6 +180,8 @@ public abstract class DesktopWindow extends Alpha {
 			DesktopUtils.safelySetVisible(true,mainWindow);
 		}
 	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void isVisible0s(ChoisePoint iX) throws Backtracking {
 		Window mainWindow= StaticDesktopAttributes.retrieveMainWindow(staticContext);

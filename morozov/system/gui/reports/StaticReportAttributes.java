@@ -2,7 +2,8 @@
 
 package morozov.system.gui.reports;
 
-import morozov.classes.*;
+import morozov.run.*;
+import morozov.worlds.*;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -10,13 +10,39 @@ import java.nio.charset.CharsetEncoder;
 import java.math.BigInteger;
 
 public class PrologReal extends Term {
-	private double value;
+	private Double value;
 	public PrologReal(double v) {
 		value= v;
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public int hashCode() {
-		return (int)StrictMath.round(value);
+		return value.hashCode();
 	}
+	public boolean equals(Object o2) {
+		if (o2 instanceof Term) {
+			return ((Term)o2).isEqualToReal(value);
+		} else {
+			return false;
+		}
+	}
+	public int compare(Object o2) {
+		if (o2 instanceof Term) {
+			return -((Term)o2).compareWithReal(value);
+		} else {
+			return 1;
+		}
+	}
+	public boolean isEqualToReal(Double v2) {
+		return value.equals(v2);
+	}
+	public int compareWithReal(Double v2) {
+		return value.compareTo(v2);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void isReal(double v, ChoisePoint cp) throws Backtracking {
 		if (Arithmetic.realsAreEqual(v,value)) {
 			return;
@@ -27,10 +53,15 @@ public class PrologReal extends Term {
 	public double getRealValue(ChoisePoint cp) throws TermIsNotAReal {
 		return value;
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		t.isReal(value,cp);
 	}
-	// Comparison operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void compareWithTerm(Term a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		a.compareDoubleWith(value,iX,op);
 	}
@@ -50,7 +81,7 @@ public class PrologReal extends Term {
 		}
 	}
 	public void compareWithDate(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		if (!op.eval(Converters.doubleArgumentToBigInteger(value,this).multiply(Converters.oneDayLengthBigInteger),BigInteger.valueOf(a))) {
+		if (!op.eval(Converters.doubleArgumentToBigInteger(value,this).multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(a))) {
 			throw Backtracking.instance;
 		}
 	}
@@ -73,7 +104,7 @@ public class PrologReal extends Term {
 		}
 	}
 	public void compareDateWith(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		if (!op.eval(BigInteger.valueOf(a),Converters.doubleArgumentToBigInteger(value,this).multiply(Converters.oneDayLengthBigInteger))) {
+		if (!op.eval(BigInteger.valueOf(a),Converters.doubleArgumentToBigInteger(value,this).multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger))) {
 			throw Backtracking.instance;
 		}
 	}
@@ -81,7 +112,9 @@ public class PrologReal extends Term {
 		aHead.compareWithDouble(value,iX,op);
 		aTail.compareWithDouble(value,iX,op);
 	}
-	// Arithmetic operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term reactWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
 		return a.reactDoubleWith(value,iX,op);
 	}
@@ -98,7 +131,7 @@ public class PrologReal extends Term {
 		return op.eval(Converters.doubleArgumentToBigInteger(value,this),a);
 	}
 	public Term reactWithDate(long a, ChoisePoint iX, BinaryOperation op) {
-		return op.evalDate(Converters.doubleArgumentToBigInteger(value,this).multiply(Converters.oneDayLengthBigInteger),BigInteger.valueOf(a));
+		return op.evalDate(Converters.doubleArgumentToBigInteger(value,this).multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(a));
 	}
 	public Term reactWithTime(long a, ChoisePoint iX, BinaryOperation op) {
 		return op.evalTime(Converters.doubleArgumentToBigInteger(value,this),BigInteger.valueOf(a));
@@ -116,7 +149,7 @@ public class PrologReal extends Term {
 		return op.eval(a,Converters.doubleArgumentToBigInteger(value,this));
 	}
 	public Term reactDateWith(long a, ChoisePoint iX, BinaryOperation op) {
-		return op.evalDate(BigInteger.valueOf(a),Converters.doubleArgumentToBigInteger(value,this).multiply(Converters.oneDayLengthBigInteger));
+		return op.evalDate(BigInteger.valueOf(a),Converters.doubleArgumentToBigInteger(value,this).multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger));
 	}
 	public Term reactTimeWith(long a, ChoisePoint iX, BinaryOperation op) {
 		return op.evalTime(BigInteger.valueOf(a),Converters.doubleArgumentToBigInteger(value,this));
@@ -126,7 +159,9 @@ public class PrologReal extends Term {
 			aHead.reactWithDouble(value,iX,op),
 			aTail.reactWithDouble(value,iX,op));
 	}
-	// Bitwise operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term blitWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
 		return a.blitDoubleWith(value,iX,op);
 	}
@@ -155,12 +190,16 @@ public class PrologReal extends Term {
 			aHead.blitWithDouble(value,iX,op),
 			aTail.blitWithDouble(value,iX,op));
 	}
-	// Unary operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term evaluate(ChoisePoint iX, UnaryOperation op) {
 		return op.eval(value);
 	}
-	// Converting Term to String
-	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, CharsetEncoder encoder) {
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		return FormatOutput.realToString(value);
 	}
 	// public String toString() {

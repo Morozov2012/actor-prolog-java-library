@@ -14,9 +14,35 @@ public class PrologString extends Term {
 	public PrologString(String v) {
 		value= v;
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public int hashCode() {
 		return value.hashCode();
 	}
+	public boolean equals(Object o2) {
+		if (o2 instanceof Term) {
+			return ((Term)o2).isEqualToString(value);
+		} else {
+			return false;
+		}
+	}
+	public int compare(Object o2) {
+		if (o2 instanceof Term) {
+			return -((Term)o2).compareWithString(value);
+		} else {
+			return 1;
+		}
+	}
+	public boolean isEqualToString(String v2) {
+		return value.equals(v2);
+	}
+	public int compareWithString(String v2) {
+		return value.compareTo(v2);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void isString(String v, ChoisePoint cp) throws Backtracking {
 		if ( !value.equals(v) )
 			throw Backtracking.instance;
@@ -24,10 +50,15 @@ public class PrologString extends Term {
 	public String getStringValue(ChoisePoint cp) throws TermIsNotAString {
 		return value;
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		t.isString(value,cp);
 	}
-	// Comparison operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void compareWithTerm(Term a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		a.compareStringWith(value,iX,op);
 	}
@@ -45,7 +76,9 @@ public class PrologString extends Term {
 		aHead.compareWithString(value,iX,op);
 		aTail.compareWithString(value,iX,op);
 	}
-	// Arithmetic operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term reactWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
 		return a.reactStringWith(value,iX,op);
 	}
@@ -66,9 +99,10 @@ public class PrologString extends Term {
 			aHead.reactWithString(value,iX,op),
 			aTail.reactWithString(value,iX,op));
 	}
-	// Converting Term to String
-	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, CharsetEncoder encoder) {
-		// System.out.printf("PrologString: >>>%s<<<\n",value.toString());
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		if (isInner || provideStrictSyntax) {
 			return "\"" + FormatOutput.encodeString(value,false,encoder) + "\"";
 		} else {

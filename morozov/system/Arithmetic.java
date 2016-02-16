@@ -4,11 +4,13 @@ package morozov.system;
 
 import target.*;
 
-import morozov.classes.*;
 import morozov.run.*;
 import morozov.system.errors.*;
 import morozov.terms.*;
+import morozov.worlds.*;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
 
 public class Arithmetic {
@@ -32,22 +34,66 @@ public class Arithmetic {
 		n1.compareWithTerm(n2,iX,operation);
 	}
 	//
-	public static boolean realsAreEqual(double v, double value) {
-		if (value==v) {
+	public static boolean realsAreEqual(double left, double right) {
+		// If d1 represents +0.0 while d2 represents -0.0, or vice versa,
+		// the equal test has the value false, even though +0.0==-0.0
+		// has the value true.
+		if (right==left) {
 			return true;
 		} else {
-			long n= DefaultOptions.significantDigitsNumber;
-			if (n > 0) {
-				String fString= String.format("%%1.%de",n-1);
-				String s1= String.format(fString,value);
-				String s2= String.format(fString,v);
-				if (s1.equals(s2)) {
+			int precision= DefaultOptions.significantDigitsNumber;
+			if (precision > 0) {
+				MathContext realNumberComparisonContext= DefaultOptions.realNumberComparisonContext;
+				// Format String Syntax: The following conversions may be applied to float, Float, double
+				// and Double ('e'): If the precision is less than the number of digits which would appear
+				// after the decimal point in the string returned by Float.toString(float) or
+				// Double.toString(double) respectively, then the value will be rounded using
+				// the round half up algorithm.
+				// ROUND_HALF_UP: Rounding mode to round towards "nearest neighbor" unless both neighbors are
+				// equidistant, in which case round up. Behaves as for ROUND_UP if the discarded fraction is
+				// >= 0.5; otherwise, behaves as for ROUND_DOWN. Note that this is the rounding mode that most
+				// of us were taught in grade school. (?!-A.M.)
+				// HALF_DOWN: Rounding mode to round towards "nearest neighbor" unless both neighbors
+				// are equidistant, in which case round down. Behaves as for RoundingMode.UP if the discarded
+				// fraction is > 0.5; otherwise, behaves as for RoundingMode.DOWN.
+				// MathContext realNumberComparisonContext= new MathContext(precision,RoundingMode.HALF_DOWN);
+				// HALF_EVEN: Rounding mode to round towards the "nearest neighbor" unless both neighbors are
+				// equidistant, in which case, round towards the even neighbor. Behaves as for RoundingMode.HALF_UP
+				// if the digit to the left of the discarded fraction is odd; behaves as for RoundingMode.HALF_DOWN
+				// if it's even. Note that this is the rounding mode that statistically minimizes cumulative error
+				// when applied repeatedly over a sequence of calculations. It is sometimes known as "Banker's
+				// rounding," and is chiefly used in the USA. This rounding mode is analogous to the rounding
+				// policy used for float and double arithmetic in Java.
+				// MathContext realNumberComparisonContext= new MathContext(precision,RoundingMode.HALF_EVEN);
+				BigDecimal decimal1= BigDecimal.valueOf(left).round(realNumberComparisonContext);
+				BigDecimal decimal2= BigDecimal.valueOf(right).round(realNumberComparisonContext);
+				// Compares this BigDecimal with the specified BigDecimal. Two BigDecimal
+				// objects that are equal in value but have a different scale (like 2.0
+				// and 2.00) are considered equal by this method.
+				if (decimal1.compareTo(decimal2)==0) {
 					return true;
 				}
 			};
 			return false;
 		}
 	}
+	// public static boolean realsAreEqual(double v, double value) {
+	//	if (value==v) {
+	//		return true;
+	//	} else {
+	//		long n= DefaultOptions.significantDigitsNumber;
+	//		if (n > 0) {
+	//			String fString= String.format("%%1.%de",n-1);
+	//			String s1= String.format(fString,value);
+	//			String s2= String.format(fString,v);
+	//			if (s1.equals(s2)) {
+	//				return true;
+	//			}
+	//		};
+	//		return false;
+	//	}
+	// }
+	//
 	// Arithmetic operations
 	public static void calculate_nullary_arithmetic_function(ChoisePoint iX, PrologVariable nV, NullaryArithmeticOperation operation) {
 		nV.value= operation.eval();

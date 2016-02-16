@@ -2,8 +2,9 @@
 
 package morozov.system.gui.sadt;
 
-import morozov.classes.*;
+import morozov.run.*;
 import morozov.system.gui.*;
+import morozov.worlds.*;
 
 import java.util.HashMap;
 import java.util.Set;

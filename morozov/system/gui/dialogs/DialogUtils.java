@@ -8,7 +8,6 @@ import morozov.run.*;
 import morozov.system.*;
 import morozov.system.gui.*;
 import morozov.system.gui.signals.*;
-import morozov.system.gui.dialogs.errors.*;
 import morozov.system.gui.dialogs.signals.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
@@ -18,29 +17,15 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 
 public class DialogUtils {
-	public static String termToDialogIdentifier(Term value, ChoisePoint iX) throws TermIsSymbolAuto {
-		try {
-			long code= value.getSymbolValue(iX);
-			if (code==SymbolCodes.symbolCode_E_auto) {
-				throw TermIsSymbolAuto.instance;
-			} else {
-				throw new WrongTermIsNotDialogIdentifier(value);
-			}
-		} catch (TermIsNotASymbol e1) {
-			try {
-				return value.getStringValue(iX);
-			} catch (TermIsNotAString e2) {
-				throw new WrongTermIsNotDialogIdentifier(value);
-			}
-		}
-	}
+	//
+	protected static Term termDefault= new PrologSymbol(SymbolCodes.symbolCode_E_default);
 	//
 	public static int calculateRealCoordinate(ExtendedCoordinate lZ, int spaceBeginning, int spaceLimit, double gridZ, double rDZ)
-		throws UseDefaultLocation {
+			throws UseDefaultLocation {
 		try {
-			return (int)StrictMath.round(spaceBeginning + (double)lZ.getValue() / gridZ * spaceLimit );
+			return PrologInteger.toInteger(spaceBeginning + lZ.getDoubleValue() / gridZ * spaceLimit );
 		} catch (CentreFigure e) {
-			return (int)StrictMath.round(spaceBeginning + ((double)spaceLimit - rDZ) / 2);
+			return PrologInteger.toInteger(spaceBeginning + ((double)spaceLimit - rDZ) / 2);
 		}
 	}
 	//
@@ -49,6 +34,7 @@ public class DialogUtils {
 		listToStringVector(array,tail,iX);
 		return array;
 	}
+	//
 	public static void listToStringVector(ArrayList<String> array, Term tail, ChoisePoint iX) {
 		tail= tail.dereferenceValue(iX);
 		if (tail.thisIsFreeVariable()) {
@@ -77,6 +63,7 @@ public class DialogUtils {
 		listToStringArray(array,tail,iX);
 		return array;
 	}
+	//
 	public static void listToStringArray(ArrayList<String> array, Term tail, ChoisePoint iX) {
 		tail= tail.dereferenceValue(iX);
 		if (tail.thisIsFreeVariable()) {
@@ -105,6 +92,7 @@ public class DialogUtils {
 		tableToStringArray(array,tail,iX);
 		return array;
 	}
+	//
 	public static void tableToStringArray(ArrayList<ArrayList<String>> array, Term tail, ChoisePoint iX) {
 		tail= tail.dereferenceValue(iX);
 		if (tail.thisIsFreeVariable()) {
@@ -155,6 +143,7 @@ public class DialogUtils {
 		listToTermArray(array,tail,iX);
 		return array;
 	}
+	//
 	public static void listToTermArray(ArrayList<Term> array, Term tail, ChoisePoint iX) {
 		tail= tail.dereferenceValue(iX);
 		if (tail.thisIsFreeVariable()) {
@@ -206,6 +195,7 @@ public class DialogUtils {
 		tableToTermArray(array,tail,iX);
 		return array;
 	}
+	//
 	public static void tableToTermArray(ArrayList<Term> array, Term tail, ChoisePoint iX) {
 		tail= tail.dereferenceValue(iX);
 		if (tail.thisIsFreeVariable()) {
@@ -257,6 +247,7 @@ public class DialogUtils {
 			}
 		}
 	}
+	//
 	protected static void rowToTermArray(ArrayList<Term> array, Term tail, ChoisePoint iX) {
 		tail= tail.dereferenceValue(iX);
 		if (tail.thisIsFreeVariable()) {
@@ -310,6 +301,7 @@ public class DialogUtils {
 			}
 		}
 	}
+	//
 	protected static Term frontCell(Term value, ChoisePoint iX) throws TermIsNotFrontCell {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable()) {
@@ -339,6 +331,7 @@ public class DialogUtils {
 			}
 		}
 	}
+	//
 	protected static Term rowTailToTerm(Term value, ChoisePoint iX) {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable()) {
@@ -364,7 +357,7 @@ public class DialogUtils {
 		}
 	}
 	//
-	public static int termToSmallInteger(Term value, ChoisePoint iX) throws RejectValue {
+	public static int termToSmallIntegerOrReject(Term value, ChoisePoint iX) throws RejectValue {
 		try {
 			BigInteger bigInteger= value.getIntegerValue(iX);
 			if (PrologInteger.isSmallInteger(bigInteger)) {
@@ -383,168 +376,6 @@ public class DialogUtils {
 				}
 			} catch (TermIsNotAReal e2) {
 				// return PrologUnknownValue.instance;
-				throw RejectValue.instance;
-			}
-		}
-	}
-	//
-	public static Term standardizeCoordinateValue(Term value, ChoisePoint iX) throws RejectValue {
-		value= value.dereferenceValue(iX);
-		if (value.thisIsUnknownValue()) {
-			return new PrologSymbol(SymbolCodes.symbolCode_E_default);
-		} else {
-			try {
-				long code= value.getSymbolValue(iX);
-				if (code==SymbolCodes.symbolCode_E_default) {
-					return new PrologSymbol(code);
-				} else if (code==SymbolCodes.symbolCode_E_centered) {
-					return new PrologSymbol(code);
-				} else {
-					throw RejectValue.instance;
-				}
-			} catch (TermIsNotASymbol e1) {
-				try {
-					double number= value.getIntegerValue(iX).doubleValue();
-					return new PrologReal(number);
-				} catch (TermIsNotAnInteger e2) {
-					try {
-						double number= value.getRealValue(iX);
-						return new PrologReal(number);
-					} catch (TermIsNotAReal e3) {
-						throw RejectValue.instance;
-					}
-				}
-			}
-		}
-	}
-	//
-	public static Term standardizeColorValue(Term value, ChoisePoint iX) throws RejectValue {
-		value= value.dereferenceValue(iX);
-		if (value.thisIsUnknownValue()) {
-			return new PrologSymbol(SymbolCodes.symbolCode_E_default);
-		} else {
-			try {
-				long code= value.getSymbolValue(iX);
-				try {
-					GUI_Utils.symbolCodeToColor(code);
-					return new PrologSymbol(code);
-				} catch (TermIsSymbolDefault e1) {
-					return new PrologSymbol(SymbolCodes.symbolCode_E_default);
-				} catch (IsNotColorSymbolCode e1) {
-					throw RejectValue.instance;
-				}
-			} catch (TermIsNotASymbol e1) {
-				try {
-					BigInteger bigInteger= value.getIntegerValue(iX);
-					// if (PrologInteger.isSmallInteger(bigInteger)) {
-						return new PrologInteger(bigInteger);
-					// } else {
-					//	throw RejectValue.instance;
-					// }
-				} catch (TermIsNotAnInteger e2) {
-					try {
-						double number= StrictMath.round(value.getRealValue(iX));
-						BigInteger bigInteger= Converters.doubleToBigInteger(number);
-						// if (PrologInteger.isSmallInteger(bigInteger)) {
-							return new PrologInteger(bigInteger.intValue());
-						// } else {
-						//	throw RejectValue.instance;
-						// }
-					} catch (TermIsNotAReal e3) {
-						try {
-							String colorName= value.getStringValue(iX);
-							try {
-								BigInteger number= Converters.stringToRoundInteger(colorName);
-								return new PrologInteger(number);
-							// } catch (NumberFormatException e4) {
-							} catch (TermIsNotAnInteger e4) {
-								try {
-									long code= GUI_Utils.nameToColorSymbolCode(colorName);
-									GUI_Utils.symbolCodeToColor(code);
-									return new PrologSymbol(code);
-								} catch (TermIsSymbolDefault e5) {
-									return new PrologSymbol(SymbolCodes.symbolCode_E_default);
-								} catch (IsNotColorName e5) {
-									throw RejectValue.instance;
-								} catch (IsNotColorSymbolCode e5) {
-									throw RejectValue.instance;
-								}
-							}
-						} catch (TermIsNotAString e4) {
-							throw RejectValue.instance;
-						}
-					}
-				}
-			}
-		}
-	}
-	//
-	public static Term standardizeFontNameValue(Term value, ChoisePoint iX) throws RejectValue {
-		value= value.dereferenceValue(iX);
-		if (value.thisIsUnknownValue()) {
-			return new PrologSymbol(SymbolCodes.symbolCode_E_default);
-		} else {
-			try {
-				long code= value.getSymbolValue(iX);
-				try {
-					GUI_Utils.symbolCodeToFontName(code);
-					return new PrologSymbol(code);
-				} catch (TermIsSymbolDefault e1) {
-					return new PrologSymbol(SymbolCodes.symbolCode_E_default);
-				} catch (IsNotFontNameSymbolCode e1) {
-					throw RejectValue.instance;
-				}
-			} catch (TermIsNotASymbol e1) {
-				try {
-					String fontName= value.getStringValue(iX);
-					return new PrologString(fontName);
-				} catch (TermIsNotAString e4) {
-					throw RejectValue.instance;
-				}
-			}
-		}
-	}
-	//
-	public static Term standardizeFontSizeValue(Term value, ChoisePoint iX) throws RejectValue {
-		value= value.dereferenceValue(iX);
-		if (value.thisIsUnknownValue()) {
-			return new PrologSymbol(SymbolCodes.symbolCode_E_default);
-		} else {
-			try {
-				BigInteger number= value.getIntegerValue(iX);
-				return new PrologInteger(number);
-			} catch (TermIsNotAnInteger e1) {
-				try {
-					double number= value.getRealValue(iX);
-					// BigInteger bigInteger= Converters.doubleToBigInteger(number);
-					return new PrologReal(number);
-				} catch (TermIsNotAReal e2) {
-					try {
-						long code= value.getSymbolValue(iX);
-						if (code==SymbolCodes.symbolCode_E_default) {
-							return new PrologSymbol(code);
-						} else {
-							throw RejectValue.instance;
-						}
-					} catch (TermIsNotASymbol e3) {
-						throw RejectValue.instance;
-					}
-				}
-			}
-		}
-	}
-	//
-	public static Term standardizeFontStyleValue(Term value, ChoisePoint iX) throws RejectValue {
-		value= value.dereferenceValue(iX);
-		if (value.thisIsUnknownValue()) {
-			return new PrologSymbol(SymbolCodes.symbolCode_E_default);
-		} else {
-			try {
-				GUI_Utils.termToFontStyle(value,iX);
-				return value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
-			} catch (TermIsSymbolDefault e) {
-				return new PrologSymbol(SymbolCodes.symbolCode_E_default);
-			} catch (IsNotFontStyle e) {
 				throw RejectValue.instance;
 			}
 		}

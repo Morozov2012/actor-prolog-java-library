@@ -6,6 +6,8 @@
 
 package morozov.system.gui.dialogs.scalable.metal;
 
+import morozov.terms.*;
+
 import javax.swing.plaf.metal.OceanTheme;
 import javax.swing.plaf.metal.MetalLookAndFeel;
 import java.awt.GradientPaint;
@@ -75,8 +77,8 @@ class MetalUtils {
 	}
 	//
 	private static void drawVerticalRectangleGradient(Graphics2D g2, float ratio1, float ratio2, Color c1, Color c2, Color c3, int w, int h) {
-		int mid= (int)StrictMath.round(ratio1 * h);
-		int mid2= (int)StrictMath.round(ratio2 * h);
+		int mid= PrologInteger.toInteger(ratio1 * h);
+		int mid2= PrologInteger.toInteger(ratio2 * h);
 		if (mid > 0) {
 			g2.setPaint(getGradient(0,0,c1,0,mid,c2));
 			g2.fillRect(0,0,w,mid);
@@ -95,8 +97,8 @@ class MetalUtils {
 		}
 	}
 	private static void drawVerticalOvalGradient(Graphics2D g2, float ratio1, float ratio2, Color c1, Color c2, Color c3, int w, int h) {
-		int mid= (int)StrictMath.round(ratio1 * h);
-		int mid2= (int)StrictMath.round(ratio2 * h);
+		int mid= PrologInteger.toInteger(ratio1 * h);
+		int mid2= PrologInteger.toInteger(ratio2 * h);
 		Shape shapeOne= new Ellipse2D.Double(0,0,h,w);
 		// Shape shapeOne= new Ellipse2D.Double(1,1,h-3,w-3);
 		// Shape shapeOne= new Ellipse2D.Double(0,0,h-1,w-1);

@@ -2,12 +2,20 @@
 
 package morozov.syntax;
 
-import morozov.terms.*;
+import target.*;
+
 import morozov.syntax.errors.*;
 import morozov.syntax.scanner.*;
+import morozov.system.*;
+import morozov.system.datum.*;
+import morozov.terms.*;
+import morozov.worlds.*;
 
+import java.io.ObjectInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.IOException;
 import java.math.BigInteger;
-
 import java.util.*;
 
 public class Parser {
@@ -25,9 +33,6 @@ public class Parser {
 		LexicalScanner scanner= new LexicalScanner(false);
 		tokens= scanner.analyse(text);
 		numberOfTokens= tokens.length;
-		// for (int j= 0; j < numberOfTokens; j++) {
-		//	System.out.printf("Token #%d: %s; ",j,tokens[j].toString());
-		// };
 		if (numberOfTokens > 0) {
 			position= 0;
 			Term[] terms= parseTerms();
@@ -39,7 +44,6 @@ public class Parser {
 	public Term[] parseTerms() {
 		ArrayList<Term> terms= new ArrayList<Term>();
 		while(true) {
-			// System.out.printf("Parser:: position=%s; numberOfTokens=%s\n",position,numberOfTokens);
 			if (position < numberOfTokens) {
 				if (tokens[position].getType()==PrologTokenType.END_OF_TEXT) {
 					return terms.toArray(new Term[0]);
@@ -63,11 +67,9 @@ public class Parser {
 		}
 	}
 	public ArrayList<Term> parseInternalTerms() {
-		// System.out.printf("%d: parseInternalTerms: %s\n",position,tokens[position]);
 		ArrayList<Term> terms= new ArrayList<Term>();
 		boolean commaExpected= false;
 		while(true) {
-			// System.out.printf("%d: parseInternalTerms{1}: %s\n",position,tokens[position]);
 			if (commaExpected) {
 				if (position < numberOfTokens) {
 					if (tokens[position].getType()==PrologTokenType.COMMA) {
@@ -81,7 +83,6 @@ public class Parser {
 			} else {
 				commaExpected= true;
 			};
-			// System.out.printf("%d: parseInternalTerms{2}: %s\n",position,tokens[position]);
 			terms.add(parseTerm());
 		}
 	}
@@ -89,17 +90,14 @@ public class Parser {
 		if (position < numberOfTokens) {
 			PrologToken frontToken= tokens[position];
 			int beginningOfTerm= frontToken.getPosition();
-			// System.out.printf("%d: parseTerm: %s\n",position,frontToken);
-			if (frontToken.getType()==PrologTokenType.SYMBOL) {
+			PrologTokenType frontTokenType= frontToken.getType();
+			if (frontTokenType==PrologTokenType.SYMBOL) {
 				if (position + 1 < numberOfTokens && tokens[position+1].getType()==PrologTokenType.L_ROUND_BRACKET) {
 					position= position + 2;
 					Term[] arguments= parseInternalTerms().toArray(new Term[0]);
 					if (position < numberOfTokens) {
 						if (tokens[position].getType()==PrologTokenType.R_ROUND_BRACKET) {
-							// System.out.printf("%d: Get Symbol Code [1]: %s\n",position,frontToken);
 							position++;
-							// System.out.printf("%d: I will return from ParseTerm{1}: %s\n",position,tokens[position]);
-							// return new PrologStructure(frontToken.getSymbolCode(),arguments);
 							Term result= new PrologStructure(frontToken.getSymbolCode(),arguments);
 							if (!rememberTextPositions) {
 								return result;
@@ -107,7 +105,6 @@ public class Parser {
 								return new TermPosition(result,beginningOfTerm);
 							}
 						} else {
-							// System.out.printf("%d: RightRoundBracketExcpected: %s\n",position,tokens[position]);
 							throw new RightRoundBracketExcpected(tokens[position].getPosition());
 						}
 					} else {
@@ -123,10 +120,7 @@ public class Parser {
 					arguments.add(new NamedTerm(0,result,beginningOfTerm));
 					return parseUnderdeterminedSet(arguments,beginningOfTerm);
 				} else if (frontToken.isIncludedIntoApostrophes()) {
-					// System.out.printf("%d: Get Symbol Code [2]: %s\n",position,frontToken);
 					position++;
-					// System.out.printf("%d: I will return from ParseTerm{2}: %s\n",position,tokens[position]);
-					// return new PrologSymbol(frontToken.getSymbolCode());
 					Term result= new PrologSymbol(frontToken.getSymbolCode());
 					if (!rememberTextPositions) {
 						return result;
@@ -134,10 +128,9 @@ public class Parser {
 						return new TermPosition(result,beginningOfTerm);
 					}
 				} else {
-					// System.out.printf("%d: SymbolShouldBeEnclosedInApostrophesHere: %s\n",position,tokens[position]);
 					throw new SymbolShouldBeEnclosedInApostrophesHere(frontToken.getPosition());
 				}
-			} else if (frontToken.getType()==PrologTokenType.L_SQUARE_BRACKET) {
+			} else if (frontTokenType==PrologTokenType.L_SQUARE_BRACKET) {
 				position++;
 				if (position < numberOfTokens && tokens[position].getType()==PrologTokenType.R_SQUARE_BRACKET) {
 					position++;
@@ -169,18 +162,17 @@ public class Parser {
 							};
 							return result;
 						} else {
-							// System.out.printf("%d: RightRoundBracketExcpected: %s\n",position,tokens[position]);
 							throw new RightSquareBracketExcpected(tokens[position].getPosition());
 						}
 					} else {
 						throw new UnexpectedEndOfTokenList(tokens[numberOfTokens-1].getPosition());
 					}
 				}
-			} else if (frontToken.getType()==PrologTokenType.L_BRACE) {
+			} else if (frontTokenType==PrologTokenType.L_BRACE) {
 				position++;
 				ArrayList<NamedTerm> arguments= new ArrayList<NamedTerm>();
 				return parseUnderdeterminedSet(arguments,beginningOfTerm);
-			} else if (frontToken.getType()==PrologTokenType.INTEGER) {
+			} else if (frontTokenType==PrologTokenType.INTEGER) {
 				if (position + 1 < numberOfTokens && tokens[position+1].getType()==PrologTokenType.L_BRACE) {
 					position= position + 2;
 					ArrayList<NamedTerm> arguments= new ArrayList<NamedTerm>();
@@ -201,7 +193,7 @@ public class Parser {
 						return new TermPosition(result,beginningOfTerm);
 					}
 				}
-			} else if (frontToken.getType()==PrologTokenType.REAL) {
+			} else if (frontTokenType==PrologTokenType.REAL) {
 				if (position + 1 < numberOfTokens && tokens[position+1].getType()==PrologTokenType.L_BRACE) {
 					position= position + 2;
 					ArrayList<NamedTerm> arguments= new ArrayList<NamedTerm>();
@@ -220,7 +212,7 @@ public class Parser {
 						return new TermPosition(result,beginningOfTerm);
 					}
 				}
-			} else if (frontToken.getType()==PrologTokenType.STRING) {
+			} else if (frontTokenType==PrologTokenType.STRING) {
 				if (position + 1 < numberOfTokens && tokens[position+1].getType()==PrologTokenType.L_BRACE) {
 					position= position + 2;
 					ArrayList<NamedTerm> arguments= new ArrayList<NamedTerm>();
@@ -241,7 +233,7 @@ public class Parser {
 						return new TermPosition(result,beginningOfTerm);
 					}
 				}
-			} else if (frontToken.getType()==PrologTokenType.NUMBER_SIGN) {
+			} else if (frontTokenType==PrologTokenType.NUMBER_SIGN) {
 				if (position + 1 < numberOfTokens && tokens[position+1].getType()==PrologTokenType.L_BRACE) {
 					position= position + 2;
 					ArrayList<NamedTerm> arguments= new ArrayList<NamedTerm>();
@@ -262,7 +254,7 @@ public class Parser {
 						return new TermPosition(result,beginningOfTerm);
 					}
 				}
-			} else if (frontToken.getType()==PrologTokenType.MINUS) {
+			} else if (frontTokenType==PrologTokenType.MINUS) {
 				position++;
 				if (position < numberOfTokens) {
 					PrologToken secondToken= tokens[position];
@@ -284,18 +276,59 @@ public class Parser {
 							return new TermPosition(result,beginningOfTerm);
 						}
 					} else {
-						// System.out.printf("%d: UnexpectedToken: %s\n",position,secondToken);
 						throw new UnexpectedToken(secondToken.getPosition());
 					}
 				} else {
 					throw new UnexpectedEndOfTokenList(tokens[numberOfTokens-1].getPosition());
 				}
-			// } else if (frontToken.getType()==PrologTokenType.VARIABLE) {
-			//	position++;
-			//	// System.out.printf("%d: I will return from ParseTerm{4}: %s\n",position,tokens[position]);
-			//	return new PrologVariable(); // frontToken.getVariableName();
+			} else if (frontTokenType==PrologTokenType.L_ROUND_BRACKET) {
+				if (position + 2 < numberOfTokens) {
+					int symbolCode;
+					PrologToken nextToken= tokens[position+1];
+					if (nextToken.getType()==PrologTokenType.SYMBOL) {
+						if (nextToken.isIncludedIntoApostrophes()) {
+							symbolCode= nextToken.getSymbolCode();
+						} else {
+							throw new SymbolShouldBeEnclosedInApostrophesHere(nextToken.getPosition());
+						}
+					} else {
+						throw new SymbolExpected(frontToken.getPosition());
+					};
+					PrologToken closingToken= tokens[position+2];
+					if (closingToken.getType()==PrologTokenType.R_ROUND_BRACKET) {
+						position= position + 3;
+						String symbolText= SymbolNames.retrieveSymbolName(symbolCode).toRawString(null);
+						byte[] byteArray= Converters.string2ByteArray(symbolText);
+						Term result;
+						InputStream inputStream= new ByteArrayInputStream(byteArray);
+						try {
+							try {
+								ObjectInputStream objectInputStream= new DataStoreInputStream(inputStream,false);
+								try {
+									result= (AbstractWorld)objectInputStream.readObject();
+								} catch (ClassNotFoundException e) {
+									throw new WorldDeserializingError(nextToken.getPosition(),e);
+								} finally {
+									objectInputStream.close();
+								}
+							} finally {
+								inputStream.close();
+							}
+						} catch (IOException e) {
+							throw new WorldDeserializingError(nextToken.getPosition(),e);
+						}
+						if (!rememberTextPositions) {
+							return result;
+						} else {
+							return new TermPosition(result,beginningOfTerm);
+						}
+					} else {
+						throw new RightRoundBracketExcpected(closingToken.getPosition());
+					}
+				} else {
+					throw new UnexpectedEndOfTokenList(tokens[numberOfTokens-1].getPosition());
+				}
 			} else {
-				// System.out.printf("%d: UnexpectedToken: %s\n",position,frontToken);
 				throw new UnexpectedToken(frontToken.getPosition());
 			}
 		} else {
@@ -348,11 +381,8 @@ public class Parser {
 		return result;
 	}
 	public ArrayList<NamedTerm> parsePairs(ArrayList<NamedTerm> terms) {
-		// System.out.printf("%d: parsePairs: %s\n",position,tokens[position]);
-		// ArrayList<NamedTerm> terms= new ArrayList<NamedTerm>();
 		boolean commaExpected= false;
 		while(true) {
-			// System.out.printf("%d: parsePairs{1}: %s\n",position,tokens[position]);
 			if (commaExpected) {
 				if (position < numberOfTokens) {
 					if (tokens[position].getType()==PrologTokenType.COMMA) {
@@ -367,10 +397,10 @@ public class Parser {
 			} else {
 				commaExpected= true;
 			};
-			// System.out.printf("%d: parsePairs{2}: %s\n",position,tokens[position]);
 			if (position < numberOfTokens) {
 				PrologToken frontToken= tokens[position];
-				if (frontToken.getType()==PrologTokenType.SYMBOL) {
+				PrologTokenType frontTokenType= frontToken.getType();
+				if (frontTokenType==PrologTokenType.SYMBOL) {
 					int pairPosition= frontToken.getPosition();
 					position++;
 					if (position < numberOfTokens) {
@@ -385,7 +415,7 @@ public class Parser {
 					} else {
 						throw new UnexpectedEndOfTokenList(tokens[numberOfTokens-1].getPosition());
 					}
-				} else if (frontToken.getType()==PrologTokenType.INTEGER) {
+				} else if (frontTokenType==PrologTokenType.INTEGER) {
 					int pairPosition= frontToken.getPosition();
 					position++;
 					if (position < numberOfTokens) {

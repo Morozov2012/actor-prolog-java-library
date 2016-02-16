@@ -5,6 +5,7 @@ package morozov.tests;
 import target.*;
 
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.*;
 import morozov.system.gui.dialogs.scalable.common.*;
@@ -59,8 +60,8 @@ public class MyDialog1 extends AbstractDialog {
 	ScalableLabel control_1_0_2;
 	ScalableLabel control_1_0_1;
 	ScalablePanel panel1;
-	public MyDialog1(boolean isTopLevelWindow, Window parent) {
-		super(isTopLevelWindow,parent);
+	public MyDialog1(YesNoDefault isModal, boolean isTopLevelWindow, YesNoDefault exitOnClose, Window parent) {
+		super(isModal,isTopLevelWindow,exitOnClose,parent);
 	}
 	protected String getPredefinedTitle() {
 		return "Demo Panel";

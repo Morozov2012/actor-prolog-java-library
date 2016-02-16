@@ -2,17 +2,10 @@
 
 package morozov.system.gui.dialogs;
 
-import target.*;
-
-import morozov.classes.*;
+import morozov.run.*;
 import morozov.system.gui.*;
-import morozov.system.gui.signals.*;
 
-import javax.swing.JDesktopPane;
 import javax.swing.JFrame;
-import javax.swing.SwingUtilities;
-import java.awt.Dialog.ModalityType;
-import java.awt.Window;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -26,7 +19,6 @@ import java.awt.event.MouseListener;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.lang.reflect.InvocationTargetException;
 
 public class ExtendedJFrame
 		extends JFrame
@@ -44,45 +36,33 @@ public class ExtendedJFrame
 		addMouseListener(this);
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void initiate(StaticContext context) {
 		staticContext= context;
 	}
 	//
-	public Point computePosition(AtomicReference<ExtendedCoordinates> actualCoordinates) throws UseDefaultLocation {
-		//
-		Dimension initialSize= getSize();
-		//
-		int initialWidth= initialSize.width;
-		int initialHeight= initialSize.height;
-		//
-		int x= 0;
-		int y= 0;
-		//
-		double gridX= DefaultOptions.gridWidth;
-		double gridY= DefaultOptions.gridHeight;
-		//
-		Rectangle bounds= computeParentLayoutSize();
-		ExtendedCoordinates actualPoint= actualCoordinates.get();
-		x= DialogUtils.calculateRealCoordinate(actualPoint.x,bounds.x,bounds.width,gridX,initialWidth);
-		y= DialogUtils.calculateRealCoordinate(actualPoint.y,bounds.y,bounds.height,gridY,initialHeight);
-		//
-		return new Point(x,y);
-	}
-	public Rectangle computeParentLayoutSize() {
-		GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
-		// Rectangle bounds= env.getMaximumWindowBounds();
-		GraphicsDevice device= env.getDefaultScreenDevice();
-		GraphicsConfiguration gc= device.getDefaultConfiguration();
-		Rectangle bounds= gc.getBounds();
-		// return new Dimension(bounds.width,bounds.height);
-		return bounds;
-	}
+	///////////////////////////////////////////////////////////////
 	//
 	public void setClosable(boolean b) {
 	}
 	public void setMaximizable(boolean b) {
 	}
 	public void setIconifiable(boolean b) {
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void addToDesktop(MainDesktopPane desktop) {
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void safelySetVisible(boolean b) {
+		DesktopUtils.safelySetVisible(b,this);
+	}
+	public void safelyDispose() {
+		DesktopUtils.safelyDispose(this);
 	}
 	public void safelyMaximize() {
 		DesktopUtils.safelyMaximize(this);
@@ -108,24 +88,18 @@ public class ExtendedJFrame
 	public boolean safelyIsRestored() {
 		return DesktopUtils.safelyIsRestored(this);
 	}
-	public void addToDesktop(JDesktopPane desktop) {
-	}
-	// public void setMaximum(boolean b) {
-	// }
 	//
-	public Dimension getRealMinimumSize() {
-		// return getUI().getMinimumSize(this);
-		// return getMinimumSize();
-		// return getLayout().minimumLayoutSize(this);
-		// return new Dimension(0,0);
-		Insets insets= getInsets();
-		return new Dimension(insets.left+insets.right,insets.top+insets.bottom);
+	///////////////////////////////////////////////////////////////
+	//
+	public Rectangle computeParentLayoutSize() {
+		GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
+		GraphicsDevice device= env.getDefaultScreenDevice();
+		GraphicsConfiguration gc= device.getDefaultConfiguration();
+		Rectangle bounds= gc.getBounds();
+		return bounds;
 	}
-	public Dimension getRealPreferredSize() {
-		// return getUI().getPreferredSize(this);
-		// return getPreferredSize();
-		return getLayout().preferredLayoutSize(this);
-	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void repaintParent() {
 		Container container= getParent();
@@ -133,9 +107,24 @@ public class ExtendedJFrame
 			container.repaint();
 		}
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void doSuperLayout() {
 		super.doLayout();
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public Dimension getRealMinimumSize() {
+		Insets insets= getInsets();
+		return new Dimension(insets.left+insets.right,insets.top+insets.bottom);
+	}
+	public Dimension getRealPreferredSize() {
+		return getLayout().preferredLayoutSize(this);
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void doLayout() {
 		dialog.doLayout();

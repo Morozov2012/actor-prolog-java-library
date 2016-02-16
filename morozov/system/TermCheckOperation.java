@@ -1,12 +1,12 @@
-// (c) 2010 IRE RAS Alexei A. Morozov
+// (c) 2014 IRE RAS Alexei A. Morozov
 
 package morozov.system;
 
-import morozov.classes.*;
 import morozov.run.*;
 import morozov.system.errors.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
+import morozov.worlds.*;
 
 import java.math.BigInteger;
 
@@ -56,8 +56,15 @@ public enum TermCheckOperation {
 	},
 	INTERNAL_WORLD {
 		public boolean eval(ChoisePoint iX, Term value, ActiveWorld currentProcess) {
-			if (value instanceof AbstractWorld) {
-				AbstractWorld world= (AbstractWorld)value;
+			if (value instanceof AbstractProcess) {
+				AbstractProcess process= (AbstractProcess)value;
+				if (currentProcess==process) {
+					return true;
+				} else {
+					return false;
+				}
+			} else if (value instanceof AbstractInternalWorld) {
+				AbstractInternalWorld world= (AbstractInternalWorld)value;
 				if (currentProcess==world.currentProcess) {
 					return true;
 				} else {
@@ -73,8 +80,15 @@ public enum TermCheckOperation {
 	},
 	EXTERNAL_WORLD {
 		public boolean eval(ChoisePoint iX, Term value, ActiveWorld currentProcess) {
-			if (value instanceof AbstractWorld) {
-				AbstractWorld world= (AbstractWorld)value;
+			if (value instanceof AbstractProcess) {
+				AbstractProcess process= (AbstractProcess)value;
+				if (currentProcess==process) {
+					return false;
+				} else {
+					return true;
+				}
+			} else if (value instanceof AbstractInternalWorld) {
+				AbstractInternalWorld world= (AbstractInternalWorld)value;
 				if (currentProcess==world.currentProcess) {
 					return false;
 				} else {
@@ -107,6 +121,36 @@ public enum TermCheckOperation {
 				return ( !(n.remainder(BigInteger.valueOf(2))).equals(BigInteger.ZERO) );
 			} catch (TermIsNotAnInteger b1) {
 				throw new WrongArgumentIsNotAnInteger(value);
+			}
+		}
+	},
+	NAN {
+		public boolean eval(ChoisePoint iX, Term value) {
+			try {
+				double r= value.getRealValue(iX);
+				return Double.isNaN(r);
+			} catch (TermIsNotAReal b1) {
+				return false;
+			}
+		}
+	},
+	INFINITE {
+		public boolean eval(ChoisePoint iX, Term value) {
+			try {
+				double r= value.getRealValue(iX);
+				return Double.isInfinite(r);
+			} catch (TermIsNotAReal b1) {
+				return false;
+			}
+		}
+	},
+	FINITE {
+		public boolean eval(ChoisePoint iX, Term value) {
+			try {
+				double r= value.getRealValue(iX);
+				return !(Double.isInfinite(r));
+			} catch (TermIsNotAReal b1) {
+				return false;
 			}
 		}
 	};

@@ -148,7 +148,6 @@ public class FontDialog extends JDialog {
 			public void actionPerformed(ActionEvent e) {
 				m_option= JOptionPane.CANCEL_OPTION;
 				setVisible(false);
-				// ((AbstractButton)e.getSource()).fireActionPerformed(e);
 			}
 		};
 		KeyStroke cancelKeyStroke= KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE,0);

@@ -4,18 +4,16 @@ package morozov.built_in;
 
 import target.*;
 
-import morozov.classes.*;
 import morozov.run.*;
 import morozov.run.errors.*;
 import morozov.system.*;
 import morozov.system.checker.*;
 import morozov.system.checker.errors.*;
 import morozov.system.checker.signals.*;
-import morozov.system.errors.*;
 import morozov.system.files.*;
-import morozov.system.signals.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
+import morozov.worlds.*;
 
 import java.math.BigInteger;
 import java.math.BigDecimal;
@@ -32,19 +30,32 @@ import java.util.ArrayList;
 
 public abstract class WebReceptor extends WebResource {
 	//
-	// protected FileSystem fileSystem= FileSystems.getDefault();
+	public ActionPeriod revisionPeriod= null;
+	public ActionPeriod attemptPeriod= null;
+	public String[] tags= null;
+	public Boolean extractAttributes= null;
+	public Boolean coalesceAdjacentStrings= null;
+	public Boolean truncateStrings= null;
 	//
-	protected static final BigDecimal defaultRevisionPeriod= BigDecimal.valueOf(-1);
-	protected static final BigDecimal defaultAttemptPeriod= BigDecimal.valueOf(-1);
-	private static final BigInteger oneMillion= BigInteger.valueOf(1000000);
+	protected boolean internalTablesAreInitialized= false;
+	protected String[] unpairedTagsTable= null;
+	protected String[] flatTagsTable= null;
+	protected String[][] referenceContainersTable= null;
+	protected String[][] specialEntitiesTable= null;
 	//
-	// protected URL_Checker specialProcess;
-	protected ActiveResource specialProcess; // = new ActiveResource();
+	protected static final long defaultRevisionPeriodInSeconds= -1;
+	protected static final long defaultAttemptPeriodInSeconds= -1;
+	protected static final BigDecimal decimalDefaultRevisionPeriodInNanoseconds= BigDecimal.valueOf(defaultRevisionPeriodInSeconds);
+	protected static final BigDecimal decimalDefaultAttemptPeriodInNanoseconds= BigDecimal.valueOf(defaultAttemptPeriodInSeconds);
+	protected static final Term termDefaultRevisionPeriod= new PrologInteger(defaultRevisionPeriodInSeconds);
+	protected static final Term termDefaultAttemptPeriod= new PrologInteger(defaultAttemptPeriodInSeconds);
+	private static final BigInteger oneMillion= BigInteger.valueOf(1_000_000);
+	//
+	protected ActiveResource specialProcess;
 	protected SlotVariable specialPort;
 	//
 	HashSet<WebReceptorRecord> backtrackableRecords= new HashSet<WebReceptorRecord>();
 	HashSet<WebReceptorRecord> permanentRecords= new HashSet<WebReceptorRecord>();
-	// GregorianCalendar calendar= new GregorianCalendar();
 	//
 	protected static String[] defaultUnpairedTagsTable= {
 		"AREA","BASE","BASEFONT","BR","COL","FRAME","HR","IMG",
@@ -65,6 +76,16 @@ public abstract class WebReceptor extends WebResource {
 	protected static String[][] defaultSpecialEntitiesTable= {
 		{"NBSP"," "},{"SHY",""}};
 	//
+	///////////////////////////////////////////////////////////////
+	//
+	public WebReceptor() {
+	}
+	public WebReceptor(GlobalWorldIdentifier id) {
+		super(id);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	abstract protected Term getBuiltInSlot_E_revision_period();
 	abstract protected Term getBuiltInSlot_E_attempt_period();
 	abstract protected Term getBuiltInSlot_E_tags();
@@ -77,6 +98,144 @@ public abstract class WebReceptor extends WebResource {
 	abstract public long entry_s_ReferenceContainersTable_2_oo();
 	abstract public long entry_s_SpecialEntitiesTable_2_oo();
 	//
+	///////////////////////////////////////////////////////////////
+	//
+	// get/set revision_period
+	//
+	public void setRevisionPeriod1s(ChoisePoint iX, Term a1) {
+		setRevisionPeriod(ActionPeriod.termToActionPeriod(a1,iX));
+	}
+	public void setRevisionPeriod(ActionPeriod value) {
+		revisionPeriod= value;
+	}
+	public void getRevisionPeriod0ff(ChoisePoint iX, PrologVariable a1) {
+		ActionPeriod value= getRevisionPeriod(iX);
+		a1.value= value.toTerm();
+	}
+	public void getRevisionPeriod0fs(ChoisePoint iX) {
+	}
+	public ActionPeriod getRevisionPeriod(ChoisePoint iX) {
+		if (revisionPeriod != null) {
+			return revisionPeriod;
+		} else {
+			Term value= getBuiltInSlot_E_revision_period();
+			return ActionPeriod.termToActionPeriod(value,iX);
+		}
+	}
+	//
+	// get/set attempt_period
+	//
+	public void setAttemptPeriod1s(ChoisePoint iX, Term a1) {
+		setAttemptPeriod(ActionPeriod.termToActionPeriod(a1,iX));
+	}
+	public void setAttemptPeriod(ActionPeriod value) {
+		attemptPeriod= value;
+	}
+	public void getAttemptPeriod0ff(ChoisePoint iX, PrologVariable a1) {
+		ActionPeriod value= getAttemptPeriod(iX);
+		a1.value= value.toTerm();
+	}
+	public void getAttemptPeriod0fs(ChoisePoint iX) {
+	}
+	public ActionPeriod getAttemptPeriod(ChoisePoint iX) {
+		if (attemptPeriod != null) {
+			return attemptPeriod;
+		} else {
+			Term value= getBuiltInSlot_E_attempt_period();
+			return ActionPeriod.termToActionPeriod(value,iX);
+		}
+	}
+	//
+	// get/set tags
+	//
+	public void setTags1s(ChoisePoint iX, Term a1) {
+		setTags(Converters.termToStrings(a1,iX,true));
+	}
+	public void setTags(String[] value) {
+		tags= value;
+	}
+	public void getTags0ff(ChoisePoint iX, PrologVariable a1) {
+		a1.value= Converters.stringArrayToList(getTags(iX));
+	}
+	public void getTags0fs(ChoisePoint iX) {
+	}
+	public String[] getTags(ChoisePoint iX) {
+		if (tags != null) {
+			return tags;
+		} else {
+			Term value= getBuiltInSlot_E_tags();
+			return Converters.termToStrings(value,iX,true);
+		}
+	}
+	//
+	// get/set extract_attributes
+	//
+	public void setExtractAttributes1s(ChoisePoint iX, Term a1) {
+		setExtractAttributes(YesNo.termYesNo2Boolean(a1,iX));
+	}
+	public void setExtractAttributes(boolean value) {
+		extractAttributes= value;
+	}
+	public void getExtractAttributes0ff(ChoisePoint iX, PrologVariable a1) {
+		a1.value= YesNo.boolean2TermYesNo(getExtractAttributes(iX));
+	}
+	public void getExtractAttributes0fs(ChoisePoint iX) {
+	}
+	public boolean getExtractAttributes(ChoisePoint iX) {
+		if (extractAttributes != null) {
+			return extractAttributes;
+		} else {
+			Term value= getBuiltInSlot_E_extract_attributes();
+			return YesNo.termYesNo2Boolean(value,iX);
+		}
+	}
+	//
+	// get/set coalesce_adjacent_strings
+	//
+	public void setCoalesceAdjacentStrings1s(ChoisePoint iX, Term a1) {
+		setCoalesceAdjacentStrings(YesNo.termYesNo2Boolean(a1,iX));
+	}
+	public void setCoalesceAdjacentStrings(boolean value) {
+		coalesceAdjacentStrings= value;
+	}
+	public void getCoalesceAdjacentStrings0ff(ChoisePoint iX, PrologVariable a1) {
+		a1.value= YesNo.boolean2TermYesNo(getCoalesceAdjacentStrings(iX));
+	}
+	public void getCoalesceAdjacentStrings0fs(ChoisePoint iX) {
+	}
+	public boolean getCoalesceAdjacentStrings(ChoisePoint iX) {
+		if (coalesceAdjacentStrings != null) {
+			return coalesceAdjacentStrings;
+		} else {
+			Term value= getBuiltInSlot_E_coalesce_adjacent_strings();
+			return YesNo.termYesNo2Boolean(value,iX);
+		}
+	}
+	//
+	// get/set truncate_strings
+	//
+	public void setTruncateStrings1s(ChoisePoint iX, Term a1) {
+		setTruncateStrings(YesNo.termYesNo2Boolean(a1,iX));
+	}
+	public void setTruncateStrings(boolean value) {
+		truncateStrings= value;
+	}
+	public void getTruncateStrings0ff(ChoisePoint iX, PrologVariable a1) {
+		a1.value= YesNo.boolean2TermYesNo(getTruncateStrings(iX));
+	}
+	public void getTruncateStrings0fs(ChoisePoint iX) {
+	}
+	public boolean getTruncateStrings(ChoisePoint iX) {
+		if (truncateStrings != null) {
+			return truncateStrings;
+		} else {
+			Term value= getBuiltInSlot_E_truncate_strings();
+			return YesNo.termYesNo2Boolean(value,iX);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void getText1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
 		getContent1ff(iX,a1,a2);
 	}
@@ -88,42 +247,26 @@ public abstract class WebReceptor extends WebResource {
 	public void getText0fs(ChoisePoint iX) {
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void getReferences2ff(ChoisePoint iX, PrologVariable a1, Term a2, Term a3) {
-		String path;
-		String mask;
-		try {
-			path= a2.getStringValue(iX);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a2);
-		};
-		try {
-			mask= a3.getStringValue(iX);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a3);
-		};
-		a1.value= getResourceReferences(path,mask,iX);
-		// iX.pushTrail(a1);
+		String mask= Converters.argumentToString(a3,iX);
+		a1.value= getResourceReferences(a2,mask,iX);
 	}
 	public void getReferences2fs(ChoisePoint iX, Term a1, Term a2) {
 	}
 	public void getReferences1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
-		try {
-			String path= a2.getStringValue(iX);
-			a1.value= getResourceReferences(path,"*",iX);
-			// iX.pushTrail(a1);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a2);
-		}
+		a1.value= getResourceReferences(a2,"*",iX);
 	}
 	public void getReferences1fs(ChoisePoint iX, Term a1) {
 	}
 	public void getReferences0ff(ChoisePoint iX, PrologVariable a1) {
-		URI uri= retrieveLocationURI(iX);
-		a1.value= getResourceReferences(uri,"*",iX);
-		// iX.pushTrail(a1);
+		a1.value= getResourceReferences("*",iX);
 	}
 	public void getReferences0fs(ChoisePoint iX) {
 	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public class GetReference2ff extends GetReference {
 		public GetReference2ff(Continuation aC, PrologVariable a1, Term a2, Term a3) {
@@ -190,22 +333,12 @@ public abstract class WebReceptor extends WebResource {
 			if (mask==null) {
 				wildcard= "*";
 			} else {
-				try {
-					wildcard= mask.getStringValue(iX);
-				} catch (TermIsNotAString e) {
-					throw new WrongArgumentIsNotAString(mask);
-				}
+				wildcard= Converters.argumentToString(mask,iX);
 			};
 			if (retrieveAddressFromSlotValue) {
-				uri= retrieveLocationURI(iX);
-				content= getResourceReferences(uri,wildcard,iX);
+				content= getResourceReferences(wildcard,iX);
 			} else {
-				try {
-					String path= targetAddress.getStringValue(iX);
-					content= getResourceReferences(path,wildcard,iX);
-				} catch (TermIsNotAString e) {
-					throw new WrongArgumentIsNotAString(targetAddress);
-				}
+				content= getResourceReferences(targetAddress,wildcard,iX);
 			};
 			ChoisePoint newIx= new ChoisePoint(iX);
 			while(true) {
@@ -245,174 +378,187 @@ public abstract class WebReceptor extends WebResource {
 		}
 	}
 	//
-	protected Term getResourceReferences(String path, String mask, ChoisePoint iX) {
+	///////////////////////////////////////////////////////////////
+	//
+	protected Term getResourceReferences(String mask, ChoisePoint iX) {
+		// boolean backslashIsSeparator= getBackslashAlwaysIsSeparator(iX);
+		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		CharacterSet characters= getCharacterSet(iX);
+		ActionPeriod revision= getRevisionPeriod(iX);
+		ActionPeriod attempts= getAttemptPeriod(iX);
+		String[] tags= getTags(iX);
+		boolean extractAttributes= getExtractAttributes(iX);
+		boolean coalesceAdjacentStrings= getCoalesceAdjacentStrings(iX);
+		boolean truncateStrings= getTruncateStrings(iX);
+		initializeInternalTables(iX);
 		try {
-			URI uri= getURI(iX,path);
-			return getResourceReferences(uri,mask,iX);
+			ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
+			return getReferencesOfResource(fileName,mask,timeout,characters,revision,attempts,tags,extractAttributes,coalesceAdjacentStrings,truncateStrings,iX);
 		} catch (Throwable e) {
-			return URL_Utils.exceptionToName(e);
+			return SimpleFileName.channelExceptionToName(e);
 		}
 	}
-	protected Term getResourceReferences(URI uri, String mask, ChoisePoint iX) {
+	protected Term getResourceReferences(Term argument, String mask, ChoisePoint iX) {
+		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		CharacterSet characters= getCharacterSet(iX);
+		ActionPeriod revision= getRevisionPeriod(iX);
+		ActionPeriod attempts= getAttemptPeriod(iX);
+		String[] tags= getTags(iX);
+		boolean extractAttributes= getExtractAttributes(iX);
+		boolean coalesceAdjacentStrings= getCoalesceAdjacentStrings(iX);
+		boolean truncateStrings= getTruncateStrings(iX);
+		initializeInternalTables(iX);
 		try {
-			URL_Utils.installCookieManagerIfNecessary(staticContext);
-			CharacterSet characterSet= retrieveCharacterSet(iX);
-			int timeout= retrieveMaxWaitingTime(iX);
-			BigDecimal revisionPeriod= retrieveRevisionPeriod(iX);
-			BigDecimal attemptPeriod= retrieveAttemptPeriod(iX);
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-			URL_Attributes attributes= URL_Utils.getResourceAttributes(uri,characterSet,timeout,staticContext,backslashIsSeparator);
-			Term result;
-			try {
-				if (attributes.isDirectory) {
-					result= retrieveDirectoryContent(uri,mask,backslashIsSeparator);
-				} else {
-					String[] tags= retrieveTags(iX);
-					boolean extractAttributes= retrieveTheExtractAttributesFlag(iX);
-					boolean coalesceAdjacentStrings= retrieveTheCoalesceAdjacentStringsFlag(iX);
-					boolean truncateStrings= retrieveTheTruncateStringsFlag(iX);
-					String[] unpairedTagsTable= retrieveUnpairedTagsTable(iX);
-					String[] flatTagsTable= retrieveFlatTagsTable(iX);
-					String[][] referenceContainersTable= retrieveReferenceContainersTable(iX);
-					String[][] specialEntitiesTable= retrieveSpecialEntitiesTable(iX);
-					String text= URL_Utils.readTextFile(attributes);
-					HTML_Explorer parser= new HTML_Explorer(
-						extractAttributes,
-						coalesceAdjacentStrings,
-						truncateStrings,
-						tags,
-						unpairedTagsTable,
-						flatTagsTable,
-						referenceContainersTable,
-						specialEntitiesTable
-						);
-					result= parser.textToReferences(text,mask,uri,backslashIsSeparator);
-				}
-			} catch (Throwable e) {
-				return URL_Utils.exceptionToName(e);
-			// } finally {
-			//	attributes.safeCloseConnection();
-			};
-			pushWebReceptorRecord(attributes,revisionPeriod,attemptPeriod,iX);
-			return result;
+			ExtendedFileName fileName= retrieveRealGlobalFileName(argument,iX);
+			return getReferencesOfResource(fileName,mask,timeout,characters,revision,attempts,tags,extractAttributes,coalesceAdjacentStrings,truncateStrings,iX);
 		} catch (Throwable e) {
-			return URL_Utils.exceptionToName(e);
+			return SimpleFileName.channelExceptionToName(e);
 		}
+	}
+	protected Term getReferencesOfResource(ExtendedFileName fileName, String mask, int timeout, CharacterSet characters, ActionPeriod revision, ActionPeriod attempts, String[] tags, boolean extractAttributes, boolean coalesceAdjacentStrings, boolean truncateStrings, ChoisePoint iX) throws Throwable {
+		URL_Attributes attributes= fileName.getUniversalResourceAttributes(timeout,characters,staticContext);
+		Term result;
+		if (attributes.isDirectory) {
+			result= retrieveDirectoryContent(attributes.uri,mask);
+		} else {
+			String text= SimpleFileName.readStringFromUniversalResource(attributes);
+			HTML_Explorer parser= new HTML_Explorer(
+				extractAttributes,
+				coalesceAdjacentStrings,
+				truncateStrings,
+				tags,
+				unpairedTagsTable,
+				flatTagsTable,
+				referenceContainersTable,
+				specialEntitiesTable
+				);
+			result= parser.textToReferences(text,mask,attributes.uri);
+		};
+		pushWebReceptorRecord(attributes,revision,attempts,iX);
+		return result;
 	}
 	//
+	protected Term retrieveDirectoryContent(URI uri, String mask) {
+		char[] nativePattern= mask.toCharArray();
+		Pattern pattern= FileNameMask.wildcard2UnixPattern(nativePattern);
+		List<Path> content= SimpleFileName.retrieveDirectoryList(uri);
+		Term result= PrologEmptyList.instance;
+		for (int n=content.size()-1; n >= 0; n--) {
+			String resolvedName= SimpleFileName.tryToMakeRealName(content.get(n)).toString();
+			if (HTML_ExplorerTools.isEnabledReference(resolvedName,pattern)) {
+				result= new PrologList(new PrologString(resolvedName),result);
+			}
+		};
+		return result;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void getTrees2ff(ChoisePoint iX, PrologVariable a1, Term a2, Term a3) {
-		String path;
-		String mask;
-		try {
-			path= a2.getStringValue(iX);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a2);
-		};
-		try {
-			mask= a3.getStringValue(iX);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a3);
-		};
-		a1.value= getResourceTrees(path,mask,iX);
-		// iX.pushTrail(a1);
+		String mask= Converters.argumentToString(a3,iX);
+		a1.value= getResourceTrees(a2,mask,iX);
 	}
 	public void getTrees2fs(ChoisePoint iX, Term a1, Term a2) {
 	}
 	public void getTrees1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
-		try {
-			String path= a2.getStringValue(iX);
-			a1.value= getResourceTrees(path,"*",iX);
-			// iX.pushTrail(a1);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a2);
-		}
+		a1.value= getResourceTrees(a2,"*",iX);
 	}
 	public void getTrees1fs(ChoisePoint iX, Term a1) {
 	}
 	public void getTrees0ff(ChoisePoint iX, PrologVariable a1) {
-		URI uri= retrieveLocationURI(iX);
-		a1.value= getResourceTrees(uri,"*",iX);
-		// iX.pushTrail(a1);
+		a1.value= getResourceTrees("*",iX);
 	}
 	public void getTrees0fs(ChoisePoint iX) {
 	}
-	protected Term getResourceTrees(String path, String mask, ChoisePoint iX) {
+	protected Term getResourceTrees(String mask, ChoisePoint iX) {
+		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		CharacterSet characters= getCharacterSet(iX);
+		ActionPeriod revision= getRevisionPeriod(iX);
+		ActionPeriod attempts= getAttemptPeriod(iX);
+		String[] tags= getTags(iX);
+		boolean extractAttributes= getExtractAttributes(iX);
+		boolean coalesceAdjacentStrings= getCoalesceAdjacentStrings(iX);
+		boolean truncateStrings= getTruncateStrings(iX);
+		initializeInternalTables(iX);
 		try {
-			URI uri= getURI(iX,path);
-			return getResourceTrees(uri,mask,iX);
+			ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
+			return getTreesOfResource(fileName,mask,timeout,characters,revision,attempts,tags,extractAttributes,coalesceAdjacentStrings,truncateStrings,iX);
 		} catch (Throwable e) {
-			return URL_Utils.exceptionToName(e);
+			return SimpleFileName.channelExceptionToName(e);
 		}
 	}
-	protected Term getResourceTrees(URI uri, String mask, ChoisePoint iX) {
+	protected Term getResourceTrees(Term argument, String mask, ChoisePoint iX) {
+		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		CharacterSet characters= getCharacterSet(iX);
+		ActionPeriod revision= getRevisionPeriod(iX);
+		ActionPeriod attempts= getAttemptPeriod(iX);
+		String[] tags= getTags(iX);
+		boolean extractAttributes= getExtractAttributes(iX);
+		boolean coalesceAdjacentStrings= getCoalesceAdjacentStrings(iX);
+		boolean truncateStrings= getTruncateStrings(iX);
+		initializeInternalTables(iX);
 		try {
-			URL_Utils.installCookieManagerIfNecessary(staticContext);
-			CharacterSet characterSet= retrieveCharacterSet(iX);
-			int timeout= retrieveMaxWaitingTime(iX);
-			BigDecimal revisionPeriod= retrieveRevisionPeriod(iX);
-			BigDecimal attemptPeriod= retrieveAttemptPeriod(iX);
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-			URL_Attributes attributes= URL_Utils.getResourceAttributes(uri,characterSet,timeout,staticContext,backslashIsSeparator);
-			Term result;
-			try {
-				if (attributes.isDirectory) {
-					result= retrieveDirectoryContent(uri,mask,backslashIsSeparator);
-				} else {
-					String[] tags= retrieveTags(iX);
-					boolean extractAttributes= retrieveTheExtractAttributesFlag(iX);
-					boolean coalesceAdjacentStrings= retrieveTheCoalesceAdjacentStringsFlag(iX);
-					boolean truncateStrings= retrieveTheTruncateStringsFlag(iX);
-					String[] unpairedTagsTable= retrieveUnpairedTagsTable(iX);
-					String[] flatTagsTable= retrieveFlatTagsTable(iX);
-					String[][] referenceContainersTable= retrieveReferenceContainersTable(iX);
-					String[][] specialEntitiesTable= retrieveSpecialEntitiesTable(iX);
-					String text= URL_Utils.readTextFile(attributes);
-					HTML_Explorer parser= new HTML_Explorer(
-						extractAttributes,
-						coalesceAdjacentStrings,
-						truncateStrings,
-						tags,
-						unpairedTagsTable,
-						flatTagsTable,
-						referenceContainersTable,
-						specialEntitiesTable
-						);
-					result= parser.textToTerm(text,uri,mask,backslashIsSeparator);
-				}
-			} catch (Throwable e) {
-				return URL_Utils.exceptionToName(e);
-			// } finally {
-			//	attributes.safeCloseConnection();
-			};
-			pushWebReceptorRecord(attributes,revisionPeriod,attemptPeriod,iX);
-			return result;
+			ExtendedFileName fileName= retrieveRealGlobalFileName(argument,iX);
+			return getTreesOfResource(fileName,mask,timeout,characters,revision,attempts,tags,extractAttributes,coalesceAdjacentStrings,truncateStrings,iX);
 		} catch (Throwable e) {
-			return URL_Utils.exceptionToName(e);
+			return SimpleFileName.channelExceptionToName(e);
+		}
+	}
+	protected Term getTreesOfResource(ExtendedFileName fileName, String mask, int timeout, CharacterSet characters, ActionPeriod revision, ActionPeriod attempts, String[] tags, boolean extractAttributes, boolean coalesceAdjacentStrings, boolean truncateStrings, ChoisePoint iX) throws Throwable {
+		URL_Attributes attributes= fileName.getUniversalResourceAttributes(timeout,characters,staticContext);
+		Term result;
+		if (attributes.isDirectory) {
+			result= retrieveDirectoryContent(attributes.uri,mask);
+		} else {
+			String text= SimpleFileName.readStringFromUniversalResource(attributes);
+			HTML_Explorer parser= new HTML_Explorer(
+				extractAttributes,
+				coalesceAdjacentStrings,
+				truncateStrings,
+				tags,
+				unpairedTagsTable,
+				flatTagsTable,
+				referenceContainersTable,
+				specialEntitiesTable
+				);
+			result= parser.textToTerm(text,attributes.uri,mask);
+		};
+		pushWebReceptorRecord(attributes,revision,attempts,iX);
+		return result;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void link1s(ChoisePoint iX, Term a1) {
+		linkResource(a1,iX);
+	}
+	public void link0s(ChoisePoint iX) {
+		linkResource(iX);
+	}
+	protected void linkResource(ChoisePoint iX) {
+		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		CharacterSet characters= getCharacterSet(iX);
+		ActionPeriod revision= getRevisionPeriod(iX);
+		ActionPeriod attempts= getAttemptPeriod(iX);
+		try {
+			ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
+			linkResource(fileName,timeout,characters,revision,attempts,iX);
+		} catch (Throwable e) {
+		}
+	}
+	protected void linkResource(Term argument, ChoisePoint iX) {
+		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		CharacterSet characters= getCharacterSet(iX);
+		ActionPeriod revision= getRevisionPeriod(iX);
+		ActionPeriod attempts= getAttemptPeriod(iX);
+		try {
+			ExtendedFileName fileName= retrieveRealGlobalFileName(argument,iX);
+			linkResource(fileName,timeout,characters,revision,attempts,iX);
+		} catch (Throwable e) {
 		}
 	}
 	//
-	public void link1s(ChoisePoint iX, Term a1) {
-		try {
-			String path= a1.getStringValue(iX);
-			linkResource(path,iX);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a1);
-		}
-	}
-	public void link0s(ChoisePoint iX) {
-		URI uri= retrieveLocationURI(iX);
-		linkResource(uri,iX);
-	}
-	protected void linkResource(String path, ChoisePoint iX) {
-		try {
-			URI uri= getURI(iX,path);
-			linkResource(uri,iX);
-		} catch (Throwable e) {
-			// Term error= new PrologString(e.toString());
-			// return new PrologStructure(SymbolCodes.symbolCode_E_error,new Term[]{error});
-			// return URL_Utils.exceptionToName(e);
-		}
-	}
+	///////////////////////////////////////////////////////////////
 	//
 	public class UnpairedTagsTable1s extends Continuation {
 		// private Continuation c0;
@@ -466,6 +612,8 @@ public abstract class WebReceptor extends WebResource {
 		}
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public class FlatTagsTable1s extends Continuation {
 		// private Continuation c0;
 		protected PrologVariable outputResult;
@@ -517,6 +665,8 @@ public abstract class WebReceptor extends WebResource {
 			throw Backtracking.instance;
 		}
 	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public class ReferenceContainersTable2s extends Continuation {
 		// private Continuation c0;
@@ -578,6 +728,8 @@ public abstract class WebReceptor extends WebResource {
 		}
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public class SpecialEntitiesTable2s extends Continuation {
 		// private Continuation c0;
 		protected PrologVariable outputResult1;
@@ -638,48 +790,18 @@ public abstract class WebReceptor extends WebResource {
 		}
 	}
 	//
-	protected BigDecimal retrieveRevisionPeriod(ChoisePoint iX) {
-		Term period= getBuiltInSlot_E_revision_period();
-		try {
-			return URL_Utils.termToActionPeriod(period,iX);
-		} catch (TermIsSymbolDefault e1) {
-			try {
-				return URL_Utils.termToActionPeriod(DefaultOptions.revisionPeriod,iX);
-			} catch (TermIsSymbolDefault e2) {
-				return defaultRevisionPeriod;
-			}
+	///////////////////////////////////////////////////////////////
+	//
+	protected void initializeInternalTables(ChoisePoint iX) {
+		if (!internalTablesAreInitialized) {
+			unpairedTagsTable= retrieveUnpairedTagsTable(iX);
+			flatTagsTable= retrieveFlatTagsTable(iX);
+			referenceContainersTable= retrieveReferenceContainersTable(iX);
+			specialEntitiesTable= retrieveSpecialEntitiesTable(iX);
+			internalTablesAreInitialized= true;
 		}
 	}
 	//
-	protected BigDecimal retrieveAttemptPeriod(ChoisePoint iX) {
-		Term period= getBuiltInSlot_E_attempt_period();
-		try {
-			return URL_Utils.termToActionPeriod(period,iX);
-		} catch (TermIsSymbolDefault e1) {
-			try {
-				return URL_Utils.termToActionPeriod(DefaultOptions.attemptPeriod,iX);
-			} catch (TermIsSymbolDefault e2) {
-				return defaultAttemptPeriod;
-			}
-		}
-	}
-	//
-	protected String[] retrieveTags(ChoisePoint iX) {
-		Term tags= getBuiltInSlot_E_tags();
-		return Converters.termToStrings(tags,iX,true);
-	}
-	protected boolean retrieveTheExtractAttributesFlag(ChoisePoint iX) {
-		Term value= getBuiltInSlot_E_extract_attributes();
-		return Converters.term2YesNo(value,iX);
-	}
-	protected boolean retrieveTheCoalesceAdjacentStringsFlag(ChoisePoint iX) {
-		Term value= getBuiltInSlot_E_coalesce_adjacent_strings();
-		return Converters.term2YesNo(value,iX);
-	}
-	protected boolean retrieveTheTruncateStringsFlag(ChoisePoint iX) {
-		Term value= getBuiltInSlot_E_truncate_strings();
-		return Converters.term2YesNo(value,iX);
-	}
 	protected String[] retrieveUnpairedTagsTable(ChoisePoint iX) {
 		long domainSignatureNumber= entry_s_UnpairedTagsTable_1_o();
 		return collect_strings(iX,domainSignatureNumber);
@@ -768,84 +890,91 @@ public abstract class WebReceptor extends WebResource {
 		}
 	}
 	//
-	protected void linkResource(URI uri, ChoisePoint iX) {
+	///////////////////////////////////////////////////////////////
+	//
+	protected void linkResource(ExtendedFileName fileName, int timeout, CharacterSet characters, ActionPeriod revision, ActionPeriod attempts, ChoisePoint iX) {
 		try {
-			URL_Utils.installCookieManagerIfNecessary(staticContext);
-			CharacterSet characterSet= retrieveCharacterSet(iX);
-			int timeout= retrieveMaxWaitingTime(iX);
-			BigDecimal revisionPeriod= retrieveRevisionPeriod(iX);
-			BigDecimal attemptPeriod= retrieveAttemptPeriod(iX);
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-			// Term result;
-			// boolean ok= false;
-			URL_Attributes attributes= URL_Utils.getResourceAttributes(uri,characterSet,timeout,staticContext,backslashIsSeparator);
-			// if (attributes.connectionWasSuccessful()) {
-			//	ok= true;
-			// };
-			pushWebReceptorRecord(attributes,revisionPeriod,attemptPeriod,iX);
-			// return result;
+			// URL_Utils.installCookieManagerIfNecessary(staticContext);
+			URL_Attributes attributes= fileName.getUniversalResourceAttributes(timeout,characters,staticContext);
+			pushWebReceptorRecord(attributes,revision,attempts,iX);
 		} catch (Throwable e) {
-			// return URL_Utils.exceptionToName(e);
+			// return SimpleFileName.channelExceptionToName(e);
 		}
 	}
-	protected Term getResourceParameters(URI uri, CharacterSet characterSet, int timeout, ChoisePoint iX) {
+	//
+	protected Term getUniversalResourceParameters(ChoisePoint iX) {
+		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		CharacterSet characters= getCharacterSet(iX);
+		ActionPeriod revision= getRevisionPeriod(iX);
+		ActionPeriod attempts= getAttemptPeriod(iX);
 		try {
-			URL_Utils.installCookieManagerIfNecessary(staticContext);
-			// int timeout= retrieveMaxWaitingTime(iX);
-			BigDecimal revisionPeriod= retrieveRevisionPeriod(iX);
-			BigDecimal attemptPeriod= retrieveAttemptPeriod(iX);
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-			// Term result;
-			// boolean ok= false;
-			URL_Attributes attributes= URL_Utils.getResourceAttributes(uri,characterSet,timeout,staticContext,backslashIsSeparator);
-			// if (attributes.connectionWasSuccessful()) {
-			//	ok= true;
-			// };
-			pushWebReceptorRecord(attributes,revisionPeriod,attemptPeriod,iX);
+			ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
+			URL_Attributes attributes= fileName.getUniversalResourceAttributes(timeout,characters,staticContext);
+			pushWebReceptorRecord(attributes,revision,attempts,iX);
 			return attributes.toTerm();
 		} catch (Throwable e) {
-			return URL_Utils.exceptionToName(e);
+			return SimpleFileName.channelExceptionToName(e);
 		}
 	}
-	protected Term getResourceContent(URI uri, ChoisePoint iX) {
+	protected Term getUniversalResourceParameters(Term argument, ChoisePoint iX) {
+		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		CharacterSet characters= getCharacterSet(iX);
+		ActionPeriod revision= getRevisionPeriod(iX);
+		ActionPeriod attempts= getAttemptPeriod(iX);
 		try {
-			URL_Utils.installCookieManagerIfNecessary(staticContext);
-			CharacterSet characterSet= retrieveCharacterSet(iX);
-			int timeout= retrieveMaxWaitingTime(iX);
-			BigDecimal revisionPeriod= retrieveRevisionPeriod(iX);
-			BigDecimal attemptPeriod= retrieveAttemptPeriod(iX);
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-			URL_Attributes attributes= URL_Utils.getResourceAttributes(uri,characterSet,timeout,staticContext,backslashIsSeparator);
+			ExtendedFileName fileName= retrieveRealGlobalFileName(argument,iX);
+			URL_Attributes attributes= fileName.getUniversalResourceAttributes(timeout,characters,staticContext);
+			pushWebReceptorRecord(attributes,revision,attempts,iX);
+			return attributes.toTerm();
+		} catch (Throwable e) {
+			return SimpleFileName.channelExceptionToName(e);
+		}
+	}
+	//
+	protected Term getUniversalResourceContent(ChoisePoint iX) {
+		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		CharacterSet characters= getCharacterSet(iX);
+		ActionPeriod revision= getRevisionPeriod(iX);
+		ActionPeriod attempts= getAttemptPeriod(iX);
+		try {
+			ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
+			URL_Attributes attributes= fileName.getUniversalResourceAttributes(timeout,characters,staticContext);
 			Term result;
 			try {
-				result= getContentOfResource(uri,characterSet,timeout,backslashIsSeparator);
+				result= fileName.getTermContentOfUniversalResource(attributes);
 			} catch (CannotRetrieveContent e2) {
 				result= e2.getExceptionName();
 			} catch (Throwable e2) {
 				throw e2;
-			// } finally {
-			//	attributes.safeCloseConnection();
 			};
-			pushWebReceptorRecord(attributes,revisionPeriod,attemptPeriod,iX);
+			pushWebReceptorRecord(attributes,revision,attempts,iX);
 			return result;
 		} catch (Throwable e1) {
-			return URL_Utils.exceptionToName(e1);
+			return SimpleFileName.channelExceptionToName(e1);
+		}
+	}
+	protected Term getUniversalResourceContent(Term argument, ChoisePoint iX) {
+		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		CharacterSet characters= getCharacterSet(iX);
+		ActionPeriod revision= getRevisionPeriod(iX);
+		ActionPeriod attempts= getAttemptPeriod(iX);
+		try {
+			ExtendedFileName fileName= retrieveRealGlobalFileName(argument,iX);
+			URL_Attributes attributes= fileName.getUniversalResourceAttributes(timeout,characters,staticContext);
+			Term result;
+			try {
+				result= fileName.getTermContentOfUniversalResource(attributes);
+			} catch (CannotRetrieveContent e2) {
+				result= e2.getExceptionName();
+			};
+			pushWebReceptorRecord(attributes,revision,attempts,iX);
+			return result;
+		} catch (Throwable e1) {
+			return SimpleFileName.channelExceptionToName(e1);
 		}
 	}
 	//
-	protected Term retrieveDirectoryContent(URI uri, String mask, boolean backslashIsSeparator) {
-		char[] nativePattern= mask.toCharArray();
-		Pattern pattern= FileNameMask.wildcard2UnixPattern(nativePattern);
-		List<Path> content= retrieveDirectoryList(uri);
-		Term result= PrologEmptyList.instance;
-		for (int n=content.size()-1; n >= 0; n--) {
-			String resolvedName= FileUtils.tryToMakeRealName(content.get(n)).toString();
-			if (HTML_ExplorerTools.isEnabledReference(resolvedName,pattern,backslashIsSeparator)) {
-				result= new PrologList(new PrologString(resolvedName),result);
-			}
-		};
-		return result;
-	}
+	///////////////////////////////////////////////////////////////
 	//
 	protected void storePermanentRecord(WebReceptorRecord record) {
 		permanentRecords.add(record);
@@ -881,7 +1010,6 @@ public abstract class WebReceptor extends WebResource {
 			ActorNumber actor= provenActorIterator.next();
 			specialProcess.forgetEvents(actor);
 		};
-		// GregorianCalendar calendar= new GregorianCalendar();
 		Calendar calendar= Calendar.getInstance();
 		BigInteger currentTime= BigInteger.valueOf(calendar.getTimeInMillis()).multiply(oneMillion);
 		specialProcess.addFutureEvents(actualRecords,currentTime);
@@ -903,13 +1031,6 @@ public abstract class WebReceptor extends WebResource {
 				actualRecords.put(key,currentRecord);
 			}
 		};
-		// HashSet<ActorNumber> provenActors= currentProcess.getActorIsToBeProved();
-		// Iterator<ActorNumber> provenActorIterator= provenActors.iterator();
-		// while (provenActorIterator.hasNext()) {
-		//	ActorNumber actor= provenActorIterator.next();
-		//	specialProcess.forgetEvents(actor);
-		// };
-		// GregorianCalendar calendar= new GregorianCalendar();
 		Calendar calendar= Calendar.getInstance();
 		BigInteger currentTime= BigInteger.valueOf(calendar.getTimeInMillis()).multiply(oneMillion);
 		specialProcess.checkAndAddFutureEvents(actualRecords,currentTime);
@@ -926,29 +1047,30 @@ public abstract class WebReceptor extends WebResource {
 			specialProcess.start();
 		}
 	}
-	protected void pushWebReceptorRecord(URL_Attributes attributes, BigDecimal revisionPeriod, BigDecimal attemptPeriod, ChoisePoint iX) {
-		if (revisionPeriod.compareTo(BigDecimal.ZERO) >= 0) {
-			if (attemptPeriod.compareTo(BigDecimal.ZERO) < 0) {
-				attemptPeriod= revisionPeriod;
-			} else if (revisionPeriod.compareTo(attemptPeriod) < 0) {
-				attemptPeriod= revisionPeriod;
+	//
+	protected void pushWebReceptorRecord(URL_Attributes attributes, ActionPeriod revision, ActionPeriod attempts, ChoisePoint iX) {
+		BigDecimal revisionTime= revision.toNanosecondsOrDefault(DefaultOptions.revisionPeriod,decimalDefaultRevisionPeriodInNanoseconds,iX);
+		BigDecimal attemptTime= attempts.toNanosecondsOrDefault(DefaultOptions.attemptPeriod,decimalDefaultAttemptPeriodInNanoseconds,iX);
+		if (revisionTime.compareTo(BigDecimal.ZERO) >= 0) {
+			if (attemptTime.compareTo(BigDecimal.ZERO) < 0) {
+				attemptTime= revisionTime;
+			} else if (revisionTime.compareTo(attemptTime) < 0) {
+				attemptTime= revisionTime;
 			}
 		};
 		boolean ok= attributes.connectionWasSuccessful();
-		// if (	(ok && revisionPeriod.compareTo(BigInteger.ZERO) >= 0) ||
-		//	(!ok && attemptPeriod.compareTo(BigInteger.ZERO) >= 0)
 		if (ok) {
-			if (revisionPeriod.compareTo(BigDecimal.ZERO) < 0) {
+			if (revisionTime.compareTo(BigDecimal.ZERO) < 0) {
 				return;
 			}
 		} else {
-			if (attemptPeriod.compareTo(BigDecimal.ZERO) < 0) {
+			if (attemptTime.compareTo(BigDecimal.ZERO) < 0) {
 				return;
 			}
 		};
 		ActorRegister aR= iX.actorRegister;
 		ActorNumber actorNumber= aR.currentActorNumber;
-		WebReceptorRecord receptorRecord= new WebReceptorRecord(this,actorNumber,attributes,revisionPeriod,attemptPeriod);
+		WebReceptorRecord receptorRecord= new WebReceptorRecord(this,actorNumber,attributes,revisionTime,attemptTime);
 		pushPredefinedClassRecord(receptorRecord);
 		storePermanentRecord(receptorRecord);
 		createCheckerIfNeed();

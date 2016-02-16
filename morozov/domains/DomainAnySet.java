@@ -7,13 +7,16 @@ import morozov.run.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 
+import java.nio.charset.CharsetEncoder;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.Iterator;
 
 public class DomainAnySet extends DomainAlternative {
 	public DomainAnySet() {
 	}
+	//
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
 		// t= t.dereferenceValue(cp);
 		t= t.dereferenceValue(cp);
@@ -35,14 +38,12 @@ public class DomainAnySet extends DomainAlternative {
 		return checkCollectAndOptimizeSetElements(t,cp,baseDomain);
 	}
 	public Term checkTerm(Term t, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
-		// initiateDomainItemIfNecessary();
 		return checkAndCollectSetElements(t,cp,baseDomain);
 	}
 	public Term checkOptimizedSet(long[] keys, Term[] elements, Term tail, Term initialValue, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
 		return checkAndCollectSetElements(initialValue,cp,baseDomain);
 	}
 	protected PrologOptimizedSet checkCollectAndOptimizeSetElements(Term t, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
-		// initiateDomainItemsIfNecessary();
 		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
 		Term setEnd= t.exploreSetPositiveElements(setPositiveMap,cp);
 		setEnd= setEnd.dereferenceValue(cp);
@@ -80,7 +81,24 @@ public class DomainAnySet extends DomainAlternative {
 			throw new DomainAlternativeDoesNotCoverTerm(position1);
 		}
 	}
-	public PrologDomain getPairDomain(long key) throws IsNotPairDomainAlternative {
+	public PrologDomain getPairDomain(long key) throws TermIsNotPairDomainAlternative {
 		return new PrologAnyDomain();
+	}
+	//
+	public boolean isEqualTo(DomainAlternative a, HashSet<PrologDomainPair> stack) {
+		return a.isEqualToAnySet();
+	}
+	public boolean isEqualToAnySet() {
+		return true;
+	}
+	public boolean coversAlternative(DomainAlternative a, PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) {
+		return a.isCoveredBySetAny();
+	}
+	public boolean isCoveredBySetAny() {
+		return true;
+	}
+	//
+	public String toString(CharsetEncoder encoder) {
+		return PrologDomainName.tagDomainAlternative_AnySet;
 	}
 }

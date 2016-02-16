@@ -12,9 +12,9 @@ package morozov.system.gui.dialogs.scalable.common;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.terms.*;
 
 import java.awt.GridBagConstraints;
-import java.awt.image.BufferedImage;
 import javax.swing.Icon;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -23,19 +23,19 @@ import java.awt.Dimension;
 
 public class IconImage implements Icon {
 	//
-	protected BufferedImage image;
+	protected java.awt.image.BufferedImage image;
 	protected boolean keepProportions;
 	protected int anchor;
 	protected int currentHeight= 0;
 	protected int currentWidth= 0;
 	//
-	public IconImage(BufferedImage i, boolean keepProportionsFlag, int a) {
+	public IconImage(java.awt.image.BufferedImage i, boolean keepProportionsFlag, int a) {
 		image= i;
 		keepProportions= keepProportionsFlag;
 		anchor= a;
 	}
 	//
-	public void setImage(BufferedImage i) {
+	public void setImage(java.awt.image.BufferedImage i) {
 		image= i;
 	}
 	//
@@ -67,7 +67,7 @@ public class IconImage implements Icon {
 					double ratio0= (double)iconHeight / iconWidth;
 					double ratio1= (double)imageHeight / imageWidth;
 					if (ratio0 < ratio1) {
-						int w2= (int)StrictMath.round(iconHeight / ratio1);
+						int w2= PrologInteger.toInteger(iconHeight / ratio1);
 						if (	anchor==GridBagConstraints.WEST ||
 							anchor==GridBagConstraints.NORTHWEST ||
 							anchor==GridBagConstraints.SOUTHWEST ) {
@@ -79,11 +79,11 @@ public class IconImage implements Icon {
 							int x3= iconWidth - w2;
 							g2.drawImage(image,x3,0,w2,iconHeight,null);
 						} else {
-							int deltaW= (int)StrictMath.round((iconWidth - w2) / 2);
+							int deltaW= PrologInteger.toInteger((iconWidth - w2) / 2);
 							g2.drawImage(image,deltaW,0,w2,iconHeight,null);
 						}
 					} else {
-						int h2= (int)StrictMath.round(iconWidth * ratio1);
+						int h2= PrologInteger.toInteger(iconWidth * ratio1);
 						if (	anchor==GridBagConstraints.NORTH ||
 							anchor==GridBagConstraints.NORTHWEST ||
 							anchor==GridBagConstraints.NORTHEAST ) {
@@ -95,7 +95,7 @@ public class IconImage implements Icon {
 							int y3= iconHeight - h2;
 							g2.drawImage(image,0,y3,iconWidth,h2,null);
 						} else {
-							int deltaH= (int)StrictMath.round((iconHeight - h2) / 2);
+							int deltaH= PrologInteger.toInteger((iconHeight - h2) / 2);
 							g2.drawImage(image,0,deltaH,iconWidth,h2,null);
 						}
 					}

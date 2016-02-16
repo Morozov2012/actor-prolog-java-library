@@ -7,10 +7,53 @@ import target.*;
 import morozov.run.*;
 import morozov.run.errors.*;
 import morozov.terms.*;
+import morozov.worlds.*;
 
 public abstract class Trap extends Lambda {
 	//
 	static Continuation success= new SuccessTermination();
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public Trap() {
+	}
+	public Trap(GlobalWorldIdentifier id) {
+		super(id);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	abstract public Term getBuiltInSlot_E_world();
+	abstract public Term getBuiltInSlot_E_handler();
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public long domainSignatureOfSubgoal_1_InClause_1(long predicateSignatureNumber) {
+		throw new UndefinedInternalCallTableEntry();
+	}
+	public long domainSignatureOfSubgoal_1_InClause_2(long predicateSignatureNumber) {
+		throw new UndefinedInternalCallTableEntry();
+	}
+	public long domainSignatureOfSubgoal_1_InClause_3(long predicateSignatureNumber) {
+		throw new UndefinedInternalCallTableEntry();
+	}
+	public long domainSignatureOfSubgoal_1_InClause_4(long predicateSignatureNumber) {
+		throw new UndefinedInternalCallTableEntry();
+	}
+	public long headingNameOfClause_1(long predicateSignatureNumber) {
+		throw new UndefinedInternalCallTableEntry();
+	}
+	public long headingNameOfClause_2(long predicateSignatureNumber) {
+		throw new UndefinedInternalCallTableEntry();
+	}
+	public long headingNameOfClause_3(long predicateSignatureNumber) {
+		throw new UndefinedInternalCallTableEntry();
+	}
+	public long headingNameOfClause_4(long predicateSignatureNumber) {
+		throw new UndefinedInternalCallTableEntry();
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void catchException(ChoisePoint iX, long predicateSignatureNumber, boolean subgoalIsCallOfFunction, boolean clauseIsFunction, Term... args) throws Backtracking {
 		catch_exception(success,iX,predicateSignatureNumber,subgoalIsCallOfFunction,clauseIsFunction,(Term[])args);
@@ -36,7 +79,7 @@ public abstract class Trap extends Lambda {
 		}
 	}
 	//
-	private void catch_exception(Continuation c0, ChoisePoint iX, long predicateSignatureNumber, boolean subgoalIsCallOfFunction, boolean clauseIsFunction, Term[] args) throws Backtracking {
+	protected void catch_exception(Continuation c0, ChoisePoint iX, long predicateSignatureNumber, boolean subgoalIsCallOfFunction, boolean clauseIsFunction, Term[] args) throws Backtracking {
 		long worldDomainSignatureNumber;
 		if (clauseIsFunction) {
 			worldDomainSignatureNumber= domainSignatureOfSubgoal_1_InClause_3(predicateSignatureNumber);
@@ -73,6 +116,7 @@ public abstract class Trap extends Lambda {
 			processException(new LowLevelErrorExit(newIndex,e1),c0,newIndex,predicateSignatureNumber,subgoalIsCallOfFunction,clauseIsFunction,args);
 		}
 	}
+	//
 	protected void processException(ErrorExit ee, Continuation c0, ChoisePoint newIndex, long predicateSignatureNumber, boolean subgoalIsCallOfFunction, boolean clauseIsFunction, Term[] args) throws Backtracking {
 		Term targetWorld= getBuiltInSlot_E_world();
 		newIndex.freeTrail();
@@ -116,32 +160,4 @@ public abstract class Trap extends Lambda {
 		};
 		throw Backtracking.instance;
 	}
-	//
-	public long domainSignatureOfSubgoal_1_InClause_1(long predicateSignatureNumber) {
-		throw new UndefinedInternalCallTableEntry();
-	}
-	public long domainSignatureOfSubgoal_1_InClause_2(long predicateSignatureNumber) {
-		throw new UndefinedInternalCallTableEntry();
-	}
-	public long domainSignatureOfSubgoal_1_InClause_3(long predicateSignatureNumber) {
-		throw new UndefinedInternalCallTableEntry();
-	}
-	public long domainSignatureOfSubgoal_1_InClause_4(long predicateSignatureNumber) {
-		throw new UndefinedInternalCallTableEntry();
-	}
-	public long headingNameOfClause_1(long predicateSignatureNumber) {
-		throw new UndefinedInternalCallTableEntry();
-	}
-	public long headingNameOfClause_2(long predicateSignatureNumber) {
-		throw new UndefinedInternalCallTableEntry();
-	}
-	public long headingNameOfClause_3(long predicateSignatureNumber) {
-		throw new UndefinedInternalCallTableEntry();
-	}
-	public long headingNameOfClause_4(long predicateSignatureNumber) {
-		throw new UndefinedInternalCallTableEntry();
-	}
-	//
-	abstract public Term getBuiltInSlot_E_world();
-	abstract public Term getBuiltInSlot_E_handler();
 }

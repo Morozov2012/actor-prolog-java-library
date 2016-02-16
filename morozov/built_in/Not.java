@@ -7,8 +7,31 @@ import target.*;
 import morozov.run.*;
 import morozov.run.errors.*;
 import morozov.terms.*;
+import morozov.worlds.*;
 
 public abstract class Not extends Lambda {
+	//
+	public Not() {
+	}
+	public Not(GlobalWorldIdentifier id) {
+		super(id);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	abstract public Term getBuiltInSlot_E_world();
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public long domainSignatureOfSubgoal_1_InClause_1(long predicateSignatureNumber) {
+		throw new UndefinedInternalCallTableEntry();
+	}
+	public long domainSignatureOfSubgoal_1_InClause_3(long predicateSignatureNumber) {
+		throw new UndefinedInternalCallTableEntry();
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void negation(ChoisePoint iX, long predicateSignatureNumber, boolean subgoalIsCallOfFunction, boolean clauseIsFunction, Term... args) throws Backtracking {
 		long worldDomainSignatureNumber;
 		if (clauseIsFunction) {
@@ -83,12 +106,4 @@ public abstract class Not extends Lambda {
 			throw Backtracking.instance;
 		}
 	}
-	//
-	public long domainSignatureOfSubgoal_1_InClause_1(long predicateSignatureNumber) {
-		throw new UndefinedInternalCallTableEntry();
-	}
-	public long domainSignatureOfSubgoal_1_InClause_3(long predicateSignatureNumber) {
-		throw new UndefinedInternalCallTableEntry();
-	}
-	abstract public Term getBuiltInSlot_E_world();
 }

@@ -4,7 +4,6 @@ package morozov.built_in;
 
 import target.*;
 
-import morozov.classes.*;
 import morozov.run.*;
 import morozov.system.errors.*;
 import morozov.system.gui.*;
@@ -12,6 +11,7 @@ import morozov.system.gui.sadt.*;
 import morozov.system.gui.sadt.errors.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
+import morozov.worlds.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,11 +19,13 @@ import java.util.Collections;
 
 public abstract class FunctionModel extends Alpha {
 	//
-	Map<String,AbstractProcess> diagramComponents= Collections.synchronizedMap(new HashMap<String,AbstractProcess>());
-	ActiveDiagram diagram;
+	protected Map<String,AbstractProcess> diagramComponents= Collections.synchronizedMap(new HashMap<String,AbstractProcess>());
+	protected ActiveDiagram diagram;
 	//
 	public FunctionModel() {
-		// LookAndFeelUtils.assignLookAndFeel();
+	}
+	public FunctionModel(GlobalWorldIdentifier id) {
+		super(id);
 	}
 	//
 	public void closeFiles() {
@@ -41,11 +43,11 @@ public abstract class FunctionModel extends Alpha {
 					try {
 						long functor= head.getStructureFunctor(iX);
 						if (functor!=SymbolCodes.symbolCode_E_component) {
-							throw new WrongTermIsNotIdentifierAndComponent(head);
+							throw new WrongArgumentIsNotIdentifierAndComponent(head);
 						};
 						Term[] pair= head.getStructureArguments(iX);
 						if (pair.length!=2) {
-							throw new WrongTermIsNotIdentifierAndComponent(head);
+							throw new WrongArgumentIsNotIdentifierAndComponent(head);
 						};
 						try {
 							String identifier= pair[0].getStringValue(iX);
@@ -53,16 +55,16 @@ public abstract class FunctionModel extends Alpha {
 							diagramComponents.put(identifier,process);
 							value= value.getNextListTail(iX);
 						} catch (TermIsNotAString e2) {
-							throw new WrongTermIsNotComponentIdentifier(pair[0]);
+							throw new WrongArgumentIsNotComponentIdentifier(pair[0]);
 						}
 					} catch (TermIsNotAStructure e2) {
-						throw new WrongTermIsNotIdentifierAndComponent(head);
+						throw new WrongArgumentIsNotIdentifierAndComponent(head);
 					}
 				}
 			} catch (EndOfList e2) {
 			}
 		} catch (TermIsNotAList e3) {
-			throw new WrongTermIsNotComponentIdentifierList(value);
+			throw new WrongArgumentIsNotComponentIdentifierList(value);
 		}
 	}
 	//

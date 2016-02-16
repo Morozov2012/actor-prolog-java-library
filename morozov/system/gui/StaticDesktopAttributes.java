@@ -2,9 +2,11 @@
 
 package morozov.system.gui;
 
-import morozov.classes.*;
+import morozov.run.*;
 
 import java.awt.Window;
+import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class StaticDesktopAttributes extends StaticAttributes {
@@ -14,6 +16,7 @@ public class StaticDesktopAttributes extends StaticAttributes {
 	private int previousDefaultPosition= -1;
 	private Window mainWindow;
 	private static final String staticIdentifier= "_Desktop";
+	private boolean exitOnClose= true;
 	//
 	private static StaticDesktopAttributes retrieveStaticDesktopAttributes(StaticContext context) {
 		StaticAttributes attributes= context.retrieveAttributes(staticIdentifier);
@@ -50,20 +53,12 @@ public class StaticDesktopAttributes extends StaticAttributes {
 		};
 		return guard;
 	}
-	// public static void setPreviousDefaultPosition(int position, StaticContext context) {
-	//	StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
-	//	synchronized(attributes) {
-	//		attributes.previousDefaultPosition= position;
-	//	}
-	// }
-	// public static int retrievePreviousDefaultPosition(StaticContext context) {
-	//	StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
-	//	int position;
-	//	synchronized(attributes) {
-	//		position= attributes.previousDefaultPosition;
-	//	};
-	//	return position;
-	// }
+	public static void resetDefaultPosition(StaticContext context) {
+		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
+		synchronized(attributes) {
+			attributes.previousDefaultPosition= -1;
+		}
+	}
 	public static int increaseDefaultPosition(StaticContext context, int step, int realWidth, int realHeight, int desktopWidth, int desktopHeight) {
 		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
 		int position;
@@ -115,5 +110,36 @@ public class StaticDesktopAttributes extends StaticAttributes {
 			window= attributes.mainWindow;
 		};
 		return window;
+	}
+	public static void setExitOnClose(boolean mode, StaticContext context) {
+		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
+		synchronized(attributes) {
+			attributes.exitOnClose= mode;
+			Window mainWindow= attributes.mainWindow;
+			if (mainWindow != null) {
+				if (mainWindow instanceof JFrame) {
+					JFrame frame= (JFrame)mainWindow;
+					try {
+						if (mode) {
+							frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+						} else {
+							// frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+							frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+						}
+					} catch (SecurityException e) {
+						// frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+						frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+					}
+				}
+			}
+		}
+	}
+	public static boolean retrieveExitOnClose(StaticContext context) {
+		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
+		boolean mode;
+		synchronized(attributes) {
+			mode= attributes.exitOnClose;
+		};
+		return mode;
 	}
 }

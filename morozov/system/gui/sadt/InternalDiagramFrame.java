@@ -2,10 +2,10 @@
 
 package morozov.system.gui.sadt;
 
-import morozov.classes.*;
+import morozov.run.*;
 import morozov.system.gui.*;
+import morozov.worlds.*;
 
-import java.awt.Font;
 import java.util.Map;
 
 public class InternalDiagramFrame extends InnerPage {
@@ -13,8 +13,8 @@ public class InternalDiagramFrame extends InnerPage {
 	//
 	public InternalDiagramFrame(String title, String identifier, DiagramContent graph, DiagramColors diagramColors, StaticContext context, Map<String,AbstractProcess> components, Map<String,ComponentState> componentSuccess) {
 		super(title);
-		panel= new DiagramPaneNoWrap(this,identifier,graph,diagramColors,context,components,componentSuccess);
-		add(panel);
+		panel= new DiagramPaneNoWrap(getInternalFrame(),identifier,graph,diagramColors,context,components,componentSuccess);
+		getInternalFrame().add(panel);
 		// MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(context);
 		// if (desktop!=null) {
 		//	Dimension size= safelyGetComponentSize(desktop);
@@ -25,9 +25,14 @@ public class InternalDiagramFrame extends InnerPage {
 		// }
 	}
 	//
+/*
 	public void setFont(Font f) {
 		super.setFont(f);
 		panel.setFont(f);
+	}
+*/
+	public void quicklyRepaint() {
+		panel.repaint();
 	}
 	//
 	// public void safelyRestoreSize(StaticContext context) {

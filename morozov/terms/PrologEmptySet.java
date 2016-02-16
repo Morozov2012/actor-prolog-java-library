@@ -18,11 +18,39 @@ public final class PrologEmptySet extends UnderdeterminedSet {
 	private PrologEmptySet() {
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
+	public boolean equals(Object o2) {
+		if (o2 instanceof Term) {
+			return ((Term)o2).isEqualToEmptySet();
+		} else {
+			return false;
+		}
+	}
+	public int compare(Object o2) {
+		if (o2 instanceof Term) {
+			return -((Term)o2).compareWithEmptySet();
+		} else {
+			return 1;
+		}
+	}
+	public boolean isEqualToEmptySet() {
+		return true;
+	}
+	public int compareWithEmptySet() {
+		return 0;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void isEmptySet(ChoisePoint cp) throws Backtracking {
 	}
 	public boolean thisIsEmptySet() {
 		return true;
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void inheritSetElements(PrologOptimizedSet set, ChoisePoint cp) throws Backtracking {
 		set.setNoValueElements();
 	}
@@ -73,6 +101,8 @@ public final class PrologEmptySet extends UnderdeterminedSet {
 		t.isEmptySet(cp);
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	protected void unify_with_set(
 			Term aTail,
 			ChoisePoint cp,
@@ -81,70 +111,16 @@ public final class PrologEmptySet extends UnderdeterminedSet {
 			HashMap<Long,Term> rightSetPositiveMap,
 			HashSet<Long> rightSetNegativeMap
 			) throws Backtracking {
-		// Term leftSetEnd= tail.exploreSet(leftSetPositiveMap,leftSetNegativeMap,cp);
 		Term rightSetEnd= aTail.exploreSet(rightSetPositiveMap,rightSetNegativeMap,cp);
-		// Set<Long> leftSetPositiveKeys= leftSetPositiveMap.keySet();
-		// Iterator<Long> leftSetPositiveIterator= leftSetPositiveKeys.iterator();
-		// while (leftSetPositiveIterator.hasNext()) {
-		//	long leftSetPositiveKey= leftSetPositiveIterator.next();
-		//	if (rightSetPositiveMap.containsKey(leftSetPositiveKey)) {
-		//		Term leftSetPositiveValue= leftSetPositiveMap.get(leftSetPositiveKey);
-		//		Term rightSetPositiveValue= rightSetPositiveMap.get(leftSetPositiveKey);
-		//		leftSetPositiveValue.unifyWith(rightSetPositiveValue,cp);
-		//		rightSetPositiveMap.remove(leftSetPositiveKey);
-		//	} else {
-		//		if (rightSetNegativeMap.contains(leftSetPositiveKey)) {
-		//			throw Backtracking.instance;
-		//		} else {
-		//			Term leftSetPositiveValue= leftSetPositiveMap.get(leftSetPositiveKey);
-		//			aTail.appendNamedElement(leftSetPositiveKey,leftSetPositiveValue,cp);
-		//		}
-		//	};
-		// leftSetPositiveIterator.remove();
-		// };
-		// Iterator<Long> leftSetNegativeIterator= leftSetNegativeMap.iterator();
-		// while (leftSetNegativeIterator.hasNext()) {
-		//	long leftSetNegativeKey= leftSetNegativeIterator.next();
-		//	if (rightSetPositiveMap.containsKey(leftSetNegativeKey)) {
-		//		throw Backtracking.instance;
-		//	} else {
-		//		if (rightSetNegativeMap.contains(leftSetNegativeKey)) {
-		//			rightSetNegativeMap.remove(leftSetNegativeKey);
-		//		} else {
-		//			aTail.appendNamedElementProhibition(leftSetNegativeKey,cp);
-		//		}
-		//	};
-		//	leftSetNegativeIterator.remove();
-		// };
 		if (!rightSetPositiveMap.isEmpty()) {
 			throw Backtracking.instance;
 		};
-		// Set<Long> rightSetPositiveKeys= rightSetPositiveMap.keySet();
-		// Iterator<Long> rightSetPositiveIterator= rightSetPositiveKeys.iterator();
-		// while (rightSetPositiveIterator.hasNext()) {
-		//	long rightSetPositiveKey= rightSetPositiveIterator.next();
-		//	Term rightSetPositiveValue= rightSetPositiveMap.get(rightSetPositiveKey);
-		//	tail.appendNamedElement(rightSetPositiveKey,rightSetPositiveValue,cp);
-		//	// rightSetPositiveIterator.remove();
-		// };
-		// Iterator<Long> rightSetNegativeIterator= rightSetNegativeMap.iterator();
-		// while (rightSetNegativeIterator.hasNext()) {
-		//	long rightSetNegativeKey= rightSetNegativeIterator.next();
-		//	tail.appendNamedElementProhibition(rightSetNegativeKey,cp);
-		//	// rightSetNegativeIterator.remove();
-		// };
-		// leftSetEnd= leftSetEnd.exploreSet(cp);
 		rightSetEnd= rightSetEnd.exploreSet(cp);
-		// if (leftSetEnd.thisIsFreeVariable() && rightSetEnd.thisIsFreeVariable()) {
-		//	PrologVariable newTail= new PrologVariable();
-		//	leftSetEnd.setValue(newTail);
-		//	rightSetEnd.setValue(newTail);
-		// } else {
-		//	leftSetEnd.isEmptySet(cp);
 		rightSetEnd.isEmptySet(cp);
-		// }
 	}
-	// Domain check
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public boolean isCoveredBySetDomain(long functor, PrologDomain headDomain, PrologDomain baseDomain, ChoisePoint cp, boolean ignoreFreeVariables) {
 		return true;
 	}
@@ -154,9 +130,10 @@ public final class PrologEmptySet extends UnderdeterminedSet {
 	public Term checkSetTerm(long functor, PrologDomain headDomain, Term initialValue, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
 		return this;
 	}
-	// Converting Term to String
-	// public String toString() {
-	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, CharsetEncoder encoder) {
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		return "{}";
 	}
 }

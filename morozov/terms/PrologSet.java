@@ -4,12 +4,12 @@ package morozov.terms;
 
 import target.*;
 
-import morozov.classes.*;
 import morozov.domains.*;
 import morozov.domains.signals.*;
 import morozov.run.*;
 import morozov.run.errors.*;
 import morozov.terms.signals.*;
+import morozov.worlds.*;
 
 import java.nio.charset.CharsetEncoder;
 import java.util.HashMap;
@@ -17,6 +17,7 @@ import java.util.HashSet;
 
 public class PrologSet extends UnderdeterminedSetItem {
 	private Term value;
+	//
 	public PrologSet(long aName, Term aValue, Term aTail) {
 		name= aName;
 		value= aValue;
@@ -40,9 +41,15 @@ public class PrologSet extends UnderdeterminedSetItem {
 			}
 		}
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public int hashCode() {
-		return (int)name + value.hashCode() + tail.hashCode();
+		return PrologSymbol.calculateHashCode(name) + value.hashCode() + tail.hashCode();
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void inheritSetElements(PrologOptimizedSet set, ChoisePoint cp) throws Backtracking {
 		set.setGivenElement(name,value,tail,cp);
 	}
@@ -137,7 +144,9 @@ public class PrologSet extends UnderdeterminedSetItem {
 	public void appendNamedElementProhibition(long aName, ChoisePoint cp) throws Backtracking {
 		tail.appendNamedElementProhibition(aName,cp);
 	}
-	// "Unify with ..." functions
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void unifyWithSet(long aName, Term aValue, Term aTail, Term aSet, ChoisePoint cp) throws Backtracking {
 		if (name == aName) {
 			value.unifyWith(aValue,cp);
@@ -181,6 +190,9 @@ public class PrologSet extends UnderdeterminedSetItem {
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		t.unifyWithSet(name,value,tail,this,cp);
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void registerVariables(ActiveWorld process, boolean isSuspending, boolean isProtecting) {
 		value.registerVariables(process,isSuspending,isProtecting);
 		tail.registerVariables(process,isSuspending,isProtecting);
@@ -213,10 +225,11 @@ public class PrologSet extends UnderdeterminedSetItem {
 			value.substituteWorlds(map,cp),
 			tail.substituteWorlds(map,cp));
 	}
-	// Domain check
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public boolean isCoveredBySetDomain(long functor, PrologDomain headDomain, PrologDomain baseDomain, ChoisePoint cp, boolean ignoreFreeVariables) {
 		if (functor == name) {
-			// System.out.printf("headDomain=%s,value=%s\n",headDomain,value);
 			if (headDomain.coversTerm(value,cp,ignoreFreeVariables)) {
 				return baseDomain.coversTerm(tail,cp,ignoreFreeVariables);
 			} else {
@@ -235,16 +248,18 @@ public class PrologSet extends UnderdeterminedSetItem {
 			throw new DomainAlternativeDoesNotCoverTerm(initialValue.getPosition());
 		}
 	}
-	// Converting Term to String
-	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, CharsetEncoder encoder) {
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		StringBuilder buffer= new StringBuilder("{");
 		try {
 			buffer.append(
 				(name < 0 ?
-					SymbolNames.retrieveSymbolName(-name).toString(encoder) :
+					SymbolNames.retrieveSymbolName(-name).toSafeString(encoder) :
 					String.format("%d",name) ) +
 				":" +
-				value.toString(cp,true,provideStrictSyntax,encoder));
+				value.toString(cp,true,provideStrictSyntax,encodeWorlds,encoder));
 			long nextName;
 			Term nextValue;
 			Term currentTail= tail;
@@ -255,7 +270,7 @@ public class PrologSet extends UnderdeterminedSetItem {
 					boolean appendElement= true;
 					try {
 						nextValue= currentTail.getNextPairValue(cp);
-						elementText= nextValue.toString(cp,true,provideStrictSyntax,encoder);
+						elementText= nextValue.toString(cp,true,provideStrictSyntax,encodeWorlds,encoder);
 					} catch (SetElementIsProhibited e) {
 						if (provideStrictSyntax) {
 							appendElement= false;
@@ -267,7 +282,7 @@ public class PrologSet extends UnderdeterminedSetItem {
 						buffer.append(",");
 						buffer.append(
 							(nextName < 0 ?
-								SymbolNames.retrieveSymbolName(-nextName).toString(encoder) :
+								SymbolNames.retrieveSymbolName(-nextName).toSafeString(encoder) :
 								String.format("%d",nextName) ) +
 							":" +
 							elementText);
@@ -279,7 +294,7 @@ public class PrologSet extends UnderdeterminedSetItem {
 				return buffer.toString();
 			} catch (TermIsNotASet e) {
 				buffer.append("|");
-				buffer.append(currentTail.toString(cp,true,provideStrictSyntax,encoder));
+				buffer.append(currentTail.toString(cp,true,provideStrictSyntax,encodeWorlds,encoder));
 				buffer.append("}");
 				return buffer.toString();
 			}
@@ -288,10 +303,10 @@ public class PrologSet extends UnderdeterminedSetItem {
 			buffer.append(
 				String.format("{%s:%s|%s}",
 					(name < 0 ?
-						SymbolNames.retrieveSymbolName(-name).toString(encoder) :
+						SymbolNames.retrieveSymbolName(-name).toSafeString(encoder) :
 						String.format("%d",name) ),
-					value.toString(cp,true,provideStrictSyntax,encoder),
-					tail.toString(cp,true,provideStrictSyntax,encoder)));
+					value.toString(cp,true,provideStrictSyntax,encodeWorlds,encoder),
+					tail.toString(cp,true,provideStrictSyntax,encodeWorlds,encoder)));
 			return buffer.toString();
 		}
 	}

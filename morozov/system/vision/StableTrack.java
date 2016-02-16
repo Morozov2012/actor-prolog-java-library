@@ -4,7 +4,6 @@ package morozov.system.vision;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.math.BigInteger;
 import java.io.PrintStream;
 

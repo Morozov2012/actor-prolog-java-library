@@ -8,12 +8,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 public abstract class ActorNumber extends Term {
+	public boolean thisIsActorNumber() {
+		return true;
+	}
 	public int hashCode() {
 		return System.identityHashCode(this);
 	}
-	public boolean isTemporary() {
-		return false;
-	}
+	abstract public boolean isNumberOfTemporaryActor();
+	//
 	public static String toCompactString(HashSet<ActorNumber> actors) {
 		StringBuilder buffer= new StringBuilder("[");
 		boolean isFirstElement= true;
@@ -23,7 +25,7 @@ public abstract class ActorNumber extends Term {
 			if (!isFirstElement) {
 				buffer.append(",");
 			}
-			if (actor.isTemporary()) {
+			if (actor.isNumberOfTemporaryActor()) {
 				buffer.append("{TempActor}");
 			}
 			else {

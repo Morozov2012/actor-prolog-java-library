@@ -2,9 +2,10 @@
 
 package morozov.system.checker;
 
-import morozov.classes.*;
 import morozov.run.*;
+import morozov.system.files.*;
 import morozov.terms.*;
+import morozov.worlds.*;
 
 import java.math.BigInteger;
 import java.math.BigDecimal;
@@ -21,20 +22,14 @@ import java.util.Calendar;
 import java.util.NoSuchElementException;
 
 public class URL_Checker extends ThreadHolder {
-	// private AtomicBoolean hasMessagesToBeProcessed= new AtomicBoolean(true);
-	// private volatile boolean stopThisThread= false;
 	protected SortedMap<BigInteger,FutureEvent> eventTable= Collections.synchronizedSortedMap(new TreeMap<BigInteger,FutureEvent>());
 	private static final BigInteger oneMillion= BigInteger.valueOf(1000000);
 	//
-	// public ThreadHolder(ActiveWorld process) {
-	//	currentProcess= process;
-	// }
 	public URL_Checker(ActiveWorld process) {
 		super(process);
 	}
 	//
 	public void run() {
-		// currentProcess.hasUpdatedPort.set(true);
 		while (!stopThisThread.get()) {
 			BigInteger firstKey= null;
 			try {
@@ -85,7 +80,7 @@ public class URL_Checker extends ThreadHolder {
 	//
 	public URL_Attributes performCheck(URL_Attributes recentAttributes, BigInteger currentTime) {
 		try {
-			URL_Attributes newAttributes= URL_Utils.renewResourceAttributes(recentAttributes);
+			URL_Attributes newAttributes= ExtendedFileName.renewUniversalResourceAttributes(recentAttributes);
 			if (newAttributes.wereChanged(recentAttributes)) {
 				((ActiveResource)currentProcess).publishResults(currentTime);
 			};

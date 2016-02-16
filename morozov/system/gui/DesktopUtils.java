@@ -2,7 +2,7 @@
 
 package morozov.system.gui;
 
-import morozov.classes.*;
+import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 
 import javax.swing.JInternalFrame;
@@ -57,7 +57,8 @@ public class DesktopUtils {
 						Frame mainWindow= new MainWindow(context);
 						StaticDesktopAttributes.setMainWindow(mainWindow,context);
 						mainWindow.setExtendedState(Frame.MAXIMIZED_BOTH);
-						mainWindow.setVisible(true);
+						// mainWindow.setVisible(true);
+						safelySetVisible(true,mainWindow);
 					} else {
 						Window mainWindow= StaticContext.retrieveSystemWindow(context);
 						StaticDesktopAttributes.setMainWindow(mainWindow,context);
@@ -73,7 +74,8 @@ public class DesktopUtils {
 						desktop= new MainDesktopPane(context);
 						StaticDesktopAttributes.setDesktopPane(desktop,context);
 						applet.getContentPane().add(desktop,BorderLayout.CENTER);
-						desktop.setVisible(true);
+						// desktop.setVisible(true);
+						safelySetVisible(true,desktop);
 					}
 				}
 			} finally {
@@ -81,8 +83,10 @@ public class DesktopUtils {
 			}
 		} else {
 			Window mainWindow= StaticDesktopAttributes.retrieveMainWindow(context);
-			mainWindow.setVisible(true);
-			desktop.setVisible(true);
+			// mainWindow.setVisible(true);
+			safelySetVisible(true,mainWindow);
+			// desktop.setVisible(true);
+			safelySetVisible(true,desktop);
 		};
 		return desktop;
 	}
@@ -90,7 +94,8 @@ public class DesktopUtils {
 	public static void makeExistedMainWindowVisible(StaticContext context) {
 		Window mainWindow= StaticDesktopAttributes.retrieveMainWindow(context);
 		if (mainWindow != null) {
-			mainWindow.setVisible(true);
+			// mainWindow.setVisible(true);
+			safelySetVisible(true,mainWindow);
 		}
 	}
 	//
@@ -349,12 +354,13 @@ public class DesktopUtils {
 		}
 	}
 	public static void restoreFrames(JInternalFrame[] frames, StaticContext context) {
+		StaticDesktopAttributes.resetDefaultPosition(context);
 		for(int n=0; n < frames.length; n++) {
-			if (frames[n] instanceof InnerPage) {
+			if (frames[n] instanceof ExtendedJInternalFrame) {
 				setIconFalse(frames[n]);
-				((InnerPage)frames[n]).safelyRestoreSize(context);
-			} else if (frames[n] instanceof ExtendedJInternalFrame) {
-				((ExtendedJInternalFrame)frames[n]).safelyRestoreSize();
+				((ExtendedJInternalFrame)frames[n]).quicklyRestoreSize(context);
+			} else if (frames[n] instanceof DialogJInternalFrame) {
+				((DialogJInternalFrame)frames[n]).safelyPositionMainPanel();
 			}
 		}
 	}
@@ -429,21 +435,21 @@ public class DesktopUtils {
 		}
 	}
 	//
-	public static Dimension safelyGetComponentSize(final Component component) {
+	public static void safelyGetComponentLocation(final Component component, final Point location) {
 		if (SwingUtilities.isEventDispatchThread()) {
-			return component.getSize();
+			Point point= component.getLocation();
+			location.setLocation(point);
 		} else {
-			final Dimension size= new Dimension();
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
-						component.getSize(size);
+						Point point= component.getLocation();
+						location.setLocation(point);
 					}
 				});
 			} catch (InterruptedException e) {
 			} catch (InvocationTargetException e) {
-			};
-			return size;
+			}
 		}
 	}
 	public static void safelyGetComponentLocation(final Component component, final Point location, final Dimension size) {
@@ -484,6 +490,23 @@ public class DesktopUtils {
 			}
 		}
 	}
+	public static Dimension safelyGetComponentSize(final Component component) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			return component.getSize();
+		} else {
+			final Dimension size= new Dimension();
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						component.getSize(size);
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			};
+			return size;
+		}
+	}
 	public static void safelyGetSizeDifference(final JInternalFrame frame, final Dimension sizeDifference) {
 		if (SwingUtilities.isEventDispatchThread()) {
 			getSizeDifference(frame,sizeDifference);
@@ -506,7 +529,7 @@ public class DesktopUtils {
 		sizeDifference.height= sizeDifference.height - cd.height;
 	}
 	//
-	public static void safelyGetSize(final Component component, final Dimension size) {
+	public static void safelyGetComponentSize(final Component component, final Dimension size) {
 		if (SwingUtilities.isEventDispatchThread()) {
 			component.getSize(size);
 		} else {
@@ -529,6 +552,7 @@ public class DesktopUtils {
 		}
 	}
 	//
+/*
 	public static void safelySetTitle(final String title, final InnerPage window) {
 		if (SwingUtilities.isEventDispatchThread()) {
 			window.setTitle(title);
@@ -544,6 +568,7 @@ public class DesktopUtils {
 			}
 		}
 	}
+*/
 	public static void safelyRepaint(final Component window) {
 		if (SwingUtilities.isEventDispatchThread()) {
 			window.repaint();
@@ -561,12 +586,16 @@ public class DesktopUtils {
 	}
 	public static void safelySetVisible(final boolean value, final Component window) {
 		if (SwingUtilities.isEventDispatchThread()) {
-			window.setVisible(value);
+			if (window.isVisible() != value) {
+				window.setVisible(value);
+			}
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
-						window.setVisible(value);
+						if (window.isVisible() != value) {
+							window.setVisible(value);
+						}
 					}
 				});
 			} catch (InterruptedException e) {
@@ -574,6 +603,51 @@ public class DesktopUtils {
 			}
 		}
 	}
+	public static void safelyDispose(final Window window) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			window.dispose();
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						window.dispose();
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	public static void safelyDispose(final JInternalFrame window) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			window.dispose();
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						window.dispose();
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	// public static void safelyDispose(final ImageWriter writer) {
+	//	if (SwingUtilities.isEventDispatchThread()) {
+	//		writer.dispose();
+	//	} else {
+	//		try {
+	//			SwingUtilities.invokeAndWait(new Runnable() {
+	//				public void run() {
+	//					writer.dispose();
+	//				}
+	//			});
+	//		} catch (InterruptedException e) {
+	//		} catch (InvocationTargetException e) {
+	//		}
+	//	}
+	// }
 	public static void safelyMaximize(final JInternalFrame window) {
 		if (SwingUtilities.isEventDispatchThread()) {
 			maximize(window);
@@ -917,6 +991,7 @@ public class DesktopUtils {
 			return false;
 		}
 	}
+/*
 	public static void safelyMoveToFront(final InnerPage window) {
 		if (SwingUtilities.isEventDispatchThread()) {
 			window.moveToFront();
@@ -932,21 +1007,7 @@ public class DesktopUtils {
 			}
 		}
 	}
-	public static void safelyDispose(final InnerPage window) {
-		if (SwingUtilities.isEventDispatchThread()) {
-			window.dispose();
-		} else {
-			try {
-				SwingUtilities.invokeAndWait(new Runnable() {
-					public void run() {
-						window.dispose();
-					}
-				});
-			} catch (InterruptedException e) {
-			} catch (InvocationTargetException e) {
-			}
-		}
-	}
+*/
 	//
 	public static void setRenderingHints(Graphics2D g2) {
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);

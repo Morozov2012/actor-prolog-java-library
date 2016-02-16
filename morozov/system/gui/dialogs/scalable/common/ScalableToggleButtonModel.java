@@ -6,13 +6,13 @@
 
 package morozov.system.gui.dialogs.scalable.common;
 
-import javax.swing.JToggleButton.ToggleButtonModel;
-
 /*
  * ScalableToggleButtonModel implementation for the Actor Prolog language
  * @version 1.0 2009/11/13
  * @author IRE RAS Alexei A. Morozov
 */
+
+import javax.swing.JToggleButton.ToggleButtonModel;
 
 public class ScalableToggleButtonModel extends ToggleButtonModel {
 	//

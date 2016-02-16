@@ -10,12 +10,16 @@ import java.util.Iterator;
 import java.util.Set;
 
 public abstract class UnderdeterminedSetWithTail extends UnderdeterminedSet {
-	// protected long name;
 	protected Term tail;
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public int hashCode() {
 		return tail.hashCode();
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	protected void unify_with_set(
 			Term aTail,
 			ChoisePoint cp,

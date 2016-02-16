@@ -10,4 +10,7 @@ public class LexicalScannerError extends RuntimeException {
 	public int getPosition() {
 		return position;
 	}
+	public String toString() {
+		return this.getClass().toString() + "(position:" + Integer.toString(position) + ")";
+	}
 }

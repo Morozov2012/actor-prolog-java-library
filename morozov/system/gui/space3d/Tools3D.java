@@ -18,7 +18,6 @@ import java.awt.event.KeyEvent;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Iterator;
-import java.math.BigInteger;
 
 import javax.vecmath.Point3d;
 import javax.vecmath.Point3f;
@@ -47,6 +46,9 @@ public class Tools3D {
 		};
 		return points;
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public static Point3d term2Coordinate(Term value, ChoisePoint iX) {
 		try { // Point3d
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_p,3,iX);
@@ -58,6 +60,9 @@ public class Tools3D {
 			throw new WrongArgumentIsNotAPoint3D(value);
 		}
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public static Point3f term2Coordinate3f(Term value, ChoisePoint iX) {
 		try { // Point3f
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_p,3,iX);
@@ -69,6 +74,9 @@ public class Tools3D {
 			throw new WrongArgumentIsNotAPoint3D(value);
 		}
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public static int[] term2Indices(Term value, ChoisePoint iX) {
 		Term[] termArray= Converters.listToArray(value,iX);
 		int[] indices= new int[termArray.length];
@@ -81,6 +89,9 @@ public class Tools3D {
 		};
 		return indices;
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public static int[] term2StripCounts(Term value, ChoisePoint iX) {
 		Term[] termArray= Converters.listToArray(value,iX);
 		int[] counts= new int[termArray.length];
@@ -93,6 +104,9 @@ public class Tools3D {
 		};
 		return counts;
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public static Vector3f[] term2Normals(Term value, ChoisePoint iX) {
 		Term[] termArray= Converters.listToArray(value,iX);
 		Vector3f[] normals= new Vector3f[termArray.length];
@@ -102,6 +116,8 @@ public class Tools3D {
 		return normals;
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public static Color3f term2Color3(Term value, ChoisePoint iX) {
 		try {
 			return term2Color3OrExit(value,iX);
@@ -109,6 +125,9 @@ public class Tools3D {
 			return new Color3f();
 		}
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public static Color3f term2Color3OrExit(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		try { // Color3f
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_color3,3,iX);
@@ -125,11 +144,14 @@ public class Tools3D {
 				float a= (float)Converters.argumentToReal(arguments[3],iX);
 				return new Color3f(new Color(r,g,b,a));
 			} catch (Backtracking b2) {
-				Color color= GUI_Utils.termToColor(value,iX);
+				Color color= ExtendedColor.termToColor(value,iX);
 				return new Color3f(color);
 			}
 		}
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public static Point3f term2Attenuation(Term value, ChoisePoint iX) {
 		try { // Attenuation
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_a,3,iX);
@@ -142,6 +164,8 @@ public class Tools3D {
 		}
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public static Vector3d term2Vector3(Term value, ChoisePoint iX) {
 		Term[] termArray= Converters.listToArray(value,iX);
 		if (termArray.length==3) {
@@ -153,6 +177,9 @@ public class Tools3D {
 			throw new WrongNumberOfElementsInList(value);
 		}
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public static Vector3f term2Vector3f(Term value, ChoisePoint iX) {
 		Term[] termArray= Converters.listToArray(value,iX);
 		if (termArray.length==3) {
@@ -164,6 +191,8 @@ public class Tools3D {
 			throw new WrongNumberOfElementsInList(value);
 		}
 	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public static Vector4d term2Vector4(Term value, ChoisePoint iX) {
 		Term[] termArray= Converters.listToArray(value,iX);
@@ -178,6 +207,8 @@ public class Tools3D {
 		}
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public static AxisAngle4d term2AxisAngle4(Term value, ChoisePoint iX) {
 		Term[] termArray= Converters.listToArray(value,iX);
 		if (termArray.length==4) {
@@ -191,19 +222,7 @@ public class Tools3D {
 		}
 	}
 	//
-	public static BehaviorName termToBehaviorName(Term value, ChoisePoint iX) {
-		try {
-			BigInteger number= value.getIntegerValue(iX);
-			return new BehaviorName(number);
-		} catch (TermIsNotAnInteger e1) {
-			try {
-				String text= value.getStringValue(iX);
-				return new BehaviorName(text);
-			} catch (TermIsNotAString e2) {
-				throw new WrongArgumentIsNotBehaviorName(value);
-			}
-		}
-	}
+	///////////////////////////////////////////////////////////////
 	//
 	public static WakeupCondition termToWakeupCondition(Term value, ChoisePoint iX) {
 		try {
@@ -247,6 +266,8 @@ public class Tools3D {
 		}
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public static WakeupOnElapsedFrames attributesToWakeupOnElapsedFrames(Term attributes, ChoisePoint iX) {
 		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
 		Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
@@ -267,7 +288,7 @@ public class Tools3D {
 						throw new WrongArgumentIsNotAnInteger(pairValue);
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_isPassive) {
-					isPassive= Converters.term2YesNo(pairValue,iX);
+					isPassive= YesNo.termYesNo2Boolean(pairValue,iX);
 				} else {
 					throw new WrongArgumentIsUnknownElapsedFramesAttribute(key);
 				}
@@ -278,6 +299,8 @@ public class Tools3D {
 			throw new WrongArgumentIsNotAttributeSet(setEnd);
 		}
 	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public static WakeupOnElapsedTime attributesToWakeupOnElapsedTime(Term attributes, ChoisePoint iX) {
 		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
@@ -294,7 +317,7 @@ public class Tools3D {
 				if (pairName==SymbolCodes.symbolCode_E_frameCount) {
 					// Milliseconds expected
 					// elapsedTime= pairValue.getLongIntegerValue(iX);
-					elapsedTime= Converters.termMillisecondsToMilliseconds(pairValue,iX);
+					elapsedTime= TimeInterval.termMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 				} else {
 					throw new WrongArgumentIsUnknownElapsedTimeAttribute(key);
 				}
@@ -306,20 +329,7 @@ public class Tools3D {
 		}
 	}
 	//
-	public static CollisionDetectorSpeedHint termToCollisionDetectorSpeedHint(Term value, ChoisePoint iX) {
-		try {
-			long code= value.getSymbolValue(iX);
-			if (code==SymbolCodes.symbolCode_E_USE_BOUNDS) {
-				return CollisionDetectorSpeedHint.USE_BOUNDS;
-			} else if (code==SymbolCodes.symbolCode_E_USE_GEOMETRY) {
-				return CollisionDetectorSpeedHint.USE_GEOMETRY;
-			} else {
-				throw new WrongTermIsNotCollisionDetectorSpeedHint(value);
-			}
-		} catch (TermIsNotASymbol e) {
-			throw new WrongTermIsNotCollisionDetectorSpeedHint(value);
-		}
-	}
+	///////////////////////////////////////////////////////////////
 	//
 	public static WakeupCondition termToCollisionDetectorWakeupCondition(Term value, Node armingNode, CollisionDetectorSpeedHint speedHint, ChoisePoint iX) {
 		WakeupCondition condition;
@@ -358,21 +368,9 @@ public class Tools3D {
 		return condition;
 	}
 	//
-	public static NodeLabel termToNodeLabel(Term value, ChoisePoint iX) {
-		try {
-			BigInteger number= value.getIntegerValue(iX);
-			return new NodeLabel(number);
-		} catch (TermIsNotAnInteger e1) {
-			try {
-				String text= value.getStringValue(iX);
-				return new NodeLabel(text);
-			} catch (TermIsNotAString e2) {
-				throw new WrongArgumentIsNotNodeLabel(value);
-			}
-		}
-	}
+	///////////////////////////////////////////////////////////////
 	//
-	protected static int extractPrimitiveAttributes(Set<Long> nameList, HashMap<Long,Term> setPositiveMap, ChoisePoint iX) {
+	public static int extractPrimitiveAttributes(Set<Long> nameList, HashMap<Long,Term> setPositiveMap, ChoisePoint iX) {
 		boolean enableAppearanceModify= false;
 		boolean enableGeometryPicking= false;
 		boolean generateNormals= true;
@@ -386,25 +384,25 @@ public class Tools3D {
 			long pairName= - key;
 			Term pairValue= setPositiveMap.get(key);
 			if (pairName==SymbolCodes.symbolCode_E_enableAppearanceModify) {
-				enableAppearanceModify= Converters.term2YesNo(pairValue,iX);
+				enableAppearanceModify= YesNo.termYesNo2Boolean(pairValue,iX);
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_enableGeometryPicking) {
-				enableGeometryPicking= Converters.term2YesNo(pairValue,iX);
+				enableGeometryPicking= YesNo.termYesNo2Boolean(pairValue,iX);
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_generateNormals) {
-				generateNormals= Converters.term2YesNo(pairValue,iX);
+				generateNormals= YesNo.termYesNo2Boolean(pairValue,iX);
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_generateNormalsInward) {
-				generateNormalsInward= Converters.term2YesNo(pairValue,iX);
+				generateNormalsInward= YesNo.termYesNo2Boolean(pairValue,iX);
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_generateTextureCoords) {
-				generateTextureCoords= Converters.term2YesNo(pairValue,iX);
+				generateTextureCoords= YesNo.termYesNo2Boolean(pairValue,iX);
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_generateTextureCoordsYUp) {
-				generateTextureCoordsYUp= Converters.term2YesNo(pairValue,iX);
+				generateTextureCoordsYUp= YesNo.termYesNo2Boolean(pairValue,iX);
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_geometryNotShared) {
-				geometryNotShared= Converters.term2YesNo(pairValue,iX);
+				geometryNotShared= YesNo.termYesNo2Boolean(pairValue,iX);
 				iterator.remove();
 			}
 		};
@@ -431,14 +429,5 @@ public class Tools3D {
 			primFlags |= Primitive.GEOMETRY_NOT_SHARED;
 		};
 		return primFlags;
-	}
-	//
-	protected static boolean debugNodes() {
-		// return true;
-		return false;
-	}
-	protected static boolean debugColors() {
-		// return true;
-		return false;
 	}
 }

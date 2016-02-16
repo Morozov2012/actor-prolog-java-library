@@ -5,94 +5,230 @@ package morozov.built_in;
 import target.*;
 
 import morozov.domains.*;
-import morozov.domains.errors.*;
-import morozov.domains.signals.*;
 import morozov.run.*;
-import morozov.system.checker.*;
-import morozov.system.checker.errors.*;
-import morozov.system.checker.signals.*;
-import morozov.system.errors.*;
+import morozov.system.*;
 import morozov.system.files.*;
-import morozov.system.files.errors.*;
-import morozov.system.records.*;
-import morozov.system.records.errors.*;
-import morozov.system.signals.*;
-import morozov.syntax.*;
-import morozov.syntax.errors.*;
-import morozov.syntax.scanner.errors.*;
+import morozov.system.datum.*;
 import morozov.terms.*;
-import morozov.terms.signals.*;
+import morozov.worlds.*;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.io.IOException;
-import java.nio.file.FileSystems;
-import java.nio.file.FileSystem;
-import java.nio.file.Path;
-import java.nio.file.Files;
-import java.nio.charset.CharsetEncoder;
-import java.nio.file.DirectoryNotEmptyException;
-
-import java.util.ArrayList;
-import java.util.Collections;
+import java.math.BigInteger;
 
 public abstract class Database extends DataAbstraction {
-	protected static final FileSystem fileSystem= FileSystems.getDefault();
 	//
-	protected DatabaseRecord content;
-	protected DatabaseRecord ultimateRecord;
+	public DatabasePlace place= null;
+	public Boolean reuseKeyNumbers= null;
 	//
-	protected String recentErrorText;
-	protected long recentErrorPosition= -1;
-	protected Throwable recentErrorException;
+	protected DatabaseTableContainer databaseTableContainer= null;
 	//
-	protected static final int defaultWaitingInterval= -1;
+	public Database() {
+	}
+	public Database(GlobalWorldIdentifier id) {
+		super(id);
+	}
 	//
-	abstract protected Term getBuiltInSlot_E_name();
-	abstract protected Term getBuiltInSlot_E_extension();
-	abstract protected Term getBuiltInSlot_E_max_waiting_time();
-	abstract protected Term getBuiltInSlot_E_character_set();
-	abstract protected Term getBuiltInSlot_E_backslash_always_is_separator();
+	// abstract public long entry_s_Update_0();
+	//
+	// abstract protected Term getBuiltInSlot_E_name();
+	// abstract protected Term getBuiltInSlot_E_extension();
+	// abstract protected Term getBuiltInSlot_E_max_waiting_time();
+	// abstract protected Term getBuiltInSlot_E_character_set();
+	// abstract protected Term getBuiltInSlot_E_backslash_always_is_separator();
+	// protected Term getBuiltInSlot_E_transaction_waiting_period()
+	// abstract protected Term getBuiltInSlot_E_transaction_sleep_period();
+	// abstract protected Term getBuiltInSlot_E_transaction_max_retry_number();
+	abstract protected Term getBuiltInSlot_E_place();
 	abstract protected PrologDomain getBuiltInSlotDomain_E_target_data();
+	//
+	protected Term getBuiltInSlot_E_reuse_key_numbers() {
+		return new PrologSymbol(SymbolCodes.symbolCode_E_yes);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	// get/set place
+	//
+	public void setPlace1s(ChoisePoint iX, Term a1) {
+		PrologDomain domain= getBuiltInSlotDomain_E_target_data();
+		DatabaseType type= getDatabaseType();
+		boolean reuseKN= getReuseKeyNumbers(iX);
+		setPlace(DatabasePlace.termToDatabasePlace(a1,this,domain,type,reuseKN,iX));
+	}
+	public void setPlace(DatabasePlace value) {
+		place= value;
+	}
+	public void getPlace0ff(ChoisePoint iX, PrologVariable a1) {
+		a1.value= getPlace(iX).toTerm();
+	}
+	public void getPlace0fs(ChoisePoint iX) {
+	}
+	public DatabasePlace getPlace(ChoisePoint iX) {
+		if (place != null) {
+			return place;
+		} else {
+			Term value= getBuiltInSlot_E_place();
+			PrologDomain domain= getBuiltInSlotDomain_E_target_data();
+			DatabaseType type= getDatabaseType();
+			boolean reuseKN= getReuseKeyNumbers(iX);
+			return DatabasePlace.termToDatabasePlace(value,this,domain,type,reuseKN,iX);
+		}
+	}
+	//
+	// get/set reuse_key_numbers
+	//
+	public void setReuseKeyNumbers1s(ChoisePoint iX, Term a1) {
+		boolean reuseKN= YesNo.termYesNo2Boolean(a1,iX);
+		setReuseKeyNumbers(reuseKN);
+		getDatabaseTable(iX).setReuseKeyNumbers(reuseKN,currentProcess,true);
+	}
+	public void setReuseKeyNumbers(boolean value) {
+		reuseKeyNumbers= value;
+	}
+	public void getReuseKeyNumbers0ff(ChoisePoint iX, PrologVariable a1) {
+		a1.value= YesNo.boolean2TermYesNo(getReuseKeyNumbers(iX));
+	}
+	public void getReuseKeyNumbers0fs(ChoisePoint iX) {
+	}
+	public boolean getReuseKeyNumbers(ChoisePoint iX) {
+		if (reuseKeyNumbers != null) {
+			return reuseKeyNumbers;
+		} else {
+			Term value= getBuiltInSlot_E_reuse_key_numbers();
+			return YesNo.termYesNo2Boolean(value,iX);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setWatchUpdates1s(ChoisePoint iX, Term a1) {
+		super.setWatchUpdates1s(iX,a1);
+		if (!getWatchUpdates(iX)) {
+			unregisterWatcher(currentProcess,iX);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public DatabaseType getDatabaseType() {
+		return DatabaseType.PLAIN;
+	}
+	//
+	public DatabaseTable retrieveStandaloneDatabaseTable(ChoisePoint iX) {
+		if (databaseTableContainer == null) {
+			PrologDomain domain= getBuiltInSlotDomain_E_target_data();
+			boolean reuseKN= getReuseKeyNumbers(iX);
+			databaseTableContainer= new DatabaseTableContainer(getDatabaseType().createTable(domain,reuseKN),false);
+		};
+		return databaseTableContainer.getTable();
+	}
+	//
+	public DatabaseTableContainer retrieveStandaloneDatabaseTableContainer(ChoisePoint iX) {
+		if (databaseTableContainer == null) {
+			PrologDomain domain= getBuiltInSlotDomain_E_target_data();
+			boolean reuseKN= getReuseKeyNumbers(iX);
+			databaseTableContainer= new DatabaseTableContainer(getDatabaseType().createTable(domain,reuseKN),false);
+		};
+		return databaseTableContainer;
+	}
+	//
+	public DatabaseTable getDatabaseTable(ChoisePoint iX) {
+		if (place != null) {
+			return place.databaseTableContainer.getTable();
+		} else {
+			Term value= getBuiltInSlot_E_place();
+			return DatabaseTableContainer.termToDatabaseTable(value,this,iX);
+		}
+	}
+	//
+	public DatabaseTableContainer getDatabaseTableContainer(ChoisePoint iX) {
+		if (place != null) {
+			return place.databaseTableContainer;
+		} else {
+			Term value= getBuiltInSlot_E_place();
+			PrologDomain domain= getBuiltInSlotDomain_E_target_data();
+			DatabaseType type= getDatabaseType();
+			boolean reuseKN= getReuseKeyNumbers(iX);
+			return DatabaseTableContainer.termToDatabaseTableContainer(value,this,domain,type,reuseKN,iX);
+		}
+	}
+	//
+	public void beginDatabaseTableTransaction(DatabaseAccessMode accessMode, TimeInterval waitingPeriod, TimeInterval sleepPeriod, BigInteger maxRetryNumber, ActiveWorld currentProcess, ChoisePoint iX) throws Backtracking {
+		if (place != null) {
+			place.beginTransaction(accessMode,waitingPeriod,sleepPeriod,maxRetryNumber,this,currentProcess,iX);
+		} else {
+			Term value= getBuiltInSlot_E_place();
+			PrologDomain domain= getBuiltInSlotDomain_E_target_data();
+			boolean reuseKN= getReuseKeyNumbers(iX);
+			DatabaseTableContainer.convertTermToDatabaseTableAndBeginTransaction(value,domain,getDatabaseType(),reuseKN,this,accessMode,waitingPeriod,sleepPeriod,maxRetryNumber,currentProcess,iX);
+		}
+	}
+	//
+	public void endDatabaseTableTransaction(ActiveWorld currentProcess, boolean watchTable, ChoisePoint iX) {
+		if (place != null) {
+			place.endTransaction(this,currentProcess,watchTable);
+		} else {
+			Term value= getBuiltInSlot_E_place();
+			PrologDomain domain= getBuiltInSlotDomain_E_target_data();
+			DatabaseTableContainer.convertTermToDatabaseTableAndEndTransaction(value,domain,getDatabaseType(),this,currentProcess,watchTable,iX);
+		}
+	}
+	//
+	public void activateWatcher(ActiveWorld currentProcess, ChoisePoint iX) {
+		setWatchUpdates(true);
+		if (place != null) {
+			place.activateWatcher(this,currentProcess);
+		} else {
+			Term value= getBuiltInSlot_E_place();
+			PrologDomain domain= getBuiltInSlotDomain_E_target_data();
+			boolean reuseKN= getReuseKeyNumbers(iX);
+			DatabaseTableContainer.convertTermToDatabaseTableAndActivateWatcher(value,domain,getDatabaseType(),reuseKN,this,currentProcess,iX);
+		}
+	}
+	//
+	public void unregisterWatcher(ActiveWorld currentProcess, ChoisePoint iX) {
+		if (place != null) {
+			place.unregisterWatcher(this,currentProcess);
+		} else {
+			Term value= getBuiltInSlot_E_place();
+			// PrologDomain domain= getBuiltInSlotDomain_E_target_data();
+			// boolean reuseKN= getReuseKeyNumbers(iX);
+			DatabaseTableContainer.convertTermToDatabaseTableAndUnregisterWatcher(value,this,currentProcess,iX);
+		}
+	}
+	//
+	public void rollbackDatabaseTableCurrentTransaction(ActiveWorld currentProcess, ChoisePoint iX) {
+		boolean watchTable= getWatchUpdates(iX);
+		if (place != null) {
+			place.rollbackCurrentTransaction(this,currentProcess,watchTable);
+		} else {
+			Term value= getBuiltInSlot_E_place();
+			PrologDomain domain= getBuiltInSlotDomain_E_target_data();
+			DatabaseTableContainer.convertTermToDatabaseTableAndRollbackCurrentTransaction(value,domain,getDatabaseType(),this,currentProcess,watchTable,iX);
+		}
+	}
+	//
+	public void rollbackDatabaseTableTransactionTree(ActiveWorld currentProcess, ChoisePoint iX) {
+		boolean watchTable= getWatchUpdates(iX);
+		if (place != null) {
+			place.rollbackTransactionTree(this,currentProcess,watchTable);
+		} else {
+			Term value= getBuiltInSlot_E_place();
+			PrologDomain domain= getBuiltInSlotDomain_E_target_data();
+			DatabaseTableContainer.convertTermToDatabaseTableAndRollbackTransactionTree(value,domain,getDatabaseType(),this,currentProcess,watchTable,iX);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void insert1s(ChoisePoint iX, Term a1) {
 		Term copy= a1.copyValue(iX,TermCircumscribingMode.PROHIBIT_FREE_VARIABLES);
-		insertRecord(copy);
+		getDatabaseTable(iX).insertRecord(copy,currentProcess,true,iX,false);
 	}
 	//
-	protected void insertRecord(Term copy) {
-		DatabaseRecord newRecord= new DatabaseRecord(copy);
-		if (content != null) {
-			content.previousRecord= newRecord;
-			newRecord.nextRecord= content;
-			content= newRecord;
-		} else {
-			content= newRecord;
-			ultimateRecord= content;
-		};
-		updateDatabaseHash(copy,newRecord);
-	}
 	public void append1s(ChoisePoint iX, Term a1) {
 		Term copy= a1.copyValue(iX,TermCircumscribingMode.PROHIBIT_FREE_VARIABLES);
-		appendRecord(copy);
+		getDatabaseTable(iX).appendRecord(copy,currentProcess,true,iX,false);
 	}
-	//
-	protected void appendRecord(Term copy) {
-		DatabaseRecord newRecord= new DatabaseRecord(copy);
-		if (content != null) {
-			ultimateRecord.nextRecord= newRecord;
-			newRecord.previousRecord= ultimateRecord;
-			ultimateRecord= newRecord;
-		} else {
-			content= newRecord;
-			ultimateRecord= content;
-		};
-		updateDatabaseHash(copy,newRecord);
-	}
-	//
-	protected void updateDatabaseHash(Term copy, DatabaseRecord record) {
-	}
-	//
 	public class Find1s extends Continuation {
 		// private Continuation c0;
 		protected PrologVariable outputResult;
@@ -111,44 +247,7 @@ public abstract class Database extends DataAbstraction {
 		}
 		//
 		public void execute(ChoisePoint iX) throws Backtracking {
-			DatabaseRecord currentRecord= content;
-			ChoisePoint newIx= new ChoisePoint(iX);
-			while(true) {
-				if (currentRecord != null) {
-					if (hasOutputArgument) {
-						outputResult.value= currentRecord.value;
-					} else {
-						try {
-							inputResult.unifyWith(currentRecord.value,newIx);
-						} catch (Backtracking b) {
-							newIx.freeTrail();
-							currentRecord= getNextValidRecord(currentRecord);
-							continue;
-						}
-					};
-					// currentRecord= currentRecord.nextRecord;
-					try {
-						c0.execute(newIx);
-					} catch (Backtracking b) {
-						if (hasOutputArgument) {
-							outputResult.value= null;
-						};
-						if (newIx.isEnabled()) {
-							newIx.freeTrail();
-							currentRecord= getNextValidRecord(currentRecord);
-							continue;
-						} else {
-							throw Backtracking.instance;
-						}
-					};
-					return;
-				} else {
-					if (hasOutputArgument) {
-						outputResult.value= null;
-					};
-					throw Backtracking.instance;
-				}
-			}
+			getDatabaseTable(iX).findRecord(outputResult,inputResult,hasOutputArgument,c0,currentProcess,true,iX);
 		}
 	}
 	//
@@ -177,45 +276,7 @@ public abstract class Database extends DataAbstraction {
 		}
 		//
 		public void execute(ChoisePoint iX) throws Backtracking {
-			DatabaseRecord currentRecord= content;
-			ChoisePoint newIx= new ChoisePoint(iX);
-			PrologDomain domainItem= getBuiltInSlotDomain_E_target_data();
-			if (!domainItem.coversTerm(pattern,newIx,true)) {
-				throw new DatabaseSearchPatternIsOfWrongDomain();
-			};
-			currentRecord= findMatch(currentRecord,pattern,newIx);
-			while(true) {
-				if (currentRecord != null) {
-					if (isFunctionCall) {
-						result.value= currentRecord.value;
-					};
-					try {
-						c0.execute(newIx);
-					} catch (Backtracking b) {
-						if (isFunctionCall) {
-							result.value= null;
-						};
-						if (newIx.isEnabled()) {
-							newIx.freeTrail();
-							if (currentRecord==null) {
-								throw Backtracking.instance;
-							} else {
-								currentRecord= currentRecord.nextRecord;
-							};
-							currentRecord= findMatch(currentRecord,pattern,newIx);
-							continue;
-						} else {
-							throw Backtracking.instance;
-						}
-					};
-					return;
-				} else {
-					if (isFunctionCall) {
-						result.value= null;
-					};
-					throw Backtracking.instance;
-				}
-			}
+			getDatabaseTable(iX).matchRecord(result,pattern,isFunctionCall,c0,currentProcess,true,iX);
 		}
 	}
 	//
@@ -237,528 +298,99 @@ public abstract class Database extends DataAbstraction {
 		}
 		//
 		public void execute(ChoisePoint iX) throws Backtracking {
-			DatabaseRecord currentRecord= content;
-			ChoisePoint newIx= new ChoisePoint(iX);
-			while(true) {
-				if (currentRecord != null) {
-					if (hasOutputArgument) {
-						outputResult.value= currentRecord.value;
-					} else {
-						try {
-							inputResult.unifyWith(currentRecord.value,newIx);
-						} catch (Backtracking b) {
-							newIx.freeTrail();
-							currentRecord= getNextValidRecord(currentRecord);
-							continue;
-						}
-					};
-					retractCurrentRecord(currentRecord);
-					try {
-						c0.execute(newIx);
-					} catch (Backtracking b) {
-						if (hasOutputArgument) {
-							outputResult.value= null;
-						};
-						if (newIx.isEnabled()) {
-							newIx.freeTrail();
-							currentRecord= getNextValidRecord(currentRecord);
-							continue;
-						} else {
-							throw Backtracking.instance;
-						}
-					};
-					return;
-				} else {
-					if (hasOutputArgument) {
-						outputResult.value= null;
-					};
-					throw Backtracking.instance;
-				}
-			}
+			getDatabaseTable(iX).retractRecord(outputResult,inputResult,hasOutputArgument,c0,currentProcess,true,iX);
 		}
 	}
 	//
 	public void retractAll0s(ChoisePoint iX) {
-		if (content != null) {
-			content.retractAll();
-			content= null;
-			ultimateRecord= null;
-		}
+		getDatabaseTable(iX).retractAll(currentProcess,true,iX);
 	}
 	public void retractAll1s(ChoisePoint iX, Term a1) {
-		DatabaseRecord currentRecord= content;
-		ChoisePoint newIx= new ChoisePoint(iX);
-		PrologDomain domainItem= getBuiltInSlotDomain_E_target_data();
-		if (!domainItem.coversTerm(a1,newIx,true)) {
-			throw new DatabaseSearchPatternIsOfWrongDomain();
-		};
-		while(true) {
-			if (currentRecord != null) {
-				if (currentRecord.value != null) {
-					try {
-						a1.unifyWith(currentRecord.value,newIx);
-					} catch (Backtracking b1) {
-						newIx.freeTrail();
-						try {
-							currentRecord= getNextValidRecord(currentRecord);
-						} catch (Backtracking b2) {
-							return;
-						};
-						continue;
-					};
-					newIx.freeTrail();
-					retractCurrentRecord(currentRecord);
-				};
-				try {
-					currentRecord= getNextValidRecord(currentRecord);
-				} catch (Backtracking b3) {
-					return;
-				};
-			} else {
-				return;
-			}
-		}
-	}
-	//
-	protected void retractCurrentRecord(DatabaseRecord currentRecord) {
-		DatabaseRecord previousRecord= currentRecord.previousRecord;
-		DatabaseRecord nextRecord= currentRecord.nextRecord;
-		if (previousRecord != null) {
-			previousRecord.nextRecord= nextRecord;
-		} else {
-			content= nextRecord;
-		};
-		if (nextRecord != null) {
-			nextRecord.previousRecord= previousRecord;
-		} else {
-			ultimateRecord= previousRecord;
-		};
-		currentRecord.value= null;
-	}
-	//
-	protected DatabaseRecord getNextValidRecord(DatabaseRecord currentRecord) throws Backtracking {
-		if (currentRecord==null) {
-			throw Backtracking.instance;
-		} else {
-			currentRecord= currentRecord.nextRecord;
-		};
-		while(true) {
-			if (currentRecord==null) {
-				throw Backtracking.instance;
-			} else if (currentRecord.value != null) {
-				return currentRecord;
-			} else {
-				DatabaseRecord nextRecord= currentRecord.nextRecord;
-				if (nextRecord != null) {
-					currentRecord= nextRecord;
-					continue;
-				} else {
-					throw Backtracking.instance;
-				}
-			}
-		}
-	}
-	protected DatabaseRecord findMatch(DatabaseRecord currentRecord, Term pattern, ChoisePoint iX) throws Backtracking {
-		while (true) {
-			if (currentRecord==null) {
-				throw Backtracking.instance;
-			} else if (currentRecord.value != null) {
-				try {
-					currentRecord.value.unifyWith(pattern,iX);
-					// iX.freeTrail();
-					return currentRecord;
-				} catch (Backtracking b) {
-					iX.freeTrail();
-				}
-			};
-			DatabaseRecord nextRecord= currentRecord.nextRecord;
-			if (nextRecord != null) {
-				currentRecord= nextRecord;
-				continue;
-			} else {
-				throw Backtracking.instance;
-			}
-		}
+		getDatabaseTable(iX).retractAll(a1,currentProcess,true,iX);
 	}
 	//
 	public void sortBy1s(ChoisePoint iX, Term targetKey) {
-		long key= DatabaseUtils.termToSortingKey(targetKey,iX);
-		ArrayList<ComparablePair> pairs= new ArrayList<ComparablePair>();
-		ArrayList<Term> rest= new ArrayList<Term>();
-		content.retrieveComparablePairs(key,pairs,rest,iX);
-		Collections.sort(pairs);
-		if (content != null) {
-			content.retractAll();
-			content= null;
-			ultimateRecord= null;
-		};
-		for (int k=0; k < pairs.size(); k++) {
-			Term newItem= pairs.get(k).value;
-			if (content != null) {
-				DatabaseRecord newRecord= new DatabaseRecord(newItem);
-				ultimateRecord.nextRecord= newRecord;
-				newRecord.previousRecord= ultimateRecord;
-				ultimateRecord= newRecord;
-			} else {
-				content= new DatabaseRecord(newItem);
-				ultimateRecord= content;
-			}
-		};
-		for (int k=0; k < rest.size(); k++) {
-			Term newItem= rest.get(k);
-			if (content != null) {
-				DatabaseRecord newRecord= new DatabaseRecord(newItem);
-				ultimateRecord.nextRecord= newRecord;
-				newRecord.previousRecord= ultimateRecord;
-				ultimateRecord= newRecord;
-			} else {
-				content= new DatabaseRecord(newItem);
-				ultimateRecord= content;
-			}
-		}
+		getDatabaseTable(iX).sortBy(targetKey,currentProcess,true,iX);
 	}
 	//
 	public void save0s(ChoisePoint iX) {
-		String fileName= retrieveDatabaseName(iX);
-		saveContent(fileName,iX);
+		ExtendedFileName fileName= retrieveRealLocalFileName(iX);
+		CharacterSet requestedCharacterSet= getCharacterSet(iX);
+		getDatabaseTable(iX).saveContent(fileName,requestedCharacterSet,currentProcess,true,iX);
 	}
-	public void save1s(ChoisePoint iX, Term name) {
-		String fileName= retrieveDatabaseName(name,iX);
-		saveContent(fileName,iX);
-	}
-	public void saveContent(String fileName, ChoisePoint iX) {
-		CharacterSet requestedCharacterSet= FileUtils.term2CharacterSet(getBuiltInSlot_E_character_set(),iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-		StringBuilder textBuffer= new StringBuilder();
-		// CharsetEncoder encoder= Charset.defaultCharset().newEncoder();
-		if (content != null) {
-			if (requestedCharacterSet.isDummy()) {
-				content.saveToTextBuffer(textBuffer,iX,null);
-			} else {
-				CharsetEncoder encoder= requestedCharacterSet.toCharSet().newEncoder();
-				content.saveToTextBuffer(textBuffer,iX,encoder);
-			}
-		};
-		try {
-			// fileName= FileUtils.replaceBackslashes(fileName,backslashIsSeparator);
-			FileUtils.create_BAK_File(fileName,backslashIsSeparator);
-			FileUtils.writeTextFile(textBuffer.toString(),fileName,requestedCharacterSet);
-		} catch (IOException e) {
-			throw new FileInputOutputError(fileName,e);
-		}
+	public void save1s(ChoisePoint iX, Term a1) {
+		ExtendedFileName fileName= retrieveRealLocalFileName(a1,iX);
+		CharacterSet requestedCharacterSet= getCharacterSet(iX);
+		getDatabaseTable(iX).saveContent(fileName,requestedCharacterSet,currentProcess,true,iX);
 	}
 	//
 	public void load0s(ChoisePoint iX) {
-		URI uri= retrieveLocationURI(iX);
-		loadContent(uri,iX);
+		ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
+		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		CharacterSet requestedCharacterSet= getCharacterSet(iX);
+		getDatabaseTableContainer(iX).loadContent(fileName,timeout,requestedCharacterSet,staticContext,currentProcess,true,iX);
 	}
-	public void load1s(ChoisePoint iX, Term name) {
-		URI uri= retrieveLocationURI(name,iX);
-		loadContent(uri,iX);
-	}
-	public void loadContent(URI uri, ChoisePoint iX) {
-		recentErrorText= "";
-		recentErrorPosition= -1;
-		recentErrorException= null;
-		CharacterSet requestedCharacterSet= FileUtils.term2CharacterSet(getBuiltInSlot_E_character_set(),iX);
-		int timeout= retrieveMaxWaitingTime(iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-		try {
-			try {
-				String textBuffer= getContentOfResource(uri,requestedCharacterSet,timeout,backslashIsSeparator);
-				Parser parser= new Parser(true);
-				Term[] terms;
-				try {
-					terms= parser.stringToTerms(textBuffer);
-				} catch (LexicalScannerError e) {
-					long errorPosition= e.getPosition();
-					recentErrorText= textBuffer.toString();
-					recentErrorPosition= errorPosition;
-					recentErrorException= e;
-					throw e;
-				} catch (ParserError e) {
-					long errorPosition= e.getPosition();
-					recentErrorText= textBuffer.toString();
-					recentErrorPosition= errorPosition;
-					recentErrorException= e;
-					throw e;
-				};
-				PrologDomain domainItem= getBuiltInSlotDomain_E_target_data();
-				boolean optimizeSets= DefaultOptions.underdeterminedSetsOptimizationIsEnabled;
-				for (int k=0; k < terms.length; k++) {
-					Term newItem= terms[k];
-					try {
-						if (optimizeSets) {
-							newItem= domainItem.checkAndOptimizeTerm(newItem,iX);
-						} else {
-							newItem= domainItem.checkTerm(newItem,iX);
-						};
-						DatabaseRecord newRecord= new DatabaseRecord(newItem);
-						insertNewItem(newItem,newRecord);
-					} catch (DomainAlternativeDoesNotCoverTerm e) {
-						long errorPosition= e.getPosition();
-						recentErrorText= textBuffer.toString();
-						recentErrorPosition= errorPosition;
-						recentErrorException= e;
-						throw new WrongTermDoesNotBelongToDomain(newItem);
-					}
-				}
-			// } catch (URISyntaxException e) {
-			//	throw new WrongTermIsMalformedURL(e);
-			} catch (CannotRetrieveContent e) {
-				throw new FileInputOutputError(uri.toString(),e);
-			}
-		} catch (RuntimeException e) {
-			if (recentErrorException==null) {
-				recentErrorException= e;
-			};
-			throw e;
-		}
-	}
-	protected String getContentOfResource(URI uri, CharacterSet characterSet, int timeout, boolean backslashIsSeparator) throws CannotRetrieveContent {
-		try {
-			URL_Utils.installCookieManagerIfNecessary(staticContext);
-			URL_Attributes attributes= URL_Utils.getResourceAttributes(uri,characterSet,timeout,staticContext,backslashIsSeparator);
-			try {
-				String text= URL_Utils.readTextFile(attributes);
-				if (attributes.connectionWasSuccessful()) {
-					return text;
-				} else {
-					throw new CannotRetrieveContent(attributes.getExceptionName());
-				}
-			} catch (Throwable e2) {
-				throw new CannotRetrieveContent(e2);
-			// } finally {
-			//	attributes.safeCloseConnection();
-			}
-		} catch (URISyntaxException e) {
-			throw new WrongTermIsMalformedURL(e);
-		// } catch (MalformedURLException e1) {
-		//	throw e1;
-		} catch (IOException e1) {
-			throw new FileInputOutputError(uri.toString(),e1);
-		// } catch (Throwable e1) {
-		//	return URL_Utils.exceptionToName(e1);
-		}
-	}
-	//
-	protected void insertNewItem(Term newItem, DatabaseRecord newRecord) {
-		if (content != null) {
-			// DatabaseRecord newRecord= new DatabaseRecord(newItem);
-			ultimateRecord.nextRecord= newRecord;
-			newRecord.previousRecord= ultimateRecord;
-			ultimateRecord= newRecord;
-		} else {
-			content= newRecord; // new DatabaseRecord(newItem);
-			ultimateRecord= content;
-		}
+	public void load1s(ChoisePoint iX, Term a1) {
+		ExtendedFileName fileName= retrieveRealGlobalFileName(a1,iX);
+		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		CharacterSet requestedCharacterSet= getCharacterSet(iX);
+		getDatabaseTableContainer(iX).loadContent(fileName,timeout,requestedCharacterSet,staticContext,currentProcess,true,iX);
 	}
 	//
 	public void recentLoadingError4s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3, PrologVariable a4) throws Backtracking {
-		if (recentErrorException != null && recentErrorText != null) {
-			a1.value= new PrologString(recentErrorText);
-			a2.value= new PrologInteger(recentErrorPosition);
-			a3.value= new PrologString(recentErrorException.toString());
-			a4.value= new PrologString(recentErrorException.toString());
-			iX.pushTrail(a1);
-			iX.pushTrail(a2);
-			iX.pushTrail(a3);
-			iX.pushTrail(a4);
-		} else {
-			throw Backtracking.instance;
-		}
+		getDatabaseTableContainer(iX).recentLoadingError(a1,a2,a3,a4,currentProcess,true,iX);
 	}
 	public void recentLoadingError3s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3) throws Backtracking {
-		if (recentErrorException != null && recentErrorText != null) {
-			a1.value= new PrologString(recentErrorText);
-			a2.value= new PrologInteger(recentErrorPosition);
-			a3.value= new PrologString(recentErrorException.toString());
-			iX.pushTrail(a1);
-			iX.pushTrail(a2);
-			iX.pushTrail(a3);
-		} else {
+		getDatabaseTableContainer(iX).recentLoadingError(a1,a2,a3,currentProcess,true,iX);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void beginTransaction1s(ChoisePoint iX, Term a1) throws Backtracking {
+		DatabaseAccessMode accessMode= DatabaseAccessMode.termToDatabaseAccessMode(a1,iX);
+		TimeInterval waitingPeriod= getTransactionWaitingPeriod(iX);
+		TimeInterval sleepPeriod= getTransactionSleepPeriod(iX);
+		BigInteger maxRetryNumber= getTransactionMaxRetryNumber(iX);
+		beginDatabaseTableTransaction(accessMode,waitingPeriod,sleepPeriod,maxRetryNumber,currentProcess,iX);
+	}
+	//
+	public void endTransaction0s(ChoisePoint iX) {
+		boolean watchTable= getWatchUpdates(iX);
+		endDatabaseTableTransaction(currentProcess,watchTable,iX);
+	}
+	//
+	public void rollbackTransaction0s(ChoisePoint iX) {
+		rollbackDatabaseTableCurrentTransaction(currentProcess,iX);
+	}
+	//
+	public void rollbackTransactionTree0s(ChoisePoint iX) {
+		rollbackDatabaseTableTransactionTree(currentProcess,iX);
+	}
+	//
+	public void activate0s(ChoisePoint iX) {
+		activateWatcher(currentProcess,iX);
+	}
+	//
+	public void isUpdated0s(ChoisePoint iX) throws Backtracking {
+		if (!getDatabaseTableContainer(iX).isUpdated(this)) {
 			throw Backtracking.instance;
 		}
 	}
 	//
-	public void doesExist0s(ChoisePoint iX) throws Backtracking {
-		try {
-			URI uri= retrieveLocationURI(iX);
-			doesExist(uri,iX);
-		} catch (Throwable e) {
-			throw Backtracking.instance;
-		}
-	}
-	public void doesExist1s(ChoisePoint iX, Term name) throws Backtracking {
-		try {
-			URI uri= retrieveLocationURI(name,iX);
-			doesExist(uri,iX);
-		} catch (Throwable e) {
-			throw Backtracking.instance;
-		}
-	}
-	protected void doesExist(URI uri, ChoisePoint iX) throws Backtracking {
-		CharacterSet characterSet= FileUtils.term2CharacterSet(getBuiltInSlot_E_character_set(),iX);
-		int timeout= retrieveMaxWaitingTime(iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-		try {
-			URL_Utils.installCookieManagerIfNecessary(staticContext);
-			URL_Attributes attributes= URL_Utils.getResourceAttributes(uri,characterSet,timeout,staticContext,backslashIsSeparator);
-			if (!attributes.connectionWasSuccessful()) {
-				throw Backtracking.instance;
-			}
-		} catch (Throwable e1) {
-			throw Backtracking.instance;
-		}
+	///////////////////////////////////////////////////////////////
+	//
+	public void update0s(ChoisePoint iX) {
 	}
 	//
-	public void isLocalResource0s(ChoisePoint iX) throws Backtracking {
-		String fileName= retrieveDatabaseName(iX);
-		isLocalResource(fileName,iX);
-	}
-	public void isLocalResource1s(ChoisePoint iX, Term a1) throws Backtracking {
-		String fileName= retrieveDatabaseName(a1,iX);
-		isLocalResource(fileName,iX);
-	}
-	protected void isLocalResource(String fileName, ChoisePoint iX) throws Backtracking {
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-		if (!URL_Utils.isLocalResource(fileName,backslashIsSeparator)) {
-			throw Backtracking.instance;
+	public class Update0s extends Continuation {
+		// private Continuation c0;
+		//
+		public Update0s(Continuation aC) {
+			c0= aC;
 		}
-	}
-	//
-	public void getFullName0ff(ChoisePoint iX, PrologVariable a1) {
-		String resolvedName= getFullName(iX);
-		a1.value= new PrologString(resolvedName);
-	}
-	public void getFullName0fs(ChoisePoint iX) {
-	}
-	public void getFullName1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
-		String resolvedName= getFullName(iX,a2);
-		a1.value= new PrologString(resolvedName);
-	}
-	public void getFullName1fs(ChoisePoint iX, Term a1) {
-	}
-	protected String getFullName(ChoisePoint iX) {
-		String location= retrieveLocationString(iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-		return URL_Utils.getFullName(location,staticContext,backslashIsSeparator);
-	}
-	protected String getFullName(ChoisePoint iX, Term a1) {
-		try {
-			String fileName= a1.getStringValue(iX);
-			fileName= appendExtensionIfNecessary(fileName,iX);
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-			return URL_Utils.getFullName(fileName,staticContext,backslashIsSeparator);
-		} catch (TermIsNotAString e1) {
-			throw new WrongArgumentIsNotAString(a1);
-		}
-	}
-	//
-	public void getURL0ff(ChoisePoint iX, PrologVariable a1) {
-		String resolvedName= getFullName(iX);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-		a1.value= new PrologString(URL_Utils.get_URL_string(resolvedName,staticContext,backslashIsSeparator));
-	}
-	public void getURL0fs(ChoisePoint iX) {
-	}
-	public void getURL1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
-		String resolvedName= getFullName(iX,a2);
-		boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-		a1.value= new PrologString(URL_Utils.get_URL_string(resolvedName,staticContext,backslashIsSeparator));
-	}
-	public void getURL1fs(ChoisePoint iX, Term a1) {
-	}
-	//
-	public void delete0s(ChoisePoint iX) {
-		String fileName= retrieveDatabaseName(iX);
-		deleteFile(fileName);
-	}
-	public void delete1s(ChoisePoint iX, Term name) {
-		String fileName= retrieveDatabaseName(name,iX);
-		deleteFile(fileName);
-	}
-	protected void deleteFile(String fileName) {
-		Path path= fileSystem.getPath(fileName);
-		try {
-			Files.deleteIfExists(path);
-		} catch (DirectoryNotEmptyException e) {
-		} catch (IOException e) {
-		}
-	}
-	//
-	protected String retrieveDatabaseName(ChoisePoint iX) {
-		Term name= getBuiltInSlot_E_name();
-		try {
-			String textName= name.getStringValue(iX);
-			textName= appendExtensionIfNecessary(textName,iX);
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-			textName= FileUtils.replaceBackslashes(textName,backslashIsSeparator);
-			return FileUtils.makeRealName(textName);
-		} catch (TermIsNotAString e) {
-			throw new WrongTermIsNotFileName(name);
-		}
-	}
-	protected String retrieveDatabaseName(Term name, ChoisePoint iX) {
-		try {
-			String textName= name.getStringValue(iX);
-			textName= appendExtensionIfNecessary(textName,iX);
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-			textName= FileUtils.replaceBackslashes(textName,backslashIsSeparator);
-			return FileUtils.makeRealName(textName);
-		} catch (TermIsNotAString e) {
-			throw new WrongTermIsNotFileName(name);
-		}
-	}
-	protected URI retrieveLocationURI(ChoisePoint iX) {
-		Term name= getBuiltInSlot_E_name();
-		return retrieveLocationURI(name,iX);
-	}
-	protected URI retrieveLocationURI(Term name, ChoisePoint iX) {
-		try {
-			String textName= name.getStringValue(iX);
-			textName= appendExtensionIfNecessary(textName,iX);
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-			URI uri= URL_Utils.create_URI(textName,staticContext,backslashIsSeparator);
-			return uri;
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(name);
-		}
-	}
-	protected String retrieveLocationString(ChoisePoint iX) {
-		Term location= getBuiltInSlot_E_name();
-		try {
-			String textName= location.getStringValue(iX);
-			textName= appendExtensionIfNecessary(textName,iX);
-			return textName;
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(location);
-		}
-	}
-	protected String appendExtensionIfNecessary(String textName, ChoisePoint iX) {
-		if (textName.indexOf('.') == -1) {
-			Term extension= getBuiltInSlot_E_extension();
-			String textExtension= null;
-			try {
-				textExtension= extension.getStringValue(iX);
-			} catch (TermIsNotAString e2) {
-				throw new WrongArgumentIsNotAString(extension);
-			};
-			textName= textName + textExtension;
-		};
-		return textName;
-	}
-	//
-	protected int retrieveMaxWaitingTime(ChoisePoint iX) {
-		Term interval= getBuiltInSlot_E_max_waiting_time();
-		try {
-			return URL_Utils.termToWaitingInterval(interval,iX);
-		} catch (TermIsSymbolDefault e1) {
-			try {
-				return URL_Utils.termToWaitingInterval(DefaultOptions.waitingInterval,iX);
-			} catch (TermIsSymbolDefault e2) {
-				return defaultWaitingInterval;
-			}
+		//
+		public void execute(ChoisePoint iX) throws Backtracking {
+			c0.execute(iX);
 		}
 	}
 }

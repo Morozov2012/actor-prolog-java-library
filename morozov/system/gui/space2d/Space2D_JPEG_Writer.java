@@ -15,14 +15,9 @@ public class Space2D_JPEG_Writer extends Space2DWriter {
 		super("jpeg",its);
 	}
 	public void setCompressionQuality(double compressionQuality) {
-		// String[] types= iwp.getCompressionTypes();
-		// System.out.printf("types: %s (%s)\n",types,types.length);
-		// for (int n=0; n < types.length; n++) {
-		//	System.out.printf("%s) %s\n",n,types[n]);
-		// };
 		if (iwp.canWriteCompressed()) {
 			float quality= StrictMath.max(0,(float)compressionQuality);
-			quality= StrictMath.max(1,quality);
+			quality= StrictMath.min(1,quality);
 			iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
 			// iwp.setCompressionType(types[0]);
 			iwp.setCompressionQuality(quality);

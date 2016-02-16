@@ -2,11 +2,17 @@
 
 package morozov.built_in;
 
-import morozov.classes.*;
 import morozov.run.*;
 import morozov.terms.*;
+import morozov.worlds.*;
 
-public abstract class Lambda extends AbstractWorld {
+public abstract class Lambda extends AbstractInternalWorld {
+	//
+	public Lambda() {
+	}
+	public Lambda(GlobalWorldIdentifier id) {
+		super(id);
+	}
 	//
 	public void goal0s(ChoisePoint iX) {
 	}

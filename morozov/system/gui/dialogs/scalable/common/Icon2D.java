@@ -13,6 +13,7 @@ package morozov.system.gui.dialogs.scalable.common;
 */
 
 import morozov.system.gui.space2d.*;
+import morozov.terms.*;
 
 import java.awt.GridBagConstraints;
 import javax.swing.Icon;
@@ -65,40 +66,40 @@ public class Icon2D implements Icon {
 					double ratio0= (double)iconHeight / iconWidth;
 					double ratio1= (double)imageHeight / imageWidth;
 					if (ratio0 < ratio1) {
-						int w2= (int)StrictMath.round(iconHeight / ratio1);
+						int w2= PrologInteger.toInteger(iconHeight / ratio1);
 						if (	anchor==GridBagConstraints.WEST ||
 							anchor==GridBagConstraints.NORTHWEST ||
 							anchor==GridBagConstraints.SOUTHWEST ) {
-							space2D.paintComponent(gg);
+							space2D.quicklyPaintComponent(gg);
 						} else if (
 							anchor==GridBagConstraints.EAST ||
 							anchor==GridBagConstraints.NORTHEAST ||
 							anchor==GridBagConstraints.SOUTHEAST ) {
 							int x3= iconWidth - w2;
 							gg.translate(x3,0);
-							space2D.paintComponent(gg);
+							space2D.quicklyPaintComponent(gg);
 						} else {
-							int deltaW= (int)StrictMath.round((iconWidth - w2) / 2);
+							int deltaW= PrologInteger.toInteger((iconWidth - w2) / 2);
 							gg.translate(deltaW,0);
-							space2D.paintComponent(gg);
+							space2D.quicklyPaintComponent(gg);
 						}
 					} else {
-						int h2= (int)StrictMath.round(iconWidth * ratio1);
+						int h2= PrologInteger.toInteger(iconWidth * ratio1);
 						if (	anchor==GridBagConstraints.NORTH ||
 							anchor==GridBagConstraints.NORTHWEST ||
 							anchor==GridBagConstraints.NORTHEAST ) {
-							space2D.paintComponent(gg);
+							space2D.quicklyPaintComponent(gg);
 						} else if (
 							anchor==GridBagConstraints.SOUTH ||
 							anchor==GridBagConstraints.SOUTHWEST ||
 							anchor==GridBagConstraints.SOUTHEAST ) {
 							int y3= iconHeight - h2;
 							gg.translate(0,y3);
-							space2D.paintComponent(gg);
+							space2D.quicklyPaintComponent(gg);
 						} else {
-							int deltaH= (int)StrictMath.round((iconHeight - h2) / 2);
+							int deltaH= PrologInteger.toInteger((iconHeight - h2) / 2);
 							gg.translate(0,deltaH);
-							space2D.paintComponent(gg);
+							space2D.quicklyPaintComponent(gg);
 						}
 					}
 				} finally {
@@ -107,8 +108,8 @@ public class Icon2D implements Icon {
                         } else {
 				Dimension d= new Dimension();
 				c.getSize(d);
-				space2D.setSize(d);
-				space2D.paintComponent(g0);
+				space2D.quicklySetSize(d);
+				space2D.quicklyPaintComponent(g0);
 			}
 		}
 	}

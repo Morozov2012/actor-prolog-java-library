@@ -8,8 +8,6 @@ import morozov.built_in.*;
 import morozov.run.*;
 import morozov.system.*;
 import morozov.system.errors.*;
-import morozov.system.files.*;
-import morozov.system.files.errors.*;
 import morozov.system.gui.*;
 import morozov.system.gui.space2d.errors.*;
 import morozov.system.signals.*;
@@ -18,26 +16,17 @@ import morozov.terms.signals.*;
 
 import java.awt.Color;
 import java.awt.geom.Arc2D;
-import java.awt.BasicStroke;
 import java.awt.RenderingHints;
 import java.awt.geom.Point2D;
 import java.awt.Paint;
-import java.awt.GradientPaint;
-import java.awt.LinearGradientPaint;
-import java.awt.RadialGradientPaint;
-import java.awt.TexturePaint;
 import java.awt.MultipleGradientPaint;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.awt.Font;
 import java.awt.font.TextAttribute;
 import java.awt.AlphaComposite;
 import java.awt.Transparency;
-import javax.imageio.ImageTypeSpecifier;
-import javax.imageio.ImageIO;
-import javax.imageio.stream.FileImageOutputStream;
-import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.FileSystem;
 
 import java.util.HashMap;
 import java.util.Set;
@@ -54,26 +43,11 @@ class CenterIsNotDefined extends RuntimeException {}
 class ImageIsNotDefined extends RuntimeException {}
 
 public class Tools2D {
-	public static Canvas2DScalingFactor termToScalingFactor(Term value, ChoisePoint iX) {
-		try {
-			long code= value.getSymbolValue(iX);
-			if (code==SymbolCodes.symbolCode_E_WIDTH) {
-				return Canvas2DScalingFactor.WIDTH;
-			} else if (code==SymbolCodes.symbolCode_E_HEIGHT) {
-				return Canvas2DScalingFactor.HEIGHT;
-			} else if (code==SymbolCodes.symbolCode_E_MIN) {
-				return Canvas2DScalingFactor.MIN;
-			} else if (code==SymbolCodes.symbolCode_E_MAX) {
-				return Canvas2DScalingFactor.MAX;
-			} else if (code==SymbolCodes.symbolCode_E_INDEPENDENT) {
-				return Canvas2DScalingFactor.INDEPENDENT;
-			} else {
-				throw new WrongArgumentIsNotScalingFactor2D(value);
-			}
-		} catch (TermIsNotASymbol e) {
-			throw new WrongArgumentIsNotScalingFactor2D(value);
-		}
-	}
+	//
+	public static int defaultTransparency= 0; // JDK uses 1, 2, 3
+	protected static final FileSystem fileSystem= FileSystems.getDefault();
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public static int termToArcClosureType(Term value, ChoisePoint iX) {
 		try {
@@ -92,6 +66,8 @@ public class Tools2D {
 		}
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public static Point2D termToPoint2D(Term value, ChoisePoint iX) {
 		try {
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_p,2,iX);
@@ -103,110 +79,7 @@ public class Tools2D {
 		}
 	}
 	//
-	public static Point2DArrays termToPoint2DArrays(Term value, ChoisePoint iX) {
-		Term[] termArray= Converters.listToArray(value,iX);
-		double[] xPoints= new double[termArray.length];
-		double[] yPoints= new double[termArray.length];
-		for (int n=0; n < termArray.length; n++) {
-			try {
-				Term[] arguments= termArray[n].isStructure(SymbolCodes.symbolCode_E_p,2,iX);
-				xPoints[n]= Converters.argumentToReal(arguments[0],iX);
-				yPoints[n]= Converters.argumentToReal(arguments[1],iX);
-			} catch (Backtracking b) {
-				throw new WrongArgumentIsNotAPoint2D(value);
-			}
-		};
-		return new Point2DArrays(xPoints,yPoints);
-	}
-	//
-	public static StrokeAndColor termToStrokeAndColor(Term value, ChoisePoint iX) {
-		Color color= null;
-		float lineWidth= 1.0f;
-		int endCap= BasicStroke.CAP_SQUARE;
-		int lineJoin= BasicStroke.JOIN_MITER;
-		float miterLimit= 10.0f;
-		float[] dashArray= null;
-		float dashPhase= 0.0f;
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
-		Term setEnd= value.exploreSetPositiveElements(setPositiveMap,iX);
-		setEnd= setEnd.dereferenceValue(iX);
-		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
-			Set<Long> nameList= setPositiveMap.keySet();
-			Iterator<Long> iterator= nameList.iterator();
-			while(iterator.hasNext()) {
-				long key= iterator.next();
-				long pairName= - key;
-				Term pairValue= setPositiveMap.get(key);
-				if (pairName==SymbolCodes.symbolCode_E_color) {
-					try {
-						color= GUI_Utils.termToColor(pairValue,iX);
-					} catch (TermIsSymbolDefault e1) {
-					}
-				} else if (pairName==SymbolCodes.symbolCode_E_lineWidth) {
-					lineWidth= (float)Converters.argumentToReal(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_endCap) {
-					endCap= termToEndCap(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_lineJoin) {
-					lineJoin= termToLineJoin(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_miterLimit) {
-					miterLimit= (float)Converters.argumentToReal(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_dashArray) {
-					dashArray= termToFloatArray(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_dashPhase) {
-					dashPhase= (float)Converters.argumentToReal(pairValue,iX);
-				} else {
-					throw new WrongArgumentIsUnknownPenAttribute(key);
-				}
-			};
-			StrokeAndColor node;
-			if (dashArray==null) {
-				node= new StrokeAndColor(color,lineWidth,endCap,lineJoin,miterLimit);
-			} else {
-				node= new StrokeAndColor(color,lineWidth,endCap,lineJoin,miterLimit,dashArray,dashPhase);
-			};
-			return node;
-		} else {
-			try {
-				color= GUI_Utils.termToColor(value,iX);
-				StrokeAndColor node= new StrokeAndColor(color,lineWidth,endCap,lineJoin,miterLimit);
-				return node;
-			} catch (TermIsSymbolDefault e1) {
-				throw new WrongArgumentIsNotPenAttributes(setEnd);
-			}
-		}
-	}
-	protected static int termToEndCap(Term value, ChoisePoint iX) {
-		try {
-			long code= value.getSymbolValue(iX);
-			if (code==SymbolCodes.symbolCode_E_CAP_BUTT) {
-				return BasicStroke.CAP_BUTT;
-			} else if (code==SymbolCodes.symbolCode_E_CAP_ROUND) {
-				return BasicStroke.CAP_ROUND;
-			} else if (code==SymbolCodes.symbolCode_E_CAP_SQUARE) {
-				return BasicStroke.CAP_SQUARE;
-			} else {
-				throw new WrongArgumentIsNotEndCap(value);
-			}
-		} catch (TermIsNotASymbol e) {
-			throw new WrongArgumentIsNotEndCap(value);
-		}
-	}
-	protected static int termToLineJoin(Term value, ChoisePoint iX) {
-		try {
-			long code= value.getSymbolValue(iX);
-			if (code==SymbolCodes.symbolCode_E_JOIN_BEVEL) {
-				return BasicStroke.JOIN_BEVEL;
-			} else if (code==SymbolCodes.symbolCode_E_JOIN_MITER) {
-				return BasicStroke.JOIN_MITER;
-			} else if (code==SymbolCodes.symbolCode_E_JOIN_ROUND) {
-				return BasicStroke.JOIN_ROUND;
-			} else {
-				throw new WrongArgumentIsNotLineJoin(value);
-			}
-		} catch (TermIsNotASymbol e) {
-			throw new WrongArgumentIsNotLineJoin(value);
-		}
-	}
+	///////////////////////////////////////////////////////////////
 	//
 	public static float[] termToFloatArray(Term value, ChoisePoint iX) {
 		Term[] termArray= Converters.listToArray(value,iX);
@@ -216,6 +89,8 @@ public class Tools2D {
 		};
 		return result;
 	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public static RenderingHints termToRenderingHints(Term value, ChoisePoint iX) {
 		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
@@ -231,7 +106,7 @@ public class Tools2D {
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_antialiasing) {
 					try {
-						boolean mode= Converters.term2OnOffDefault(pairValue,iX);
+						boolean mode= OnOff.termOnOffDefault2Boolean(pairValue,iX);
 						if (mode) {
 							rh.put(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 						} else {
@@ -259,7 +134,7 @@ public class Tools2D {
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_fractionalMetrics) {
 					try {
-						boolean mode= Converters.term2OnOffDefault(pairValue,iX);
+						boolean mode= OnOff.termOnOffDefault2Boolean(pairValue,iX);
 						if (mode) {
 							rh.put(RenderingHints.KEY_FRACTIONALMETRICS,RenderingHints.VALUE_FRACTIONALMETRICS_ON);
 						} else {
@@ -289,6 +164,7 @@ public class Tools2D {
 			throw new WrongArgumentIsNotRenderingAttributes(setEnd);
 		}
 	}
+	//
 	protected static Object termToRenderingStrategy(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -305,6 +181,7 @@ public class Tools2D {
 			throw new WrongArgumentIsNotRenderingStrategy(value);
 		}
 	}
+	//
 	protected static Object termToDitheringMode(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -321,6 +198,7 @@ public class Tools2D {
 			throw new WrongArgumentIsNotDitheringMode(value);
 		}
 	}
+	//
 	protected static Object termToTextAntialiasingMode(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -347,6 +225,7 @@ public class Tools2D {
 			throw new WrongArgumentIsNotTextAntialiasingMode(value);
 		}
 	}
+	//
 	protected static Object termToInterpolationMode(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -363,6 +242,7 @@ public class Tools2D {
 			throw new WrongArgumentIsNotInterpolationMode(value);
 		}
 	}
+	//
 	protected static Object termToAlphaInterpolationMode(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -379,6 +259,7 @@ public class Tools2D {
 			throw new WrongArgumentIsNotAlphaInterpolationMode(value);
 		}
 	}
+	//
 	protected static Object termToColorRenderingMode(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -395,6 +276,7 @@ public class Tools2D {
 			throw new WrongArgumentIsNotColorRenderingMode(value);
 		}
 	}
+	//
 	protected static Object termToStrokeControlMode(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -412,293 +294,7 @@ public class Tools2D {
 		}
 	}
 	//
-	public static BrushAttributes termToBrushAttributes(Term value, Canvas2D targetWorld, ChoisePoint iX) {
-		try { // on, off
-			try {
-				long code= value.getSymbolValue(iX);
-				if (code==SymbolCodes.symbolCode_E_on) {
-					return new BrushAttributes(true);
-				} else if (code==SymbolCodes.symbolCode_E_off) {
-					return new BrushAttributes(false);
-				} else {
-					throw Backtracking.instance;
-				}
-			} catch (TermIsNotASymbol b1) {
-				throw Backtracking.instance;
-			}
-		} catch (Backtracking b2) {
-		try { // GradientPaint
-			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_GradientPaint,1,iX);
-			return new BrushAttributes(attributesToGradientPaint(arguments[0],iX));
-		} catch (Backtracking b3) {
-		try { // LinearGradientPaint
-			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_LinearGradientPaint,1,iX);
-			return new BrushAttributes(attributesToLinearGradientPaint(arguments[0],iX));
-		} catch (Backtracking b4) {
-		try { // RadialGradientPaint
-			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_RadialGradientPaint,1,iX);
-			return new BrushAttributes(attributesToRadialGradientPaint(arguments[0],iX));
-		} catch (Backtracking b5) {
-		try { // TexturePaint
-			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_TexturePaint,1,iX);
-			return new BrushAttributes(attributesToTexturePaint(arguments[0],targetWorld,iX));
-		} catch (Backtracking b6) {
-		try { // Color
-			try {
-				Color color= GUI_Utils.termToColor(value,iX);
-				return new BrushAttributes(color);
-			} catch (TermIsSymbolDefault b7) {
-				throw Backtracking.instance;
-			}
-		} catch (Backtracking b8) {
-			throw new WrongArgumentIsNotBrushAttributes(value);
-		}
-		}
-		}
-		}
-		}
-		}
-	}
-	protected static Paint attributesToGradientPaint(Term value, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
-		Term setEnd= value.exploreSetPositiveElements(setPositiveMap,iX);
-		setEnd= setEnd.dereferenceValue(iX);
-		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
-			Point2D p1= null;
-			Point2D p2= null;
-			Color color1= null;
-			Color color2= null;
-			boolean isCyclic= false;
-			Set<Long> nameList= setPositiveMap.keySet();
-			Iterator<Long> iterator= nameList.iterator();
-			while(iterator.hasNext()) {
-				long key= iterator.next();
-				long pairName= - key;
-				Term pairValue= setPositiveMap.get(key);
-				if (pairName==SymbolCodes.symbolCode_E_isCyclic) {
-					isCyclic= Converters.term2YesNo(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_point1) {
-					p1= termToPoint2D(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_point2) {
-					p2= termToPoint2D(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_color1) {
-					try {
-						color1= GUI_Utils.termToColor(pairValue,iX);
-					} catch (TermIsSymbolDefault e1) {
-						// throw new WrongArgumentIsNotAColor(pairValue);
-						color1= Color.WHITE; // Actor Prolog default value
-					}
-				} else if (pairName==SymbolCodes.symbolCode_E_color2) {
-					try {
-						color2= GUI_Utils.termToColor(pairValue,iX);
-					} catch (TermIsSymbolDefault e2) {
-						// throw new WrongArgumentIsNotAColor(pairValue);
-						color2= Color.BLACK; // Actor Prolog default value
-					}
-				} else {
-					throw new WrongArgumentIsUnknownGradientPaintAttribute(key);
-				}
-			};
-			if (p1 == null) {
-				throw new FirstPointIsNotDefined();
-			};
-			if (p2 == null) {
-				throw new SecondPointIsNotDefined();
-			};
-			if (color1 == null) {
-				throw new FirstColorIsNotDefined();
-			};
-			if (color2 == null) {
-				throw new SecondColorIsNotDefined();
-			};
-			return new GradientPaint(p1,color1,p2,color2,isCyclic);
-		} else {
-			throw new WrongArgumentIsNotGradientPaintAttributes(setEnd);
-		}
-	}
-	protected static LinearGradientPaint attributesToLinearGradientPaint(Term value, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
-		Term setEnd= value.exploreSetPositiveElements(setPositiveMap,iX);
-		setEnd= setEnd.dereferenceValue(iX);
-		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
-			Point2D p1= null;
-			Point2D p2= null;
-			float[] fractions= null;
-			Color[] colors= null;
-			MultipleGradientPaint.CycleMethod cycleMethod= MultipleGradientPaint.CycleMethod.NO_CYCLE;
-			MultipleGradientPaint.ColorSpaceType colorSpace= null; // MultipleGradientPaint.ColorSpaceType.SRGB;
-			AffineTransform gradientTransform= null;
-			Set<Long> nameList= setPositiveMap.keySet();
-			Iterator<Long> iterator= nameList.iterator();
-			while(iterator.hasNext()) {
-				long key= iterator.next();
-				long pairName= - key;
-				Term pairValue= setPositiveMap.get(key);
-				if (pairName==SymbolCodes.symbolCode_E_point1) {
-					p1= termToPoint2D(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_point2) {
-					p2= termToPoint2D(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_fractions) {
-					fractions= termToFractions(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_colors) {
-					colors= termToColors(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_cycleMethod) {
-					cycleMethod= termToCycleMethod(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_colorSpace) {
-					colorSpace= termToColorSpaceType(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_gradientTransform) {
-					gradientTransform= termToTransform2D(pairValue,iX);
-				} else {
-					throw new WrongArgumentIsUnknownLinearGradientPaintAttribute(key);
-				}
-			};
-			if (p1 == null) {
-				throw new FirstPointIsNotDefined();
-			};
-			if (p2 == null) {
-				throw new SecondPointIsNotDefined();
-			};
-			if (fractions == null) {
-				throw new FractionsAreNotDefined();
-			};
-			if (colors == null) {
-				throw new ColorsAreNotDefined();
-			};
-			if (gradientTransform == null) {
-				if (colorSpace == null) {
-					return new LinearGradientPaint(p1,p2,fractions,colors,cycleMethod);
-				} else {
-					gradientTransform= new AffineTransform();
-					return new LinearGradientPaint(p1,p2,fractions,colors,cycleMethod,colorSpace,gradientTransform);
-				}
-			} else {
-				if (colorSpace == null) {
-					colorSpace= MultipleGradientPaint.ColorSpaceType.SRGB;
-				};
-				return new LinearGradientPaint(p1,p2,fractions,colors,cycleMethod,colorSpace,gradientTransform);
-			}
-		} else {
-			throw new WrongArgumentIsNotLinearGradientPaintAttributes(setEnd);
-		}
-	}
-	protected static RadialGradientPaint attributesToRadialGradientPaint(Term value, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
-		Term setEnd= value.exploreSetPositiveElements(setPositiveMap,iX);
-		setEnd= setEnd.dereferenceValue(iX);
-		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
-			Point2D center= null;
-			float radius= 10; // Actor Prolog default value
-			Point2D focus= null;
-			float[] fractions= null;
-			Color[] colors= null;
-			MultipleGradientPaint.CycleMethod cycleMethod= MultipleGradientPaint.CycleMethod.NO_CYCLE;
-			MultipleGradientPaint.ColorSpaceType colorSpace= null; // MultipleGradientPaint.ColorSpaceType.SRGB;
-			AffineTransform gradientTransform= null;
-			Set<Long> nameList= setPositiveMap.keySet();
-			Iterator<Long> iterator= nameList.iterator();
-			while(iterator.hasNext()) {
-				long key= iterator.next();
-				long pairName= - key;
-				Term pairValue= setPositiveMap.get(key);
-				if (pairName==SymbolCodes.symbolCode_E_center) {
-					center= termToPoint2D(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_radius) {
-					radius= (float)Converters.argumentToReal(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_focus) {
-					focus= termToPoint2D(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_fractions) {
-					fractions= termToFractions(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_colors) {
-					colors= termToColors(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_cycleMethod) {
-					cycleMethod= termToCycleMethod(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_colorSpace) {
-					colorSpace= termToColorSpaceType(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_gradientTransform) {
-					gradientTransform= termToTransform2D(pairValue,iX);
-				} else {
-					throw new WrongArgumentIsUnknownRadialGradientPaintAttribute(key);
-				}
-			};
-			if (center == null) {
-				throw new CenterIsNotDefined();
-			};
-			if (focus == null) {
-				focus= center;
-			};
-			if (fractions == null) {
-				throw new FractionsAreNotDefined();
-			};
-			if (colors == null) {
-				throw new ColorsAreNotDefined();
-			};
-			if (gradientTransform == null) {
-				if (colorSpace == null) {
-					return new RadialGradientPaint(center,radius,focus,fractions,colors,cycleMethod);
-				} else {
-					gradientTransform= new AffineTransform();
-					return new RadialGradientPaint(center,radius,focus,fractions,colors,cycleMethod,colorSpace,gradientTransform);
-				}
-			} else {
-				if (colorSpace == null) {
-					colorSpace= MultipleGradientPaint.ColorSpaceType.SRGB;
-				};
-				return new RadialGradientPaint(center,radius,focus,fractions,colors,cycleMethod,colorSpace,gradientTransform);
-			}
-		} else {
-			throw new WrongArgumentIsNotRadialGradientPaintAttributes(setEnd);
-		}
-	}
-	protected static TexturePaint attributesToTexturePaint(Term value, Canvas2D targetWorld, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
-		Term setEnd= value.exploreSetPositiveElements(setPositiveMap,iX);
-		setEnd= setEnd.dereferenceValue(iX);
-		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
-			BufferedImage image= null;
-			Point2D anchor= null;
-			double width= -1;
-			double height= -1;
-			Set<Long> nameList= setPositiveMap.keySet();
-			Iterator<Long> iterator= nameList.iterator();
-			while(iterator.hasNext()) {
-				long key= iterator.next();
-				long pairName= - key;
-				Term pairValue= setPositiveMap.get(key);
-				if (pairName==SymbolCodes.symbolCode_E_image) {
-					image= targetWorld.readImage(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_anchor) {
-					anchor= termToPoint2D(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_width) {
-					width= Converters.argumentToReal(pairValue,iX);
-				} else if (pairName==SymbolCodes.symbolCode_E_height) {
-					height= Converters.argumentToReal(pairValue,iX);
-				} else {
-					throw new WrongArgumentIsUnknownTexturePaintAttribute(key);
-				}
-			};
-			if (image == null) {
-				throw new ImageIsNotDefined();
-			};
-			double x1;
-			double y1;
-			if (anchor == null) {
-				x1= 0;
-				y1= 0;
-			} else {
-				x1= anchor.getX();
-				y1= anchor.getY();
-			};
-			if (width < 0) {
-				width= image.getWidth();
-			};
-			if (height < 0) {
-				height= image.getHeight();
-			};
-			return new TexturePaint(image,new Rectangle2D.Double(x1,y1,width,height));
-		} else {
-			throw new WrongArgumentIsNotTexturePaintAttributes(setEnd);
-		}
-	}
+	///////////////////////////////////////////////////////////////
 	//
 	public static float[] termToFractions(Term value, ChoisePoint iX) {
 		Term[] termArray= Converters.listToArray(value,iX);
@@ -709,12 +305,14 @@ public class Tools2D {
 		return fractions;
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public static Color[] termToColors(Term value, ChoisePoint iX) {
 		Term[] termArray= Converters.listToArray(value,iX);
 		Color[] colors= new Color[termArray.length];
 		for (int n=0; n < termArray.length; n++) {
 			try {
-				colors[n]= GUI_Utils.termToColor(termArray[n],iX);
+				colors[n]= ExtendedColor.termToColor(termArray[n],iX);
 			} catch (TermIsSymbolDefault e2) {
 				// throw new WrongArgumentIsNotAColor(pairValue);
 				if (n % 2 == 0) {
@@ -726,6 +324,8 @@ public class Tools2D {
 		};
 		return colors;
 	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public static MultipleGradientPaint.CycleMethod termToCycleMethod(Term value, ChoisePoint iX) {
 		try {
@@ -744,6 +344,8 @@ public class Tools2D {
 		}
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public static MultipleGradientPaint.ColorSpaceType termToColorSpaceType(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -758,6 +360,8 @@ public class Tools2D {
 			throw new WrongArgumentIsNotColorSpaceType(value);
 		}
 	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public static AffineTransform termToTransform2D(Term value, ChoisePoint iX) {
 		try { // rotation
@@ -846,6 +450,8 @@ public class Tools2D {
 		}
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public static Font termToFont2D(Term value, Canvas2D targetWorld, ChoisePoint iX) {
 		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
 		Term setEnd= value.exploreSetPositiveElements(setPositiveMap,iX);
@@ -866,7 +472,7 @@ public class Tools2D {
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_size) {
 					try {
-						int size= GUI_Utils.termToFontSize(pairValue,iX);
+						int size= ExtendedFontSize.termToFontSize(pairValue,iX);
 						int realFontSize= DefaultOptions.fontSystemSimulationMode.simulate(size);
 						fontAttributes.put(TextAttribute.SIZE,realFontSize);
 					} catch (TermIsSymbolDefault e) {
@@ -887,7 +493,7 @@ public class Tools2D {
 					Integer superscript= termToFontSuperscript2D(pairValue,iX);
 					fontAttributes.put(TextAttribute.SUPERSCRIPT,superscript);
 				} else if (pairName==SymbolCodes.symbolCode_E_foreground) {
-					BrushAttributes attributes= termToBrushAttributes(pairValue,targetWorld,iX);
+					BrushAttributes attributes= BrushAttributes.termToBrushAttributes(pairValue,targetWorld,iX);
 					if (attributes.isSwitch) {
 						if (!attributes.fillFigures) {
 							Paint paint= new Color(0,0,0,0);
@@ -898,7 +504,7 @@ public class Tools2D {
 						fontAttributes.put(TextAttribute.FOREGROUND,paint);
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_background) {
-					BrushAttributes attributes= termToBrushAttributes(pairValue,targetWorld,iX);
+					BrushAttributes attributes= BrushAttributes.termToBrushAttributes(pairValue,targetWorld,iX);
 					if (attributes.isSwitch) {
 						// if (!attributes.fillFigures) {
 						//	Paint paint= new Color(0,0,0,0);
@@ -912,7 +518,7 @@ public class Tools2D {
 					Integer underline= termToFontUnderline2D(pairValue,iX);
 					fontAttributes.put(TextAttribute.UNDERLINE,underline);
 				} else if (pairName==SymbolCodes.symbolCode_E_strikethrough) {
-					Boolean strikethrough= Converters.term2OnOff(pairValue,iX);
+					Boolean strikethrough= OnOff.termOnOff2Boolean(pairValue,iX);
 					fontAttributes.put(TextAttribute.STRIKETHROUGH,strikethrough);
 				} else if (pairName==SymbolCodes.symbolCode_E_runDirection) {
 					try {
@@ -933,7 +539,7 @@ public class Tools2D {
 					Integer inputMethodUnderline= termToInputMethodUnderline(pairValue,iX);
 					fontAttributes.put(TextAttribute.INPUT_METHOD_HIGHLIGHT,inputMethodUnderline);
 				} else if (pairName==SymbolCodes.symbolCode_E_swapColors) {
-					Boolean swapColors= Converters.term2YesNo(pairValue,iX);
+					Boolean swapColors= YesNo.termYesNo2Boolean(pairValue,iX);
 					fontAttributes.put(TextAttribute.SWAP_COLORS,swapColors);
 				} else if (pairName==SymbolCodes.symbolCode_E_kerning) {
 					Integer kerning= termToFontKerning2D(pairValue,iX);
@@ -971,9 +577,10 @@ public class Tools2D {
 				throw new WrongArgumentIsNotFontName2D(value);
 			}
 		} catch (TermIsNotASymbol e) {
-			return GUI_Utils.termToFontName(value,iX);
+			return ExtendedFontName.termToFontName(value,iX);
 		}
 	}
+	//
 	protected static Number termToFontWeight2D(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -1006,6 +613,7 @@ public class Tools2D {
 			return Converters.argumentToReal(value,iX);
 		}
 	}
+	//
 	protected static Number termToFontWidth2D(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -1026,6 +634,7 @@ public class Tools2D {
 			return Converters.argumentToReal(value,iX);
 		}
 	}
+	//
 	protected static Number termToFontPosture2D(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -1040,6 +649,7 @@ public class Tools2D {
 			return Converters.argumentToReal(value,iX);
 		}
 	}
+	//
 	protected static Integer termToFontSuperscript2D(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -1058,6 +668,7 @@ public class Tools2D {
 			}
 		}
 	}
+	//
 	protected static Integer termToFontUnderline2D(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -1086,6 +697,7 @@ public class Tools2D {
 			}
 		}
 	}
+	//
 	protected static Boolean termToFontRunDirection2D(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -1102,6 +714,7 @@ public class Tools2D {
 			throw new WrongArgumentIsNotFontRunDirection2D(value);
 		}
 	}
+	//
 	protected static Integer termToFontBidiEmbedding2D(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -1118,6 +731,7 @@ public class Tools2D {
 			}
 		}
 	}
+	//
 	protected static Number termToFontJustification2D(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -1132,6 +746,7 @@ public class Tools2D {
 			return Converters.argumentToReal(value,iX);
 		}
 	}
+	//
 	protected static Integer termToInputMethodUnderline(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -1160,6 +775,7 @@ public class Tools2D {
 			}
 		}
 	}
+	//
 	protected static Integer termToFontKerning2D(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -1178,6 +794,7 @@ public class Tools2D {
 			}
 		}
 	}
+	//
 	protected static Integer termToFontLigatures2D(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -1196,6 +813,7 @@ public class Tools2D {
 			}
 		}
 	}
+	//
 	protected static Number termToFontTracking2D(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -1215,45 +833,7 @@ public class Tools2D {
 		}
 	}
 	//
-	public static Canvas2DHorizontalAlignment termToHorizontalAlignment(Term value, ChoisePoint iX) {
-		try {
-			long code= value.getSymbolValue(iX);
-			if (code==SymbolCodes.symbolCode_E_default) {
-				return Canvas2DHorizontalAlignment.DEFAULT;
-			} else if (code==SymbolCodes.symbolCode_E_LEFT) {
-				return Canvas2DHorizontalAlignment.LEFT;
-			} else if (code==SymbolCodes.symbolCode_E_RIGHT) {
-				return Canvas2DHorizontalAlignment.RIGHT;
-			} else if (code==SymbolCodes.symbolCode_E_CENTER) {
-				return Canvas2DHorizontalAlignment.CENTER;
-			} else {
-				throw new WrongArgumentIsNotHorizontalAlignment(value);
-			}
-		} catch (TermIsNotASymbol e) {
-			throw new WrongArgumentIsNotHorizontalAlignment(value);
-		}
-	}
-	//
-	public static Canvas2DVerticalAlignment termToVerticalAlignment(Term value, ChoisePoint iX) {
-		try {
-			long code= value.getSymbolValue(iX);
-			if (code==SymbolCodes.symbolCode_E_default) {
-				return Canvas2DVerticalAlignment.DEFAULT;
-			} else if (code==SymbolCodes.symbolCode_E_BASELINE) {
-				return Canvas2DVerticalAlignment.BASELINE;
-			} else if (code==SymbolCodes.symbolCode_E_TOP) {
-				return Canvas2DVerticalAlignment.TOP;
-			} else if (code==SymbolCodes.symbolCode_E_BOTTOM) {
-				return Canvas2DVerticalAlignment.BOTTOM;
-			} else if (code==SymbolCodes.symbolCode_E_CENTER) {
-				return Canvas2DVerticalAlignment.CENTER;
-			} else {
-				throw new WrongArgumentIsNotVerticalAlignment(value);
-			}
-		} catch (TermIsNotASymbol e) {
-			throw new WrongArgumentIsNotVerticalAlignment(value);
-		}
-	}
+	///////////////////////////////////////////////////////////////
 	//
 	public static int termToCompositingRule(Term value, ChoisePoint iX) {
 		try {
@@ -1290,11 +870,14 @@ public class Tools2D {
 		}
 	}
 	//
-	public static int termToBufferedImageType(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
+	///////////////////////////////////////////////////////////////
+	//
+	public static int termToBufferedImageType(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_default) {
-				throw TermIsSymbolDefault.instance;
+				// throw TermIsSymbolDefault.instance;
+				return java.awt.image.BufferedImage.TYPE_CUSTOM;
 			} else if (code==SymbolCodes.symbolCode_E_TYPE_3BYTE_BGR) {
 				return java.awt.image.BufferedImage.TYPE_3BYTE_BGR;
 			} else if (code==SymbolCodes.symbolCode_E_TYPE_4BYTE_ABGR) {
@@ -1329,11 +912,50 @@ public class Tools2D {
 		}
 	}
 	//
-	public static int termToImageTransparency(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
+	///////////////////////////////////////////////////////////////
+	//
+	public static Term bufferedImageTypeToTerm(int value) {
+		long code;
+		if (value==java.awt.image.BufferedImage.TYPE_3BYTE_BGR) {
+			code= SymbolCodes.symbolCode_E_TYPE_3BYTE_BGR;
+		} else if (value==java.awt.image.BufferedImage.TYPE_4BYTE_ABGR) {
+			code= SymbolCodes.symbolCode_E_TYPE_4BYTE_ABGR;
+		} else if (value==java.awt.image.BufferedImage.TYPE_4BYTE_ABGR_PRE) {
+			code= SymbolCodes.symbolCode_E_TYPE_4BYTE_ABGR_PRE;
+		} else if (value==java.awt.image.BufferedImage.TYPE_BYTE_BINARY) {
+			code= SymbolCodes.symbolCode_E_TYPE_BYTE_BINARY;
+		} else if (value==java.awt.image.BufferedImage.TYPE_BYTE_GRAY) {
+			code= SymbolCodes.symbolCode_E_TYPE_BYTE_GRAY;
+		} else if (value==java.awt.image.BufferedImage.TYPE_BYTE_INDEXED) {
+			code= SymbolCodes.symbolCode_E_TYPE_BYTE_INDEXED;
+		} else if (value==java.awt.image.BufferedImage.TYPE_INT_ARGB) {
+			code= SymbolCodes.symbolCode_E_TYPE_INT_ARGB;
+		} else if (value==java.awt.image.BufferedImage.TYPE_INT_ARGB_PRE) {
+			code= SymbolCodes.symbolCode_E_TYPE_INT_ARGB_PRE;
+		} else if (value==java.awt.image.BufferedImage.TYPE_INT_BGR) {
+			code= SymbolCodes.symbolCode_E_TYPE_INT_BGR;
+		} else if (value==java.awt.image.BufferedImage.TYPE_INT_RGB) {
+			code= SymbolCodes.symbolCode_E_TYPE_INT_RGB;
+		} else if (value==java.awt.image.BufferedImage.TYPE_USHORT_555_RGB) {
+			code= SymbolCodes.symbolCode_E_TYPE_USHORT_555_RGB;
+		} else if (value==java.awt.image.BufferedImage.TYPE_USHORT_565_RGB) {
+			code= SymbolCodes.symbolCode_E_TYPE_USHORT_565_RGB;
+		} else if (value==java.awt.image.BufferedImage.TYPE_USHORT_GRAY) {
+			code= SymbolCodes.symbolCode_E_TYPE_USHORT_GRAY;
+		} else {
+			code= SymbolCodes.symbolCode_E_default;
+		};
+		return new PrologSymbol(code);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public static int termToImageTransparency(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_default) {
-				throw TermIsSymbolDefault.instance;
+				// throw TermIsSymbolDefault.instance;
+				return defaultTransparency;
 			} else if (code==SymbolCodes.symbolCode_E_OPAQUE) {
 				return Transparency.OPAQUE;
 			} else if (code==SymbolCodes.symbolCode_E_BITMASK) {
@@ -1348,107 +970,19 @@ public class Tools2D {
 		}
 	}
 	//
-	public static void write(String fileName, boolean backslashIsSeparator, BufferedImage image, Term attributes, ChoisePoint iX) {
-		String formatName= FileUtils.extractFileNameExtension(fileName,backslashIsSeparator);
-		if (formatName.length() > 0 && formatName.codePointAt(0)=='.') {
-			formatName= formatName.substring(1);
+	///////////////////////////////////////////////////////////////
+	//
+	public static Term imageTransparencyToTerm(int value) {
+		long code;
+		if (value==Transparency.OPAQUE) {
+			code= SymbolCodes.symbolCode_E_OPAQUE;
+		} else if (value==Transparency.BITMASK) {
+			code= SymbolCodes.symbolCode_E_BITMASK;
+		} else if (value==Transparency.TRANSLUCENT) {
+			code= SymbolCodes.symbolCode_E_TRANSLUCENT;
+		} else {
+			code= SymbolCodes.symbolCode_E_default;
 		};
-		formatName= formatName.toLowerCase();
-		if (attributes==null) {
-			java.io.File file= new java.io.File(fileName);
-			try {
-				ImageIO.write(image,formatName,file);
-			} catch (IOException e) {
-				throw new FileInputOutputError(fileName,e);
-			}
-		} else {
-			Tools2D.write(fileName,formatName,image,attributes,iX);
-		}
-	}
-	//
-	public static void write(String fileName, String defaultFormatName, BufferedImage image, Term attributes, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
-		Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
-		setEnd= setEnd.dereferenceValue(iX);
-		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
-			ImageFormat format= ImageFormat.UNIVERSAL;
-			Set<Long> nameList= setPositiveMap.keySet();
-			Iterator<Long> iterator= nameList.iterator();
-			while(iterator.hasNext()) {
-				long key= iterator.next();
-				long pairName= - key;
-				Term pairValue= setPositiveMap.get(key);
-				if (pairName==SymbolCodes.symbolCode_E_format) {
-					try {
-						format= termToImageFormat(pairValue,iX);
-					} catch (TermIsSymbolDefault e) {
-					};
-					iterator.remove();
-				}
-			};
-			ImageTypeSpecifier its= new ImageTypeSpecifier(image);
-			Space2DWriter writer= format.createWriter(defaultFormatName,its);
-			iterator= nameList.iterator();
-			while(iterator.hasNext()) {
-				long key= iterator.next();
-				long pairName= - key;
-				Term pairValue= setPositiveMap.get(key);
-				if (pairName==SymbolCodes.symbolCode_E_compressionQuality) {
-					double compressionQuality= Converters.argumentToReal(pairValue,iX);
-					writer.setCompressionQuality(compressionQuality);
-				} else if (pairName==SymbolCodes.symbolCode_E_progressiveMode) {
-					boolean progressiveMode= Converters.term2OnOff(pairValue,iX);
-					writer.setProgressiveMode(progressiveMode);
-				} else if (pairName==SymbolCodes.symbolCode_E_interlacing) {
-					boolean interlacing= Converters.term2OnOff(pairValue,iX);
-					writer.setInterlacing(interlacing);
-				} else if (pairName==SymbolCodes.symbolCode_E_comment) {
-					String comment= pairValue.toString(iX);
-					writer.setComment(comment);
-				} else {
-					throw new WrongArgumentIsUnknownImageAttribute(key);
-				}
-                	};
-			try {
-				java.io.File file= new java.io.File(fileName);
-				FileImageOutputStream output= new FileImageOutputStream(file);
-				try {
-					writer.setOutput(output);
-					// IIOImage iioImage= new IIOImage(image,null,metadata);
-					writer.write(image);
-				} finally {
-					output.flush();
-					output.close();
-					writer.dispose();
-				}
-			} catch (IOException e) {
-				throw new FileInputOutputError(fileName,e);
-			}
-		} else {
-			throw new WrongArgumentIsNotImageAttributes(setEnd);
-		}
-	}
-	//
-	public static ImageFormat termToImageFormat(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
-		try {
-			long code= value.getSymbolValue(iX);
-			if (code==SymbolCodes.symbolCode_E_default) {
-				throw TermIsSymbolDefault.instance;
-			} else if (code==SymbolCodes.symbolCode_E_JPEG) {
-				return ImageFormat.JPEG;
-			} else if (code==SymbolCodes.symbolCode_E_PNG) {
-				return ImageFormat.PNG;
-			} else if (code==SymbolCodes.symbolCode_E_GIF) {
-				return ImageFormat.GIF;
-			} else if (code==SymbolCodes.symbolCode_E_BMP) {
-				return ImageFormat.BMP;
-			} else if (code==SymbolCodes.symbolCode_E_WBMP) {
-				return ImageFormat.WBMP;
-			} else {
-				throw new WrongArgumentIsNotImageFormat(value);
-			}
-		} catch (TermIsNotASymbol e) {
-			throw new WrongArgumentIsNotImageFormat(value);
-		}
+		return new PrologSymbol(code);
 	}
 }

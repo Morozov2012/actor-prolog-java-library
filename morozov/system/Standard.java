@@ -54,7 +54,7 @@ public class Standard {
 		} catch (EndOfList e) {
 			return;
 		} catch (TermIsNotAList e) {
-			throw new WrongTermIsNotArgumentList(currentTail);
+			throw new WrongArgumentIsNotArgumentList(currentTail);
 		}
 	}
 	//
@@ -75,7 +75,7 @@ public class Standard {
 		} catch (EndOfList e) {
 			return;
 		} catch (TermIsNotAList e) {
-			throw new WrongTermIsNotArgumentList(currentTail);
+			throw new WrongArgumentIsNotArgumentList(currentTail);
 		}
 	}
 	//
@@ -98,18 +98,15 @@ public class Standard {
 			String entry= domain.getStringValue(cp);
 			value= value.dereferenceValue(cp);
 			if (value.thisIsFreeVariable()) {
-				throw new WrongTermIsNotBoundVariable(value);
+				throw new WrongArgumentIsNotBoundVariable(value);
 			} else {
-				// System.out.printf("entry: %s\n",entry);
 				PrologDomain domainItem= DomainTable.getDomainAlternatives(entry);
-				// System.out.printf("Standard::domainItem: %s\n",domainItem);
-				// System.out.printf("Standard::value: %s (%s)\n\n",value,value.getClass());
 				if (!value.isCoveredByDomain(domainItem,cp,false)) {
 					throw new WrongTermDoesNotBelongToDomain(value);
 				}
 			}
 		} catch (TermIsNotAString e) {
-			throw new WrongTermIsNotDomainTableEntry(domain);
+			throw new WrongArgumentIsNotDomainTableEntry(domain);
 		}
 	}
 	//
@@ -121,13 +118,12 @@ public class Standard {
 				throw Backtracking.instance;
 			} else {
 				PrologDomain domainItem= DomainTable.getDomainAlternatives(entry);
-				// System.out.printf("Standard:domainItem: %s %s\n",value,value.getClass());
 				if (!domainItem.coversTerm(value,cp,false)) {
 					throw Backtracking.instance;
 				}
 			}
 		} catch (TermIsNotAString e) {
-			throw new WrongTermIsNotDomainTableEntry(domain);
+			throw new WrongArgumentIsNotDomainTableEntry(domain);
 		}
 	}
 	//

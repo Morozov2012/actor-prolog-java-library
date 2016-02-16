@@ -3,7 +3,7 @@
 package morozov.system.gui.space3d;
 
 import morozov.built_in.*;
-import morozov.classes.*;
+import morozov.run.*;
 import morozov.system.gui.space3d.signals.*;
 import morozov.terms.*;
 
@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.TimerTask;
 import java.lang.IllegalStateException;
 
 public class CustomizedPickCanvas
@@ -45,17 +44,14 @@ public class CustomizedPickCanvas
 	protected Canvas3D targetWorld;
 	protected javax.media.j3d.Canvas3D space3D;
 	protected java.util.Timer scheduler;
-	protected TimerTask currentTask;
+	protected LocalCustomizedPickCanvasTask currentTask;
 	//
 	protected HashSet<NodeLabel> currentlyIndicatedLabels= new HashSet<NodeLabel>();
-	//
-	// protected Appearance lit= new Appearance();
 	//
 	public CustomizedPickCanvas(BranchGroup b, Canvas3D world, javax.media.j3d.Canvas3D c) {
 		super(c,b);
 		targetWorld= world;
 		space3D= c;
-		// lit.setMaterial(new Material());
 		refineMouseEventListenerList();
 		refineMouseMotionEventListenerList();
 	}
@@ -96,10 +92,6 @@ public class CustomizedPickCanvas
 	}
 	//
 	protected void refineMouseEventListenerList() {
-		// MouseListener[] list1= space3D.getMouseListeners();
-		// for (int n= 0; n < list1.length; n++) {
-		//	System.out.printf("%s) list: %s\n",n,list1[n]);
-		// };
 		MouseListener[] list= space3D.getMouseListeners();
 		if (	handleMouseClicked ||
 			handleMouseEntered ||
@@ -143,7 +135,6 @@ public class CustomizedPickCanvas
 		}
 	}
 	public void mouseEntered(MouseEvent mouseEvent) {
-		// System.out.printf("CustomizedBehavior::mouseEntered(%s)\n",mouseEvent);
 		// Invoked when the mouse enters a component.
 		activateTimer();
 		if (handleMouseEntered) {
@@ -152,7 +143,6 @@ public class CustomizedPickCanvas
 		}
 	}
 	public void mouseExited(MouseEvent mouseEvent) {
-		// System.out.printf("CustomizedBehavior::mouseExited(%s)\n",mouseEvent);
 		// Invoked when the mouse exits a component.
 		suspendTimer();
 		if (handleMouseExited) {
@@ -211,9 +201,7 @@ public class CustomizedPickCanvas
 			PointerInfo info= MouseInfo.getPointerInfo();
 			if (info != null) {
 				Point location= info.getLocation();
-				// System.out.printf("Watch: %s\n",location);
 				SwingUtilities.convertPointFromScreen(location,space3D);
-				// System.out.printf("Watch: [converted] %s\n",location);
 				setShapeLocation(location.x,location.y);
 				try {
 					NodeLabel[] labels= retrieveNodeLabels();
@@ -254,8 +242,6 @@ public class CustomizedPickCanvas
 				currentlyIndicatedLabels.add(currentNodeLabel);
 			}
 		};
-		// System.out.printf("numberOfRemovedLabels: %s\n",numberOfRemovedLabels);
-		// System.out.printf("numberOfNewLabels: %s\n",numberOfNewLabels);
 		if (numberOfRemovedLabels > 0 && handleMouseExited) {
 			long domainSignature= targetWorld.entry_s_MouseExited_1_i();
 			Term predicateArgument= nodeLabelsToTerm(removedLabels);
@@ -270,7 +256,6 @@ public class CustomizedPickCanvas
 	}
 	//
 	protected Term retrieveNodeLabelList(MouseEvent mouseEvent) throws NoObjectSelected {
-		// System.out.printf("mouseEvent.getScreen X,Y: %s\n",mouseEvent.getLocationOnScreen());
 		setShapeLocation(mouseEvent);
 		return retrieveNodeLabelList();
 	}
@@ -335,7 +320,7 @@ public class CustomizedPickCanvas
 	protected void sendMessage(long domainSignature, Term predicateArgument) {
 		Term[] arguments= new Term[]{predicateArgument};
 		AsyncCall call= new AsyncCall(domainSignature,targetWorld,true,true,arguments,true);
-		targetWorld.receiveAsyncCall(call);
+		targetWorld.transmitAsyncCall(call,null);
 	}
 	//
 	public void activateTimer() {
@@ -346,7 +331,7 @@ public class CustomizedPickCanvas
 						if (scheduler==null) {
 							scheduler= new java.util.Timer(true);
 						};
-						currentTask= new LocalTask(this);
+						currentTask= new LocalCustomizedPickCanvasTask(this);
 						long correctedPeriod= period;
 						if (correctedPeriod <= 1) {
 							correctedPeriod= 1;
@@ -381,18 +366,5 @@ public class CustomizedPickCanvas
 			scheduler.purge();
 			scheduler.cancel();
 		}
-	}
-}
-
-class LocalTask extends TimerTask {
-	//
-	protected CustomizedPickCanvas pickCanvas;
-	//
-	public LocalTask(CustomizedPickCanvas canvas) {
-		pickCanvas= canvas;
-	}
-	//
-	public void run() {
-		pickCanvas.mouseWatch();
 	}
 }

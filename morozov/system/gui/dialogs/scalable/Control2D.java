@@ -15,8 +15,8 @@ package morozov.system.gui.dialogs.scalable;
 import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
-import morozov.system.gui.dialogs.signals.*;
 import morozov.system.gui.space2d.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
 
 import javax.swing.JLabel;
@@ -58,8 +58,8 @@ public class Control2D extends ActiveComponent {
 		if (component!=null) {
 			component.setFont(font);
 			Dimension dimension= LayoutUtils.computeDimension(font,component,width,height);
-			space2D.setMinimumSize(dimension);
-			space2D.setPreferredSize(dimension);
+			space2D.getControl().setMinimumSize(dimension);
+			space2D.getControl().setPreferredSize(dimension);
 			component.setMinimumSize(dimension);
 			component.setPreferredSize(dimension);
 			icon2D.setSize(dimension);
@@ -71,13 +71,14 @@ public class Control2D extends ActiveComponent {
 			value= value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 			if (value instanceof morozov.built_in.Canvas2D) {
 				if (currentValue != null) {
-					currentValue.release(dialog.isToBeModal(),iX);
+					currentValue.release(dialog.isModal,iX);
 				};
 				currentValue= (morozov.built_in.Canvas2D)value;
-				currentValue.registerCanvas2D(space2D);
-				currentValue.draw(dialog.isToBeModal(),iX);
-				dialog.invalidate();
-				dialog.repaint();
+				currentValue.registerCanvasSpace(space2D,iX);
+				currentValue.draw(dialog.isModal,iX);
+				// dialog.invalidate();
+				// dialog.repaint();
+				dialog.safelyInvalidateAndRepaint();
 			}
 		}
 	}

@@ -14,12 +14,6 @@ public class ArrayIndices {
 	}
 	//
 	public boolean equals(Object o) {
-		// System.out.printf("ArrayIndices:: %s ??? %s\n\n",o,this);
-		// System.out.printf("ArrayIndices:: VECTOR\n");
-		// for (int n=0; n < vector.length; n++) {
-		//	System.out.printf(" %s ",vector[n]);
-		// };
-		// System.out.printf("O.K.\n\n");
 		if (o==null) {
 			return false;
 		} else {
@@ -46,11 +40,6 @@ public class ArrayIndices {
 		for (int n=0; n < vector.length; n++) {
 			sum+= vector[n].intValue();
 		};
-		// System.out.printf("ArrayIndices:: HASH\n");
-		// for (int n=0; n < vector.length; n++) {
-		//	System.out.printf(" %s ",vector[n]);
-		// };
-		// System.out.printf("==> %s\n\n",sum);
 		return sum;
 	}
 	//

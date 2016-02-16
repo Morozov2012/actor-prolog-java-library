@@ -2,9 +2,6 @@
 
 package morozov.system.vision;
 
-import java.awt.Graphics2D;
-import java.awt.Color;
-import java.awt.geom.Line2D;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;

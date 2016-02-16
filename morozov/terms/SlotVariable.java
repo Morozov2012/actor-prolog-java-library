@@ -2,13 +2,14 @@
 
 package morozov.terms;
 
-import morozov.classes.*;
 import morozov.domains.*;
 import morozov.domains.signals.*;
 import morozov.run.*;
 import morozov.run.errors.*;
 import morozov.system.*;
+import morozov.terms.errors.*;
 import morozov.terms.signals.*;
+import morozov.worlds.*;
 
 import java.nio.charset.CharsetEncoder;
 import java.math.BigInteger;
@@ -20,23 +21,25 @@ import java.util.Set;
 
 public class SlotVariable extends Term {
 	public HashMap<ActiveWorld,SlotVariableValue> processTable= new HashMap<ActiveWorld,SlotVariableValue>();
-	// public ReentrantReadWriteLock processTableLock= new ReentrantReadWriteLock(true);
 	public ReentrantReadWriteLock processTableLock= new ReentrantReadWriteLock(false);
 	public Term globalValue;
 	public boolean globalValueIsProtected= false;
 	public ActiveWorld globalValueOwner;
-	// public boolean isTemporary() {
-	//	return true;
-	// }
 	//
-	public boolean equals(Object o) {
-		// System.out.printf("EQUALS:\n%s\n%s\n",this,o);
-		return this==o;
-	}
+	///////////////////////////////////////////////////////////////
+	//
 	public int hashCode() {
 		return System.identityHashCode(this);
 	}
-	// Slot value access
+	public boolean equals(Object o2) {
+		throw new SlotVariableCannotBeCompared();
+	}
+	public int compare(Object o2) {
+		throw new SlotVariableCannotBeCompared();
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public SlotVariableValue get(ActiveWorld process) {
 		SlotVariableValue value= null;
 		processTableLock.readLock().lock();
@@ -50,6 +53,9 @@ public class SlotVariable extends Term {
 	}
 	//
 	public final Term getValue(ChoisePoint cp) {
+		if (cp==null) {
+			throw new WrongArgumentIsNotBoundVariable(this);
+		};
 		ActorRegister aR= cp.actorRegister;
 		ActiveWorld currentProcess= aR.currentProcess;
 		ActorNumber actorNumber= aR.currentActorNumber;
@@ -110,7 +116,8 @@ public class SlotVariable extends Term {
 		}
 	}
 	//
-	// "Is a ..." functions
+	///////////////////////////////////////////////////////////////
+	//
 	public void isInteger(int v, ChoisePoint cp) throws Backtracking {
 		Term value= getValue(cp);
 		value.isInteger(v,cp);
@@ -154,7 +161,9 @@ public class SlotVariable extends Term {
 	public boolean thisIsSlotVariable() {
 		return true;
 	}
-	// "Get ... value" functions
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term dereferenceValue(ChoisePoint cp) {
 		Term value= getValue(cp);
 		return value.dereferenceValue(cp);
@@ -287,35 +296,31 @@ public class SlotVariable extends Term {
 		Term value= getValue(cp);
 		value.appendNamedElementProhibition(aName,cp);
 	}
-	// public long getAbstractWorldNumber(ChoisePoint cp) throws TermIsNotAWorld, TermIsDummyWorld, TermIsUnboundVariable {
-	//	Term value= getValue(cp);
-	//	return value.getAbstractWorldNumber(cp);
-	// }
-	public long getInternalWorldClass(AbstractWorld currentClass, ChoisePoint cp) throws Backtracking, TermIsNotAWorld, TermIsDummyWorld, TermIsUnboundVariable {
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public AbstractInternalWorld getInternalWorld(ChoisePoint cp) throws Backtracking, TermIsNotAWorld, TermIsDummyWorld, TermIsUnboundVariable {
 		Term value= getValue(cp);
-		return value.getInternalWorldClass(currentClass,cp);
+		return value.getInternalWorld(cp);
 	}
 	//
-	public AbstractWorld internalWorld(AbstractProcess process, ChoisePoint cp) throws Backtracking {
+	public AbstractInternalWorld internalWorld(AbstractProcess process, ChoisePoint cp) throws Backtracking {
 		Term value= getValue(cp);
 		return value.internalWorld(process,cp);
 	}
 	//
-	public AbstractWorld internalWorld(ChoisePoint cp) {
+	public AbstractInternalWorld internalWorld(ChoisePoint cp) {
 		Term value= getValue(cp);
 		return value.internalWorld(cp);
 	}
 	//
-	public Term internalWorldOrTerm(ChoisePoint cp) {
+	public GlobalWorldIdentifier getGlobalWorldIdentifier(ChoisePoint cp) throws TermIsNotAWorld, TermIsDummyWorld, TermIsUnboundVariable {
 		Term value= getValue(cp);
-		return value.internalWorldOrTerm(cp);
+		return value.getGlobalWorldIdentifier(cp);
 	}
 	//
-	// public AbstractWorld world(ChoisePoint cp) {
-	//	Term value= getValue(cp);
-	//	return value.world(cp);
-	// }
-	// "Unify with ..." functions
+	///////////////////////////////////////////////////////////////
+	//
 	public void unifyWithStructure(long aFunctor, Term[] values, Term structure, ChoisePoint cp) throws Backtracking {
 		Term value= getValue(cp);
 		value.unifyWithStructure(aFunctor,values,structure,cp);
@@ -336,7 +341,9 @@ public class SlotVariable extends Term {
 		Term value= getValue(cp);
 		value.unifyWithSetElement(aElement,setElement,cp);
 	}
-	// General "Unify With" function
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		Term value= getValue(cp); // To link slot value with the actor.
 		if (this == t) {
@@ -344,7 +351,9 @@ public class SlotVariable extends Term {
 		};
 		value.unifyWith(t,cp);
 	}
-	// Operations on slot variables
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void registerVariables(ActiveWorld process, boolean isSuspending, boolean isProtecting) {
 		registerVariables(process,false,isSuspending,isProtecting);
 	}
@@ -424,7 +433,9 @@ public class SlotVariable extends Term {
 		Term value= getValue(cp);
 		return value.substituteWorlds(map,cp);
 	}
-	// Domain check
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public boolean isCoveredByDomain(PrologDomain baseDomain, ChoisePoint cp, boolean ignoreFreeVariables) {
 		Term value= getValue(cp);
 		return baseDomain.coversTerm(value,cp,ignoreFreeVariables);
@@ -433,7 +444,9 @@ public class SlotVariable extends Term {
 		Term value= getValue(cp);
 		return value.checkSetTerm(functor,headDomain,initialValue,cp,baseDomain);
 	}
-	// Comparison operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void compareWithTerm(Term a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		Term value= getValue(iX);
 		value.compareWithTerm(a,iX,op);
@@ -486,7 +499,9 @@ public class SlotVariable extends Term {
 		Term value= getValue(iX);
 		value.compareListWith(aHead,aTail,iX,op);
 	}
-	// Arithmetic operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term reactWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
 		Term value= getValue(iX);
 		return value.reactWithTerm(a,iX,op);
@@ -543,7 +558,9 @@ public class SlotVariable extends Term {
 		Term value= getValue(iX);
 		return value.reactListWith(aHead,aTail,iX,op);
 	}
-	// Bitwise operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term blitWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
 		Term value= getValue(iX);
 		return value.blitWithTerm(a,iX,op);
@@ -576,19 +593,22 @@ public class SlotVariable extends Term {
 		Term value= getValue(iX);
 		return value.blitListWith(aHead,aTail,iX,op);
 	}
-	// Unary operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term evaluate(ChoisePoint iX, UnaryOperation op) {
 		Term value= getValue(iX);
 		return value.evaluate(iX,op);
 	}
-	// Converting Term to String
-	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, CharsetEncoder encoder) {
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		if (cp==null) {
 			return toString();
 		} else {
 			Term value= getValue(cp);
-			// return "&" + value.toString(cp,isInner,provideStrictSyntax,encoder);
-			return value.toString(cp,isInner,provideStrictSyntax,encoder);
+			return value.toString(cp,isInner,provideStrictSyntax,encodeWorlds,encoder);
 		}
 	}
 	public String toString() {
@@ -599,7 +619,6 @@ public class SlotVariable extends Term {
 		} finally {
 			processTableLock.readLock().unlock();
 		};
-		// return "&(" + text + ")";
 		return "(" + text + ")";
 	}
 }

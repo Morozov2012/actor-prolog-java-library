@@ -15,12 +15,14 @@ package morozov.system.gui.dialogs.scalable;
 import morozov.built_in.*;
 import morozov.run.*;
 import morozov.system.gui.dialogs.*;
-import morozov.system.gui.dialogs.signals.*;
 import morozov.system.gui.reports.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
 
 import java.awt.Dimension;
 import java.awt.Font;
+import javax.swing.SwingUtilities;
+import java.lang.reflect.InvocationTargetException;
 
 public class ReportControl extends ActiveComponent {
 	//
@@ -35,12 +37,32 @@ public class ReportControl extends ActiveComponent {
 		dialog= tD;
 		height= rows;
 		width= columns;
-		space= new ExtendedReportSpace(new TextPaneNoWrap());
-		component= space;
-		Font dialogFont= dialog.getFont();
-		Dimension dimension= LayoutUtils.computeDimension(dialogFont,space,width,height);
-		space.setMinimumSize(dimension);
-		space.setPreferredSize(dimension);
+		space= new ExtendedReportSpace(null,new TextPaneNoWrap());
+		space.setDialog(dialog);
+		component= space.getControl();
+		safelyInitiateControlSize();
+	}
+	//
+	protected void safelyInitiateControlSize() {
+		if (SwingUtilities.isEventDispatchThread()) {
+			quicklyInitiateControlSize();
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						quicklyInitiateControlSize();
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	protected void quicklyInitiateControlSize() {
+		Font dialogFont= dialog.quicklyGetFont();
+		Dimension dimension= LayoutUtils.computeDimension(dialogFont,space.getControl(),width,height);
+		space.getControl().setMinimumSize(dimension);
+		space.getControl().setPreferredSize(dimension);
 	}
 	//
 	// protected int getInitialTopBorder() {return 5;}
@@ -52,16 +74,16 @@ public class ReportControl extends ActiveComponent {
 		super.setFont(externalFont);
 		if (space != null) {
 			space.setPanelFontSize(externalFont.getSize(),false);
-			Dimension dimension= LayoutUtils.computeDimension(externalFont,space,width,height);
+			Dimension dimension= LayoutUtils.computeDimension(externalFont,space.getControl(),width,height);
 			// 2013.08.29: Если устанавливать размеры
 			// space, а не component,
 			// то SWING сходит с ума.
 			// panel.setMinimumSize(dimension);
 			// panel.setPreferredSize(dimension);
-			space.setMinimumSize(dimension);
-			space.setPreferredSize(dimension);
+			space.getControl().setMinimumSize(dimension);
+			space.getControl().setPreferredSize(dimension);
 			dialog.doLayout(true);
-			dialog.repaint();
+			dialog.safelyRepaint();
 			dialog.repaintAfterDelay();
 		}
 	}
@@ -71,13 +93,15 @@ public class ReportControl extends ActiveComponent {
 			value= value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 			if (value instanceof Report) {
 				if (currentValue != null) {
-					currentValue.release(space.panel,dialog.isToBeModal(),iX);
+					// currentValue.release(space.panel,dialog.isModal,iX);
+					currentValue.release(dialog.isModal,iX);
 				};
 				currentValue= (Report)value;
-				currentValue.registerReport(space,iX);
-				currentValue.draw(dialog.isToBeModal(),iX);
+				// currentValue.registerReport(space,iX);
+				currentValue.registerCanvasSpace(space,iX);
+				currentValue.draw(dialog.isModal,iX);
 				dialog.doLayout(true);
-				dialog.repaint();
+				dialog.safelyRepaint();
 				dialog.repaintAfterDelay();
 			}
 		}

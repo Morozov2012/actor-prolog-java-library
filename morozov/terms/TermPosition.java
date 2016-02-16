@@ -2,12 +2,12 @@
 
 package morozov.terms;
 
-import morozov.classes.*;
 import morozov.domains.*;
 import morozov.domains.signals.*;
 import morozov.run.*;
 import morozov.system.*;
 import morozov.terms.signals.*;
+import morozov.worlds.*;
 
 import java.nio.charset.CharsetEncoder;
 import java.math.BigInteger;
@@ -18,14 +18,98 @@ import java.util.LinkedHashSet;
 public class TermPosition extends Term {
 	protected Term value;
 	protected long position;
+	//
 	public TermPosition(Term t, long p) {
 		value= t;
 		position= p;
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public int hashCode() {
 		return value.hashCode();
 	}
-	// "Is a ..." functions
+	public boolean equals(Object o2) {
+		return value.equals(o2);
+	}
+	public int compare(Object o2) {
+		return value.compare(o2);
+	}
+	public boolean isEqualToInteger(BigInteger v2) {
+		return value.isEqualToInteger(v2);
+	}
+	public boolean isEqualToReal(Double v2) {
+		return value.isEqualToReal(v2);
+	}
+	public boolean isEqualToString(String v2) {
+		return value.isEqualToString(v2);
+	}
+	public boolean isEqualToSymbol(long v2) {
+		return value.isEqualToSymbol(v2);
+	}
+	public boolean isEqualToEmptyList() {
+		return value.isEqualToEmptyList();
+	}
+	public boolean isEqualToEmptySet() {
+		return value.isEqualToEmptySet();
+	}
+	public boolean isEqualToNoValue() {
+		return value.isEqualToNoValue();
+	}
+	public boolean isEqualToUnknownValue() {
+		return value.isEqualToUnknownValue();
+	}
+	public boolean isEqualToStructure(long f2, Term[] a2) {
+		return value.isEqualToStructure(f2,a2);
+	}
+	public boolean isEqualToList(Term h2, Term t2) {
+		return value.isEqualToList(h2,t2);
+	}
+	public boolean isEqualToSet(UnderdeterminedSet o2) {
+		return value.isEqualToSet(o2);
+	}
+	public boolean isEqualToWorld(GlobalWorldIdentifier id2) {
+		return value.isEqualToWorld(id2);
+	}
+	public int compareWithInteger(BigInteger v2) {
+		return value.compareWithInteger(v2);
+	}
+	public int compareWithReal(Double v2) {
+		return value.compareWithReal(v2);
+	}
+	public int compareWithString(String v2) {
+		return value.compareWithString(v2);
+	}
+	public int compareWithSymbol(long v2) {
+		return value.compareWithSymbol(v2);
+	}
+	public int compareWithEmptyList() {
+		return value.compareWithEmptyList();
+	}
+	public int compareWithEmptySet() {
+		return value.compareWithEmptySet();
+	}
+	public int compareWithNoValue() {
+		return value.compareWithNoValue();
+	}
+	public int compareWithUnknownValue() {
+		return value.compareWithUnknownValue();
+	}
+	public int compareWithStructure(long f2, Term[] a2) {
+		return value.compareWithStructure(f2,a2);
+	}
+	public int compareWithList(Term h2, Term t2) {
+		return value.compareWithList(h2,t2);
+	}
+	public int compareWithSet(UnderdeterminedSet o2) {
+		return value.compareWithSet(o2);
+	}
+	public int compareWithWorld(GlobalWorldIdentifier id2) {
+		return value.compareWithWorld(id2);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void isInteger(int v, ChoisePoint cp) throws Backtracking {
 		value.isInteger(v,cp);
 	}
@@ -68,17 +152,20 @@ public class TermPosition extends Term {
 	// public boolean thisIsUnknownValue() {
 	//	return value.thisIsUnknownValue();
 	// }
-	public void isNoValue(ChoisePoint cp) throws Backtracking {
-		value.isNoValue(cp);
-	}
+	// public void isNoValue(ChoisePoint cp) throws Backtracking {
+	//	value.isNoValue(cp);
+	// }
 	// public boolean thisIsNoValue() {
 	//	return value.thisIsNoValue();
 	// }
 	public void isWorld(Term v, ChoisePoint cp) throws Backtracking {
 		value.isWorld(v,cp);
 	}
-	// public boolean thisIsWorld() {
-	//	return value.thisIsWorld();
+	// public boolean thisIsOwnWorld() {
+	//	return value.thisIsOwnWorld();
+	// }
+	// public boolean thisIsForeignWorld() {
+	//	return value.thisIsForeignWorld();
 	// }
 	// public boolean thisIsProcess() {
 	//	return value.thisIsProcess();
@@ -86,7 +173,9 @@ public class TermPosition extends Term {
 	// public boolean thisIsSlotVariable() {
 	//	return value.thisIsSlotVariable();
 	// }
-	// "Get ... value" functions
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term getValue(ChoisePoint cp) {
 		return value.getValue(cp);
 	}
@@ -198,32 +287,34 @@ public class TermPosition extends Term {
 	public void appendNamedElementProhibition(long aName, ChoisePoint cp) throws Backtracking {
 		value.appendNamedElementProhibition(aName,cp);
 	}
-	public long getInternalWorldClass(AbstractWorld currentClass, ChoisePoint cp) throws Backtracking, TermIsNotAWorld, TermIsDummyWorld, TermIsUnboundVariable {
-		return value.getInternalWorldClass(currentClass,cp);
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public AbstractInternalWorld getInternalWorld(ChoisePoint cp) throws Backtracking, TermIsNotAWorld, TermIsDummyWorld, TermIsUnboundVariable {
+		return value.getInternalWorld(cp);
 	}
 	//
-	public AbstractWorld internalWorld(AbstractProcess process, ChoisePoint cp) throws Backtracking {
+	public AbstractInternalWorld internalWorld(AbstractProcess process, ChoisePoint cp) throws Backtracking {
 		return value.internalWorld(process,cp);
 	}
 	//
-	public AbstractWorld internalWorld(ChoisePoint cp) {
+	public AbstractInternalWorld internalWorld(ChoisePoint cp) {
 		return value.internalWorld(cp);
 	}
 	//
-	public Term internalWorldOrTerm(ChoisePoint cp) {
-		return value.internalWorldOrTerm(cp);
+	public GlobalWorldIdentifier getGlobalWorldIdentifier(ChoisePoint cp) throws TermIsNotAWorld, TermIsDummyWorld, TermIsUnboundVariable {
+		return value.getGlobalWorldIdentifier(cp);
 	}
 	//
-	// public AbstractWorld world(ChoisePoint cp) {
-	//	return value.world(cp);
-	// }
 	public long[] getClassHierarchy() {
 		return value.getClassHierarchy();
 	}
 	public long[] getInterfaceHierarchy() {
 		return value.getInterfaceHierarchy();
 	}
-	// "Unify with ..." functions
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void unifyWithStructure(long aFunctor, Term[] arguments, Term structure, ChoisePoint cp) throws Backtracking {
 		value.unifyWithStructure(aFunctor,arguments,structure,cp);
 	}
@@ -245,7 +336,9 @@ public class TermPosition extends Term {
 	public void unifyWithSetElement(Term aElement, Term setElement, ChoisePoint cp) throws Backtracking {
 		value.unifyWithSetElement(aElement,setElement,cp);
 	}
-	// General "Unify With" function
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		value.unifyWith(t,cp);
 	}
@@ -278,7 +371,9 @@ public class TermPosition extends Term {
 	public long getPosition() {
 		return position;
 	}
-	// Operations on variables
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void clear() {
 		value.clear();
 	}
@@ -288,11 +383,15 @@ public class TermPosition extends Term {
 	public void setValue(Term newNode) {
 		value.setValue(newNode);
 	}
-	// Operations on class instances
-	public void extractWorlds(AbstractProcess process, LinkedHashSet<AbstractWorld> list) {
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void extractWorlds(AbstractProcess process, LinkedHashSet<AbstractInternalWorld> list) {
 		value.extractWorlds(process,list);
 	}
-	// Operations on slot variables
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void registerVariables(ActiveWorld process, boolean isSuspending, boolean isProtecting) {
 		value.registerVariables(process,isSuspending,isProtecting);
 	}
@@ -311,14 +410,18 @@ public class TermPosition extends Term {
 	public Term substituteWorlds(HashMap<AbstractWorld,Term> map, ChoisePoint cp) {
 		return new TermPosition(value.substituteWorlds(map,cp),position);
 	}
-	// Domain check
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public boolean isCoveredByDomain(PrologDomain baseDomain, ChoisePoint cp, boolean ignoreFreeVariables) {
 		return value.isCoveredByDomain(baseDomain,cp,ignoreFreeVariables);
 	}
 	public Term checkSetTerm(long functor, PrologDomain headDomain, Term initialValue, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
 		return value.checkSetTerm(functor,headDomain,initialValue,cp,baseDomain);
 	}
-	// Comparison operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void compareWithTerm(Term a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		value.compareWithTerm(a,iX,op);
 	}
@@ -358,7 +461,9 @@ public class TermPosition extends Term {
 	public void compareListWith(Term aHead, Term aTail, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		value.compareListWith(aHead,aTail,iX,op);
 	}
-	// Arithmetic operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term reactWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
 		return value.reactWithTerm(a,iX,op);
 	}
@@ -401,7 +506,9 @@ public class TermPosition extends Term {
 	public Term reactListWith(Term aHead, Term aTail, ChoisePoint iX, BinaryOperation op) {
 		return value.reactListWith(aHead,aTail,iX,op);
 	}
-	// Bitwise operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term blitWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
 		return value.blitWithTerm(a,iX,op);
 	}
@@ -426,16 +533,17 @@ public class TermPosition extends Term {
 	public Term blitListWith(Term aHead, Term aTail, ChoisePoint iX, BinaryOperation op) {
 		return value.blitListWith(aHead,aTail,iX,op);
 	}
-	// Unary operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term evaluate(ChoisePoint iX, UnaryOperation op) {
 		return value.evaluate(iX,op);
 	}
-	// Converting Term to String
-	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, CharsetEncoder encoder) {
-		return value.toString(cp,isInner,provideStrictSyntax,encoder);
-		// return	"TermPosition[" +
-		//		FormatOutput.integerToString(position) + "](" +
-		//		value.toString(cp,isInner,provideStrictSyntax,encoder) + ")";
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
+		return value.toString(cp,isInner,provideStrictSyntax,encodeWorlds,encoder);
 	}
 	public String toString(ChoisePoint cp) {
 		return value.toString(cp);

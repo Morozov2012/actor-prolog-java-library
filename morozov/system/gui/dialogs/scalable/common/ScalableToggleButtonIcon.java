@@ -6,6 +6,14 @@
 
 package morozov.system.gui.dialogs.scalable.common;
 
+/*
+ * ScalableToggleButtonIcon implementation for the Actor Prolog language
+ * @version 1.0 2009/11/18
+ * @author IRE RAS Alexei A. Morozov
+*/
+
+import morozov.terms.*;
+
 import javax.swing.JToggleButton;
 import javax.swing.Icon;
 import javax.swing.plaf.UIResource;
@@ -19,12 +27,6 @@ import java.awt.Rectangle;
 import java.awt.geom.Rectangle2D;
 import java.io.Serializable;
 import java.util.HashMap;
-
-/*
- * ScalableToggleButtonIcon implementation for the Actor Prolog language
- * @version 1.0 2009/11/18
- * @author IRE RAS Alexei A. Morozov
-*/
 
 public abstract class ScalableToggleButtonIcon implements Icon, UIResource, Serializable, Cloneable {
 	//
@@ -80,9 +82,9 @@ public abstract class ScalableToggleButtonIcon implements Icon, UIResource, Seri
 					Rectangle2D r2D= givenFont.getStringBounds("M",fRC);
 					// Returns an integer Rectangle that completely encloses the Shape:
 					Rectangle rect= r2D.getBounds();
-					int width= (int)StrictMath.round(rect.getWidth());
-					// int height= (int)StrictMath.round(rect.getHeight());
-					measuredSize= (int)StrictMath.round(width*horizontalScaling);
+					int width= PrologInteger.toInteger(rect.getWidth());
+					// int height= PrologInteger.toInteger(rect.getHeight());
+					measuredSize= PrologInteger.toInteger(width*horizontalScaling);
 					measuredFonts.put(givenFont,measuredSize);
 				}
 			}

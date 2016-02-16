@@ -4,8 +4,15 @@ package morozov.built_in;
 
 import morozov.run.*;
 import morozov.terms.*;
+import morozov.worlds.*;
 
 public abstract class JavaTestbed extends Alpha {
+	//
+	public JavaTestbed() {
+	}
+	public JavaTestbed(GlobalWorldIdentifier id) {
+		super(id);
+	}
 	//
 	public void unifyTerms(ChoisePoint iX, Term a1, Term a2) throws Backtracking {
 		System.out.printf("TESTBED(before):: a1=%s\n",a1);
@@ -19,7 +26,6 @@ public abstract class JavaTestbed extends Alpha {
 		System.out.printf("Argument1=%s\n",a1);
 	}
 	public static class WriteOneTerm1s extends Continuation {
-		// protected Continuation c0;
 		protected Term variable1;
 		public WriteOneTerm1s(Continuation aC, Term a1) {
 			c0= aC;
@@ -36,7 +42,6 @@ public abstract class JavaTestbed extends Alpha {
 		a1.value= new PrologInteger(1000);
 	}
 	public static class WriteOneTerm1ff extends Continuation {
-		// protected Continuation c0;
 		protected PrologVariable variable1;
 		protected Term variable2;
 		public WriteOneTerm1ff(Continuation aC, PrologVariable a1, Term a2) {
@@ -55,7 +60,6 @@ public abstract class JavaTestbed extends Alpha {
 		System.out.printf("Argument1=%s\n",a1);
 	}
 	public static class WriteOneTerm1fs extends Continuation {
-		// protected Continuation c0;
 		protected Term variable1;
 		public WriteOneTerm1fs(Continuation aC, Term a1) {
 			c0= aC;
@@ -71,7 +75,6 @@ public abstract class JavaTestbed extends Alpha {
 		System.out.printf("Argument1=%s, Argument2=%s\n",a1,a2);
 	}
 	public static class WriteTwoTerms2s extends Continuation {
-		// protected Continuation c0;
 		protected Term variable1;
 		protected Term variable2;
 		public WriteTwoTerms2s(Continuation aC, Term a1, Term a2) {
@@ -90,7 +93,6 @@ public abstract class JavaTestbed extends Alpha {
 		a1.value= new PrologInteger(1000);
 	}
 	public static class WriteTwoTerms2ff extends Continuation {
-		// protected Continuation c0;
 		protected PrologVariable variable1;
 		protected Term variable2;
 		protected Term variable3;
@@ -111,7 +113,6 @@ public abstract class JavaTestbed extends Alpha {
 		System.out.printf("Argument1=%s, Argument2=%s\n",a1,a2);
 	}
 	public static class WriteTwoTerms2fs extends Continuation {
-		// protected Continuation c0;
 		protected Term variable1;
 		protected Term variable2;
 		public WriteTwoTerms2fs(Continuation aC, Term a1, Term a2) {
@@ -135,7 +136,6 @@ public abstract class JavaTestbed extends Alpha {
 		}
 	}
 	public static class WriteMetaPredicate extends Continuation {
-		// private Continuation c0;
 		private long predicateSignatureNumber;
 		private boolean subgoalIsCallOfFunction;
 		private boolean clauseIsFunction;
@@ -171,7 +171,6 @@ public abstract class JavaTestbed extends Alpha {
 		}
 	}
 	public static class WriteMetaAtom extends Continuation {
-		// private Continuation c0;
 		private long predicateSignatureNumber;
 		private boolean subgoalIsCallOfFunction;
 		private boolean clauseIsFunction;
@@ -209,7 +208,6 @@ public abstract class JavaTestbed extends Alpha {
 		}
 	}
 	public static class ReturnOneNumber1s extends Continuation {
-		// protected Continuation c0;
 		protected Term variable1;
 		public ReturnOneNumber1s(Continuation aC, Term a1) {
 			c0= aC;
@@ -240,7 +238,6 @@ public abstract class JavaTestbed extends Alpha {
 		}
 	}
 	public static class ReturnOneNumber1ff extends Continuation {
-		// protected Continuation c0;
 		protected PrologVariable variable1;
 		protected Term variable2;
 		public ReturnOneNumber1ff(Continuation aC, PrologVariable a1, Term a2) {
@@ -272,7 +269,6 @@ public abstract class JavaTestbed extends Alpha {
 		}
 	}
 	public static class ReturnOneNumber1fs extends Continuation {
-		// protected Continuation c0;
 		protected Term variable1;
 		public ReturnOneNumber1fs(Continuation aC, Term a1) {
 			c0= aC;
@@ -289,7 +285,6 @@ public abstract class JavaTestbed extends Alpha {
 	}
 	//
 	public static void returnTwoNumbers2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
-		// System.out.printf("Argument1=%s, Argument2=%s\n",a1,a2);
 		a1.value= new PrologInteger(110);
 		iX.pushTrail(a1);
 		a2.value= new PrologInteger(120);
@@ -307,7 +302,6 @@ public abstract class JavaTestbed extends Alpha {
 		}
 	}
 	public static class ReturnTwoNumbers2s extends Continuation {
-		// protected Continuation c0;
 		protected Term variable1;
 		protected Term variable2;
 		public ReturnTwoNumbers2s(Continuation aC, Term a1, Term a2) {
@@ -330,7 +324,7 @@ public abstract class JavaTestbed extends Alpha {
 	}
 	//
 	public static void returnTwoNumbers2ff(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3) {
-		// System.out.printf("Argument1=%s, Argument2=%s, Argument3=%s\n",a1,a2,a3);
+		System.out.printf("Argument1=%s, Argument2=%s, Argument3=%s\n",a1,a2,a3);
 		a1.value= new PrologInteger(1000);
 		a2.value= new PrologInteger(110);
 		iX.pushTrail(a2);
@@ -350,7 +344,6 @@ public abstract class JavaTestbed extends Alpha {
 		}
 	}
 	public static class ReturnTwoNumbers2ff extends Continuation {
-		// protected Continuation c0;
 		protected PrologVariable variable1;
 		protected Term variable2;
 		protected Term variable3;
@@ -376,7 +369,7 @@ public abstract class JavaTestbed extends Alpha {
 	}
 	//
 	public static void returnTwoNumbers2fs(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
-		// System.out.printf("Argument1=%s, Argument2=%s\n",a1,a2);
+		System.out.printf("Argument1=%s, Argument2=%s\n",a1,a2);
 		a1.value= new PrologInteger(110);
 		iX.pushTrail(a1);
 		a2.value= new PrologInteger(120);
@@ -394,7 +387,6 @@ public abstract class JavaTestbed extends Alpha {
 		}
 	}
 	public static class ReturnTwoNumbers2fs extends Continuation {
-		// protected Continuation c0;
 		protected Term variable1;
 		protected Term variable2;
 		public ReturnTwoNumbers2fs(Continuation aC, Term a1, Term a2) {
@@ -428,7 +420,6 @@ public abstract class JavaTestbed extends Alpha {
 		}
 	}
 	public static class AskMetaPredicate extends Continuation {
-		// private Continuation c0;
 		private long predicateSignatureNumber;
 		private boolean subgoalIsCallOfFunction;
 		private boolean clauseIsFunction;

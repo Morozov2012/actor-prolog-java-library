@@ -67,14 +67,11 @@ public class ChoisePoint {
 		actorRegister.currentProcess.backtrack(choisePointNumber,initialSizeOfTrail);
 	}
 	// public String toString() {
-	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, CharsetEncoder encoder) {
-		if (choisePointState)
-			// return "true;" + actorRegister.toString();
+	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
+		if (choisePointState) {
 			return choisePointNumber + ";enabled";
-			// return "true";
-		else
-			// return "false;" + actorRegister.toString();
+		} else {
 			return choisePointNumber + ";disabled";
-			// return "false";
+		}
 	}
 }

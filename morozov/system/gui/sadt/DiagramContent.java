@@ -4,6 +4,8 @@ package morozov.system.gui.sadt;
 
 import target.*;
 
+import morozov.terms.*;
+
 import morozov.system.gui.sadt.signals.*;
 
 import java.awt.Graphics2D;
@@ -80,13 +82,11 @@ public class DiagramContent {
 	private int adjustFont(Graphics2D g2, Dimension size, DiagramColors diagramColors) {
 		g2.setFont(diagramColors.initialFont);
 		if (fontHasAppropriateSize(g2,size,diagramColors.initialFont)) {
-			// System.out.printf("return diagramColors.fontSize=%s\n",diagramColors.fontSize);
 			return diagramColors.fontSize;
 		} else {
 			Font currentFont= diagramColors.initialFont;
 			int currentFontSize= diagramColors.fontSize;
 			for (int n=0; n < boxes.length; n++) {
-				// System.out.printf("n=%s) currentFontSize=%s\n",n,currentFontSize);
 				if (currentFontSize <= diagramColors.minimalFontSize) {
 					break;
 				};
@@ -101,12 +101,11 @@ public class DiagramContent {
 						int iterationNumber= 0;
 						while (true) {
 							iterationNumber= iterationNumber + 1;
-							// System.out.printf("iterationNumber=%s) (n=%s) currentFontSize=%s\n",iterationNumber,n,currentFontSize);
 							if (iterationNumber > 100) {
 								break;
 							};
 							if (upperFontSize > lowerFontSize + 1) {
-								int newFontSize= (int)StrictMath.round((upperFontSize + lowerFontSize) / 2);
+								int newFontSize= PrologInteger.toInteger((upperFontSize + lowerFontSize) / 2);
 								Font newFont= DiagramUtils.computeFont(diagramColors,newFontSize);
 								if (currentBox.fontSizeIsSuitable(newFont,g2,size)) {
 									lowerFont= newFont;

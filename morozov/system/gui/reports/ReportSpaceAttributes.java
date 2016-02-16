@@ -2,21 +2,19 @@
 
 package morozov.system.gui.reports;
 
-import morozov.classes.*;
+import morozov.run.*;
+import morozov.system.gui.*;
+
 import javax.swing.text.StyledDocument;
 import javax.swing.text.DefaultStyledDocument;
 import java.awt.Color;
 import java.awt.Font;
 
-// import java.util.concurrent.atomic.AtomicInteger;
-// import java.util.concurrent.atomic.AtomicBoolean;
-
-public class ReportSpaceAttributes {
+public class ReportSpaceAttributes extends CanvasSpaceAttributes {
 	//
 	public static final int automaticFontSizeAdjustment= -1;
 	//
 	protected StaticContext staticContext;
-	private boolean controlIsInitialized= false;
 	private StyledDocument currentStyledDocument= null;
 	private Integer currentCaretPosition= null;
 	private Integer currentSelectionStart= null;
@@ -32,21 +30,13 @@ public class ReportSpaceAttributes {
 			currentStyledDocument= new DefaultStyledDocument();
 		}
 	}
-	synchronized public boolean initializeControlIfNecessary() {
-		if (!controlIsInitialized) {
-			controlIsInitialized= true;
-			return true;
-		} else {
-			return false;
-		}
-	}
-	synchronized public boolean controlIsNotInitialized() {
-		return !controlIsInitialized;
-	}
 	synchronized public void setStyledDocument(StyledDocument document) {
 		currentStyledDocument= document;
 	}
 	synchronized public StyledDocument getStyledDocument() {
+		if (currentStyledDocument==null) {
+			currentStyledDocument= new DefaultStyledDocument();
+		};
 		return currentStyledDocument;
 	}
 	synchronized public void setFontSize(int size) {
@@ -73,7 +63,6 @@ public class ReportSpaceAttributes {
 		space.setAttributes(null);
 	}
 	synchronized public void implementValues(ExtendedReportSpace space) {
-		// staticContext= context;
 		space.setAttributes(this);
 		TextPaneNoWrap panel= space.panel;
 		if (panel != null) {

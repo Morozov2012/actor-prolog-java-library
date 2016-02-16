@@ -8,8 +8,9 @@ package morozov.system.gui.dialogs.special;
 
 import target.*;
 
-import morozov.classes.*;
 import morozov.run.*;
+import morozov.system.gui.*;
+import morozov.worlds.*;
 
 import javax.swing.JDialog;
 
@@ -107,11 +108,13 @@ public class RunTimeErrorDialog extends JDialog implements ActionListener {
 	}
 	public void activate() {
 		assemble();
+		pack();
 		setNewFont(getFont());
 		setModalityType(ModalityType.DOCUMENT_MODAL);
 		pack();
 		SpecialUtils.centre(this);
-		setVisible(true);
+		// setVisible(true);
+		DesktopUtils.safelySetVisible(true,this);
 	}
 	//
 	public void assemble() {
@@ -437,13 +440,15 @@ public class RunTimeErrorDialog extends JDialog implements ActionListener {
 	//
 	protected void tuneStackTraceAreaVisibility() {
 		if (hasCompactMode) {
-			// area_3_2_5;
-			control_3_2_5.setVisible(false);
-			control_3_1_5.setVisible(false);
+			// control_3_2_5.setVisible(false);
+			DesktopUtils.safelySetVisible(false,control_3_2_5);
+			// control_3_1_5.setVisible(false);
+			DesktopUtils.safelySetVisible(false,control_3_1_5);
 		} else {
-			// area_3_2_5;
-			control_3_2_5.setVisible(true);
-			control_3_1_5.setVisible(true);
+			// control_3_2_5.setVisible(true);
+			DesktopUtils.safelySetVisible(true,control_3_2_5);
+			// control_3_1_5.setVisible(true);
+			DesktopUtils.safelySetVisible(true,control_3_1_5);
 		}
 	}
 	//
@@ -494,13 +499,14 @@ public class RunTimeErrorDialog extends JDialog implements ActionListener {
 			pack();
 			SpecialUtils.centre(this);
 		} else if ("goto".equals(e.getActionCommand())) {
-			// setVisible(false);
 			processHolder.reportErrorPosition(error,textPosition,unitCode,sourceFileNumber);
 		} else if ("stop".equals(e.getActionCommand())) {
-			setVisible(false);
+			// setVisible(false);
+			DesktopUtils.safelySetVisible(false,this);
 			processHolder.stopProgram(error,textPosition,unitCode,sourceFileNumber);
 		} else if ("continue".equals(e.getActionCommand())) {
-			setVisible(false);
+			// setVisible(false);
+			DesktopUtils.safelySetVisible(false,this);
 		}
 	}
 }

@@ -14,7 +14,7 @@ package morozov.system.gui.dialogs.scalable;
 
 import morozov.run.*;
 import morozov.system.gui.dialogs.*;
-import morozov.system.gui.dialogs.signals.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
 
 import java.awt.event.ActionEvent;
@@ -33,7 +33,7 @@ public class ScalableListButton extends ScalableComboBox {
 		if (targetDialog!=null) {
 			targetDialog.reportValueUpdate(this);
 			// int modifiers= event.getModifiers();
-			if (component!=null && targetDialog.isShowing() && ((JComboBox)component).isPopupVisible()) {
+			if (component!=null && targetDialog.safelyIsShowing() && ((JComboBox)component).isPopupVisible()) {
 				synchronized(component) {
 					Object selectedValue= ((JComboBox)component).getSelectedItem();
 					if (selectedValue!=null) {

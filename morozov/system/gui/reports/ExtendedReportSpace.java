@@ -4,19 +4,31 @@ package morozov.system.gui.reports;
 
 import target.*;
 
-import morozov.classes.*;
+import morozov.built_in.*;
+import morozov.run.*;
 import morozov.system.gui.*;
 
-import javax.swing.JScrollPane;
-import javax.swing.JPopupMenu;
-import javax.swing.JMenuItem;
+import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Insets;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.EventQueue;
+import javax.swing.JViewport;
+import javax.swing.JScrollPane;
+import javax.swing.JScrollBar;
+import javax.swing.text.Document;
+import javax.swing.JPopupMenu;
+import javax.swing.JMenuItem;
+import javax.swing.SwingUtilities;
+import javax.swing.text.BadLocationException;
 
-public class ExtendedReportSpace extends JScrollPane implements MouseListener, ActionListener {
+import java.lang.reflect.InvocationTargetException;
+
+public class ExtendedReportSpace extends CanvasSpace implements MouseListener, ActionListener {
 	//
 	public TextPaneNoWrap panel;
 	public ReportSpaceAttributes attributes;
@@ -24,8 +36,15 @@ public class ExtendedReportSpace extends JScrollPane implements MouseListener, A
 	protected JPopupMenu popup;
 	protected JMenuItem item_copy;
 	//
-	public ExtendedReportSpace(TextPaneNoWrap p) {
-		super(p);
+	protected boolean scrollBarIsLocked= false;
+	protected boolean scrollBarWasReleased= true;
+	protected int scrollBarLockedPosition= 0;
+	protected int scrollBarPreviousMaximum= 0;
+	//
+	public ExtendedReportSpace(Report world, TextPaneNoWrap p) {
+		// super(p);
+		targetWorld= world;
+		control= new JScrollPane(p);
 		panel= p;
 		panel.setEditable(false);
 		panel.setAutoscrolls(true);
@@ -34,12 +53,26 @@ public class ExtendedReportSpace extends JScrollPane implements MouseListener, A
 	public void setAttributes(ReportSpaceAttributes a) {
 		attributes= a;
 	}
-	//public void setStaticContext(StaticContext context) {
-	//	attributes.setStaticContext(context);
-	//}
+	//
+	public void safelySetBackground(final Color color) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			panel.setBackground(color);
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						panel.setBackground(color);
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void setFont(Font font) {
-		// super.setFont(font);
 		setPanelFontSize(font.getSize(),false);
 	}
 	//
@@ -61,13 +94,13 @@ public class ExtendedReportSpace extends JScrollPane implements MouseListener, A
 						};
 						attributes.setFontSize(size);
 						font= font.deriveFont((float)size);
-						ReportUtils.safelySetFont(font,panel);
+						ReportUtils.safelySetFont(font,panel,false);
 					}
 				}
 			}
 		}
 	}
-	public void setPanelFont(String name, int style, int size) {
+	public void setPanelFont(String name, int style, int size, boolean invokeUpdate) {
 		if (attributes != null) {
 			if (panel != null) {
 				if (size==ReportSpaceAttributes.automaticFontSizeAdjustment) {
@@ -81,18 +114,27 @@ public class ExtendedReportSpace extends JScrollPane implements MouseListener, A
 					if (size != (double)integerSize) {
 						font= font.deriveFont((float)size);
 					};
-					ReportUtils.safelySetFont(font,panel);
+					ReportUtils.safelySetFont(font,panel,invokeUpdate);
 				}
 			}
 		}
 	}
-	// public Font getInternalFont() {
-	//	if (panel != null) {
-	//		return ReportUtils.safelyGetFont(panel);
-	//	} else {
-	//		return null;
-	//	}
-	// }
+	public Font getInternalFont() {
+		if (panel != null) {
+			return ReportUtils.safelyGetFont(panel);
+		} else {
+			return null;
+		}
+	}
+	public FontMetrics getFontMetrics() {
+		if (panel != null) {
+			return ReportUtils.safelyGetFontMetrics(panel);
+		} else {
+			return null;
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public JPopupMenu installTextPanePopupMenu(ActionListener listener) {
 		JPopupMenu popup= new JPopupMenu();
@@ -136,21 +178,128 @@ public class ExtendedReportSpace extends JScrollPane implements MouseListener, A
 		return popup;
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void safelySetCaretPosition(final int textLength) {
+		if (EventQueue.isDispatchThread()) {
+			quicklySetCaretPosition(textLength);
+		} else {
+			try {
+				EventQueue.invokeAndWait(
+					new Runnable() {
+						public void run() {
+							quicklySetCaretPosition(textLength);
+						}
+					});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	//
+	public void quicklySetCaretPosition(int textLength) {
+		JScrollBar scrollBar= ((JScrollPane)control).getVerticalScrollBar();
+		int value= scrollBar.getValue();
+		int extent= scrollBar.getVisibleAmount();
+		int maximum= scrollBar.getMaximum();
+		boolean valueIsAdjusting= scrollBar.getValueIsAdjusting();
+		if (valueIsAdjusting) {
+			if (scrollBarWasReleased) {
+				if (scrollBarIsLocked && value + extent >= scrollBarPreviousMaximum) {
+					scrollBarIsLocked= false;
+					scrollBarWasReleased= false;
+				} else {
+					if (!scrollBarIsLocked) {
+						scrollBarIsLocked= true;
+						scrollBarLockedPosition= value;
+						scrollBarWasReleased= false;
+					}
+				}
+			}
+		} else {
+			scrollBarWasReleased= true;
+		};
+		if (!scrollBarIsLocked) {
+			panel.setCaretPosition(textLength);
+		} else {
+			if (scrollBarLockedPosition > maximum) {
+				scrollBarLockedPosition= maximum;
+			};
+			panel.setCaretPosition(scrollBarLockedPosition);
+		};
+		scrollBarPreviousMaximum= maximum;
+	}
+	//
+	public void safelyResetCaretPosition() {
+		if (EventQueue.isDispatchThread()) {
+			resetCaretPosition();
+		} else {
+			try {
+				EventQueue.invokeAndWait(
+					new Runnable() {
+						public void run() {
+							resetCaretPosition();
+						}
+					});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	protected void resetCaretPosition() {
+		panel.setCaretPosition(0);
+		JScrollBar scrollBar= ((JScrollPane)control).getVerticalScrollBar();
+		scrollBar.setValue(scrollBar.getMinimum());
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void safelyRemoveSuperfluousLines(final Document doc, final Boolean isSucceeded) {
+		if (EventQueue.isDispatchThread()) {
+			removeSuperfluousLines(doc,isSucceeded);
+		} else {
+			try {
+				EventQueue.invokeAndWait(
+					new Runnable() {
+						public void run() {
+							removeSuperfluousLines(doc,isSucceeded);
+						}
+					});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	protected void removeSuperfluousLines(Document doc, Boolean isSucceeded) {
+		isSucceeded= false;
+		JViewport viewport= ((JScrollPane)control).getViewport();
+		double pageHeight= viewport.getExtentSize().getHeight();
+		Insets scrollPaneInsets= viewport.getInsets();
+		double correctedPageHeight= pageHeight - scrollPaneInsets.top - scrollPaneInsets.bottom;
+		double textHeight= panel.getMinimumSize().getHeight();
+		if (textHeight >= correctedPageHeight) {
+			try {
+				String plainText= doc.getText(0,doc.getLength());
+				FontMetrics metrics= getFontMetrics();
+				if (metrics != null) {
+					double lineHeight= metrics.getHeight();
+					long pageCapacity= (long)Math.floor(correctedPageHeight / lineHeight);
+					pageCapacity= StrictMath.max(pageCapacity,1);
+					long endPosition= ReportUtils.calculate_position_of_line_end(plainText,pageCapacity);
+					doc.remove(0,(int)endPosition+1);
+					isSucceeded= true;
+				}
+			} catch (BadLocationException e) {
+			}
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void enableMouseListener() {
-		// if (owner != null) {
-		//	owner.addMouseListener(this);
-		// } else {
 		panel.addMouseListener(this);
-		// };
 		popup= installTextPanePopupMenu(this);
 	}
-	//public void disableMouseListener() {
-	//	// if (owner != null) {
- 	//	//	owner.removeMouseListener(this);
-	//	// } else {
-	//	panel.removeMouseListener(this);
-	//	// }
-	//}
 	//
 	public void mouseClicked(MouseEvent event) {
 	}
@@ -189,22 +338,10 @@ public class ExtendedReportSpace extends JScrollPane implements MouseListener, A
 	public void actionPerformed(ActionEvent event) {
 		String name= event.getActionCommand();
 		if (name.equals("Cancel")) {
-		// } else if (name.equals("Cut")) {
-		//	if (panel != null) {
-		//		panel.cut();
-		//	}
 		} else if (name.equals("Copy")) {
 			if (panel != null) {
 				panel.copy();
 			}
-		// } else if (name.equals("Paste")) {
-		//	if (panel != null) {
-		//		panel.paste();
-		//	}
-		// } else if (name.equals("Delete")) {
-		//	if (panel != null) {
-		//		panel.replaceSelection("");
-		//	}
 		} else if (name.equals("SelectAll")) {
 			if (panel != null) {
 				panel.selectAll();

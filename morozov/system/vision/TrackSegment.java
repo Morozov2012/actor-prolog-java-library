@@ -2,12 +2,6 @@
 
 package morozov.system.vision;
 
-import java.awt.Graphics2D;
-import java.awt.geom.Path2D;
-import java.awt.geom.Line2D;
-import java.awt.geom.Rectangle2D;
-import java.awt.geom.Ellipse2D;
-import java.awt.FontMetrics;
 import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -33,6 +27,7 @@ class TrackSegment {
 	public double[] characteristicLengthValues;
 	public double meanCharacteristicLength= 0.0;
 	public double meanSquaredCharacteristicLength= 0.0;
+	public double meanStandardizedArea= 0.0;
 	public long[] contourLengthValues;
 	public double meanBlobArea= 0.0;
 	public double meanForegroundArea= 0.0;
@@ -142,16 +137,20 @@ class TrackSegment {
 			//
 			double characteristicLength= 0.0;
 			double squaredCharacteristicLength= 0.0;
+			double standardizedArea= 0.0;
 			for (int n=0; n < length; n++) {
 				double value= characteristicLengthValues[n];
 				characteristicLength= characteristicLength + value;
-				squaredCharacteristicLength= squaredCharacteristicLength + value*value;
+				double squaredValue= value*value;
+				squaredCharacteristicLength= squaredCharacteristicLength + squaredValue;
+				standardizedArea= standardizedArea + (foregroundAreaValues[n] / squaredValue);
 			};
 			//
 			meanCharacteristicLength= characteristicLength / length;
 			meanSquaredCharacteristicLength= squaredCharacteristicLength / length;
+			meanStandardizedArea= standardizedArea / length;
 			//
-			windowedR2= VisionUtils.fastWindowedR2(frameNumbers,contourLengthValues,r2WindowHalfwidth);
+			windowedR2= WindowedR2.fastWindowedR2(frameNumbers,contourLengthValues,r2WindowHalfwidth);
 			//
 			double[] xy;
 			int x11= rectangles[0][1];
@@ -325,7 +324,7 @@ class TrackSegment {
 				double[] temporaryVectorX= new double[length];
 				double[] temporaryVectorY= new double[length];
 				for (int n=0; n < length; n++) {
-					// Fixed 2014-05-13: 
+					// Fixed 2014-05-13:
 					// velocityVectorX[n]= VisionUtils.medianAbs(velocityVectorX,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth+1);
 					// velocityVectorY[n]= VisionUtils.medianAbs(velocityVectorY,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth+1);
 					temporaryVectorX[n]= VisionUtils.medianAbs(velocityVectorX,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth);

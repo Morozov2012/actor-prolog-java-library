@@ -56,7 +56,6 @@ public class TabListCellRenderer extends JLabel implements ListCellRenderer<Obje
 		} 
 	}
 	public int[] computeTabs(String[] rows) {
-		// System.out.printf("COMPUTE TABS\n");
 		ArrayList<Integer> rowWidth= new ArrayList<Integer>();
 		FontMetrics metrics= getFontMetrics(getFont());
 		for (int n=0; n < rows.length; n++) {
@@ -68,7 +67,6 @@ public class TabListCellRenderer extends JLabel implements ListCellRenderer<Obje
 				if (k >= rowWidth.size()) {
 					rowWidth.add(columnWdth);
 				} else {
-					// System.out.printf("k=%s; rowWidth.size()=%s\n",k,rowWidth.size());
 					rowWidth.set(k,StrictMath.max(rowWidth.get(k),columnWdth));
 				};
 				k= k + 1;

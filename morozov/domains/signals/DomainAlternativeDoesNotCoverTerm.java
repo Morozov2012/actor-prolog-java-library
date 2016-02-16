@@ -7,7 +7,6 @@ import morozov.run.*;
 public final class DomainAlternativeDoesNotCoverTerm extends LightweightException {
 	protected long position;
 	public DomainAlternativeDoesNotCoverTerm(long p) {
-		// System.out.printf("DomainAlternativeDoesNotCoverTerm::new:position=%d\n",p);
 		position= p;
 	}
 	// public DomainAlternativeDoesNotCoverTerm() {

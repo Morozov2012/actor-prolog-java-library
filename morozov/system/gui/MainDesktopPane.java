@@ -2,16 +2,20 @@
 
 package morozov.system.gui;
 
-import morozov.classes.*;
+import morozov.run.*;
 
 import javax.swing.JDesktopPane;
 import javax.swing.JPopupMenu;
+import javax.swing.SwingUtilities;
 
 import java.awt.Dimension;
+import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+
+import java.lang.reflect.InvocationTargetException;
 
 public class MainDesktopPane extends JDesktopPane implements MouseListener, ActionListener {
 	private StaticContext staticContext;
@@ -24,7 +28,54 @@ public class MainDesktopPane extends JDesktopPane implements MouseListener, Acti
 		addMouseListener(this);
 	}
 	//
+	public void safelyAdd(final Component comp) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			add(comp);
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						add(comp);
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	public void safelyAdd(final Component comp, final Object constraints) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			add(comp,constraints);
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						add(comp,constraints);
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	public void safelyAdd(final Component comp, final int index) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			add(comp,index);
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						add(comp,index);
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	//
 	public void doLayout() {
+		super.doLayout();
 		boolean enableResizingOfComponents= false;
 		if (desktopSize==null) {
 			desktopSize= getSize(null);
@@ -41,7 +92,7 @@ public class MainDesktopPane extends JDesktopPane implements MouseListener, Acti
 		if (enableResizingOfComponents) {
 			DesktopUtils.restoreFrames(staticContext);
 		};
-		super.doLayout();
+		// super.doLayout();
 	}
 	//
 	public void mouseClicked(MouseEvent event) {

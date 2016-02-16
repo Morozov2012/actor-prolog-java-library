@@ -27,13 +27,13 @@ public enum BinaryOperation {
 			return new PrologString(String.format("%s%c",n1,i2));
 		}
 		public Term evalDate(BigInteger n1, BigInteger n2) {
-			return Converters.integerToDate(n1.add(n2));
+			return Converters.millisecondsToDate(n1.add(n2));
 		}
 		public Term evalTime(BigInteger n1, BigInteger n2) {
-			return Converters.integerToTime(n1.add(n2));
+			return Converters.millisecondsToTime(n1.add(n2));
 		}
 		public Term evalDays(BigInteger n1, BigInteger n2) {
-			return new PrologInteger((n1.add(n2)).divide(Converters.oneDayLengthBigInteger));
+			return new PrologInteger((n1.add(n2)).divide(TimeUnits.oneDayLengthInMillisecondsBigInteger));
 		}
 	},
 	MINUS {
@@ -44,13 +44,13 @@ public enum BinaryOperation {
 			return new PrologReal(n1 - n2);
 		}
 		public Term evalDate(BigInteger n1, BigInteger n2) {
-			return Converters.integerToDate(n1.subtract(n2));
+			return Converters.millisecondsToDate(n1.subtract(n2));
 		}
 		public Term evalTime(BigInteger n1, BigInteger n2) {
-			return Converters.integerToTime(n1.subtract(n2));
+			return Converters.millisecondsToTime(n1.subtract(n2));
 		}
 		public Term evalDays(BigInteger n1, BigInteger n2) {
-			return new PrologInteger((n1.subtract(n2)).divide(Converters.oneDayLengthBigInteger));
+			return new PrologInteger((n1.subtract(n2)).divide(TimeUnits.oneDayLengthInMillisecondsBigInteger));
 		}
 	},
 	MULT {

@@ -2,8 +2,6 @@
 
 package morozov.system.indices;
 
-import target.*;
-
 import morozov.system.indices.errors.*;
 
 import java.math.BigInteger;
@@ -13,15 +11,15 @@ public class IndexRange {
 	public BigInteger rightBound;
 	public BigInteger center;
 	public IndexRange(BigInteger left, BigInteger right) {
-		if (left.compareTo(right) > 0) {
-			if (DefaultOptions.integerOverflowCheck) {
-				throw new IllegalIndexRange(left,right);
-			} else {
-				BigInteger temporaryValue= left;
-				left= right;
-				right= temporaryValue;
-			}
-		};
+		// if (left.compareTo(right) > 0) {
+		//	if (DefaultOptions.integerOverflowCheck) {
+		//		throw new IllegalIndexRange(left,right);
+		//	} else {
+		//		BigInteger temporaryValue= left;
+		//		left= right;
+		//		right= temporaryValue;
+		//	}
+		// };
 		leftBound= left;
 		rightBound= right;
 		center= left.add(right).divide(BigInteger.valueOf(2));

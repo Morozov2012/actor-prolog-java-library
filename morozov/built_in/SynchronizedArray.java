@@ -3,15 +3,12 @@
 package morozov.built_in;
 
 import morozov.run.*;
-//import morozov.run.errors.*;
 import morozov.system.*;
-//import morozov.system.errors.*;
 import morozov.system.indices.*;
 import morozov.system.indices.errors.*;
 import morozov.terms.*;
-//import morozov.terms.signals.*;
+import morozov.worlds.*;
 
-//import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Collections;
@@ -19,19 +16,82 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class SynchronizedArray extends LambdaArray {
 	//
+	protected Boolean implementProtectingPorts= false;
+	protected Boolean implementSuspendingPorts= false;
+	//
 	protected Map<ArrayIndices,SlotVariable> synchronizedVolume= Collections.synchronizedMap(new HashMap<ArrayIndices,SlotVariable>());
 	protected AtomicBoolean contentIsAccepted= new AtomicBoolean(false);
 	protected AtomicBoolean isSelfContained= new AtomicBoolean(false);
 	protected AtomicBoolean isClient= new AtomicBoolean(false);
 	protected AtomicBoolean isServer= new AtomicBoolean(false);
 	//
+	///////////////////////////////////////////////////////////////
+	//
+	public SynchronizedArray() {
+	}
+	public SynchronizedArray(GlobalWorldIdentifier id) {
+		super(id);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	abstract public Term getBuiltInSlot_E_content();
 	abstract public Term getBuiltInSlot_E_implement_protecting_ports();
 	abstract public Term getBuiltInSlot_E_implement_suspending_ports();
 	//
+	///////////////////////////////////////////////////////////////
+	//
+	// get/set implementProtectingPorts
+	//
+	public void setImplementProtectingPorts1s(ChoisePoint iX, Term a1) {
+		setImplementProtectingPorts(YesNo.termYesNo2Boolean(a1,iX));
+	}
+	public void setImplementProtectingPorts(boolean value) {
+		implementProtectingPorts= value;
+	}
+	public void getImplementProtectingPorts0ff(ChoisePoint iX, PrologVariable a1) {
+		boolean value= getImplementProtectingPorts(iX);
+		a1.value= YesNo.boolean2TermYesNo(value);
+	}
+	public void getImplementProtectingPorts0fs(ChoisePoint iX) {
+	}
+	public boolean getImplementProtectingPorts(ChoisePoint iX) {
+		if (implementProtectingPorts != null) {
+			return implementProtectingPorts;
+		} else {
+			Term value= getBuiltInSlot_E_implement_protecting_ports();
+			return YesNo.termYesNo2Boolean(value,iX);
+		}
+	}
+	//
+	// get/set implementSuspendingPorts
+	//
+	public void setImplementSuspendingPorts1s(ChoisePoint iX, Term a1) {
+		setImplementSuspendingPorts(YesNo.termYesNo2Boolean(a1,iX));
+	}
+	public void setImplementSuspendingPorts(boolean value) {
+		implementSuspendingPorts= value;
+	}
+	public void getImplementSuspendingPorts0ff(ChoisePoint iX, PrologVariable a1) {
+		boolean value= getImplementSuspendingPorts(iX);
+		a1.value= YesNo.boolean2TermYesNo(value);
+	}
+	public void getImplementSuspendingPorts0fs(ChoisePoint iX) {
+	}
+	public boolean getImplementSuspendingPorts(ChoisePoint iX) {
+		if (implementSuspendingPorts != null) {
+			return implementSuspendingPorts;
+		} else {
+			Term value= getBuiltInSlot_E_implement_suspending_ports();
+			return YesNo.termYesNo2Boolean(value,iX);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	protected Term accessArrayElement(ArrayIndices arrayIndices, ChoisePoint iX) throws Backtracking {
-		boolean isProtectingPort= Converters.term2YesNo(getBuiltInSlot_E_implement_protecting_ports(),iX);
-		boolean isSuspendingPort= Converters.term2YesNo(getBuiltInSlot_E_implement_suspending_ports(),iX);
+		boolean isProtectingPort= getImplementProtectingPorts(iX);
+		boolean isSuspendingPort= getImplementSuspendingPorts(iX);
 		synchronized (this) {
 			SlotVariable variable= synchronizedVolume.get(arrayIndices);
 			if (variable==null) {

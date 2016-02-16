@@ -15,6 +15,31 @@ public final class PrologEmptyList extends Term {
 	private PrologEmptyList() {
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
+	public boolean equals(Object o2) {
+		if (o2 instanceof Term) {
+			return ((Term)o2).isEqualToEmptyList();
+		} else {
+			return false;
+		}
+	}
+	public int compare(Object o2) {
+		if (o2 instanceof Term) {
+			return -((Term)o2).compareWithEmptyList();
+		} else {
+			return 1;
+		}
+	}
+	public boolean isEqualToEmptyList() {
+		return true;
+	}
+	public int compareWithEmptyList() {
+		return 0;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void isEmptyList(ChoisePoint cp) throws Backtracking {
 	}
 	public boolean thisIsEmptyList() {
@@ -22,9 +47,15 @@ public final class PrologEmptyList extends Term {
 	}
 	public void isOutputEmptyList(ChoisePoint cp) {
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		t.isEmptyList(cp);
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term getNextListHead(ChoisePoint cp) throws EndOfList, TermIsNotAList {
 		throw EndOfList.instance;
 	}
@@ -37,7 +68,9 @@ public final class PrologEmptyList extends Term {
 	public Term getNextListTailSafely(ChoisePoint cp) throws EndOfList, TermIsNotAList {
 		throw EndOfList.instance;
 	}
-	// Comparison operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void compareWithTerm(Term a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 	}
 	public void compareWithBigInteger(BigInteger a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
@@ -62,7 +95,9 @@ public final class PrologEmptyList extends Term {
 	}
 	public void compareDateWith(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 	}
-	// Arithmetic operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term reactWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
 		return instance;
 	}
@@ -102,7 +137,9 @@ public final class PrologEmptyList extends Term {
 	public Term reactTimeWith(long a, ChoisePoint iX, BinaryOperation op) {
 		return instance;
 	}
-	// Bitwise operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term blitWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
 		return instance;
 	}
@@ -124,13 +161,16 @@ public final class PrologEmptyList extends Term {
 	public Term blitDoubleWith(double a, ChoisePoint iX, BinaryOperation op) {
 		return instance;
 	}
-	// Unary operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term evaluate(ChoisePoint iX, UnaryOperation op) {
 		return instance;
 	}
-	// Converting Term to String
-	// public String toString() {
-	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, CharsetEncoder encoder) {
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		return "[]";
 	}
 }

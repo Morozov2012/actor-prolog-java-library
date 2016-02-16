@@ -6,10 +6,13 @@ import morozov.domains.signals.*;
 import morozov.run.*;
 import morozov.terms.*;
 
+import java.nio.charset.CharsetEncoder;
+
 public class PrologAnyDomain extends PrologDomain {
 	public PrologAnyDomain() {
 		super(new AnonymousDomainName(), new DomainAlternative[0]);
 	}
+	//
 	public boolean coversTerm(Term t, ChoisePoint cp, boolean ignoreFreeVariables) {
 		return true;
 	}
@@ -27,5 +30,9 @@ public class PrologAnyDomain extends PrologDomain {
 	}
 	public PrologDomain getPairDomain(long key) {
 		return this;
+	}
+	//
+	public String toString(CharsetEncoder encoder) {
+		return PrologDomainName.tagDomainItem_AnyDomain;
 	}
 }

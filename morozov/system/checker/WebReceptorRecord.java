@@ -2,8 +2,8 @@
 
 package morozov.system.checker;
 
-import morozov.classes.*;
 import morozov.run.*;
+import morozov.worlds.*;
 
 import java.math.BigDecimal;
 
@@ -12,7 +12,7 @@ public class WebReceptorRecord extends PredefinedClassRecord {
 	public URL_Attributes attributes;
 	public BigDecimal revisionPeriod;
 	public BigDecimal attemptPeriod;
-	public WebReceptorRecord(AbstractWorld world, ActorNumber aN, URL_Attributes l, BigDecimal rP, BigDecimal aP) {
+	public WebReceptorRecord(AbstractInternalWorld world, ActorNumber aN, URL_Attributes l, BigDecimal rP, BigDecimal aP) {
 		super(world);
 		actorNumber= aN;
 		attributes= l;

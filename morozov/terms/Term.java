@@ -2,31 +2,119 @@
 
 package morozov.terms;
 
-import morozov.classes.*;
 import morozov.domains.*;
 import morozov.domains.signals.*;
 import morozov.run.*;
 import morozov.system.*;
 import morozov.terms.errors.*;
 import morozov.terms.signals.*;
+import morozov.worlds.*;
 
+import java.io.Serializable;
 import java.nio.charset.CharsetEncoder;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 
-public abstract class Term implements Cloneable {
-	// equals
-	public boolean equals(Object o) {
-		// System.out.printf("EQUALS:\n%s\n%s\n",this,o);
-		// System.out.printf("Term::equals: %s vs %s = %s\n",this,(Term)o,TermComparator.compareTwoTerms(this,(Term)o));
-		return TermComparator.compareTwoTerms(this,(Term)o)==0;
-	}
+public abstract class Term implements Cloneable, Serializable {
 	public int hashCode() {
-		return 1;
+		return System.identityHashCode(this);
 	}
-	// "Is a ..." functions
+	public boolean equals(Object o2) {
+		if (o2 instanceof Term) {
+			return ((Term)o2).compareWithClass(this.getClass())==0;
+		} else {
+			return false;
+		}
+	}
+	public int compare(Object o2) {
+		if (o2 instanceof Term) {
+			return -((Term)o2).compareWithClass(this.getClass());
+		} else {
+			return 1;
+		}
+	}
+	public boolean isEqualToInteger(BigInteger v2) {
+		return false;
+	}
+	public boolean isEqualToReal(Double v2) {
+		return false;
+	}
+	public boolean isEqualToString(String v2) {
+		return false;
+	}
+	public boolean isEqualToSymbol(long v2) {
+		return false;
+	}
+	public boolean isEqualToEmptyList() {
+		return false;
+	}
+	public boolean isEqualToEmptySet() {
+		return false;
+	}
+	public boolean isEqualToNoValue() {
+		return false;
+	}
+	public boolean isEqualToUnknownValue() {
+		return false;
+	}
+	public boolean isEqualToStructure(long f2, Term[] a2) {
+		return false;
+	}
+	public boolean isEqualToList(Term h2, Term t2) {
+		return false;
+	}
+	public boolean isEqualToSet(UnderdeterminedSet o2) {
+		return false;
+	}
+	public boolean isEqualToWorld(GlobalWorldIdentifier id2) {
+		return false;
+	}
+	public int compareWithInteger(BigInteger v2) {
+		return compareWithClass(PrologInteger.class);
+	}
+	public int compareWithReal(Double v2) {
+		return compareWithClass(PrologReal.class);
+	}
+	public int compareWithString(String v2) {
+		return compareWithClass(PrologString.class);
+	}
+	public int compareWithSymbol(long v2) {
+		return compareWithClass(PrologSymbol.class);
+	}
+	public int compareWithEmptyList() {
+		return compareWithClass(PrologEmptyList.class);
+	}
+	public int compareWithEmptySet() {
+		return compareWithClass(PrologEmptySet.class);
+	}
+	public int compareWithNoValue() {
+		return compareWithClass(PrologNoValue.class);
+	}
+	public int compareWithUnknownValue() {
+		return compareWithClass(PrologUnknownValue.class);
+	}
+	public int compareWithStructure(long f2, Term[] a2) {
+		return compareWithClass(PrologStructure.class);
+	}
+	public int compareWithList(Term h2, Term t2) {
+		return compareWithClass(PrologList.class);
+	}
+	public int compareWithSet(UnderdeterminedSet o2) {
+		return compareWithClass(UnderdeterminedSet.class);
+	}
+	public int compareWithWorld(GlobalWorldIdentifier id2) {
+		return compareWithClass(AbstractWorld.class);
+	}
+	public int compareWithClass(Class c2) {
+		String n1= getClass().getName();
+		String n2= c2.getName();
+		return n1.compareTo(n2);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void isInteger(int v, ChoisePoint cp) throws Backtracking {
 		throw Backtracking.instance;
 	}
@@ -52,7 +140,7 @@ public abstract class Term implements Cloneable {
 		return false;
 	}
 	public void isOutputEmptyList(ChoisePoint cp) {
-		throw new WrongTermIsNotArgumentList(this);
+		throw new WrongArgumentIsNotArgumentList(this);
 	}
 	public void isEmptySet(ChoisePoint cp) throws Backtracking {
 		throw Backtracking.instance;
@@ -78,16 +166,54 @@ public abstract class Term implements Cloneable {
 	public void isWorld(Term v, ChoisePoint cp) throws Backtracking {
 		throw Backtracking.instance;
 	}
-	public boolean thisIsWorld() {
+	public boolean thisIsOwnWorld() {
+		return false;
+	}
+	public boolean thisIsForeignWorld() {
 		return false;
 	}
 	public boolean thisIsProcess() {
 		return false;
 	}
+	public boolean thisIsActorNumber() {
+		return false;
+	}
 	public boolean thisIsSlotVariable() {
 		return false;
 	}
-	// "Get ... value" functions
+	public boolean thisIsFreeVariable() {
+		return false;
+	}
+	public boolean thisIsArgumentNumber() {
+		return false;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public long getNumber() {
+		throw new WrongArgumentIsNotArgumentNumber(this);
+	}
+	public ArgumentNumber add(long deltaN) {
+		throw new WrongArgumentIsNotArgumentNumber(this);
+	}
+	public ArgumentNumber subtract(long deltaN) {
+		throw new WrongArgumentIsNotArgumentNumber(this);
+	}
+	public void isArityEqualTo(long v, ChoisePoint cp) throws Backtracking {
+		throw new WrongArgumentIsNotArgumentNumber(this);
+	}
+	public void isArityMoreOrEqualTo(long v, ChoisePoint cp) throws Backtracking {
+		throw new WrongArgumentIsNotArgumentNumber(this);
+	}
+	public void verifyListOfRestValues(long deltaN, Term list, ChoisePoint cp) {
+		throw new WrongArgumentIsNotArgumentNumber(this);
+	}
+	public long getPosition() {
+		return -1;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term getValue(ChoisePoint cp) {
 		return this;
 	}
@@ -134,16 +260,16 @@ public abstract class Term implements Cloneable {
 		throw TermIsNotAList.instance;
 	}
 	public Term getExistentHead() {
-		throw new WrongTermIsNotArgumentList(this);
+		throw new WrongArgumentIsNotArgumentList(this);
 	}
 	public Term getExistentTail() {
-		throw new WrongTermIsNotArgumentList(this);
+		throw new WrongArgumentIsNotArgumentList(this);
 	}
 	public Term getOutputHead(ChoisePoint cp) {
-		throw new WrongTermIsNotArgumentList(this);
+		throw new WrongArgumentIsNotArgumentList(this);
 	}
 	public Term getOutputTail(ChoisePoint cp) {
-		throw new WrongTermIsNotArgumentList(this);
+		throw new WrongArgumentIsNotArgumentList(this);
 	}
 	public Term getNextListHeadSafely(ChoisePoint cp) throws EndOfList, TermIsNotAList {
 		throw TermIsNotAList.instance;
@@ -199,35 +325,34 @@ public abstract class Term implements Cloneable {
 	public void appendNamedElementProhibition(long aName, ChoisePoint cp) throws Backtracking {
 		throw Backtracking.instance;
 	}
-	public long getInternalWorldClass(AbstractWorld currentClass, ChoisePoint cp) throws Backtracking, TermIsNotAWorld, TermIsDummyWorld, TermIsUnboundVariable {
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public AbstractInternalWorld getInternalWorld(ChoisePoint cp) throws Backtracking, TermIsNotAWorld, TermIsDummyWorld, TermIsUnboundVariable {
 		throw TermIsNotAWorld.instance;
 	}
 	//
-	public AbstractWorld internalWorld(AbstractProcess process, ChoisePoint cp) throws Backtracking {
-		throw new WrongTermIsDataItem(this);
+	public AbstractInternalWorld internalWorld(AbstractProcess process, ChoisePoint cp) throws Backtracking {
+		throw new WrongArgumentIsDataItem(this);
 	}
 	//
-	public AbstractWorld internalWorld(ChoisePoint cp) {
-		throw new WrongTermIsDataItem(this);
+	public AbstractInternalWorld internalWorld(ChoisePoint cp) {
+		throw new WrongArgumentIsDataItem(this);
 	}
 	//
-	public Term internalWorldOrTerm(ChoisePoint cp) {
-		return this;
+	public GlobalWorldIdentifier getGlobalWorldIdentifier(ChoisePoint cp) throws TermIsNotAWorld, TermIsDummyWorld, TermIsUnboundVariable {
+		throw TermIsNotAWorld.instance;
 	}
-	//
-	// public AbstractWorld world(ChoisePoint cp) {
-	//	throw new WrongTermIsDataItem(this);
-	// }
 	//
 	public long[] getClassHierarchy() {
-		// System.out.printf("Term::getClassHierarchy()\n\n");
-		// throw new RuntimeException();
 		return new long[0];
 	}
 	public long[] getInterfaceHierarchy() {
 		return new long[0];
 	}
-	// "Unify with ..." functions
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void unifyWithStructure(long aFunctor, Term[] arguments, Term structure, ChoisePoint cp) throws Backtracking {
 		throw Backtracking.instance;
 	}
@@ -249,50 +374,26 @@ public abstract class Term implements Cloneable {
 	public void unifyWithSetElement(Term aElement, Term setElement, ChoisePoint cp) throws Backtracking {
 		throw Backtracking.instance;
 	}
-	// General "Unify With" function
 	abstract public void unifyWith(Term t, ChoisePoint cp) throws Backtracking;
 	//
-	public boolean thisIsFreeVariable() {
-		return false;
-	}
-	// Internal operations
-	public boolean thisIsArgumentNumber() {
-		return false;
-	}
-	public long getNumber() {
-		throw new WrongTermIsNotArgumentNumber(this);
-	}
-	public ArgumentNumber add(long deltaN) {
-		throw new WrongTermIsNotArgumentNumber(this);
-	}
-	public ArgumentNumber subtract(long deltaN) {
-		throw new WrongTermIsNotArgumentNumber(this);
-	}
-	public void isArityEqualTo(long v, ChoisePoint cp) throws Backtracking {
-		throw new WrongTermIsNotArgumentNumber(this);
-	}
-	public void isArityMoreOrEqualTo(long v, ChoisePoint cp) throws Backtracking {
-		throw new WrongTermIsNotArgumentNumber(this);
-	}
-	public void verifyListOfRestValues(long deltaN, Term list, ChoisePoint cp) {
-		throw new WrongTermIsNotArgumentNumber(this);
-	}
-	public long getPosition() {
-		return -1;
-	}
-	// Operations on variables
+	///////////////////////////////////////////////////////////////
+	//
 	public void clear() {
-		throw new WrongTermIsNotBoundVariable(this);
+		throw new WrongArgumentIsNotBoundVariable(this);
 	}
 	public void registerNewSlotVariable(HashSet<SlotVariable> slotVariables) {
 	}
 	public void setValue(Term newNode) {
-		throw new WrongTermIsNotFreeVariable(this);
+		throw new WrongArgumentIsNotFreeVariable(this);
 	}
-	// Operations on class instances
-	public void extractWorlds(AbstractProcess process, LinkedHashSet<AbstractWorld> list) {
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void extractWorlds(AbstractProcess process, LinkedHashSet<AbstractInternalWorld> list) {
 	}
-	// Operations on slot variables
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void registerVariables(ActiveWorld process, boolean isSuspending, boolean isProtecting) {
 	}
 	public void registerTargetWorlds(HashSet<AbstractWorld> worlds, ChoisePoint cp) {
@@ -309,11 +410,12 @@ public abstract class Term implements Cloneable {
 	public Term substituteWorlds(HashMap<AbstractWorld,Term> map, ChoisePoint cp) {
 		return this;
 	}
-	// Domain check
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public boolean isCoveredByDomain(PrologDomain baseDomain, ChoisePoint cp, boolean ignoreFreeVariables) {
 		return baseDomain.coversTerm(this,cp,ignoreFreeVariables);
 	}
-	// Domain check
 	public boolean isCoveredBySetDomain(long functor, PrologDomain headDomain, PrologDomain baseDomain, ChoisePoint cp, boolean ignoreFreeVariables) {
 		return false;
 	}
@@ -323,7 +425,9 @@ public abstract class Term implements Cloneable {
 	public Term checkSetTerm(long functor, PrologDomain headDomain, Term initialValue, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
 		throw new DomainAlternativeDoesNotCoverTerm(initialValue.getPosition());
 	}
-	// Comparison operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void compareWithTerm(Term a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		throw new OperationIsNotDefinedForTheArgument(this);
 	}
@@ -363,7 +467,9 @@ public abstract class Term implements Cloneable {
 	public void compareListWith(Term aHead, Term aTail, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		throw new OperationIsNotDefinedForTheArgument(this);
 	}
-	// Arithmetic operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term reactWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
 		throw new OperationIsNotDefinedForTheArgument(this);
 	}
@@ -406,7 +512,9 @@ public abstract class Term implements Cloneable {
 	public Term reactListWith(Term aHead, Term aTail, ChoisePoint iX, BinaryOperation op) {
 		throw new OperationIsNotDefinedForTheArgument(this);
 	}
-	// Bitwise operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term blitWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
 		throw new OperationIsNotDefinedForTheArgument(this);
 	}
@@ -431,12 +539,16 @@ public abstract class Term implements Cloneable {
 	public Term blitListWith(Term aHead, Term aTail, ChoisePoint iX, BinaryOperation op) {
 		throw new OperationIsNotDefinedForTheArgument(this);
 	}
-	// Unary operations
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term evaluate(ChoisePoint iX, UnaryOperation op) {
 		throw new OperationIsNotDefinedForTheArgument(this);
 	}
-	// Converting Term to String
-	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, CharsetEncoder encoder) {
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		if (cp==null) {
 			return super.toString();
 		} else {
@@ -444,9 +556,9 @@ public abstract class Term implements Cloneable {
 		}
 	}
 	public String toString(ChoisePoint cp) {
-		return toString(cp,false,false,null);
+		return toString(cp,false,false,true,null);
 	}
 	public String toString() {
-		return toString(null,true,false,null);
+		return toString(null,true,false,false,null);
 	}
 }

@@ -6,9 +6,7 @@ import target.*;
 
 import morozov.built_in.*;
 import morozov.run.*;
-import morozov.system.*;
 import morozov.system.gui.space3d.errors.*;
-import morozov.system.signals.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 
@@ -17,6 +15,18 @@ import javax.media.j3d.View;
 import com.sun.j3d.utils.universe.SimpleUniverse;
 
 public class Utils3D extends PrincipalNode3D {
+	protected static Term termParallelProjection= new PrologSymbol(SymbolCodes.symbolCode_E_PARALLEL_PROJECTION);
+	protected static Term termPerspectiveProjection= new PrologSymbol(SymbolCodes.symbolCode_E_PERSPECTIVE_PROJECTION);
+	protected static Term termVirtualWorld= new PrologSymbol(SymbolCodes.symbolCode_E_VIRTUAL_WORLD);
+	protected static Term termPhysicalWorld= new PrologSymbol(SymbolCodes.symbolCode_E_PHYSICAL_WORLD);
+	protected static Term termVisibilityDrawVisible= new PrologSymbol(SymbolCodes.symbolCode_E_VISIBILITY_DRAW_VISIBLE);
+	protected static Term termVisibilityDrawInvisible= new PrologSymbol(SymbolCodes.symbolCode_E_VISIBILITY_DRAW_INVISIBLE);
+	protected static Term termVisibilityDrawAll= new PrologSymbol(SymbolCodes.symbolCode_E_VISIBILITY_DRAW_ALL);
+	protected static Term termTransparencySortNone= new PrologSymbol(SymbolCodes.symbolCode_E_TRANSPARENCY_SORT_NONE);
+	protected static Term termTransparencySortGeometry= new PrologSymbol(SymbolCodes.symbolCode_E_TRANSPARENCY_SORT_GEOMETRY);
+	//protected static Term term= new PrologSymbol(SymbolCodes.symbolCode_E_);
+	//protected static Term term= new PrologSymbol(SymbolCodes.symbolCode_E_);
+	//protected static Term term= new PrologSymbol(SymbolCodes.symbolCode_E_);
 	//
 	public static BranchGroup termToBranchGroupOrNodeList(Term value, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
 		try { // BranchGroup
@@ -38,10 +48,17 @@ public class Utils3D extends PrincipalNode3D {
 			} else if (code==SymbolCodes.symbolCode_E_PERSPECTIVE_PROJECTION) {
 				return View.PERSPECTIVE_PROJECTION;
 			} else {
-				throw new WrongTermIsNotProjectionPolicy(value);
+				throw new WrongArgumentIsNotProjectionPolicy(value);
 			}
 		} catch (TermIsNotASymbol e) {
-			throw new WrongTermIsNotProjectionPolicy(value);
+			throw new WrongArgumentIsNotProjectionPolicy(value);
+		}
+	}
+	public static Term projectionPolicyToTerm(int value) {
+		switch (value) {
+			case View.PARALLEL_PROJECTION: return termParallelProjection;
+			case View.PERSPECTIVE_PROJECTION: return termPerspectiveProjection;
+			default: return termPerspectiveProjection;
 		}
 	}
 	//
@@ -53,10 +70,17 @@ public class Utils3D extends PrincipalNode3D {
 			} else if (code==SymbolCodes.symbolCode_E_PHYSICAL_WORLD) {
 				return View.PHYSICAL_WORLD;
 			} else {
-				throw new WrongTermIsNotWindowResizePolicy(value);
+				throw new WrongArgumentIsNotWindowResizePolicy(value);
 			}
 		} catch (TermIsNotASymbol e) {
-			throw new WrongTermIsNotWindowResizePolicy(value);
+			throw new WrongArgumentIsNotWindowResizePolicy(value);
+		}
+	}
+	public static Term windowResizePolicyToTerm(int value) {
+		switch (value) {
+			case View.VIRTUAL_WORLD: return termVirtualWorld;
+			case View.PHYSICAL_WORLD: return termPhysicalWorld;
+			default: return termPhysicalWorld;
 		}
 	}
 	//
@@ -68,10 +92,17 @@ public class Utils3D extends PrincipalNode3D {
 			} else if (code==SymbolCodes.symbolCode_E_PHYSICAL_WORLD) {
 				return View.PHYSICAL_WORLD;
 			} else {
-				throw new WrongTermIsNotWindowMovementPolicy(value);
+				throw new WrongArgumentIsNotWindowMovementPolicy(value);
 			}
 		} catch (TermIsNotASymbol e) {
-			throw new WrongTermIsNotWindowMovementPolicy(value);
+			throw new WrongArgumentIsNotWindowMovementPolicy(value);
+		}
+	}
+	public static Term windowMovementPolicyToTerm(int value) {
+		switch (value) {
+			case View.VIRTUAL_WORLD: return termVirtualWorld;
+			case View.PHYSICAL_WORLD: return termPhysicalWorld;
+			default: return termPhysicalWorld;
 		}
 	}
 	//
@@ -85,10 +116,18 @@ public class Utils3D extends PrincipalNode3D {
 			} else if (code==SymbolCodes.symbolCode_E_VISIBILITY_DRAW_ALL) {
 				return View.VISIBILITY_DRAW_ALL;
 			} else {
-				throw new WrongTermIsNotVisibilityPolicy(value);
+				throw new WrongArgumentIsNotVisibilityPolicy(value);
 			}
 		} catch (TermIsNotASymbol e) {
-			throw new WrongTermIsNotVisibilityPolicy(value);
+			throw new WrongArgumentIsNotVisibilityPolicy(value);
+		}
+	}
+	public static Term visibilityPolicyToTerm(int value) {
+		switch (value) {
+			case View.VISIBILITY_DRAW_VISIBLE: return termVisibilityDrawVisible;
+			case View.VISIBILITY_DRAW_INVISIBLE: return termVisibilityDrawInvisible;
+			case View.VISIBILITY_DRAW_ALL: return termVisibilityDrawAll;
+			default: return termVisibilityDrawVisible;
 		}
 	}
 	//
@@ -100,61 +139,17 @@ public class Utils3D extends PrincipalNode3D {
 			} else if (code==SymbolCodes.symbolCode_E_TRANSPARENCY_SORT_GEOMETRY) {
 				return View.TRANSPARENCY_SORT_GEOMETRY;
 			} else {
-				throw new WrongTermIsNotTransparencySortingPolicy(value);
+				throw new WrongArgumentIsNotTransparencySortingPolicy(value);
 			}
 		} catch (TermIsNotASymbol e) {
-			throw new WrongTermIsNotTransparencySortingPolicy(value);
+			throw new WrongArgumentIsNotTransparencySortingPolicy(value);
 		}
 	}
-	//
-	public static double termToFieldOfView(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
-		try {
-			return Converters.termToReal(value,iX);
-		} catch (TermIsNotAReal e1) {
-			try {
-				long code= value.getSymbolValue(iX);
-				if (code==SymbolCodes.symbolCode_E_default) {
-					throw TermIsSymbolDefault.instance;
-				} else {
-					throw new WrongTermIsNotFieldOfView(value);
-				}
-			} catch (TermIsNotASymbol e2) {
-				throw new WrongTermIsNotFieldOfView(value);
-			}
-		}
-	}
-	//
-	public static double termToFrontClipDistance(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
-		try {
-			return Converters.termToReal(value,iX);
-		} catch (TermIsNotAReal e1) {
-			try {
-				long code= value.getSymbolValue(iX);
-				if (code==SymbolCodes.symbolCode_E_default) {
-					throw TermIsSymbolDefault.instance;
-				} else {
-					throw new WrongTermIsNotFrontClipDistance(value);
-				}
-			} catch (TermIsNotASymbol e2) {
-				throw new WrongTermIsNotFrontClipDistance(value);
-			}
-		}
-	}
-	//
-	public static double termToBackClipDistance(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
-		try {
-			return Converters.termToReal(value,iX);
-		} catch (TermIsNotAReal e1) {
-			try {
-				long code= value.getSymbolValue(iX);
-				if (code==SymbolCodes.symbolCode_E_default) {
-					throw TermIsSymbolDefault.instance;
-				} else {
-					throw new WrongTermIsNotBackClipDistance(value);
-				}
-			} catch (TermIsNotASymbol e2) {
-				throw new WrongTermIsNotBackClipDistance(value);
-			}
+	public static Term transparencySortingPolicyToTerm(int value) {
+		switch (value) {
+			case View.TRANSPARENCY_SORT_NONE: return termTransparencySortNone;
+			case View.TRANSPARENCY_SORT_GEOMETRY: return termTransparencySortGeometry;
+			default: return termTransparencySortNone;
 		}
 	}
 }

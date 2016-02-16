@@ -2,9 +2,10 @@
 
 package morozov.system.gui.sadt;
 
-import morozov.classes.*;
+import morozov.run.*;
 import morozov.system.gui.*;
 import morozov.system.gui.sadt.signals.*;
+import morozov.worlds.*;
 
 import javax.swing.JInternalFrame;
 import javax.swing.JPanel;
@@ -74,6 +75,7 @@ public class DiagramPaneNoWrap extends JPanel implements MouseListener, ActionLi
 				if (event.getClickCount() >= 2) {
 					if (!identifier.isEmpty()) {
 						owner.setVisible(false);
+						// DesktopUtils.safelySetVisible(false,owner);
 					} else {
 						try {
 							owner.setIcon(true);

@@ -1,45 +1,154 @@
-// (c) 2010 IRE RAS Alexei A. Morozov
+// (c) 2010-2015 IRE RAS Alexei A. Morozov
 
 package morozov.built_in;
 
 import target.*;
 
-import morozov.classes.*;
 import morozov.run.*;
 import morozov.system.errors.*;
-import morozov.system.checker.*;
 import morozov.system.checker.errors.*;
 import morozov.system.files.*;
 import morozov.system.files.errors.*;
+import morozov.system.command.*;
 import morozov.system.*;
 import morozov.terms.*;
-import morozov.terms.signals.*;
+import morozov.worlds.*;
 
 import java.io.IOException;
-import java.applet.AppletContext;
-import javax.swing.JApplet;
-import java.awt.Desktop;
+import java.nio.file.FileSystems;
+import java.nio.file.FileSystem;
+import java.nio.file.Path;
+import java.nio.file.Files;
 import java.net.URL;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.MalformedURLException;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.applet.AppletContext;
+import java.awt.Desktop;
+import javax.swing.JApplet;
 
 public abstract class Application extends Alpha {
+	//
+	public ProcessBuilderCommand command= null;
+	public String arguments= null;
+	public WindowMode windowMode= null;
+	public Boolean enableMultipleInstances= null;
 	//
 	protected long processCounter= 0;
 	protected HashSet<Process> accountableProceses= new HashSet<Process>();
 	protected HashSet<PendingProcess> supervisors= new HashSet<PendingProcess>();
 	//
+	protected static final FileSystem fileSystem= FileSystems.getDefault();
+	//
+	public Application() {
+	}
+	public Application(GlobalWorldIdentifier id) {
+		super(id);
+	}
+	//
 	abstract protected Term getBuiltInSlot_E_command();
 	abstract protected Term getBuiltInSlot_E_arguments();
 	abstract protected Term getBuiltInSlot_E_window_mode();
 	abstract protected Term getBuiltInSlot_E_enable_multiple_instances();
-	abstract protected Term getBuiltInSlot_E_backslash_always_is_separator();
+	// abstract protected Term getBuiltInSlot_E_backslash_always_is_separator();
 	//
 	abstract public long entry_s_End_1_i();
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	// get/set command
+	//
+	public void setCommand1s(ChoisePoint iX, Term a1) {
+		ProcessBuilderCommand text= ProcessBuilderCommand.termToProcessBuilderCommand(a1,iX);
+		setCommand(text);
+	}
+	public void setCommand(ProcessBuilderCommand value) {
+		command= value;
+	}
+	public void getCommand0ff(ChoisePoint iX, PrologVariable a1) {
+		a1.value= getCommand(iX).toTerm();
+	}
+	public void getCommand0fs(ChoisePoint iX) {
+	}
+	public ProcessBuilderCommand getCommand(ChoisePoint iX) {
+		if (command != null) {
+			return command;
+		} else {
+			Term value= getBuiltInSlot_E_command();
+			return ProcessBuilderCommand.termToProcessBuilderCommand(value,iX);
+		}
+	}
+	//
+	// get/set arguments
+	//
+	public void setArguments1s(ChoisePoint iX, Term a1) {
+		String text= Converters.argumentToString(a1,iX);
+		setArguments(text);
+	}
+	public void setArguments(String value) {
+		arguments= value;
+	}
+	public void getArguments0ff(ChoisePoint iX, PrologVariable a1) {
+		a1.value= new PrologString(getArguments(iX));
+	}
+	public void getArguments0fs(ChoisePoint iX) {
+	}
+	public String getArguments(ChoisePoint iX) {
+		if (arguments != null) {
+			return arguments;
+		} else {
+			Term value= getBuiltInSlot_E_arguments();
+			return Converters.argumentToString(value,iX);
+		}
+	}
+	//
+	// get/set windowMode
+	//
+	public void setWindowMode1s(ChoisePoint iX, Term a1) {
+		WindowMode mode= WindowMode.termToWindowMode(a1,iX);
+		setWindowMode(mode);
+	}
+	public void setWindowMode(WindowMode value) {
+		windowMode= value;
+	}
+	public void getWindowMode0ff(ChoisePoint iX, PrologVariable a1) {
+		a1.value= getWindowMode(iX).toTerm();
+	}
+	public void getWindowMode0fs(ChoisePoint iX) {
+	}
+	public WindowMode getWindowMode(ChoisePoint iX) {
+		if (windowMode != null) {
+			return windowMode;
+		} else {
+			Term value= getBuiltInSlot_E_window_mode();
+			return WindowMode.termToWindowMode(value,iX);
+		}
+	}
+	//
+	// get/set enableMultipleInstances
+	//
+	public void setEnableMultipleInstances1s(ChoisePoint iX, Term a1) {
+		setEnableMultipleInstances(YesNo.termYesNo2Boolean(a1,iX));
+	}
+	public void setEnableMultipleInstances(boolean value) {
+		enableMultipleInstances= value;
+	}
+	public void getEnableMultipleInstances0ff(ChoisePoint iX, PrologVariable a1) {
+		boolean value= getEnableMultipleInstances(iX);
+		a1.value= YesNo.boolean2TermYesNo(value);
+	}
+	public void getEnableMultipleInstances0fs(ChoisePoint iX) {
+	}
+	public boolean getEnableMultipleInstances(ChoisePoint iX) {
+		if (enableMultipleInstances != null) {
+			return enableMultipleInstances;
+		} else {
+			return YesNo.termYesNo2Boolean(getBuiltInSlot_E_enable_multiple_instances(),iX);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void closeFiles() {
 		Iterator<PendingProcess> processList= supervisors.iterator();
@@ -51,51 +160,35 @@ public abstract class Application extends Alpha {
 		super.closeFiles();
 	}
 	//
-	public void activate2s(ChoisePoint iX, Term command, Term arguments) {
-		try {
-			String text= arguments.getStringValue(iX);
-			activate(iX,command,text,false);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(arguments);
-		}
-	}
-	public void activate1s(ChoisePoint iX, Term command) {
-		activate(iX,command,"",false);
-	}
 	public void activate0s(ChoisePoint iX) {
-		Term command= getBuiltInSlot_E_command();
-		Term arguments= getBuiltInSlot_E_arguments();
-		try {
-			String text= arguments.getStringValue(iX);
-			activate(iX,command,text,true);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(arguments);
-		}
+		ProcessBuilderCommand command= getCommand(iX);
+		String arguments= getArguments(iX);
+		activate(iX,command,arguments,true);
 	}
-	protected void activate(ChoisePoint iX, Term command, String arguments, boolean isAccountableSubprocess) {
-		try {
-			String commandText= command.getStringValue(iX);
-			activateProcessBuilder(commandText,arguments,isAccountableSubprocess,iX);
-		} catch (TermIsNotAString e1) {
-			try {
-				long code= command.getSymbolValue(iX);
-				if (code==SymbolCodes.symbolCode_E_auto) {
-					activateBrowser(arguments,iX);
-				} else {
-					throw new WrongTermIsNotACommand(command);
-				}
-			} catch (TermIsNotASymbol e2) {
-				try {
-					long code= command.getStructureFunctor(iX);
-					if (code==SymbolCodes.symbolCode_E_auto) {
-						activateBrowser(arguments,iX);
-					} else {
-						throw new WrongTermIsNotACommand(command);
-					}
-				} catch (TermIsNotAStructure e3) {
-					throw new WrongTermIsNotACommand(command);
-				}
-			}
+	public void activate1s(ChoisePoint iX, Term a1) {
+		ProcessBuilderCommand command= ProcessBuilderCommand.termToProcessBuilderCommand(a1,iX);
+		String arguments= getArguments(iX);
+		activate(iX,command,arguments,false);
+	}
+	public void activate2s(ChoisePoint iX, Term a1, Term a2) {
+		ProcessBuilderCommand command= ProcessBuilderCommand.termToProcessBuilderCommand(a1,iX);
+		String arguments= Converters.argumentToString(a2,iX);
+		activate(iX,command,arguments,false);
+	}
+	protected void activate(ChoisePoint iX, ProcessBuilderCommand command, String arguments, boolean isAccountableSubprocess) {
+		if (command.isAutomatic) {
+			if (command.isExtensionSpecific) {
+				boolean backslashIsSeparator= getBackslashAlwaysIsSeparator(iX);
+				boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
+				SimpleFileName simpleFile= SimpleFileName.termToSimpleFileName(arguments,backslashIsSeparator,acceptOnlyURI);
+				String extension= command.text;
+				RelativeFileName relativeFile= simpleFile.formRelativeFileName(true,extension);
+				arguments= relativeFile.toString();
+			};
+			activateBrowser(arguments,iX);
+		} else {
+			boolean enableMultipleInstancesFlag= getEnableMultipleInstances(iX);
+			activateProcessBuilder(command.text,arguments,isAccountableSubprocess,enableMultipleInstancesFlag);
 		}
 	}
 	//
@@ -124,15 +217,13 @@ public abstract class Application extends Alpha {
 		}
 	}
 	//
-	protected void activateProcessBuilder(String command, String arguments, boolean isAccountableSubprocess, ChoisePoint iX) {
-		Term instanceControl= getBuiltInSlot_E_enable_multiple_instances();
+	protected void activateProcessBuilder(String commandText, String arguments, boolean isAccountableSubprocess, boolean enableMultipleInstancesFlag) {
 		try {
-			boolean enableMultipleInstances= Converters.term2YesNo(instanceControl,iX);
 			if (isAccountableSubprocess) {
-				if (!enableMultipleInstances && processCounter > 0) {
+				if (!enableMultipleInstancesFlag && processCounter > 0) {
 					return;
 				} else {
-					ProcessBuilder builder= new ProcessBuilder(command,arguments);
+					ProcessBuilder builder= new ProcessBuilder(commandText,arguments);
 					Process p= builder.start();
 					processCounter++;
 					accountableProceses.add(p);
@@ -142,95 +233,84 @@ public abstract class Application extends Alpha {
 					supervisor.start();
 				}
 			} else {
-				new ProcessBuilder(command,arguments).start();
+				new ProcessBuilder(commandText,arguments).start();
 			}
 		} catch (IOException e) {
-			throw new FileInputOutputError(command,e);
+			throw new FileInputOutputError(commandText,e);
 		// } catch (InterruptedException e) {
 		}
 	}
 	//
-	protected void activateBrowser(String arguments, ChoisePoint iX) {
+	protected void activateBrowser(String commandText, ChoisePoint iX) {
 		JApplet applet= StaticContext.retrieveApplet(staticContext);
 		if (applet != null) {
 			AppletContext ac= applet.getAppletContext();
 			try {
+				boolean backslashIsSeparator= getBackslashAlwaysIsSeparator(iX);
+				boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
+				SimpleFileName simpleFile= SimpleFileName.termToSimpleFileName(commandText,backslashIsSeparator,acceptOnlyURI);
+				ExtendedFileName extendedFile= simpleFile.formRealFileNameBasedOnPath(false,false,"",null,staticContext);
 				URL codeBase= applet.getCodeBase();
 				if (codeBase != null) {
-					URL url= new URL(codeBase,arguments);
+					URL url= new URL(codeBase,extendedFile.get_URI_OfResource().toASCIIString());
 					ac.showDocument(url,"_blank");
 				} else { // A probable bug in JDK 1.7.0_40
-					activateDesktopApplication(arguments,iX);
+					activateDesktopApplication(commandText,false,iX);
 				}
 			} catch (MalformedURLException e) {
-				throw new WrongTermIsMalformedURL(e);
+				throw new WrongArgumentIsMalformedURL(commandText,e);
 			}
 		} else {
-			activateDesktopApplication(arguments,iX);
+			activateDesktopApplication(commandText,false,iX);
 		}
 	}
-	protected void activateDesktopApplication(String arguments, ChoisePoint iX) {
+	protected void activateDesktopApplication(String commandText, boolean quotesAreEliminated, ChoisePoint iX) {
 		if (Desktop.isDesktopSupported()) {
 			Desktop desktop= Desktop.getDesktop();
-			boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparator(getBuiltInSlot_E_backslash_always_is_separator(),iX);
-			if (URL_Utils.isLocalResource(arguments,backslashIsSeparator)) {
-				try {
-					arguments= FileUtils.replaceBackslashes(arguments,backslashIsSeparator);
-					java.io.File file= new java.io.File(arguments);
-					if (file.exists()) {
-						desktop.open(file);
+			boolean backslashIsSeparator= getBackslashAlwaysIsSeparator(iX);
+			boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
+			SimpleFileName simpleFile= SimpleFileName.termToSimpleFileName(commandText,backslashIsSeparator,acceptOnlyURI);
+			try {
+				ExtendedFileName extendedFile= simpleFile.formRealFileNameBasedOnPath(false,false,"",null,staticContext);
+				if (extendedFile.getIsLocalResource()) {
+					Path path= extendedFile.getPathOfLocalResource();
+					if (Files.exists(path)) {
+						desktop.open(path.toFile());
+					} else if (quotesAreEliminated) {
+						// throw new WrongArgumentIsNotFileName(new PrologString(commandText));
+						desktop.open(path.toFile());
 					} else {
-						String truncatedName= FileUtils.deleteQuotationMarks(arguments);
-						file= new java.io.File(truncatedName);
-						if (file.exists()) {
-							desktop.open(file);
-						} else {
-							browseResource(desktop,arguments);
-						}
+						commandText= FileUtils.deleteQuotationMarks(commandText);
+						activateDesktopApplication(commandText,true,iX);
 					}
-				} catch (NullPointerException e) {
-					// File is null.
-					throw new WrongTermIsNotFileName(new PrologString(arguments));
-				} catch (IllegalArgumentException e) {
-					// The specified file doesn't exist.
-					throw new FileIsNotFound();
-				} catch (UnsupportedOperationException e) {
-					// The current platform does not support the Desktop.Action.OPEN action.
-					throw new ApplicationIsNotSupported();
-				} catch (IOException e) {
-					// The specified file has no associated application or the associated application fails to be launched.
-					throw new FileInputOutputError(arguments,e);
-				// } catch (SecurityException e) {
-					// A security manager exists and its SecurityManager.checkRead(java.lang.String) method
-					// denies read access to the file, or it denies the AWTPermission("showWindowWithoutWarningBanner")
-					// permission, or the calling thread is not allowed to create a subprocess.
+				} else {
+					desktop.browse(extendedFile.get_URI_OfResource());
 				}
-			} else {
-				browseResource(desktop,arguments);
+			// } catch (URISyntaxException e) {
+			} catch (WrongArgumentIsMalformedURL e) {
+				if (quotesAreEliminated) {
+					throw new WrongArgumentIsNotFileName(new PrologString(commandText));
+				} else {
+					commandText= FileUtils.deleteQuotationMarks(commandText);
+					activateDesktopApplication(commandText,true,iX);
+				}
+			} catch (NullPointerException e) {
+				// File is null.
+				throw new WrongArgumentIsNotFileName(new PrologString(commandText));
+			} catch (IllegalArgumentException e) {
+				// The specified file doesn't exist.
+				throw new FileIsNotFound(commandText);
+			} catch (UnsupportedOperationException e) {
+				// The current platform does not support the Desktop.Action.OPEN action.
+				throw new ApplicationIsNotSupported();
+			} catch (IOException e) {
+				// The specified file has no associated application or the associated application fails to be launched.
+				throw new FileInputOutputError(commandText,e);
+			// } catch (SecurityException e) {
+				// A security manager exists and its SecurityManager.checkRead(java.lang.String) method
+				// denies read access to the file, or it denies the AWTPermission("showWindowWithoutWarningBanner")
+				// permission, or the calling thread is not allowed to create a subprocess.
 			}
-		}
-	}
-	//
-	protected void browseResource(Desktop desktop, String arguments) {
-		try {
-			desktop.browse(new URI(arguments));
-		} catch (URISyntaxException e) {
-			throw new WrongTermIsMalformedURL(e);
-		} catch (NullPointerException e) {
-			// Uri is null.
-			throw new WrongTermIsNotFileName(new PrologString(arguments));
-		} catch (UnsupportedOperationException e) {
-			// The current platform does not support the Desktop.Action.BROWSE action.
-			throw new ApplicationIsNotSupported();
-		} catch (IOException e) {
-			// The user default browser is not found, or it fails to be launched, or the default handler application failed to be launched.
-			// 2011.04.03
-			// throw new FileInputOutputError(arguments,e);
-		// } catch (SecurityException e) {
-			// A security manager exists and it denies the AWTPermission("showWindowWithoutWarningBanner") permission,
-			// or the calling thread is not allowed to create a subprocess; and not invoked from within an applet or
-			// Java Web Started application IllegalArgumentException - if the necessary permissions are not available
-			// and the URI can not be converted to a URL.
 		}
 	}
 }
@@ -261,7 +341,7 @@ class PendingProcess extends Thread {
 		supervisors.remove(this);
 		if (isActual.get()) {
 			AsyncCall item= new AsyncCall(domainSignature,targetWorld,true,true,arguments,true);
-			targetWorld.receiveAsyncCall(item);
+			targetWorld.transmitAsyncCall(item,null);
 		}
 	}
 	//

@@ -1,0 +1,103 @@
+// (c) 2015 IRE RAS Alexei A. Morozov
+
+package morozov.worlds.remote;
+
+import morozov.run.*;
+import morozov.system.gui.space2d.*;
+import morozov.worlds.remote.signals.*;
+
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+public interface ExternalWorldInterface extends Remote {
+	public long selectSignature(MethodSignature signature, byte[] localDomainTable) throws RemoteException;
+	public void receiveAsyncCall(long domainSignatureNumber, boolean isControlCall, boolean useBuffer, byte[] arguments) throws RemoteException;
+	public void sendResidentRequest(ExternalResidentInterface resident, long domainSignatureNumber, byte[] arguments, boolean sortAndReduceResultList) throws RemoteException;
+	public void withdrawRequest(ExternalResidentInterface resident) throws RemoteException;
+	//
+	public byte[] getImage() throws RemoteException, OwnWorldIsNotBufferedImage;
+	public void setImage(byte[] array, GenericImageEncodingAttributes attributes) throws RemoteException, OwnWorldIsNotBufferedImage;
+	//
+	public void subtract(long FrameNumber, byte[] BufferedImage, boolean takeFrameIntoAccount, GenericImageEncodingAttributes attributes) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public long getFrameNumber() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void commit() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void resetSettings() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void resetStatistics() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void resetResults() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void resetAll() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public byte[] getBlobs() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public byte[] getTracks() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public byte[] getConnectedGraphs() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public byte[] getRecentImage() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public byte[] getBackgroundImage() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public byte[] getSigmaImage() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public byte[] getForegroundImage() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public byte[] getSynthesizedImage() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public GenericImageEncodingAttributes getCurrentImageEncodingAttributes() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public boolean getBlobExtractionMode() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public boolean getBlobTracingMode() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public int getMinimalTrainingInterval() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public int getMaximalTrainingInterval() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public boolean getGrayscaleMode() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public boolean getBackgroundGaussianFilteringMode() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public int getBackgroundGaussianFilterRadius() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public boolean getBackgroundRankFilteringMode() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public int getBackgroundRankFilterThreshold() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public double getBackgroundStandardDeviationFactor() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public boolean getForegroundContouringMode() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public int getR2WindowHalfwidth() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public int getHorizontalBlobBorder() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public int getVerticalBlobBorder() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public double getHorizontalExtraBorderCoefficient() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public double getVerticalExtraBorderCoefficient() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public int getMinimalBlobIntersectionArea() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public int getMinimalBlobSize() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public int getMinimalTrackDuration() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public int getMaximalBlobInvisibilityInterval() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public int getMaximalTrackRetentionInterval() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public byte[] getSerializedInverseTransformationMatrix() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public double getSamplingRate() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public boolean getCharacteristicLengthMedianFilteringMode() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public int getCharacteristicLengthMedianFilterHalfwidth() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public boolean getVelocityMedianFilteringMode() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public int getVelocityMedianFilterHalfwidth() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public boolean getSlowTracksDeletionMode() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public double getFuzzyVelocityThreshold() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public double getFuzzyDistanceThreshold() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public double getFuzzyThresholdBorder() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public int getSynthesizedImageTransparency() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public boolean getSynthesizedImageRectangularBlobsMode() throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setBlobExtractionMode(boolean mode) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setBlobTracingMode(boolean mode) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setMinimalTrainingInterval(int frames) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setMaximalTrainingInterval(int frames) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setGrayscaleMode(boolean mode) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setBackgroundGaussianFilteringMode(boolean mode) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setBackgroundGaussianFilterRadius(int radius) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setBackgroundRankFilteringMode(boolean mode) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setBackgroundRankFilterThreshold(int threshold) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setBackgroundStandardDeviationFactor(double factor) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setForegroundContouringMode(boolean mode) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setR2WindowHalfwidth(int halfwidth) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setHorizontalBlobBorder(int size) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setVerticalBlobBorder(int size) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setHorizontalExtraBorderCoefficient(double coefficient) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setVerticalExtraBorderCoefficient(double coefficient) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setMinimalBlobIntersectionArea(int size) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setMinimalBlobSize(int size) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setMinimalTrackDuration(int frames) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setMaximalBlobInvisibilityInterval(int frames) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setMaximalTrackRetentionInterval(int frames) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setSerializedInverseTransformationMatrix(byte[] matrix) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setSamplingRate(double rate) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setCharacteristicLengthMedianFilteringMode(boolean mode) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setCharacteristicLengthMedianFilterHalfwidth(int halfwidth) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setVelocityMedianFilteringMode(boolean mode) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setVelocityMedianFilterHalfwidth(int halfwidth) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setSlowTracksDeletionMode(boolean mode) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setFuzzyVelocityThreshold(double threshold) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setFuzzyDistanceThreshold(double threshold) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setFuzzyThresholdBorder(double threshold) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setSynthesizedImageTransparency(int transparency) throws RemoteException, OwnWorldIsNotImageSubtractor;
+	public void setSynthesizedImageRectangularBlobsMode(boolean mode) throws RemoteException, OwnWorldIsNotImageSubtractor;
+}

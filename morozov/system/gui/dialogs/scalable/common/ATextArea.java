@@ -54,7 +54,7 @@ public class ATextArea
 		// repaint(); // Возможно, это причина глюков.
 		if (targetDialog!=null) {
 			targetDialog.reportValueUpdate(targetComponent);
-			targetDialog.invalidate();
+			targetDialog.safelyInvalidate();
 			// targetDialog.repaint(); // Возможно, это причина глюков.
 			// Попытка бороться с глюками SWING:
 			// targetDialog.repaintAfterDelay();
@@ -88,7 +88,7 @@ public class ATextArea
 	//
 	// public void setText(String t) {
 	//	if (t.equalsIgnoreCase("#")) {
-	//		throw new WrongTermIsNotSwitch();
+	//		throw new WrongArgumentIsNotSwitch();
 	//	}
 	// }
 	public void putValue(Term value, ChoisePoint iX) {

@@ -2,9 +2,10 @@
 
 package morozov.system.gui.dialogs;
 
+import morozov.built_in.*;
 import morozov.run.*;
 import morozov.system.gui.dialogs.scalable.*;
-import morozov.system.gui.dialogs.signals.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
 
 import javax.swing.SwingUtilities;
@@ -80,7 +81,6 @@ public class DialogEntry {
 	}
 	//
 	public void putValue(Term value, final ChoisePoint iX) {
-//System.out.printf("DialogEntry::(%s)putValue=%s\n",this,value);
 		if (entryType.isValueOrAction()) {
 			synchronized(currentValueGuard) {
 				Term newValue;
@@ -90,7 +90,6 @@ public class DialogEntry {
 					return;
 				};
 				boolean skipOperation= false;
-				// System.out.printf("currentValue=%s,newValue=%s\n",currentValue,newValue);
 				if (currentValue==null || isToBeRefreshed.get()) {
 					currentValue= newValue;
 				} else {
@@ -186,7 +185,7 @@ public class DialogEntry {
 				try {
 					newValue= entryType.standardizeValue(value,iX);
 				} catch (RejectValue e) {
-					isInitiated.set(true); // 2012.09.09
+					isInitiated.set(true);
 					return;
 				};
 				boolean skipOperation= false;
@@ -207,7 +206,6 @@ public class DialogEntry {
 							entryType.putValue(dialog,currentValue,iX);
 						} finally {
 							dialog.insideThePutOperation.set(false);
-							// isInitiated.set(true);
 						}
 					} else {
 						try {
@@ -218,7 +216,6 @@ public class DialogEntry {
 										entryType.putValue(dialog,currentValue,iX);
 									} finally {
 										dialog.insideThePutOperation.set(false);
-										// isInitiated.set(true);
 									}
 								}
 							});
@@ -227,7 +224,7 @@ public class DialogEntry {
 						}
 					}
 				};
-				isInitiated.set(true); // 2012.09.09
+				isInitiated.set(true);
 			}
 		}
 	}
@@ -300,37 +297,30 @@ public class DialogEntry {
 				throw Backtracking.instance;
 			};
 			synchronized(currentValueGuard) {
-				// try {
-					if (currentValue==null || refreshValue || isToBeRefreshed.get()) {
-						if (SwingUtilities.isEventDispatchThread()) {
-							currentValue= entryType.getValue(dialog);
-						} else {
-							try {
-								SwingUtilities.invokeAndWait(new Runnable() {
-									public void run() {
-										// try {
-											intermediateValue= entryType.getValue(dialog);
-										// } catch (CannotComputeDesktopSize e) {
-										// }
-									}
-								});
-							} catch (InterruptedException e) {
-								intermediateValue= PrologUnknownValue.instance;
-							} catch (InvocationTargetException e) {
-								intermediateValue= PrologUnknownValue.instance;
-							};
-							if (intermediateValue!=null) {
-								currentValue= intermediateValue;
-							} else {
-								throw Backtracking.instance;
-							}
+				if (currentValue==null || refreshValue || isToBeRefreshed.get()) {
+					if (SwingUtilities.isEventDispatchThread()) {
+						currentValue= entryType.getValue(dialog);
+					} else {
+						try {
+							SwingUtilities.invokeAndWait(new Runnable() {
+								public void run() {
+									intermediateValue= entryType.getValue(dialog);
+								}
+							});
+						} catch (InterruptedException e) {
+							intermediateValue= PrologUnknownValue.instance;
+						} catch (InvocationTargetException e) {
+							intermediateValue= PrologUnknownValue.instance;
 						};
-						isToBeRefreshed.set(false);
+						if (intermediateValue!=null) {
+							currentValue= intermediateValue;
+						} else {
+							throw Backtracking.instance;
+						}
 					};
-					return currentValue;
-				// } catch (CannotComputeDesktopSize e) {
-				//	throw Backtracking.instance;
-				// }
+					isToBeRefreshed.set(false);
+				};
+				return currentValue;
 			}
 		}
 	}
@@ -366,11 +356,7 @@ public class DialogEntry {
 					try {
 						SwingUtilities.invokeAndWait(new Runnable() {
 							public void run() {
-								// try {
 								intermediateRange= component.getRange();
-								// } catch (Backtracking e) {
-								//	intermediateRange= null;
-								// }
 							}
 						});
 					} catch (InterruptedException e) {
@@ -387,35 +373,32 @@ public class DialogEntry {
 			}
 		} else {
 			synchronized(currentValueGuard) {
-				// try {
-					if (SwingUtilities.isEventDispatchThread()) {
-						return entryType.getValue(dialog);
+				if (SwingUtilities.isEventDispatchThread()) {
+					return entryType.getValue(dialog);
+				} else {
+					try {
+						SwingUtilities.invokeAndWait(new Runnable() {
+							public void run() {
+								intermediateValue= entryType.getValue(dialog);
+							}
+						});
+					} catch (InterruptedException e) {
+						intermediateValue= PrologUnknownValue.instance;
+					} catch (InvocationTargetException e) {
+						intermediateValue= PrologUnknownValue.instance;
+					};
+					if (intermediateValue!=null) {
+						return intermediateValue;
 					} else {
-						try {
-							SwingUtilities.invokeAndWait(new Runnable() {
-								public void run() {
-									// try {
-										intermediateValue= entryType.getValue(dialog);
-									// } catch (CannotComputeDesktopSize e) {
-									// }
-								}
-							});
-						} catch (InterruptedException e) {
-							intermediateValue= PrologUnknownValue.instance;
-						} catch (InvocationTargetException e) {
-							intermediateValue= PrologUnknownValue.instance;
-						};
-						if (intermediateValue!=null) {
-							return intermediateValue;
-						} else {
-							return PrologUnknownValue.instance;
-						}
+						return PrologUnknownValue.instance;
 					}
-				// } catch (CannotComputeDesktopSize e) {
-				//	return PrologUnknownValue.instance;
-				// }
+				}
 			}
 		}
+	}
+	//
+	public Term getSlotByName(Dialog targetWorld, ChoisePoint iX) {
+		return entryType.getSlotByName(name,targetWorld,iX);
 	}
 	//
 	public void setFieldIsEnabled(final boolean mode) {

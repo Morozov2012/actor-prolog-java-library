@@ -19,6 +19,6 @@ public class NamedErrorExit extends ErrorExit {
 	}
 	public String toString() {
 		SymbolName name= SymbolNames.retrieveSymbolName(nameCode);
-		return name.toString(null);
+		return "'" + name.toRawString(null) + "'";
 	}
 }

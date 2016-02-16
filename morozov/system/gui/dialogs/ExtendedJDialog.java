@@ -2,13 +2,9 @@
 
 package morozov.system.gui.dialogs;
 
-import target.*;
-
-import morozov.classes.*;
+import morozov.run.*;
 import morozov.system.gui.*;
-import morozov.system.gui.signals.*;
 
-import javax.swing.JDesktopPane;
 import javax.swing.JDialog;
 import javax.swing.SwingUtilities;
 import java.awt.Dialog.ModalityType;
@@ -45,45 +41,33 @@ public class ExtendedJDialog
 		addMouseListener(this);
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void initiate(StaticContext context) {
 		staticContext= context;
 	}
 	//
-	public Point computePosition(AtomicReference<ExtendedCoordinates> actualCoordinates) throws UseDefaultLocation {
-		//
-		Dimension initialSize= getSize();
-		//
-		int initialWidth= initialSize.width;
-		int initialHeight= initialSize.height;
-		//
-		int x= 0;
-		int y= 0;
-		//
-		double gridX= DefaultOptions.gridWidth;
-		double gridY= DefaultOptions.gridHeight;
-		//
-		Rectangle bounds= computeParentLayoutSize();
-		ExtendedCoordinates actualPoint= actualCoordinates.get();
-		x= DialogUtils.calculateRealCoordinate(actualPoint.x,bounds.x,bounds.width,gridX,initialWidth);
-		y= DialogUtils.calculateRealCoordinate(actualPoint.y,bounds.y,bounds.height,gridY,initialHeight);
-		//
-		return new Point(x,y);
+	///////////////////////////////////////////////////////////////
+	//
+	public void addToDesktop(MainDesktopPane desktop) {
 	}
-	public Rectangle computeParentLayoutSize() {
-		GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
-		// Rectangle bounds= env.getMaximumWindowBounds();
-		GraphicsDevice device= env.getDefaultScreenDevice();
-		GraphicsConfiguration gc= device.getDefaultConfiguration();
-		Rectangle bounds= gc.getBounds();
-		// return new Dimension(bounds.width,bounds.height);
-		return bounds;
-	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void setClosable(boolean b) {
 	}
 	public void setMaximizable(boolean b) {
 	}
 	public void setIconifiable(boolean b) {
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void safelySetVisible(boolean b) {
+		DesktopUtils.safelySetVisible(b,this);
+	}
+	public void safelyDispose() {
+		DesktopUtils.safelyDispose(this);
 	}
 	public void safelyMaximize() {
 	}
@@ -92,10 +76,10 @@ public class ExtendedJDialog
 	public void safelyRestore() {
 	}
 	public boolean safelyIsVisible() {
-		return isVisible();
+		return DesktopUtils.safelyIsVisible(this);
 	}
 	public boolean safelyIsHidden() {
-		return !isVisible();
+		return DesktopUtils.safelyIsHidden(this);
 	}
 	public boolean safelyIsMaximized() {
 		return false;
@@ -106,24 +90,18 @@ public class ExtendedJDialog
 	public boolean safelyIsRestored() {
 		return true;
 	}
-	public void addToDesktop(JDesktopPane desktop) {
-	}
-	// public void setMaximum(boolean b) {
-	// }
 	//
-	public Dimension getRealMinimumSize() {
-		// return getUI().getMinimumSize(this);
-		// return getMinimumSize();
-		// return getLayout().minimumLayoutSize(this);
-		// return new Dimension(0,0);
-		Insets insets= getInsets();
-		return new Dimension(insets.left+insets.right,insets.top+insets.bottom);
+	///////////////////////////////////////////////////////////////
+	//
+	public Rectangle computeParentLayoutSize() {
+		GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
+		GraphicsDevice device= env.getDefaultScreenDevice();
+		GraphicsConfiguration gc= device.getDefaultConfiguration();
+		Rectangle bounds= gc.getBounds();
+		return bounds;
 	}
-	public Dimension getRealPreferredSize() {
-		// return getUI().getPreferredSize(this);
-		// return getPreferredSize();
-		return getLayout().preferredLayoutSize(this);
-	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void repaintParent() {
 		Container container= getParent();
@@ -131,9 +109,24 @@ public class ExtendedJDialog
 			container.repaint();
 		}
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void doSuperLayout() {
 		super.doLayout();
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public Dimension getRealMinimumSize() {
+		Insets insets= getInsets();
+		return new Dimension(insets.left+insets.right,insets.top+insets.bottom);
+	}
+	public Dimension getRealPreferredSize() {
+		return getLayout().preferredLayoutSize(this);
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void doLayout() {
 		dialog.doLayout();
@@ -179,14 +172,15 @@ public class ExtendedJDialog
 			}
 		}
 	}
+	//
 	public void safelySetLocationAndSize(final Point location, final Dimension size) {
 		if (SwingUtilities.isEventDispatchThread()) {
-			setLocationAndSize(location,size);
+			quicklySetLocationAndSize(location,size);
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
-						setLocationAndSize(location,size);
+						quicklySetLocationAndSize(location,size);
 					}
 				});
 			} catch (InterruptedException e) {
@@ -194,12 +188,12 @@ public class ExtendedJDialog
 			}
 		}
 	}
-	public void setLocationAndSize(Point location, Dimension size) {
+	private void quicklySetLocationAndSize(Point location, Dimension size) {
 		setLocation(location);
 		setSize(size);
 	}
 	//
-	public boolean isMaximum() {
-		return false;
-	}
+	// public boolean isMaximum() {
+	//	return false;
+	// }
 }

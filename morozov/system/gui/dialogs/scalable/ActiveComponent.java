@@ -14,10 +14,9 @@ package morozov.system.gui.dialogs.scalable;
 
 import morozov.run.*;
 import morozov.system.gui.dialogs.*;
-import morozov.system.gui.dialogs.signals.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
 
-// import javax.swing.JComponent;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import javax.swing.event.ChangeListener;
@@ -92,7 +91,6 @@ public abstract class ActiveComponent
 	//
 	public boolean isEnabled(boolean mode) {
 		if (component != null) {
-//System.out.printf("component.isEnabled()=%s;mode=%s;\n",component.isEnabled(),mode);
 			return (component.isEnabled() == mode);
 		} else {
 			return false;
@@ -180,7 +178,7 @@ public abstract class ActiveComponent
 		// диалог, закрываю диалог, и потом текущий диалог
 		// некорректно перерисовывается.
 		// См. пример test_117_45_enable_disable_01_jdk.a.
-		targetDialog.revalidateAndRepaint();
+		targetDialog.safelyRevalidateAndRepaint();
 	}
 	//
 	public void setForeground(Color c) {

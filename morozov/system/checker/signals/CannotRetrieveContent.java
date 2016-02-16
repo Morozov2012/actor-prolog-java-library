@@ -3,7 +3,7 @@
 package morozov.system.checker.signals;
 
 import morozov.run.*;
-import morozov.system.checker.*;
+import morozov.system.files.*;
 import morozov.terms.*;
 
 public final class CannotRetrieveContent extends LightweightException {
@@ -12,7 +12,7 @@ public final class CannotRetrieveContent extends LightweightException {
 		exceptionName= e;
 	}
 	public CannotRetrieveContent(Throwable e) {
-		exceptionName= URL_Utils.exceptionToName(e);
+		exceptionName= SimpleFileName.channelExceptionToName(e);
 	}
 	public Term getExceptionName() {
 		return exceptionName;

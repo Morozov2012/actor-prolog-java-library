@@ -6,6 +6,12 @@
 
 package morozov.system.gui.dialogs.scalable.common;
 
+/*
+ * ScalableTableModel implementation for the Actor Prolog language
+ * @version 1.0 2012/08/25
+ * @author IRE RAS Alexei A. Morozov
+*/
+
 import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.errors.*;
@@ -16,12 +22,6 @@ import javax.swing.table.AbstractTableModel;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-/*
- * ScalableTableModel implementation for the Actor Prolog language
- * @version 1.0 2012/08/25
- * @author IRE RAS Alexei A. Morozov
-*/
 
 public class ScalableTableModel extends AbstractTableModel {
 	//
@@ -56,10 +56,10 @@ public class ScalableTableModel extends AbstractTableModel {
 			long domainSignature= targetDialog.get_data_request_signature();
 			if (resident==null) {
 				resident= new ScalableTableResident(targetDialog,table);
-				resident.initiate(targetDialog.targetWorld,domainSignature,new PrologString(tableName));
+				resident.initiate(targetDialog.getTargetWorld(),domainSignature,new PrologString(tableName));
 				resident.startProcesses();
 			} else {
-				resident.initiate(targetDialog.targetWorld,domainSignature,new PrologString(tableName));
+				resident.initiate(targetDialog.getTargetWorld(),domainSignature,new PrologString(tableName));
 			}
 		} catch (TermIsNotAString e1) {
 			if (!checkResidentValues) {

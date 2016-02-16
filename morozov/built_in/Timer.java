@@ -4,30 +4,125 @@ package morozov.built_in;
 
 import target.*;
 
-import morozov.classes.*;
 import morozov.run.*;
 import morozov.system.*;
 import morozov.system.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
+import morozov.worlds.*;
 
 import java.math.BigDecimal;
-import java.math.MathContext;
 import java.util.Calendar;
-import java.util.TimerTask;
 
 public abstract class Timer extends Alpha {
 	//
+	public TimeInterval period= null;
+	public TimeInterval initialDelay= null;
+	//
 	private java.util.Timer scheduler;
-	private TimerTask currentTask;
+	private LocalTimerTask currentTask;
 	private boolean isRepeatedAction= false;
 	private long currentPeriod= 1000;
 	private long currentFirstDelay= 1000;
-	// private static final BigDecimal oneMillionBig= BigDecimal.valueOf(1000000);
-	// private static final BigInteger constant_MaxLong= BigInteger.valueOf(Long.MAX_VALUE);
-	// private static final BigInteger constant_MinLong= BigInteger.valueOf(Long.MIN_VALUE);
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	abstract protected Term getBuiltInSlot_E_period();
+	abstract protected Term getBuiltInSlot_E_initial_delay();
 	//
 	public abstract long entry_s_Tick_0();
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public Timer() {
+	}
+	public Timer(GlobalWorldIdentifier id) {
+		super(id);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	// get/set period
+	//
+	public void setPeriod1s(ChoisePoint iX, Term a1) {
+		setPeriod(TimeInterval.termSecondsToTimeInterval(a1,iX));
+		changePeriod(iX);
+	}
+	public void setPeriod2s(ChoisePoint iX, Term a1, Term a2) {
+		TimeInterval p= TimeInterval.termSecondsToTimeInterval(a1,iX);
+		TimeInterval d= TimeInterval.termSecondsToTimeInterval(a2,iX);
+		setPeriod(p);
+		setInitialDelay(d);
+		changePeriod(iX);
+	}
+	public void setPeriod(TimeInterval value) {
+		period= value;
+	}
+	public void getPeriod0ff(ChoisePoint iX, PrologVariable a1) {
+		a1.value= getPeriod(iX).toTerm();
+	}
+	public void getPeriod0fs(ChoisePoint iX) {
+	}
+	public TimeInterval getPeriod(ChoisePoint iX) {
+		if (period != null) {
+			return period;
+		} else {
+			Term value= getBuiltInSlot_E_period();
+			return TimeInterval.termSecondsToTimeInterval(value,iX);
+		}
+	}
+	//
+	// get/set initialDelay
+	//
+	public void setInitialDelay1s(ChoisePoint iX, Term a1) {
+		setInitialDelay(TimeInterval.termSecondsToTimeInterval(a1,iX));
+		changePeriod(iX);
+	}
+	public void setInitialDelay(TimeInterval value) {
+		initialDelay= value;
+	}
+	public void getInitialDelay0ff(ChoisePoint iX, PrologVariable a1) {
+		a1.value= getInitialDelay(iX).toTerm();
+	}
+	public void getInitialDelay0fs(ChoisePoint iX) {
+	}
+	public TimeInterval getInitialDelay(ChoisePoint iX) {
+		if (initialDelay != null) {
+			return initialDelay;
+		} else {
+			Term value= getBuiltInSlot_E_initial_delay();
+			return TimeInterval.termSecondsToTimeInterval(value,iX);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	protected void changePeriod(ChoisePoint iX) {
+		long p= getPeriod(iX).toMillisecondsLong();
+		long d= getInitialDelay(iX).toMillisecondsLong();
+		if (currentPeriod != p || currentFirstDelay != d) {
+			currentPeriod= p;
+			currentFirstDelay= d;
+			if (scheduler != null) {
+				if (currentTask != null) {
+					currentTask.cancel();
+					scheduler.purge();
+					currentTask= new LocalTimerTask(currentProcess,this);
+					long correctedPeriod= currentPeriod;
+					if (correctedPeriod <= 1) {
+						correctedPeriod= 1;
+					};
+					if (isRepeatedAction) {
+						scheduler.scheduleAtFixedRate(currentTask,correctedPeriod,correctedPeriod);
+					} else {
+						scheduler.schedule(currentTask,correctedPeriod);
+					}
+				}
+			}
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void closeFiles() {
 		closeTimer();
@@ -44,12 +139,14 @@ public abstract class Timer extends Alpha {
 		}
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void activate0s(ChoisePoint iX) {
 		if (currentTask==null) {
 			if (scheduler==null) {
 				scheduler= new java.util.Timer(false);
 			};
-			currentTask= new LocalTask(currentProcess,this);
+			currentTask= new LocalTimerTask(currentProcess,this);
 			isRepeatedAction= true;
 			long correctedPeriod= currentPeriod;
 			long correctedFirstDelay= currentFirstDelay;
@@ -64,18 +161,18 @@ public abstract class Timer extends Alpha {
 	}
 	//
 	public void delay1s(ChoisePoint iX, Term n1) {
-		long delay= Converters.termSecondsToMilliseconds(n1,iX);
+		long delay= TimeInterval.termSecondsToTimeInterval(n1,iX).toMillisecondsLong();
 		if (scheduler==null) {
 			scheduler= new java.util.Timer(false);
 		};
 		if (currentTask==null) {
 			isRepeatedAction= false;
-			scheduler.schedule(new LocalTask(currentProcess,this),delay);
+			scheduler.schedule(new LocalTimerTask(currentProcess,this),delay);
 		} else {
 			currentTask.cancel();
 			scheduler.purge();
 			currentProcess.cancelTimerMessage(this);
-			currentTask= new LocalTask(currentProcess,this);
+			currentTask= new LocalTimerTask(currentProcess,this);
 			if (isRepeatedAction) {
 				long correctedPeriod= currentPeriod;
 				if (correctedPeriod <= 1) {
@@ -88,45 +185,11 @@ public abstract class Timer extends Alpha {
 		}
 	}
 	//
-	public void setPeriod1s(ChoisePoint iX, Term n1) {
-		long period= Converters.termSecondsToMilliseconds(n1,iX);
-		setPeriod(period,period);
-	}
-	public void setPeriod2s(ChoisePoint iX, Term n1, Term n2) {
-		long period= Converters.termSecondsToMilliseconds(n1,iX);
-		long firstDelay= Converters.termSecondsToMilliseconds(n2,iX);
-		setPeriod(period,firstDelay);
-	}
-	protected void setPeriod(long period, long firstDelay) {
-		if (currentPeriod != period || currentFirstDelay != firstDelay) {
-			currentPeriod= period;
-			currentFirstDelay= firstDelay;
-			if (scheduler != null) {
-				if (currentTask != null) {
-					currentTask.cancel();
-					scheduler.purge();
-					currentTask= new LocalTask(currentProcess,this);
-					long correctedPeriod= currentPeriod;
-					// long correctedFirstDelay= currentFirstDelay;
-					if (correctedPeriod <= 1) {
-						correctedPeriod= 1;
-					};
-					// if (correctedFirstDelay < 0) {
-					//	correctedFirstDelay= 0;
-					// };
-					if (isRepeatedAction) {
-						scheduler.scheduleAtFixedRate(currentTask,correctedPeriod,correctedPeriod);
-					} else {
-						scheduler.schedule(currentTask,correctedPeriod);
-					}
-				}
-			}
-		}
-	}
-	//
 	public void suspend0s(ChoisePoint iX) {
 		closeTimer();
 	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void tick0s(ChoisePoint iX) {
 	}
@@ -142,6 +205,8 @@ public abstract class Timer extends Alpha {
 			c0.execute(iX);
 		}
 	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public static void time3s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3) {
 		// Calendar calendar= new GregorianCalendar();
@@ -194,7 +259,6 @@ public abstract class Timer extends Alpha {
 	}
 	//
 	public static void milliseconds0ff(ChoisePoint iX, PrologVariable argument) {
-		// Calendar calendar= new GregorianCalendar();
 		Calendar calendar= Calendar.getInstance();
 		long milliseconds= calendar.getTimeInMillis();
 		argument.value= new PrologInteger(milliseconds);
@@ -204,7 +268,6 @@ public abstract class Timer extends Alpha {
 	}
 	//
 	public static void date4s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3, PrologVariable a4) {
-		// Calendar calendar= new GregorianCalendar();
 		Calendar calendar= Calendar.getInstance();
 		int year= calendar.get(Calendar.YEAR);
 		int month= calendar.get(Calendar.MONTH) + 1;
@@ -224,7 +287,6 @@ public abstract class Timer extends Alpha {
 		iX.pushTrail(a4);
 	}
 	public static void date3s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3) {
-		// Calendar calendar= new GregorianCalendar();
 		Calendar calendar= Calendar.getInstance();
 		int year= calendar.get(Calendar.YEAR);
 		int month= calendar.get(Calendar.MONTH) + 1;
@@ -237,7 +299,6 @@ public abstract class Timer extends Alpha {
 		iX.pushTrail(a3);
 	}
 	public static void date0ff(ChoisePoint iX, PrologVariable argument) {
-		// Calendar calendar= new GregorianCalendar();
 		Calendar calendar= Calendar.getInstance();
 		int year= calendar.get(Calendar.YEAR);
 		int month= calendar.get(Calendar.MONTH) + 1;
@@ -255,29 +316,11 @@ public abstract class Timer extends Alpha {
 	public static void date0fs(ChoisePoint iX) {
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void sleep1s(ChoisePoint iX, Term n1) {
-		try {
-			BigDecimal nanos= Converters.termToTimeInterval(n1,iX);
-			BigDecimal milliseconds= nanos.divideToIntegralValue(Converters.oneMillionBig,MathContext.DECIMAL128);
-			BigDecimal remainder= nanos.subtract(milliseconds.multiply(Converters.oneMillionBig));
-			int delayInMilliseconds= PrologInteger.toInteger(milliseconds);
-			int delayInNanos= PrologInteger.toInteger(remainder);
-			if (delayInMilliseconds >= 0) {
-				if (delayInNanos > 0) {
-					if (delayInNanos <= 999999) {
-						currentProcess.thread.sleep(delayInMilliseconds,delayInNanos);
-					} else {
-						delayInMilliseconds++;
-						currentProcess.thread.sleep(delayInMilliseconds);
-					}
-				} else {
-					currentProcess.thread.sleep(delayInMilliseconds);
-				}
-			}
-		} catch (TermIsNotTimeInterval e1) {
-			throw new WrongArgumentIsNotTimeInterval(n1);
-		} catch (InterruptedException e2) {
-		}
+		BigDecimal nanos= TimeInterval.termSecondsToTimeInterval(n1,iX).toNanosecondsBigDecimal();
+		SystemUtils.sleep(nanos,currentProcess);
 	}
 	//
 	public void setPriority1s(ChoisePoint iX, Term n1) {
@@ -290,22 +333,14 @@ public abstract class Timer extends Alpha {
 	}
 	//
 	public void getPriority0ff(ChoisePoint iX, PrologVariable n1) {
-		n1.value= new PrologInteger(currentProcess.thread.getPriority());
+		n1.value= Converters.ProcessPriorityToTerm(currentProcess.thread.getPriority());
 	}
 	public void getPriority0fs(ChoisePoint iX) {
 	}
-}
-
-class LocalTask extends TimerTask {
-	private ActiveWorld currentProcess;
-	private AbstractWorld targetWorld;
 	//
-	public LocalTask(ActiveWorld process, AbstractWorld target) {
-		currentProcess= process;
-		targetWorld= target;
+	public void getPriorityNumber0ff(ChoisePoint iX, PrologVariable n1) {
+		n1.value= new PrologInteger(currentProcess.thread.getPriority());
 	}
-	//
-	public void run() {
-		currentProcess.receiveTimerMessage(targetWorld);
+	public void getPriorityNumber0fs(ChoisePoint iX) {
 	}
 }

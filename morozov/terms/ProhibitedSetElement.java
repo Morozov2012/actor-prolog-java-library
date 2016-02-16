@@ -4,11 +4,11 @@ package morozov.terms;
 
 import target.*;
 
-import morozov.classes.*;
 import morozov.domains.*;
 import morozov.domains.signals.*;
 import morozov.run.*;
 import morozov.terms.signals.*;
+import morozov.worlds.*;
 
 import java.nio.charset.CharsetEncoder;
 import java.util.HashMap;
@@ -19,9 +19,15 @@ public class ProhibitedSetElement extends UnderdeterminedSetItem {
 		name= aName;
 		tail= aTail;
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public int hashCode() {
-		return (int)name + tail.hashCode();
+		return tail.hashCode();
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void isEmptySet(ChoisePoint cp) throws Backtracking {
 		tail.isEmptySet(cp);
 	}
@@ -112,7 +118,9 @@ public class ProhibitedSetElement extends UnderdeterminedSetItem {
 			tail.appendNamedElementProhibition(aName,cp);
 		}
 	}
-	// "Unify with ..." functions
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void unifyWithSet(long aName, Term aValue, Term aTail, Term aSet, ChoisePoint cp) throws Backtracking {
 		if (name == aName) {
 			throw Backtracking.instance;
@@ -181,7 +189,9 @@ public class ProhibitedSetElement extends UnderdeterminedSetItem {
 			name,
 			tail.substituteWorlds(map,cp));
 	}
-	// Domain check
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public boolean isCoveredBySetDomain(long functor, PrologDomain headDomain, PrologDomain baseDomain, ChoisePoint cp, boolean ignoreFreeVariables) {
 		return baseDomain.coversTerm(tail,cp,ignoreFreeVariables);
 	}
@@ -195,16 +205,18 @@ public class ProhibitedSetElement extends UnderdeterminedSetItem {
 			throw new DomainAlternativeDoesNotCoverTerm(initialValue.getPosition());
 		}
 	}
-	// Converting Term to String
-	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, CharsetEncoder encoder) {
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		if (provideStrictSyntax) {
-			return tail.toString(cp,isInner,provideStrictSyntax,encoder);
+			return tail.toString(cp,isInner,provideStrictSyntax,encodeWorlds,encoder);
 		} else {
 			StringBuilder buffer= new StringBuilder("{");
 			try {
 				buffer.append(
 					(name < 0 ?
-						SymbolNames.retrieveSymbolName(-name).toString(encoder) :
+						SymbolNames.retrieveSymbolName(-name).toSafeString(encoder) :
 						String.format("%d",name) ) +
 					":" + PrologNoValue.namePrologNoValue);
 				long nextName;
@@ -216,12 +228,12 @@ public class ProhibitedSetElement extends UnderdeterminedSetItem {
 						buffer.append(",");
 						buffer.append(
 							(nextName < 0 ?
-								SymbolNames.retrieveSymbolName(-nextName).toString(encoder) :
+								SymbolNames.retrieveSymbolName(-nextName).toSafeString(encoder) :
 								String.format("%d",nextName) ) +
 							":");
 						try {
 							nextValue= currentTail.getNextPairValue(cp);
-							buffer.append(nextValue.toString(cp,true,provideStrictSyntax,encoder));
+							buffer.append(nextValue.toString(cp,true,provideStrictSyntax,encodeWorlds,encoder));
 						} catch (SetElementIsProhibited e) {
 							buffer.append(PrologNoValue.namePrologNoValue);
 						};
@@ -232,7 +244,7 @@ public class ProhibitedSetElement extends UnderdeterminedSetItem {
 					return buffer.toString();
 				} catch (TermIsNotASet e) {
 					buffer.append("|");
-					buffer.append(currentTail.toString(cp,true,provideStrictSyntax,encoder));
+					buffer.append(currentTail.toString(cp,true,provideStrictSyntax,encodeWorlds,encoder));
 					buffer.append("}");
 					return buffer.toString();
 				}
@@ -241,10 +253,10 @@ public class ProhibitedSetElement extends UnderdeterminedSetItem {
 				buffer.append(
 					String.format("{%s:%s|%s}",
 						(name < 0 ?
-							SymbolNames.retrieveSymbolName(-name).toString(encoder) :
+							SymbolNames.retrieveSymbolName(-name).toSafeString(encoder) :
 							String.format("%d",name) ),
 						PrologNoValue.namePrologNoValue,
-						tail.toString(cp,true,provideStrictSyntax,encoder)));
+						tail.toString(cp,true,provideStrictSyntax,encodeWorlds,encoder)));
 				return buffer.toString();
 			}
 		}

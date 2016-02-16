@@ -15,7 +15,7 @@ package morozov.system.gui.dialogs.scalable;
 import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
-import morozov.system.gui.dialogs.signals.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
 
 import javax.swing.JLabel;
@@ -100,8 +100,9 @@ public class ScalableLabel extends ActiveComponent {
 		text= value.toString(iX);
 		if (component!=null) {
 			((JLabel)component).setText(alignText(text));
-			dialog.invalidate(); // 2012.03.05
-			dialog.repaint(); // 2013.09.04
+			// dialog.invalidate(); // 2012.03.05
+			// dialog.repaint(); // 2013.09.04
+			dialog.safelyInvalidateAndRepaint();
 		}
 	}
 	//

@@ -12,4 +12,3 @@ public class MessageBoxPane extends JOptionPane {
 		return 90;
 	}
 }
-

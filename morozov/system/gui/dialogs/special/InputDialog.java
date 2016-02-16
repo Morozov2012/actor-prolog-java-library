@@ -7,6 +7,7 @@
 package morozov.system.gui.dialogs.special;
 
 import morozov.system.*;
+import morozov.system.gui.*;
 import morozov.terms.signals.*;
 
 import java.math.BigInteger;
@@ -57,7 +58,8 @@ public class InputDialog extends JDialog implements PropertyChangeListener {
 		optionPane.addPropertyChangeListener(this);
 		pack();
 		SpecialUtils.centre(this);
-		setVisible(true);
+		// setVisible(true);
+		DesktopUtils.safelySetVisible(true,this);
 	}
 	//
 	public void propertyChange(PropertyChangeEvent e) {
@@ -73,7 +75,6 @@ public class InputDialog extends JDialog implements PropertyChangeListener {
 			} else if (value instanceof Integer) {
 				int answer= (Integer)value;
 				optionPane.setValue(JOptionPane.UNINITIALIZED_VALUE);
-				// System.out.printf("Value=%s\n",answer);
 				if (answer==JOptionPane.OK_OPTION) {
 					typedText= textField.getText();
 					try {
@@ -81,7 +82,6 @@ public class InputDialog extends JDialog implements PropertyChangeListener {
 							BigInteger result= Converters.stringToStrictInteger(typedText);
 						} else {
 							double result= Converters.stringToReal(typedText);
-							// System.out.printf(">>>result=%f<<<",result);
 							if (Double.isNaN(result)) {
 								throw TermIsNotAReal.instance;
 							} else if (Double.isInfinite(result)) {
@@ -117,6 +117,7 @@ public class InputDialog extends JDialog implements PropertyChangeListener {
 	}
 	protected void clearAndHide() {
 		textField.setText(null);
-		setVisible(false);
+		// setVisible(false);
+		DesktopUtils.safelySetVisible(false,this);
 	}
 }

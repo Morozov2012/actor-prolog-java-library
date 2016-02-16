@@ -2,7 +2,8 @@
 
 package morozov.system.gui.space2d;
 
-import morozov.classes.*;
+import morozov.run.*;
+import morozov.worlds.*;
 
 import java.util.HashMap;
 import java.util.Map;

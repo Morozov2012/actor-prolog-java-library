@@ -2,9 +2,7 @@
 
 package morozov.system.vision;
 
-import java.io.PrintStream;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.math.BigInteger;
 
 class BreakPoint {

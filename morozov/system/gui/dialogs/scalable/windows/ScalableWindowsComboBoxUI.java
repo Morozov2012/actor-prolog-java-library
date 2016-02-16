@@ -7,6 +7,7 @@
 package morozov.system.gui.dialogs.scalable.windows;
 
 import morozov.system.gui.dialogs.scalable.common.*;
+import morozov.terms.*;
 
 import javax.swing.UIManager;
 import javax.swing.DefaultListCellRenderer;
@@ -103,14 +104,14 @@ class ScalableComboBoxArrowButton extends BasicArrowButton {
 	//
 	public Dimension getPreferredSize() {
 		// return new Dimension(16,16);
-		return new Dimension((int)StrictMath.round(16*(2.0/5)),16);
-		// return new Dimension((int)StrictMath.round(8*(2.0/5)),8);
-		// return new Dimension((int)StrictMath.round(32*(2.0/5)),32);
-		// return new Dimension((int)StrictMath.round(64*(2.0/5)),64);
+		return new Dimension(PrologInteger.toInteger(16*(2.0/5)),16);
+		// return new Dimension(PrologInteger.toInteger(8*(2.0/5)),8);
+		// return new Dimension(PrologInteger.toInteger(32*(2.0/5)),32);
+		// return new Dimension(PrologInteger.toInteger(64*(2.0/5)),64);
 	}
 	public Insets getInsets() {
 		Insets insets= super.getInsets();
-		insets.set(insets.bottom,(int)StrictMath.round(insets.left*(2.0/5)),insets.top,(int)StrictMath.round(insets.right*(2.0/5)));
+		insets.set(insets.bottom,PrologInteger.toInteger(insets.left*(2.0/5)),insets.top,PrologInteger.toInteger(insets.right*(2.0/5)));
 		return insets;
 	}
 }

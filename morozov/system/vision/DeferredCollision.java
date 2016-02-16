@@ -2,8 +2,6 @@
 
 package morozov.system.vision;
 
-import java.io.PrintStream;
-
 class DeferredCollision {
 	public long implementationTime;
 	public GrowingTrack receiver;

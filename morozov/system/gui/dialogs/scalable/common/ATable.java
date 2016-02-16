@@ -45,8 +45,8 @@ public class ATable extends JScrollPane {
 	public ATable(AbstractDialog tD, ActiveComponent tC, double tableLength, double tableHeight, ScalableTableColors colors, ScalableTableColumnDescription[] columnDescriptions, Term initialValue, ChoisePoint iX) {
 		targetDialog= tD;
 		targetComponent= tC;
-		length= (int)StrictMath.round(tableLength);
-		// height= (int)StrictMath.round(tableHeight);
+		length= PrologInteger.toInteger(tableLength);
+		// height= PrologInteger.toInteger(tableHeight);
 		table= new ExtendedJTable(tableHeight,colors,columnDescriptions,new ScalableTableModel(targetDialog,this,columnDescriptions,initialValue,iX),iX);
 		// table.setFillsViewportHeight(true);
 		table.setFillsViewportHeight(false);
@@ -57,8 +57,6 @@ public class ATable extends JScrollPane {
 		// setMinimumSize(tableSize);
 		setViewportView(table);
 		table.getSelectionModel().addListSelectionListener(targetComponent);
-		// targetDialog.sendResidentRequest(new ScalableTableResident(),"TABLE1",iX);
-		// setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 	}
 	//
 	public void addFocusListener(FocusListener l) {
@@ -130,7 +128,6 @@ public class ATable extends JScrollPane {
 	}
 	//
 	public void setFont(Font font) {
-		// System.out.printf("font=%s\n",font);
 		super.setFont(font);
 		if (table!=null) {
 			table.setFont(font);
@@ -140,17 +137,9 @@ public class ATable extends JScrollPane {
 	public void setViewportSize(Font font) {
 		JTableHeader header= table.getTableHeader();
 		Dimension headerPreferableSize= header.getPreferredSize();
-		// System.out.printf("headerPreferableSize=%s\n",headerPreferableSize);
 		FontMetrics metrics= getFontMetrics(font);
 		int rowHeight= metrics.getHeight();
-		// targetDialog.doLayout(true);
 		Dimension tableSize= table.getPreferredSize();
-		// System.out.printf("===\n");
-		// System.out.printf("border=%s\n",getBorder());
-		// System.out.printf("Insets=%s\n",getBorder().getBorderInsets(this));
-		// System.out.printf("metrics.getHeight()=%s\n",rowHeight);
-		// System.out.printf("rowMargin=%s\n",table.getRowMargin());
-		// System.out.printf("headerPreferableSize.height=%s\n",headerPreferableSize.height);
 		int rowMargin= table.getRowMargin();
 		Border border= getBorder();
 		int extraSpace= 0;
@@ -185,11 +174,7 @@ public class ATable extends JScrollPane {
 							model.setValueIsAdjusting(false);
 						}
 					} catch (TermIsNotAnInteger e1) {
-						// try {
 						implementMultipleSelection(value,iX);
-						// } catch(Throwable ee) {
-						// System.out.printf("ee=%s\n",ee);
-						// }
 					}
 				}
 			}
@@ -245,7 +230,7 @@ public class ATable extends JScrollPane {
 				};
 				targetDialog.doLayout(true);
 				Dimension tableSize= table.getPreferredSize();
-				targetDialog.repaint();
+				targetDialog.safelyRepaint();
 				targetDialog.repaintAfterDelay();
 			}
 		}

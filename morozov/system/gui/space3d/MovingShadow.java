@@ -88,8 +88,6 @@ class MovingShadow extends Group {
 		Point3f lightPosition= new Point3f(0,0,0);
 		tr.transform(lightPosition);
 		//
-		// System.out.printf("[15]lightPosition:%s\n",lightPosition);
-		//
 		float[] planeCos= plane2Cos(plane);
 		//
 		float[] planePoint= translatePoint(planeCos,lightPosition);
@@ -175,8 +173,6 @@ class MovingShadow extends Group {
 			u.invert();
 			shadowProj.mul(u,proj);
 		} catch (SingularMatrixException e) {
-			//
-			// System.out.printf("!!! SingularMatrixException: %s\n",e);
 			//
 			Transform3D proj= new Transform3D();
 			proj.set(mat);

@@ -35,7 +35,7 @@ public class ExtendedJTable extends JTable {
 	protected ColoredTableCellHeaderRenderer[] columnHeaderRenderers;
 	public ExtendedJTable(double height, ScalableTableColors colors, ScalableTableColumnDescription[] descriptions, TableModel dm, ChoisePoint iX) {
 		super(dm);
-		// height= (int)StrictMath.round(tableHeight);
+		// height= PrologInteger.toInteger(tableHeight);
 		tableHeight= height;
 		columnDescriptions= descriptions;
 		numberOfColumns= columnDescriptions.length;
@@ -57,30 +57,30 @@ public class ExtendedJTable extends JTable {
 			Color titleBackground= null;
 			// Color tableBackground= null;
 			try {
-				cellForeground= GUI_Utils.termToColorSafe(cellForegroundColor,iX);
+				cellForeground= ExtendedColor.termToColorSafe(cellForegroundColor,iX);
 			} catch (TermIsSymbolDefault e) {
 			};
 			try {
-				cellBackground= GUI_Utils.termToColorSafe(cellBackgroundColor,iX);
+				cellBackground= ExtendedColor.termToColorSafe(cellBackgroundColor,iX);
 			} catch (TermIsSymbolDefault e) {
 			};
 			try {
-				titleForeground= GUI_Utils.termToColorSafe(titleForegroundColor,iX);
+				titleForeground= ExtendedColor.termToColorSafe(titleForegroundColor,iX);
 			} catch (TermIsSymbolDefault e) {
 			};
 			try {
-				titleBackground= GUI_Utils.termToColorSafe(titleBackgroundColor,iX);
+				titleBackground= ExtendedColor.termToColorSafe(titleBackgroundColor,iX);
 			} catch (TermIsSymbolDefault e) {
 			};
 			// try {
-			//	tableBackground= GUI_Utils.termToColorSafe(tableBackgroundColor,iX);
+			//	tableBackground= ExtendedColor.termToColorSafe(tableBackgroundColor,iX);
 			// } catch (TermIsSymbolDefault e) {
 			// };
 			setAutoCreateColumnsFromModel(false);
 			cellRenderers[n]= new ColoredTableCellRenderer(horizontalAlignment,cellForeground,cellBackground);
 			columnHeaderRenderers[n]= new ColoredTableCellHeaderRenderer(titleForeground,titleBackground);
 			TableColumn column= columnModel.getColumn(n);
-			int preferredWidth= (int)StrictMath.round(width*charWidth);
+			int preferredWidth= PrologInteger.toInteger(width*charWidth);
 			column.setPreferredWidth(preferredWidth);
 			// setBackground(tableBackground);
 		};
@@ -107,7 +107,7 @@ public class ExtendedJTable extends JTable {
 		for (int n=0; n < numberOfColumns; n++) {
 			double width= columnDescriptions[n].width;
 			TableColumn column= columnModel.getColumn(n);
-			int preferredWidth= (int)StrictMath.round(width*charWidth);
+			int preferredWidth= PrologInteger.toInteger(width*charWidth);
 			column.setPreferredWidth(preferredWidth);
 		};
 		// int rowHeight= StrictMath.max(metrics.getHeight(),16); // DEBUG
@@ -122,12 +122,14 @@ public class ExtendedJTable extends JTable {
 		// int rowHeight= StrictMath.max(metrics.getHeight(),5); // DEBUG
 		// int margin= getRowMargin();
 		int rowHeight= metrics.getHeight(); // + margin;
-		double actualHeight= StrictMath.min(tableHeight,model.getRowCount());
-		int preferredHeight= (int)StrictMath.round(actualHeight*rowHeight);
+		int rowCount= model.getRowCount();
+		double actualHeight;
+		if (rowCount > 0) {
+			actualHeight= StrictMath.min(tableHeight,model.getRowCount());
+		} else {
+			actualHeight= tableHeight;
+		};
+		int preferredHeight= PrologInteger.toInteger(actualHeight*rowHeight);
 		return new Dimension(size.width,preferredHeight);
 	}
-	// public boolean getScrollableTracksViewportHeight() {
-	//	// return true;
-	//	return false;
-	// }
 }

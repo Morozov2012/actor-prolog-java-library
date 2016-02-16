@@ -2,7 +2,7 @@
 
 package morozov.system.gui.space3d;
 
-import morozov.classes.*;
+import morozov.run.*;
 import morozov.system.gui.*;
 
 public class InternalFrame3D extends InnerPage {

@@ -3,6 +3,7 @@
 package morozov.system.checker;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.Files;
 import java.nio.file.FileSystems;
 import java.nio.file.FileSystem;
@@ -21,14 +22,20 @@ public class LocalFileAttributes {
 	public boolean isOK= false;
 	public LocalFileAttributes(URI uri) {
 		try {
-			Path path= fileSystem.provider().getPath(uri);
+			Path path= Paths.get(uri);
 			basicAttributes= Files.readAttributes(path,BasicFileAttributes.class);
 			if (basicAttributes.isDirectory()) {
 				directoryContent= new ArrayList<Path>();
-				DirectoryStream<Path> stream;
-				stream= Files.newDirectoryStream(path);
-				for (Path entry: stream) {
-					directoryContent.add(entry);
+				DirectoryStream<Path> stream= Files.newDirectoryStream(path);
+				try {
+					for (Path entry: stream) {
+						directoryContent.add(entry);
+					}
+				} finally {
+					try {
+						stream.close();
+					} catch (Throwable e) {
+					}
 				}
 			};
 			isOK= true;

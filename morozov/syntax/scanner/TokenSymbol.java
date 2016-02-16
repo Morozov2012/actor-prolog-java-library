@@ -22,7 +22,7 @@ public class TokenSymbol extends PrologToken {
 		return includedIntoApostrophes;
 	}
 	public String toString() {
-		return SymbolNames.retrieveSymbolName(value).toString(null);
+		return SymbolNames.retrieveSymbolName(value).toRawString(null);
 		// return String.format("%s",value);
 	}
 }
