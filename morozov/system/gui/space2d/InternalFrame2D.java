@@ -25,7 +25,6 @@ public class InternalFrame2D
 		implements ActionListener, MouseListener, MouseMotionListener {
 	protected Canvas2D targetWorld;
 	protected AtomicReference<Canvas2DScalingFactor> scalingFactor;
-	// public ExtendedSpace2D space;
 	//
 	public InternalFrame2D(Canvas2D target, String title, StaticContext context, List<Java2DCommand> commandList, AtomicReference<Canvas2DScalingFactor> scaling) {
 		super(title);
@@ -36,9 +35,6 @@ public class InternalFrame2D
 		safelyAdd(extendedSpace2D);
 	}
 	//
-	// public Canvas2DScalingFactor getScalingFactor() {
-	//	return scalingFactor.get();
-	// }
 	public DrawingMode getDrawingMode() {
 		if (canvasSpace != null) {
 			return ((ExtendedSpace2D)canvasSpace).getDrawingMode();
@@ -60,25 +56,6 @@ public class InternalFrame2D
 			canvasSpace.safelyRepaint();
 		}
 	}
-	//
-/*
-	public void repaint() {
-		super.repaint();
-		if (canvasSpace != null) {
-			canvasSpace.repaint();
-		}
-	}
-*/
-	//
-/*
-	public Dimension getSize(Dimension size) {
-		if (canvasSpace != null) {
-			return canvasSpace.getSize(size);
-		} else {
-			return null;
-		}
-	}
-*/
 	//
 	public void actionPerformed(ActionEvent event) {
 		long domainSignature= targetWorld.entry_s_Action_1_i();

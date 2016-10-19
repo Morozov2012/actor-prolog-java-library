@@ -652,8 +652,9 @@ public abstract class Canvas2D extends BufferedImageController {
 	public void initiateRegisteredCanvasSpace(CanvasSpace s, ChoisePoint iX) {
 		ExtendedSpace2D extendedSpace= (ExtendedSpace2D)s;
 		// extendedSpace.setTargetWorld(this);
-		extendedSpace.setCommands(actualCommands);
+		extendedSpace.setScalingFactor(actingScalingFactor);
 		extendedSpace.setEnableAntialiasing(sceneAntialiasingIsEnabled);
+		extendedSpace.setCommands(actualCommands);
 	}
 	//
 	protected void enableMouseListeners() {
@@ -710,8 +711,8 @@ public abstract class Canvas2D extends BufferedImageController {
 	}
 	protected void refreshAttributesOfCanvasSpace(ChoisePoint iX) {
 		changeBackgroundColor(iX);
-		sceneAntialiasingIsEnabled.set(getEnableSceneAntialiasing(iX));
 		actingScalingFactor.set(getScalingFactor(iX));
+		sceneAntialiasingIsEnabled.set(getEnableSceneAntialiasing(iX));
 	}
 	//
 	///////////////////////////////////////////////////////////////

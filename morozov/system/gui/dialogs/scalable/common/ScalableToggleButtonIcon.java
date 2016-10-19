@@ -12,6 +12,7 @@ package morozov.system.gui.dialogs.scalable.common;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.system.gui.*;
 import morozov.terms.*;
 
 import javax.swing.JToggleButton;
@@ -76,7 +77,8 @@ public abstract class ScalableToggleButtonIcon implements Icon, UIResource, Seri
 			if (size!=null) {
 				measuredSize= size;
 			} else if (relatedComponent!=null) {
-				Graphics2D g2D= (Graphics2D)relatedComponent.getGraphics();
+				// Graphics2D g2D= (Graphics2D)relatedComponent.getGraphics();
+				Graphics2D g2D= DesktopUtils.safelyGetGraphics2D(relatedComponent);
 				if (g2D!=null) {
 					FontRenderContext fRC= g2D.getFontRenderContext();
 					Rectangle2D r2D= givenFont.getStringBounds("M",fRC);

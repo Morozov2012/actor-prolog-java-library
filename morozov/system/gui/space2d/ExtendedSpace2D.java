@@ -46,11 +46,13 @@ public class ExtendedSpace2D
 	//
 	public ExtendedSpace2D(boolean keepProportions) {
 		Canvas2DScalingFactor scaling;
-		if (keepProportions) {
-			scaling= Canvas2DScalingFactor.MIN;
-		} else {
-			scaling= Canvas2DScalingFactor.INDEPENDENT;
-		};
+		// if (keepProportions) {
+		//	scaling= Canvas2DScalingFactor.MIN;
+		// } else {
+		//	scaling= Canvas2DScalingFactor.INDEPENDENT;
+		// };
+		// 2016.08.04 !!!
+		scaling= Canvas2DScalingFactor.INDEPENDENT;
 		scalingFactor= new AtomicReference<Canvas2DScalingFactor>(scaling);
 		sceneAntialiasingIsEnabled= new AtomicBoolean(false);
 		control= new ExtendedJPanel(owner,currentCommands,oldCommands,scalingFactor,sceneAntialiasingIsEnabled,redrawingIsSuspended);
@@ -65,8 +67,13 @@ public class ExtendedSpace2D
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public void setScalingFactor(AtomicReference<Canvas2DScalingFactor> factor) {
+		scalingFactor= factor;
+		((ExtendedJPanel)control).setScalingFactor(factor);
+	}
 	public void setEnableAntialiasing(AtomicBoolean enableAntialiasing) {
 		sceneAntialiasingIsEnabled= enableAntialiasing;
+		((ExtendedJPanel)control).setEnableAntialiasing(enableAntialiasing);
 	}
 	public void setCommands(List<Java2DCommand> commandList) {
 		currentCommands= commandList;
@@ -339,7 +346,8 @@ public class ExtendedSpace2D
 		GraphicsConfiguration gc= o.getGraphicsConfiguration();
 		if (gc != null) {
 			java.awt.image.BufferedImage bufferedImage= gc.createCompatibleImage(integerWidth,integerHeight);
-			Graphics g= bufferedImage.getGraphics();
+			// Graphics g= bufferedImage.getGraphics();
+			Graphics g= DesktopUtils.safelyGetGraphics2D(bufferedImage);
 			try {
 				g.translate(x0,y0);
 				control.print(g);

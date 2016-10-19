@@ -2,6 +2,7 @@
 
 package morozov.system.vision;
 
+import morozov.system.gui.*;
 import morozov.terms.*;
 
 import java.awt.image.WritableRaster;
@@ -16,6 +17,12 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicReference;
 import java.math.BigInteger;
+
+import java.awt.color.ColorSpace;
+import java.awt.image.ColorConvertOp;
+import java.util.Calendar;
+import java.io.PrintWriter;
+import java.io.IOException;
 
 public class PlainImageSubtractor {
 	//
@@ -86,6 +93,11 @@ public class PlainImageSubtractor {
 	protected int numberOfExtraBands;
 	protected int backgroundN= -1;
 	protected int maximalN= 30000;
+//protected long[] rawVideoTime;
+//protected int[][][] rawVideo;
+//protected int rawVideoFrameLimit= 150;
+//protected int rawVideoFrameCounter= 0;
+//protected boolean rawVideoIsDone= false;
 	protected int[][] backgroundSum;
 	protected int[][] backgroundSumX2;
 	protected int[][] deltaPixels;
@@ -208,12 +220,12 @@ public class PlainImageSubtractor {
 		if (backgroundN >= minimalTrainingInterval) {
 			if (extractBlobs) {
 				extractBlobs();
-			};
-			if (trackBlobs) {
-				identifyBlobs();
-			} else {
-				for (int k=0; k < currentBlobIdentifiers.length; k++) {
-					currentBlobIdentifiers[k]= BigInteger.valueOf(k+1);
+				if (trackBlobs) {
+					identifyBlobs();
+				} else {
+					for (int k=0; k < currentBlobIdentifiers.length; k++) {
+						currentBlobIdentifiers[k]= BigInteger.valueOf(k+1);
+					}
 				}
 			}
 		}
@@ -230,7 +242,8 @@ public class PlainImageSubtractor {
 			}
 		};
 		java.awt.image.BufferedImage extractedImage= new java.awt.image.BufferedImage(imageWidth,imageHeight,java.awt.image.BufferedImage.TYPE_4BYTE_ABGR);
-		Graphics2D g2= (Graphics2D)extractedImage.getGraphics();
+		// Graphics2D g2= (Graphics2D)extractedImage.getGraphics();
+		Graphics2D g2= DesktopUtils.safelyGetGraphics2D(extractedImage);
 		g2.drawImage(recentImage,0,0,null);
 		WritableRaster imageRaster= extractedImage.getRaster();
 		imageRaster.setSamples(0,0,imageWidth,imageHeight,3,contourPixels);
@@ -746,6 +759,10 @@ public class PlainImageSubtractor {
 				numberOfBands= 3;
 				numberOfExtraBands= 1;
 			};
+//rawVideoTime= new long[rawVideoFrameLimit];
+//rawVideo= new int[numberOfBands][vectorLength][rawVideoFrameLimit];
+//rawVideoFrameCounter= 0;
+//rawVideoIsDone= false;
 			backgroundN= 0;
 			backgroundSum= new int[numberOfBands][vectorLength];
 			backgroundSumX2= new int[numberOfBands][vectorLength];
@@ -761,6 +778,7 @@ public class PlainImageSubtractor {
 		for (int k=0; k < numberOfBands; k++) {
 			raster.getSamples(0,0,imageWidth,imageHeight,k,imagePixels[k]);
 		};
+//imagePixels= VisionUtils.convertRGBtoHSB(imagePixels);
 		for (int k=0; k < numberOfBands+numberOfExtraBands; k++) {
 			for (int n=0; n < vectorLength; n++) {
 				deltaPixels[k][n]= 0;
@@ -812,6 +830,41 @@ public class PlainImageSubtractor {
 		} else {
 			contourPixels= deltaPixels[0];
 		};
+//if (rawVideoFrameCounter < rawVideoFrameLimit) {
+//	Calendar calendar= Calendar.getInstance();
+//	long milliseconds= calendar.getTimeInMillis();
+//	rawVideoTime[rawVideoFrameCounter]= milliseconds;
+//	for (int k=0; k < numberOfBands; k++) {
+//		for (int n=0; n < vectorLength; n++) {
+//			rawVideo[k][n][rawVideoFrameCounter]= imagePixels[k][n];
+//		}
+//	};
+//	rawVideoFrameCounter++;
+//} else if (!rawVideoIsDone) {
+//	rawVideoIsDone= true;
+//	try {
+//		// FileOutputStream stream= new FileOutputStream("video.txt");
+//		PrintWriter stream= new PrintWriter("video.txt");
+//		stream.printf("%d\n",rawVideoFrameCounter);
+//		stream.printf("%d\n",numberOfBands);
+//		stream.printf("%d\n",vectorLength);
+//		stream.printf("%d\n",imageWidth);
+//		stream.printf("%d\n",imageHeight);
+//		for (int f=0; f < rawVideoFrameLimit; f++) {
+//			stream.printf("%d\n",rawVideoTime[f]);
+//			for (int k=0; k < numberOfBands; k++) {
+//				for (int n=0; n < vectorLength; n++) {
+//					stream.printf("%d\n",rawVideo[k][n][f]);
+//				}
+//			};
+//			System.out.printf("Frame %d / %d : O.K.\n",f,rawVideoFrameLimit);
+//		};
+//		stream.close();
+//		System.out.printf("Done!\n");
+//	} catch (IOException e) {
+//		System.out.printf("ERROR: %s",e);
+//	}
+//}
 		if (takeImageIntoAccount) {
 			if (backgroundN >= maximalN) {
 				backgroundN= backgroundN / overcrowdedMatrixReductionCoefficient;
@@ -834,7 +887,8 @@ public class PlainImageSubtractor {
 	}
 	public java.awt.image.BufferedImage filterAndConvertToGray(java.awt.image.BufferedImage a) {
 		java.awt.image.BufferedImage b= new java.awt.image.BufferedImage(a.getWidth(),a.getHeight(),java.awt.image.BufferedImage.TYPE_BYTE_GRAY);
-		Graphics2D g2= (Graphics2D)b.getGraphics();
+		// Graphics2D g2= (Graphics2D)b.getGraphics();
+		Graphics2D g2= DesktopUtils.safelyGetGraphics2D(b);
 		if (useGaussianFiltering) {
 			if (gaussianMatrix==null) {
 				gaussianMatrix= VisionUtils.gaussianMatrix(gaussianFilterRadius);
@@ -853,7 +907,8 @@ public class PlainImageSubtractor {
 	}
 	public java.awt.image.BufferedImage filterAndConvertToBGR(java.awt.image.BufferedImage a) {
 		java.awt.image.BufferedImage b= new java.awt.image.BufferedImage(a.getWidth(),a.getHeight(),java.awt.image.BufferedImage.TYPE_3BYTE_BGR);
-		Graphics2D g2= (Graphics2D)b.getGraphics();
+		// Graphics2D g2= (Graphics2D)b.getGraphics();
+		Graphics2D g2= DesktopUtils.safelyGetGraphics2D(b);
 		if (useGaussianFiltering) {
 			if (gaussianMatrix==null) {
 				gaussianMatrix= VisionUtils.gaussianMatrix(gaussianFilterRadius);
@@ -865,6 +920,12 @@ public class PlainImageSubtractor {
 				null);
 			g2.drawImage(a,cop,0,0);
 		} else {
+// ColorConvertOp ccop= new ColorConvertOp(
+//	// ColorSpace.getInstance(ColorSpace.CS_CIEXYZ),
+//	// ColorSpace.getInstance(ColorSpace.CS_GRAY),
+//	ColorSpace.getInstance(ColorSpace.CS_PYCC),
+//	null);
+// g2.drawImage(a,ccop,0,0);
 			g2.drawImage(a,0,0,null);
 		};
 		return b;

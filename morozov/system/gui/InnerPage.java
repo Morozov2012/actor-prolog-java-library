@@ -631,7 +631,8 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		GraphicsConfiguration gc= internalFrame.getGraphicsConfiguration();
 		if (gc != null) {
 			java.awt.image.BufferedImage bufferedImage= gc.createCompatibleImage(integerWidth,integerHeight);
-			Graphics g= bufferedImage.getGraphics();
+			// Graphics g= bufferedImage.getGraphics();
+			Graphics g= DesktopUtils.safelyGetGraphics2D(bufferedImage);
 			try {
 				g.translate(x0,y0);
 				internalFrame.print(g);

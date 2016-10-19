@@ -222,4 +222,77 @@ class VisionUtils {
 			return (x - threshold + halfwidth) * (1 / (2*halfwidth));
 		}
 	}
+	//
+	public static int[][] convertRGBtoHSB(int[][] pixelsRGB) {
+//if (true) {
+//return pixelsRGB;
+//}
+		int numberOfBands= pixelsRGB.length;
+		if (numberOfBands < 3) {
+			return pixelsRGB;
+		};
+		int vectorLength= pixelsRGB[1].length;
+		int[][] pixelsHSB= new int[numberOfBands][vectorLength];
+		if (numberOfBands > 3) {
+			for (int b=0; b < numberOfBands; b++) {
+				for (int n=0; n < vectorLength; n++) {
+					pixelsHSB[b][n]= pixelsRGB[b][n];
+				}
+			}
+		};
+		for (int n=0; n < vectorLength; n++) {
+			int r= pixelsRGB[0][n];
+			int g= pixelsRGB[1][n];
+			int b= pixelsRGB[2][n];
+			float hue;
+			float saturation;
+			float brightness;
+			int cmax= (r > g) ? r : g;
+			if (b > cmax) {
+				cmax= b;
+			};
+			int cmin= (r < g) ? r : g;
+			if (b < cmin) {
+				cmin= b;
+			};
+			brightness= ((float) cmax) / 255.0f;
+			if (cmax != 0) {
+				saturation= ((float) (cmax - cmin)) / ((float) cmax);
+			} else {
+				saturation= 0;
+			};
+			if (saturation == 0) {
+				hue= 0;
+			} else {
+				float redc= ((float) (cmax - r)) / ((float) (cmax - cmin));
+				float greenc= ((float) (cmax - g)) / ((float) (cmax - cmin));
+				float bluec= ((float) (cmax - b)) / ((float) (cmax - cmin));
+				if (r == cmax) {
+					hue= bluec - greenc;
+				} else if (g == cmax) {
+					hue= 2.0f + redc - bluec;
+				} else {
+					hue= 4.0f + greenc - redc;
+				};
+				hue= hue / 6.0f;
+				if (hue < 0) {
+					hue= hue + 1.0f;
+				}
+			};
+			pixelsHSB[0][n]= (int) (hue * 255);
+			pixelsHSB[1][n]= (int) (saturation * 255);
+			pixelsHSB[2][n]= (int) (brightness * 255);
+			//pixelsHSB[0][n]= (int) (hue * 255);
+			//pixelsHSB[1][n]= (int) (hue * 255);
+			//pixelsHSB[2][n]= (int) (hue * 255);
+			//pixelsHSB[0][n]= (int) (saturation * 255);
+			//pixelsHSB[1][n]= (int) (saturation * 255);
+			//pixelsHSB[2][n]= (int) (saturation * 255);
+			//pixelsHSB[0][n]= (int) (brightness * 255);
+			//pixelsHSB[1][n]= (int) (brightness * 255);
+			//pixelsHSB[2][n]= (int) (brightness * 255);
+
+		};
+		return pixelsHSB;
+	}
 }

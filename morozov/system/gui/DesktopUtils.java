@@ -4,6 +4,7 @@ package morozov.system.gui;
 
 import morozov.run.*;
 import morozov.system.gui.dialogs.*;
+import morozov.system.gui.errors.*;
 
 import javax.swing.JInternalFrame;
 import javax.swing.JLayeredPane;
@@ -33,6 +34,7 @@ import java.beans.PropertyVetoException;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class DesktopUtils {
@@ -1008,6 +1010,45 @@ public class DesktopUtils {
 		}
 	}
 */
+	//
+	public static Graphics2D safelyGetGraphics2D(final java.awt.image.BufferedImage image) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			return image.createGraphics();
+		} else {
+			try {
+				final AtomicReference<Graphics2D> state= new AtomicReference<Graphics2D>(null);
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						state.set(image.createGraphics());
+					}
+				});
+				return state.get();
+			} catch (InterruptedException e) {
+				throw new CannotGetGraphics2D();
+			} catch (InvocationTargetException e) {
+				throw new CannotGetGraphics2D();
+			}
+		}
+	}
+	public static Graphics2D safelyGetGraphics2D(final Component component) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			return (Graphics2D)component.getGraphics();
+		} else {
+			try {
+				final AtomicReference<Graphics2D> state= new AtomicReference<Graphics2D>(null);
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						state.set((Graphics2D)component.getGraphics());
+					}
+				});
+				return state.get();
+			} catch (InterruptedException e) {
+				throw new CannotGetGraphics2D();
+			} catch (InvocationTargetException e) {
+				throw new CannotGetGraphics2D();
+			}
+		}
+	}
 	//
 	public static void setRenderingHints(Graphics2D g2) {
 		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);

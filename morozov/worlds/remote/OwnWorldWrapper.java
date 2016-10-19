@@ -156,7 +156,9 @@ public class OwnWorldWrapper
 	}
 	public void receiveAsyncCall(long domainSignatureNumber, boolean isControlCall, boolean useBuffer, byte[] argumentByteArray) {
 		Term[] arguments= Converters.deserializeArguments(argumentByteArray,domainSignatureNumber);
-		ownWorld.receiveAsyncCall(new AsyncCall(domainSignatureNumber,ownWorld,ownWorld,isControlCall,useBuffer,arguments,true));
+		// ownWorld.receiveAsyncCall(new AsyncCall(domainSignatureNumber,ownWorld,ownWorld,isControlCall,useBuffer,arguments,true));
+		ChoisePoint iX= null;
+		ownWorld.transmitAsyncCall(new AsyncCall(domainSignatureNumber,ownWorld,ownWorld,isControlCall,useBuffer,arguments,true),iX);
 	}
 	//
 	///////////////////////////////////////////////////////////////

@@ -36,6 +36,12 @@ public class ExtendedJPanel extends JPanel {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public void setScalingFactor(AtomicReference<Canvas2DScalingFactor> factor) {
+		scalingFactor= factor;
+	}
+	public void setEnableAntialiasing(AtomicBoolean enableAntialiasing) {
+		sceneAntialiasingIsEnabled= enableAntialiasing;
+	}
 	public void setCommands(List<Java2DCommand> commandList) {
 		currentCommands= commandList;
 	}
