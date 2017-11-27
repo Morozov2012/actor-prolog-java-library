@@ -23,7 +23,7 @@ public abstract class WebResource extends SymbolicInformation {
 	///////////////////////////////////////////////////////////////
 	//
 	abstract protected Term getBuiltInSlot_E_location();
-	// abstract protected Term getBuiltInSlot_E_max_waiting_time();
+	// abstract protected Term getBuiltInSlot_E_maximal_waiting_time();
 	// abstract protected Term getBuiltInSlot_E_character_set();
 	// abstract protected Term getBuiltInSlot_E_backslash_always_is_separator();
 	// abstract protected Term getBuiltInSlot_E_mask();
@@ -41,8 +41,8 @@ public abstract class WebResource extends SymbolicInformation {
 	public void setLocation(String value) {
 		location= value;
 	}
-	public void getLocation0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= new PrologString(getLocation(iX));
+	public void getLocation0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(new PrologString(getLocation(iX)));
 	}
 	public void getLocation0fs(ChoisePoint iX) {
 	}
@@ -76,32 +76,32 @@ public abstract class WebResource extends SymbolicInformation {
 		boolean backslashAlwaysIsSeparator= getBackslashAlwaysIsSeparator(iX);
 		boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
 		ExtendedFileName baseResource= retrieveRealGlobalFileName(iX);
-		SimpleFileName fileName= SimpleFileName.termToSimpleFileName(value,backslashAlwaysIsSeparator,acceptOnlyURI,iX);
+		SimpleFileName fileName= SimpleFileName.argumentToSimpleFileName(value,backslashAlwaysIsSeparator,acceptOnlyURI,iX);
 		return fileName.formRealFileNameBasedOnEFN(false,true,getExtension(iX),baseResource,staticContext);
 	}
 	protected ExtendedFileName retrieveRealGlobalFileName(String value, ChoisePoint iX) {
 		boolean backslashAlwaysIsSeparator= getBackslashAlwaysIsSeparator(iX);
 		boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
 		ExtendedFileName baseResource= retrieveRealGlobalFileName(iX);
-		SimpleFileName fileName= SimpleFileName.termToSimpleFileName(value,backslashAlwaysIsSeparator,acceptOnlyURI);
+		SimpleFileName fileName= SimpleFileName.argumentToSimpleFileName(value,backslashAlwaysIsSeparator,acceptOnlyURI);
 		return fileName.formRealFileNameBasedOnEFN(false,false,"",baseResource,staticContext);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void getParameters0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getUniversalResourceParameters(iX);
+	public void getParameters0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getUniversalResourceParameters(iX));
 	}
 	public void getParameters0fs(ChoisePoint iX) {
 	}
-	public void getParameters1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
-		a1.value= getUniversalResourceParameters(a2,iX);
+	public void getParameters1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		result.setNonBacktrackableValue(getUniversalResourceParameters(a1,iX));
 	}
 	public void getParameters1fs(ChoisePoint iX, Term a1) {
 	}
 	//
 	protected Term getUniversalResourceParameters(ChoisePoint iX) {
-		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		CharacterSet characterSet= getCharacterSet(iX);
 		try {
 			ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
@@ -111,7 +111,7 @@ public abstract class WebResource extends SymbolicInformation {
 		}
 	}
 	protected Term getUniversalResourceParameters(Term argument, ChoisePoint iX) {
-		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		CharacterSet characterSet= getCharacterSet(iX);
 		try {
 			ExtendedFileName fileName= retrieveRealGlobalFileName(argument,iX);
@@ -123,19 +123,19 @@ public abstract class WebResource extends SymbolicInformation {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void getString0ff(ChoisePoint iX, PrologVariable outputText) {
-		getContent0ff(iX,outputText);
+	public void getString0ff(ChoisePoint iX, PrologVariable result) {
+		getContent0ff(iX,result);
 	}
 	public void getString0fs(ChoisePoint iX) {
 	}
 	//
-	public void getContent0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getUniversalResourceContent(iX);
+	public void getContent0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getUniversalResourceContent(iX));
 	}
 	public void getContent0fs(ChoisePoint iX) {
 	}
-	public void getContent1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
-		a1.value= getUniversalResourceContent(a2,iX);
+	public void getContent1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		result.setNonBacktrackableValue(getUniversalResourceContent(a1,iX));
 	}
 	public void getContent1fs(ChoisePoint iX, Term a1) {
 	}
@@ -143,7 +143,7 @@ public abstract class WebResource extends SymbolicInformation {
 	///////////////////////////////////////////////////////////////
 	//
 	protected Term getUniversalResourceContent(ChoisePoint iX) {
-		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		CharacterSet characterSet= getCharacterSet(iX);
 		try {
 			ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
@@ -153,7 +153,7 @@ public abstract class WebResource extends SymbolicInformation {
 		}
 	}
 	protected Term getUniversalResourceContent(Term argument, ChoisePoint iX) {
-		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		CharacterSet characterSet= getCharacterSet(iX);
 		try {
 			ExtendedFileName fileName= retrieveRealGlobalFileName(argument,iX);

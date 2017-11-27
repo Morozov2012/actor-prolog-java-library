@@ -163,9 +163,6 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 			throw new CannotCloneOptimizedSet();
 		}
 	}
-	// protected void setValue(int index, Term value) {
-	//	elements[index]= value;
-	// }
 	public void isEmptySet(ChoisePoint cp) throws Backtracking {
 		for (int i= 0; i < elements.length; i++) {
 			Term e1= elements[i];

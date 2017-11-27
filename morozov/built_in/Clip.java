@@ -31,7 +31,7 @@ public abstract class Clip extends DataAbstraction {
 	//
 	// abstract protected Term getBuiltInSlot_E_name();
 	// abstract protected Term getBuiltInSlot_E_extension();
-	// abstract protected Term getBuiltInSlot_E_max_waiting_time();
+	// abstract protected Term getBuiltInSlot_E_maximal_waiting_time();
 	// abstract protected Term getBuiltInSlot_E_backslash_always_is_separator();
 	//
 	///////////////////////////////////////////////////////////////
@@ -115,7 +115,7 @@ public abstract class Clip extends DataAbstraction {
 	}
 	//
 	protected javax.sound.sampled.Clip openContent(ExtendedFileName fileName, ChoisePoint iX, boolean useCommonClip) {
-		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		byte[] array= fileName.getByteContentOfUniversalResource(CharacterSet.NONE,timeout,staticContext);
 		InputStream stream= new ByteArrayInputStream(array);
 		AudioInputStream audioStream;
@@ -166,45 +166,45 @@ public abstract class Clip extends DataAbstraction {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void getFrameLength0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getFrameLength0ff(ChoisePoint iX, PrologVariable result) {
 		if (commonClip != null) {
 			long length= commonClip.getFrameLength();
-			a1.value= new PrologInteger(length);
+			result.setNonBacktrackableValue(new PrologInteger(length));
 		} else {
-			a1.value= new PrologInteger(-1);
+			result.setNonBacktrackableValue(new PrologInteger(-1));
 		}
 	}
 	public void getFrameLength0fs(ChoisePoint iX) {
 	}
 	//
-	public void getMicrosecondLength0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getMicrosecondLength0ff(ChoisePoint iX, PrologVariable result) {
 		if (commonClip != null) {
 			long length= commonClip.getMicrosecondLength();
-			a1.value= new PrologInteger(length);
+			result.setNonBacktrackableValue(new PrologInteger(length));
 		} else {
-			a1.value= new PrologInteger(-1);
+			result.setNonBacktrackableValue(new PrologInteger(-1));
 		}
 	}
 	public void getMicrosecondLength0fs(ChoisePoint iX) {
 	}
 	//
-	public void getFramePosition0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getFramePosition0ff(ChoisePoint iX, PrologVariable result) {
 		if (commonClip != null) {
 			long length= commonClip.getLongFramePosition();
-			a1.value= new PrologInteger(length);
+			result.setNonBacktrackableValue(new PrologInteger(length));
 		} else {
-			a1.value= new PrologInteger(0);
+			result.setNonBacktrackableValue(new PrologInteger(0));
 		}
 	}
 	public void getFramePosition0fs(ChoisePoint iX) {
 	}
 	//
-	public void getMicrosecondPosition0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getMicrosecondPosition0ff(ChoisePoint iX, PrologVariable result) {
 		if (commonClip != null) {
 			long length= commonClip.getMicrosecondPosition();
-			a1.value= new PrologInteger(length);
+			result.setNonBacktrackableValue(new PrologInteger(length));
 		} else {
-			a1.value= new PrologInteger(0);
+			result.setNonBacktrackableValue(new PrologInteger(0));
 		}
 	}
 	public void getMicrosecondPosition0fs(ChoisePoint iX) {

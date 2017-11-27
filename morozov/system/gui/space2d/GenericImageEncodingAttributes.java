@@ -8,6 +8,7 @@ import morozov.run.*;
 import morozov.system.*;
 import morozov.system.gui.space2d.errors.*;
 import morozov.terms.*;
+import morozov.terms.errors.*;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -32,7 +33,7 @@ public class GenericImageEncodingAttributes implements Serializable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static GenericImageEncodingAttributes termToImageEncodingAttributes(Term attributes, ChoisePoint iX) {
+	public static GenericImageEncodingAttributes argumentToImageEncodingAttributes(Term attributes, ChoisePoint iX) {
 		if (attributes==null) {
 			return new GenericImageEncodingAttributes();
 		} else {
@@ -52,9 +53,9 @@ public class GenericImageEncodingAttributes implements Serializable {
 					long pairName= - key;
 					Term pairValue= setPositiveMap.get(key);
 					if (pairName==SymbolCodes.symbolCode_E_format) {
-						format= ImageFileFormat.termToImageFileFormat(pairValue,iX);
+						format= ImageFileFormat.argumentToImageFileFormat(pairValue,iX);
 					} else if (pairName==SymbolCodes.symbolCode_E_compressionQuality) {
-						compressionQuality= NumericalValue.termToNumericalValue(pairValue,iX);
+						compressionQuality= NumericalValue.argumentToNumericalValue(pairValue,iX);
 					} else if (pairName==SymbolCodes.symbolCode_E_progressiveMode) {
 						progressiveMode= OnOff.termOnOff2Boolean(pairValue,iX);
 					} else if (pairName==SymbolCodes.symbolCode_E_interlacing) {
@@ -67,7 +68,7 @@ public class GenericImageEncodingAttributes implements Serializable {
                 		};
 				return new ExtendedImageEncodingAttributes(format,compressionQuality,progressiveMode,interlacing,comment);
 			} else {
-				throw new WrongArgumentIsNotImageAttributes(setEnd);
+				throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 			}
 		}
 	}

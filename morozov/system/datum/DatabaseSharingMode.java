@@ -35,7 +35,7 @@ public enum DatabaseSharingMode {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static DatabaseSharingMode termToDatabaseSharingMode(Term value, ChoisePoint iX) {
+	public static DatabaseSharingMode argumentToDatabaseSharingMode(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_exclusive_access) {

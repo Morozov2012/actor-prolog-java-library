@@ -12,6 +12,7 @@ import morozov.system.gui.*;
 import morozov.system.gui.space2d.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
+import morozov.terms.errors.*;
 import morozov.terms.signals.*;
 
 import java.awt.Color;
@@ -49,7 +50,7 @@ public class Tools2D {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static int termToArcClosureType(Term value, ChoisePoint iX) {
+	public static int argumentToArcClosureType(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_OPEN) {
@@ -68,7 +69,7 @@ public class Tools2D {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static Point2D termToPoint2D(Term value, ChoisePoint iX) {
+	public static Point2D argumentToPoint2D(Term value, ChoisePoint iX) {
 		try {
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_p,2,iX);
 			double xPoint= Converters.argumentToReal(arguments[0],iX);
@@ -81,7 +82,7 @@ public class Tools2D {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static float[] termToFloatArray(Term value, ChoisePoint iX) {
+	public static float[] argumentToFloatArray(Term value, ChoisePoint iX) {
 		Term[] termArray= Converters.listToArray(value,iX);
 		float[] result= new float[termArray.length];
 		for (int n=0; n < termArray.length; n++) {
@@ -92,7 +93,7 @@ public class Tools2D {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static RenderingHints termToRenderingHints(Term value, ChoisePoint iX) {
+	public static RenderingHints argumentToRenderingHints(Term value, ChoisePoint iX) {
 		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
 		Term setEnd= value.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
@@ -116,13 +117,13 @@ public class Tools2D {
 						rh.put(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_DEFAULT);
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_rendering) {
-					Object mode= termToRenderingStrategy(pairValue,iX);
+					Object mode= argumentToRenderingStrategy(pairValue,iX);
 					rh.put(RenderingHints.KEY_RENDERING,mode);
 				} else if (pairName==SymbolCodes.symbolCode_E_dithering) {
-					Object mode= termToDitheringMode(pairValue,iX);
+					Object mode= argumentToDitheringMode(pairValue,iX);
 					rh.put(RenderingHints.KEY_DITHERING,mode);
 				} else if (pairName==SymbolCodes.symbolCode_E_textAntialiasing) {
-					Object mode= termToTextAntialiasingMode(pairValue,iX);
+					Object mode= argumentToTextAntialiasingMode(pairValue,iX);
 					rh.put(RenderingHints.KEY_TEXT_ANTIALIASING,mode);
 				} else if (pairName==SymbolCodes.symbolCode_E_text_LCD_contrast) {
 					try {
@@ -144,16 +145,16 @@ public class Tools2D {
 						rh.put(RenderingHints.KEY_FRACTIONALMETRICS,RenderingHints.VALUE_FRACTIONALMETRICS_DEFAULT);
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_interpolation) {
-					Object mode= termToInterpolationMode(pairValue,iX);
+					Object mode= argumentToInterpolationMode(pairValue,iX);
 					rh.put(RenderingHints.KEY_INTERPOLATION,mode);
 				} else if (pairName==SymbolCodes.symbolCode_E_alphaInterpolation) {
-					Object mode= termToAlphaInterpolationMode(pairValue,iX);
+					Object mode= argumentToAlphaInterpolationMode(pairValue,iX);
 					rh.put(RenderingHints.KEY_ALPHA_INTERPOLATION,mode);
 				} else if (pairName==SymbolCodes.symbolCode_E_colorRendering) {
-					Object mode= termToColorRenderingMode(pairValue,iX);
+					Object mode= argumentToColorRenderingMode(pairValue,iX);
 					rh.put(RenderingHints.KEY_COLOR_RENDERING,mode);
 				} else if (pairName==SymbolCodes.symbolCode_E_strokeControl) {
-					Object mode= termToStrokeControlMode(pairValue,iX);
+					Object mode= argumentToStrokeControlMode(pairValue,iX);
 					rh.put(RenderingHints.KEY_STROKE_CONTROL,mode);
 				} else {
 					throw new WrongArgumentIsUnknownRenderingAttribute(key);
@@ -161,11 +162,11 @@ public class Tools2D {
 			};
 			return rh;
 		} else {
-			throw new WrongArgumentIsNotRenderingAttributes(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
-	protected static Object termToRenderingStrategy(Term value, ChoisePoint iX) {
+	protected static Object argumentToRenderingStrategy(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_SPEED) {
@@ -182,7 +183,7 @@ public class Tools2D {
 		}
 	}
 	//
-	protected static Object termToDitheringMode(Term value, ChoisePoint iX) {
+	protected static Object argumentToDitheringMode(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_DISABLE) {
@@ -199,7 +200,7 @@ public class Tools2D {
 		}
 	}
 	//
-	protected static Object termToTextAntialiasingMode(Term value, ChoisePoint iX) {
+	protected static Object argumentToTextAntialiasingMode(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_on) {
@@ -226,7 +227,7 @@ public class Tools2D {
 		}
 	}
 	//
-	protected static Object termToInterpolationMode(Term value, ChoisePoint iX) {
+	protected static Object argumentToInterpolationMode(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_NEAREST_NEIGHBOR) {
@@ -243,7 +244,7 @@ public class Tools2D {
 		}
 	}
 	//
-	protected static Object termToAlphaInterpolationMode(Term value, ChoisePoint iX) {
+	protected static Object argumentToAlphaInterpolationMode(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_SPEED) {
@@ -260,7 +261,7 @@ public class Tools2D {
 		}
 	}
 	//
-	protected static Object termToColorRenderingMode(Term value, ChoisePoint iX) {
+	protected static Object argumentToColorRenderingMode(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_SPEED) {
@@ -277,7 +278,7 @@ public class Tools2D {
 		}
 	}
 	//
-	protected static Object termToStrokeControlMode(Term value, ChoisePoint iX) {
+	protected static Object argumentToStrokeControlMode(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_NORMALIZE) {
@@ -296,7 +297,7 @@ public class Tools2D {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static float[] termToFractions(Term value, ChoisePoint iX) {
+	public static float[] argumentToFractions(Term value, ChoisePoint iX) {
 		Term[] termArray= Converters.listToArray(value,iX);
 		float[] fractions= new float[termArray.length];
 		for (int n=0; n < termArray.length; n++) {
@@ -307,12 +308,12 @@ public class Tools2D {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static Color[] termToColors(Term value, ChoisePoint iX) {
+	public static Color[] argumentToGradientColors(Term value, ChoisePoint iX) {
 		Term[] termArray= Converters.listToArray(value,iX);
 		Color[] colors= new Color[termArray.length];
 		for (int n=0; n < termArray.length; n++) {
 			try {
-				colors[n]= ExtendedColor.termToColor(termArray[n],iX);
+				colors[n]= ExtendedColor.argumentToColor(termArray[n],iX);
 			} catch (TermIsSymbolDefault e2) {
 				// throw new WrongArgumentIsNotAColor(pairValue);
 				if (n % 2 == 0) {
@@ -327,7 +328,7 @@ public class Tools2D {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static MultipleGradientPaint.CycleMethod termToCycleMethod(Term value, ChoisePoint iX) {
+	public static MultipleGradientPaint.CycleMethod argumentToCycleMethod(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_NO_CYCLE) {
@@ -346,7 +347,7 @@ public class Tools2D {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static MultipleGradientPaint.ColorSpaceType termToColorSpaceType(Term value, ChoisePoint iX) {
+	public static MultipleGradientPaint.ColorSpaceType argumentToColorSpaceType(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_LINEAR_RGB) {
@@ -363,7 +364,7 @@ public class Tools2D {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static AffineTransform termToTransform2D(Term value, ChoisePoint iX) {
+	public static AffineTransform argumentToTransform2D(Term value, ChoisePoint iX) {
 		try { // rotation
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_rotation,1,iX);
 			double theta= Converters.argumentToReal(arguments[0],iX);
@@ -452,7 +453,7 @@ public class Tools2D {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static Font termToFont2D(Term value, Canvas2D targetWorld, ChoisePoint iX) {
+	public static Font argumentToFont2D(Term value, Canvas2D targetWorld, ChoisePoint iX) {
 		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
 		Term setEnd= value.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
@@ -466,34 +467,34 @@ public class Tools2D {
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_name) {
 					try {
-						String faceName= termToFontName2D(pairValue,iX);
+						String faceName= argumentToFontName2D(pairValue,iX);
 						fontAttributes.put(TextAttribute.FAMILY,faceName);
 					} catch (TermIsSymbolDefault e) {
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_size) {
 					try {
-						int size= ExtendedFontSize.termToFontSize(pairValue,iX);
+						int size= ExtendedFontSize.argumentToFontSize(pairValue,iX);
 						int realFontSize= DefaultOptions.fontSystemSimulationMode.simulate(size);
 						fontAttributes.put(TextAttribute.SIZE,realFontSize);
 					} catch (TermIsSymbolDefault e) {
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_weight) {
-					Number weight= termToFontWeight2D(pairValue,iX);
+					Number weight= argumentToFontWeight2D(pairValue,iX);
 					fontAttributes.put(TextAttribute.WEIGHT,weight);
 				} else if (pairName==SymbolCodes.symbolCode_E_width) {
-					Number width= termToFontWidth2D(pairValue,iX);
+					Number width= argumentToFontWidth2D(pairValue,iX);
 					fontAttributes.put(TextAttribute.WIDTH,width);
 				} else if (pairName==SymbolCodes.symbolCode_E_posture) {
-					Number posture= termToFontPosture2D(pairValue,iX);
+					Number posture= argumentToFontPosture2D(pairValue,iX);
 					fontAttributes.put(TextAttribute.POSTURE,posture);
 				} else if (pairName==SymbolCodes.symbolCode_E_transform) {
-					AffineTransform transform= termToTransform2D(pairValue,iX);
+					AffineTransform transform= argumentToTransform2D(pairValue,iX);
 					fontAttributes.put(TextAttribute.TRANSFORM,transform);
 				} else if (pairName==SymbolCodes.symbolCode_E_superscript) {
-					Integer superscript= termToFontSuperscript2D(pairValue,iX);
+					Integer superscript= argumentToFontSuperscript2D(pairValue,iX);
 					fontAttributes.put(TextAttribute.SUPERSCRIPT,superscript);
 				} else if (pairName==SymbolCodes.symbolCode_E_foreground) {
-					BrushAttributes attributes= BrushAttributes.termToBrushAttributes(pairValue,targetWorld,iX);
+					BrushAttributes attributes= BrushAttributes.argumentToBrushAttributes(pairValue,targetWorld,iX);
 					if (attributes.isSwitch) {
 						if (!attributes.fillFigures) {
 							Paint paint= new Color(0,0,0,0);
@@ -504,7 +505,7 @@ public class Tools2D {
 						fontAttributes.put(TextAttribute.FOREGROUND,paint);
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_background) {
-					BrushAttributes attributes= BrushAttributes.termToBrushAttributes(pairValue,targetWorld,iX);
+					BrushAttributes attributes= BrushAttributes.argumentToBrushAttributes(pairValue,targetWorld,iX);
 					if (attributes.isSwitch) {
 						// if (!attributes.fillFigures) {
 						//	Paint paint= new Color(0,0,0,0);
@@ -515,40 +516,40 @@ public class Tools2D {
 						fontAttributes.put(TextAttribute.BACKGROUND,paint);
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_underline) {
-					Integer underline= termToFontUnderline2D(pairValue,iX);
+					Integer underline= argumentToFontUnderline2D(pairValue,iX);
 					fontAttributes.put(TextAttribute.UNDERLINE,underline);
 				} else if (pairName==SymbolCodes.symbolCode_E_strikethrough) {
 					Boolean strikethrough= OnOff.termOnOff2Boolean(pairValue,iX);
 					fontAttributes.put(TextAttribute.STRIKETHROUGH,strikethrough);
 				} else if (pairName==SymbolCodes.symbolCode_E_runDirection) {
 					try {
-						Boolean runDirection= termToFontRunDirection2D(pairValue,iX);
+						Boolean runDirection= argumentToFontRunDirection2D(pairValue,iX);
 						fontAttributes.put(TextAttribute.RUN_DIRECTION,runDirection);
 					} catch (TermIsSymbolDefault e) {
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_bidiEmbedding) {
 					try {
-						Integer bidiEmbedding= termToFontBidiEmbedding2D(pairValue,iX);
+						Integer bidiEmbedding= argumentToFontBidiEmbedding2D(pairValue,iX);
 						fontAttributes.put(TextAttribute.BIDI_EMBEDDING,bidiEmbedding);
 					} catch (TermIsSymbolDefault e) {
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_justification) {
-					Number justification= termToFontJustification2D(pairValue,iX);
+					Number justification= argumentToFontJustification2D(pairValue,iX);
 					fontAttributes.put(TextAttribute.JUSTIFICATION,justification);
 				} else if (pairName==SymbolCodes.symbolCode_E_inputMethodUnderline) {
-					Integer inputMethodUnderline= termToInputMethodUnderline(pairValue,iX);
+					Integer inputMethodUnderline= argumentToInputMethodUnderline(pairValue,iX);
 					fontAttributes.put(TextAttribute.INPUT_METHOD_HIGHLIGHT,inputMethodUnderline);
 				} else if (pairName==SymbolCodes.symbolCode_E_swapColors) {
 					Boolean swapColors= YesNo.termYesNo2Boolean(pairValue,iX);
 					fontAttributes.put(TextAttribute.SWAP_COLORS,swapColors);
 				} else if (pairName==SymbolCodes.symbolCode_E_kerning) {
-					Integer kerning= termToFontKerning2D(pairValue,iX);
+					Integer kerning= argumentToFontKerning2D(pairValue,iX);
 					fontAttributes.put(TextAttribute.KERNING,kerning);
 				} else if (pairName==SymbolCodes.symbolCode_E_ligatures) {
-					Integer ligatures= termToFontLigatures2D(pairValue,iX);
+					Integer ligatures= argumentToFontLigatures2D(pairValue,iX);
 					fontAttributes.put(TextAttribute.LIGATURES,ligatures);
 				} else if (pairName==SymbolCodes.symbolCode_E_tracking) {
-					Number tracking= termToFontTracking2D(pairValue,iX);
+					Number tracking= argumentToFontTracking2D(pairValue,iX);
 					fontAttributes.put(TextAttribute.TRACKING,tracking);
 				} else {
 					throw new WrongArgumentIsUnknownFontAttribute(key);
@@ -556,11 +557,11 @@ public class Tools2D {
 			};
 			return new Font(fontAttributes);
 		} else {
-			throw new WrongArgumentIsNotFontAttributes(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
-	protected static String termToFontName2D(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
+	protected static String argumentToFontName2D(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_DIALOG) {
@@ -577,11 +578,11 @@ public class Tools2D {
 				throw new WrongArgumentIsNotFontName2D(value);
 			}
 		} catch (TermIsNotASymbol e) {
-			return ExtendedFontName.termToFontName(value,iX);
+			return ExtendedFontName.argumentToFontName(value,iX);
 		}
 	}
 	//
-	protected static Number termToFontWeight2D(Term value, ChoisePoint iX) {
+	protected static Number argumentToFontWeight2D(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_WEIGHT_EXTRA_LIGHT) {
@@ -614,7 +615,7 @@ public class Tools2D {
 		}
 	}
 	//
-	protected static Number termToFontWidth2D(Term value, ChoisePoint iX) {
+	protected static Number argumentToFontWidth2D(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_WIDTH_CONDENSED) {
@@ -635,7 +636,7 @@ public class Tools2D {
 		}
 	}
 	//
-	protected static Number termToFontPosture2D(Term value, ChoisePoint iX) {
+	protected static Number argumentToFontPosture2D(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_POSTURE_REGULAR) {
@@ -650,7 +651,7 @@ public class Tools2D {
 		}
 	}
 	//
-	protected static Integer termToFontSuperscript2D(Term value, ChoisePoint iX) {
+	protected static Integer argumentToFontSuperscript2D(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_SUPERSCRIPT_SUPER) {
@@ -669,7 +670,7 @@ public class Tools2D {
 		}
 	}
 	//
-	protected static Integer termToFontUnderline2D(Term value, ChoisePoint iX) {
+	protected static Integer argumentToFontUnderline2D(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_on) {
@@ -698,7 +699,7 @@ public class Tools2D {
 		}
 	}
 	//
-	protected static Boolean termToFontRunDirection2D(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
+	protected static Boolean argumentToFontRunDirection2D(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_RUN_DIRECTION_LTR) {
@@ -715,7 +716,7 @@ public class Tools2D {
 		}
 	}
 	//
-	protected static Integer termToFontBidiEmbedding2D(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
+	protected static Integer argumentToFontBidiEmbedding2D(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_default) {
@@ -732,7 +733,7 @@ public class Tools2D {
 		}
 	}
 	//
-	protected static Number termToFontJustification2D(Term value, ChoisePoint iX) {
+	protected static Number argumentToFontJustification2D(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_JUSTIFICATION_FULL) {
@@ -747,7 +748,7 @@ public class Tools2D {
 		}
 	}
 	//
-	protected static Integer termToInputMethodUnderline(Term value, ChoisePoint iX) {
+	protected static Integer argumentToInputMethodUnderline(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_on) {
@@ -776,7 +777,7 @@ public class Tools2D {
 		}
 	}
 	//
-	protected static Integer termToFontKerning2D(Term value, ChoisePoint iX) {
+	protected static Integer argumentToFontKerning2D(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_on) {
@@ -795,7 +796,7 @@ public class Tools2D {
 		}
 	}
 	//
-	protected static Integer termToFontLigatures2D(Term value, ChoisePoint iX) {
+	protected static Integer argumentToFontLigatures2D(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_on) {
@@ -814,7 +815,7 @@ public class Tools2D {
 		}
 	}
 	//
-	protected static Number termToFontTracking2D(Term value, ChoisePoint iX) {
+	protected static Number argumentToFontTracking2D(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_on) {
@@ -835,7 +836,7 @@ public class Tools2D {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static int termToCompositingRule(Term value, ChoisePoint iX) {
+	public static int argumentToCompositingRule(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_CLEAR) {
@@ -872,7 +873,7 @@ public class Tools2D {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static int termToBufferedImageType(Term value, ChoisePoint iX) {
+	public static int argumentToBufferedImageType(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_default) {
@@ -950,7 +951,7 @@ public class Tools2D {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static int termToImageTransparency(Term value, ChoisePoint iX) {
+	public static int argumentToImageTransparency(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_default) {

@@ -13,8 +13,13 @@ import morozov.system.signals.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 
+import java.awt.Font;
+import java.awt.Color;
+import java.awt.font.TextAttribute;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DialogUtils {
 	//
@@ -378,6 +383,39 @@ public class DialogUtils {
 				// return PrologUnknownValue.instance;
 				throw RejectValue.instance;
 			}
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public static Font refineTextAndSpaceColors(Font font, Color individualSpaceColor, Color spaceColor, Color individualTextColor, Color textColor) {
+		if (individualSpaceColor != null) {
+			Map<TextAttribute,Object> map= new HashMap<TextAttribute,Object>();
+			map.put(TextAttribute.BACKGROUND,individualSpaceColor);
+			refineTextColor(map,individualTextColor,textColor);
+			font= font.deriveFont(map);
+		} else if (spaceColor != null) {
+			Map<TextAttribute,Object> map= new HashMap<TextAttribute,Object>();
+			map.put(TextAttribute.BACKGROUND,spaceColor);
+			refineTextColor(map,individualTextColor,textColor);
+			font= font.deriveFont(map);
+		} else if (individualTextColor != null) {
+			Map<TextAttribute,Object> map= new HashMap<TextAttribute,Object>();
+			map.put(TextAttribute.FOREGROUND,individualTextColor);
+			font= font.deriveFont(map);
+		} else if (textColor != null) {
+			Map<TextAttribute,Object> map= new HashMap<TextAttribute,Object>();
+			map.put(TextAttribute.FOREGROUND,textColor);
+			font= font.deriveFont(map);
+		};
+		return font;
+	}
+	//
+	public static void refineTextColor(Map<TextAttribute,Object> map, Color individualTextColor, Color textColor) {
+		if (individualTextColor != null) {
+			map.put(TextAttribute.FOREGROUND,individualTextColor);
+		} else if (textColor != null) {
+			map.put(TextAttribute.FOREGROUND,textColor);
 		}
 	}
 }

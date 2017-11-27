@@ -57,23 +57,23 @@ public class ExtendedJTable extends JTable {
 			Color titleBackground= null;
 			// Color tableBackground= null;
 			try {
-				cellForeground= ExtendedColor.termToColorSafe(cellForegroundColor,iX);
+				cellForeground= ExtendedColor.argumentToColorSafe(cellForegroundColor,iX);
 			} catch (TermIsSymbolDefault e) {
 			};
 			try {
-				cellBackground= ExtendedColor.termToColorSafe(cellBackgroundColor,iX);
+				cellBackground= ExtendedColor.argumentToColorSafe(cellBackgroundColor,iX);
 			} catch (TermIsSymbolDefault e) {
 			};
 			try {
-				titleForeground= ExtendedColor.termToColorSafe(titleForegroundColor,iX);
+				titleForeground= ExtendedColor.argumentToColorSafe(titleForegroundColor,iX);
 			} catch (TermIsSymbolDefault e) {
 			};
 			try {
-				titleBackground= ExtendedColor.termToColorSafe(titleBackgroundColor,iX);
+				titleBackground= ExtendedColor.argumentToColorSafe(titleBackgroundColor,iX);
 			} catch (TermIsSymbolDefault e) {
 			};
 			// try {
-			//	tableBackground= ExtendedColor.termToColorSafe(tableBackgroundColor,iX);
+			//	tableBackground= ExtendedColor.argumentToColorSafe(tableBackgroundColor,iX);
 			// } catch (TermIsSymbolDefault e) {
 			// };
 			setAutoCreateColumnsFromModel(false);

@@ -89,7 +89,7 @@ public enum DialogEntryType {
 	},
 	TITLE {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			ExtendedTitle title= ExtendedTitle.termToExtendedTitleSafe(value,iX);
+			ExtendedTitle title= ExtendedTitle.argumentToExtendedTitleSafe(value,iX);
 			dialog.changeTitle(title);
 		}
 		Term getValue(AbstractDialog dialog) {
@@ -131,7 +131,7 @@ public enum DialogEntryType {
 	},
 	TEXT_COLOR {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			ExtendedColor color= ExtendedColor.termToExtendedColorSafe(value,iX);
+			ExtendedColor color= ExtendedColor.argumentToExtendedColorSafe(value,iX);
 			dialog.changeTextColor(color,true,iX);
 			// dialog.safelyRepaint();
 		}
@@ -156,7 +156,7 @@ public enum DialogEntryType {
 	},
 	SPACE_COLOR {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			ExtendedColor color= ExtendedColor.termToExtendedColorSafe(value,iX);
+			ExtendedColor color= ExtendedColor.argumentToExtendedColorSafe(value,iX);
 			dialog.changeSpaceColor(color,true,iX);
 			// dialog.safelyRepaint();
 		}
@@ -181,7 +181,7 @@ public enum DialogEntryType {
 	},
 	BACKGROUND_COLOR {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			ExtendedColor color= ExtendedColor.termToExtendedColorSafe(value,iX);
+			ExtendedColor color= ExtendedColor.argumentToExtendedColorSafe(value,iX);
 			dialog.changeBackgroundColor(color,true,iX);
 			// dialog.safelyRepaint();
 		}
@@ -206,7 +206,7 @@ public enum DialogEntryType {
 	},
 	FONT_NAME {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			ExtendedFontName fontName= ExtendedFontName.termToExtendedFontNameSafe(value,iX);
+			ExtendedFontName fontName= ExtendedFontName.argumentToExtendedFontNameSafe(value,iX);
 			dialog.changeFontName(fontName,iX);
 		}
 		Term getValue(AbstractDialog dialog) {
@@ -226,7 +226,7 @@ public enum DialogEntryType {
 	},
 	FONT_SIZE {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			ExtendedFontSize fontSize= ExtendedFontSize.termToExtendedFontSizeSafe(value,iX);
+			ExtendedFontSize fontSize= ExtendedFontSize.argumentToExtendedFontSizeSafe(value,iX);
 			dialog.changeFontSize(fontSize,iX);
 		}
 		Term getValue(AbstractDialog dialog) {
@@ -248,7 +248,7 @@ public enum DialogEntryType {
 	},
 	FONT_STYLE {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			ExtendedFontStyle fontStyle= ExtendedFontStyle.termToExtendedFontStyleSafe(value,iX);
+			ExtendedFontStyle fontStyle= ExtendedFontStyle.argumentToExtendedFontStyleSafe(value,iX);
 			dialog.changeFontStyle(fontStyle,iX);
 		}
 		Term getValue(AbstractDialog dialog) {
@@ -271,7 +271,7 @@ public enum DialogEntryType {
 	},
 	X {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			ExtendedCoordinate x= ExtendedCoordinate.termToExtendedCoordinateSafe(value,iX);
+			ExtendedCoordinate x= ExtendedCoordinate.argumentToExtendedCoordinateSafe(value,iX);
 			dialog.changeActualX(x,iX);
 		}
 		Term getValue(AbstractDialog dialog) {
@@ -290,7 +290,7 @@ public enum DialogEntryType {
 	},
 	Y {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			ExtendedCoordinate y= ExtendedCoordinate.termToExtendedCoordinateSafe(value,iX);
+			ExtendedCoordinate y= ExtendedCoordinate.argumentToExtendedCoordinateSafe(value,iX);
 			dialog.changeActualY(y,iX);
 		}
 		Term getValue(AbstractDialog dialog) {
@@ -309,7 +309,7 @@ public enum DialogEntryType {
 	},
 	IDENTIFIER {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			dialog.getTargetWorld().setIdentifier(DialogIdentifierOrAuto.termToDialogIdentifierOrAuto(value,iX));
+			dialog.getTargetWorld().setIdentifier(DialogIdentifierOrAuto.argumentToDialogIdentifierOrAuto(value,iX));
 		}
 		Term getValue(AbstractDialog dialog) {
 			throw new IllegalCallOfInternalMethod();

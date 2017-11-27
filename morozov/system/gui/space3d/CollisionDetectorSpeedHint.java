@@ -16,7 +16,7 @@ public enum CollisionDetectorSpeedHint {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static CollisionDetectorSpeedHint termToCollisionDetectorSpeedHint(Term value, ChoisePoint iX) {
+	public static CollisionDetectorSpeedHint argumentToCollisionDetectorSpeedHint(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_USE_BOUNDS) {

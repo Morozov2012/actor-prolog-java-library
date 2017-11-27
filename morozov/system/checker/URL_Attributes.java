@@ -22,11 +22,11 @@ public class URL_Attributes {
 	public int maxWaitingInterval;
 	public boolean isLocalResource;
 	public LocalFileAttributes localFileAttributes;
-	public boolean has_UTF_Coding;
+	// public boolean has_UTF_Coding;
 	public boolean isDirectory;
 	public long lastModificationTime;
 	public long size;
-	public URL_Attributes(URI i, URL l, Throwable e, Term eN, CharacterSet cS, int mWI, boolean iLR, boolean h_UFT_C, boolean iD) {
+	public URL_Attributes(URI i, URL l, Throwable e, Term eN, CharacterSet cS, int mWI, boolean iLR, boolean iD) {
 		uri= i;
 		url= l;
 		// connection= null;
@@ -38,12 +38,12 @@ public class URL_Attributes {
 		if (isLocalResource) {
 			localFileAttributes= new LocalFileAttributes(uri);
 		};
-		has_UTF_Coding= h_UFT_C;
+		// has_UTF_Coding= h_UFT_C;
 		isDirectory= iD;
 		lastModificationTime= -1;
 		size= -1;
 	}
-	public URL_Attributes(URI i, URL l, CharacterSet cS, int mWI, boolean iLR, boolean h_UFT_C, boolean iD, long lMT, long s) {
+	public URL_Attributes(URI i, URL l, CharacterSet cS, int mWI, boolean iLR, boolean iD, long lMT, long s) {
 		uri= i;
 		url= l;
 		// connection= c;
@@ -55,7 +55,7 @@ public class URL_Attributes {
 		if (isLocalResource) {
 			localFileAttributes= new LocalFileAttributes(uri);
 		};
-		has_UTF_Coding= h_UFT_C;
+		// has_UTF_Coding= h_UFT_C;
 		isDirectory= iD;
 		lastModificationTime= lMT;
 		size= s;
@@ -71,7 +71,7 @@ public class URL_Attributes {
 		if (isLocalResource) {
 			localFileAttributes= new LocalFileAttributes(uri);
 		};
-		has_UTF_Coding= oldAttributes.has_UTF_Coding;
+		// has_UTF_Coding= oldAttributes.has_UTF_Coding;
 		isDirectory= iD; // oldAttributes.isDirectory;
 		lastModificationTime= lMT;
 		size= s;
@@ -87,7 +87,7 @@ public class URL_Attributes {
 		if (isLocalResource) {
 			localFileAttributes= new LocalFileAttributes(uri);
 		};
-		has_UTF_Coding= oldAttributes.has_UTF_Coding;
+		// has_UTF_Coding= oldAttributes.has_UTF_Coding;
 		isDirectory= iD; // oldAttributes.isDirectory;
 		lastModificationTime= -1;
 		size= -1;

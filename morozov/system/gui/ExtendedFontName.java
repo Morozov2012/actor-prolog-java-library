@@ -52,20 +52,20 @@ public class ExtendedFontName {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static ExtendedFontName termToExtendedFontNameSafe(Term value, ChoisePoint iX) {
+	public static ExtendedFontName argumentToExtendedFontNameSafe(Term value, ChoisePoint iX) {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
 			return new ExtendedFontName();
 		} else {
 			try {
-				return termToExtendedFontName(value,iX);
+				return argumentToExtendedFontName(value,iX);
 			} catch (RuntimeException e) {
 				return new ExtendedFontName();
 			}
 		}
 	}
 	//
-	public static Term termToExtendedFontNameOrFail(Term value, ChoisePoint iX) throws Backtracking {
+	public static Term argumentToExtendedFontNameOrFail(Term value, ChoisePoint iX) throws Backtracking {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable()) {
 			throw Backtracking.instance;
@@ -73,7 +73,7 @@ public class ExtendedFontName {
 			return termDefault;
 		} else {
 			try {
-				return fontNameToTerm(termToFontName(value,iX));
+				return fontNameToTerm(argumentToFontName(value,iX));
 			} catch (TermIsSymbolDefault e) {
 				return termDefault;
 			} catch (RuntimeException e) {
@@ -82,28 +82,28 @@ public class ExtendedFontName {
 		}
 	}
 	//
-	public static ExtendedFontName termToExtendedFontName(Term value, ChoisePoint iX) {
+	public static ExtendedFontName argumentToExtendedFontName(Term value, ChoisePoint iX) {
 		try {
-			return new ExtendedFontName(termToFontName(value,iX));
+			return new ExtendedFontName(argumentToFontName(value,iX));
 		} catch (TermIsSymbolDefault e) {
 			return new ExtendedFontName();
 		}
 	}
 	//
-	public static String termToFontNameSafe(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
+	public static String argumentToFontNameSafe(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
 			throw TermIsSymbolDefault.instance;
 		} else {
 			try {
-				return termToFontName(value,iX);
+				return argumentToFontName(value,iX);
 			} catch (RuntimeException e) {
 				throw TermIsSymbolDefault.instance;
 			}
 		}
 	}
 	//
-	public static String termToFontName(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
+	public static String argumentToFontName(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		try {
 			long code= value.getSymbolValue(iX);
 			try {

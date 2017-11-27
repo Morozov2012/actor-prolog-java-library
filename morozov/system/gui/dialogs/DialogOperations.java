@@ -7,6 +7,7 @@ import morozov.system.gui.*;
 
 import java.awt.GraphicsConfiguration;
 import java.awt.Component;
+import java.awt.Window;
 import java.awt.event.ComponentListener;
 import java.awt.Dimension;
 import java.awt.Rectangle;
@@ -15,6 +16,7 @@ import java.awt.Color;
 
 public interface DialogOperations {
 	public void initiate(StaticContext context);
+	public Window getWindow();
 	//
 	public void setDefaultCloseOperation(int operation);
 	public void setClosable(boolean b);
@@ -25,7 +27,7 @@ public interface DialogOperations {
 	public void pack();
 	public Component add(Component comp);
 	public void addComponentListener(ComponentListener l);
-	public void addToDesktop(MainDesktopPane desktop);
+	public void addToDesktopIfNecessary(StaticContext context);
 	//
 	public void safelySetVisible(boolean b);
 	public void safelyDispose();
@@ -45,6 +47,7 @@ public interface DialogOperations {
 	//
 	public void invalidate();
 	public void validate();
+	// public void validateTree();
 	public void revalidate();
 	public void repaint();
 	public void repaintParent();

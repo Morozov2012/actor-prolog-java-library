@@ -40,7 +40,7 @@ public class ProcessBuilderCommand {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static ProcessBuilderCommand termToProcessBuilderCommand(Term value, ChoisePoint iX) {
+	public static ProcessBuilderCommand argumentToProcessBuilderCommand(Term value, ChoisePoint iX) {
 		try {
 			String commandText= value.getStringValue(iX);
 			return new ProcessBuilderCommand(commandText);

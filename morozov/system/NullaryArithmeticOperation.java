@@ -5,6 +5,21 @@ package morozov.system;
 import morozov.terms.*;
 
 public enum NullaryArithmeticOperation {
+	NOT_A_NUMBER {
+		public Term eval() {
+			return new PrologReal(Double.NaN);
+		}
+	},
+	POSITIVE_INFINITY {
+		public Term eval() {
+			return new PrologReal(Double.POSITIVE_INFINITY);
+		}
+	},
+	NEGATIVE_INFINITY {
+		public Term eval() {
+			return new PrologReal(Double.NEGATIVE_INFINITY);
+		}
+	},
 	RANDOM {
 		public Term eval() {
 			return new PrologReal(StrictMath.random());
@@ -15,5 +30,5 @@ public enum NullaryArithmeticOperation {
 			return new PrologReal(StrictMath.PI);
 		}
 	};
-	public abstract Term eval();
+	abstract public Term eval();
 }

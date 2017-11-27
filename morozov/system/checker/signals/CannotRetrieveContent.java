@@ -17,4 +17,11 @@ public final class CannotRetrieveContent extends LightweightException {
 	public Term getExceptionName() {
 		return exceptionName;
 	}
+	public String toString() {
+		if (exceptionName != null) {
+			return this.getClass().toString() + "(" + exceptionName.toString() + ")";
+		} else {
+			return this.getClass().toString();
+		}
+	}
 }

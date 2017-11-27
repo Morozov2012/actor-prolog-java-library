@@ -10,7 +10,7 @@ import morozov.terms.*;
 import morozov.terms.signals.*;
 
 public class DatabaseUtils {
-	public static long termToSortingKey(Term targetKey, ChoisePoint iX) {
+	public static long argumentToSortingKey(Term targetKey, ChoisePoint iX) {
 		try {
 			long code= targetKey.getSymbolValue(iX);
 			return - code;

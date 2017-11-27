@@ -25,6 +25,8 @@ public class ActivePasswordField extends ActiveComponent {
 	//
 	protected boolean isEditable= false;
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public ActivePasswordField(AbstractDialog target, int columns) {
 		this(target,"",columns);
 	}
@@ -36,39 +38,25 @@ public class ActivePasswordField extends ActiveComponent {
 		textFiled.addFocusListener(this);
 	}
 	//
-	// protected int getInitialTopBorder() {return 5;}
-	// protected int getInitialLeftBorder() {return 5;}
-	// protected int getInitialBottomBorder() {return 5;}
-	// protected int getInitialRightBorder() {return 5;}
+	///////////////////////////////////////////////////////////////
 	//
-	public void setEditable(boolean b) {
-		isEditable= b;
-		if (component!=null) {
-			((APasswordField)component).setEditable(b);
+	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
+		value= value.dereferenceValue(iX);
+		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
+			throw RejectValue.instance;
+		} else {
+			return super.standardizeValue(value,iX);
 		}
 	}
-	public void setFont(Font font) {
-		if (component!=null) {
-			component.setFont(font);
-		}
-		super.setFont(font);
-		// setMinimumSize(getPreferredSize());
-	}
-	public void setHorizontalAlignment(int alignment) {
-		if (component!=null) {
-			((APasswordField)component).setHorizontalAlignment(alignment);
-		}
-	}
-	public void setBackground(Color c) {
-	}
-	public void setForeground(Color c) {
-	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void putValue(Term value, ChoisePoint iX) {
 		if (component!=null) {
 			((APasswordField)component).setText(value.toString(iX));
 		}
 	}
+	//
 	public Term getValue() {
 		if (component!=null) {
 			return new PrologString(new String(((APasswordField)component).getPassword()));
@@ -77,12 +65,25 @@ public class ActivePasswordField extends ActiveComponent {
 		}
 	}
 	//
-	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-		value= value.dereferenceValue(iX);
-		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
-			throw RejectValue.instance;
-		} else {
-			return super.standardizeValue(value,iX);
+	///////////////////////////////////////////////////////////////
+	//
+	public void setGeneralForeground(Color c) {
+	}
+	public void setGeneralBackground(Color c) {
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setEditable(boolean b) {
+		isEditable= b;
+		if (component!=null) {
+			((APasswordField)component).setEditable(b);
+		}
+	}
+	//
+	public void setHorizontalAlignment(int alignment) {
+		if (component!=null) {
+			((APasswordField)component).setHorizontalAlignment(alignment);
 		}
 	}
 }

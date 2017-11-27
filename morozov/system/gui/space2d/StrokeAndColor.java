@@ -33,7 +33,7 @@ public class StrokeAndColor extends BasicStroke {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static StrokeAndColor termToStrokeAndColor(Term value, ChoisePoint iX) {
+	public static StrokeAndColor argumentToStrokeAndColor(Term value, ChoisePoint iX) {
 		Color color= null;
 		float lineWidth= 1.0f;
 		int endCap= BasicStroke.CAP_SQUARE;
@@ -53,19 +53,19 @@ public class StrokeAndColor extends BasicStroke {
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_color) {
 					try {
-						color= ExtendedColor.termToColor(pairValue,iX);
+						color= ExtendedColor.argumentToColor(pairValue,iX);
 					} catch (TermIsSymbolDefault e1) {
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_lineWidth) {
 					lineWidth= (float)Converters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_endCap) {
-					endCap= termToEndCap(pairValue,iX);
+					endCap= argumentToEndCap(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_lineJoin) {
-					lineJoin= termToLineJoin(pairValue,iX);
+					lineJoin= argumentToLineJoin(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_miterLimit) {
 					miterLimit= (float)Converters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_dashArray) {
-					dashArray= Tools2D.termToFloatArray(pairValue,iX);
+					dashArray= Tools2D.argumentToFloatArray(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_dashPhase) {
 					dashPhase= (float)Converters.argumentToReal(pairValue,iX);
 				} else {
@@ -81,7 +81,7 @@ public class StrokeAndColor extends BasicStroke {
 			return node;
 		} else {
 			try {
-				color= ExtendedColor.termToColor(value,iX);
+				color= ExtendedColor.argumentToColor(value,iX);
 				StrokeAndColor node= new StrokeAndColor(color,lineWidth,endCap,lineJoin,miterLimit);
 				return node;
 			} catch (TermIsSymbolDefault e1) {
@@ -94,7 +94,7 @@ public class StrokeAndColor extends BasicStroke {
 	// Auxiliary operations
 	///////////////////////////////////////////////////////////////
 	//
-	protected static int termToEndCap(Term value, ChoisePoint iX) {
+	protected static int argumentToEndCap(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_CAP_BUTT) {
@@ -111,7 +111,7 @@ public class StrokeAndColor extends BasicStroke {
 		}
 	}
 	//
-	protected static int termToLineJoin(Term value, ChoisePoint iX) {
+	protected static int argumentToLineJoin(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_JOIN_BEVEL) {

@@ -89,20 +89,20 @@ public class ExtendedSize {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static ExtendedSize termToExtendedSizeSafe(Term value, ChoisePoint iX) {
+	public static ExtendedSize argumentToExtendedSizeSafe(Term value, ChoisePoint iX) {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
 			return new ExtendedSize();
 		} else {
 			try {
-				return termToExtendedSize(value,iX);
+				return argumentToExtendedSize(value,iX);
 			} catch (RuntimeException e) {
 				return new ExtendedSize();
 			}
 		}
 	}
 	//
-	public static ExtendedSize termToExtendedSize(Term value, ChoisePoint iX) {
+	public static ExtendedSize argumentToExtendedSize(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_default) {

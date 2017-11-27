@@ -46,7 +46,7 @@ public class HashMapTable extends DatabaseTable {
 				throw e;
 			}
 		} else {
-			oldRecord.value= copy;
+			oldRecord.content= copy;
 			return oldRecord;
 		}
 	}
@@ -65,7 +65,7 @@ public class HashMapTable extends DatabaseTable {
 				throw e;
 			}
 		} else {
-			oldRecord.value= copy;
+			oldRecord.content= copy;
 			return oldRecord;
 		}
 	}
@@ -85,7 +85,7 @@ public class HashMapTable extends DatabaseTable {
 				throw e;
 			}
 		} else {
-			oldRecord.value= map;
+			oldRecord.content= map;
 		}
 	}
 	//
@@ -94,7 +94,8 @@ public class HashMapTable extends DatabaseTable {
 		Term copy2= argumentValue.copyValue(iX,TermCircumscribingMode.PROHIBIT_FREE_VARIABLES);
 		DatabaseRecord result= databaseHash.get(copy2);
 		if (result != null) {
-			argumentResult.value= DatabaseUtils.extractSecondArgument(result.value,null);
+			argumentResult.setNonBacktrackableValue(DatabaseUtils.extractSecondArgument(result.content,null));
+			// iX.pushTrail(argumentResult);
 		} else {
 			throw Backtracking.instance;
 		}
@@ -133,7 +134,7 @@ public class HashMapTable extends DatabaseTable {
 	//
 	protected void retractCurrentRecord(DatabaseRecord currentRecord, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
-		Term key= DatabaseUtils.extractMapKey(currentRecord.value,iX);
+		Term key= DatabaseUtils.extractMapKey(currentRecord.content,iX);
 		databaseHash.remove(key);
 		super.retractCurrentRecord(currentRecord,currentProcess,false,iX);
 	}

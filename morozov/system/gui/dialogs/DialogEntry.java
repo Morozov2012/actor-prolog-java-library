@@ -4,6 +4,7 @@ package morozov.system.gui.dialogs;
 
 import morozov.built_in.*;
 import morozov.run.*;
+import morozov.system.gui.dialogs.errors.*;
 import morozov.system.gui.dialogs.scalable.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
@@ -15,10 +16,10 @@ import java.lang.reflect.InvocationTargetException;
 public class DialogEntry {
 	protected AbstractDialog dialog= null;
 	protected boolean isSlotName;
-	protected boolean isNumericCode= false;
+	protected boolean isNumericalName= false;
 	protected String name= null;
 	protected long code;
-	protected ActiveComponent component;
+	protected ActiveComponentInterface component;
 	protected boolean isInsistent;
 	protected DialogEntryType entryType= DialogEntryType.VALUE;
 	Object currentValueGuard= new Object();
@@ -39,22 +40,22 @@ public class DialogEntry {
 		isInsistent= flag2;
 		entryType= type;
 	}
-	public DialogEntry(AbstractDialog td, boolean flag1, String slotName, ActiveComponent targetComponent, boolean flag2) {
+	public DialogEntry(AbstractDialog td, boolean flag1, String slotName, ActiveComponentInterface targetComponent, boolean flag2) {
 		dialog= td;
 		isSlotName= flag1;
 		name= slotName;
 		component= targetComponent;
 		isInsistent= flag2;
 	}
-	public DialogEntry(AbstractDialog td, long number, ActiveComponent targetComponent, boolean flag2) {
+	public DialogEntry(AbstractDialog td, long number, ActiveComponentInterface targetComponent, boolean flag2) {
 		dialog= td;
 		isSlotName= false;
-		isNumericCode= true;
+		isNumericalName= true;
 		code= number;
 		component= targetComponent;
 		isInsistent= flag2;
 	}
-	public DialogEntry(AbstractDialog td, boolean flag1, String slotName, ActiveComponent targetComponent, boolean flag2, DialogEntryType type) {
+	public DialogEntry(AbstractDialog td, boolean flag1, String slotName, ActiveComponentInterface targetComponent, boolean flag2, DialogEntryType type) {
 		dialog= td;
 		isSlotName= flag1;
 		name= slotName;
@@ -62,10 +63,10 @@ public class DialogEntry {
 		isInsistent= flag2;
 		entryType= type;
 	}
-	public DialogEntry(AbstractDialog td, long number, ActiveComponent targetComponent, boolean flag2, DialogEntryType type) {
+	public DialogEntry(AbstractDialog td, long number, ActiveComponentInterface targetComponent, boolean flag2, DialogEntryType type) {
 		dialog= td;
 		isSlotName= false;
-		isNumericCode= true;
+		isNumericalName= true;
 		code= number;
 		component= targetComponent;
 		isInsistent= flag2;
@@ -80,8 +81,34 @@ public class DialogEntry {
 		}
 	}
 	//
-	public void putValue(Term value, final ChoisePoint iX) {
-		if (entryType.isValueOrAction()) {
+	public void putValue(final DialogControlOperation operation, final Term value, final ChoisePoint iX) {
+		if (operation != DialogControlOperation.VALUE) {
+			synchronized(currentValueGuard) {
+				if (SwingUtilities.isEventDispatchThread()) {
+					dialog.incrementTheInsideThePutOperationCounter();
+					try {
+						component.putValue(operation,value,iX);
+					} finally {
+						dialog.decrementTheInsideThePutOperationCounter();
+					}
+				} else {
+					try {
+						SwingUtilities.invokeAndWait(new Runnable() {
+							public void run() {
+								dialog.incrementTheInsideThePutOperationCounter();
+								try {
+									component.putValue(operation,value,iX);
+								} finally {
+									dialog.decrementTheInsideThePutOperationCounter();
+								}
+							}
+						});
+					} catch (InterruptedException e) {
+					} catch (InvocationTargetException e) {
+					}
+				}
+			}
+		} else if (entryType.isValueOrAction()) {
 			synchronized(currentValueGuard) {
 				Term newValue;
 				try {
@@ -102,11 +129,11 @@ public class DialogEntry {
 				};
 				if (!skipOperation || !isInitiated.get()) {
 					if (SwingUtilities.isEventDispatchThread()) {
-						dialog.insideThePutOperation.set(true);
+						dialog.incrementTheInsideThePutOperationCounter();
 						try {
-							component.putValue(currentValue,iX);
+							component.putValue(operation,currentValue,iX);
 						} finally {
-							dialog.insideThePutOperation.set(false);
+							dialog.decrementTheInsideThePutOperationCounter();
 							isInitiated.set(true);
 							isToBeRefreshed.set(false);
 						}
@@ -114,11 +141,11 @@ public class DialogEntry {
 						try {
 							SwingUtilities.invokeAndWait(new Runnable() {
 								public void run() {
-									dialog.insideThePutOperation.set(true);
+									dialog.incrementTheInsideThePutOperationCounter();
 									try {
-										component.putValue(currentValue,iX);
+										component.putValue(operation,currentValue,iX);
 									} finally {
-										dialog.insideThePutOperation.set(false);
+										dialog.decrementTheInsideThePutOperationCounter();
 										isInitiated.set(true);
 										isToBeRefreshed.set(false);
 									}
@@ -151,11 +178,11 @@ public class DialogEntry {
 				};
 				if (!skipOperation || !isInitiated.get()) {
 					if (SwingUtilities.isEventDispatchThread()) {
-						dialog.insideThePutOperation.set(true);
+						dialog.incrementTheInsideThePutOperationCounter();
 						try {
 							component.putRange(currentRange,iX);
 						} finally {
-							dialog.insideThePutOperation.set(false);
+							dialog.decrementTheInsideThePutOperationCounter();
 							isInitiated.set(true);
 							isToBeRefreshed.set(false);
 						}
@@ -163,11 +190,11 @@ public class DialogEntry {
 						try {
 							SwingUtilities.invokeAndWait(new Runnable() {
 								public void run() {
-									dialog.insideThePutOperation.set(true);
+									dialog.incrementTheInsideThePutOperationCounter();
 									try {
 										component.putRange(currentRange,iX);
 									} finally {
-										dialog.insideThePutOperation.set(false);
+										dialog.decrementTheInsideThePutOperationCounter();
 										isInitiated.set(true);
 										isToBeRefreshed.set(false);
 									}
@@ -201,21 +228,22 @@ public class DialogEntry {
 				};
 				if (!skipOperation || !isInitiated.get()) {
 					if (SwingUtilities.isEventDispatchThread()) {
-						dialog.insideThePutOperation.set(true);
+						dialog.incrementTheInsideThePutOperationCounter();
 						try {
 							entryType.putValue(dialog,currentValue,iX);
 						} finally {
-							dialog.insideThePutOperation.set(false);
+							dialog.decrementTheInsideThePutOperationCounter();
 						}
 					} else {
 						try {
 							SwingUtilities.invokeAndWait(new Runnable() {
 								public void run() {
-									dialog.insideThePutOperation.set(true);
+									dialog.incrementTheInsideThePutOperationCounter();
 									try {
 										entryType.putValue(dialog,currentValue,iX);
 									} finally {
-										dialog.insideThePutOperation.set(false);
+										dialog.decrementTheInsideThePutOperationCounter();
+
 									}
 								}
 							});
@@ -242,12 +270,12 @@ public class DialogEntry {
 			synchronized(currentValueGuard) {
 				if (currentValue==null || refreshValue || isToBeRefreshed.get()) {
 					if (SwingUtilities.isEventDispatchThread()) {
-						currentValue= component.getValue();
+						currentValue= component.getValue(DialogControlOperation.VALUE);
 					} else {
 						try {
 							SwingUtilities.invokeAndWait(new Runnable() {
 								public void run() {
-									intermediateValue= component.getValue();
+									intermediateValue= component.getValue(DialogControlOperation.VALUE);
 								}
 							});
 						} catch (InterruptedException e) {
@@ -324,16 +352,42 @@ public class DialogEntry {
 			}
 		}
 	}
-	public Term getVisibleValue() {
-		if (entryType.isValueOrAction()) {
+	public Term getVisibleValue(final DialogControlOperation operation) {
+		if (operation != DialogControlOperation.VALUE) {
 			synchronized(currentValueGuard) {
 				if (SwingUtilities.isEventDispatchThread()) {
-					return component.getValue();
+					return component.getValue(operation);
 				} else {
 					try {
 						SwingUtilities.invokeAndWait(new Runnable() {
 							public void run() {
-								intermediateValue= component.getValue();
+								intermediateValue= component.getValue(operation);
+							}
+						});
+					} catch (InterruptedException e) {
+						// intermediateValue= PrologUnknownValue.instance;
+						throw new CannotAccessDialogControl(e.getCause());
+					} catch (InvocationTargetException e) {
+						// intermediateValue= PrologUnknownValue.instance;
+						throw new CannotAccessDialogControl(e.getCause());
+					};
+					if (intermediateValue!=null) {
+						return intermediateValue;
+					} else {
+						// return PrologUnknownValue.instance;
+						throw new CannotAccessDialogControl(null);
+					}
+				}
+			}
+		} else if (entryType.isValueOrAction()) {
+			synchronized(currentValueGuard) {
+				if (SwingUtilities.isEventDispatchThread()) {
+					return component.getValue(operation);
+				} else {
+					try {
+						SwingUtilities.invokeAndWait(new Runnable() {
+							public void run() {
+								intermediateValue= component.getValue(operation);
 							}
 						});
 					} catch (InterruptedException e) {
@@ -449,7 +503,7 @@ public class DialogEntry {
 	public Term toTerm() {
 		if (isSlotName) {
 			return new PrologSymbol(SymbolTable.retrieveSymbolCode(name));
-		} else if (isNumericCode) {
+		} else if (isNumericalName) {
 			return new PrologInteger(code);
 		} else {
 			return new PrologString(name);

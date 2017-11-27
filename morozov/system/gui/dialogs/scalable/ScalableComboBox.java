@@ -40,6 +40,8 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 	protected boolean enableSorting= false;
 	protected SortedStrings sortedStrings;
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public ScalableComboBox(AbstractDialog tD, String[] items, double visibleRowCount, double visibleColumnCount, boolean enableSorting) {
 		this(tD,items,visibleRowCount,visibleColumnCount,true,enableSorting);
 	}
@@ -77,74 +79,29 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 		comboBox.addFocusListener(this);
 	}
 	//
-	public void changedUpdate(DocumentEvent e) {
-		// Gives notification that an attribute or set of attributes changed.
-		if (targetDialog!=null) {
-			targetDialog.reportValueUpdate(this);
-		}
-	}
-	public void insertUpdate(DocumentEvent e) {
-		// Gives notification that there was an insert into the document.
-		if (targetDialog!=null) {
-			targetDialog.reportValueUpdate(this);
-		}
-	}
-	public void removeUpdate(DocumentEvent e) {
-		// Gives notification that a portion of the document has been removed.
-		if (targetDialog!=null) {
-			targetDialog.reportValueUpdate(this);
-		}
-	}
+	///////////////////////////////////////////////////////////////
 	//
-	public void actionPerformed(ActionEvent event) {
-		if (targetDialog!=null) {
-			targetDialog.reportValueUpdate(this);
-		}
-	}
-	//
-	// protected int getInitialTopBorder() {return 5;}
-	// protected int getInitialLeftBorder() {return 5;}
-	// protected int getInitialBottomBorder() {return 5;}
-	// protected int getInitialRightBorder() {return 5;}
-	//
-	public void setBackground(Color c) {
-		if (component!=null) {
-			component.setBackground(c);
-			ComponentUI cui= ((JComboBox)component).getUI();
-			if (cui instanceof ScalableComboBoxUI) {
-				ScalableComboBoxUI scbui= (ScalableComboBoxUI)cui;
-				scbui.setBackground(c);
+	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
+		value= value.dereferenceValue(iX);
+		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
+			throw RejectValue.instance;
+		} else {
+			ArrayList<Term> items= DialogUtils.listToTermArray(value,iX);
+			// return Converters.arrayListToTerm(items);
+			if (items.size() >= 1) {
+				return items.get(items.size()-1);
+			} else {
+				return new PrologString("");
 			}
 		}
 	}
 	//
-	public void setEditable(boolean flag) {
-		if (component!=null) {
-			((JComboBox)component).setEditable(flag);
-		}
-	}
-	public void setSelectedIndex(int index) {
-		if (component!=null) {
-			if (enableSorting) {
-				index= sortedStrings.resolveIndex(index);
-			};
-			((JComboBox)component).setSelectedIndex(index);
-		}
-	}
-	public void setFont(Font font) {
-		super.setFont(font);
-		if (component!=null) {
-			component.setFont(font);
-		}
+	public Term standardizeRange(Term value, ChoisePoint iX) {
+		ArrayList<String> items= DialogUtils.listToStringArray(value,iX);
+		return Converters.stringArrayToList(items);
 	}
 	//
-	protected String createPrototypeString(int delta) {
-		StringBuilder buffer= new StringBuilder(0);
-		for (int j=0; j < delta; j++) {
-			buffer= buffer.append("M");
-		};
-		return buffer.toString();
-	}
+	///////////////////////////////////////////////////////////////
 	//
 	public void putValue(Term value, ChoisePoint iX) {
 		if (component!=null) {
@@ -198,6 +155,7 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 			}
 		}
 	}
+	//
 	public void putRange(Term value, ChoisePoint iX) {
 		if (component!=null) {
 			synchronized(component) {
@@ -205,6 +163,7 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 			}
 		}
 	}
+	//
 	public Term getValue() {
 		if (component!=null) {
 			synchronized(component) {
@@ -248,6 +207,7 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 			return PrologUnknownValue.instance;
 		}
 	}
+	//
 	public Term getRange() {
 		if (component!=null) {
 			synchronized(component) {
@@ -264,7 +224,44 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 		}
 	}
 	//
-	// Auxiliary function
+	///////////////////////////////////////////////////////////////
+	//
+	public void setBackground(Color c) {
+		super.setBackground(c);
+		if (component!=null) {
+			ComponentUI cui= ((JComboBox)component).getUI();
+			if (cui instanceof ScalableComboBoxUI) {
+				ScalableComboBoxUI scbui= (ScalableComboBoxUI)cui;
+				scbui.setBackground(c);
+			}
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setEditable(boolean flag) {
+		if (component!=null) {
+			((JComboBox)component).setEditable(flag);
+		}
+	}
+	public void setSelectedIndex(int index) {
+		if (component!=null) {
+			if (enableSorting) {
+				index= sortedStrings.resolveIndex(index);
+			};
+			((JComboBox)component).setSelectedIndex(index);
+		}
+	}
+	//
+	protected String createPrototypeString(int delta) {
+		StringBuilder buffer= new StringBuilder(0);
+		for (int j=0; j < delta; j++) {
+			buffer= buffer.append("M");
+		};
+		return buffer.toString();
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	@SuppressWarnings("unchecked")
 	protected void addListOfItems(Term list, ChoisePoint iX) {
@@ -283,28 +280,33 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 			comboBox.addItem(items[n]);
 		}
 	}
-	// protected Object makeObj(final String item) {
-	//	return new Object() {
-	//		public String toString() { return item; }
-	//		};
-	// }
 	//
-	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-		value= value.dereferenceValue(iX);
-		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
-			throw RejectValue.instance;
-		} else {
-			ArrayList<Term> items= DialogUtils.listToTermArray(value,iX);
-			// return Converters.arrayListToTerm(items);
-			if (items.size() >= 1) {
-				return items.get(items.size()-1);
-			} else {
-				return new PrologString("");
-			}
+	///////////////////////////////////////////////////////////////
+	//
+	public void changedUpdate(DocumentEvent e) {
+		// Gives notification that an attribute or set of attributes changed.
+		if (targetDialog!=null) {
+			targetDialog.reportValueUpdate(this);
 		}
 	}
-	public Term standardizeRange(Term value, ChoisePoint iX) {
-		ArrayList<String> items= DialogUtils.listToStringArray(value,iX);
-		return Converters.stringArrayToList(items);
+	public void insertUpdate(DocumentEvent e) {
+		// Gives notification that there was an insert into the document.
+		if (targetDialog!=null) {
+			targetDialog.reportValueUpdate(this);
+		}
+	}
+	public void removeUpdate(DocumentEvent e) {
+		// Gives notification that a portion of the document has been removed.
+		if (targetDialog!=null) {
+			targetDialog.reportValueUpdate(this);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void actionPerformed(ActionEvent event) {
+		if (targetDialog!=null) {
+			targetDialog.reportValueUpdate(this);
+		}
 	}
 }

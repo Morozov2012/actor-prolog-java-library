@@ -21,7 +21,7 @@ public class InternalTextFrame extends InnerPage {
 	public InternalTextFrame(Report world, String title, ReportSpaceAttributes a) {
 		super(title);
 		panel= new TextPaneNoWrap();
-		ExtendedReportSpace extendedReportSpace= new ExtendedReportSpace(world,panel);
+		ExtendedReportSpace extendedReportSpace= new ExtendedReportSpace(null,world,panel);
 		canvasSpace= extendedReportSpace;
 		extendedReportSpace.setAttributes(a);
 		extendedReportSpace.enableMouseListener();

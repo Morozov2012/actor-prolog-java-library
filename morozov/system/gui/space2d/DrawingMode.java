@@ -56,6 +56,13 @@ public class DrawingMode {
 		verticalAlignment= vA;
 	}
 	//
+	public int getWindowWidth() {
+		return windowWidth;
+	}
+	public int getWindowHeight() {
+		return windowHeight;
+	}
+	//
 	public double getFactorX() {
 		if (sizeFactor < 0) {
 			return virtualWindowWidth;

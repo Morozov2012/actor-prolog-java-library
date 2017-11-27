@@ -7,6 +7,7 @@ import target.*;
 import morozov.built_in.*;
 import morozov.run.*;
 import morozov.system.gui.*;
+import morozov.system.gui.dialogs.scalable.*;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -41,8 +42,8 @@ public class ExtendedReportSpace extends CanvasSpace implements MouseListener, A
 	protected int scrollBarLockedPosition= 0;
 	protected int scrollBarPreviousMaximum= 0;
 	//
-	public ExtendedReportSpace(Report world, TextPaneNoWrap p) {
-		// super(p);
+	public ExtendedReportSpace(CustomControlComponent customControl, Report world, TextPaneNoWrap p) {
+		super(customControl);
 		targetWorld= world;
 		control= new JScrollPane(p);
 		panel= p;

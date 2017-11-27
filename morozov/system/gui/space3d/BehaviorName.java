@@ -26,7 +26,7 @@ public class BehaviorName {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static BehaviorName termToBehaviorName(Term value, ChoisePoint iX) {
+	public static BehaviorName argumentToBehaviorName(Term value, ChoisePoint iX) {
 		try {
 			BigInteger number= value.getIntegerValue(iX);
 			return new BehaviorName(number);

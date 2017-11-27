@@ -5,7 +5,7 @@ package morozov.system.gui.space2d;
 import java.awt.Graphics2D;
 
 public abstract class Java2DCommand {
-	public abstract void execute(Graphics2D g2, DrawingMode drawingMode);
+	abstract public void execute(Graphics2D g2, DrawingMode drawingMode);
 	public boolean isAuxiliaryCommand() {
 		return false;
 	}

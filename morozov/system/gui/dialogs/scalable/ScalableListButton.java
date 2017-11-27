@@ -29,6 +29,29 @@ public class ScalableListButton extends ScalableComboBox {
 		// ((JComboBox)component).addActionListener(this);
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
+	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
+		value= value.dereferenceValue(iX);
+		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
+			throw RejectValue.instance;
+		} else {
+			ArrayList<Term> items= DialogUtils.listToTermArray(value,iX);
+			if (items.size() >= 1) {
+				return items.get(items.size()-1);
+			} else {
+				return new PrologInteger(0);
+			}
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setGeneralForeground(Color c) {
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void actionPerformed(ActionEvent event) {
 		if (targetDialog!=null) {
 			targetDialog.reportValueUpdate(this);
@@ -41,23 +64,6 @@ public class ScalableListButton extends ScalableComboBox {
 						targetDialog.actionPerformed(new ActionEvent(event.getSource(),event.getID(),command,event.getWhen(),event.getModifiers()));
 					}
 				}
-			}
-		};
-	}
-	//
-	public void setForeground(Color c) {
-	}
-	//
-	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-		value= value.dereferenceValue(iX);
-		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
-			throw RejectValue.instance;
-		} else {
-			ArrayList<Term> items= DialogUtils.listToTermArray(value,iX);
-			if (items.size() >= 1) {
-				return items.get(items.size()-1);
-			} else {
-				return new PrologInteger(0);
 			}
 		}
 	}

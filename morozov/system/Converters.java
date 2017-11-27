@@ -142,6 +142,14 @@ public class Converters {
 		return result;
 	}
 	//
+	public static long argumentToLongInteger(Term value, ChoisePoint iX) {
+		try {
+			return value.getLongIntegerValue(iX);
+		} catch (TermIsNotAnInteger e) {
+			throw new WrongArgumentIsNotAnInteger(value);
+		}
+	}
+	//
 	public static BigInteger stringToRoundInteger(String text) throws TermIsNotAnInteger {
 		BigInteger result;
 		try {
@@ -213,11 +221,34 @@ public class Converters {
 		}
 	}
 	//
+	public static BigInteger argumentToDateInMilliseconds(Term value, ChoisePoint iX) {
+		try {
+			return termToDateInMilliseconds(value,iX);
+		} catch (TermIsNotADate e) {
+			throw new WrongArgumentIsNotADate(value);
+		}
+	}
+	public static void argumentToDateInMilliseconds(Term value, Calendar calendar, ChoisePoint iX) {
+		try {
+			termToDateInMilliseconds(value,calendar,iX);
+		} catch (TermIsNotADate e) {
+			throw new WrongArgumentIsNotADate(value);
+		}
+	}
+	//
 	public static BigInteger termToDateInMilliseconds(Term value, ChoisePoint iX) throws TermIsNotADate {
 		try {
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_date,3,iX);
 			long timeInMillis= termsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],value,iX);
 			return BigInteger.valueOf(timeInMillis);
+		} catch (Backtracking b) {
+			throw TermIsNotADate.instance;
+		}
+	}
+	public static void termToDateInMilliseconds(Term value, Calendar calendar, ChoisePoint iX) throws TermIsNotADate {
+		try {
+			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_date,3,iX);
+			termsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],value,calendar,iX);
 		} catch (Backtracking b) {
 			throw TermIsNotADate.instance;
 		}
@@ -246,6 +277,38 @@ public class Converters {
 			throw TermIsNotADate.instance;
 		}
 	}
+	public static void termsToDateInMilliseconds(Term a1, Term a2, Term a3, Term term, Calendar calendar, ChoisePoint iX) throws TermIsNotADate {
+		try {
+			int year= a1.getSmallIntegerValue(iX);
+			int month= monthToInteger(a2,iX);
+			int day= a3.getSmallIntegerValue(iX);
+			// Calendar calendar= Calendar.getInstance();
+			calendar.set(year,month-1,day);
+			// long timeInMillis= calendar.getTimeInMillis();
+			// return timeInMillis;
+		} catch (TermIsNotAnInteger e) {
+			throw new WrongArgumentIsNotADate(term);
+		} catch (Backtracking b) {
+			throw TermIsNotADate.instance;
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public static BigInteger argumentToTimeInMilliseconds(Term value, ChoisePoint iX) {
+		try {
+			return termToTimeInMilliseconds(value,iX);
+		} catch (TermIsNotATime e) {
+			throw new WrongArgumentIsNotATime(value);
+		}
+	}
+	public static void argumentToTimeInMilliseconds(Term value, Calendar calendar, ChoisePoint iX) {
+		try {
+			termToTimeInMilliseconds(value,calendar,iX);
+		} catch (TermIsNotATime e) {
+			throw new WrongArgumentIsNotATime(value);
+		}
+	}
 	//
 	public static BigInteger termToTimeInMilliseconds(Term value, ChoisePoint iX) throws TermIsNotATime {
 		try {
@@ -257,6 +320,19 @@ public class Converters {
 				Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_time,3,iX);
 				long timeInMillis= termsToTimeInMilliseconds(arguments[0],arguments[1],arguments[2],value,iX);
 				return BigInteger.valueOf(timeInMillis);
+			}
+		} catch (Backtracking b1) {
+			throw TermIsNotATime.instance;
+		}
+	}
+	public static void termToTimeInMilliseconds(Term value, Calendar calendar, ChoisePoint iX) throws TermIsNotATime {
+		try {
+			try {
+				Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_time,4,iX);
+				termsToTimeInMilliseconds(arguments[0],arguments[1],arguments[2],arguments[3],value,calendar,iX);
+			} catch (Backtracking b2) {
+				Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_time,3,iX);
+				termsToTimeInMilliseconds(arguments[0],arguments[1],arguments[2],value,calendar,iX);
 			}
 		} catch (Backtracking b1) {
 			throw TermIsNotATime.instance;
@@ -287,6 +363,22 @@ public class Converters {
 			throw new WrongArgumentIsNotATime(term);
 		}
 	}
+	public static void termsToTimeInMilliseconds(Term a1, Term a2, Term a3, Term a4, Term term, Calendar calendar, ChoisePoint iX) throws TermIsNotATime {
+		try {
+			int hours= a1.getSmallIntegerValue(iX);
+			int minutes= a2.getSmallIntegerValue(iX);
+			int seconds= a3.getSmallIntegerValue(iX);
+			int milliseconds= a4.getSmallIntegerValue(iX);
+			// Calendar calendar= Calendar.getInstance();
+			calendar.set(Calendar.HOUR_OF_DAY,hours);
+			calendar.set(Calendar.MINUTE,minutes);
+			calendar.set(Calendar.SECOND,seconds);
+			calendar.set(Calendar.MILLISECOND,milliseconds);
+			// return calendar.getTimeInMillis();
+		} catch (TermIsNotAnInteger e) {
+			throw new WrongArgumentIsNotATime(term);
+		}
+	}
 	//
 	public static long argumentsToTimeInMilliseconds(Term a1, Term a2, Term a3, Term term, ChoisePoint iX) {
 		try {
@@ -312,33 +404,63 @@ public class Converters {
 			throw new WrongArgumentIsNotATime(term);
 		}
 	}
+	public static void termsToTimeInMilliseconds(Term a1, Term a2, Term a3, Term term, Calendar calendar, ChoisePoint iX) throws TermIsNotATime {
+		try {
+			int hours= a1.getSmallIntegerValue(iX);
+			int minutes= a2.getSmallIntegerValue(iX);
+			int seconds= a3.getSmallIntegerValue(iX);
+			int milliseconds= 0;
+			// Calendar calendar= Calendar.getInstance();
+			calendar.set(Calendar.HOUR_OF_DAY,hours);
+			calendar.set(Calendar.MINUTE,minutes);
+			calendar.set(Calendar.SECOND,seconds);
+			calendar.set(Calendar.MILLISECOND,milliseconds);
+			// return calendar.getTimeInMillis();
+		} catch (TermIsNotAnInteger e) {
+			throw new WrongArgumentIsNotATime(term);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public static Term millisecondsToDate(BigInteger value) {
 		Calendar calendar= Calendar.getInstance();
 		calendar.setTimeInMillis(PrologInteger.toLong(value));
+		return formDate(calendar);
+	}
+	//
+	public static Term formDate(Calendar calendar) {
 		int year= calendar.get(Calendar.YEAR);
 		int month= calendar.get(Calendar.MONTH) + 1;
 		int day= calendar.get(Calendar.DAY_OF_MONTH);
-		Term[] arguments= new Term[3];
-		arguments[0]= new PrologInteger(BigInteger.valueOf(year));
-		arguments[1]= new PrologInteger(BigInteger.valueOf(month));
-		arguments[2]= new PrologInteger(BigInteger.valueOf(day));
-		return new PrologStructure(SymbolCodes.symbolCode_E_date,arguments);
+		return new PrologStructure(
+			SymbolCodes.symbolCode_E_date,
+			new Term[]{
+				new PrologInteger(year),
+				new PrologInteger(month),
+				new PrologInteger(day)}
+			);
 	}
 	//
 	public static Term millisecondsToTime(BigInteger value) {
 		Calendar calendar= Calendar.getInstance();
 		calendar.setTimeInMillis(PrologInteger.toLong(value));
-		int hours= calendar.get(Calendar.HOUR_OF_DAY);
+		return formTime(calendar);
+	}
+	//
+	public static Term formTime(Calendar calendar) {
+		int hours= calendar.get(Calendar.HOUR);
 		int minutes= calendar.get(Calendar.MINUTE);
 		int seconds= calendar.get(Calendar.SECOND);
-		int milliseconds= calendar.get(Calendar.MILLISECOND);
-		Term[] arguments= new Term[4];
-		arguments[0]= new PrologInteger(BigInteger.valueOf(hours));
-		arguments[1]= new PrologInteger(BigInteger.valueOf(minutes));
-		arguments[2]= new PrologInteger(BigInteger.valueOf(seconds));
-		arguments[3]= new PrologInteger(BigInteger.valueOf(milliseconds));
-		return new PrologStructure(SymbolCodes.symbolCode_E_time,arguments);
+		long milliseconds= calendar.get(Calendar.MILLISECOND);
+		return new PrologStructure(
+			SymbolCodes.symbolCode_E_time,
+			new Term[]{
+				new PrologInteger(hours),
+				new PrologInteger(minutes),
+				new PrologInteger(seconds),
+				new PrologInteger(milliseconds)}
+			);
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -641,19 +763,19 @@ public class Converters {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static BigInteger[] termToIntegers(Term value, ChoisePoint iX) {
+	public static BigInteger[] argumentToIntegers(Term value, ChoisePoint iX) {
 		ArrayList<BigInteger> integerList= new ArrayList<BigInteger>();
-		termToIntegers(integerList,value,iX);
+		argumentToIntegers(integerList,value,iX);
 		return integerList.toArray(new BigInteger[0]);
 	}
 	//
-	public static void termToIntegers(ArrayList<BigInteger> integerList, Term value, ChoisePoint iX) {
+	public static void argumentToIntegers(ArrayList<BigInteger> integerList, Term value, ChoisePoint iX) {
 		Term nextHead;
 		Term currentTail= value;
 		try {
 			while (true) {
 				nextHead= currentTail.getNextListHead(iX);
-				termToIntegers(integerList,nextHead,iX);
+				argumentToIntegers(integerList,nextHead,iX);
 				currentTail= currentTail.getNextListTail(iX);
 			}
 		} catch (EndOfList e1) {
@@ -669,9 +791,9 @@ public class Converters {
 		}
 	}
 	//
-	public static long[] termToLongIntegers(Term value, ChoisePoint iX) {
+	public static long[] argumentToLongIntegers(Term value, ChoisePoint iX) {
 		ArrayList<Long> integerList= new ArrayList<Long>();
-		termToLongIntegers(integerList,value,iX);
+		argumentToLongIntegers(integerList,value,iX);
 		long[] array= new long[integerList.size()];
 		for (int n=0; n < array.length; n++) {
 			array[n]= integerList.get(n);
@@ -679,13 +801,13 @@ public class Converters {
 		return array;
 	}
 	//
-	public static void termToLongIntegers(ArrayList<Long> integerList, Term value, ChoisePoint iX) {
+	public static void argumentToLongIntegers(ArrayList<Long> integerList, Term value, ChoisePoint iX) {
 		Term nextHead;
 		Term currentTail= value;
 		try {
 			while (true) {
 				nextHead= currentTail.getNextListHead(iX);
-				termToLongIntegers(integerList,nextHead,iX);
+				argumentToLongIntegers(integerList,nextHead,iX);
 				currentTail= currentTail.getNextListTail(iX);
 			}
 		} catch (EndOfList e1) {
@@ -729,15 +851,40 @@ public class Converters {
 	}
 	//
 	public static Term arrayToList(Term[] array) {
+		Term result= PrologEmptyList.instance;
+		for (int n=array.length-1; n >= 0; n--) {
+			result= new PrologList(array[n],result);
+		};
+		return result;
+	}
+	public static Term arrayToList(Term[] array, Term result) {
+		// Term result= PrologEmptyList.instance;
+		for (int n=array.length-1; n >= 0; n--) {
+			result= new PrologList(array[n],result);
+		};
+		return result;
+	}
+	//
+	public static Term sparseArrayToList(Term[] array) {
 		Term buffer= PrologEmptyList.instance;
 		for (int n=array.length-1; n >= 0; n--) {
-			buffer= new PrologList(array[n],buffer);
+			Term term= array[n];
+			if (term != null) {
+				buffer= new PrologList(term,buffer);
+			}
 		};
 		return buffer;
 	}
 	//
 	public static Term arrayListToTerm(ArrayList<Term> array) {
 		Term result= PrologEmptyList.instance;
+		for (int n=array.size()-1; n >= 0; n--) {
+			result= new PrologList(array.get(n),result);
+		};
+		return result;
+	}
+	public static Term arrayListToTerm(ArrayList<Term> array, Term result) {
+		// Term result= PrologEmptyList.instance;
 		for (int n=array.size()-1; n >= 0; n--) {
 			result= new PrologList(array.get(n),result);
 		};

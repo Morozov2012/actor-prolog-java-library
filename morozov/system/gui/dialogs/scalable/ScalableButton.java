@@ -7,7 +7,9 @@
 package morozov.system.gui.dialogs.scalable;
 
 import morozov.run.*;
+import morozov.system.gui.*;
 import morozov.system.gui.dialogs.*;
+// import morozov.system.gui.dialogs.errors.*;
 import morozov.terms.*;
 
 import javax.swing.JButton;
@@ -26,10 +28,7 @@ public class ScalableButton extends ScalableAbstractButton {
 	protected int initialBottomMargin= 0;
 	protected int initialRightMargin= 7;
 	//
-	// protected int getInitialTopBorder() {return 5;}
-	// protected int getInitialLeftBorder() {return 5;}
-	// protected int getInitialBottomBorder() {return 5;}
-	// protected int getInitialRightBorder() {return 5;}
+	///////////////////////////////////////////////////////////////
 	//
 	public ScalableButton(AbstractDialog tD) {
 		this(tD,null,null);
@@ -51,10 +50,15 @@ public class ScalableButton extends ScalableAbstractButton {
 		component= new JButton(text,icon);
 	}
 	//
-	public void setFont(Font font) {
-		super.setFont(font);
+	///////////////////////////////////////////////////////////////
+	//
+	// public void setGeneralForeground(Color c) {
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	protected void setMargin() {
 		if (component!=null) {
-			component.setFont(font);
 			if (horizontalScaling > 0 && verticalScaling > 0) {
 				((JButton)component).setMargin(new Insets(initialTopMargin,initialLeftMargin,initialBottomMargin,initialRightMargin));
 				Dimension preferredSize= component.getPreferredSize();
@@ -70,13 +74,30 @@ public class ScalableButton extends ScalableAbstractButton {
 			}
 		}
 	}
-	public void setForeground(Color c) {
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setIndividualText(Term value, ChoisePoint iX) {
+		if (component!=null) {
+			AnnotatedButton.safelyUpdateAbstractButton((JButton)component,value,iX);
+			// ((JButton)component).invalidate();
+			// Без этой команды при изменении надписи на кнопке
+			// соседние кнопки сдвигаются, но перерисовываются
+			// некорректно; новое изображение кнопок ступенькой
+			// накладывается на старое.
+			targetDialog.safelyRevalidateAndRepaint();
+			// Без этой команды при изменении надписи на кнопке
+			// иногда портится фон окна, содержащего кнопку.
+			targetDialog.repaintAfterDelay();
+		}
 	}
 	//
-	public void putValue(Term value, ChoisePoint iX) {
-		// setText(value.toString(iX));
-	}
-	public Term getValue() {
-		return PrologUnknownValue.instance;
+	public Term getIndividualText() {
+		if (component!=null) {
+			String text= AnnotatedButton.safelyRestoreText((JButton)component);
+			return new PrologString(text);
+		} else {
+			return termEmptyString;
+		}
 	}
 }

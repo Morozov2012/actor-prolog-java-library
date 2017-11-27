@@ -54,15 +54,15 @@ public class TimeInterval {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static TimeInterval termSecondsToTimeInterval(Term a, ChoisePoint iX) {
-		return termToTimeInterval(a,false,iX);
+	public static TimeInterval argumentSecondsToTimeInterval(Term a, ChoisePoint iX) {
+		return argumentToTimeInterval(a,false,iX);
 	}
 	//
-	public static TimeInterval termMillisecondsToTimeInterval(Term a, ChoisePoint iX) {
-		return termToTimeInterval(a,true,iX);
+	public static TimeInterval argumentMillisecondsToTimeInterval(Term a, ChoisePoint iX) {
+		return argumentToTimeInterval(a,true,iX);
 	}
 	//
-	public static TimeInterval termToTimeInterval(Term a, boolean acceptMilliseconds, ChoisePoint iX) {
+	public static TimeInterval argumentToTimeInterval(Term a, boolean acceptMilliseconds, ChoisePoint iX) {
 		try {
 			BigDecimal value= new BigDecimal(a.getIntegerValue(iX));
 			if (acceptMilliseconds) {

@@ -36,8 +36,43 @@ public class Java2DScaleAndDrawImage extends Java2DCommand {
 		double factorY= drawingMode.getFactorY();
 		int integerX= PrologInteger.toInteger(x1*factorX);
 		int integerY= PrologInteger.toInteger(y1*factorY);
-		int integerWidth= PrologInteger.toInteger(width*factorX);
-		int integerHeight= PrologInteger.toInteger(height*factorY);
+		int integerWidth;
+		int integerHeight;
+		if (width > 0 && height > 0) {
+			integerWidth= PrologInteger.toInteger(width*factorX);
+			integerHeight= PrologInteger.toInteger(height*factorY);
+		} else if (width <= 0 && height <= 0) {
+			int imageWidth= image.getWidth(null);
+			int imageHeight= image.getHeight(null);
+			double imageRatio= (double)imageWidth / imageHeight;
+			int windowWidth= drawingMode.getWindowWidth();
+			int windowHeight= drawingMode.getWindowHeight();
+			double actualWindowWidth= windowWidth*(1.0-x1);
+			double actualWindowHeight= windowHeight*(1.0-y1);
+			double windowRatio= actualWindowWidth / actualWindowHeight;
+			if (windowRatio > imageRatio) {
+				integerHeight= PrologInteger.toInteger(actualWindowHeight);
+				integerWidth= PrologInteger.toInteger(actualWindowHeight*imageRatio);
+			} else {
+				integerWidth= PrologInteger.toInteger(actualWindowWidth);
+				integerHeight= PrologInteger.toInteger(actualWindowWidth/imageRatio);
+			}
+		} else {
+			int imageWidth= image.getWidth(null);
+			int imageHeight= image.getHeight(null);
+			double imageRatio= (double)imageWidth / imageHeight;
+			if (width <= 0) {
+				int windowHeight= drawingMode.getWindowHeight();
+				double actualWindowHeight= height*windowHeight;
+				integerHeight= PrologInteger.toInteger(actualWindowHeight);
+				integerWidth= PrologInteger.toInteger(actualWindowHeight*imageRatio);
+			} else {
+				int windowWidth= drawingMode.getWindowWidth();
+				double actualWindowWidth= width*windowWidth;
+				integerWidth= PrologInteger.toInteger(actualWindowWidth);
+				integerHeight= PrologInteger.toInteger(actualWindowWidth/imageRatio);
+			}
+		};
 		if (color==null) {
 			g2.drawImage(image,integerX,integerY,integerWidth,integerHeight,null);
 		} else {

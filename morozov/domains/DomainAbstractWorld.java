@@ -7,6 +7,7 @@ import morozov.worlds.remote.*;
 import java.util.HashSet;
 
 public abstract class DomainAbstractWorld extends DomainAlternative {
+	//
 	public DomainAbstractWorld() {
 	}
 	//

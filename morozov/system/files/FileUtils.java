@@ -11,7 +11,7 @@ import morozov.terms.signals.*;
 import java.util.ArrayList;
 
 public class FileUtils {
-	public static FileNameMask[] termToFileNameMasks(Term types, ChoisePoint iX) {
+	public static FileNameMask[] argumentToFileNameMasks(Term types, ChoisePoint iX) {
 		ArrayList<FileNameMask> list= new ArrayList<FileNameMask>();
 		Term nextHead= null;
 		Term currentTail= types;

@@ -28,19 +28,19 @@ public class Utils3D extends PrincipalNode3D {
 	//protected static Term term= new PrologSymbol(SymbolCodes.symbolCode_E_);
 	//protected static Term term= new PrologSymbol(SymbolCodes.symbolCode_E_);
 	//
-	public static BranchGroup termToBranchGroupOrNodeList(Term value, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
+	public static BranchGroup argumentToBranchGroupOrNodeList(Term value, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
 		try { // BranchGroup
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_BranchGroup,1,iX);
 			return attributesToBranchGroup(arguments[0],targetWorld,u,space3D,iX);
 		} catch (Backtracking b) {
 			BranchGroup branchGroup= new BranchGroup();
-			termToListOfNodes(branchGroup,branchGroup,value,targetWorld,u,space3D,null,iX);
+			argumentToListOfNodes(branchGroup,branchGroup,value,targetWorld,u,space3D,null,iX);
 			return branchGroup;
 			// throw new WrongArgumentIsNotBranchGroup(value);
 		}
 	}
 	//
-	public static int termToProjectionPolicy(Term value, ChoisePoint iX) {
+	public static int argumentToProjectionPolicy(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_PARALLEL_PROJECTION) {
@@ -62,7 +62,7 @@ public class Utils3D extends PrincipalNode3D {
 		}
 	}
 	//
-	public static int termToWindowResizePolicy(Term value, ChoisePoint iX) {
+	public static int argumentToWindowResizePolicy(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_VIRTUAL_WORLD) {
@@ -84,7 +84,7 @@ public class Utils3D extends PrincipalNode3D {
 		}
 	}
 	//
-	public static int termToWindowMovementPolicy(Term value, ChoisePoint iX) {
+	public static int argumentToWindowMovementPolicy(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_VIRTUAL_WORLD) {
@@ -106,7 +106,7 @@ public class Utils3D extends PrincipalNode3D {
 		}
 	}
 	//
-	public static int termToVisibilityPolicy(Term value, ChoisePoint iX) {
+	public static int argumentToVisibilityPolicy(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_VISIBILITY_DRAW_VISIBLE) {
@@ -131,7 +131,7 @@ public class Utils3D extends PrincipalNode3D {
 		}
 	}
 	//
-	public static int termToTransparencySortingPolicy(Term value, ChoisePoint iX) {
+	public static int argumentToTransparencySortingPolicy(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_TRANSPARENCY_SORT_NONE) {

@@ -7,6 +7,7 @@ import target.*;
 import morozov.built_in.*;
 import morozov.run.*;
 import morozov.system.gui.*;
+import morozov.system.gui.dialogs.errors.*;
 import morozov.system.gui.dialogs.scalable.*;
 import morozov.system.gui.signals.*;
 import morozov.system.signals.*;
@@ -84,13 +85,13 @@ public abstract class DialogFoundation {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected abstract void setNewFont(Font commonFont);
-	protected abstract void setNewBackground(Color c);
-	protected abstract void setNewForeground(Color c);
-	protected abstract void setNewSpaceColor(Color c);
-	protected abstract void setNewAlarmColors(Color fc, Color bc);
+	protected abstract void setGeneralFont(Font commonFont);
+	// protected abstract void setGeneralBackground(Color c);
+	protected abstract void setGeneralForeground(Color c);
+	protected abstract void setGeneralSpaceColor(Color c);
+	protected abstract void setAlarmColors(Color fc, Color bc);
 	//
-	public abstract void assemble(ChoisePoint iX);
+	abstract public void assemble(ChoisePoint iX);
 	//
 	protected void defineDefaultButton() {
 	}
@@ -227,7 +228,7 @@ public abstract class DialogFoundation {
 			value= textColor.getValue();
 		} catch (UseDefaultColor e1) {
 			try {
-				value= ExtendedColor.termToColorSafe(getPredefinedTextColor(),iX);
+				value= ExtendedColor.argumentToColorSafe(getPredefinedTextColor(),iX);
 			} catch (TermIsSymbolDefault e2) {
 				value= defaultDialogTextColor;
 			}
@@ -254,7 +255,7 @@ public abstract class DialogFoundation {
 		}
 	}
 	private void quicklySetTextColor(Color color, boolean repaintContainer) {
-		setNewForeground(color);
+		setGeneralForeground(color);
 		if (repaintContainer) {
 			dialogContainer.repaint();
 		}
@@ -287,7 +288,7 @@ public abstract class DialogFoundation {
 			value= spaceColor.getValue();
 		} catch (UseDefaultColor e1) {
 			try {
-				value= ExtendedColor.termToColorSafe(getPredefinedSpaceColor(),iX);
+				value= ExtendedColor.argumentToColorSafe(getPredefinedSpaceColor(),iX);
 			} catch (TermIsSymbolDefault e2) {
 				value= defaultDialogSpaceColor;
 			}
@@ -314,7 +315,7 @@ public abstract class DialogFoundation {
 		}
 	}
 	private void quicklySetSpaceColor(Color color, boolean repaintContainer) {
-		setNewSpaceColor(color);
+		setGeneralSpaceColor(color);
 		if (repaintContainer) {
 			dialogContainer.repaint();
 		}
@@ -328,7 +329,7 @@ public abstract class DialogFoundation {
 			value= backgroundColor.getValue();
 		} catch (UseDefaultColor e1) {
 			try {
-				value= ExtendedColor.termToColorSafe(getPredefinedBackgroundColor(),iX);
+				value= ExtendedColor.argumentToColorSafe(getPredefinedBackgroundColor(),iX);
 			} catch (TermIsSymbolDefault e2) {
 				value= defaultDialogSuccessBackgroundColor;
 			}
@@ -357,12 +358,12 @@ public abstract class DialogFoundation {
 		}
 	}
 	private void quicklySetBackgroundColor(Color color, boolean repaintContainer) {
-		setNewBackground(color);
+		setGeneralBackground(color);
 		if (repaintContainer) {
 			dialogContainer.repaint();
 		}
 	}
-	public void setBackground(Color c) { // To be called from setNewBackground.
+	protected void setGeneralBackground(Color c) { // To be called from setGeneralBackground.
 		dialogContainer.setBackground(c);
 	}
 	public Color safelyGetBackgroundColor() {
@@ -390,7 +391,7 @@ public abstract class DialogFoundation {
 	protected Color instantiateFailureForegroundColor(ChoisePoint iX) {
 		Color value;
 		try {
-			value= ExtendedColor.termToColorSafe(DefaultOptions.failureDrawingForegroundColor,iX);
+			value= ExtendedColor.argumentToColorSafe(DefaultOptions.failureDrawingForegroundColor,iX);
 		} catch (TermIsSymbolDefault e1) {
 			value= defaultDialogFailureForegroundColor;
 		};
@@ -402,7 +403,7 @@ public abstract class DialogFoundation {
 	protected Color instantiateFailureBackgroundColor(ChoisePoint iX) {
 		Color value;
 		try {
-			value= ExtendedColor.termToColorSafe(DefaultOptions.failureDrawingBackgroundColor,iX);
+			value= ExtendedColor.argumentToColorSafe(DefaultOptions.failureDrawingBackgroundColor,iX);
 		} catch (TermIsSymbolDefault e1) {
 			value= defaultDialogFailureBackgroundColor;
 		};
@@ -417,10 +418,10 @@ public abstract class DialogFoundation {
 			value= fontName.getValue();
 		} catch (UseDefaultFontName e1) {
 			try {
-				value= ExtendedFontName.termToFontName(getPredefinedFontName(),iX);
+				value= ExtendedFontName.argumentToFontName(getPredefinedFontName(),iX);
 			} catch (TermIsSymbolDefault e2) {
 				try {
-					value= ExtendedFontName.termToFontName(DefaultOptions.dialogFontName,iX);
+					value= ExtendedFontName.argumentToFontName(DefaultOptions.dialogFontName,iX);
 				} catch (TermIsSymbolDefault e3) {
 					value= defaultDialogFontName;
 				}
@@ -449,10 +450,10 @@ public abstract class DialogFoundation {
 			value= fontSize.getValue();
 		} catch (UseDefaultFontSize e1) {
 			try {
-				value= ExtendedFontSize.termToFontSize(getPredefinedFontSize(),iX);
+				value= ExtendedFontSize.argumentToFontSize(getPredefinedFontSize(),iX);
 			} catch (TermIsSymbolDefault e2) {
 				try {
-					value= ExtendedFontSize.termToFontSize(DefaultOptions.dialogFontSize,iX);
+					value= ExtendedFontSize.argumentToFontSize(DefaultOptions.dialogFontSize,iX);
 				} catch (TermIsSymbolDefault e3) {
 					value= defaultDialogFontSize;
 				}
@@ -486,12 +487,12 @@ public abstract class DialogFoundation {
 		} catch (UseDefaultFontStyle e1) {
 			Term predefinedFontStyle= getPredefinedFontStyle();
 			try {
-				style= ExtendedFontStyle.termToFontStyleSafe(predefinedFontStyle,iX);
+				style= ExtendedFontStyle.argumentToFontStyleSafe(predefinedFontStyle,iX);
 				isUnderlined= ExtendedFontStyle.fontIsUnderlinedSafe(predefinedFontStyle,iX);
 			} catch (TermIsSymbolDefault e2) {
 				Term dialogFontStyle= DefaultOptions.dialogFontStyle;
 				try {
-					style= ExtendedFontStyle.termToFontStyleSafe(dialogFontStyle,iX);
+					style= ExtendedFontStyle.argumentToFontStyleSafe(dialogFontStyle,iX);
 					isUnderlined= ExtendedFontStyle.fontIsUnderlinedSafe(dialogFontStyle,iX);
 				} catch (TermIsSymbolDefault e3) {
 					style= defaultDialogFontStyle;
@@ -526,7 +527,7 @@ public abstract class DialogFoundation {
 	//
 	protected ExtendedCoordinate instantiateX(ExtendedCoordinate x, ChoisePoint iX) {
 		if (x.isDefault()) {
-			x= ExtendedCoordinate.termToExtendedCoordinateSafe(getPredefinedX(),iX);
+			x= ExtendedCoordinate.argumentToExtendedCoordinateSafe(getPredefinedX(),iX);
 			if (x.isDefault()) {
 				x= defaultDialogX;
 			}
@@ -535,7 +536,7 @@ public abstract class DialogFoundation {
 	}
 	protected ExtendedCoordinate instantiateY(ExtendedCoordinate y, ChoisePoint iX) {
 		if (y.isDefault()) {
-			y= ExtendedCoordinate.termToExtendedCoordinateSafe(getPredefinedY(),iX);
+			y= ExtendedCoordinate.argumentToExtendedCoordinateSafe(getPredefinedY(),iX);
 			if (y.isDefault()) {
 				y= defaultDialogY;
 			}
@@ -719,7 +720,7 @@ public abstract class DialogFoundation {
 	//
 	protected void safelyCreateNewFontAndResize() {
 		Font newFont= create_new_font();
-		safelySetNewFont(newFont);
+		safelySetGeneralFont(newFont);
 		implementPreferredSize();
 		safelyValidate();
 	}
@@ -738,6 +739,7 @@ public abstract class DialogFoundation {
 				});
 			} catch (InterruptedException e) {
 			} catch (InvocationTargetException e) {
+				throw new DialogCreationError(e.getCause());
 			}
 		}
 	}
@@ -746,8 +748,8 @@ public abstract class DialogFoundation {
 		mainPanel.setTransparency(false);
 		mainPanel.setHatchColor(hatchColor());
 		dialogContainer.setTitle(initialTitle);
-		setNewAlarmColors(initialFailureForegroundColor,initialFailureBackgroundColor);
-		setNewBackground(refinedBackgroundColor);
+		setAlarmColors(initialFailureForegroundColor,initialFailureBackgroundColor);
+		setGeneralBackground(refinedBackgroundColor);
 		dialogContainer.add(mainPanel);
 	}
 	//
@@ -760,7 +762,7 @@ public abstract class DialogFoundation {
 		};
 		//
 		Font initialFont= create_new_font();
-		safelySetNewFont(initialFont);
+		safelySetGeneralFont(initialFont);
 		//
 		Dimension preferredSize= new Dimension();
 		Dimension minimumSize= new Dimension();
@@ -918,14 +920,14 @@ public abstract class DialogFoundation {
 		}
 	}
 	//
-	public void safelySetNewFont(final Font font) {
+	public void safelySetGeneralFont(final Font font) {
 		if (SwingUtilities.isEventDispatchThread()) {
-			setNewFont(font);
+			setGeneralFont(font);
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
-						setNewFont(font);
+						setGeneralFont(font);
 					}
 				});
 			} catch (InterruptedException e) {
@@ -959,6 +961,9 @@ public abstract class DialogFoundation {
 	}
 	private void quicklyRevalidateAndRepaint() {
 		dialogContainer.revalidate();
+		// dialogContainer.invalidate();
+		// dialogContainer.revalidate();
+		// dialogContainer.validateTree();
 		dialogContainer.repaint();
 	}
 	//

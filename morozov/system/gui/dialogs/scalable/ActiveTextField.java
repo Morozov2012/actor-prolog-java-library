@@ -25,6 +25,8 @@ public class ActiveTextField extends ActiveComponent {
 	//
 	protected boolean isEditable= false;
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public ActiveTextField(AbstractDialog target, int columns) {
 		this(target,"",columns);
 	}
@@ -39,43 +41,25 @@ public class ActiveTextField extends ActiveComponent {
 		super(target);
 	}
 	//
-	// protected int getInitialTopBorder() {return 5;}
-	// protected int getInitialLeftBorder() {return 5;}
-	// protected int getInitialBottomBorder() {return 5;}
-	// protected int getInitialRightBorder() {return 5;}
+	///////////////////////////////////////////////////////////////
 	//
-	public void setEditable(boolean b) {
-		isEditable= b;
-		if (component!=null) {
-			((ATextField)component).setEditable(b);
+	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
+		value= value.dereferenceValue(iX);
+		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
+			throw RejectValue.instance;
+		} else {
+			return super.standardizeValue(value,iX);
 		}
 	}
-	public void setFont(Font font) {
-		if (component!=null) {
-			component.setFont(font);
-		};
-		super.setFont(font);
-	}
-	public void setHorizontalAlignment(int alignment) {
-		if (component!=null) {
-			((ATextField)component).setHorizontalAlignment(alignment);
-		}
-	}
-	public void setBackground(Color c) {
-	}
-	public void setForeground(Color c) {
-	}
-	public void setAlarmColors(Color fc, Color bc) {
-		if (component!=null) {
-			((ATextField)component).setAlarmColors(fc,bc);
-		}
-	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void putValue(Term value, ChoisePoint iX) {
 		if (component!=null) {
 			((ATextField)component).setText(value.toString(iX));
 		}
 	}
+	//
 	public Term getValue() {
 		if (component!=null) {
 			return ((ATextField)component).getValue();
@@ -84,12 +68,31 @@ public class ActiveTextField extends ActiveComponent {
 		}
 	}
 	//
-	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-		value= value.dereferenceValue(iX);
-		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
-			throw RejectValue.instance;
-		} else {
-			return super.standardizeValue(value,iX);
+	///////////////////////////////////////////////////////////////
+	//
+	public void setGeneralForeground(Color c) {
+	}
+	public void setGeneralBackground(Color c) {
+	}
+	//
+	public void setAlarmColors(Color fc, Color bc) {
+		if (component!=null) {
+			((ATextField)component).setAlarmColors(fc,bc);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setEditable(boolean b) {
+		isEditable= b;
+		if (component!=null) {
+			((ATextField)component).setEditable(b);
+		}
+	}
+	//
+	public void setHorizontalAlignment(int alignment) {
+		if (component!=null) {
+			((ATextField)component).setHorizontalAlignment(alignment);
 		}
 	}
 }

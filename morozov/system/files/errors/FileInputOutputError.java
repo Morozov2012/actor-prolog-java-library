@@ -3,8 +3,10 @@
 package morozov.system.files.errors;
 
 public class FileInputOutputError extends RuntimeException {
+	//
 	public String fileName1;
 	public String fileName2;
+	//
 	public FileInputOutputError(String name, Throwable e) {
 		super(e);
 		fileName1= name;
@@ -15,6 +17,7 @@ public class FileInputOutputError extends RuntimeException {
 		fileName1= name1;
 		fileName2= name2;
 	}
+	//
 	public String toString() {
 		if (fileName1 != null) {
 			if (fileName2 != null) {

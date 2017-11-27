@@ -58,20 +58,20 @@ public class ExtendedTitle {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static ExtendedTitle termToExtendedTitleSafe(Term value, ChoisePoint iX) {
+	public static ExtendedTitle argumentToExtendedTitleSafe(Term value, ChoisePoint iX) {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
 			return new ExtendedTitle();
 		} else {
 			try {
-				return termToExtendedTitle(value,iX);
+				return argumentToExtendedTitle(value,iX);
 			} catch (RuntimeException e) {
 				return new ExtendedTitle();
 			}
 		}
 	}
 	//
-	public static Term termToExtendedTitleOrFail(Term value, ChoisePoint iX) throws Backtracking {
+	public static Term argumentToExtendedTitleOrFail(Term value, ChoisePoint iX) throws Backtracking {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable()) {
 			throw Backtracking.instance;
@@ -79,7 +79,7 @@ public class ExtendedTitle {
 			return termDefault;
 		} else {
 			try {
-				return new PrologString(termToTitle(value,iX));
+				return new PrologString(argumentToTitle(value,iX));
 			} catch (TermIsSymbolDefault e) {
 				return termDefault;
 			} catch (RuntimeException e) {
@@ -88,28 +88,28 @@ public class ExtendedTitle {
 		}
 	}
 	//
-	public static ExtendedTitle termToExtendedTitle(Term value, ChoisePoint iX) {
+	public static ExtendedTitle argumentToExtendedTitle(Term value, ChoisePoint iX) {
 		try {
-			return new ExtendedTitle(termToTitle(value,iX));
+			return new ExtendedTitle(argumentToTitle(value,iX));
 		} catch (TermIsSymbolDefault e) {
 			return new ExtendedTitle();
 		}
 	}
 	//
-	public static String termToTitleSafe(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
+	public static String argumentToTitleSafe(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
 			throw TermIsSymbolDefault.instance;
 		} else {
 			try {
-				return termToTitle(value,iX);
+				return argumentToTitle(value,iX);
 			} catch (RuntimeException e) {
 				throw TermIsSymbolDefault.instance;
 			}
 		}
 	}
 	//
-	public static String termToTitle(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
+	public static String argumentToTitle(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		try {
 			return value.getStringValue(iX);
 		} catch (TermIsNotAString e1) {

@@ -86,7 +86,7 @@ public abstract class Canvas2D extends BufferedImageController {
 	// get/set scalingFactor
 	//
 	public void setScalingFactor1s(ChoisePoint iX, Term a1) {
-		Canvas2DScalingFactor factor= Canvas2DScalingFactor.termToScalingFactor(a1,iX);
+		Canvas2DScalingFactor factor= Canvas2DScalingFactor.argumentToScalingFactor(a1,iX);
 		setScalingFactor(factor);
 		actingScalingFactor.set(factor);
 		repaintAfterDelay(iX);
@@ -94,9 +94,9 @@ public abstract class Canvas2D extends BufferedImageController {
 	public void setScalingFactor(Canvas2DScalingFactor value) {
 		scalingFactor= value;
 	}
-	public void getScalingFactor0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getScalingFactor0ff(ChoisePoint iX, PrologVariable result) {
 		Canvas2DScalingFactor value= getScalingFactor(iX);
-		a1.value= value.toTerm();
+		result.setNonBacktrackableValue(value.toTerm());
 	}
 	public void getScalingFactor0fs(ChoisePoint iX) {
 	}
@@ -105,7 +105,7 @@ public abstract class Canvas2D extends BufferedImageController {
 			return scalingFactor;
 		} else {
 			Term value= getBuiltInSlot_E_scaling_factor();
-			return Canvas2DScalingFactor.termToScalingFactor(value,iX);
+			return Canvas2DScalingFactor.argumentToScalingFactor(value,iX);
 		}
 	}
 	//
@@ -144,27 +144,27 @@ public abstract class Canvas2D extends BufferedImageController {
 	public void setMesh2s(ChoisePoint iX, Term columns, Term rows) {
 		double rColumns= Converters.argumentToReal(columns,iX);
 		double rRows= Converters.argumentToReal(rows,iX);
-		append_command(new Java2DSetMesh(rColumns,rRows));
+		appendCommand(new Java2DSetMesh(rColumns,rRows));
 		// repaintAfterDelay(iX);
 	}
 	//
 	public void setTransform1s(ChoisePoint iX, Term value) {
-		AffineTransform transform= Tools2D.termToTransform2D(value,iX);
-		append_command(new Java2DSetTransform(transform));
+		AffineTransform transform= Tools2D.argumentToTransform2D(value,iX);
+		appendCommand(new Java2DSetTransform(transform));
 		repaintAfterDelay(iX);
 	}
 	//
 	public void translate2s(ChoisePoint iX, Term x1, Term y1) {
 		double rX1= Converters.argumentToReal(x1,iX);
 		double rY1= Converters.argumentToReal(y1,iX);
-		append_command(new Java2DTranslate(rX1,rY1));
+		appendCommand(new Java2DTranslate(rX1,rY1));
 		repaintAfterDelay(iX);
 	}
 	//
 	public void drawPoint2s(ChoisePoint iX, Term x1, Term y1) {
 		double rX1= Converters.argumentToReal(x1,iX);
 		double rY1= Converters.argumentToReal(y1,iX);
-		append_command(new Java2DDrawPoint(rX1,rY1));
+		appendCommand(new Java2DDrawPoint(rX1,rY1));
 		repaintAfterDelay(iX);
 	}
 	//
@@ -173,13 +173,13 @@ public abstract class Canvas2D extends BufferedImageController {
 		double rY1= Converters.argumentToReal(y1,iX);
 		double rX2= Converters.argumentToReal(x2,iX);
 		double rY2= Converters.argumentToReal(y2,iX);
-		append_command(new Java2DDrawLine(rX1,rY1,rX2,rY2));
+		appendCommand(new Java2DDrawLine(rX1,rY1,rX2,rY2));
 		repaintAfterDelay(iX);
 	}
 	//
 	public void drawPolygon1s(ChoisePoint iX, Term pointList) {
-		Point2DArrays arrays= Point2DArrays.termToPoint2DArrays(pointList,iX);
-		append_command(new Java2DDrawPolygon(arrays.xPoints,arrays.yPoints));
+		Point2DArrays arrays= Point2DArrays.argumentToPoint2DArrays(pointList,iX);
+		appendCommand(new Java2DDrawPolygon(arrays.xPoints,arrays.yPoints));
 		repaintAfterDelay(iX);
 	}
 	//
@@ -188,7 +188,7 @@ public abstract class Canvas2D extends BufferedImageController {
 		double rY1= Converters.argumentToReal(y1,iX);
 		double rWidth= Converters.argumentToReal(width,iX);
 		double rHeight= Converters.argumentToReal(height,iX);
-		append_command(new Java2DDrawRectangle(rX1,rY1,rWidth,rHeight));
+		appendCommand(new Java2DDrawRectangle(rX1,rY1,rWidth,rHeight));
 		repaintAfterDelay(iX);
 	}
 	//
@@ -199,7 +199,7 @@ public abstract class Canvas2D extends BufferedImageController {
 		double rHeight= Converters.argumentToReal(height,iX);
 		double rArcW= Converters.argumentToReal(arcWidth,iX);
 		double rArcH= Converters.argumentToReal(arcHeight,iX);
-		append_command(new Java2DDrawRoundRectangle(rX1,rY1,rWidth,rHeight,rArcW,rArcH));
+		appendCommand(new Java2DDrawRoundRectangle(rX1,rY1,rWidth,rHeight,rArcW,rArcH));
 		repaintAfterDelay(iX);
 	}
 	//
@@ -208,7 +208,7 @@ public abstract class Canvas2D extends BufferedImageController {
 		double rY1= Converters.argumentToReal(y1,iX);
 		double rWidth= Converters.argumentToReal(width,iX);
 		double rHeight= Converters.argumentToReal(height,iX);
-		append_command(new Java2DDrawEllipse(rX1,rY1,rWidth,rHeight));
+		appendCommand(new Java2DDrawEllipse(rX1,rY1,rWidth,rHeight));
 		repaintAfterDelay(iX);
 	}
 	//
@@ -216,7 +216,7 @@ public abstract class Canvas2D extends BufferedImageController {
 		drawArc(x1,y1,width,height,start,extent,Arc2D.OPEN,iX);
 	}
 	public void drawArc7s(ChoisePoint iX, Term x1, Term y1, Term width, Term height, Term start, Term extent, Term closureType) {
-		int type= Tools2D.termToArcClosureType(closureType,iX);
+		int type= Tools2D.argumentToArcClosureType(closureType,iX);
 		drawArc(x1,y1,width,height,start,extent,type,iX);
 	}
 	protected void drawArc(Term x1, Term y1, Term width, Term height, Term start, Term extent, int type, ChoisePoint iX) {
@@ -226,7 +226,7 @@ public abstract class Canvas2D extends BufferedImageController {
 		double rHeight= Converters.argumentToReal(height,iX);
 		double rStart= Converters.argumentToReal(start,iX);
 		double rExtent= Converters.argumentToReal(extent,iX);
-		append_command(new Java2DDrawArc(rX1,rY1,rWidth,rHeight,rStart,rExtent,type));
+		appendCommand(new Java2DDrawArc(rX1,rY1,rWidth,rHeight,rStart,rExtent,type));
 		repaintAfterDelay(iX);
 	}
 	//
@@ -237,7 +237,7 @@ public abstract class Canvas2D extends BufferedImageController {
 		double rCtrlY1= Converters.argumentToReal(ctrlY1,iX);
 		double rX2= Converters.argumentToReal(x2,iX);
 		double rY2= Converters.argumentToReal(y2,iX);
-		append_command(new Java2DDrawQuadCurve(rX1,rY1,rCtrlX1,rCtrlY1,rX2,rY2));
+		appendCommand(new Java2DDrawQuadCurve(rX1,rY1,rCtrlX1,rCtrlY1,rX2,rY2));
 		repaintAfterDelay(iX);
 	}
 	//
@@ -250,7 +250,7 @@ public abstract class Canvas2D extends BufferedImageController {
 		double rCtrlY2= Converters.argumentToReal(ctrlY2,iX);
 		double rX2= Converters.argumentToReal(x2,iX);
 		double rY2= Converters.argumentToReal(y2,iX);
-		append_command(new Java2DDrawCubicCurve(rX1,rY1,rCtrlX1,rCtrlY1,rCtrlX2,rCtrlY2,rX2,rY2));
+		appendCommand(new Java2DDrawCubicCurve(rX1,rY1,rCtrlX1,rCtrlY1,rCtrlX2,rCtrlY2,rX2,rY2));
 		repaintAfterDelay(iX);
 	}
 	//
@@ -258,7 +258,7 @@ public abstract class Canvas2D extends BufferedImageController {
 		double rX1= Converters.argumentToReal(x1,iX);
 		double rY1= Converters.argumentToReal(y1,iX);
 		String rText= text.toString(iX);
-		append_command(new Java2DDrawText(rX1,rY1,rText));
+		appendCommand(new Java2DDrawText(rX1,rY1,rText));
 		repaintAfterDelay(iX);
 	}
 	//
@@ -270,7 +270,7 @@ public abstract class Canvas2D extends BufferedImageController {
 	}
 	public void drawImage2s(ChoisePoint iX, Term a1, Term a2) {
 		try {
-			Color color= ExtendedColor.termToColor(a2,iX);
+			Color color= ExtendedColor.argumentToColor(a2,iX);
 			drawImage(a1,color,iX);
 		} catch (TermIsSymbolDefault e1) {
 			drawImage(a1,iX);
@@ -283,7 +283,7 @@ public abstract class Canvas2D extends BufferedImageController {
 	}
 	public void drawImage4s(ChoisePoint iX, Term a1, Term a2, Term a3, Term a4) {
 		try {
-			Color color= ExtendedColor.termToColor(a4,iX);
+			Color color= ExtendedColor.argumentToColor(a4,iX);
 			drawImage(a1,a2,a3,color,iX);
 		} catch (TermIsSymbolDefault e1) {
 			drawImage(a1,a2,a3,iX);
@@ -296,7 +296,7 @@ public abstract class Canvas2D extends BufferedImageController {
 	}
 	public void drawImage6s(ChoisePoint iX, Term a1, Term a2, Term a3, Term a4, Term a5, Term a6) {
 		try {
-			Color color= ExtendedColor.termToColor(a6,iX);
+			Color color= ExtendedColor.argumentToColor(a6,iX);
 			drawImage(a1,a2,a3,a4,a5,color,iX);
 		} catch (TermIsSymbolDefault e1) {
 			drawImage(a1,a2,a3,a4,a5,iX);
@@ -309,7 +309,7 @@ public abstract class Canvas2D extends BufferedImageController {
 	}
 	public void drawImage10s(ChoisePoint iX, Term a1, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7, Term a8, Term a9, Term a10) {
 		try {
-			Color color= ExtendedColor.termToColor(a10,iX);
+			Color color= ExtendedColor.argumentToColor(a10,iX);
 			drawImage(a1,a2,a3,a4,a5,a6,a7,a8,a9,color,iX);
 		} catch (TermIsSymbolDefault e1) {
 			drawImage(a1,a2,a3,a4,a5,a6,a7,a8,a9,iX);
@@ -319,13 +319,13 @@ public abstract class Canvas2D extends BufferedImageController {
 	protected void drawImage(Term a1, ChoisePoint iX) {
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		if (nativeImage != null) {
-			append_command(new Java2DDrawImage(nativeImage));
+			appendCommand(new Java2DDrawImage(nativeImage));
 		}
 	}
 	protected void drawImage(Term a1, Color color, ChoisePoint iX) {
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		if (nativeImage != null) {
-			append_command(new Java2DDrawImage(nativeImage,color));
+			appendCommand(new Java2DDrawImage(nativeImage,color));
 		}
 	}
 	protected void drawImage(Term a1, Term a2, Term a3, ChoisePoint iX) {
@@ -333,7 +333,7 @@ public abstract class Canvas2D extends BufferedImageController {
 		double y1= Converters.argumentToReal(a3,iX);
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		if (nativeImage != null) {
-			append_command(new Java2DDrawImage(nativeImage,x1,y1));
+			appendCommand(new Java2DDrawImage(nativeImage,x1,y1));
 		}
 	}
 	protected void drawImage(Term a1, Term a2, Term a3, Color color, ChoisePoint iX) {
@@ -341,7 +341,7 @@ public abstract class Canvas2D extends BufferedImageController {
 		double y1= Converters.argumentToReal(a3,iX);
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		if (nativeImage != null) {
-			append_command(new Java2DDrawImage(nativeImage,x1,y1,color));
+			appendCommand(new Java2DDrawImage(nativeImage,x1,y1,color));
 		}
 	}
 	protected void drawImage(Term a1, Term a2, Term a3, Term a4, Term a5, ChoisePoint iX) {
@@ -351,7 +351,7 @@ public abstract class Canvas2D extends BufferedImageController {
 		double height= Converters.argumentToReal(a5,iX);
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		if (nativeImage != null) {
-			append_command(new Java2DScaleAndDrawImage(nativeImage,x1,y1,width,height));
+			appendCommand(new Java2DScaleAndDrawImage(nativeImage,x1,y1,width,height));
 		}
 	}
 	protected void drawImage(Term a1, Term a2, Term a3, Term a4, Term a5, Color color, ChoisePoint iX) {
@@ -361,7 +361,7 @@ public abstract class Canvas2D extends BufferedImageController {
 		double height= Converters.argumentToReal(a5,iX);
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		if (nativeImage != null) {
-			append_command(new Java2DScaleAndDrawImage(nativeImage,x1,y1,width,height,color));
+			appendCommand(new Java2DScaleAndDrawImage(nativeImage,x1,y1,width,height,color));
 		}
 	}
 	protected void drawImage(Term a1, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7, Term a8, Term a9, ChoisePoint iX) {
@@ -375,7 +375,7 @@ public abstract class Canvas2D extends BufferedImageController {
 		double sourceY2= Converters.argumentToReal(a9,iX);
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		if (nativeImage != null) {
-			append_command(new Java2DPickOutAndDrawImage(
+			appendCommand(new Java2DPickOutAndDrawImage(
 				nativeImage,
 				destinationX1,
 				destinationY1,
@@ -398,7 +398,7 @@ public abstract class Canvas2D extends BufferedImageController {
 		double sourceY2= Converters.argumentToReal(a9,iX);
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		if (nativeImage != null) {
-			append_command(new Java2DPickOutAndDrawImage(
+			appendCommand(new Java2DPickOutAndDrawImage(
 				nativeImage,
 				destinationX1,
 				destinationY1,
@@ -415,44 +415,44 @@ public abstract class Canvas2D extends BufferedImageController {
 	///////////////////////////////////////////////////////////////
 	//
 	public void setPen1s(ChoisePoint iX, Term value) {
-		StrokeAndColor attributes= StrokeAndColor.termToStrokeAndColor(value,iX);
-		append_command(new Java2DSetPen(attributes));
+		StrokeAndColor attributes= StrokeAndColor.argumentToStrokeAndColor(value,iX);
+		appendCommand(new Java2DSetPen(attributes));
 	}
 	//
 	public void setBrush1s(ChoisePoint iX, Term value) {
-		BrushAttributes attributes= BrushAttributes.termToBrushAttributes(value,this,iX);
-		append_command(new Java2DSetBrushAttributes(attributes));
+		BrushAttributes attributes= BrushAttributes.argumentToBrushAttributes(value,this,iX);
+		appendCommand(new Java2DSetBrushAttributes(attributes));
 	}
 	//
 	public void setFont1s(ChoisePoint iX, Term value) {
-		Font font= Tools2D.termToFont2D(value,this,iX);
-		append_command(new Java2DSetFont(font));
+		Font font= Tools2D.argumentToFont2D(value,this,iX);
+		appendCommand(new Java2DSetFont(font));
 	}
 	//
 	public void setTextAlignment2s(ChoisePoint iX, Term hA, Term vA) {
-		Canvas2DHorizontalAlignment horizontalAlignment= Canvas2DHorizontalAlignment.termToHorizontalAlignment(hA,iX);
-		Canvas2DVerticalAlignment verticalAlignment= Canvas2DVerticalAlignment.termToVerticalAlignment(vA,iX);
-		append_command(new Java2DSetTextAlignment(horizontalAlignment,verticalAlignment));
+		Canvas2DHorizontalAlignment horizontalAlignment= Canvas2DHorizontalAlignment.argumentToHorizontalAlignment(hA,iX);
+		Canvas2DVerticalAlignment verticalAlignment= Canvas2DVerticalAlignment.argumentToVerticalAlignment(vA,iX);
+		appendCommand(new Java2DSetTextAlignment(horizontalAlignment,verticalAlignment));
 	}
 	//
 	public void setPaintMode0s(ChoisePoint iX) {
-		append_command(new Java2DSetPaintMode());
+		appendCommand(new Java2DSetPaintMode());
 	}
 	//
 	public void setCompositingRule1s(ChoisePoint iX, Term value) {
-		int rule= Tools2D.termToCompositingRule(value,iX);
-		append_command(new Java2DSetComposite(rule));
+		int rule= Tools2D.argumentToCompositingRule(value,iX);
+		appendCommand(new Java2DSetComposite(rule));
 	}
 	public void setCompositingRule2s(ChoisePoint iX, Term a1, Term a2) {
-		int rule= Tools2D.termToCompositingRule(a1,iX);
+		int rule= Tools2D.argumentToCompositingRule(a1,iX);
 		float alpha= (float)Converters.argumentToReal(a2,iX);
-		append_command(new Java2DSetComposite(rule,alpha));
+		appendCommand(new Java2DSetComposite(rule,alpha));
 	}
 	//
 	public void set_XOR_Mode1s(ChoisePoint iX, Term value) {
 		Color color;
 		try {
-			color= ExtendedColor.termToColor(value,iX);
+			color= ExtendedColor.argumentToColor(value,iX);
 		} catch (TermIsSymbolDefault e1) {
 			try {
 				color= getBackgroundColor(iX).getValue();
@@ -460,17 +460,17 @@ public abstract class Canvas2D extends BufferedImageController {
 				color= getDefaultBackgroundColor();
 			}
 		};
-		append_command(new Java2DSetXORMode(color));
+		appendCommand(new Java2DSetXORMode(color));
 	}
 	//
 	public void setRenderingMode1s(ChoisePoint iX, Term value) {
 		RenderingHints hints;
-		hints= Tools2D.termToRenderingHints(value,iX);
-		append_command(new Java2DSetRenderingMode(hints));
+		hints= Tools2D.argumentToRenderingHints(value,iX);
+		appendCommand(new Java2DSetRenderingMode(hints));
 	}
 	//
-	public void markDrawing0ff(ChoisePoint iX, PrologVariable value) {
-		value.setValue(new PrologInteger(actualCommands.size()));
+	public void markDrawing0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(new PrologInteger(actualCommands.size()));
 	}
 	public void markDrawing0fs(ChoisePoint iX) {
 	}
@@ -601,7 +601,7 @@ public abstract class Canvas2D extends BufferedImageController {
 	}
 	public void save2s(ChoisePoint iX, Term a1, Term a2) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(a1,iX);
-		GenericImageEncodingAttributes attributes= GenericImageEncodingAttributes.termToImageEncodingAttributes(a2,iX);
+		GenericImageEncodingAttributes attributes= GenericImageEncodingAttributes.argumentToImageEncodingAttributes(a2,iX);
 		saveContent(fileName,attributes,iX);
 	}
 	protected void saveContent(ExtendedFileName fileName, GenericImageEncodingAttributes attributes, ChoisePoint iX) {
@@ -701,7 +701,7 @@ public abstract class Canvas2D extends BufferedImageController {
 		//
 		internalFrame2D.safelyAddComponentListener(this);
 		//
-		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
+		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(staticContext);
 		desktop.safelyAdd(internalFrame2D.getInternalFrame());
 		//
 		canvasSpace= internalFrame2D.getCanvasSpace();
@@ -717,7 +717,7 @@ public abstract class Canvas2D extends BufferedImageController {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected void append_command(Java2DCommand command) {
+	protected void appendCommand(Java2DCommand command) {
 		synchronized(this) {
 			if (implementDelayedCleaning) {
 				actualCommands.clear();

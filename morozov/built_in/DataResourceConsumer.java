@@ -16,24 +16,29 @@ public abstract class DataResourceConsumer extends DataAbstraction {
 		super(id);
 	}
 	//
-	// abstract protected Term getBuiltInSlot_E_max_waiting_time();
+	// abstract protected Term getBuiltInSlot_E_maximal_waiting_time();
 	// abstract protected Term getBuiltInSlot_E_backslash_always_is_separator();
 	//
 	///////////////////////////////////////////////////////////////
 	//
 	public java.awt.image.BufferedImage readImage(ChoisePoint iX) {
 		ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
-		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		return fileName.readImage(timeout,staticContext);
+	}
+	public java.awt.image.BufferedImage readImage(Term targetName, int xSubsampling, int ySubsampling, int xOffset, int yOffset, ChoisePoint iX) {
+		ExtendedFileName fileName= retrieveRealGlobalFileName(targetName,iX);
+		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
+		return fileName.readImage(timeout,xSubsampling,ySubsampling,xOffset,yOffset,staticContext);
 	}
 	public java.awt.image.BufferedImage readImage(Term targetName, ChoisePoint iX) {
 		ExtendedFileName fileName= retrieveRealGlobalFileName(targetName,iX);
-		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		return fileName.readImage(timeout,staticContext);
 	}
 	public java.awt.image.BufferedImage readImage(String textName, ChoisePoint iX) {
 		ExtendedFileName fileName= retrieveRealGlobalFileName(textName,iX);
-		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		return fileName.readImage(timeout,staticContext);
 	}
 	//

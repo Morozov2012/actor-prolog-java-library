@@ -11,6 +11,7 @@ import morozov.system.gui.*;
 import morozov.system.gui.space3d.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
+import morozov.terms.errors.*;
 import morozov.terms.signals.*;
 
 import java.awt.Color;
@@ -144,7 +145,7 @@ public class Tools3D {
 				float a= (float)Converters.argumentToReal(arguments[3],iX);
 				return new Color3f(new Color(r,g,b,a));
 			} catch (Backtracking b2) {
-				Color color= ExtendedColor.termToColor(value,iX);
+				Color color= ExtendedColor.argumentToColor(value,iX);
 				return new Color3f(color);
 			}
 		}
@@ -224,7 +225,7 @@ public class Tools3D {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static WakeupCondition termToWakeupCondition(Term value, ChoisePoint iX) {
+	public static WakeupCondition argumentToWakeupCondition(Term value, ChoisePoint iX) {
 		try {
 			long flag= value.getSymbolValue(iX);
 			if (flag==SymbolCodes.symbolCode_E_KEY_PRESSED) {
@@ -296,7 +297,7 @@ public class Tools3D {
 			WakeupOnElapsedFrames node= new WakeupOnElapsedFrames(frameCount,isPassive);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
@@ -317,7 +318,7 @@ public class Tools3D {
 				if (pairName==SymbolCodes.symbolCode_E_frameCount) {
 					// Milliseconds expected
 					// elapsedTime= pairValue.getLongIntegerValue(iX);
-					elapsedTime= TimeInterval.termMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+					elapsedTime= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 				} else {
 					throw new WrongArgumentIsUnknownElapsedTimeAttribute(key);
 				}
@@ -325,13 +326,13 @@ public class Tools3D {
 			WakeupOnElapsedTime node= new WakeupOnElapsedTime(elapsedTime);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static WakeupCondition termToCollisionDetectorWakeupCondition(Term value, Node armingNode, CollisionDetectorSpeedHint speedHint, ChoisePoint iX) {
+	public static WakeupCondition argumentToCollisionDetectorWakeupCondition(Term value, Node armingNode, CollisionDetectorSpeedHint speedHint, ChoisePoint iX) {
 		WakeupCondition condition;
 		try {
 			long flag= value.getSymbolValue(iX);

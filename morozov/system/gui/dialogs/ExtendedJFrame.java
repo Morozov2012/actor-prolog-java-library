@@ -6,6 +6,7 @@ import morozov.run.*;
 import morozov.system.gui.*;
 
 import javax.swing.JFrame;
+import java.awt.Window;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Point;
@@ -42,6 +43,10 @@ public class ExtendedJFrame
 		staticContext= context;
 	}
 	//
+	public Window getWindow() {
+		return this;
+	}
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public void setClosable(boolean b) {
@@ -53,7 +58,7 @@ public class ExtendedJFrame
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void addToDesktop(MainDesktopPane desktop) {
+	public void addToDesktopIfNecessary(StaticContext context) {
 	}
 	//
 	///////////////////////////////////////////////////////////////

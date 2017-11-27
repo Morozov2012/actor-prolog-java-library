@@ -12,6 +12,7 @@ import morozov.system.gui.*;
 import morozov.system.gui.space3d.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
+import morozov.terms.errors.*;
 import morozov.terms.signals.*;
 
 import java.awt.Font;
@@ -71,7 +72,7 @@ import javax.media.j3d.OrientedShape3D;
 
 public class AuxiliaryNode3D extends Tools3D {
 	//
-	public static javax.media.j3d.Alpha termToAlpha3D(Term value, ChoisePoint iX) {
+	public static javax.media.j3d.Alpha argumentToAlpha3D(Term value, ChoisePoint iX) {
 		try { // Alpha3D
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Alpha3D,1,iX);
 			Term attributes= arguments[0];
@@ -94,27 +95,27 @@ public class AuxiliaryNode3D extends Tools3D {
 						decreasingEnable= YesNo.termYesNo2Boolean(pairValue,iX);
 					} else if (pairName==SymbolCodes.symbolCode_E_increasingAlphaDuration) {
 						// long increasingAlphaDuration= pairValue.getLongIntegerValue(iX);
-						long increasingAlphaDuration= TimeInterval.termMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+						long increasingAlphaDuration= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setIncreasingAlphaDuration(increasingAlphaDuration);
 					} else if (pairName==SymbolCodes.symbolCode_E_decreasingAlphaDuration) {
 						// long decreasingAlphaDuration= pairValue.getLongIntegerValue(iX);
-						long decreasingAlphaDuration= TimeInterval.termMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+						long decreasingAlphaDuration= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setDecreasingAlphaDuration(decreasingAlphaDuration);
 					} else if (pairName==SymbolCodes.symbolCode_E_alphaAtZeroDuration) {
 						// long alphaAtZeroDuration= pairValue.getLongIntegerValue(iX);
-						long alphaAtZeroDuration= TimeInterval.termMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+						long alphaAtZeroDuration= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setAlphaAtZeroDuration(alphaAtZeroDuration);
 					} else if (pairName==SymbolCodes.symbolCode_E_alphaAtOneDuration) {
 						// long alphaAtOneDuration= pairValue.getLongIntegerValue(iX);
-						long alphaAtOneDuration= TimeInterval.termMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+						long alphaAtOneDuration= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setAlphaAtOneDuration(alphaAtOneDuration);
 					} else if (pairName==SymbolCodes.symbolCode_E_increasingAlphaRampDuration) {
 						// long increasingAlphaRampDuration= pairValue.getLongIntegerValue(iX);
-						long increasingAlphaRampDuration= TimeInterval.termMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+						long increasingAlphaRampDuration= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setIncreasingAlphaRampDuration(increasingAlphaRampDuration);
 					} else if (pairName==SymbolCodes.symbolCode_E_decreasingAlphaRampDuration) {
 						// long decreasingAlphaRampDuration= pairValue.getLongIntegerValue(iX);
-						long decreasingAlphaRampDuration= TimeInterval.termMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+						long decreasingAlphaRampDuration= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setDecreasingAlphaRampDuration(decreasingAlphaRampDuration);
 					} else if (pairName==SymbolCodes.symbolCode_E_loopCount) {
 						try {
@@ -125,15 +126,15 @@ public class AuxiliaryNode3D extends Tools3D {
 						}
 					} else if (pairName==SymbolCodes.symbolCode_E_startTime) {
 						// long startTime= pairValue.getLongIntegerValue(iX);
-						long startTime= TimeInterval.termMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+						long startTime= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setStartTime(startTime);
 					} else if (pairName==SymbolCodes.symbolCode_E_triggerTime) {
 						// long triggerTime= pairValue.getLongIntegerValue(iX);
-						long triggerTime= TimeInterval.termMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+						long triggerTime= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setTriggerTime(triggerTime);
 					} else if (pairName==SymbolCodes.symbolCode_E_phaseDelayDuration) {
 						// long phaseDelayDuration= pairValue.getLongIntegerValue(iX);
-						long phaseDelayDuration= TimeInterval.termMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+						long phaseDelayDuration= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setPhaseDelayDuration(phaseDelayDuration);
 					} else {
 						throw new WrongArgumentIsUnknownAlphaAttribute(key);
@@ -149,13 +150,13 @@ public class AuxiliaryNode3D extends Tools3D {
 				node.setMode(mode);
 				return node;
 			} else {
-				throw new WrongArgumentIsNotAttributeSet(setEnd);
+				throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 			}
 		} catch (Backtracking b) {
 			throw new WrongArgumentIsNotAnAlpha3D(value);
 		}
 	}
-	public static Bounds termToBounds(Term value, ChoisePoint iX) {
+	public static Bounds argumentToBounds(Term value, ChoisePoint iX) {
 		try { // Bounds
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_BoundingSphere,1,iX);
 			Term attributes= arguments[0];
@@ -182,13 +183,13 @@ public class AuxiliaryNode3D extends Tools3D {
 				};
 				return node;
 			} else {
-				throw new WrongArgumentIsNotAttributeSet(setEnd);
+				throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 			}
 		} catch (Backtracking b) {
 			throw new WrongArgumentIsNotBounds(value);
 		}
 	}
-	public static Transform3D termToTransform3D(Term value, ChoisePoint iX) {
+	public static Transform3D argumentToTransform3D(Term value, ChoisePoint iX) {
 		try { // Transform3D
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Transform3D,1,iX);
 			Term attributes= arguments[0];
@@ -274,16 +275,16 @@ public class AuxiliaryNode3D extends Tools3D {
 				};
 				return node;
 			} else {
-				throw new WrongArgumentIsNotAttributeSet(setEnd);
+				throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 			}
 		} catch (Backtracking b) {
 			throw new WrongArgumentIsNotATransform3D(value);
 		}
 	}
-	public static Geometry termToGeometry(Term value, ChoisePoint iX) {
+	public static Geometry argumentToGeometry(Term value, ChoisePoint iX) {
 		try { // Geometry
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_geometryArray,1,iX);
-			GeometryInfo node= termToGeometryInfo(arguments[0],iX);
+			GeometryInfo node= argumentToGeometryInfo(arguments[0],iX);
 			return node.getGeometryArray();
 		} catch (Backtracking b1) {
 		try { // PointArray
@@ -379,7 +380,7 @@ public class AuxiliaryNode3D extends Tools3D {
 		}
 		}
 	}
-	public static GeometryInfo termToGeometryInfo(Term value, ChoisePoint iX) {
+	public static GeometryInfo argumentToGeometryInfo(Term value, ChoisePoint iX) {
 		try { // GeometryInfo
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_GeometryInfo,1,iX);
 			Term attributes= arguments[0];
@@ -465,13 +466,13 @@ public class AuxiliaryNode3D extends Tools3D {
 				};
 				return node;
 			} else {
-				throw new WrongArgumentIsNotAttributeSet(setEnd);
+				throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 			}
 		} catch (Backtracking b) {
 			throw new WrongArgumentIsNotGeometryInfo(value);
 		}
 	}
-	public static Appearance termToAppearance(Term value, Canvas3D targetWorld, ChoisePoint iX) {
+	public static Appearance argumentToAppearance(Term value, Canvas3D targetWorld, ChoisePoint iX) {
 		try { // Appearance
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Appearance,1,iX);
 			Term attributes= arguments[0];
@@ -487,19 +488,19 @@ public class AuxiliaryNode3D extends Tools3D {
 					long pairName= - key;
 					Term pairValue= setPositiveMap.get(key);
 					if (pairName==SymbolCodes.symbolCode_E_material) {
-						Material material= termToMaterial(pairValue,iX);
+						Material material= argumentToMaterial(pairValue,iX);
 						node.setMaterial(material);
 					} else if (pairName==SymbolCodes.symbolCode_E_coloringAttributes) {
-						ColoringAttributes coloringAttributes= termToColoringAttributes(pairValue,iX);
+						ColoringAttributes coloringAttributes= argumentToColoringAttributes(pairValue,iX);
 						node.setColoringAttributes(coloringAttributes);
 					} else if (pairName==SymbolCodes.symbolCode_E_polygonAttributes) {
-						PolygonAttributes polygonAttributes= termToPolygonRenderingMode(pairValue,iX);
+						PolygonAttributes polygonAttributes= argumentToPolygonRenderingMode(pairValue,iX);
 						node.setPolygonAttributes(polygonAttributes);
 					} else if (pairName==SymbolCodes.symbolCode_E_transparencyAttributes) {
-						TransparencyAttributes transparencyAttributes= termToObjectTransparency(pairValue,iX);
+						TransparencyAttributes transparencyAttributes= argumentToObjectTransparency(pairValue,iX);
 						node.setTransparencyAttributes(transparencyAttributes);
 					} else if (pairName==SymbolCodes.symbolCode_E_texture) {
-						Texture texture= termToTexture2D(pairValue,targetWorld,iX);
+						Texture texture= argumentToTexture2D(pairValue,targetWorld,iX);
 						node.setTexture(texture);
 					} else if (pairName==SymbolCodes.symbolCode_E_allowMaterialRead) {
 						boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
@@ -561,13 +562,13 @@ public class AuxiliaryNode3D extends Tools3D {
 				// node.setLineAttributes(new LineAttributes(1,LineAttributes.PATTERN_SOLID,true));
 				return node;
 			} else {
-				throw new WrongArgumentIsNotAttributeSet(setEnd);
+				throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 			}
 		} catch (Backtracking b) {
 			throw new WrongArgumentIsNotAnAppearance(value);
 		}
 	}
-	protected static Texture2D termToTexture2D(Term value, Canvas3D targetWorld, ChoisePoint iX) {
+	protected static Texture2D argumentToTexture2D(Term value, Canvas3D targetWorld, ChoisePoint iX) {
 		try { // Texture2D
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Texture2D,1,iX);
 			Term attributes= arguments[0];
@@ -584,10 +585,10 @@ public class AuxiliaryNode3D extends Tools3D {
 					long pairName= - key;
 					Term pairValue= setPositiveMap.get(key);
 					if (pairName==SymbolCodes.symbolCode_E_image) {
-						image= termToImageComponent2D(pairValue,targetWorld,iX);
+						image= argumentToImageComponent2D(pairValue,targetWorld,iX);
 						iterator.remove();
 					} else if (pairName==SymbolCodes.symbolCode_E_format) {
-						format= termToTextureFormat(pairValue,iX);
+						format= argumentToTextureFormat(pairValue,iX);
 						iterator.remove();
 					}
 				};
@@ -607,10 +608,10 @@ public class AuxiliaryNode3D extends Tools3D {
 							boolean enableTextureMapping= YesNo.termYesNo2Boolean(pairValue,iX);
 							node.setEnable(enableTextureMapping);
 						} else if (pairName==SymbolCodes.symbolCode_E_magnificationFilter) {
-							int magFilter= termToMagnificationFilter(pairValue,iX);
+							int magFilter= argumentToMagnificationFilter(pairValue,iX);
 							node.setMagFilter(magFilter);
 						} else if (pairName==SymbolCodes.symbolCode_E_minificationFilter) {
-							int minFilter= termToMinificationFilter(pairValue,iX);
+							int minFilter= argumentToMinificationFilter(pairValue,iX);
 							node.setMinFilter(minFilter);
 						} else {
 							throw new WrongArgumentIsUnknownTexture2DAttribute(key);
@@ -621,13 +622,13 @@ public class AuxiliaryNode3D extends Tools3D {
 					throw new ImageFileNameIsNotDefined();
 				}
 			} else {
-				throw new WrongArgumentIsNotAttributeSet(setEnd);
+				throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 			}
 		} catch (Backtracking b) {
 			throw new WrongArgumentIsNotATexture2D(value);
 		}
 	}
-	protected static int termToTextureFormat(Term value, ChoisePoint iX) {
+	protected static int argumentToTextureFormat(Term value, ChoisePoint iX) {
 		try {
 			long flag= value.getSymbolValue(iX);
 			if (flag==SymbolCodes.symbolCode_E_INTENSITY) {
@@ -649,7 +650,7 @@ public class AuxiliaryNode3D extends Tools3D {
 			throw new WrongArgumentIsNotASymbol(value);
 		}
 	}
-	protected static int termToMagnificationFilter(Term value, ChoisePoint iX) {
+	protected static int argumentToMagnificationFilter(Term value, ChoisePoint iX) {
 		try {
 			long flag= value.getSymbolValue(iX);
 			if (flag==SymbolCodes.symbolCode_E_FASTEST) {
@@ -675,7 +676,7 @@ public class AuxiliaryNode3D extends Tools3D {
 			throw new WrongArgumentIsNotASymbol(value);
 		}
 	}
-	protected static int termToMinificationFilter(Term value, ChoisePoint iX) {
+	protected static int argumentToMinificationFilter(Term value, ChoisePoint iX) {
 		try {
 			long flag= value.getSymbolValue(iX);
 			if (flag==SymbolCodes.symbolCode_E_FASTEST) {
@@ -699,7 +700,7 @@ public class AuxiliaryNode3D extends Tools3D {
 			throw new WrongArgumentIsNotASymbol(value);
 		}
 	}
-	public static Material termToMaterial(Term value, ChoisePoint iX) {
+	public static Material argumentToMaterial(Term value, ChoisePoint iX) {
 		try { // Material
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Material,1,iX);
 			Term attributes= arguments[0];
@@ -739,14 +740,14 @@ public class AuxiliaryNode3D extends Tools3D {
 				};
 				return node;
 			} else {
-				throw new WrongArgumentIsNotAttributeSet(setEnd);
+				throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 			}
 		} catch (Backtracking b) {
 			throw new WrongArgumentIsNotAMaterial(value);
 		}
 	}
 	//
-	public static ColoringAttributes termToColoringAttributes(Term value, ChoisePoint iX) {
+	public static ColoringAttributes argumentToColoringAttributes(Term value, ChoisePoint iX) {
 		try { // ColoringAttributes
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_ColoringAttributes,1,iX);
 			Term attributes= arguments[0];
@@ -765,7 +766,7 @@ public class AuxiliaryNode3D extends Tools3D {
 						Color3f color= term2Color3(pairValue,iX);
 						node.setColor(color);
 					} else if (pairName==SymbolCodes.symbolCode_E_shadeModel) {
-						int model= termToShadeModel(pairValue,iX);
+						int model= argumentToShadeModel(pairValue,iX);
 						node.setShadeModel(model);
 					} else if (pairName==SymbolCodes.symbolCode_E_allowColorRead) {
 						boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
@@ -793,13 +794,13 @@ public class AuxiliaryNode3D extends Tools3D {
 				};
 				return node;
 			} else {
-				throw new WrongArgumentIsNotColoringAttribute(setEnd);
+				throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 			}
 		} catch (Backtracking b) {
 			throw new WrongArgumentIsNotColoringAttribute(value);
 		}
 	}
-	protected static PolygonAttributes termToPolygonRenderingMode(Term value, ChoisePoint iX) {
+	protected static PolygonAttributes argumentToPolygonRenderingMode(Term value, ChoisePoint iX) {
 		try { // PolygonAttributes
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_PolygonAttributes,1,iX);
 			Term attributes= arguments[0];
@@ -819,10 +820,10 @@ public class AuxiliaryNode3D extends Tools3D {
 					long pairName= - key;
 					Term pairValue= setPositiveMap.get(key);
 					if (pairName==SymbolCodes.symbolCode_E_rasterizationMode) {
-						polygonRasterizationMode= termToRasterizationMode(pairValue,iX);
+						polygonRasterizationMode= argumentToRasterizationMode(pairValue,iX);
 						// iterator.remove();
 					} else if (pairName==SymbolCodes.symbolCode_E_cullFace) {
-						cullFace= termToFaceCullingMode(pairValue,iX);
+						cullFace= argumentToFaceCullingMode(pairValue,iX);
 						// iterator.remove();
 					} else if (pairName==SymbolCodes.symbolCode_E_polygonOffsetBias) {
 						polygonOffsetBias= (float)Converters.argumentToReal(pairValue,iX);
@@ -845,13 +846,13 @@ public class AuxiliaryNode3D extends Tools3D {
 					polygonOffsetFactor);
 				return node;
 			} else {
-				throw new WrongArgumentIsNotPolygonRenderingMode(setEnd);
+				throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 			}
 		} catch (Backtracking b) {
 			throw new WrongArgumentIsNotPolygonRenderingMode(value);
 		}
 	}
-	protected static int termToShadeModel(Term value, ChoisePoint iX) {
+	protected static int argumentToShadeModel(Term value, ChoisePoint iX) {
 		try {
 			long flag= value.getSymbolValue(iX);
 			if (flag==SymbolCodes.symbolCode_E_FASTEST) {
@@ -869,7 +870,7 @@ public class AuxiliaryNode3D extends Tools3D {
 			throw new WrongArgumentIsNotASymbol(value);
 		}
 	}
-	protected static int termToRasterizationMode(Term value, ChoisePoint iX) {
+	protected static int argumentToRasterizationMode(Term value, ChoisePoint iX) {
 		try {
 			long flag= value.getSymbolValue(iX);
 			if (flag==SymbolCodes.symbolCode_E_POLYGON_POINT) {
@@ -885,7 +886,7 @@ public class AuxiliaryNode3D extends Tools3D {
 			throw new WrongArgumentIsNotASymbol(value);
 		}
 	}
-	protected static int termToFaceCullingMode(Term value, ChoisePoint iX) {
+	protected static int argumentToFaceCullingMode(Term value, ChoisePoint iX) {
 		try {
 			long flag= value.getSymbolValue(iX);
 			if (flag==SymbolCodes.symbolCode_E_CULL_BACK) {
@@ -901,7 +902,7 @@ public class AuxiliaryNode3D extends Tools3D {
 			throw new WrongArgumentIsNotASymbol(value);
 		}
 	}
-	protected static TransparencyAttributes termToObjectTransparency(Term value, ChoisePoint iX) {
+	protected static TransparencyAttributes argumentToObjectTransparency(Term value, ChoisePoint iX) {
 		try { // ObjectTransparency
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_TransparencyAttributes,1,iX);
 			Term attributes= arguments[0];
@@ -920,13 +921,13 @@ public class AuxiliaryNode3D extends Tools3D {
 						float transparency= (float)Converters.argumentToReal(pairValue,iX);
 						node.setTransparency(transparency);
 					} else if (pairName==SymbolCodes.symbolCode_E_transparencyMode) {
-						int mode= termToTransparencyMode(pairValue,iX);
+						int mode= argumentToTransparencyMode(pairValue,iX);
 						node.setTransparencyMode(mode);
 					} else if (pairName==SymbolCodes.symbolCode_E_dstBlendFunction) {
-						int mode= termToBlendFunction(pairValue,iX);
+						int mode= argumentToBlendFunction(pairValue,iX);
 						node.setDstBlendFunction(mode);
 					} else if (pairName==SymbolCodes.symbolCode_E_srcBlendFunction) {
-						int mode= termToBlendFunction(pairValue,iX);
+						int mode= argumentToBlendFunction(pairValue,iX);
 						node.setSrcBlendFunction(mode);
 					} else {
 						throw new WrongArgumentIsUnknownTransparencyAttribute(key);
@@ -934,13 +935,13 @@ public class AuxiliaryNode3D extends Tools3D {
 				};
 				return node;
 			} else {
-				throw new WrongArgumentIsNotObjectTransparency(setEnd);
+				throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 			}
 		} catch (Backtracking b) {
 			throw new WrongArgumentIsNotObjectTransparency(value);
 		}
 	}
-	protected static int termToTransparencyMode(Term value, ChoisePoint iX) {
+	protected static int argumentToTransparencyMode(Term value, ChoisePoint iX) {
 		try {
 			long flag= value.getSymbolValue(iX);
 			if (flag==SymbolCodes.symbolCode_E_NONE) {
@@ -960,7 +961,7 @@ public class AuxiliaryNode3D extends Tools3D {
 			throw new WrongArgumentIsNotASymbol(value);
 		}
 	}
-	protected static int termToBlendFunction(Term value, ChoisePoint iX) {
+	protected static int argumentToBlendFunction(Term value, ChoisePoint iX) {
 		try {
 			long flag= value.getSymbolValue(iX);
 			if (flag==SymbolCodes.symbolCode_E_BLEND_ZERO) {
@@ -1067,7 +1068,7 @@ public class AuxiliaryNode3D extends Tools3D {
 			extractGeometryAttributes(node,nameList,setPositiveMap,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	public static LineStripArray attributesToLineStripArray(Term attributes, ChoisePoint iX) {
@@ -1149,7 +1150,7 @@ public class AuxiliaryNode3D extends Tools3D {
 			extractGeometryAttributes(node,nameList,setPositiveMap,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	public static IndexedPointArray attributesToIndexedPointArray(Term attributes, ChoisePoint iX) {
@@ -1249,7 +1250,7 @@ public class AuxiliaryNode3D extends Tools3D {
 			extractGeometryAttributes(node,nameList,setPositiveMap,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	public static IndexedLineStripArray attributesToIndexedLineStripArray(Term attributes, ChoisePoint iX) {
@@ -1347,10 +1348,10 @@ public class AuxiliaryNode3D extends Tools3D {
 			extractGeometryAttributes(node,nameList,setPositiveMap,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
-	public static Text3D termToText3D(Term value, ChoisePoint iX) {
+	public static Text3D argumentToText3D(Term value, ChoisePoint iX) {
 		try { // Text3D
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Text3D,1,iX);
 			return attributesToText3D(arguments[0],iX);
@@ -1372,7 +1373,7 @@ public class AuxiliaryNode3D extends Tools3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_font3D) {
-					font= termToFont3D(pairValue,iX);
+					font= argumentToFont3D(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_string) {
 					text= pairValue.toString(iX);
@@ -1527,7 +1528,7 @@ public class AuxiliaryNode3D extends Tools3D {
 			};
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	protected static int term2Text3DHorizontalAlignment(Term value, ChoisePoint iX) {
@@ -1580,7 +1581,7 @@ public class AuxiliaryNode3D extends Tools3D {
 			throw new WrongArgumentIsNotASymbol(value);
 		}
 	}
-	public static Font3D termToFont3D(Term value, ChoisePoint iX) {
+	public static Font3D argumentToFont3D(Term value, ChoisePoint iX) {
 		try { // Font3D
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Font3D,1,iX);
 			return attributesToFont3D(arguments[0],iX);
@@ -1606,23 +1607,23 @@ public class AuxiliaryNode3D extends Tools3D {
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_fontName) {
 					try {
-						fontName= ExtendedFontName.termToFontNameSafe(pairValue,iX);
+						fontName= ExtendedFontName.argumentToFontNameSafe(pairValue,iX);
 					} catch (TermIsSymbolDefault e) {
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_fontSize) {
 					try {
-						fontSize= ExtendedFontSize.termToFontSizeSafe(pairValue,iX);
+						fontSize= ExtendedFontSize.argumentToFontSizeSafe(pairValue,iX);
 					} catch (TermIsSymbolDefault e) {
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_fontStyle) {
 					try {
-						fontStyle= ExtendedFontStyle.termToFontStyleSafe(pairValue,iX);
+						fontStyle= ExtendedFontStyle.argumentToFontStyleSafe(pairValue,iX);
 					} catch (TermIsSymbolDefault e) {
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_tessellationTolerance) {
 					tessellationTolerance= Converters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_extrudePath) {
-					extrudePath= termToFontExtrusion(pairValue,iX);
+					extrudePath= argumentToFontExtrusion(pairValue,iX);
 				} else {
 					throw new WrongArgumentIsUnknownFont3DAttribute(key);
 				}
@@ -1650,10 +1651,10 @@ public class AuxiliaryNode3D extends Tools3D {
 			};
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
-	public static FontExtrusion termToFontExtrusion(Term value, ChoisePoint iX) {
+	public static FontExtrusion argumentToFontExtrusion(Term value, ChoisePoint iX) {
 		try { // FontExtrusion
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_FontExtrusion,1,iX);
 			return attributesToFontExtrusion(arguments[0],iX);
@@ -1694,7 +1695,7 @@ public class AuxiliaryNode3D extends Tools3D {
 			};
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	protected static void extractDiffuseColor(Material node, Term value, ChoisePoint iX) {
@@ -1726,7 +1727,7 @@ public class AuxiliaryNode3D extends Tools3D {
 			}
 		}
 	}
-	protected static int termToPickingDetailLevel(Term value, ChoisePoint iX) {
+	protected static int argumentToPickingDetailLevel(Term value, ChoisePoint iX) {
 		try {
 			long flag= value.getSymbolValue(iX);
 			if (flag==SymbolCodes.symbolCode_E_INTERSECT_TEST) {
@@ -1742,7 +1743,7 @@ public class AuxiliaryNode3D extends Tools3D {
 			throw new WrongArgumentIsNotASymbol(value);
 		}
 	}
-	protected static int termToPickingMode(Term value, ChoisePoint iX) {
+	protected static int argumentToPickingMode(Term value, ChoisePoint iX) {
 		try {
 			long flag= value.getSymbolValue(iX);
 			if (flag==SymbolCodes.symbolCode_E_BOUNDS) {
@@ -1758,7 +1759,7 @@ public class AuxiliaryNode3D extends Tools3D {
 			throw new WrongArgumentIsNotASymbol(value);
 		}
 	}
-	protected static ImageComponent2D termToImageComponent2D(Term value, Canvas3D targetWorld, ChoisePoint iX) {
+	protected static ImageComponent2D argumentToImageComponent2D(Term value, Canvas3D targetWorld, ChoisePoint iX) {
 		java.awt.image.BufferedImage nativeImage= targetWorld.acquireNativeImage(value,iX);
 		if (nativeImage != null) {
 			TextureLoader textureLoader= new TextureLoader(nativeImage);
@@ -1767,7 +1768,7 @@ public class AuxiliaryNode3D extends Tools3D {
 			throw new WrongArgumentIsEmptyImage(value);
 		}
 	}
-	protected static int termToImageScaleMode(Term value, ChoisePoint iX) {
+	protected static int argumentToImageScaleMode(Term value, ChoisePoint iX) {
 		try {
 			long flag= value.getSymbolValue(iX);
 			if (flag==SymbolCodes.symbolCode_E_SCALE_FIT_ALL) {
@@ -1789,7 +1790,7 @@ public class AuxiliaryNode3D extends Tools3D {
 			throw new WrongArgumentIsNotASymbol(value);
 		}
 	}
-	protected static int termToBillboardAlignmentMode(Term value, ChoisePoint iX) {
+	protected static int argumentToBillboardAlignmentMode(Term value, ChoisePoint iX) {
 		try {
 			long flag= value.getSymbolValue(iX);
 			if (flag==SymbolCodes.symbolCode_E_ROTATE_ABOUT_AXIS) {

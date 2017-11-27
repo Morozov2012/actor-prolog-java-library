@@ -16,6 +16,7 @@ import morozov.terms.signals.*;
 
 import javax.swing.ButtonModel;
 import javax.swing.AbstractButton;
+import java.awt.Font;
 
 import java.math.BigInteger;
 import java.util.Enumeration;
@@ -24,42 +25,45 @@ public class ScalableButtonGroup extends ActiveComponent {
 	//
 	public AButtonGroup buttonGroup;
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public ScalableButtonGroup(AbstractDialog tD) {
 		super(tD);
 		buttonGroup= new AButtonGroup(tD,this);
 	}
 	//
-	// protected int getInitialTopBorder() {return 0;}
-	// protected int getInitialLeftBorder() {return 0;}
-	// protected int getInitialBottomBorder() {return 0;}
-	// protected int getInitialRightBorder() {return 0;}
+	///////////////////////////////////////////////////////////////
 	//
-	public void add(AbstractButton b) {
-		if (buttonGroup!=null) {
-			buttonGroup.add(b);
-		}
-	}
-	//
-	public void setSelected(ButtonModel m, boolean b) {
-		if (buttonGroup!=null) {
-			buttonGroup.setSelected(m,b);
-		}
-	}
-	//
-	public void setUncertain() {
-		if (buttonGroup!=null) {
-			Enumeration<AbstractButton> buttons= buttonGroup.getElements();
-			while (buttons.hasMoreElements()) {
-				AbstractButton currentButton= buttons.nextElement();
-				ScalableToggleButtonModel model= (ScalableToggleButtonModel)currentButton.getModel();
-				model.setUncertain(true);
-				currentButton.repaint();
+	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
+		value= value.dereferenceValue(iX);
+		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
+			throw RejectValue.instance;
+		} else {
+			try {
+				BigInteger bigInteger= value.getIntegerValue(iX);
+				if (PrologInteger.isSmallInteger(bigInteger)) {
+					return new PrologInteger(bigInteger);
+				} else {
+					throw RejectValue.instance;
+				}
+			} catch (TermIsNotAnInteger e1) {
+				try {
+					double number= StrictMath.round(value.getRealValue(iX));
+					BigInteger bigInteger= Converters.doubleToBigInteger(number);
+					if (PrologInteger.isSmallInteger(bigInteger)) {
+						return new PrologInteger(bigInteger);
+					} else {
+						throw RejectValue.instance;
+					}
+				} catch (TermIsNotAReal e2) {
+					String text= value.toString(iX);
+					return new PrologString(text);
+				}
 			}
 		}
-		// if (targetDialog!=null) {
-		//	targetDialog.reportValueUpdate(this);
-		// }
 	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void putValue(Term value, ChoisePoint iX) {
 		if (buttonGroup!=null) {
@@ -116,34 +120,7 @@ public class ScalableButtonGroup extends ActiveComponent {
 		}
 	}
 	//
-	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-		value= value.dereferenceValue(iX);
-		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
-			throw RejectValue.instance;
-		} else {
-			try {
-				BigInteger bigInteger= value.getIntegerValue(iX);
-				if (PrologInteger.isSmallInteger(bigInteger)) {
-					return new PrologInteger(bigInteger);
-				} else {
-					throw RejectValue.instance;
-				}
-			} catch (TermIsNotAnInteger e1) {
-				try {
-					double number= StrictMath.round(value.getRealValue(iX));
-					BigInteger bigInteger= Converters.doubleToBigInteger(number);
-					if (PrologInteger.isSmallInteger(bigInteger)) {
-						return new PrologInteger(bigInteger);
-					} else {
-						throw RejectValue.instance;
-					}
-				} catch (TermIsNotAReal e2) {
-					String text= value.toString(iX);
-					return new PrologString(text);
-				}
-			}
-		}
-	}
+	///////////////////////////////////////////////////////////////
 	//
 	public void setIsEnabled(boolean mode) {
 		if (buttonGroup!=null) {
@@ -178,5 +155,34 @@ public class ScalableButtonGroup extends ActiveComponent {
 		} else {
 			return false;
 		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void add(AbstractButton b) {
+		if (buttonGroup!=null) {
+			buttonGroup.add(b);
+		}
+	}
+	//
+	public void setSelected(ButtonModel m, boolean b) {
+		if (buttonGroup!=null) {
+			buttonGroup.setSelected(m,b);
+		}
+	}
+	//
+	public void setUncertain() {
+		if (buttonGroup!=null) {
+			Enumeration<AbstractButton> buttons= buttonGroup.getElements();
+			while (buttons.hasMoreElements()) {
+				AbstractButton currentButton= buttons.nextElement();
+				ScalableToggleButtonModel model= (ScalableToggleButtonModel)currentButton.getModel();
+				model.setUncertain(true);
+				currentButton.repaint();
+			}
+		}
+		// if (targetDialog!=null) {
+		//	targetDialog.reportValueUpdate(this);
+		// }
 	}
 }

@@ -9,6 +9,7 @@ package morozov.system.gui.dialogs.scalable;
 import target.*;
 
 import morozov.run.*;
+import morozov.system.gui.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
 import morozov.system.signals.*;
@@ -58,49 +59,43 @@ public class ScalableCheckBox extends ScalableAbstractButton {
 		((JCheckBox)component).addActionListener(this);
 	}
 	//
-	// protected int getInitialTopBorder() {return 5;}
-	// protected int getInitialLeftBorder() {return 7;}
-	// protected int getInitialBottomBorder() {return 5;}
-	// protected int getInitialRightBorder() {return 7;}
+	///////////////////////////////////////////////////////////////
 	//
-	public boolean hasClassicStyle() {
-		if (component!=null) {
-			ScalableToggleButtonModel model= (ScalableToggleButtonModel)((JCheckBox)component).getModel();
-			return model.hasClassicStyle();
-		} else {
-			return false;
-		}
-	}
-	public void setHasClassicStyle(boolean flag) {
-		if (component!=null) {
-			ScalableToggleButtonModel model= (ScalableToggleButtonModel)((JCheckBox)component).getModel();
-			model.setHasClassicStyle(flag);
-		}
-	}
-	public void setFont(Font font) {
-		super.setFont(font);
-		if (component!=null) {
-			// ((JCheckBox)component).setFont(font);
-			BasicRadioButtonUI ui= (BasicRadioButtonUI)((JCheckBox)component).getUI();
-			Icon defaultIcon= ui.getDefaultIcon();
-			if (defaultIcon!=null) {
-				if (defaultIcon instanceof ScalableToggleButtonIcon) {
-					ScalableToggleButtonIcon scalableIcon= (ScalableToggleButtonIcon)defaultIcon;
-					scalableIcon.setFont(component,font,horizontalScaling);
+	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
+		try {
+			long code= value.getSymbolValue(iX);
+			if (code==SymbolCodes.symbolCode_E_yes) {
+				return new PrologSymbol(SymbolCodes.symbolCode_E_yes);
+			} else if (code==SymbolCodes.symbolCode_E_no) {
+				return new PrologSymbol(SymbolCodes.symbolCode_E_no);
+			} else if (code==SymbolCodes.symbolCode_E_unknown) {
+				return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
+			} else {
+				// return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
+				throw RejectValue.instance;
+			}
+		} catch (TermIsNotASymbol e1) {
+			try {
+				String text= value.getStringValue(iX);
+				if (text.equalsIgnoreCase("yes")) {
+					return new PrologSymbol(SymbolCodes.symbolCode_E_yes);
+				} else if (text.equalsIgnoreCase("no")) {
+					return new PrologSymbol(SymbolCodes.symbolCode_E_no);
+				} else if (text.equalsIgnoreCase("unknown")) {
+					return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
+				} else {
+					// return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
+					throw RejectValue.instance;
 				}
+			} catch (TermIsNotAString e2) {
+				// return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
+				throw RejectValue.instance;
 			}
 		}
 	}
-	public void setAlarmColors(Color fc, Color bc) {
-		BasicRadioButtonUI ui= (BasicRadioButtonUI)((JCheckBox)component).getUI();
-		Icon defaultIcon= ui.getDefaultIcon();
-		if (defaultIcon!=null) {
-			if (defaultIcon instanceof ScalableToggleButtonIcon) {
-				ScalableToggleButtonIcon scalableIcon= (ScalableToggleButtonIcon)defaultIcon;
-				scalableIcon.setAlarmColors(fc,bc);
-			}
-		}
-	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void putValue(Term value, ChoisePoint iX) {
 		if (component!=null) {
 			try {
@@ -151,6 +146,7 @@ public class ScalableCheckBox extends ScalableAbstractButton {
 			// }
 		}
 	}
+	//
 	public Term getValue() {
 		if (component!=null) {
 			if (isUncertain()) {
@@ -168,36 +164,67 @@ public class ScalableCheckBox extends ScalableAbstractButton {
 		}
 	}
 	//
-	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-		try {
-			long code= value.getSymbolValue(iX);
-			if (code==SymbolCodes.symbolCode_E_yes) {
-				return new PrologSymbol(SymbolCodes.symbolCode_E_yes);
-			} else if (code==SymbolCodes.symbolCode_E_no) {
-				return new PrologSymbol(SymbolCodes.symbolCode_E_no);
-			} else if (code==SymbolCodes.symbolCode_E_unknown) {
-				return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
-			} else {
-				// return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
-				throw RejectValue.instance;
+	///////////////////////////////////////////////////////////////
+	//
+	public void setAlarmColors(Color fc, Color bc) {
+		BasicRadioButtonUI ui= (BasicRadioButtonUI)((JCheckBox)component).getUI();
+		Icon defaultIcon= ui.getDefaultIcon();
+		if (defaultIcon!=null) {
+			if (defaultIcon instanceof ScalableToggleButtonIcon) {
+				ScalableToggleButtonIcon scalableIcon= (ScalableToggleButtonIcon)defaultIcon;
+				scalableIcon.setAlarmColors(fc,bc);
 			}
-		} catch (TermIsNotASymbol e1) {
-			try {
-				String text= value.getStringValue(iX);
-				if (text.equalsIgnoreCase("yes")) {
-					return new PrologSymbol(SymbolCodes.symbolCode_E_yes);
-				} else if (text.equalsIgnoreCase("no")) {
-					return new PrologSymbol(SymbolCodes.symbolCode_E_no);
-				} else if (text.equalsIgnoreCase("unknown")) {
-					return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
-				} else {
-					// return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
-					throw RejectValue.instance;
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setIndividualText(Term value, ChoisePoint iX) {
+		AnnotatedButton.safelyUpdateAbstractButton((JCheckBox)component,value,iX);
+		targetDialog.safelyRevalidateAndRepaint();
+	}
+	//
+	public Term getIndividualText() {
+		if (component!=null) {
+			String text= AnnotatedButton.safelyRestoreText((JCheckBox)component);
+			return new PrologString(text);
+		} else {
+			return termEmptyString;
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setFont(Font font) {
+		super.setFont(font);
+		if (component!=null) {
+			// ((JCheckBox)component).setFont(font);
+			BasicRadioButtonUI ui= (BasicRadioButtonUI)((JCheckBox)component).getUI();
+			Icon defaultIcon= ui.getDefaultIcon();
+			if (defaultIcon!=null) {
+				if (defaultIcon instanceof ScalableToggleButtonIcon) {
+					ScalableToggleButtonIcon scalableIcon= (ScalableToggleButtonIcon)defaultIcon;
+					scalableIcon.setFont(component,font,horizontalScaling);
 				}
-			} catch (TermIsNotAString e2) {
-				// return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
-				throw RejectValue.instance;
 			}
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public boolean hasClassicStyle() {
+		if (component!=null) {
+			ScalableToggleButtonModel model= (ScalableToggleButtonModel)((JCheckBox)component).getModel();
+			return model.hasClassicStyle();
+		} else {
+			return false;
+		}
+	}
+	//
+	public void setHasClassicStyle(boolean flag) {
+		if (component!=null) {
+			ScalableToggleButtonModel model= (ScalableToggleButtonModel)((JCheckBox)component).getModel();
+			model.setHasClassicStyle(flag);
 		}
 	}
 }

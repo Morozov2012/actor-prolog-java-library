@@ -67,7 +67,7 @@ public abstract class FindAll extends Lambda {
 	}
 	//
 	private void collect_items(Continuation c0, ChoisePoint iX, long predicateSignatureNumber, boolean subgoalIsCallOfFunction, boolean clauseIsFunction, Term[] args) throws Backtracking {
-		CollectingMode reduceResultList= CollectingMode.termToCollectingMode(getBuiltInSlot_E_mode(),iX);
+		CollectingMode reduceResultList= CollectingMode.argumentToCollectingMode(getBuiltInSlot_E_mode(),iX);
 		long worldDomainSignatureNumber;
 		if (clauseIsFunction) {
 			worldDomainSignatureNumber= domainSignatureOfSubgoal_1_InClause_3(predicateSignatureNumber);

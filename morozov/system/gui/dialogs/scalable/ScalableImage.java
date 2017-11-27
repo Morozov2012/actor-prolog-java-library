@@ -20,33 +20,26 @@ import morozov.terms.*;
 
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.lang.reflect.InvocationTargetException;
 
-public class ScalableImage extends ActiveComponent {
+public class ScalableImage extends CustomControlComponent {
 	//
-	protected AbstractDialog dialog;
 	protected String address= "";
-	protected double width= 0;
-	protected double height= 0;
-	// protected boolean keepProportions;
-	// protected int anchor;
 	protected IconImage scalableIcon;
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public ScalableImage(AbstractDialog tD, ChoisePoint iX, String text, double columns, double rows, boolean keepProportions, int anchor) {
-		super(tD);
-		dialog= tD;
+		super(tD,columns,rows);
 		address= text;
-		height= rows;
-		width= columns;
-		// keepProportions= flag;
-		// anchor= a;
-		// boolean enableAntialiasing= dialog.getTargetWorld().antialiasingIsEnabled(iX);
 		String label= "";
 		java.awt.image.BufferedImage image= null;
 		if (!address.isEmpty()) {
 			try {
-				image= dialog.getTargetWorld().readImage(address,iX);
+				image= targetDialog.getTargetWorld().readImage(address,iX);
 			} catch (Throwable e) {
 				label= e.toString();
 			}
@@ -57,49 +50,7 @@ public class ScalableImage extends ActiveComponent {
 		component= jL;
 	}
 	//
-	// protected int getInitialTopBorder() {return 5;}
-	// protected int getInitialLeftBorder() {return 5;}
-	// protected int getInitialBottomBorder() {return 5;}
-	// protected int getInitialRightBorder() {return 5;}
-	//
-	public void setFont(Font font) {
-		super.setFont(font);
-		if (component!=null) {
-			component.setFont(font);
-			Dimension dimension= LayoutUtils.computeDimension(font,component,width,height);
-			scalableIcon.setSize(dimension);
-		}
-	}
-	//
-	public void putValue(Term value, ChoisePoint iX) {
-		address= value.toString(iX);
-		if (component!=null) {
-			if (address.isEmpty()) {
-				scalableIcon.setImage(null);
-				((JLabel)component).setText("");
-			} else {
-				try {
-					java.awt.image.BufferedImage image= dialog.getTargetWorld().readImage(address,iX);
-					scalableIcon.setImage(image);
-					((JLabel)component).setText("");
-				} catch (Throwable e) {
-					String label= e.toString();
-					scalableIcon.setImage(null);
-					((JLabel)component).setText(label);
-				}
-			};
-			// dialog.invalidate();
-			// Без команды repaint не меняется фотография
-			// в примере test_117_26_image_01_jdk, если
-			// диалоговое окно максимизировано.
-			// dialog.repaint(); // 2013.09.04
-			dialog.safelyInvalidateAndRepaint();
-		}
-	}
-	//
-	public Term getValue() {
-		return new PrologString(address);
-	}
+	///////////////////////////////////////////////////////////////
 	//
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		value= value.dereferenceValue(iX);
@@ -107,6 +58,64 @@ public class ScalableImage extends ActiveComponent {
 			return new PrologString("");
 		} else {
 			return new PrologString(value.toString(iX));
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void putValue(Term value, ChoisePoint iX) {
+		address= value.toString(iX);
+		if (component!=null) {
+			java.awt.image.BufferedImage image;
+			if (address.isEmpty()) {
+				image= null;
+			} else {
+				image= targetDialog.getTargetWorld().readImage(address,iX);
+			};
+			safelyPutValue(image);
+			// targetDialog.invalidate();
+			// Без команды repaint не меняется фотография
+			// в примере test_117_26_image_01_jdk, если
+			// диалоговое окно максимизировано.
+			// targetDialog.repaint(); // 2013.09.04
+			targetDialog.safelyInvalidateAndRepaint();
+		}
+	}
+	protected void safelyPutValue(final java.awt.image.BufferedImage image) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			quicklyPutValue(image);
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						quicklyPutValue(image);
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	protected void quicklyPutValue(java.awt.image.BufferedImage image) {
+		try {
+			scalableIcon.setImage(image);
+			((JLabel)component).setText("");
+		} catch (Throwable e) {
+			String label= e.toString();
+			scalableIcon.setImage(null);
+			((JLabel)component).setText(label);
+		}
+	}
+	//
+	public Term getValue() {
+		return new PrologString(address);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setDimension(Dimension dimension) {
+		if (component!=null) {
+			scalableIcon.setSize(dimension);
 		}
 	}
 }

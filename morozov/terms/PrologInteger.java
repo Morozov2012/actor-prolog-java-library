@@ -14,7 +14,11 @@ import java.math.BigInteger;
 import java.math.BigDecimal;
 
 public class PrologInteger extends Term {
+	//
 	private BigInteger value;
+	//
+	public static PrologInteger ZERO= new PrologInteger(0);
+	public static PrologInteger ONE= new PrologInteger(1);
 	//
 	public PrologInteger(long v) {
 		value= BigInteger.valueOf(v);

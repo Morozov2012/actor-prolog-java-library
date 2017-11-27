@@ -68,7 +68,7 @@ public class DatabaseTableContainer extends LoadableContainer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static DatabaseTable termToDatabaseTable(Term value, Database database, ChoisePoint iX) {
+	public static DatabaseTable argumentToDatabaseTable(Term value, Database database, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_standalone) {
@@ -104,7 +104,7 @@ public class DatabaseTableContainer extends LoadableContainer {
 		}
 	}
 	//
-	public static DatabaseTableContainer termToDatabaseTableContainer(Term value, Database database, PrologDomain domain, DatabaseType type, boolean reuseKN, ChoisePoint iX) {
+	public static DatabaseTableContainer argumentToDatabaseTableContainer(Term value, Database database, PrologDomain domain, DatabaseType type, boolean reuseKN, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_standalone) {

@@ -12,6 +12,11 @@ package morozov.system.gui.dialogs.scalable;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.run.*;
+import morozov.system.gui.*;
+import morozov.system.gui.dialogs.*;
+import morozov.terms.*;
+
 import javax.swing.border.TitledBorder;
 import javax.swing.BorderFactory;
 import java.awt.Font;
@@ -22,47 +27,66 @@ import java.util.Map;
 import java.util.HashMap;
 
 public class ScalableTitledPanel extends ScalablePanel {
+	//
 	protected TitledBorder border;
 	protected Font colourlessFont;
 	protected Color textColor;
 	protected Color spaceColor;
-	public ScalableTitledPanel(String title) {
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public ScalableTitledPanel(AbstractDialog tD, String title) {
+		super(tD);
 		border= BorderFactory.createTitledBorder(title);
 		setBorder(border);
 	}
-	public void setForeground(Color c) {
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setGeneralForeground(Color c) {
 	}
-	// public void setForeground(Color c) {
-	//	super.setForeground(c);
-	//	textColor= c;
-	//	if (border!=null) {
-	//		setFont(colourlessFont);
-	//	};
-	//	repaint();
-	// }
-	public void setSpaceColor(Color c) {
-		spaceColor= c;
-		if (border!=null) {
-			setFont(colourlessFont);
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setIndividualText(Term value, ChoisePoint iX) {
+		String title1= value.toString(iX);
+		String title2= AnnotatedButton.reduceAmpersands(title1);
+		border= BorderFactory.createTitledBorder(title2);
+		setBorder(border);
+		if (colourlessFont==null) {
+			colourlessFont= getFont();
 		};
-		// invalidate();
-		repaint();
+		setGeneralFont(colourlessFont);
+		// targetDialog.safelyRevalidateAndRepaint();
 	}
+	//
+	public Term getIndividualText() {
+		if (border != null) {
+			String title2= border.getTitle();
+			String title1= AnnotatedButton.restoreAmpersands(title2);
+			return new PrologString(title1);
+		} else {
+			return termEmptyString;
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void setFont(Font font) {
 		super.setFont(font);
 		colourlessFont= font;
-		if (border!=null) {
-			if (textColor!=null || spaceColor!=null) {
-				Map<TextAttribute,Object> map= new HashMap<TextAttribute,Object>();
-				if (textColor!=null) {
-					map.put(TextAttribute.FOREGROUND,textColor);
-				};
-				font= font.deriveFont(map);
-			};
+		if (border != null) {
 			border.setTitleFont(font);
+			targetDialog.safelyRevalidateAndRepaint();
+			// invalidate();
+			// repaint();
 		}
 	}
-	// public boolean isTitledPanel() {
-	//	return true;
-	// }
+	//
+	public void setForeground(Color c) {
+		super.setForeground(c);
+		if (border != null) {
+			border.setTitleColor(c);
+		}
+	}
 }

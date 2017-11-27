@@ -15,7 +15,7 @@ public enum FileAccessMode {
 	APPENDING,
 	MODIFYING;
 	//
-	public static FileAccessMode termToFileAccessMode(Term value, ChoisePoint iX) {
+	public static FileAccessMode argumentToFileAccessMode(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_reading) {

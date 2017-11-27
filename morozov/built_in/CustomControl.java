@@ -120,14 +120,15 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	// get/set title
 	//
 	public void setTitle1s(ChoisePoint iX, Term a1) {
-		setTitle(ExtendedTitle.termToExtendedTitle(a1,iX));
+		setTitle(ExtendedTitle.argumentToExtendedTitle(a1,iX));
 		changeTitle(iX);
 	}
 	public void setTitle(ExtendedTitle value) {
 		title.set(value);
 	}
-	public void getTitle0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getTitle(iX).toTerm();
+	public void getTitle0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getTitle(iX).toTerm());
+		// iX.pushTrail(a1);
 	}
 	public void getTitle0fs(ChoisePoint iX) {
 	}
@@ -137,7 +138,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return text;
 		} else {
 			Term value= getBuiltInSlot_E_title();
-			return ExtendedTitle.termToExtendedTitleSafe(value,iX);
+			return ExtendedTitle.argumentToExtendedTitleSafe(value,iX);
 		}
 	}
 	public Term getTitleOrFail(ChoisePoint iX) throws Backtracking {
@@ -146,20 +147,21 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return text.toTerm();
 		} else {
 			Term value= getBuiltInSlot_E_title();
-			return ExtendedTitle.termToExtendedTitleOrFail(value,iX);
+			return ExtendedTitle.argumentToExtendedTitleOrFail(value,iX);
 		}
 	}
 	//
 	// get/set x
 	//
 	public void setX1s(ChoisePoint iX, Term a1) {
-		setX(ExtendedCoordinate.termToExtendedCoordinate(a1,iX));
+		setX(ExtendedCoordinate.argumentToExtendedCoordinate(a1,iX));
 	}
 	public void setX(ExtendedCoordinate value) {
 		x.set(value);
 	}
-	public void getX0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getX(iX).toTerm();
+	public void getX0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getX(iX).toTerm());
+		// iX.pushTrail(a1);
 	}
 	public void getX0fs(ChoisePoint iX) {
 	}
@@ -169,7 +171,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return coordinate;
 		} else {
 			Term value= getBuiltInSlot_E_x();
-			return ExtendedCoordinate.termToExtendedCoordinateSafe(value,iX);
+			return ExtendedCoordinate.argumentToExtendedCoordinateSafe(value,iX);
 		}
 	}
 	public Term getXOrFail(ChoisePoint iX) throws Backtracking {
@@ -178,20 +180,21 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return coordinate.toTerm();
 		} else {
 			Term value= getBuiltInSlot_E_x();
-			return ExtendedCoordinate.termToExtendedCoordinateOrFail(value,iX);
+			return ExtendedCoordinate.argumentToExtendedCoordinateOrFail(value,iX);
 		}
 	}
 	//
 	// get/set y
 	//
 	public void setY1s(ChoisePoint iX, Term a1) {
-		setY(ExtendedCoordinate.termToExtendedCoordinate(a1,iX));
+		setY(ExtendedCoordinate.argumentToExtendedCoordinate(a1,iX));
 	}
 	public void setY(ExtendedCoordinate value) {
 		y.set(value);
 	}
-	public void getY0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getY(iX).toTerm();
+	public void getY0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getY(iX).toTerm());
+		// iX.pushTrail(a1);
 	}
 	public void getY0fs(ChoisePoint iX) {
 	}
@@ -201,7 +204,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return coordinate;
 		} else {
 			Term value= getBuiltInSlot_E_y();
-			return ExtendedCoordinate.termToExtendedCoordinateSafe(value,iX);
+			return ExtendedCoordinate.argumentToExtendedCoordinateSafe(value,iX);
 		}
 	}
 	public Term getYOrFail(ChoisePoint iX) throws Backtracking {
@@ -210,35 +213,36 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return coordinate.toTerm();
 		} else {
 			Term value= getBuiltInSlot_E_y();
-			return ExtendedCoordinate.termToExtendedCoordinateOrFail(value,iX);
+			return ExtendedCoordinate.argumentToExtendedCoordinateOrFail(value,iX);
 		}
 	}
 	//
 	// get/set defaultPosition
 	//
 	public void setDefaultPosition2s(ChoisePoint iX, Term a1, Term a2) {
-		setX(ExtendedCoordinate.termToExtendedCoordinate(a1,iX));
-		setY(ExtendedCoordinate.termToExtendedCoordinate(a2,iX));
+		setX(ExtendedCoordinate.argumentToExtendedCoordinate(a1,iX));
+		setY(ExtendedCoordinate.argumentToExtendedCoordinate(a2,iX));
 	}
 	public void getDefaultPosition2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
-		a1.value= getX(iX).toTerm();
-		a2.value= getY(iX).toTerm();
-		iX.pushTrail(a1);
-		iX.pushTrail(a2);
+		a1.setBacktrackableValue(getX(iX).toTerm(),iX);
+		a2.setBacktrackableValue(getY(iX).toTerm(),iX);
+		//iX.pushTrail(a1);
+		//iX.pushTrail(a2);
 	}
 	//
 	// get/set backgroundColor
 	//
 	public void setBackgroundColor1s(ChoisePoint iX, Term a1) {
-		setBackgroundColor(ExtendedColor.termToExtendedColor(a1,iX));
+		setBackgroundColor(ExtendedColor.argumentToExtendedColor(a1,iX));
 		// createGraphicWindowIfNecessary(iX,false);
 		changeBackgroundColor(iX);
 	}
 	public void setBackgroundColor(ExtendedColor value) {
 		backgroundColor.set(value);
 	}
-	public void getBackgroundColor0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getBackgroundColor(iX).toTerm();
+	public void getBackgroundColor0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getBackgroundColor(iX).toTerm());
+		// iX.pushTrail(a1);
 	}
 	public void getBackgroundColor0fs(ChoisePoint iX) {
 	}
@@ -248,7 +252,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return color;
 		} else {
 			Term value= getBuiltInSlot_E_background_color();
-			return ExtendedColor.termToExtendedColorSafe(value,iX);
+			return ExtendedColor.argumentToExtendedColorSafe(value,iX);
 		}
 	}
 	public Term getBackgroundColorOrFail(ChoisePoint iX) throws Backtracking {
@@ -257,40 +261,41 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return color.toTerm();
 		} else {
 			Term value= getBuiltInSlot_E_background_color();
-			return ExtendedColor.termToExtendedColorOrFail(value,iX);
+			return ExtendedColor.argumentToExtendedColorOrFail(value,iX);
 		}
 	}
 	//
 	// get/set defaultBounds
 	//
 	public void setDefaultBounds4s(ChoisePoint iX, Term a1, Term a2, Term a3, Term a4) {
-		setX(ExtendedCoordinate.termToExtendedCoordinate(a1,iX));
-		setY(ExtendedCoordinate.termToExtendedCoordinate(a2,iX));
-		setWidth(ExtendedSize.termToExtendedSize(a3,iX));
-		setHeight(ExtendedSize.termToExtendedSize(a4,iX));
+		setX(ExtendedCoordinate.argumentToExtendedCoordinate(a1,iX));
+		setY(ExtendedCoordinate.argumentToExtendedCoordinate(a2,iX));
+		setWidth(ExtendedSize.argumentToExtendedSize(a3,iX));
+		setHeight(ExtendedSize.argumentToExtendedSize(a4,iX));
 	}
 	public void getDefaultBounds4s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3, PrologVariable a4) {
-		a1.value= getX(iX).toTerm();
-		a2.value= getY(iX).toTerm();
-		a3.value= getWidth(iX).toTerm();
-		a4.value= getHeight(iX).toTerm();
-		iX.pushTrail(a1);
-		iX.pushTrail(a2);
-		iX.pushTrail(a3);
-		iX.pushTrail(a4);
+		a1.setBacktrackableValue(getX(iX).toTerm(),iX);
+		a2.setBacktrackableValue(getY(iX).toTerm(),iX);
+		a3.setBacktrackableValue(getWidth(iX).toTerm(),iX);
+		a4.setBacktrackableValue(getHeight(iX).toTerm(),iX);
+		//iX.pushTrail(a1);
+		//iX.pushTrail(a2);
+		//iX.pushTrail(a3);
+		//iX.pushTrail(a4);
 	}
 	//
 	// get/set textColor
 	//
 	public void setTextColor1s(ChoisePoint iX, Term a1) {
-		setTextColor(ExtendedColor.termToExtendedColor(a1,iX));
+		setTextColor(ExtendedColor.argumentToExtendedColor(a1,iX));
 		changeTextColor(iX);
 	}
 	public void setTextColor(ExtendedColor value) {
 		textColor.set(value);
 	}
-	public void getTextColor0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getTextColor(iX).toTerm();
+	public void getTextColor0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getTextColor(iX).toTerm());
+		// iX.pushTrail(a1);
 	}
 	public void getTextColor0fs(ChoisePoint iX) {
 	}
@@ -300,7 +305,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return color;
 		} else {
 			Term value= getBuiltInSlot_E_text_color();
-			return ExtendedColor.termToExtendedColorSafe(value,iX);
+			return ExtendedColor.argumentToExtendedColorSafe(value,iX);
 		}
 	}
 	public Term getTextColorOrFail(ChoisePoint iX) throws Backtracking {
@@ -309,21 +314,22 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return color.toTerm();
 		} else {
 			Term value= getBuiltInSlot_E_text_color();
-			return ExtendedColor.termToExtendedColorOrFail(value,iX);
+			return ExtendedColor.argumentToExtendedColorOrFail(value,iX);
 		}
 	}
 	//
 	// get/set spaceColor
 	//
 	public void setSpaceColor1s(ChoisePoint iX, Term a1) {
-		setSpaceColor(ExtendedColor.termToExtendedColor(a1,iX));
+		setSpaceColor(ExtendedColor.argumentToExtendedColor(a1,iX));
 		changeSpaceColor(iX);
 	}
 	public void setSpaceColor(ExtendedColor value) {
 		spaceColor.set(value);
 	}
-	public void getSpaceColor0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getSpaceColor(iX).toTerm();
+	public void getSpaceColor0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getSpaceColor(iX).toTerm());
+		// iX.pushTrail(a1);
 	}
 	public void getSpaceColor0fs(ChoisePoint iX) {
 	}
@@ -333,7 +339,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return color;
 		} else {
 			Term value= getBuiltInSlot_E_space_color();
-			return ExtendedColor.termToExtendedColorSafe(value,iX);
+			return ExtendedColor.argumentToExtendedColorSafe(value,iX);
 		}
 	}
 	public Term getSpaceColorOrFail(ChoisePoint iX) throws Backtracking {
@@ -342,7 +348,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return color.toTerm();
 		} else {
 			Term value= getBuiltInSlot_E_space_color();
-			return ExtendedColor.termToExtendedColorOrFail(value,iX);
+			return ExtendedColor.argumentToExtendedColorOrFail(value,iX);
 		}
 	}
 	//
@@ -351,14 +357,15 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	// get/set fontName
 	//
 	public void setFontName1s(ChoisePoint iX, Term a1) {
-		setFontName(ExtendedFontName.termToExtendedFontName(a1,iX));
+		setFontName(ExtendedFontName.argumentToExtendedFontName(a1,iX));
 		changeFontName(iX);
 	}
 	public void setFontName(ExtendedFontName value) {
 		fontName.set(value);
 	}
-	public void getFontName0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getFontName(iX).toTerm();
+	public void getFontName0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getFontName(iX).toTerm());
+		// iX.pushTrail(a1);
 	}
 	public void getFontName0fs(ChoisePoint iX) {
 	}
@@ -368,7 +375,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return name;
 		} else {
 			Term value= getBuiltInSlot_E_font_name();
-			return ExtendedFontName.termToExtendedFontNameSafe(value,iX);
+			return ExtendedFontName.argumentToExtendedFontNameSafe(value,iX);
 		}
 	}
 	public Term getFontNameOrFail(ChoisePoint iX) throws Backtracking {
@@ -377,21 +384,22 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return name.toTerm();
 		} else {
 			Term value= getBuiltInSlot_E_font_name();
-			return ExtendedFontName.termToExtendedFontNameOrFail(value,iX);
+			return ExtendedFontName.argumentToExtendedFontNameOrFail(value,iX);
 		}
 	}
 	//
 	// get/set fontSize
 	//
 	public void setFontSize1s(ChoisePoint iX, Term a1) {
-		setFontSize(ExtendedFontSize.termToExtendedFontSize(a1,iX));
+		setFontSize(ExtendedFontSize.argumentToExtendedFontSize(a1,iX));
 		changeFontSize(iX);
 	}
 	public void setFontSize(ExtendedFontSize value) {
 		fontSize.set(value);
 	}
-	public void getFontSize0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getFontSize(iX).toTerm();
+	public void getFontSize0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getFontSize(iX).toTerm());
+		// iX.pushTrail(a1);
 	}
 	public void getFontSize0fs(ChoisePoint iX) {
 	}
@@ -401,7 +409,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return size;
 		} else {
 			Term value= getBuiltInSlot_E_font_size();
-			return ExtendedFontSize.termToExtendedFontSizeSafe(value,iX);
+			return ExtendedFontSize.argumentToExtendedFontSizeSafe(value,iX);
 		}
 	}
 	public Term getFontSizeOrFail(ChoisePoint iX) throws Backtracking {
@@ -410,21 +418,22 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return size.toTerm();
 		} else {
 			Term value= getBuiltInSlot_E_font_size();
-			return ExtendedFontSize.termToExtendedFontSizeOrFail(value,iX);
+			return ExtendedFontSize.argumentToExtendedFontSizeOrFail(value,iX);
 		}
 	}
 	//
 	// get/set fontStyle
 	//
 	public void setFontStyle1s(ChoisePoint iX, Term a1) {
-		setFontStyle(ExtendedFontStyle.termToExtendedFontStyle(a1,iX));
+		setFontStyle(ExtendedFontStyle.argumentToExtendedFontStyle(a1,iX));
 		changeFontStyle(iX);
 	}
 	public void setFontStyle(ExtendedFontStyle value) {
 		fontStyle.set(value);
 	}
-	public void getFontStyle0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getFontStyle(iX).toTerm();
+	public void getFontStyle0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getFontStyle(iX).toTerm());
+		// iX.pushTrail(a1);
 	}
 	public void getFontStyle0fs(ChoisePoint iX) {
 	}
@@ -434,7 +443,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return style;
 		} else {
 			Term value= getBuiltInSlot_E_font_style();
-			return ExtendedFontStyle.termToExtendedFontStyleSafe(value,iX);
+			return ExtendedFontStyle.argumentToExtendedFontStyleSafe(value,iX);
 		}
 	}
 	public Term getFontStyleOrFail(ChoisePoint iX) throws Backtracking {
@@ -443,7 +452,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return style.toTerm();
 		} else {
 			Term value= getBuiltInSlot_E_font_style();
-			return ExtendedFontStyle.termToExtendedFontStyleOrFail(value,iX);
+			return ExtendedFontStyle.argumentToExtendedFontStyleOrFail(value,iX);
 		}
 	}
 	//
@@ -457,9 +466,10 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	public void setEnableSceneAntialiasing(boolean value) {
 		enableSceneAntialiasing= value;
 	}
-	public void getEnableSceneAntialiasing0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getEnableSceneAntialiasing0ff(ChoisePoint iX, PrologVariable result) {
 		boolean value= getEnableSceneAntialiasing(iX);
-		a1.value= YesNo.boolean2TermYesNo(value);
+		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(value));
+		// iX.pushTrail(a1);
 	}
 	public void getEnableSceneAntialiasing0fs(ChoisePoint iX) {
 	}
@@ -477,16 +487,17 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	// get/set menu
 	//
 	public void setMenu1s(ChoisePoint iX, Term a1) {
-		TranslatedMenuItem[] list= TranslatedMenuItem.termToTranslatedMenuItems(a1,iX);
+		TranslatedMenuItem[] list= TranslatedMenuItem.argumentToTranslatedMenuItems(a1,iX);
 		setMenu(list);
 		addMenuIfNecessary(iX,list);
 	}
 	public void setMenu(TranslatedMenuItem[] value) {
 		menu= value;
 	}
-	public void getMenu0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getMenu0ff(ChoisePoint iX, PrologVariable result) {
 		TranslatedMenuItem[] value= getMenu(iX);
-		a1.value= TranslatedMenuItem.translatedMenuItemsToTerm(value);
+		result.setNonBacktrackableValue(TranslatedMenuItem.translatedMenuItemsToTerm(value));
+		// iX.pushTrail(a1);
 	}
 	public void getMenu0fs(ChoisePoint iX) {
 	}
@@ -495,7 +506,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return menu;
 		} else {
 			Term value= getBuiltInSlot_E_menu();
-			return TranslatedMenuItem.termToTranslatedMenuItems(value,iX);
+			return TranslatedMenuItem.argumentToTranslatedMenuItems(value,iX);
 		}
 	}
 	//
@@ -504,7 +515,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		synchronized(this) {
 			if (graphicWindow != null) {
 				if (list.length > 0) {
-					JMenuBar menuBar= TranslatedMenuItem.termToJMenuBar(list,graphicWindow);
+					JMenuBar menuBar= TranslatedMenuItem.argumentToJMenuBar(list,graphicWindow);
 					graphicWindow.safelySetMenu(menuBar);
 				} else {
 					graphicWindow.safelySetMenu(null);
@@ -517,8 +528,8 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	///////////////////////////////////////////////////////////////
 	//
 	public void setActualPosition2s(ChoisePoint iX, Term a1, Term a2) {
-		ExtendedCoordinate eX= ExtendedCoordinate.termToExtendedCoordinate(a1,iX);
-		ExtendedCoordinate eY= ExtendedCoordinate.termToExtendedCoordinate(a2,iX);
+		ExtendedCoordinate eX= ExtendedCoordinate.argumentToExtendedCoordinate(a1,iX);
+		ExtendedCoordinate eY= ExtendedCoordinate.argumentToExtendedCoordinate(a2,iX);
 		createGraphicWindowIfNecessary(iX,false);
 		synchronized(this) {
 			if (graphicWindow != null) {
@@ -543,21 +554,15 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 				}
 			}
 		};
-		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
-		Dimension desktopSize;
-		if (desktop==null) {
-			desktopSize= new Dimension(1,1);
-		} else {
-			desktopSize= DesktopUtils.safelyGetComponentSize(desktop);
-		};
+		Dimension desktopSize= getSizeOfMainDesctopPane();
 		double gridX= DefaultOptions.gridWidth;
 		double gridY= DefaultOptions.gridHeight;
 		double logicalX= CoordinateAndSize.reconstruct(canvasLocation.x,desktopSize.width,gridX);
 		double logicalY= CoordinateAndSize.reconstruct(canvasLocation.y,desktopSize.height,gridY);
-		a1.value= new PrologReal(logicalX);
-		a2.value= new PrologReal(logicalY);
-		iX.pushTrail(a1);
-		iX.pushTrail(a2);
+		a1.setBacktrackableValue(new PrologReal(logicalX),iX);
+		a2.setBacktrackableValue(new PrologReal(logicalY),iX);
+		//iX.pushTrail(a1);
+		//iX.pushTrail(a2);
 	}
 	//
 	public void getPositionInPixels2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
@@ -571,15 +576,15 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 				}
 			}
 		};
-		a1.value= new PrologInteger(canvasLocation.x);
-		a2.value= new PrologInteger(canvasLocation.y);
-		iX.pushTrail(a1);
-		iX.pushTrail(a2);
+		a1.setBacktrackableValue(new PrologInteger(canvasLocation.x),iX);
+		a2.setBacktrackableValue(new PrologInteger(canvasLocation.y),iX);
+		//iX.pushTrail(a1);
+		//iX.pushTrail(a2);
 	}
 	//
 	public void setActualSize2s(ChoisePoint iX, Term a1, Term a2) {
-		ExtendedSize eWidth= ExtendedSize.termToExtendedSize(a1,iX);
-		ExtendedSize eHeight= ExtendedSize.termToExtendedSize(a2,iX);
+		ExtendedSize eWidth= ExtendedSize.argumentToExtendedSize(a1,iX);
+		ExtendedSize eHeight= ExtendedSize.argumentToExtendedSize(a2,iX);
 		createGraphicWindowIfNecessary(iX,false);
 		synchronized(this) {
 			if (graphicWindow != null) {
@@ -604,21 +609,15 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 				}
 			}
 		};
-		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
-		Dimension desktopSize;
-		if (desktop==null) {
-			desktopSize= new Dimension(1,1);
-		} else {
-			desktopSize= DesktopUtils.safelyGetComponentSize(desktop);
-		};
+		Dimension desktopSize= getSizeOfMainDesctopPane();
 		double gridX= DefaultOptions.gridWidth;
 		double gridY= DefaultOptions.gridHeight;
 		double logicalWidth= CoordinateAndSize.reconstruct(canvasSize.width,desktopSize.width,gridX);
 		double logicalHeight= CoordinateAndSize.reconstruct(canvasSize.height,desktopSize.height,gridY);
-		a1.value= new PrologReal(logicalWidth);
-		a2.value= new PrologReal(logicalHeight);
-		iX.pushTrail(a1);
-		iX.pushTrail(a2);
+		a1.setBacktrackableValue(new PrologReal(logicalWidth),iX);
+		a2.setBacktrackableValue(new PrologReal(logicalHeight),iX);
+		//iX.pushTrail(a1);
+		//iX.pushTrail(a2);
 	}
 	//
 	public void getSizeInPixels2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
@@ -632,17 +631,17 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 				}
 			}
 		};
-		a1.value= new PrologInteger(canvasSize.width);
-		a2.value= new PrologInteger(canvasSize.height);
-		iX.pushTrail(a1);
-		iX.pushTrail(a2);
+		a1.setBacktrackableValue(new PrologInteger(canvasSize.width),iX);
+		a2.setBacktrackableValue(new PrologInteger(canvasSize.height),iX);
+		//iX.pushTrail(a1);
+		//iX.pushTrail(a2);
 	}
 	//
 	public void setActualBounds4s(ChoisePoint iX, Term a1, Term a2, Term a3, Term a4) {
-		ExtendedCoordinate eX= ExtendedCoordinate.termToExtendedCoordinate(a1,iX);
-		ExtendedCoordinate eY= ExtendedCoordinate.termToExtendedCoordinate(a2,iX);
-		ExtendedSize eWidth= ExtendedSize.termToExtendedSize(a3,iX);
-		ExtendedSize eHeight= ExtendedSize.termToExtendedSize(a4,iX);
+		ExtendedCoordinate eX= ExtendedCoordinate.argumentToExtendedCoordinate(a1,iX);
+		ExtendedCoordinate eY= ExtendedCoordinate.argumentToExtendedCoordinate(a2,iX);
+		ExtendedSize eWidth= ExtendedSize.argumentToExtendedSize(a3,iX);
+		ExtendedSize eHeight= ExtendedSize.argumentToExtendedSize(a4,iX);
 		createGraphicWindowIfNecessary(iX,false);
 		synchronized(this) {
 			if (graphicWindow != null) {
@@ -670,27 +669,32 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 				}
 			}
 		};
-		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
-		Dimension desktopSize;
-		if (desktop==null) {
-			desktopSize= new Dimension(1,1);
-		} else {
-			desktopSize= DesktopUtils.safelyGetComponentSize(desktop);
-		};
+		Dimension desktopSize= getSizeOfMainDesctopPane();
 		double gridX= DefaultOptions.gridWidth;
 		double gridY= DefaultOptions.gridHeight;
 		double logicalX= CoordinateAndSize.reconstruct(canvasLocation.x,desktopSize.width,gridX);
 		double logicalY= CoordinateAndSize.reconstruct(canvasLocation.y,desktopSize.height,gridY);
 		double logicalWidth= CoordinateAndSize.reconstruct(canvasSize.width,desktopSize.width,gridX);
 		double logicalHeight= CoordinateAndSize.reconstruct(canvasSize.height,desktopSize.height,gridY);
-		a1.value= new PrologReal(logicalX);
-		a2.value= new PrologReal(logicalY);
-		a3.value= new PrologReal(logicalWidth);
-		a4.value= new PrologReal(logicalHeight);
-		iX.pushTrail(a1);
-		iX.pushTrail(a2);
-		iX.pushTrail(a3);
-		iX.pushTrail(a4);
+		a1.setBacktrackableValue(new PrologReal(logicalX),iX);
+		a2.setBacktrackableValue(new PrologReal(logicalY),iX);
+		a3.setBacktrackableValue(new PrologReal(logicalWidth),iX);
+		a4.setBacktrackableValue(new PrologReal(logicalHeight),iX);
+		//iX.pushTrail(a1);
+		//iX.pushTrail(a2);
+		//iX.pushTrail(a3);
+		//iX.pushTrail(a4);
+	}
+	//
+	protected Dimension getSizeOfMainDesctopPane() {
+		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(staticContext);
+		Dimension desktopSize;
+		if (desktop==null) {
+			desktopSize= new Dimension(1,1);
+		} else {
+			desktopSize= DesktopUtils.safelyGetComponentSize(desktop);
+		};
+		return desktopSize;
 	}
 	//
 	public void getBoundsInPixels4s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3, PrologVariable a4) {
@@ -705,14 +709,14 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 				}
 			}
 		};
-		a1.value= new PrologInteger(canvasLocation.x);
-		a2.value= new PrologInteger(canvasLocation.y);
-		a3.value= new PrologInteger(canvasSize.width);
-		a4.value= new PrologInteger(canvasSize.height);
-		iX.pushTrail(a1);
-		iX.pushTrail(a2);
-		iX.pushTrail(a3);
-		iX.pushTrail(a4);
+		a1.setBacktrackableValue(new PrologInteger(canvasLocation.x),iX);
+		a2.setBacktrackableValue(new PrologInteger(canvasLocation.y),iX);
+		a3.setBacktrackableValue(new PrologInteger(canvasSize.width),iX);
+		a4.setBacktrackableValue(new PrologInteger(canvasSize.height),iX);
+		//iX.pushTrail(a1);
+		//iX.pushTrail(a2);
+		//iX.pushTrail(a3);
+		//iX.pushTrail(a4);
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -997,6 +1001,25 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	public void start0s(ChoisePoint iX) {
 	}
 	public void stop0s(ChoisePoint iX) {
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void refineWidth1s(ChoisePoint iX, Term a1) {
+		double ratio= Converters.argumentToReal(a1,iX);
+		synchronized(this) {
+			if (canvasSpace != null) {
+				canvasSpace.safelyRefineWidth(ratio);
+			}
+		}
+	}
+	public void refineHeight1s(ChoisePoint iX, Term a1) {
+		double ratio= Converters.argumentToReal(a1,iX);
+		synchronized(this) {
+			if (canvasSpace != null) {
+				canvasSpace.safelyRefineHeight(ratio);
+			}
+		}
 	}
 	//
 	///////////////////////////////////////////////////////////////

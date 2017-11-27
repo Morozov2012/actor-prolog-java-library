@@ -80,14 +80,18 @@ public abstract class ScalableToggleButtonIcon implements Icon, UIResource, Seri
 				// Graphics2D g2D= (Graphics2D)relatedComponent.getGraphics();
 				Graphics2D g2D= DesktopUtils.safelyGetGraphics2D(relatedComponent);
 				if (g2D!=null) {
-					FontRenderContext fRC= g2D.getFontRenderContext();
-					Rectangle2D r2D= givenFont.getStringBounds("M",fRC);
-					// Returns an integer Rectangle that completely encloses the Shape:
-					Rectangle rect= r2D.getBounds();
-					int width= PrologInteger.toInteger(rect.getWidth());
-					// int height= PrologInteger.toInteger(rect.getHeight());
-					measuredSize= PrologInteger.toInteger(width*horizontalScaling);
-					measuredFonts.put(givenFont,measuredSize);
+					try {
+						FontRenderContext fRC= g2D.getFontRenderContext();
+						Rectangle2D r2D= givenFont.getStringBounds("M",fRC);
+						// Returns an integer Rectangle that completely encloses the Shape:
+						Rectangle rect= r2D.getBounds();
+						int width= PrologInteger.toInteger(rect.getWidth());
+						// int height= PrologInteger.toInteger(rect.getHeight());
+						measuredSize= PrologInteger.toInteger(width*horizontalScaling);
+						measuredFonts.put(givenFont,measuredSize);
+					} finally {
+						g2D.dispose();
+					}
 				}
 			}
 		}

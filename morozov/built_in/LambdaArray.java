@@ -43,9 +43,9 @@ public abstract class LambdaArray extends Lambda {
 	public void setIndicesRange(IndexRange[] value) {
 		indicesRange= value;
 	}
-	public void getIndicesRange0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getIndicesRange0ff(ChoisePoint iX, PrologVariable result) {
 		IndexRange[] value= getIndicesRange(iX);
-		a1.value= ArrayUtils.indexRangesToTerm(value);
+		result.setNonBacktrackableValue(ArrayUtils.indexRangesToTerm(value));
 	}
 	public void getIndicesRange0fs(ChoisePoint iX) {
 	}
@@ -65,9 +65,9 @@ public abstract class LambdaArray extends Lambda {
 	public void setIndexChecking(boolean value) {
 		indexChecking= value;
 	}
-	public void getIndexChecking0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getIndexChecking0ff(ChoisePoint iX, PrologVariable result) {
 		boolean value= getIndexChecking(iX);
-		a1.value= OnOff.boolean2TermOnOff(value);
+		result.setNonBacktrackableValue(OnOff.boolean2TermOnOff(value));
 	}
 	public void getIndexChecking0fs(ChoisePoint iX) {
 	}
@@ -85,7 +85,8 @@ public abstract class LambdaArray extends Lambda {
 		ArrayIndices arrayIndices= collectArrayIndices((Term[])givenIndices,iX);
 		try {
 			Term value= accessArrayElement(arrayIndices,iX);
-			result.value= value;
+			result.setNonBacktrackableValue(value);
+			// iX.pushTrail(result);
 		} catch (Backtracking b) {
 			throw new ImperativeProcedureFailed();
 		}
@@ -119,21 +120,21 @@ public abstract class LambdaArray extends Lambda {
 	}
 	//
 	public class Element1mff extends Element {
-		public Element1mff(Continuation aC, PrologVariable a1, Term... a2) {
-			super(aC,a2);
-			result= a1;
+		public Element1mff(Continuation aC, PrologVariable result, Term... a1) {
+			super(aC,a1);
+			argumentResult= result;
 		}
 	}
 	public class Element1mfs extends Element {
-		public Element1mfs(Continuation aC, Term... a2) {
-			super(aC,a2);
+		public Element1mfs(Continuation aC, Term... a1) {
+			super(aC,a1);
 			isFunctionCall= false;
 		}
 	}
 	public class Element0ff extends Element {
-		public Element0ff(Continuation aC, PrologVariable a1) {
+		public Element0ff(Continuation aC, PrologVariable result) {
 			super(aC);
-			result= a1;
+			argumentResult= result;
 		}
 	}
 	public class Element0fs extends Element {
@@ -143,133 +144,133 @@ public abstract class LambdaArray extends Lambda {
 		}
 	}
 	public class Element1ff extends Element {
-		public Element1ff(Continuation aC, PrologVariable a1, Term a2) {
-			super(aC,a2);
-			result= a1;
+		public Element1ff(Continuation aC, PrologVariable result, Term a1) {
+			super(aC,a1);
+			argumentResult= result;
 		}
 	}
 	public class Element1fs extends Element {
-		public Element1fs(Continuation aC, Term a2) {
-			super(aC,a2);
+		public Element1fs(Continuation aC, Term a1) {
+			super(aC,a1);
 			isFunctionCall= false;
 		}
 	}
 	public class Element2ff extends Element {
-		public Element2ff(Continuation aC, PrologVariable a1, Term a2, Term a3) {
-			super(aC,a2,a3);
-			result= a1;
+		public Element2ff(Continuation aC, PrologVariable result, Term a1, Term a2) {
+			super(aC,a1,a2);
+			argumentResult= result;
 		}
 	}
 	public class Element2fs extends Element {
-		public Element2fs(Continuation aC, Term a2, Term a3) {
-			super(aC,a2,a3);
+		public Element2fs(Continuation aC, Term a1, Term a2) {
+			super(aC,a1,a2);
 			isFunctionCall= false;
 		}
 	}
 	public class Element3ff extends Element {
-		public Element3ff(Continuation aC, PrologVariable a1, Term a2, Term a3, Term a4) {
-			super(aC,a2,a3,a4);
-			result= a1;
+		public Element3ff(Continuation aC, PrologVariable result, Term a1, Term a2, Term a3) {
+			super(aC,a1,a2,a3);
+			argumentResult= result;
 		}
 	}
 	public class Element3fs extends Element {
-		public Element3fs(Continuation aC, Term a2, Term a3, Term a4) {
-			super(aC,a2,a3,a4);
+		public Element3fs(Continuation aC, Term a1, Term a2, Term a3) {
+			super(aC,a1,a2,a3);
 			isFunctionCall= false;
 		}
 	}
 	public class Element4ff extends Element {
-		public Element4ff(Continuation aC, PrologVariable a1, Term a2, Term a3, Term a4, Term a5) {
-			super(aC,a2,a3,a4,a5);
-			result= a1;
+		public Element4ff(Continuation aC, PrologVariable result, Term a1, Term a2, Term a3, Term a4) {
+			super(aC,a1,a2,a3,a4);
+			argumentResult= result;
 		}
 	}
 	public class Element4fs extends Element {
-		public Element4fs(Continuation aC, Term a2, Term a3, Term a4, Term a5) {
-			super(aC,a2,a3,a4,a5);
+		public Element4fs(Continuation aC, Term a1, Term a2, Term a3, Term a4) {
+			super(aC,a1,a2,a3,a4);
 			isFunctionCall= false;
 		}
 	}
 	public class Element5ff extends Element {
-		public Element5ff(Continuation aC, PrologVariable a1, Term a2, Term a3, Term a4, Term a5, Term a6) {
-			super(aC,a2,a3,a4,a5,a6);
-			result= a1;
+		public Element5ff(Continuation aC, PrologVariable result, Term a1, Term a2, Term a3, Term a4, Term a5) {
+			super(aC,a1,a2,a3,a4,a5);
+			argumentResult= result;
 		}
 	}
 	public class Element5fs extends Element {
-		public Element5fs(Continuation aC, Term a2, Term a3, Term a4, Term a5, Term a6) {
-			super(aC,a2,a3,a4,a5,a6);
+		public Element5fs(Continuation aC, Term a1, Term a2, Term a3, Term a4, Term a5) {
+			super(aC,a1,a2,a3,a4,a5);
 			isFunctionCall= false;
 		}
 	}
 	public class Element6ff extends Element {
-		public Element6ff(Continuation aC, PrologVariable a1, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7) {
-			super(aC,a2,a3,a4,a5,a6,a7);
-			result= a1;
+		public Element6ff(Continuation aC, PrologVariable result, Term a1, Term a2, Term a3, Term a4, Term a5, Term a6) {
+			super(aC,a1,a2,a3,a4,a5,a6);
+			argumentResult= result;
 		}
 	}
 	public class Element6fs extends Element {
-		public Element6fs(Continuation aC, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7) {
-			super(aC,a2,a3,a4,a5,a6,a7);
+		public Element6fs(Continuation aC, Term a1, Term a2, Term a3, Term a4, Term a5, Term a6) {
+			super(aC,a1,a2,a3,a4,a5,a6);
 			isFunctionCall= false;
 		}
 	}
 	public class Element7ff extends Element {
-		public Element7ff(Continuation aC, PrologVariable a1, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7, Term a8) {
-			super(aC,a2,a3,a4,a5,a6,a7,a8);
-			result= a1;
+		public Element7ff(Continuation aC, PrologVariable result, Term a1, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7) {
+			super(aC,a1,a2,a3,a4,a5,a6,a7);
+			argumentResult= result;
 		}
 	}
 	public class Element7fs extends Element {
-		public Element7fs(Continuation aC, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7, Term a8) {
-			super(aC,a2,a3,a4,a5,a6,a7,a8);
+		public Element7fs(Continuation aC, Term a1, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7) {
+			super(aC,a1,a2,a3,a4,a5,a6,a7);
 			isFunctionCall= false;
 		}
 	}
 	public class Element8ff extends Element {
-		public Element8ff(Continuation aC, PrologVariable a1, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7, Term a8, Term a9) {
-			super(aC,a2,a3,a4,a5,a6,a7,a8,a9);
-			result= a1;
+		public Element8ff(Continuation aC, PrologVariable result, Term a1, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7, Term a8) {
+			super(aC,a1,a2,a3,a4,a5,a6,a7,a8);
+			argumentResult= result;
 		}
 	}
 	public class Element8fs extends Element {
-		public Element8fs(Continuation aC, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7, Term a8, Term a9) {
-			super(aC,a2,a3,a4,a5,a6,a7,a8,a9);
+		public Element8fs(Continuation aC, Term a1, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7, Term a8) {
+			super(aC,a1,a2,a3,a4,a5,a6,a7,a8);
 			isFunctionCall= false;
 		}
 	}
 	public class Element9ff extends Element {
-		public Element9ff(Continuation aC, PrologVariable a1, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7, Term a8, Term a9, Term a10) {
-			super(aC,a2,a3,a4,a5,a6,a7,a8,a9,a10);
-			result= a1;
+		public Element9ff(Continuation aC, PrologVariable result, Term a1, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7, Term a8, Term a9) {
+			super(aC,a1,a2,a3,a4,a5,a6,a7,a8,a9);
+			argumentResult= result;
 		}
 	}
 	public class Element9fs extends Element {
-		public Element9fs(Continuation aC, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7, Term a8, Term a9, Term a10) {
-			super(aC,a2,a3,a4,a5,a6,a7,a8,a9,a10);
+		public Element9fs(Continuation aC, Term a1, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7, Term a8, Term a9) {
+			super(aC,a1,a2,a3,a4,a5,a6,a7,a8,a9);
 			isFunctionCall= false;
 		}
 	}
 	public class Element10ff extends Element {
-		public Element10ff(Continuation aC, PrologVariable a1, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7, Term a8, Term a9, Term a10, Term a11) {
-			super(aC,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11);
-			result= a1;
+		public Element10ff(Continuation aC, PrologVariable result, Term a1, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7, Term a8, Term a9, Term a10) {
+			super(aC,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10);
+			argumentResult= result;
 		}
 	}
 	public class Element10fs extends Element {
-		public Element10fs(Continuation aC, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7, Term a8, Term a9, Term a10, Term a11) {
-			super(aC,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11);
+		public Element10fs(Continuation aC, Term a1, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7, Term a8, Term a9, Term a10) {
+			super(aC,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10);
 			isFunctionCall= false;
 		}
 	}
 	public class Element extends Continuation {
-		protected PrologVariable result;
+		protected PrologVariable argumentResult;
 		protected Term[] givenIndices;
 		protected boolean isFunctionCall= true;
 		//
-		public Element(Continuation aC, Term... a2) {
+		public Element(Continuation aC, Term... a1) {
 			c0= aC;
-			givenIndices= a2;
+			givenIndices= a1;
 		}
 		//
 		public void execute(ChoisePoint iX) throws Backtracking {
@@ -325,7 +326,8 @@ public abstract class LambdaArray extends Lambda {
 ArrayIndices arrayIndices= new ArrayIndices(currentIndexValue);
 Term value= accessArrayElement(arrayIndices,newIx);
 if (isFunctionCall) {
-	result.value= value;
+	argumentResult.setNonBacktrackableValue(value);
+	// iX.pushTrail(argumentResult);
 };
 c0.execute(newIx);
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -406,7 +408,8 @@ if (!skipPass) {
 	ArrayIndices arrayIndices= new ArrayIndices(currentIndexValue);
 	Term value= accessArrayElement(arrayIndices,newIx);
 	if (isFunctionCall) {
-		result.value= value;
+		argumentResult.setNonBacktrackableValue(value);
+		// iX.pushTrail(argumentResult);
 	};
 	try {
 		c0.execute(newIx);
@@ -417,7 +420,8 @@ if (!skipPass) {
 };
 if (processBacktracking || skipPass) {
 	if (isFunctionCall) {
-		result.value= null;
+		argumentResult.clear();
+		// iX.pushTrail(argumentResult);
 	};
 	if (newIx.isEnabled()) {
 		newIx.freeTrail();

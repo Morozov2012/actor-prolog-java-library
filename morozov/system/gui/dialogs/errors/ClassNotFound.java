@@ -7,4 +7,7 @@ public class ClassNotFound extends RuntimeException {
 	public ClassNotFound(String name) {
 		className= name;
 	}
+	public String toString() {
+		return this.getClass().toString() + "(" + className + ")";
+	}
 }

@@ -42,8 +42,9 @@ public abstract class SymbolicInformation extends DataAbstraction {
 	public void setCaseSensitivity(boolean value) {
 		caseSensitivity= value;
 	}
-	public void getCaseSensitivity0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= OnOff.boolean2TermOnOff(getCaseSensitivity(iX));
+	public void getCaseSensitivity0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(OnOff.boolean2TermOnOff(getCaseSensitivity(iX)));
+		// iX.pushTrail(a1);
 	}
 	public void getCaseSensitivity0fs(ChoisePoint iX) {
 	}
@@ -64,11 +65,12 @@ public abstract class SymbolicInformation extends DataAbstraction {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void length1ff(ChoisePoint iX, PrologVariable result, Term a2) {
-		String text= Converters.argumentToString(a2,iX);
-		result.value= new PrologInteger(text.length());
+	public void length1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		String text= Converters.argumentToString(a1,iX);
+		result.setNonBacktrackableValue(new PrologInteger(text.length()));
+		// iX.pushTrail(result);
 	}
-	public void length1fs(ChoisePoint iX, Term inputText) {
+	public void length1fs(ChoisePoint iX, Term a1) {
 	}
 	public void length0ff(ChoisePoint iX, PrologVariable result) {
 		Term inputText= retrieveTextString(iX);
@@ -77,19 +79,20 @@ public abstract class SymbolicInformation extends DataAbstraction {
 	public void length0fs(ChoisePoint iX) {
 	}
 	//
-	public void format2mff(ChoisePoint iX, PrologVariable a1, Term... args) {
+	public void format2mff(ChoisePoint iX, PrologVariable result, Term... args) {
 		StringBuilder textBuffer= FormatOutput.termsToFormattedString(iX,(Term[])args);
-		a1.value= new PrologString(textBuffer.toString());
+		result.setNonBacktrackableValue(new PrologString(textBuffer.toString()));
 		// iX.pushTrail(a1);
 	}
 	public void format2mfs(ChoisePoint iX, Term... args) {
 	}
 	//
-	public void upper1ff(ChoisePoint iX, PrologVariable result, Term a2) {
-		String text= Converters.argumentToString(a2,iX);
-		result.value= new PrologString(text.toUpperCase(Locale.ENGLISH));
+	public void upper1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		String text= Converters.argumentToString(a1,iX);
+		result.setNonBacktrackableValue(new PrologString(text.toUpperCase(Locale.ENGLISH)));
+		// iX.pushTrail(result);
 	}
-	public void upper1fs(ChoisePoint iX, Term inputText) {
+	public void upper1fs(ChoisePoint iX, Term a1) {
 	}
 	public void upper0ff(ChoisePoint iX, PrologVariable result) {
 		Term inputText= retrieveTextString(iX);
@@ -98,11 +101,12 @@ public abstract class SymbolicInformation extends DataAbstraction {
 	public void upper0fs(ChoisePoint iX) {
 	}
 	//
-	public void lower1ff(ChoisePoint iX, PrologVariable result, Term a2) {
-		String text= Converters.argumentToString(a2,iX);
-		result.value= new PrologString(text.toLowerCase(Locale.ENGLISH));
+	public void lower1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		String text= Converters.argumentToString(a1,iX);
+		result.setNonBacktrackableValue(new PrologString(text.toLowerCase(Locale.ENGLISH)));
+		// iX.pushTrail(result);
 	}
-	public void lower1fs(ChoisePoint iX, Term inputText) {
+	public void lower1fs(ChoisePoint iX, Term a1) {
 	}
 	public void lower0ff(ChoisePoint iX, PrologVariable result) {
 		Term inputText= retrieveTextString(iX);
@@ -171,29 +175,29 @@ public abstract class SymbolicInformation extends DataAbstraction {
 	}
 	//
 	public class Search2ff extends Search {
-		public Search2ff(Continuation aC, PrologVariable a1, Term a2, Term a3) {
+		public Search2ff(Continuation aC, PrologVariable result, Term a1, Term a2) {
 			c0= aC;
-			outputResult= a1;
-			inputText= a2;
-			inputTarget= a3;
+			outputResult= result;
+			inputText= a1;
+			inputTarget= a2;
 			hasOutput= true;
 			retrieveTextString= false;
 		}
 	}
 	public class Search2fs extends Search {
-		public Search2fs(Continuation aC, Term a2, Term a3) {
+		public Search2fs(Continuation aC, Term a1, Term a2) {
 			c0= aC;
-			inputText= a2;
-			inputTarget= a3;
+			inputText= a1;
+			inputTarget= a2;
 			hasOutput= false;
 			retrieveTextString= false;
 		}
 	}
 	public class Search1ff extends Search {
-		public Search1ff(Continuation aC, PrologVariable a1, Term a2) {
+		public Search1ff(Continuation aC, PrologVariable result, Term a1) {
 			c0= aC;
-			outputResult= a1;
-			inputTarget= a2;
+			outputResult= result;
+			inputTarget= a1;
 			hasOutput= true;
 			retrieveTextString= true;
 		}
@@ -228,7 +232,7 @@ public abstract class SymbolicInformation extends DataAbstraction {
 					int p1= SystemUtils.indexOf(text,target,currentPosition,caseSensitivity);
 					if (p1 >= 0) {
 						if (hasOutput) {
-							outputResult.value= new PrologInteger(p1+1);
+							outputResult.setNonBacktrackableValue(new PrologInteger(p1+1));
 							// newIx.pushTrail(outputResult);
 						};
 						try {
@@ -260,10 +264,10 @@ public abstract class SymbolicInformation extends DataAbstraction {
 		if (n < 0 || n > text.length()) {
 			throw Backtracking.instance;
 		} else {
-			front.value= new PrologString(text.substring(0,n));
-			tail.value= new PrologString(text.substring(n));
-			iX.pushTrail(front);
-			iX.pushTrail(tail);
+			front.setBacktrackableValue(new PrologString(text.substring(0,n)),iX);
+			tail.setBacktrackableValue(new PrologString(text.substring(n)),iX);
+			//iX.pushTrail(front);
+			//iX.pushTrail(tail);
 		}
 	}
 	public void split4s(ChoisePoint iX, Term position, Term inputText, Term front, PrologVariable tail) throws Backtracking {
@@ -273,8 +277,8 @@ public abstract class SymbolicInformation extends DataAbstraction {
 			throw Backtracking.instance;
 		} else {
 			front.isString(text.substring(0,n),iX);
-			tail.value= new PrologString(text.substring(n));
-			iX.pushTrail(tail);
+			tail.setBacktrackableValue(new PrologString(text.substring(n)),iX);
+			//iX.pushTrail(tail);
 		}
 	}
 	public void split4s(ChoisePoint iX, Term position, Term inputText, PrologVariable front, Term tail) throws Backtracking {
@@ -283,9 +287,9 @@ public abstract class SymbolicInformation extends DataAbstraction {
 		if (n < 0 || n > text.length()) {
 			throw Backtracking.instance;
 		} else {
-			front.value= new PrologString(text.substring(0,n));
+			front.setBacktrackableValue(new PrologString(text.substring(0,n)),iX);
+			//iX.pushTrail(front);
 			tail.isString(text.substring(n),iX);
-			iX.pushTrail(front);
 		}
 	}
 	public void split4s(ChoisePoint iX, Term position, Term inputText, Term front, Term tail) throws Backtracking {
@@ -318,25 +322,25 @@ public abstract class SymbolicInformation extends DataAbstraction {
 	public void extractFrontToken3s(ChoisePoint iX, Term a1, PrologVariable a2, PrologVariable a3) throws Backtracking {
 		String text= Converters.argumentToString(a1,iX);
 		String[] textSegments= extractFrontToken(text);
-		a2.value= new PrologString(textSegments[0]);
-		a3.value= new PrologString(textSegments[1]);
-		iX.pushTrail(a2);
-		iX.pushTrail(a3);
+		a2.setBacktrackableValue(new PrologString(textSegments[0]),iX);
+		a3.setBacktrackableValue(new PrologString(textSegments[1]),iX);
+		//iX.pushTrail(a2);
+		//iX.pushTrail(a3);
 	}
 	public void extractFrontToken3s(ChoisePoint iX, Term a1, Term a2, PrologVariable a3) throws Backtracking {
 		String text= Converters.argumentToString(a1,iX);
 		String[] textSegments= extractFrontToken(text);
 		a2.isString(textSegments[0],iX);
-		a3.value= new PrologString(textSegments[1]);
+		a3.setBacktrackableValue(new PrologString(textSegments[1]),iX);
 		// iX.pushTrail(a2);
-		iX.pushTrail(a3);
+		//iX.pushTrail(a3);
 	}
 	public void extractFrontToken3s(ChoisePoint iX, Term a1, PrologVariable a2, Term a3) throws Backtracking {
 		String text= Converters.argumentToString(a1,iX);
 		String[] textSegments= extractFrontToken(text);
-		a2.value= new PrologString(textSegments[0]);
+		a2.setBacktrackableValue(new PrologString(textSegments[0]),iX);
 		a3.isString(textSegments[1],iX);
-		iX.pushTrail(a2);
+		//iX.pushTrail(a2);
 		// iX.pushTrail(a3);
 	}
 	public void extractFrontToken3s(ChoisePoint iX, Term a1, Term a2, Term a3) throws Backtracking {
@@ -350,8 +354,8 @@ public abstract class SymbolicInformation extends DataAbstraction {
 	public void extractFrontToken3s(ChoisePoint iX, PrologVariable a1, Term a2, Term a3) throws Backtracking {
 		String token= Converters.argumentToString(a2,iX);
 		String rest= Converters.argumentToString(a3,iX);
-		a1.value= new PrologString(token+rest);
-		iX.pushTrail(a1);
+		a1.setBacktrackableValue(new PrologString(token+rest),iX);
+		//iX.pushTrail(a1);
 	}
 	public void extractFrontToken2s(ChoisePoint iX, PrologVariable token, PrologVariable rest) throws Backtracking {
 		Term inputText= retrieveTextString(iX);
@@ -396,9 +400,10 @@ public abstract class SymbolicInformation extends DataAbstraction {
 		}
 	}
 	//
-	public void extractTokens1ff(ChoisePoint iX, PrologVariable result, Term a2) {
-		String text= Converters.argumentToString(a2,iX);
-		result.value= extractTokens(text);
+	public void extractTokens1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		String text= Converters.argumentToString(a1,iX);
+		result.setNonBacktrackableValue(extractTokens(text));
+		// iX.pushTrail(result);
 	}
 	public void extractTokens1fs(ChoisePoint iX, Term a1) {
 	}
@@ -422,45 +427,46 @@ public abstract class SymbolicInformation extends DataAbstraction {
 		return Converters.arrayListToTerm(tokens);
 	}
 	//
-	public void skipSpaces1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
-		String text= Converters.argumentToString(a2,iX);
+	public void skipSpaces1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		String text= Converters.argumentToString(a1,iX);
 		String rest= LexicalScanner.skipFrontSpaces(text);
-		a1.value= new PrologString(rest);
+		result.setNonBacktrackableValue(new PrologString(rest));
 		// iX.pushTrail(a1);
 	}
-	public void skipSpaces1fs(ChoisePoint iX, PrologVariable a1, Term a2) {
+	public void skipSpaces1fs(ChoisePoint iX, Term a1) {
 	}
-	public void skipSpaces0ff(ChoisePoint iX, PrologVariable a1) {
+	public void skipSpaces0ff(ChoisePoint iX, PrologVariable result) {
 		Term inputText= retrieveTextString(iX);
-		skipSpaces1ff(iX,a1,inputText);
+		skipSpaces1ff(iX,result,inputText);
 	}
-	public void skipSpaces0fs(ChoisePoint iX, PrologVariable a1) {
+	public void skipSpaces0fs(ChoisePoint iX) {
 	}
 	//
-	public void trim1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
-		String text= Converters.argumentToString(a2,iX);
+	public void trim1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		String text= Converters.argumentToString(a1,iX);
 		String rest= text.trim();
-		a1.value= new PrologString(rest);
+		result.setNonBacktrackableValue(new PrologString(rest));
 		// iX.pushTrail(a1);
 	}
-	public void trim1fs(ChoisePoint iX, PrologVariable a1, Term a2) {
+	public void trim1fs(ChoisePoint iX, Term a1) {
 	}
-	public void trim0ff(ChoisePoint iX, PrologVariable a1) {
+	public void trim0ff(ChoisePoint iX, PrologVariable result) {
 		Term inputText= retrieveTextString(iX);
-		trim1ff(iX,a1,inputText);
+		trim1ff(iX,result,inputText);
 	}
-	public void trim0fs(ChoisePoint iX, PrologVariable a1) {
+	public void trim0fs(ChoisePoint iX) {
 	}
 	//
-	public void extractLines1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
-		String text= Converters.argumentToString(a2,iX);
-		a1.value= extractLines(text);
+	public void extractLines1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		String text= Converters.argumentToString(a1,iX);
+		result.setNonBacktrackableValue(extractLines(text));
+		// iX.pushTrail(a1);
 	}
 	public void extractLines1fs(ChoisePoint iX, Term a1) {
 	}
-	public void extractLines0ff(ChoisePoint iX, PrologVariable a1) {
+	public void extractLines0ff(ChoisePoint iX, PrologVariable result) {
 		Term inputText= retrieveTextString(iX);
-		extractLines1ff(iX,a1,inputText);
+		extractLines1ff(iX,result,inputText);
 	}
 	public void extractLines0fs(ChoisePoint iX) {
 	}
@@ -470,7 +476,7 @@ public abstract class SymbolicInformation extends DataAbstraction {
 		if (values[lastElement].isEmpty()) {
 			lastElement= lastElement - 1;
 		};
-		Term result= PrologEmptyList.instance;
+		Term buffer= PrologEmptyList.instance;
 		for (int n=lastElement; n >= 0; n--) {
 			String value= values[n];
 			while (true) {
@@ -485,9 +491,9 @@ public abstract class SymbolicInformation extends DataAbstraction {
 					break;
 				}
 			};
-			result= new PrologList(new PrologString(value),result);
+			buffer= new PrologList(new PrologString(value),buffer);
 		};
-		return result;
+		return buffer;
 	}
 	// (i,o,o)
 	public void extractFrontCode3s(ChoisePoint iX, Term inputText, PrologVariable front, PrologVariable tail) throws Backtracking {
@@ -496,10 +502,10 @@ public abstract class SymbolicInformation extends DataAbstraction {
 			throw Backtracking.instance;
 		} else {
 			int code= text.codePointAt(0);
-			front.value= new PrologInteger(code);
-			tail.value= new PrologString(text.substring(1));
-			iX.pushTrail(front);
-			iX.pushTrail(tail);
+			front.setBacktrackableValue(new PrologInteger(code),iX);
+			tail.setBacktrackableValue(new PrologString(text.substring(1)),iX);
+			//iX.pushTrail(front);
+			//iX.pushTrail(tail);
 		}
 	}
 	public void extractFrontCode2s(ChoisePoint iX, PrologVariable front, PrologVariable tail) throws Backtracking {
@@ -517,8 +523,8 @@ public abstract class SymbolicInformation extends DataAbstraction {
 			if (code1 != code2) {
 				throw Backtracking.instance;
 			} else {
-				tail.value= new PrologString(text.substring(1));
-				iX.pushTrail(tail);
+				tail.setBacktrackableValue(new PrologString(text.substring(1)),iX);
+				//iX.pushTrail(tail);
 			}
 		}
 	}
@@ -537,8 +543,8 @@ public abstract class SymbolicInformation extends DataAbstraction {
 				throw Backtracking.instance;
 			} else {
 				int code= text.codePointAt(0);
-				front.value= new PrologInteger(code);
-				iX.pushTrail(front);
+				front.setBacktrackableValue(new PrologInteger(code),iX);
+				//iX.pushTrail(front);
 			}
 		}
 	}
@@ -572,23 +578,23 @@ public abstract class SymbolicInformation extends DataAbstraction {
 	public void extractFrontCode3s(ChoisePoint iX, PrologVariable outputText, Term front, Term tail) throws Backtracking {
 		int codePoint1= Converters.argumentToSmallInteger(front,iX);
 		String t2= Converters.argumentToString(tail,iX);
-		outputText.value= new PrologString(new String(new int[]{codePoint1},0,1).concat(t2));
-		iX.pushTrail(outputText);
+		outputText.setBacktrackableValue(new PrologString(new String(new int[]{codePoint1},0,1).concat(t2)),iX);
+		//iX.pushTrail(outputText);
 	}
 	//
-	public void replace3ff(ChoisePoint iX, PrologVariable a1, Term a2, Term a3, Term a4) throws Backtracking {
-		String text= Converters.argumentToString(a2,iX);
-		String target= Converters.argumentToString(a3,iX);
-		String replacement= Converters.argumentToString(a4,iX);
+	public void replace3ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2, Term a3) throws Backtracking {
+		String text= Converters.argumentToString(a1,iX);
+		String target= Converters.argumentToString(a2,iX);
+		String replacement= Converters.argumentToString(a3,iX);
 		boolean caseSensitivity= getCaseSensitivity(iX);
 		int index= SystemUtils.indexOf(text,target,0,caseSensitivity);
 		if (index == -1) {
 			throw Backtracking.instance;
 		} else {
-			StringBuilder result= new StringBuilder(text.substring(0,index));
-			result.append(replacement);
-			result.append(text.substring(index+target.length()));
-			a1.value= new PrologString(result.toString());
+			StringBuilder buffer= new StringBuilder(text.substring(0,index));
+			buffer.append(replacement);
+			buffer.append(text.substring(index+target.length()));
+			result.setNonBacktrackableValue(new PrologString(buffer.toString()));
 			// iX.pushTrail(a1);
 		}
 	}
@@ -602,19 +608,19 @@ public abstract class SymbolicInformation extends DataAbstraction {
 			throw Backtracking.instance;
 		}
 	}
-	public void replace2ff(ChoisePoint iX, PrologVariable a1, Term a2, Term a3) throws Backtracking {
+	public void replace2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) throws Backtracking {
 		Term inputText= retrieveTextString(iX);
-		replace3ff(iX,a1,inputText,a2,a3);
+		replace3ff(iX,result,inputText,a1,a2);
 	}
 	public void replace2fs(ChoisePoint iX, Term a1, Term a2) throws Backtracking {
 		Term inputText= retrieveTextString(iX);
 		replace3fs(iX,inputText,a1,a2);
 	}
 	//
-	public void replaceAll3ff(ChoisePoint iX, PrologVariable a1, Term a2, Term a3, Term a4) {
-		String text= Converters.argumentToString(a2,iX);
-		String target= Converters.argumentToString(a3,iX);
-		String replacement= Converters.argumentToString(a4,iX);
+	public void replaceAll3ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2, Term a3) {
+		String text= Converters.argumentToString(a1,iX);
+		String target= Converters.argumentToString(a2,iX);
+		String replacement= Converters.argumentToString(a3,iX);
 		boolean caseSensitivity= getCaseSensitivity(iX);
 		String modifiedText;
 		if (!caseSensitivity && target.length() > 0) {
@@ -646,14 +652,14 @@ public abstract class SymbolicInformation extends DataAbstraction {
 		} else {
 			modifiedText= text.replace(target,replacement);
 		};
-		a1.value= new PrologString(modifiedText);
+		result.setNonBacktrackableValue(new PrologString(modifiedText));
 		// iX.pushTrail(a1);
 	}
 	public void replaceAll3fs(ChoisePoint iX, Term a1, Term a2, Term a3) {
 	}
-	public void replaceAll2ff(ChoisePoint iX, PrologVariable a1, Term a2, Term a3) {
+	public void replaceAll2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
 		Term inputText= retrieveTextString(iX);
-		replaceAll3ff(iX,a1,inputText,a2,a3);
+		replaceAll3ff(iX,result,inputText,a1,a2);
 	}
 	public void replaceAll2fs(ChoisePoint iX, Term a1, Term a2) {
 	}

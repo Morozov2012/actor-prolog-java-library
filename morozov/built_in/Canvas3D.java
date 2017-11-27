@@ -17,6 +17,8 @@ import java.awt.event.ComponentEvent;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Image;
 
 import javax.media.j3d.Shape3D;
 import javax.media.j3d.BranchGroup;
@@ -33,6 +35,8 @@ import javax.media.j3d.ColoringAttributes;
 import javax.media.j3d.Font3D;
 import javax.media.j3d.View;
 import javax.media.j3d.GraphicsConfigTemplate3D;
+// import javax.media.j3d.J3DGraphics2D;
+import javax.media.j3d.ImageComponent2D;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Color3f;
 import com.sun.j3d.utils.universe.SimpleUniverse;
@@ -45,7 +49,7 @@ import java.util.Map;
 import java.util.Iterator;
 import java.util.Enumeration;
 
-public abstract class Canvas3D extends DataResourceConsumer {
+public abstract class Canvas3D extends BufferedImageController { // DataResourceConsumer {
 	//
 	protected HashMap<NodeLabel,NodeContainer> localMemory= new HashMap<NodeLabel,NodeContainer>();
 	protected HashMap<Node,NodeLabel> inverseTable= new HashMap<Node,NodeLabel>();
@@ -53,8 +57,6 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	protected HashSet<CustomizedPickCanvas> customizedPickCanvasList= new HashSet<CustomizedPickCanvas>();
 	//
 	protected AtomicBoolean controlIsInitialized= new AtomicBoolean(false);
-	// protected ExtendedSpace3D space3D= null;
-	// protected InternalFrame3D graphicWindow= null;
 	protected SimpleUniverse simpleUniverse= null;
 	protected TransformGroup spin= null;
 	protected Term currentSceneTree= null;
@@ -162,7 +164,7 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	// get/set projectionPolicy
 	//
 	public void setProjectionPolicy1s(ChoisePoint iX, Term a1) {
-		setProjectionPolicy(Utils3D.termToProjectionPolicy(a1,iX));
+		setProjectionPolicy(Utils3D.argumentToProjectionPolicy(a1,iX));
 		View view= getCurrentView();
 		if (view != null) {
 			view.setProjectionPolicy(getProjectionPolicy(iX));
@@ -171,8 +173,8 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	public void setProjectionPolicy(int value) {
 		projectionPolicy= value;
 	}
-	public void getProjectionPolicy0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= Utils3D.projectionPolicyToTerm(getProjectionPolicy(iX));
+	public void getProjectionPolicy0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(Utils3D.projectionPolicyToTerm(getProjectionPolicy(iX)));
 	}
 	public void getProjectionPolicy0fs(ChoisePoint iX) {
 	}
@@ -181,14 +183,14 @@ public abstract class Canvas3D extends DataResourceConsumer {
 			return projectionPolicy;
 		} else {
 			Term value= getBuiltInSlot_E_projection_policy();
-			return Utils3D.termToProjectionPolicy(value,iX);
+			return Utils3D.argumentToProjectionPolicy(value,iX);
 		}
 	}
 	//
 	// get/set windowResizePolicy
 	//
 	public void setWindowResizePolicy1s(ChoisePoint iX, Term a1) {
-		setWindowResizePolicy(Utils3D.termToWindowResizePolicy(a1,iX));
+		setWindowResizePolicy(Utils3D.argumentToWindowResizePolicy(a1,iX));
 		View view= getCurrentView();
 		if (view != null) {
 			view.setWindowResizePolicy(getWindowResizePolicy(iX));
@@ -197,8 +199,8 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	public void setWindowResizePolicy(int value) {
 		windowResizePolicy= value;
 	}
-	public void getWindowResizePolicy0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= Utils3D.windowResizePolicyToTerm(getWindowResizePolicy(iX));
+	public void getWindowResizePolicy0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(Utils3D.windowResizePolicyToTerm(getWindowResizePolicy(iX)));
 	}
 	public void getWindowResizePolicy0fs(ChoisePoint iX) {
 	}
@@ -207,14 +209,14 @@ public abstract class Canvas3D extends DataResourceConsumer {
 			return windowResizePolicy;
 		} else {
 			Term value= getBuiltInSlot_E_window_resize_policy();
-			return Utils3D.termToWindowResizePolicy(value,iX);
+			return Utils3D.argumentToWindowResizePolicy(value,iX);
 		}
 	}
 	//
 	// get/set windowMovementPolicy
 	//
 	public void setWindowMovementPolicy1s(ChoisePoint iX, Term a1) {
-		setWindowMovementPolicy(Utils3D.termToWindowMovementPolicy(a1,iX));
+		setWindowMovementPolicy(Utils3D.argumentToWindowMovementPolicy(a1,iX));
 		View view= getCurrentView();
 		if (view != null) {
 			view.setWindowMovementPolicy(getWindowMovementPolicy(iX));
@@ -223,8 +225,8 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	public void setWindowMovementPolicy(int value) {
 		windowMovementPolicy= value;
 	}
-	public void getWindowMovementPolicy0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= Utils3D.windowMovementPolicyToTerm(getWindowMovementPolicy(iX));
+	public void getWindowMovementPolicy0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(Utils3D.windowMovementPolicyToTerm(getWindowMovementPolicy(iX)));
 	}
 	public void getWindowMovementPolicy0fs(ChoisePoint iX) {
 	}
@@ -233,14 +235,14 @@ public abstract class Canvas3D extends DataResourceConsumer {
 			return windowMovementPolicy;
 		} else {
 			Term value= getBuiltInSlot_E_window_movement_policy();
-			return Utils3D.termToWindowMovementPolicy(value,iX);
+			return Utils3D.argumentToWindowMovementPolicy(value,iX);
 		}
 	}
 	//
 	// get/set visibilityPolicy
 	//
 	public void setVisibilityPolicy1s(ChoisePoint iX, Term a1) {
-		setVisibilityPolicy(Utils3D.termToVisibilityPolicy(a1,iX));
+		setVisibilityPolicy(Utils3D.argumentToVisibilityPolicy(a1,iX));
 		View view= getCurrentView();
 		if (view != null) {
 			view.setVisibilityPolicy(getVisibilityPolicy(iX));
@@ -249,8 +251,8 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	public void setVisibilityPolicy(int value) {
 		visibilityPolicy= value;
 	}
-	public void getVisibilityPolicy0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= Utils3D.visibilityPolicyToTerm(getVisibilityPolicy(iX));
+	public void getVisibilityPolicy0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(Utils3D.visibilityPolicyToTerm(getVisibilityPolicy(iX)));
 	}
 	public void getVisibilityPolicy0fs(ChoisePoint iX) {
 	}
@@ -259,14 +261,14 @@ public abstract class Canvas3D extends DataResourceConsumer {
 			return visibilityPolicy;
 		} else {
 			Term value= getBuiltInSlot_E_visibility_policy();
-			return Utils3D.termToVisibilityPolicy(value,iX);
+			return Utils3D.argumentToVisibilityPolicy(value,iX);
 		}
 	}
 	//
 	// get/set transparencySortingPolicy
 	//
 	public void setTransparencySortingPolicy1s(ChoisePoint iX, Term a1) {
-		setTransparencySortingPolicy(Utils3D.termToTransparencySortingPolicy(a1,iX));
+		setTransparencySortingPolicy(Utils3D.argumentToTransparencySortingPolicy(a1,iX));
 		View view= getCurrentView();
 		if (view != null) {
 			view.setTransparencySortingPolicy(getTransparencySortingPolicy(iX));
@@ -275,8 +277,8 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	public void setTransparencySortingPolicy(int value) {
 		transparencySortingPolicy= value;
 	}
-	public void getTransparencySortingPolicy0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= Utils3D.transparencySortingPolicyToTerm(getTransparencySortingPolicy(iX));
+	public void getTransparencySortingPolicy0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(Utils3D.transparencySortingPolicyToTerm(getTransparencySortingPolicy(iX)));
 	}
 	public void getTransparencySortingPolicy0fs(ChoisePoint iX) {
 	}
@@ -285,14 +287,14 @@ public abstract class Canvas3D extends DataResourceConsumer {
 			return transparencySortingPolicy;
 		} else {
 			Term value= getBuiltInSlot_E_transparency_sorting_policy();
-			return Utils3D.termToTransparencySortingPolicy(value,iX);
+			return Utils3D.argumentToTransparencySortingPolicy(value,iX);
 		}
 	}
 	//
 	// get/set minimumFrameCycleTime
 	//
 	public void setMinimumFrameCycleTime1s(ChoisePoint iX, Term a1) {
-		setMinimumFrameCycleTime(WaitingInterval.termToWaitingInterval(a1,iX));
+		setMinimumFrameCycleTime(WaitingInterval.argumentToWaitingInterval(a1,iX));
 		View view= getCurrentView();
 		if (view != null) {
 			changeMinimumFrameCycleTimeInNanos(getMinimumFrameCycleTime(iX),view);
@@ -301,8 +303,8 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	public void setMinimumFrameCycleTime(WaitingInterval value) {
 		minimumFrameCycleTime= value;
 	}
-	public void getMinimumFrameCycleTime0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getMinimumFrameCycleTime(iX).toTerm();
+	public void getMinimumFrameCycleTime0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getMinimumFrameCycleTime(iX).toTerm());
 	}
 	public void getMinimumFrameCycleTime0fs(ChoisePoint iX) {
 	}
@@ -311,14 +313,14 @@ public abstract class Canvas3D extends DataResourceConsumer {
 			return minimumFrameCycleTime;
 		} else {
 			Term value= getBuiltInSlot_E_minimum_frame_cycle_time();
-			return WaitingInterval.termToWaitingInterval(value,iX);
+			return WaitingInterval.argumentToWaitingInterval(value,iX);
 		}
 	}
 	//
 	// get/set fieldOfView
 	//
 	public void setFieldOfView1s(ChoisePoint iX, Term a1) {
-		setFieldOfView(FieldOfView.termToFieldOfView(a1,iX));
+		setFieldOfView(FieldOfView.argumentToFieldOfView(a1,iX));
 		View view= getCurrentView();
 		if (view != null) {
 			changeFieldOfView(getFieldOfView(iX),view);
@@ -327,9 +329,9 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	public void setFieldOfView(FieldOfView value) {
 		fieldOfView= value;
 	}
-	public void getFieldOfView0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getFieldOfView0ff(ChoisePoint iX, PrologVariable result) {
 		FieldOfView value= getFieldOfView(iX);
-		a1.value= value.toTerm();
+		result.setNonBacktrackableValue(value.toTerm());
 	}
 	public void getFieldOfView0fs(ChoisePoint iX) {
 	}
@@ -338,14 +340,14 @@ public abstract class Canvas3D extends DataResourceConsumer {
 			return fieldOfView;
 		} else {
 			Term value= getBuiltInSlot_E_field_of_view();
-			return FieldOfView.termToFieldOfView(value,iX);
+			return FieldOfView.argumentToFieldOfView(value,iX);
 		}
 	}
 	//
 	// get/set frontClipDistance
 	//
 	public void setFrontClipDistance1s(ChoisePoint iX, Term a1) {
-		setFrontClipDistance(ClipDistance.termToClipDistance(a1,iX));
+		setFrontClipDistance(ClipDistance.argumentToClipDistance(a1,iX));
 		View view= getCurrentView();
 		if (view != null) {
 			changeFrontClipDistance(getFrontClipDistance(iX),view);
@@ -354,9 +356,9 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	public void setFrontClipDistance(ClipDistance value) {
 		frontClipDistance= value;
 	}
-	public void getFrontClipDistance0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getFrontClipDistance0ff(ChoisePoint iX, PrologVariable result) {
 		ClipDistance value= getFrontClipDistance(iX);
-		a1.value= value.toTerm();
+		result.setNonBacktrackableValue(value.toTerm());
 	}
 	public void getFrontClipDistance0fs(ChoisePoint iX) {
 	}
@@ -365,14 +367,14 @@ public abstract class Canvas3D extends DataResourceConsumer {
 			return frontClipDistance;
 		} else {
 			Term value= getBuiltInSlot_E_front_clip_distance();
-			return ClipDistance.termToClipDistance(value,iX);
+			return ClipDistance.argumentToClipDistance(value,iX);
 		}
 	}
 	//
 	// get/set backClipDistance
 	//
 	public void setBackClipDistance1s(ChoisePoint iX, Term a1) {
-		setBackClipDistance(ClipDistance.termToClipDistance(a1,iX));
+		setBackClipDistance(ClipDistance.argumentToClipDistance(a1,iX));
 		View view= getCurrentView();
 		if (view != null) {
 			changeBackClipDistance(getBackClipDistance(iX),view);
@@ -381,9 +383,9 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	public void setBackClipDistance(ClipDistance value) {
 		backClipDistance= value;
 	}
-	public void getBackClipDistance0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getBackClipDistance0ff(ChoisePoint iX, PrologVariable result) {
 		ClipDistance value= getBackClipDistance(iX);
-		a1.value= value.toTerm();
+		result.setNonBacktrackableValue(value.toTerm());
 	}
 	public void getBackClipDistance0fs(ChoisePoint iX) {
 	}
@@ -392,7 +394,7 @@ public abstract class Canvas3D extends DataResourceConsumer {
 			return backClipDistance;
 		} else {
 			Term value= getBuiltInSlot_E_back_clip_distance();
-			return ClipDistance.termToClipDistance(value,iX);
+			return ClipDistance.argumentToClipDistance(value,iX);
 		}
 	}
 	//
@@ -408,9 +410,9 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	public void setEnableDepthBufferFreezing(boolean value) {
 		enableDepthBufferFreezing= value;
 	}
-	public void getEnableDepthBufferFreezing0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getEnableDepthBufferFreezing0ff(ChoisePoint iX, PrologVariable result) {
 		boolean value= getEnableDepthBufferFreezing(iX);
-		a1.value= YesNo.boolean2TermYesNo(value);
+		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(value));
 	}
 	public void getEnableDepthBufferFreezing0fs(ChoisePoint iX) {
 	}
@@ -435,9 +437,9 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	public void setEnableLocalEyeLighting(boolean value) {
 		enableLocalEyeLighting= value;
 	}
-	public void getEnableLocalEyeLighting0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getEnableLocalEyeLighting0ff(ChoisePoint iX, PrologVariable result) {
 		boolean value= getEnableLocalEyeLighting(iX);
-		a1.value= YesNo.boolean2TermYesNo(value);
+		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(value));
 	}
 	public void getEnableLocalEyeLighting0fs(ChoisePoint iX) {
 	}
@@ -546,7 +548,7 @@ public abstract class Canvas3D extends DataResourceConsumer {
 				// GraphicsConfiguration config=
 				//	java.awt.GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getBestConfiguration(gct3D);
 				GraphicsConfiguration config= getGraphicsConfiguration(graphicWindow.getInternalFrame());
-				canvasSpace= new ExtendedSpace3D(this,config);
+				canvasSpace= new ExtendedSpace3D(null,this,config);
 				graphicWindow.safelyAdd(canvasSpace.getControl(),0);
 			} else {
 				return;
@@ -570,21 +572,25 @@ public abstract class Canvas3D extends DataResourceConsumer {
 			spin.addChild(specialBehavior);
 		};
 		if (simpleUniverse==null) {
-			simpleUniverse= new SimpleUniverse((javax.media.j3d.Canvas3D)canvasSpace.getControl(),0);
+			ExtendedSpace3D spece3D= (ExtendedSpace3D)canvasSpace;
+			javax.media.j3d.Canvas3D control= (javax.media.j3d.Canvas3D)spece3D.getControl();
+			simpleUniverse= new SimpleUniverse(control,0);
 			setViewAttributes(simpleUniverse,iX);
-			BranchGroup scene= Utils3D.termToBranchGroupOrNodeList(a1,this,simpleUniverse,(javax.media.j3d.Canvas3D)canvasSpace.getControl(),iX);
+			BranchGroup scene= Utils3D.argumentToBranchGroupOrNodeList(a1,this,simpleUniverse,control,iX);
 			scene.setCapability(BranchGroup.ALLOW_DETACH);
 			spin.setChild(scene,0);
 			BranchGroup branchGroup= new BranchGroup();
 			branchGroup.setCapability(BranchGroup.ALLOW_DETACH);
 			branchGroup.addChild(spin);
 			simpleUniverse.addBranchGraph(branchGroup);
+			spece3D.setUniverse(simpleUniverse);
+			simpleUniverse.addRenderingErrorListener(new OffScreenCanvas3DRenderingErrorListener());
 		} else {
 			releasePickCanvas();
 			// simpleUniverse.removeAllLocales();
 			// simpleUniverse.cleanup();
 			setViewAttributes(simpleUniverse,iX);
-			BranchGroup scene= Utils3D.termToBranchGroupOrNodeList(a1,this,simpleUniverse,(javax.media.j3d.Canvas3D)canvasSpace.getControl(),iX);
+			BranchGroup scene= Utils3D.argumentToBranchGroupOrNodeList(a1,this,simpleUniverse,(javax.media.j3d.Canvas3D)canvasSpace.getControl(),iX);
 			scene.setCapability(BranchGroup.ALLOW_DETACH);
 			spin.setChild(scene,0);
 		};
@@ -817,12 +823,12 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	///////////////////////////////////////////////////////////////
 	//
 	public void setNode2s(ChoisePoint iX, Term a1, Term a2) {
-		NodeLabel nodeLabel= NodeLabel.termToNodeLabel(a1,iX);
+		NodeLabel nodeLabel= NodeLabel.argumentToNodeLabel(a1,iX);
 		synchronized(this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
 				if (canvasSpace != null) {
-					BranchGroup newNode= PrincipalNode3D.termToBranchGroup(a2,this,simpleUniverse,(javax.media.j3d.Canvas3D)canvasSpace.getControl(),iX);
+					BranchGroup newNode= PrincipalNode3D.argumentToBranchGroup(a2,this,simpleUniverse,(javax.media.j3d.Canvas3D)canvasSpace.getControl(),iX);
 					Node parent= c.getParent();
 					if (parent != null && parent instanceof Group) {
 						Group group= (Group)parent;
@@ -839,11 +845,11 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	}
 	//
 	public void setTransform2s(ChoisePoint iX, Term a1, Term a2) {
-		NodeLabel nodeLabel= NodeLabel.termToNodeLabel(a1,iX);
+		NodeLabel nodeLabel= NodeLabel.argumentToNodeLabel(a1,iX);
 		synchronized(this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
-				Transform3D transform= PrincipalNode3D.termToTransform3D(a2,iX);
+				Transform3D transform= PrincipalNode3D.argumentToTransform3D(a2,iX);
 				c.setTransform(transform);
 			} else {
 				throw new WrongArgumentIsUnknownNodeLabel(a1);
@@ -852,11 +858,11 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	}
 	//
 	public void setTranslation2s(ChoisePoint iX, Term a1, Term a2) {
-		NodeLabel nodeLabel= NodeLabel.termToNodeLabel(a1,iX);
+		NodeLabel nodeLabel= NodeLabel.argumentToNodeLabel(a1,iX);
 		synchronized(this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
-				// Transform3D transform= PrincipalNode3D.termToTransform3D(a2,iX);
+				// Transform3D transform= PrincipalNode3D.argumentToTransform3D(a2,iX);
 				Vector3d vector= Tools3D.term2Vector3(a2,iX);
 				c.setTranslation(vector);
 			} else {
@@ -866,11 +872,11 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	}
 	//
 	public void setAppearance2s(ChoisePoint iX, Term a1, Term a2) {
-		NodeLabel nodeLabel= NodeLabel.termToNodeLabel(a1,iX);
+		NodeLabel nodeLabel= NodeLabel.argumentToNodeLabel(a1,iX);
 		synchronized(this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
-				Appearance appearance= AuxiliaryNode3D.termToAppearance(a2,this,iX);
+				Appearance appearance= AuxiliaryNode3D.argumentToAppearance(a2,this,iX);
 				c.setAppearance(appearance);
 			} else {
 				throw new WrongArgumentIsUnknownNodeLabel(a1);
@@ -879,11 +885,11 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	}
 	//
 	public void setColoringAttributes2s(ChoisePoint iX, Term a1, Term a2) {
-		NodeLabel nodeLabel= NodeLabel.termToNodeLabel(a1,iX);
+		NodeLabel nodeLabel= NodeLabel.argumentToNodeLabel(a1,iX);
 		synchronized(this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
-				ColoringAttributes coloringAttributes= AuxiliaryNode3D.termToColoringAttributes(a2,iX);
+				ColoringAttributes coloringAttributes= AuxiliaryNode3D.argumentToColoringAttributes(a2,iX);
 				c.setColoringAttributes(coloringAttributes);
 			} else {
 				throw new WrongArgumentIsUnknownNodeLabel(a1);
@@ -892,11 +898,11 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	}
 	//
 	public void setFont3D2s(ChoisePoint iX, Term a1, Term a2) {
-		NodeLabel nodeLabel= NodeLabel.termToNodeLabel(a1,iX);
+		NodeLabel nodeLabel= NodeLabel.argumentToNodeLabel(a1,iX);
 		synchronized(this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
-				Font3D font= AuxiliaryNode3D.termToFont3D(a2,iX);
+				Font3D font= AuxiliaryNode3D.argumentToFont3D(a2,iX);
 				c.setFont3D(font);
 			} else {
 				throw new WrongArgumentIsUnknownNodeLabel(a1);
@@ -905,7 +911,7 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	}
 	//
 	public void setString2s(ChoisePoint iX, Term a1, Term a2) {
-		NodeLabel nodeLabel= NodeLabel.termToNodeLabel(a1,iX);
+		NodeLabel nodeLabel= NodeLabel.argumentToNodeLabel(a1,iX);
 		synchronized(this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
@@ -979,33 +985,6 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	// protected boolean desktopDoesNotExist() {
-	//	MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
-	//	if (desktop==null) {
-	//		return true;
-	//	} else {
-	//		return false;
-	//	}
-	// }
-	// public boolean canvasSpaceDoesNotExist() {
-	//	synchronized(this) {
-	//		return (canvasSpace==null);
-	//	}
-	// }
-	// protected void createGraphicWindowIfNecessary(ChoisePoint iX, boolean enableMovingWindowToFront) {
-	//	synchronized(this) {
-	//		if (canvasSpaceDoesNotExist() && !controlIsInitialized.get()) {
-	//			DesktopUtils.createPaneIfNecessary(staticContext);
-	//			graphicWindow= createInternalFrameIfNecessary(iX,enableMovingWindowToFront);
-	//		} else if (graphicWindow != null) {
-	//			if (enableMovingWindowToFront) {
-	//				graphicWindow.safelyMoveToFront();
-	//			};
-	//			graphicWindow.safelySetVisible(true);
-	//		}
-	//	}
-	// }
-	//
 	protected InternalFrame3D createInternalFrameIfNecessary(ChoisePoint iX, boolean enableMovingWindowToFront) {
 		Map<AbstractWorld,InternalFrame3D> innerWindows= StaticAttributes3D.retrieveInnerWindows(staticContext);
 		InternalFrame3D graphicWindow= innerWindows.get(this);
@@ -1043,7 +1022,7 @@ public abstract class Canvas3D extends DataResourceConsumer {
 		//
 		internalFrame3D.safelyAddComponentListener(this);
 		//
-		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
+		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(staticContext);
 		desktop.safelyAdd(internalFrame3D.getInternalFrame());
 		//
 		canvasSpace= internalFrame3D.getCanvasSpace();
@@ -1066,10 +1045,10 @@ public abstract class Canvas3D extends DataResourceConsumer {
 	//	Term width= getBuiltInSlot_E_width().copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 	//	Term height= getBuiltInSlot_E_height().copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 	//	//
-	//	graphicWindow.logicalWidth.set(ExtendedSize.termToExtendedSize(width,iX));
-	//	graphicWindow.logicalHeight.set(ExtendedSize.termToExtendedSize(height,iX));
-	//	graphicWindow.logicalX.set(ExtendedCoordinate.termToExtendedCoordinate(x,iX));
-	//	graphicWindow.logicalY.set(ExtendedCoordinate.termToExtendedCoordinate(y,iX));
+	//	graphicWindow.logicalWidth.set(ExtendedSize.argumentToExtendedSize(width,iX));
+	//	graphicWindow.logicalHeight.set(ExtendedSize.argumentToExtendedSize(height,iX));
+	//	graphicWindow.logicalX.set(ExtendedCoordinate.argumentToExtendedCoordinate(x,iX));
+	//	graphicWindow.logicalY.set(ExtendedCoordinate.argumentToExtendedCoordinate(y,iX));
 	//	//
 	//	changeBackgroundColor(iX,getBuiltInSlot_E_background_color());
 	// }
@@ -1135,6 +1114,21 @@ public abstract class Canvas3D extends DataResourceConsumer {
 			};
 			current_object= current_object.getParent();
 		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void getImage1s(ChoisePoint iX, Term a1) {
+		createGraphicWindowIfNecessary(iX,false);
+		java.awt.image.BufferedImage bufferedImage= ((ExtendedSpace3D)canvasSpace).createBufferedImage();
+		modifyImage(a1,bufferedImage,iX);
+	}
+	public void getImage3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
+		int width= Converters.argumentToSmallInteger(a2,iX);
+		int height= Converters.argumentToSmallInteger(a3,iX);
+		createGraphicWindowIfNecessary(iX,false);
+		java.awt.image.BufferedImage bufferedImage= ((ExtendedSpace3D)canvasSpace).createBufferedImage(width,height);
+		modifyImage(a1,bufferedImage,iX);
 	}
 	//
 	///////////////////////////////////////////////////////////////

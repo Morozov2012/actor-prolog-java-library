@@ -26,12 +26,12 @@ public abstract class DataAbstraction extends CustomControl {
 	public String extension= null;
 	public TimeInterval transactionWaitingPeriod= null;
 	public TimeInterval transactionSleepPeriod= null;
-	public BigInteger transactionMaxRetryNumber= null;
+	public BigInteger transactionMaximalRetryNumber= null;
 	public Boolean watchUpdates= null;
 	//
 	protected double defaultTransactionWaitingPeriod= 10.0; // [sec]
 	protected double defaultTransactionSleepPeriod= 0.1; // [sec]
-	protected int defaultTransactionMaxRetryNumber= 1000;
+	protected int defaultTransactionMaximalRetryNumber= 1000;
 	//
 	public DataAbstraction() {
 	}
@@ -51,8 +51,8 @@ public abstract class DataAbstraction extends CustomControl {
 	protected Term getBuiltInSlot_E_transaction_sleep_period() {
 		return new PrologReal(defaultTransactionSleepPeriod);
 	}
-	protected Term getBuiltInSlot_E_transaction_max_retry_number() {
-		return new PrologInteger(defaultTransactionMaxRetryNumber);
+	protected Term getBuiltInSlot_E_transaction_maximal_retry_number() {
+		return new PrologInteger(defaultTransactionMaximalRetryNumber);
 	}
 	protected Term getBuiltInSlot_E_watch_updates() {
 		return termNo;
@@ -68,13 +68,13 @@ public abstract class DataAbstraction extends CustomControl {
 	public void setName1s(ChoisePoint iX, Term a1) {
 		boolean backslashAlwaysIsSeparator= getBackslashAlwaysIsSeparator(iX);
 		boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
-		setName(SimpleFileName.termToSimpleFileName(a1,backslashAlwaysIsSeparator,acceptOnlyURI,iX));
+		setName(SimpleFileName.argumentToSimpleFileName(a1,backslashAlwaysIsSeparator,acceptOnlyURI,iX));
 	}
 	public void setName(SimpleFileName value) {
 		name= value;
 	}
-	public void getName0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getName(iX).toTerm();
+	public void getName0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getName(iX).toTerm());
 	}
 	public void getName0fs(ChoisePoint iX) {
 	}
@@ -85,7 +85,7 @@ public abstract class DataAbstraction extends CustomControl {
 			Term value= getBuiltInSlot_E_name();
 			boolean backslashAlwaysIsSeparator= getBackslashAlwaysIsSeparator(iX);
 			boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
-			return SimpleFileName.termToSimpleFileName(value,backslashAlwaysIsSeparator,acceptOnlyURI,iX);
+			return SimpleFileName.argumentToSimpleFileName(value,backslashAlwaysIsSeparator,acceptOnlyURI,iX);
 		}
 	}
 	//
@@ -101,8 +101,8 @@ public abstract class DataAbstraction extends CustomControl {
 	public void setExtension(String value) {
 		extension= value;
 	}
-	public void getExtension0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= new PrologString(getExtension(iX));
+	public void getExtension0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(new PrologString(getExtension(iX)));
 	}
 	public void getExtension0fs(ChoisePoint iX) {
 	}
@@ -122,13 +122,13 @@ public abstract class DataAbstraction extends CustomControl {
 	// get/set transactionWaitingPeriod
 	//
 	public void setTransactionWaitingPeriod1s(ChoisePoint iX, Term a1) {
-		setTransactionWaitingPeriod(TimeInterval.termSecondsToTimeInterval(a1,iX));
+		setTransactionWaitingPeriod(TimeInterval.argumentSecondsToTimeInterval(a1,iX));
 	}
 	public void setTransactionWaitingPeriod(TimeInterval value) {
 		transactionWaitingPeriod= value;
 	}
-	public void getTransactionWaitingPeriod0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getTransactionWaitingPeriod(iX).toTerm();
+	public void getTransactionWaitingPeriod0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getTransactionWaitingPeriod(iX).toTerm());
 	}
 	public void getTransactionWaitingPeriod0fs(ChoisePoint iX) {
 	}
@@ -137,20 +137,20 @@ public abstract class DataAbstraction extends CustomControl {
 			return transactionWaitingPeriod;
 		} else {
 			Term value= getBuiltInSlot_E_transaction_waiting_period();
-			return TimeInterval.termSecondsToTimeInterval(value,iX);
+			return TimeInterval.argumentSecondsToTimeInterval(value,iX);
 		}
 	}
 	//
 	// get/set transactionSleepPeriod
 	//
 	public void setTransactionSleepPeriod1s(ChoisePoint iX, Term a1) {
-		setTransactionSleepPeriod(TimeInterval.termSecondsToTimeInterval(a1,iX));
+		setTransactionSleepPeriod(TimeInterval.argumentSecondsToTimeInterval(a1,iX));
 	}
 	public void setTransactionSleepPeriod(TimeInterval value) {
 		transactionSleepPeriod= value;
 	}
-	public void getTransactionSleepPeriod0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getTransactionSleepPeriod(iX).toTerm();
+	public void getTransactionSleepPeriod0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getTransactionSleepPeriod(iX).toTerm());
 	}
 	public void getTransactionSleepPeriod0fs(ChoisePoint iX) {
 	}
@@ -159,28 +159,28 @@ public abstract class DataAbstraction extends CustomControl {
 			return transactionSleepPeriod;
 		} else {
 			Term value= getBuiltInSlot_E_transaction_sleep_period();
-			return TimeInterval.termSecondsToTimeInterval(value,iX);
+			return TimeInterval.argumentSecondsToTimeInterval(value,iX);
 		}
 	}
 	//
-	// get/set transaction_max_retry_number
+	// get/set transaction_maximal_retry_number
 	//
-	public void setTransactionMaxRetryNumber1s(ChoisePoint iX, Term a1) {
-		setTransactionMaxRetryNumber(Converters.argumentToStrictInteger(a1,iX));
+	public void setTransactionMaximalRetryNumber1s(ChoisePoint iX, Term a1) {
+		setTransactionMaximalRetryNumber(Converters.argumentToStrictInteger(a1,iX));
 	}
-	public void setTransactionMaxRetryNumber(BigInteger value) {
-		transactionMaxRetryNumber= value;
+	public void setTransactionMaximalRetryNumber(BigInteger value) {
+		transactionMaximalRetryNumber= value;
 	}
-	public void getTransactionMaxRetryNumber0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= new PrologInteger(getTransactionMaxRetryNumber(iX));
+	public void getTransactionMaximalRetryNumber0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(new PrologInteger(getTransactionMaximalRetryNumber(iX)));
 	}
-	public void getTransactionMaxRetryNumber0fs(ChoisePoint iX) {
+	public void getTransactionMaximalRetryNumber0fs(ChoisePoint iX) {
 	}
-	public BigInteger getTransactionMaxRetryNumber(ChoisePoint iX) {
-		if (transactionMaxRetryNumber != null) {
-			return transactionMaxRetryNumber;
+	public BigInteger getTransactionMaximalRetryNumber(ChoisePoint iX) {
+		if (transactionMaximalRetryNumber != null) {
+			return transactionMaximalRetryNumber;
 		} else {
-			Term value= getBuiltInSlot_E_transaction_max_retry_number();
+			Term value= getBuiltInSlot_E_transaction_maximal_retry_number();
 			return Converters.argumentToStrictInteger(value,iX);
 		}
 	}
@@ -194,8 +194,8 @@ public abstract class DataAbstraction extends CustomControl {
 	public void setWatchUpdates(boolean value) {
 		watchUpdates= value;
 	}
-	public void getWatchUpdates0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= YesNo.boolean2TermYesNo(getWatchUpdates(iX));
+	public void getWatchUpdates0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getWatchUpdates(iX)));
 	}
 	public void getWatchUpdates0fs(ChoisePoint iX) {
 	}
@@ -217,7 +217,7 @@ public abstract class DataAbstraction extends CustomControl {
 	protected RelativeFileName retrieveRelativeGlobalFileName(Term value, ChoisePoint iX) {
 		boolean backslashAlwaysIsSeparator= getBackslashAlwaysIsSeparator(iX);
 		boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
-		SimpleFileName fileName= SimpleFileName.termToSimpleFileName(value,backslashAlwaysIsSeparator,acceptOnlyURI,iX);
+		SimpleFileName fileName= SimpleFileName.argumentToSimpleFileName(value,backslashAlwaysIsSeparator,acceptOnlyURI,iX);
 		return fileName.formRelativeFileName(true,getExtension(iX));
 	}
 	//
@@ -229,14 +229,14 @@ public abstract class DataAbstraction extends CustomControl {
 		boolean backslashAlwaysIsSeparator= getBackslashAlwaysIsSeparator(iX);
 		boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
 		// ExtendedFileName baseResource= retrieveRealGlobalFileName(iX);
-		SimpleFileName fileName= SimpleFileName.termToSimpleFileName(value,backslashAlwaysIsSeparator,acceptOnlyURI,iX);
+		SimpleFileName fileName= SimpleFileName.argumentToSimpleFileName(value,backslashAlwaysIsSeparator,acceptOnlyURI,iX);
 		return fileName.formRealFileNameBasedOnPath(false,true,getExtension(iX),currentDirectory,staticContext);
 	}
 	protected ExtendedFileName retrieveRealGlobalFileName(String value, ChoisePoint iX) {
 		boolean backslashAlwaysIsSeparator= getBackslashAlwaysIsSeparator(iX);
 		boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
 		// ExtendedFileName baseResource= retrieveRealGlobalFileName(iX);
-		SimpleFileName fileName= SimpleFileName.termToSimpleFileName(value,backslashAlwaysIsSeparator,acceptOnlyURI);
+		SimpleFileName fileName= SimpleFileName.argumentToSimpleFileName(value,backslashAlwaysIsSeparator,acceptOnlyURI);
 		return fileName.formRealFileNameBasedOnPath(false,false,"",currentDirectory,staticContext);
 	}
 	//
@@ -248,7 +248,7 @@ public abstract class DataAbstraction extends CustomControl {
 		boolean backslashAlwaysIsSeparator= getBackslashAlwaysIsSeparator(iX);
 		boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
 		// ExtendedFileName baseResource= retrieveRealGlobalFileName(iX);
-		SimpleFileName fileName= SimpleFileName.termToSimpleFileName(value,backslashAlwaysIsSeparator,acceptOnlyURI,iX);
+		SimpleFileName fileName= SimpleFileName.argumentToSimpleFileName(value,backslashAlwaysIsSeparator,acceptOnlyURI,iX);
 		return fileName.formRealFileNameBasedOnPath(true,true,getExtension(iX),currentDirectory,staticContext);
 	}
 	//
@@ -260,7 +260,7 @@ public abstract class DataAbstraction extends CustomControl {
 		boolean backslashAlwaysIsSeparator= getBackslashAlwaysIsSeparator(iX);
 		boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
 		// ExtendedFileName baseResource= retrieveRealGlobalFileName(iX);
-		SimpleFileName fileName= SimpleFileName.termToSimpleFileName(value,backslashAlwaysIsSeparator,acceptOnlyURI,iX);
+		SimpleFileName fileName= SimpleFileName.argumentToSimpleFileName(value,backslashAlwaysIsSeparator,acceptOnlyURI,iX);
 		return fileName.formRealFileNameBasedOnPath(true,false,getExtension(iX),currentDirectory,staticContext);
 	}
 	//
@@ -275,9 +275,9 @@ public abstract class DataAbstraction extends CustomControl {
 		currentDirectory= fileName.setCurrentDirectory();
 	}
 	//
-	public void getCurrentDirectory0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getCurrentDirectory0ff(ChoisePoint iX, PrologVariable result) {
 		String textName= ExtendedFileName.getCurrentDirectory(currentDirectory);
-		a1.value= new PrologString(textName);
+		result.setNonBacktrackableValue(new PrologString(textName));
 	}
 	public void getCurrentDirectory0fs(ChoisePoint iX) {
 	}
@@ -293,17 +293,18 @@ public abstract class DataAbstraction extends CustomControl {
 		fileName.makeDirectory();
 	}
 	//
-	public void listDirectory0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= ExtendedFileName.listDirectory(currentDirectory,null);
+	public void listDirectory0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(ExtendedFileName.listDirectory(currentDirectory));
 	}
 	public void listDirectory0fs(ChoisePoint iX) {
 	}
-	public void listDirectory1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
+	public void listDirectory1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		boolean backslashAlwaysIsSeparator= getBackslashAlwaysIsSeparator(iX);
 		try {
-			String mask= a2.getStringValue(iX);
-			a1.value= ExtendedFileName.listDirectory(currentDirectory,mask);
+			String mask= a1.getStringValue(iX);
+			result.setNonBacktrackableValue(ExtendedFileName.listDirectory(currentDirectory,mask,backslashAlwaysIsSeparator));
 		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a2);
+			throw new WrongArgumentIsNotAString(a1);
 		}
 	}
 	public void listDirectory1fs(ChoisePoint iX, Term a1) {
@@ -311,28 +312,28 @@ public abstract class DataAbstraction extends CustomControl {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void getFullName0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getFullName0ff(ChoisePoint iX, PrologVariable result) {
 		ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
-		a1.value= fileName.toFullName();
+		result.setNonBacktrackableValue(fileName.toFullName());
 	}
 	public void getFullName0fs(ChoisePoint iX) {
 	}
-	public void getFullName1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
-		ExtendedFileName fileName= retrieveRealGlobalFileName(a2,iX);
-		a1.value= fileName.toFullName();
+	public void getFullName1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		ExtendedFileName fileName= retrieveRealGlobalFileName(a1,iX);
+		result.setNonBacktrackableValue(fileName.toFullName());
 	}
 	public void getFullName1fs(ChoisePoint iX, Term a1) {
 	}
 	//
-	public void getURL0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getURL0ff(ChoisePoint iX, PrologVariable result) {
 		ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
-		a1.value= fileName.toURL();
+		result.setNonBacktrackableValue(fileName.toURL());
 	}
 	public void getURL0fs(ChoisePoint iX) {
 	}
-	public void getURL1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
-		ExtendedFileName fileName= retrieveRealGlobalFileName(a2,iX);
-		a1.value= fileName.toURL();
+	public void getURL1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		ExtendedFileName fileName= retrieveRealGlobalFileName(a1,iX);
+		result.setNonBacktrackableValue(fileName.toURL());
 	}
 	public void getURL1fs(ChoisePoint iX, Term a1) {
 	}
@@ -360,14 +361,16 @@ public abstract class DataAbstraction extends CustomControl {
 	public void replaceExtension1ff(ChoisePoint iX, PrologVariable result, Term a1) {
 		RelativeFileName fileName= retrieveRelativeGlobalFileName(iX);
 		String newExtension= Converters.argumentToString(a1,iX);
-		result.value= fileName.replaceFileExtension(newExtension);
+		result.setNonBacktrackableValue(fileName.replaceFileExtension(newExtension));
+		// iX.pushTrail(result);
 	}
 	public void replaceExtension1fs(ChoisePoint iX, Term a1) {
 	}
 	public void replaceExtension2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
 		RelativeFileName fileName= retrieveRelativeGlobalFileName(a1,iX);
 		String newExtension= Converters.argumentToString(a2,iX);
-		result.value= fileName.replaceFileExtension(newExtension);
+		result.setNonBacktrackableValue(fileName.replaceFileExtension(newExtension));
+		// iX.pushTrail(result);
 	}
 	public void replaceExtension2fs(ChoisePoint iX, Term a1, Term a2) {
 	}
@@ -377,7 +380,7 @@ public abstract class DataAbstraction extends CustomControl {
 	public void doesExist0s(ChoisePoint iX) throws Backtracking {
 		try {
 			ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
-			int timeout= getMaxWaitingTimeInMilliseconds(iX);
+			int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 			CharacterSet characterSet= getCharacterSet(iX);
 			fileName.doesExist(timeout,characterSet,staticContext);
 		} catch (Throwable e) {
@@ -387,7 +390,7 @@ public abstract class DataAbstraction extends CustomControl {
 	public void doesExist1s(ChoisePoint iX, Term a1) throws Backtracking {
 		try {
 			ExtendedFileName fileName= retrieveRealGlobalFileName(a1,iX);
-			int timeout= getMaxWaitingTimeInMilliseconds(iX);
+			int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 			CharacterSet characterSet= getCharacterSet(iX);
 			fileName.doesExist(timeout,characterSet,staticContext);
 		} catch (Throwable e) {

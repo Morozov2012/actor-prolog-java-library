@@ -41,7 +41,7 @@ public enum WindowMode {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static WindowMode termToWindowMode(Term value, ChoisePoint iX) {
+	public static WindowMode argumentToWindowMode(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_invisible) {

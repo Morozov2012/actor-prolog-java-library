@@ -126,6 +126,47 @@
 @cd ..
 @cd ..
 @cd ..
+@cd morozov\system\ffmpeg
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\ffmpeg\converters
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\ffmpeg\converters\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\ffmpeg\converters\signals
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\ffmpeg\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
 @cd morozov\system\files
 @dir /b *.java > dir.txt
 @javac -Xlint:fallthrough @dir.txt
@@ -348,6 +389,216 @@
 @cd ..
 @cd ..
 @cd ..
+@cd morozov\system\kinect
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\converters
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\converters\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\converters\interfaces
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\frames
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\frames\data
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\frames\data\converters
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\frames\data\converters\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\frames\data\converters\signals
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\frames\data\interfaces
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\frames\data\tools
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\frames\interfaces
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\frames\text
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\frames\tools
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\frames\tools\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\interfaces
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\modes
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\modes\converters
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\modes\converters\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\modes\interfaces
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\modes\interfaces\signals
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\kinect\modes\tools
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
 @cd morozov\system\datum
 @dir /b *.java > dir.txt
 @javac -Xlint:fallthrough @dir.txt
@@ -385,10 +636,114 @@
 @cd ..
 @cd ..
 @cd ..
-@cd morozov\system\vision\errors
+@cd morozov\system\vision\plain
 @dir /b *.java > dir.txt
 @javac -Xlint:fallthrough @dir.txt
 @erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\vision\plain\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\vision\vpm
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\vision\vpm\commands
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\vision\vpm\commands\blb
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\vision\vpm\commands\img
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\vision\vpm\commands\msk
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\vision\vpm\commands\pxl
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\vision\vpm\commands\trk
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\vision\vpm\converters
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\vision\vpm\converters\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd morozov\system\vision\vpm\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
 @cd ..
 @cd ..
 @cd ..

@@ -11,6 +11,7 @@ import morozov.system.gui.*;
 import morozov.system.gui.space2d.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
+import morozov.terms.errors.*;
 import morozov.terms.signals.*;
 
 import java.awt.Color;
@@ -48,7 +49,7 @@ public class BrushAttributes {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static BrushAttributes termToBrushAttributes(Term value, Canvas2D targetWorld, ChoisePoint iX) {
+	public static BrushAttributes argumentToBrushAttributes(Term value, Canvas2D targetWorld, ChoisePoint iX) {
 		try { // on, off
 			try {
 				long code= value.getSymbolValue(iX);
@@ -81,7 +82,7 @@ public class BrushAttributes {
 		} catch (Backtracking b6) {
 		try { // Color
 			try {
-				Color color= ExtendedColor.termToColor(value,iX);
+				Color color= ExtendedColor.argumentToColor(value,iX);
 				return new BrushAttributes(color);
 			} catch (TermIsSymbolDefault b7) {
 				throw Backtracking.instance;
@@ -119,19 +120,19 @@ public class BrushAttributes {
 				if (pairName==SymbolCodes.symbolCode_E_isCyclic) {
 					isCyclic= YesNo.termYesNo2Boolean(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_point1) {
-					p1= Tools2D.termToPoint2D(pairValue,iX);
+					p1= Tools2D.argumentToPoint2D(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_point2) {
-					p2= Tools2D.termToPoint2D(pairValue,iX);
+					p2= Tools2D.argumentToPoint2D(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_color1) {
 					try {
-						color1= ExtendedColor.termToColor(pairValue,iX);
+						color1= ExtendedColor.argumentToColor(pairValue,iX);
 					} catch (TermIsSymbolDefault e1) {
 						// throw new WrongArgumentIsNotAColor(pairValue);
 						color1= Color.WHITE; // Actor Prolog default value
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_color2) {
 					try {
-						color2= ExtendedColor.termToColor(pairValue,iX);
+						color2= ExtendedColor.argumentToColor(pairValue,iX);
 					} catch (TermIsSymbolDefault e2) {
 						// throw new WrongArgumentIsNotAColor(pairValue);
 						color2= Color.BLACK; // Actor Prolog default value
@@ -154,7 +155,7 @@ public class BrushAttributes {
 			};
 			return new GradientPaint(p1,color1,p2,color2,isCyclic);
 		} else {
-			throw new WrongArgumentIsNotGradientPaintAttributes(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
@@ -177,19 +178,19 @@ public class BrushAttributes {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_point1) {
-					p1= Tools2D.termToPoint2D(pairValue,iX);
+					p1= Tools2D.argumentToPoint2D(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_point2) {
-					p2= Tools2D.termToPoint2D(pairValue,iX);
+					p2= Tools2D.argumentToPoint2D(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_fractions) {
-					fractions= Tools2D.termToFractions(pairValue,iX);
+					fractions= Tools2D.argumentToFractions(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_colors) {
-					colors= Tools2D.termToColors(pairValue,iX);
+					colors= Tools2D.argumentToGradientColors(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_cycleMethod) {
-					cycleMethod= Tools2D.termToCycleMethod(pairValue,iX);
+					cycleMethod= Tools2D.argumentToCycleMethod(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_colorSpace) {
-					colorSpace= Tools2D.termToColorSpaceType(pairValue,iX);
+					colorSpace= Tools2D.argumentToColorSpaceType(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_gradientTransform) {
-					gradientTransform= Tools2D.termToTransform2D(pairValue,iX);
+					gradientTransform= Tools2D.argumentToTransform2D(pairValue,iX);
 				} else {
 					throw new WrongArgumentIsUnknownLinearGradientPaintAttribute(key);
 				}
@@ -220,7 +221,7 @@ public class BrushAttributes {
 				return new LinearGradientPaint(p1,p2,fractions,colors,cycleMethod,colorSpace,gradientTransform);
 			}
 		} else {
-			throw new WrongArgumentIsNotLinearGradientPaintAttributes(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
@@ -244,21 +245,21 @@ public class BrushAttributes {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_center) {
-					center= Tools2D.termToPoint2D(pairValue,iX);
+					center= Tools2D.argumentToPoint2D(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_radius) {
 					radius= (float)Converters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_focus) {
-					focus= Tools2D.termToPoint2D(pairValue,iX);
+					focus= Tools2D.argumentToPoint2D(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_fractions) {
-					fractions= Tools2D.termToFractions(pairValue,iX);
+					fractions= Tools2D.argumentToFractions(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_colors) {
-					colors= Tools2D.termToColors(pairValue,iX);
+					colors= Tools2D.argumentToGradientColors(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_cycleMethod) {
-					cycleMethod= Tools2D.termToCycleMethod(pairValue,iX);
+					cycleMethod= Tools2D.argumentToCycleMethod(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_colorSpace) {
-					colorSpace= Tools2D.termToColorSpaceType(pairValue,iX);
+					colorSpace= Tools2D.argumentToColorSpaceType(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_gradientTransform) {
-					gradientTransform= Tools2D.termToTransform2D(pairValue,iX);
+					gradientTransform= Tools2D.argumentToTransform2D(pairValue,iX);
 				} else {
 					throw new WrongArgumentIsUnknownRadialGradientPaintAttribute(key);
 				}
@@ -289,7 +290,7 @@ public class BrushAttributes {
 				return new RadialGradientPaint(center,radius,focus,fractions,colors,cycleMethod,colorSpace,gradientTransform);
 			}
 		} else {
-			throw new WrongArgumentIsNotRadialGradientPaintAttributes(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
@@ -311,7 +312,7 @@ public class BrushAttributes {
 				if (pairName==SymbolCodes.symbolCode_E_image) {
 					image= targetWorld.readImage(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_anchor) {
-					anchor= Tools2D.termToPoint2D(pairValue,iX);
+					anchor= Tools2D.argumentToPoint2D(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_width) {
 					width= Converters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_height) {
@@ -340,7 +341,7 @@ public class BrushAttributes {
 			};
 			return new TexturePaint(image,new Rectangle2D.Double(x1,y1,width,height));
 		} else {
-			throw new WrongArgumentIsNotTexturePaintAttributes(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 }

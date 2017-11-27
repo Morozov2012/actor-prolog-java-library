@@ -34,8 +34,9 @@ public class PrologList extends Term {
 				nextItem= nextList.tail; // .dereferenceValue(cp);
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 				} else {
 					return result;
 				}
@@ -211,8 +212,9 @@ public class PrologList extends Term {
 				nextItem= nextList.tail; // .dereferenceValue(cp);
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 				} else {
 					throw new WrongArgumentIsNotConstructorArgument(nextList);
 				}
@@ -234,8 +236,9 @@ public class PrologList extends Term {
 				nextItem= nextList.tail; // .dereferenceValue(cp);
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 				} else {
 					// throw new WrongArgumentIsNotConstructorArgument(nextList);
 					return;
@@ -262,8 +265,9 @@ public class PrologList extends Term {
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 					continue;
 				} else {
 					createdList.tail= PrologUnknownValue.instance;
@@ -353,8 +357,9 @@ public class PrologList extends Term {
 				nextItem= nextList.tail; // .dereferenceValue(cp);
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
 				}
@@ -376,8 +381,9 @@ public class PrologList extends Term {
 				nextItem= nextList.tail; // .dereferenceValue(cp);
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
 				}
@@ -399,8 +405,9 @@ public class PrologList extends Term {
 				nextItem= nextList.tail; // .dereferenceValue(cp);
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
 				}
@@ -422,8 +429,9 @@ public class PrologList extends Term {
 				nextItem= nextList.tail; // .dereferenceValue(cp);
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
 				}
@@ -445,8 +453,9 @@ public class PrologList extends Term {
 				nextItem= nextList.tail; // .dereferenceValue(cp);
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
 				}
@@ -468,8 +477,9 @@ public class PrologList extends Term {
 				nextItem= nextList.tail; // .dereferenceValue(cp);
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
 				}
@@ -491,8 +501,9 @@ public class PrologList extends Term {
 				nextItem= nextList.tail; // .dereferenceValue(cp);
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
 				}
@@ -514,8 +525,9 @@ public class PrologList extends Term {
 				nextItem= nextList.tail; // .dereferenceValue(cp);
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
 				}
@@ -537,8 +549,9 @@ public class PrologList extends Term {
 				nextItem= nextList.tail; // .dereferenceValue(cp);
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
 				}
@@ -560,8 +573,9 @@ public class PrologList extends Term {
 				nextItem= nextList.tail; // .dereferenceValue(cp);
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
 				}
@@ -583,8 +597,9 @@ public class PrologList extends Term {
 				nextItem= nextList.tail; // .dereferenceValue(cp);
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
 				}
@@ -659,8 +674,9 @@ public class PrologList extends Term {
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 					continue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
@@ -687,8 +703,9 @@ public class PrologList extends Term {
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 					continue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
@@ -715,8 +732,9 @@ public class PrologList extends Term {
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 					continue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
@@ -743,8 +761,9 @@ public class PrologList extends Term {
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 					continue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
@@ -771,8 +790,9 @@ public class PrologList extends Term {
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 					continue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
@@ -799,8 +819,9 @@ public class PrologList extends Term {
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 					continue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
@@ -827,8 +848,9 @@ public class PrologList extends Term {
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 					continue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
@@ -855,8 +877,9 @@ public class PrologList extends Term {
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 					continue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
@@ -883,8 +906,9 @@ public class PrologList extends Term {
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 					continue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
@@ -911,8 +935,9 @@ public class PrologList extends Term {
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 					continue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
@@ -939,8 +964,9 @@ public class PrologList extends Term {
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 					continue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
@@ -967,8 +993,9 @@ public class PrologList extends Term {
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 					continue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
@@ -1006,8 +1033,9 @@ public class PrologList extends Term {
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 					continue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
@@ -1034,8 +1062,9 @@ public class PrologList extends Term {
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 					continue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
@@ -1062,8 +1091,9 @@ public class PrologList extends Term {
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 					continue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
@@ -1090,8 +1120,9 @@ public class PrologList extends Term {
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 					continue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
@@ -1118,8 +1149,9 @@ public class PrologList extends Term {
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 					continue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
@@ -1146,8 +1178,9 @@ public class PrologList extends Term {
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 					continue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);
@@ -1182,8 +1215,9 @@ public class PrologList extends Term {
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
-				if (nextList.value != null) {
-					nextItem= nextList.value;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
 					continue;
 				} else {
 					throw new WrongArgumentIsNotBoundVariable(nextList);

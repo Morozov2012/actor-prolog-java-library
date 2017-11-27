@@ -73,7 +73,6 @@ public class ForeignWorldWrapper extends AbstractWorld {
 	///////////////////////////////////////////////////////////////
 	//
 	protected long changeSignatureNumber(long domainSignatureNumber) {
-		//
 		Long externalSignatureNumber= signatureMap.get(domainSignatureNumber);
 		if (externalSignatureNumber==null) {
 			MethodSignature signature= MethodSignatures.getSignature(domainSignatureNumber);
@@ -174,10 +173,4 @@ public class ForeignWorldWrapper extends AbstractWorld {
 	public boolean isNumberOfTemporaryActor() {
 		return false;
 	}
-	//
-	///////////////////////////////////////////////////////////////
-	//
-	// private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-	//	stream.defaultReadObject();
-	// }
 }

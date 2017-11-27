@@ -54,6 +54,7 @@ public class LayoutUtils {
 		};
 		return new Insets(topBorder,leftBorder,bottomBorder,rightBorder);
 	}
+	//
 	public static Dimension computeDimension(Font font, Component component, double width, double height) {
 		FontMetrics metrics= component.getFontMetrics(font);
 		int charWidth= metrics.charWidth('M');
@@ -63,7 +64,6 @@ public class LayoutUtils {
 		Rectangle rectangle= layout.getPixelBounds(null,0,0);
 		double charHeight= rectangle.getHeight();
 		int currentHeight= PrologInteger.toInteger(height*charHeight);
-		// scalableIcon.setSize(currentWidth,currentHeight);
 		Dimension dimension= new Dimension(currentWidth,currentHeight);
 		return dimension;
 	}

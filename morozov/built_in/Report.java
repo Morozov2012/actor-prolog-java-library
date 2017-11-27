@@ -34,7 +34,7 @@ public abstract class Report extends Text {
 	//
 	// There are values of slots:
 	//
-	protected AtomicReference<ExtendedMaxLineNumber> maxLineNumber= new AtomicReference<>();
+	protected AtomicReference<ExtendedMaximalLineNumber> maximalLineNumber= new AtomicReference<>();
 	protected AtomicReference<Boolean> areaType= new AtomicReference<>(); // Is Console Text Window
 	//
 	// There are attributes of the real graphic image:
@@ -73,7 +73,7 @@ public abstract class Report extends Text {
 	// abstract protected Term getBuiltInSlot_E_width();
 	// abstract protected Term getBuiltInSlot_E_height();
 	// abstract protected Term getBuiltInSlot_E_background_color();
-	abstract protected Term getBuiltInSlot_E_max_line_number();
+	abstract protected Term getBuiltInSlot_E_maximal_line_number();
 	abstract protected Term getBuiltInSlot_E_area_type();
 	//
 	abstract public long entry_s_Action_1_i();
@@ -83,40 +83,40 @@ public abstract class Report extends Text {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	// get/set maxLineNumber
+	// get/set maximalLineNumber
 	//
-	public void setMaxLineNumber1s(ChoisePoint iX, Term a1) {
-		setMaxLineNumber(ExtendedMaxLineNumber.termToExtendedMaxLineNumber(a1,iX));
+	public void setMaximalLineNumber1s(ChoisePoint iX, Term a1) {
+		setMaximalLineNumber(ExtendedMaximalLineNumber.argumentToExtendedMaximalLineNumber(a1,iX));
 	}
-	public void setMaxLineNumber(ExtendedMaxLineNumber value) {
-		maxLineNumber.set(value);
+	public void setMaximalLineNumber(ExtendedMaximalLineNumber value) {
+		maximalLineNumber.set(value);
 	}
-	public void getMaxLineNumber0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getMaxLineNumber(iX).toTerm();
+	public void getMaximalLineNumber0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getMaximalLineNumber(iX).toTerm());
 	}
-	public void getMaxLineNumber0fs(ChoisePoint iX) {
+	public void getMaximalLineNumber0fs(ChoisePoint iX) {
 	}
-	public ExtendedMaxLineNumber getMaxLineNumber(ChoisePoint iX) {
-		ExtendedMaxLineNumber number= maxLineNumber.get();
+	public ExtendedMaximalLineNumber getMaximalLineNumber(ChoisePoint iX) {
+		ExtendedMaximalLineNumber number= maximalLineNumber.get();
 		if (number != null) {
 			return number;
 		} else {
-			Term value= getBuiltInSlot_E_max_line_number();
-			return ExtendedMaxLineNumber.termToExtendedMaxLineNumberSafe(value,iX);
+			Term value= getBuiltInSlot_E_maximal_line_number();
+			return ExtendedMaximalLineNumber.argumentToExtendedMaximalLineNumberSafe(value,iX);
 		}
 	}
 	//
 	// get/set areaType
 	//
 	public void setAreaType1s(ChoisePoint iX, Term a1) {
-		setAreaType(ReportUtils.termToAreaType(a1,iX));
+		setAreaType(ReportUtils.argumentToAreaType(a1,iX));
 	}
 	public void setAreaType(boolean value) {
 		areaType.set(value);
 	}
-	public void getAreaType0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getAreaType0ff(ChoisePoint iX, PrologVariable result) {
 		boolean value= getAreaType(iX);
-		a1.value= ReportUtils.areaTypeToTerm(value);
+		result.setNonBacktrackableValue(ReportUtils.areaTypeToTerm(value));
 	}
 	public void getAreaType0fs(ChoisePoint iX) {
 	}
@@ -126,18 +126,18 @@ public abstract class Report extends Text {
 			return type;
 		} else {
 			Term value= getBuiltInSlot_E_area_type();
-			return ReportUtils.termToAreaTypeSafe(value,iX);
+			return ReportUtils.argumentToAreaTypeSafe(value,iX);
 		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
 	public void setColor1s(ChoisePoint iX, Term a1) {
-		setTextColor(ExtendedColor.termToExtendedColor(a1,iX));
+		setTextColor(ExtendedColor.argumentToExtendedColor(a1,iX));
 	}
 	public void setColor2s(ChoisePoint iX, Term a1, Term a2) {
-		ExtendedColor tColor= ExtendedColor.termToExtendedColor(a1,iX);
-		ExtendedColor sColor= ExtendedColor.termToExtendedColor(a2,iX);
+		ExtendedColor tColor= ExtendedColor.argumentToExtendedColor(a1,iX);
+		ExtendedColor sColor= ExtendedColor.argumentToExtendedColor(a2,iX);
 		setTextColor(tColor);
 		setSpaceColor(sColor);
 	}
@@ -158,16 +158,16 @@ public abstract class Report extends Text {
 	}
 	//
 	public void setFont2s(ChoisePoint iX, Term a1, Term a2) {
-		ExtendedFontName fName= ExtendedFontName.termToExtendedFontName(a1,iX);
-		ExtendedFontSize fSize= ExtendedFontSize.termToExtendedFontSize(a2,iX);
+		ExtendedFontName fName= ExtendedFontName.argumentToExtendedFontName(a1,iX);
+		ExtendedFontSize fSize= ExtendedFontSize.argumentToExtendedFontSize(a2,iX);
 		setFontName(fName);
 		setFontSize(fSize);
 		changeFont(iX);
 	}
 	public void setFont3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
-		ExtendedFontName fName= ExtendedFontName.termToExtendedFontName(a1,iX);
-		ExtendedFontSize fSize= ExtendedFontSize.termToExtendedFontSize(a2,iX);
-		ExtendedFontStyle fStyle= ExtendedFontStyle.termToExtendedFontStyle(a3,iX);
+		ExtendedFontName fName= ExtendedFontName.argumentToExtendedFontName(a1,iX);
+		ExtendedFontSize fSize= ExtendedFontSize.argumentToExtendedFontSize(a2,iX);
+		ExtendedFontStyle fStyle= ExtendedFontStyle.argumentToExtendedFontStyle(a3,iX);
 		setFontName(fName);
 		setFontSize(fSize);
 		setFontStyle(fStyle);
@@ -200,7 +200,7 @@ public abstract class Report extends Text {
 		} catch (UseDefaultFontName e1) {
 			try {
 				Term nameOfFont= DefaultOptions.textFontName;
-				name= ExtendedFontName.termToFontName(nameOfFont,iX);
+				name= ExtendedFontName.argumentToFontName(nameOfFont,iX);
 			} catch (TermIsSymbolDefault e2) {
 				name= defaultFontName;
 			}
@@ -215,7 +215,7 @@ public abstract class Report extends Text {
 		} catch (UseDefaultFontStyle e1) {
 			try {
 				Term styleOfFont= DefaultOptions.textFontStyle;
-				style= ExtendedFontStyle.termToFontStyleSafe(styleOfFont,iX);
+				style= ExtendedFontStyle.argumentToFontStyleSafe(styleOfFont,iX);
 				isUnderlined= ExtendedFontStyle.fontIsUnderlinedSafe(styleOfFont,iX);
 			} catch (TermIsSymbolDefault e2) {
 				style= defaultFontStyle;
@@ -247,7 +247,7 @@ public abstract class Report extends Text {
 				if (graphicWindow != null) {
 					try {
 						Term sizeOfFont= DefaultOptions.textFontSize;
-						size= ExtendedFontSize.termToFontSizeSafe(sizeOfFont,iX);
+						size= ExtendedFontSize.argumentToFontSizeSafe(sizeOfFont,iX);
 					} catch (TermIsSymbolDefault e2) {
 						size= defaultFontSize;
 					}
@@ -282,7 +282,7 @@ public abstract class Report extends Text {
 		}
 	}
 	//
-	public void getString0ff(ChoisePoint iX, PrologVariable text) {
+	public void getString0ff(ChoisePoint iX, PrologVariable result) {
 		synchronized(this) {
 			String content;
 			Document doc= ((ReportSpaceAttributes)spaceAttributes).getStyledDocument();
@@ -291,7 +291,7 @@ public abstract class Report extends Text {
 			} else {
 				content= "";
 			};
-			text.value= new PrologString(content);
+			result.setNonBacktrackableValue(new PrologString(content));
 		}
 	}
 	public void getString0fs(ChoisePoint iX) {
@@ -401,7 +401,7 @@ public abstract class Report extends Text {
 		internalTextFrame.safelySetStyledDocument(((ReportSpaceAttributes)spaceAttributes).getStyledDocument());
 		internalTextFrame.safelyAddComponentListener(this);
 		//
-		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
+		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(staticContext);
 		desktop.safelyAdd(internalTextFrame.getInternalFrame());
 		//
 		canvasSpace= internalTextFrame.getCanvasSpace();
@@ -451,8 +451,8 @@ public abstract class Report extends Text {
 					safelyInsertString(doc,textBuffer.toString(),transparentTextAttributes);
 				};
 				try {
-					long maxLineNumber= getMaxLineNumber(iX).getValue();
-					safelyRemoveSuperfluousLines(maxLineNumber,doc);
+					long maximalLineNumber= getMaximalLineNumber(iX).getValue();
+					safelyRemoveSuperfluousLines(maximalLineNumber,doc);
 				} catch (UseWindowHeight e) {
 					if (canvasSpace != null) {
 						synchronized(canvasSpace) {
@@ -579,16 +579,16 @@ public abstract class Report extends Text {
 		}
 	}
 	//
-	protected void safelyRemoveSuperfluousLines(final long maxLineNumber, final Document doc) {
+	protected void safelyRemoveSuperfluousLines(final long maximalLineNumber, final Document doc) {
 		if (EventQueue.isDispatchThread()) {
-			removeSuperfluousLines(maxLineNumber,doc);
+			removeSuperfluousLines(maximalLineNumber,doc);
 		} else {
 			try {
 				// waitForIdle();
 				EventQueue.invokeAndWait(
 					new Runnable() {
 						public void run() {
-							removeSuperfluousLines(maxLineNumber,doc);
+							removeSuperfluousLines(maximalLineNumber,doc);
 						}
 					});
 			} catch (InterruptedException e) {
@@ -596,12 +596,12 @@ public abstract class Report extends Text {
 			}
 		}
 	}
-	protected void removeSuperfluousLines(long maxLineNumber, Document doc) {
+	protected void removeSuperfluousLines(long maximalLineNumber, Document doc) {
 		try {
 			String plainText= doc.getText(0,doc.getLength());
 			long numberOfLines= ReportUtils.calculate_number_of_lines(plainText);
-			if (numberOfLines > maxLineNumber) {
-				long endPosition= ReportUtils.calculate_position_of_line_end(plainText,maxLineNumber);
+			if (numberOfLines > maximalLineNumber) {
+				long endPosition= ReportUtils.calculate_position_of_line_end(plainText,maximalLineNumber);
 				doc.remove(0,(int)endPosition+1);
 			}
 		} catch (BadLocationException e) {

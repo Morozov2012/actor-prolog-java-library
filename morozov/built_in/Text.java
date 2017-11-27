@@ -31,8 +31,8 @@ public abstract class Text extends SymbolicInformation {
 		}
 	}
 	//
-	public void getString0ff(ChoisePoint iX, PrologVariable outputText) {
-		outputText.value= new PrologString(textString.toString());
+	public void getString0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(new PrologString(textString.toString()));
 	}
 	public void getString0fs(ChoisePoint iX) {
 	}

@@ -49,14 +49,14 @@ public abstract class BufferedImage extends BufferedImageController {
 	// get/set imageType
 	//
 	public void setImageType1s(ChoisePoint iX, Term a1) {
-		setImageType(Tools2D.termToBufferedImageType(a1,iX));
+		setImageType(Tools2D.argumentToBufferedImageType(a1,iX));
 	}
 	public void setImageType(int value) {
 		imageType= value;
 	}
-	public void getImageType0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getImageType0ff(ChoisePoint iX, PrologVariable result) {
 		int value= getImageType(iX);
-		a1.value= Tools2D.bufferedImageTypeToTerm(value);
+		result.setNonBacktrackableValue(Tools2D.bufferedImageTypeToTerm(value));
 	}
 	public void getImageType0fs(ChoisePoint iX) {
 	}
@@ -65,21 +65,21 @@ public abstract class BufferedImage extends BufferedImageController {
 			return imageType;
 		} else {
 			Term value= getBuiltInSlot_E_image_type();
-			return Tools2D.termToBufferedImageType(value,iX);
+			return Tools2D.argumentToBufferedImageType(value,iX);
 		}
 	}
 	//
 	// get/set imageTransparency
 	//
 	public void setImageTransparency1s(ChoisePoint iX, Term a1) {
-		setImageTransparency(Tools2D.termToImageTransparency(a1,iX));
+		setImageTransparency(Tools2D.argumentToImageTransparency(a1,iX));
 	}
 	public void setImageTransparency(int value) {
 		imageTransparency= value;
 	}
-	public void getImageTransparency0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getImageTransparency0ff(ChoisePoint iX, PrologVariable result) {
 		int value= getImageTransparency(iX);
-		a1.value= Tools2D.imageTransparencyToTerm(value);
+		result.setNonBacktrackableValue(Tools2D.imageTransparencyToTerm(value));
 	}
 	public void getImageTransparency0fs(ChoisePoint iX) {
 	}
@@ -88,7 +88,7 @@ public abstract class BufferedImage extends BufferedImageController {
 			return imageTransparency;
 		} else {
 			Term value= getBuiltInSlot_E_image_transparency();
-			return Tools2D.termToImageTransparency(value,iX);
+			return Tools2D.argumentToImageTransparency(value,iX);
 		}
 	}
 	//
@@ -104,9 +104,9 @@ public abstract class BufferedImage extends BufferedImageController {
 		createImage(a1,a2,a3,iX);
 	}
 	protected java.awt.image.BufferedImage createImage(Term a1, Term a2, Term a3, ChoisePoint iX) {
-		ExtendedSize eWidth= ExtendedSize.termToExtendedSize(a1,iX);
-		ExtendedSize eHeight= ExtendedSize.termToExtendedSize(a2,iX);
-		int imageType= Tools2D.termToBufferedImageType(a3,iX);
+		ExtendedSize eWidth= ExtendedSize.argumentToExtendedSize(a1,iX);
+		ExtendedSize eHeight= ExtendedSize.argumentToExtendedSize(a2,iX);
+		int imageType= Tools2D.argumentToBufferedImageType(a3,iX);
 		return createImage(eWidth,eHeight,imageType,iX);
 	}
 	protected java.awt.image.BufferedImage createImage(ExtendedSize eWidth, ExtendedSize eHeight, int imageType, ChoisePoint iX) {
@@ -176,8 +176,8 @@ public abstract class BufferedImage extends BufferedImageController {
 	}
 	//
 	public void setActualSize2s(ChoisePoint iX, Term a1, Term a2) {
-		ExtendedSize eWidth= ExtendedSize.termToExtendedSize(a1,iX);
-		ExtendedSize eHeight= ExtendedSize.termToExtendedSize(a2,iX);
+		ExtendedSize eWidth= ExtendedSize.argumentToExtendedSize(a1,iX);
+		ExtendedSize eHeight= ExtendedSize.argumentToExtendedSize(a2,iX);
 		java.awt.image.BufferedImage image= bufferedImage.get();
 		if (image != null) {
 			int givenWidth= computeWidth(eWidth,iX);
@@ -204,8 +204,11 @@ public abstract class BufferedImage extends BufferedImageController {
 					newImage= new java.awt.image.BufferedImage(givenWidth,givenHeight,imageType);
 				};
 				Graphics2D g2= newImage.createGraphics();
-				g2.drawImage(image,0,0,givenWidth,givenHeight,null);
-				g2.dispose();
+				try {
+					g2.drawImage(image,0,0,givenWidth,givenHeight,null);
+				} finally {
+					g2.dispose();
+				};
 				bufferedImage.set(newImage);
 			}
 		} else {
@@ -215,22 +218,26 @@ public abstract class BufferedImage extends BufferedImageController {
 	public void getActualSize2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
 		java.awt.image.BufferedImage image= bufferedImage.get();
 		if (image != null) {
-			a1.value= new PrologInteger(image.getWidth());
-			a2.value= new PrologInteger(image.getHeight());
+			a1.setBacktrackableValue(new PrologInteger(image.getWidth()),iX);
+			a2.setBacktrackableValue(new PrologInteger(image.getHeight()),iX);
 		} else {
-			a1.value= noValue;
-			a2.value= noValue;
+			a1.setBacktrackableValue(noValue,iX);
+			a2.setBacktrackableValue(noValue,iX);
 		}
+		//iX.pushTrail(a1);
+		//iX.pushTrail(a2);
 	}
 	public void getSizeInPixels2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
 		java.awt.image.BufferedImage image= bufferedImage.get();
 		if (image != null) {
-			a1.value= new PrologInteger(image.getWidth());
-			a2.value= new PrologInteger(image.getHeight());
+			a1.setBacktrackableValue(new PrologInteger(image.getWidth()),iX);
+			a2.setBacktrackableValue(new PrologInteger(image.getHeight()),iX);
 		} else {
-			a1.value= noValue;
-			a2.value= noValue;
+			a1.setBacktrackableValue(noValue,iX);
+			a2.setBacktrackableValue(noValue,iX);
 		}
+		//iX.pushTrail(a1);
+		//iX.pushTrail(a2);
 	}
 	//
 	public void setPixel5s(ChoisePoint iX, Term a1, Term a2, Term a3, Term a4, Term a5) {
@@ -269,7 +276,7 @@ public abstract class BufferedImage extends BufferedImageController {
 	}
 	public void save2s(ChoisePoint iX, Term a1, Term a2) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(a1,iX);
-		GenericImageEncodingAttributes attributes= GenericImageEncodingAttributes.termToImageEncodingAttributes(a2,iX);
+		GenericImageEncodingAttributes attributes= GenericImageEncodingAttributes.argumentToImageEncodingAttributes(a2,iX);
 		java.awt.image.BufferedImage nativeImage= bufferedImage.get();
 		writeImage(fileName,nativeImage,attributes);
 	}
@@ -279,5 +286,12 @@ public abstract class BufferedImage extends BufferedImageController {
 	}
 	public void load1s(ChoisePoint iX, Term a1) {
 		bufferedImage.set(readImage(a1,iX));
+	}
+	public void load5s(ChoisePoint iX, Term a1, Term a2, Term a3, Term a4, Term a5) {
+		int xSubsampling= Converters.argumentToSmallInteger(a2,iX);
+		int ySubsampling= Converters.argumentToSmallInteger(a3,iX);
+		int xOffset= Converters.argumentToSmallInteger(a4,iX);
+		int yOffset= Converters.argumentToSmallInteger(a5,iX);
+		bufferedImage.set(readImage(a1,xSubsampling,ySubsampling,xOffset,yOffset,iX));
 	}
 }

@@ -10,6 +10,7 @@ import java.nio.charset.CharsetEncoder;
 import java.util.HashMap;
 
 public abstract class MultiArgumentDomainItem extends DomainAlternative {
+	//
 	protected String[] domainTableEntries;
 	protected transient PrologDomain[] domainItems;
 	//

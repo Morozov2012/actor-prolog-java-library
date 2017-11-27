@@ -12,6 +12,7 @@ import morozov.system.gui.*;
 import morozov.system.gui.space3d.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
+import morozov.terms.errors.*;
 import morozov.terms.signals.*;
 
 import java.awt.Font;
@@ -63,7 +64,7 @@ import com.sun.j3d.utils.picking.PickTool;
 
 public class PrincipalNode3D extends AuxiliaryNode3D {
 	//
-	public static Node termToNode(Term value, BranchGroup branchGroup, Group group, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, TransformGroup target, ChoisePoint iX) {
+	public static Node argumentToNode(Term value, BranchGroup branchGroup, Group group, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, TransformGroup target, ChoisePoint iX) {
 		try { // TransformGroup
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_TransformGroup,1,iX);
 			return attributesToTransformGroup(arguments[0],targetWorld,u,space3D,iX);
@@ -196,18 +197,18 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 		}
 	}
 	//
-	public static void termToListOfNodes(BranchGroup branchGroup, Group group, Term value, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, TransformGroup target, ChoisePoint iX) {
+	public static void argumentToListOfNodes(BranchGroup branchGroup, Group group, Term value, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, TransformGroup target, ChoisePoint iX) {
 		Term nextHead;
 		Term currentTail= value;
 		try {
 			while (true) {
 				nextHead= currentTail.getNextListHead(iX);
-				Node node= termToNode(nextHead,branchGroup,group,targetWorld,u,space3D,target,iX);
+				Node node= argumentToNode(nextHead,branchGroup,group,targetWorld,u,space3D,target,iX);
 				if (node != null) {
 					group.addChild(node);
 				};
 				if (debugNodes()) {
-					System.out.printf("PrincipalNode3D::termToListOfNodes:%s.addChild(%s);\n",group,node);
+					System.out.printf("PrincipalNode3D::argumentToListOfNodes:%s.addChild(%s);\n",group,node);
 				}
 				currentTail= currentTail.getNextListTail(iX);
 			}
@@ -218,19 +219,19 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 		}
 	}
 	//
-	public static void termToCollisionDetectorList(Term value, Node armingNode, Group group, Canvas3D targetWorld, ChoisePoint iX) {
+	public static void argumentToCollisionDetectorList(Term value, Node armingNode, Group group, Canvas3D targetWorld, ChoisePoint iX) {
 		Term nextHead;
 		Term currentTail= value;
 		try {
 			while (true) {
 				nextHead= currentTail.getNextListHead(iX);
-				// Node node= termToNode(nextHead,branchGroup,group,targetWorld,u,space3D,target,iX);
-				Node node= termToCollisionDetector(nextHead,armingNode,group,targetWorld,iX);
+				// Node node= argumentToNode(nextHead,branchGroup,group,targetWorld,u,space3D,target,iX);
+				Node node= argumentToCollisionDetector(nextHead,armingNode,group,targetWorld,iX);
 				if (node != null) {
 					group.addChild(node);
 				};
 				if (debugNodes()) {
-					System.out.printf("PrincipalNode3D::termToListOfNodes:%s.addChild(%s);\n",group,node);
+					System.out.printf("PrincipalNode3D::argumentToListOfNodes:%s.addChild(%s);\n",group,node);
 				}
 				currentTail= currentTail.getNextListTail(iX);
 			}
@@ -241,7 +242,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 		}
 	}
 	//
-	public static Group termToGroup(Term value, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
+	public static Group argumentToGroup(Term value, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
 		try { // Group
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Group,1,iX);
 			return attributesToGroup(arguments[0],targetWorld,u,space3D,iX);
@@ -259,7 +260,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			extractGroupAttributes(node,nameList,setPositiveMap,targetWorld,u,space3D,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	protected static void extractGroupAttributes(Group node, Set<Long> nameList, HashMap<Long,Term> setPositiveMap, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
@@ -299,10 +300,10 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				};
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_branches) {
-				termToListOfNodes(null,node,pairValue,targetWorld,u,space3D,null,iX);
+				argumentToListOfNodes(null,node,pairValue,targetWorld,u,space3D,null,iX);
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_label) {
-				NodeLabel label= NodeLabel.termToNodeLabel(pairValue,iX);
+				NodeLabel label= NodeLabel.argumentToNodeLabel(pairValue,iX);
 				targetWorld.rememberNode(label,node);
 				iterator.remove();
 			// } else {
@@ -319,17 +320,17 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			long pairName= - key;
 			Term pairValue= setPositiveMap.get(key);
 			if (pairName==SymbolCodes.symbolCode_E_label) {
-				NodeLabel label= NodeLabel.termToNodeLabel(pairValue,iX);
+				NodeLabel label= NodeLabel.argumentToNodeLabel(pairValue,iX);
 				targetWorld.rememberNode(label,node);
 			} else if (pairName==SymbolCodes.symbolCode_E_collisionDetectors) {
-				termToCollisionDetectorList(pairValue,node,group,targetWorld,iX);
+				argumentToCollisionDetectorList(pairValue,node,group,targetWorld,iX);
 			} else {
 				throw new WrongArgumentIsUnknownNodeAttribute(key);
 			}
 		}
 	}
 	//
-	public static BranchGroup termToBranchGroup(Term value, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
+	public static BranchGroup argumentToBranchGroup(Term value, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
 		try { // BranchGroup
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_BranchGroup,1,iX);
 			return attributesToBranchGroup(arguments[0],targetWorld,u,space3D,iX);
@@ -360,7 +361,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 					compileBranchGroup= YesNo.termYesNo2Boolean(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_branches) {
-					termToListOfNodes(node,node,pairValue,targetWorld,u,space3D,null,iX);
+					argumentToListOfNodes(node,node,pairValue,targetWorld,u,space3D,null,iX);
 					iterator.remove();
 				// } else {
 				//	throw new WrongArgumentIsUnknownBranchGroupAttribute(key);
@@ -372,11 +373,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			};
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
-	public static TransformGroup termToTransformGroup(Term value, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
+	public static TransformGroup argumentToTransformGroup(Term value, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
 		try { // TransformGroup
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_TransformGroup,1,iX);
 			return attributesToTransformGroup(arguments[0],targetWorld,u,space3D,iX);
@@ -409,14 +410,14 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 					};
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_branches) {
-					termToListOfNodes(null,node,pairValue,targetWorld,u,space3D,node,iX);
+					argumentToListOfNodes(null,node,pairValue,targetWorld,u,space3D,node,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_transform3D) {
-					Transform3D transform3D= termToTransform3D(pairValue,iX);
+					Transform3D transform3D= argumentToTransform3D(pairValue,iX);
 					node.setTransform(transform3D);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_label) {
-					NodeLabel label= NodeLabel.termToNodeLabel(pairValue,iX);
+					NodeLabel label= NodeLabel.argumentToNodeLabel(pairValue,iX);
 					targetWorld.rememberNode(label,node);
 					iterator.remove();
 				// } else {
@@ -426,11 +427,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			extractGroupAttributes(node,nameList,setPositiveMap,targetWorld,u,space3D,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
-	public static ColorCube termToColorCube(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
+	public static ColorCube argumentToColorCube(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
 		try { // ColorCube
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_ColorCube,1,iX);
 			return attributesToColorCube(arguments[0],group,targetWorld,iX);
@@ -466,11 +467,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			extractNodeAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
-	public static RotationInterpolator termToRotationInterpolator(Term value, Group group, Canvas3D targetWorld, TransformGroup target, ChoisePoint iX) {
+	public static RotationInterpolator argumentToRotationInterpolator(Term value, Group group, Canvas3D targetWorld, TransformGroup target, ChoisePoint iX) {
 		try { // RotationInterpolator
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_RotationInterpolator,1,iX);
 			return attributesToRotationInterpolator(arguments[0],group,targetWorld,target,iX);
@@ -491,7 +492,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_alpha) {
-					alpha= termToAlpha3D(pairValue,iX);
+					alpha= argumentToAlpha3D(pairValue,iX);
 					iterator.remove();
 				// } else {
 				//	throw new WrongArgumentIsUnknownRotationInterpolatorAttribute(key);
@@ -513,11 +514,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_schedulingBounds) {
-					Bounds bounds= termToBounds(pairValue,iX);
+					Bounds bounds= argumentToBounds(pairValue,iX);
 					node.setSchedulingBounds(bounds);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_transformAxis) {
-					Transform3D transform3D= termToTransform3D(pairValue,iX);
+					Transform3D transform3D= argumentToTransform3D(pairValue,iX);
 					node.setTransformAxis(transform3D);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_minimumAngle) {
@@ -535,11 +536,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			extractNodeAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
-	public static Shape3D termToShape3D(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
+	public static Shape3D argumentToShape3D(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
 		try { // Shape3D
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Shape3D,1,iX);
 			return attributesToShape3D(arguments[0],group,targetWorld,iX);
@@ -557,7 +558,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			extractShape3DAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	protected static void extractShape3DAttributes(Shape3D node, Group group, Set<Long> nameList, HashMap<Long,Term> setPositiveMap, Canvas3D targetWorld, ChoisePoint iX) {
@@ -567,11 +568,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			long pairName= - key;
 			Term pairValue= setPositiveMap.get(key);
 			if (pairName==SymbolCodes.symbolCode_E_geometry) {
-				Geometry geometry= termToGeometry(pairValue,iX);
+				Geometry geometry= argumentToGeometry(pairValue,iX);
 				node.setGeometry(geometry);
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_appearance) {
-				Appearance appearance= termToAppearance(pairValue,targetWorld,iX);
+				Appearance appearance= argumentToAppearance(pairValue,targetWorld,iX);
 				node.setAppearance(appearance);
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_allowAppearanceOverrideRead) {
@@ -623,7 +624,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				};
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_pickingDetailLevel) {
-				int pickingDetailLevel= termToPickingDetailLevel(pairValue,iX);
+				int pickingDetailLevel= argumentToPickingDetailLevel(pairValue,iX);
 				PickTool.setCapabilities(node,pickingDetailLevel);
 				iterator.remove();
 			// } else {
@@ -636,7 +637,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			long pairName= - key;
 			Term pairValue= setPositiveMap.get(key);
 			if (pairName==SymbolCodes.symbolCode_E_cullFace) {
-				int mode= termToFaceCullingMode(pairValue,iX);
+				int mode= argumentToFaceCullingMode(pairValue,iX);
 				Appearance appearance= node.getAppearance();
 				PolygonAttributes polygonAttributes= appearance.getPolygonAttributes();
 				if (polygonAttributes==null) {
@@ -654,7 +655,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 		extractNodeAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 	}
 	//
-	public static OrientedShape3D termToBillboard(Term value, Group group, Canvas3D targetWorld, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
+	public static OrientedShape3D argumentToBillboard(Term value, Group group, Canvas3D targetWorld, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
 		try { // OrientedShape3D
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Billboard,1,iX);
 			return attributesToBillboard(arguments[0],group,targetWorld,space3D,iX);
@@ -675,7 +676,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_mode) {
-					int mode= termToBillboardAlignmentMode(pairValue,iX);
+					int mode= argumentToBillboardAlignmentMode(pairValue,iX);
 					node.setAlignmentMode(mode);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_point) {
@@ -699,11 +700,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			extractShape3DAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
-	public static Text2D termToText2D(Term value, Group group, Canvas3D targetWorld, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
+	public static Text2D argumentToText2D(Term value, Group group, Canvas3D targetWorld, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
 		try { // Text2D
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Text2D,1,iX);
 			return attributesToText2D(arguments[0],group,targetWorld,space3D,iX);
@@ -736,19 +737,19 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_fontName) {
 					try {
-						fontName= ExtendedFontName.termToFontNameSafe(pairValue,iX);
+						fontName= ExtendedFontName.argumentToFontNameSafe(pairValue,iX);
 					} catch (TermIsSymbolDefault e) {
 					};
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_fontSize) {
 					try {
-						fontSize= ExtendedFontSize.termToFontSizeSafe(pairValue,iX);
+						fontSize= ExtendedFontSize.argumentToFontSizeSafe(pairValue,iX);
 					} catch (TermIsSymbolDefault e) {
 					};
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_fontStyle) {
 					try {
-						fontStyle= ExtendedFontStyle.termToFontStyleSafe(pairValue,iX);
+						fontStyle= ExtendedFontStyle.argumentToFontStyleSafe(pairValue,iX);
 					} catch (TermIsSymbolDefault e) {
 					};
 					iterator.remove();
@@ -786,11 +787,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			extractShape3DAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
-	public static Background termToBackground(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
+	public static Background argumentToBackground(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
 		try { // Background
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Background,1,iX);
 			return attributesToBackground(arguments[0],group,targetWorld,iX);
@@ -815,15 +816,15 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 					node.setColor(color);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_image) {
-					ImageComponent2D image= termToImageComponent2D(pairValue,targetWorld,iX);
+					ImageComponent2D image= argumentToImageComponent2D(pairValue,targetWorld,iX);
 					node.setImage(image);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_scaleMode) {
-					int imageScaleMode= termToImageScaleMode(pairValue,iX);
+					int imageScaleMode= argumentToImageScaleMode(pairValue,iX);
 					node.setImageScaleMode(imageScaleMode);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_applicationBounds) {
-					Bounds bounds= termToBounds(pairValue,iX);
+					Bounds bounds= argumentToBounds(pairValue,iX);
 					node.setApplicationBounds(bounds);
 					iterator.remove();
 				// } else {
@@ -833,11 +834,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			extractNodeAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
-	public static AmbientLight termToAmbientLight(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
+	public static AmbientLight argumentToAmbientLight(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
 		try { // AmbientLight
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_AmbientLight,1,iX);
 			return attributesToAmbientLight(arguments[0],group,targetWorld,iX);
@@ -855,11 +856,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			extractLightAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
-	public static DirectionalLight termToDirectionalLight(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
+	public static DirectionalLight argumentToDirectionalLight(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
 		try { // DirectionalLight
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_DirectionalLight,1,iX);
 			return attributesToDirectionalLight(arguments[0],group,targetWorld,iX);
@@ -890,11 +891,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			extractLightAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
-	public static PointLight termToPointLight(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
+	public static PointLight argumentToPointLight(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
 		try { // PointLight
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_PointLight,1,iX);
 			return attributesToPointLight(arguments[0],group,targetWorld,iX);
@@ -909,7 +910,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
 			PointLight node= new PointLight();
 			if (debugColors()) {
-				System.out.printf("PrincipalNode3D::termToNode:PointLight node= new PointLight();\n");
+				System.out.printf("PrincipalNode3D::argumentToNode:PointLight node= new PointLight();\n");
 			}
 			Set<Long> nameList= setPositiveMap.keySet();
 			Iterator<Long> iterator= nameList.iterator();
@@ -921,14 +922,14 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 					Point3f point= term2Coordinate3f(pairValue,iX);
 					node.setPosition(point);
 					if (debugColors()) {
-						System.out.printf("PrincipalNode3D::termToNode:node(%s).setPosition(%s)\n",node,point);
+						System.out.printf("PrincipalNode3D::argumentToNode:node(%s).setPosition(%s)\n",node,point);
 					}
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_attenuation) {
 					Point3f attenuation= term2Attenuation(pairValue,iX);
 					node.setAttenuation(attenuation);
 					if (debugColors()) {
-						System.out.printf("PrincipalNode3D::termToNode:node(%s).setAttenuation(%s);\n",node,attenuation);
+						System.out.printf("PrincipalNode3D::argumentToNode:node(%s).setAttenuation(%s);\n",node,attenuation);
 					}
 					iterator.remove();
 				// } else {
@@ -938,7 +939,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			extractLightAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
@@ -956,7 +957,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 					System.out.printf("PrincipalNode3D::extractLightAttributes:node(%s).setColor(%s)\n",node,color);
 				}
 			} else if (pairName==SymbolCodes.symbolCode_E_influencingBounds) {
-				Bounds bounds= termToBounds(pairValue,iX);
+				Bounds bounds= argumentToBounds(pairValue,iX);
 				node.setInfluencingBounds(bounds);
 				iterator.remove();
 				if (debugColors()) {
@@ -976,7 +977,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 		extractNodeAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 	}
 	//
-	public static Box termToBox(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
+	public static Box argumentToBox(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
 		try { // Box
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Box,1,iX);
 			return attributesToBox(arguments[0],group,targetWorld,iX);
@@ -1019,7 +1020,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_appearance) {
-					Appearance appearance= termToAppearance(pairValue,targetWorld,iX);
+					Appearance appearance= argumentToAppearance(pairValue,targetWorld,iX);
 					node.setAppearance(appearance);
 					iterator.remove();
 				// } else {
@@ -1029,11 +1030,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			extractNodeAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
-	public static Cone termToCone(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
+	public static Cone argumentToCone(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
 		try { // Cone
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Cone,1,iX);
 			return attributesToCone(arguments[0],group,targetWorld,iX);
@@ -1088,7 +1089,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_appearance) {
-					Appearance appearance= termToAppearance(pairValue,targetWorld,iX);
+					Appearance appearance= argumentToAppearance(pairValue,targetWorld,iX);
 					node.setAppearance(appearance);
 					iterator.remove();
 				// } else {
@@ -1098,11 +1099,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			extractNodeAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
-	public static Cylinder termToCylinder(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
+	public static Cylinder argumentToCylinder(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
 		try { // Cylinder
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Cylinder,1,iX);
 			return attributesToCylinder(arguments[0],group,targetWorld,iX);
@@ -1157,7 +1158,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_appearance) {
-					Appearance appearance= termToAppearance(pairValue,targetWorld,iX);
+					Appearance appearance= argumentToAppearance(pairValue,targetWorld,iX);
 					node.setAppearance(appearance);
 					iterator.remove();
 				// } else {
@@ -1167,11 +1168,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			extractNodeAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
-	public static Sphere termToSphere(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
+	public static Sphere argumentToSphere(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
 		try { // Sphere
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Sphere,1,iX);
 			return attributesToSphere(arguments[0],group,targetWorld,iX);
@@ -1214,7 +1215,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_appearance) {
-					Appearance appearance= termToAppearance(pairValue,targetWorld,iX);
+					Appearance appearance= argumentToAppearance(pairValue,targetWorld,iX);
 					node.setAppearance(appearance);
 					iterator.remove();
 				// } else {
@@ -1224,11 +1225,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			extractNodeAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
-	public static MouseRotate termToMouseRotate(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
+	public static MouseRotate argumentToMouseRotate(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
 		try { // MouseRotate
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_MouseRotate,1,iX);
 			return attributesToMouseRotate(arguments[0],group,targetWorld,null,iX);
@@ -1247,14 +1248,14 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				extractMouseBehaviorAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 				return node;
 			} else {
-				throw new WrongArgumentIsNotAttributeSet(setEnd);
+				throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 			}
 		} else {
 			throw new MouseBehaviorMustBeInsideTransformGroup();
 		}
 	}
 	//
-	public static MouseTranslate termToMouseTranslate(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
+	public static MouseTranslate argumentToMouseTranslate(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
 		try { // MouseTranslate
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_MouseTranslate,1,iX);
 			return attributesToMouseTranslate(arguments[0],group,targetWorld,null,iX);
@@ -1273,14 +1274,14 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				extractMouseBehaviorAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 				return node;
 			} else {
-				throw new WrongArgumentIsNotAttributeSet(setEnd);
+				throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 			}
 		} else {
 			throw new MouseBehaviorMustBeInsideTransformGroup();
 		}
 	}
 	//
-	public static MouseWheelZoom termToMouseWheelZoom(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
+	public static MouseWheelZoom argumentToMouseWheelZoom(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
 		try { // MouseWheelZoom
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_MouseWheelZoom,1,iX);
 			return attributesToMouseWheelZoom(arguments[0],group,targetWorld,null,iX);
@@ -1299,14 +1300,14 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				extractMouseBehaviorAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 				return node;
 			} else {
-				throw new WrongArgumentIsNotAttributeSet(setEnd);
+				throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 			}
 		} else {
 			throw new MouseBehaviorMustBeInsideTransformGroup();
 		}
 	}
 	//
-	public static MouseZoom termToMouseZoom(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
+	public static MouseZoom argumentToMouseZoom(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
 		try { // MouseZoom
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_MouseZoom,1,iX);
 			return attributesToMouseZoom(arguments[0],group,targetWorld,null,iX);
@@ -1325,7 +1326,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				extractMouseBehaviorAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 				return node;
 			} else {
-				throw new WrongArgumentIsNotAttributeSet(setEnd);
+				throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 			}
 		} else {
 			throw new MouseBehaviorMustBeInsideTransformGroup();
@@ -1339,7 +1340,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			long pairName= - key;
 			Term pairValue= setPositiveMap.get(key);
 			if (pairName==SymbolCodes.symbolCode_E_schedulingBounds) {
-				Bounds bounds= termToBounds(pairValue,iX);
+				Bounds bounds= argumentToBounds(pairValue,iX);
 				node.setSchedulingBounds(bounds);
 				iterator.remove();
 			// } else {
@@ -1349,7 +1350,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 		extractNodeAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 	}
 	//
-	public static OrbitBehavior termToOrbitBehavior(Term value, Group group, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
+	public static OrbitBehavior argumentToOrbitBehavior(Term value, Group group, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
 		try { // OrbitBehavior
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_OrbitBehavior,1,iX);
 			return attributesToOrbitBehavior(arguments[0],group,targetWorld,u,space3D,iX);
@@ -1453,7 +1454,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 					node.setRotationCenter(center);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_schedulingBounds) {
-					Bounds bounds= termToBounds(pairValue,iX);
+					Bounds bounds= argumentToBounds(pairValue,iX);
 					node.setSchedulingBounds(bounds);
 					iterator.remove();
 				// } else {
@@ -1465,11 +1466,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			viewingPlatform.setViewPlatformBehavior(node);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
-	public static ModelClip termToModelClip(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
+	public static ModelClip argumentToModelClip(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
 		try { // ModelClip
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_ModelClip,1,iX);
 			return attributesToModelClip(arguments[0],group,targetWorld,iX);
@@ -1492,7 +1493,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_influencingBounds) {
-					Bounds bounds= termToBounds(pairValue,iX);
+					Bounds bounds= argumentToBounds(pairValue,iX);
 					node.setInfluencingBounds(bounds);
 					iterator.remove();
 				} else if (key >= 1 && key <= 6) {
@@ -1507,11 +1508,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			extractNodeAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
-	public static Behavior termToCustomizedBehavior(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
+	public static Behavior argumentToCustomizedBehavior(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
 		try { // CustomizedBehavior
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_CustomizedBehavior,1,iX);
 			return attributesToCustomizedBehavior(arguments[0],group,targetWorld,iX);
@@ -1532,15 +1533,15 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_name) {
-					BehaviorName name= BehaviorName.termToBehaviorName(pairValue,iX);
+					BehaviorName name= BehaviorName.argumentToBehaviorName(pairValue,iX);
 					node.setName(name);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_wakeupOn) {
-					WakeupCondition condition= termToWakeupCondition(pairValue,iX);
+					WakeupCondition condition= argumentToWakeupCondition(pairValue,iX);
 					node.setWakeupCondition(condition);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_schedulingBounds) {
-					Bounds bounds= termToBounds(pairValue,iX);
+					Bounds bounds= argumentToBounds(pairValue,iX);
 					node.setSchedulingBounds(bounds);
 					iterator.remove();
 				// } else {
@@ -1550,11 +1551,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			extractNodeAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
-	public static Behavior termToCollisionDetector(Term value, Node armingNode, Group group, Canvas3D targetWorld, ChoisePoint iX) {
+	public static Behavior argumentToCollisionDetector(Term value, Node armingNode, Group group, Canvas3D targetWorld, ChoisePoint iX) {
 		try { // CollisionDetector
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_CollisionDetector,1,iX);
 			return attributesToCollisionDetector(arguments[0],armingNode,group,targetWorld,iX);
@@ -1576,14 +1577,14 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_name) {
-					BehaviorName name= BehaviorName.termToBehaviorName(pairValue,iX);
+					BehaviorName name= BehaviorName.argumentToBehaviorName(pairValue,iX);
 					node.setName(name);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_speedHint) {
-					speedHint= CollisionDetectorSpeedHint.termToCollisionDetectorSpeedHint(pairValue,iX);
+					speedHint= CollisionDetectorSpeedHint.argumentToCollisionDetectorSpeedHint(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_schedulingBounds) {
-					Bounds bounds= termToBounds(pairValue,iX);
+					Bounds bounds= argumentToBounds(pairValue,iX);
 					node.setSchedulingBounds(bounds);
 					iterator.remove();
 				// } else {
@@ -1596,7 +1597,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_wakeupOn) {
-					WakeupCondition condition= termToCollisionDetectorWakeupCondition(pairValue,armingNode,speedHint,iX);
+					WakeupCondition condition= argumentToCollisionDetectorWakeupCondition(pairValue,armingNode,speedHint,iX);
 					node.setWakeupCondition(condition);
 					iterator.remove();
 				// } else {
@@ -1606,11 +1607,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			extractNodeAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
 			return node;
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
-	public static Group termToMovingShadow(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
+	public static Group argumentToMovingShadow(Term value, Group group, Canvas3D targetWorld, ChoisePoint iX) {
 		try { // MovingShadow
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_MovingShadow,1,iX);
 			return attributesToMovingShadow(arguments[0],group,targetWorld,iX);
@@ -1636,10 +1637,10 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_object) {
-					objectLabel= NodeLabel.termToNodeLabel(pairValue,iX);
+					objectLabel= NodeLabel.argumentToNodeLabel(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_pointLight) {
-					pointLightLabel= NodeLabel.termToNodeLabel(pairValue,iX);
+					pointLightLabel= NodeLabel.argumentToNodeLabel(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_plane) {
 					plane= term2Vector4(pairValue,iX);
@@ -1648,10 +1649,10 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 					standoff= Converters.argumentToReal(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_appearance) {
-					appearance= termToAppearance(pairValue,targetWorld,iX);
+					appearance= argumentToAppearance(pairValue,targetWorld,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_schedulingBounds) {
-					bounds= termToBounds(pairValue,iX);
+					bounds= argumentToBounds(pairValue,iX);
 					iterator.remove();
 				// } else {
 				//	throw new WrongArgumentIsUnknownMovingShadowAttribute(key);
@@ -1665,11 +1666,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				throw new MovingShadowObjectIsNotDefined();
 			}
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//
-	public static CustomizedPickCanvas termToPickCanvas(Term value, BranchGroup branchGroup, Canvas3D targetWorld, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
+	public static CustomizedPickCanvas argumentToPickCanvas(Term value, BranchGroup branchGroup, Canvas3D targetWorld, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
 		try { // PickCanvas
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_PickCanvas,1,iX);
 			return attributesToPickCanvas(arguments[0],branchGroup,targetWorld,space3D,iX);
@@ -1707,13 +1708,13 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 					} else if (pairName==SymbolCodes.symbolCode_E_isPassive) {
 						node.setIsPassive(YesNo.termYesNo2Boolean(pairValue,iX));
 					} else if (pairName==SymbolCodes.symbolCode_E_period) {
-						long timeInterval= TimeInterval.termMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+						long timeInterval= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setPeriod(timeInterval);
 					} else if (pairName==SymbolCodes.symbolCode_E_tolerance) {
 						float tolerance= (float)Converters.argumentToReal(pairValue,iX);
 						node.setTolerance(tolerance);
 					} else if (pairName==SymbolCodes.symbolCode_E_mode) {
-						int pickingMode= termToPickingMode(pairValue,iX);
+						int pickingMode= argumentToPickingMode(pairValue,iX);
 						node.setMode(pickingMode);
 					} else {
 						throw new WrongArgumentIsUnknownPickCanvasAttribute(key);
@@ -1724,7 +1725,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				throw new PickCanvasMustBeInsideBranchGroup();
 			}
 		} else {
-			throw new WrongArgumentIsNotAttributeSet(setEnd);
+			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
 		}
 	}
 	//

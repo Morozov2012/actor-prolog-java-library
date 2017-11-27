@@ -49,7 +49,7 @@ public class TranslatedMenuItem {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static TranslatedMenuItem[] termToTranslatedMenuItems(Term value, ChoisePoint iX) {
+	public static TranslatedMenuItem[] argumentToTranslatedMenuItems(Term value, ChoisePoint iX) {
 		ArrayList<TranslatedMenuItem> vector= new ArrayList<TranslatedMenuItem>();
 		term2TranslatedMenuItems(vector,true,value,iX);
 		return vector.toArray(new TranslatedMenuItem[vector.size()]);
@@ -147,7 +147,7 @@ public class TranslatedMenuItem {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static JMenuBar termToJMenuBar(TranslatedMenuItem[] value, ActionListener listener) {
+	public static JMenuBar argumentToJMenuBar(TranslatedMenuItem[] value, ActionListener listener) {
 		JMenuBar mb= new JMenuBar();
 		term2JMenu(mb,null,true,listener,value);
 		return mb;
@@ -196,86 +196,28 @@ public class TranslatedMenuItem {
 		}
 	}
 	protected static JMenuItem createNamedJMenuItem(String text) {
-		AnnotatedButton button= interpretAmpersands(text);
-		JMenuItem item= new JMenuItem(button.name);
-		if (button.mnemonicIndex >= 0) {
-			item.setMnemonic(button.mnemonicCode);
+		AnnotatedButton button= AnnotatedButton.interpretAmpersands(text);
+		JMenuItem item= new JMenuItem(button.getName());
+		if (button.hasMnemonicIndex()) {
+			item.setMnemonic(button.getMnemonicCode());
 			try {
-				item.setDisplayedMnemonicIndex(button.mnemonicIndex);
+				item.setDisplayedMnemonicIndex(button.getMnemonicIndex());
 			} catch (IllegalArgumentException e) {
 			}
 		};
 		return item;
 	}
 	protected static JMenu createNamedJMenu(String text) {
-		AnnotatedButton button= interpretAmpersands(text);
-		JMenu menu= new JMenu(button.name);
-		if (button.mnemonicIndex >= 0) {
-			menu.setMnemonic(button.mnemonicCode);
+		AnnotatedButton button= AnnotatedButton.interpretAmpersands(text);
+		JMenu menu= new JMenu(button.getName());
+		if (button.hasMnemonicIndex()) {
+			menu.setMnemonic(button.getMnemonicCode());
 			try {
-				menu.setDisplayedMnemonicIndex(button.mnemonicIndex);
+				menu.setDisplayedMnemonicIndex(button.getMnemonicIndex());
 			} catch (IllegalArgumentException e) {
 			}
 		};
 		return menu;
-	}
-	protected static AnnotatedButton interpretAmpersands(String text) {
-		int mnemonicCode= -1;
-		int mnemonicIndex= -1;
-		char[] characters= text.toCharArray();
-		int textLength= characters.length;
-		StringBuilder buffer= new StringBuilder();
-		boolean processSupplementaryCharacter= false;
-		int position= 0;
-		char c1;
-		char c2;
-		int code;
-		while(true) {
-			if (position >= textLength) {
-				break;
-			} else {
-				c1= characters[position];
-				if (	(position + 1 <= textLength - 1) &&
-					Character.isSurrogatePair(c1,characters[position+1])) {
-					c2= characters[position+1];
-					code= Character.toCodePoint(c1,c2);
-					processSupplementaryCharacter= true;
-				} else {
-					c2= 0;
-					code= c1;
-					processSupplementaryCharacter= false;
-				}
-			};
-			if (code == '&') {
-				if (position + 1 <= textLength - 1) {
-					if (characters[position+1]=='&') {
-						buffer.append(c1);
-						position= position + 2;
-						continue;
-					} else {
-						if (mnemonicIndex==-1) {
-							mnemonicCode= characters[position+1];
-							mnemonicIndex= position;
-						};
-						position++;
-						continue;
-					}
-				} else {
-					position++;
-					continue;
-				}
-			} else {
-				if (processSupplementaryCharacter) {
-					buffer.append(c1);
-					buffer.append(c2);
-					position= position + 2;
-				} else {
-					buffer.append(c1);
-					position++;
-				}
-			}
-		};
-		return new AnnotatedButton(buffer.toString(),mnemonicCode,mnemonicIndex);
 	}
 	//
 	///////////////////////////////////////////////////////////////

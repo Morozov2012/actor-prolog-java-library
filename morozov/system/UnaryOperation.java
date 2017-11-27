@@ -157,6 +157,6 @@ public enum UnaryOperation {
 			}
 		}
 	};
-	public abstract Term eval(BigInteger n1);
-	public abstract Term eval(double n1);
+	abstract public Term eval(BigInteger n1);
+	abstract public Term eval(double n1);
 }

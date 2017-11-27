@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 public abstract class UnderdeterminedSetWithTail extends UnderdeterminedSet {
+	//
 	protected Term tail;
 	//
 	///////////////////////////////////////////////////////////////
@@ -81,8 +82,8 @@ public abstract class UnderdeterminedSetWithTail extends UnderdeterminedSet {
 		rightSetEnd= rightSetEnd.exploreSet(cp);
 		if (leftSetEnd.thisIsFreeVariable() && rightSetEnd.thisIsFreeVariable()) {
 			PrologVariable newTail= new PrologVariable();
-			leftSetEnd.setValue(newTail);
-			rightSetEnd.setValue(newTail);
+			leftSetEnd.setBacktrackableValue(newTail,cp);
+			rightSetEnd.setBacktrackableValue(newTail,cp);
 		} else {
 			leftSetEnd.isEmptySet(cp);
 			rightSetEnd.isEmptySet(cp);

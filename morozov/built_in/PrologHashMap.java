@@ -25,8 +25,8 @@ public abstract class PrologHashMap extends Database {
 		((HashMapTable)getDatabaseTable(iX)).put(a1,a2,currentProcess,true,iX);
 	}
 	//
-	public void get1ff(ChoisePoint iX, PrologVariable a1, Term a2) throws Backtracking {
-		((HashMapTable)getDatabaseTable(iX)).get(a1,a2,currentProcess,true,iX);
+	public void get1ff(ChoisePoint iX, PrologVariable result, Term a1) throws Backtracking {
+		((HashMapTable)getDatabaseTable(iX)).get(result,a1,currentProcess,true,iX);
 	}
 	public void get1fs(ChoisePoint iX, Term a1) throws Backtracking {
 		((HashMapTable)getDatabaseTable(iX)).containsKey(a1,currentProcess,true,iX);

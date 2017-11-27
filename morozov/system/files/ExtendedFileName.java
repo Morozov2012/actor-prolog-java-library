@@ -10,6 +10,13 @@ import morozov.system.datum.*;
 import morozov.system.files.errors.*;
 import morozov.terms.*;
 
+import java.awt.Dimension;
+import javax.imageio.ImageIO;
+import javax.imageio.ImageReader;
+import javax.imageio.ImageReadParam;
+import javax.imageio.stream.MemoryCacheImageInputStream;
+import java.util.Iterator;
+
 import javax.swing.JApplet;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -225,7 +232,7 @@ public class ExtendedFileName extends RelativeFileName {
 				};
 				connection.setUseCaches(false);
 				InputStream stream= connection.getInputStream();
-				boolean has_UTF_Coding= has_UTF_Coding(stream);
+				// boolean has_UTF_Coding= has_UTF_Coding(stream);
 				try {
 					long lastModificationTime;
 					try {
@@ -245,7 +252,7 @@ public class ExtendedFileName extends RelativeFileName {
 						characterSet,
 						timeout,
 						isLocalResource,
-						has_UTF_Coding,
+						// has_UTF_Coding,
 						isDirectoryName,
 						lastModificationTime,
 						contentLength);
@@ -262,7 +269,7 @@ public class ExtendedFileName extends RelativeFileName {
 					characterSet,
 					timeout,
 					isLocalResource,
-					false,
+					// false,
 					isDirectoryName);
 			}
 		} catch (Throwable e1) {
@@ -274,7 +281,7 @@ public class ExtendedFileName extends RelativeFileName {
 				characterSet,
 				timeout,
 				isLocalResource,
-				false,
+				// false,
 				isDirectoryName);
 		}
 	}
@@ -428,8 +435,35 @@ public class ExtendedFileName extends RelativeFileName {
 			URL_Attributes attributes= getUniversalResourceAttributes(timeout,CharacterSet.NONE,staticContext);
 			try {
 				Object object= readObjectFromUniversalResource(attributes);
-				if (!attributes.connectionWasSuccessful()) {
+				if (attributes.connectionWasSuccessful()) {
 					return object;
+				} else {
+					throw new CannotRetrieveContent(attributes.getExceptionName());
+				}
+			} catch (Throwable e2) {
+				throw new CannotRetrieveContent(e2);
+			// } finally {
+			//	attributes.safeCloseConnection();
+			}
+		} catch (URISyntaxException e1) {
+			throw new WrongArgumentIsMalformedURL(uri.toString(),e1);
+		// } catch (MalformedURLException e1) {
+		//	throw e1;
+		} catch (IOException e1) {
+			throw new FileInputOutputError(uri.toString(),e1);
+		// } catch (Throwable e1) {
+		//	return channelExceptionToName(e1);
+		}
+	}
+	//
+	public InputStream getInputStreamOfUniversalResource(int timeout, StaticContext staticContext) throws CannotRetrieveContent {
+		URI uri= get_URI_OfResource();
+		try {
+			URL_Attributes attributes= getUniversalResourceAttributes(timeout,CharacterSet.NONE,staticContext);
+			try {
+				InputStream inputStream= getInputStreamFromUniversalResource(attributes);
+				if (attributes.connectionWasSuccessful()) {
+					return inputStream;
 				} else {
 					throw new CannotRetrieveContent(attributes.getExceptionName());
 				}
@@ -470,7 +504,7 @@ public class ExtendedFileName extends RelativeFileName {
 		}
 	}
 	//
-	protected boolean doesExist(boolean considerLocalResourcesOnly, int timeout, CharacterSet characterSet, StaticContext staticContext) {
+	public boolean doesExist(boolean considerLocalResourcesOnly, int timeout, CharacterSet characterSet, StaticContext staticContext) {
 		if (!isStandardFile) {
 			if (isLocalResource) {
 				return Files.exists(filePath);
@@ -549,13 +583,16 @@ public class ExtendedFileName extends RelativeFileName {
 		}
 	}
 	//
-	public static Term listDirectory(Path currentDirectory, String mask) {
+	public static Term listDirectory(Path currentDirectory) {
+		return listDirectory(currentDirectory,null,true);
+	}
+	public static Term listDirectory(Path currentDirectory, String mask, boolean backslashAlwaysIsSeparator) {
 		List<Path> list;
 		if (currentDirectory==null) {
 			Path path= fileSystem.getPath(getUserDirectory());
-			list= listSourceFiles(path,mask);
+			list= listSourceFiles(path,mask,backslashAlwaysIsSeparator);
 		} else {
-			list= listSourceFiles(currentDirectory,mask);
+			list= listSourceFiles(currentDirectory,mask,backslashAlwaysIsSeparator);
 		};
 		Term result= PrologEmptyList.instance;
 		for (int n=list.size()-1; n >= 0; n--) {
@@ -611,7 +648,7 @@ public class ExtendedFileName extends RelativeFileName {
 			Path path1= getPathOfLocalResource();
 			Path path2= fileName2.getPathOfLocalResource();
 			try {
-				Files.move(path1,path2,StandardCopyOption.ATOMIC_MOVE);
+				Files.move(path1,path2); // StandardCopyOption.ATOMIC_MOVE
 			// } catch (UnsupportedOperationException e) {
 			// } catch (FileAlreadyExistsException e) {
 			// } catch (AtomicMoveNotSupportedException e) {
@@ -648,7 +685,7 @@ public class ExtendedFileName extends RelativeFileName {
 			Path path2= fileSystem.getPath(fileName2);
 			try {
 				Files.deleteIfExists(path2);
-				Files.move(path1,path2,StandardCopyOption.ATOMIC_MOVE);
+				Files.move(path1,path2); // StandardCopyOption.ATOMIC_MOVE
 			} catch (IOException e) {
 			}
 		}
@@ -658,7 +695,7 @@ public class ExtendedFileName extends RelativeFileName {
 		if (!isStandardFile) {
 			Path path1= getPathOfLocalResource();
 			String fileName2= modifyFileExtension(newExtension);
-			SimpleFileName sFN2= termToSimpleFileName(fileName2,backslashAlwaysIsSeparator,acceptOnlyUniformResourceIdentifiers);
+			SimpleFileName sFN2= argumentToSimpleFileName(fileName2,backslashAlwaysIsSeparator,acceptOnlyUniformResourceIdentifiers);
 			ExtendedFileName eFN2= sFN2.formRealFileNameBasedOnPath(createLocalName,true,newExtension,currentDirectory,staticContext);
 			return eFN2;
 		} else {
@@ -905,10 +942,33 @@ public class ExtendedFileName extends RelativeFileName {
 	}
 	//
 	public java.awt.image.BufferedImage readImage(int timeout, StaticContext staticContext) {
+		return readImage(timeout,1,1,0,0,staticContext);
+	}
+	public java.awt.image.BufferedImage readImage(int timeout, int xSubsampling, int ySubsampling, int xOffset, int yOffset, StaticContext staticContext) {
 		byte[] array= getByteContentOfUniversalResource(CharacterSet.NONE,timeout,staticContext);
-		InputStream stream= new ByteArrayInputStream(array);
+		InputStream inputStream= new ByteArrayInputStream(array);
+		// try {
+		//	java.awt.image.BufferedImage image= ImageIO.read(inputStream);
+		//	return image;
+		// } catch(IOException e) {
+		//	throw new FileInputOutputError(toString(),e);
+		// }
+		// IIORegistry iioRegistry= IIORegistry.getDefaultInstance();
+		// Iterator<ImageReader> iterator= ImageIO.getImageReadersByFormatName("jpg");
+		MemoryCacheImageInputStream imageStream= new MemoryCacheImageInputStream(inputStream);
+		Iterator<ImageReader> iterator= ImageIO.getImageReaders(imageStream);
+		if (!iterator.hasNext()) {
+			throw new ImageFileHasUnknownFormat(toString());
+		};
+		ImageReader reader= iterator.next();
+		ImageReadParam readParam= reader.getDefaultReadParam();
+		// readParam.setSourceRenderSize(new Dimension(640,480));
+		// readParam.setSourceSubsampling(100,100,0,0);
+		// readParam.setSourceSubsampling(3,3,0,0);
+		readParam.setSourceSubsampling(xSubsampling,ySubsampling,xOffset,yOffset);
+		reader.setInput(imageStream);
 		try {
-			java.awt.image.BufferedImage image= ImageIO.read(stream);
+			java.awt.image.BufferedImage image= reader.read(0,readParam);
 			return image;
 		} catch(IOException e) {
 			throw new FileInputOutputError(toString(),e);

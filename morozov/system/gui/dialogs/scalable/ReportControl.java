@@ -24,24 +24,45 @@ import java.awt.Font;
 import javax.swing.SwingUtilities;
 import java.lang.reflect.InvocationTargetException;
 
-public class ReportControl extends ActiveComponent {
+public class ReportControl extends CustomControlComponent {
 	//
-	protected AbstractDialog dialog;
-	protected double width= 0;
-	protected double height= 0;
 	protected Report currentValue= null;
 	protected ExtendedReportSpace space;
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public ReportControl(AbstractDialog tD, ChoisePoint iX, double columns, double rows, boolean keepProportions, int anchor) {
-		super(tD);
-		dialog= tD;
-		height= rows;
-		width= columns;
-		space= new ExtendedReportSpace(null,new TextPaneNoWrap());
-		space.setDialog(dialog);
+		super(tD,columns,rows);
+		space= new ExtendedReportSpace(this,null,new TextPaneNoWrap());
+		space.setDialog(targetDialog);
 		component= space.getControl();
 		safelyInitiateControlSize();
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void putValue(Term value, ChoisePoint iX) {
+		if (space !=null) {
+			value= value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
+			if (value instanceof Report) {
+				if (currentValue != null) {
+					currentValue.release(targetDialog.isModal,iX);
+				};
+				currentValue= (Report)value;
+				currentValue.registerCanvasSpace(space,iX);
+				currentValue.draw(targetDialog.isModal,iX);
+				targetDialog.doLayout(true);
+				targetDialog.safelyRepaint();
+				targetDialog.repaintAfterDelay();
+			}
+		}
+	}
+	//
+	public Term getValue() {
+		return currentValue;
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	protected void safelyInitiateControlSize() {
 		if (SwingUtilities.isEventDispatchThread()) {
@@ -59,22 +80,23 @@ public class ReportControl extends ActiveComponent {
 		}
 	}
 	protected void quicklyInitiateControlSize() {
-		Font dialogFont= dialog.quicklyGetFont();
+		Font dialogFont= targetDialog.quicklyGetFont();
 		Dimension dimension= LayoutUtils.computeDimension(dialogFont,space.getControl(),width,height);
 		space.getControl().setMinimumSize(dimension);
 		space.getControl().setPreferredSize(dimension);
 	}
 	//
-	// protected int getInitialTopBorder() {return 5;}
-	// protected int getInitialLeftBorder() {return 5;}
-	// protected int getInitialBottomBorder() {return 5;}
-	// protected int getInitialRightBorder() {return 5;}
+	///////////////////////////////////////////////////////////////
 	//
-	public void setFont(Font externalFont) {
-		super.setFont(externalFont);
+	public void setFont(Font font) {
+		super.setFont(font);
 		if (space != null) {
-			space.setPanelFontSize(externalFont.getSize(),false);
-			Dimension dimension= LayoutUtils.computeDimension(externalFont,space.getControl(),width,height);
+			space.setPanelFontSize(font.getSize(),false);
+		}
+	}
+	//
+	public void setDimension(Dimension dimension) {
+		if (space != null) {
 			// 2013.08.29: Если устанавливать размеры
 			// space, а не component,
 			// то SWING сходит с ума.
@@ -82,41 +104,9 @@ public class ReportControl extends ActiveComponent {
 			// panel.setPreferredSize(dimension);
 			space.getControl().setMinimumSize(dimension);
 			space.getControl().setPreferredSize(dimension);
-			dialog.doLayout(true);
-			dialog.safelyRepaint();
-			dialog.repaintAfterDelay();
-		}
-	}
-	//
-	public void putValue(Term value, ChoisePoint iX) {
-		if (space !=null) {
-			value= value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
-			if (value instanceof Report) {
-				if (currentValue != null) {
-					// currentValue.release(space.panel,dialog.isModal,iX);
-					currentValue.release(dialog.isModal,iX);
-				};
-				currentValue= (Report)value;
-				// currentValue.registerReport(space,iX);
-				currentValue.registerCanvasSpace(space,iX);
-				currentValue.draw(dialog.isModal,iX);
-				dialog.doLayout(true);
-				dialog.safelyRepaint();
-				dialog.repaintAfterDelay();
-			}
-		}
-	}
-	//
-	public Term getValue() {
-		return currentValue;
-	}
-	//
-	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-		value= value.dereferenceValue(iX);
-		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
-			return PrologUnknownValue.instance;
-		} else {
-			return value;
+			targetDialog.doLayout(true);
+			targetDialog.safelyRepaint();
+			targetDialog.repaintAfterDelay();
 		}
 	}
 }

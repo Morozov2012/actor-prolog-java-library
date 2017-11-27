@@ -30,8 +30,8 @@ public class Arithmetic {
 		}
 	}
 	// Comparison operations
-	public static void compare_two_numbers(ChoisePoint iX, Term n1, Term n2, ComparisonOperation operation) throws Backtracking {
-		n1.compareWithTerm(n2,iX,operation);
+	public static void compare_two_numbers(ChoisePoint iX, Term a1, Term a2, ComparisonOperation operation) throws Backtracking {
+		a1.compareWithTerm(a2,iX,operation);
 	}
 	//
 	public static boolean realsAreEqual(double left, double right) {
@@ -95,23 +95,23 @@ public class Arithmetic {
 	// }
 	//
 	// Arithmetic operations
-	public static void calculate_nullary_arithmetic_function(ChoisePoint iX, PrologVariable nV, NullaryArithmeticOperation operation) {
-		nV.value= operation.eval();
+	public static void calculate_nullary_arithmetic_function(ChoisePoint iX, PrologVariable result, NullaryArithmeticOperation operation) {
+		result.setNonBacktrackableValue(operation.eval());
 		// iX.pushTrail(nV);
 	}
 	//
-	public static void calculate_unary_function(ChoisePoint iX, PrologVariable nV, Term n1, UnaryOperation operation) {
-		nV.value= n1.evaluate(iX,operation);
+	public static void calculate_unary_function(ChoisePoint iX, PrologVariable result, Term a1, UnaryOperation operation) {
+		result.setNonBacktrackableValue(a1.evaluate(iX,operation));
 		// iX.pushTrail(nV);
 	}
 	//
-	public static void calculate_binary_arithmetic_function(ChoisePoint iX, PrologVariable nV, Term n1, Term n2, BinaryOperation operation) {
-		nV.value= n1.reactWithTerm(n2,iX,operation);
+	public static void calculate_binary_arithmetic_function(ChoisePoint iX, PrologVariable result, Term a1, Term a2, BinaryOperation operation) {
+		result.setNonBacktrackableValue(a1.reactWithTerm(a2,iX,operation));
 		// iX.pushTrail(nV);
 	}
 	//
-	public static void calculate_binary_bitwise_function(ChoisePoint iX, PrologVariable nV, Term n1, Term n2, BinaryOperation operation) {
-		nV.value= n1.blitWithTerm(n2,iX,operation);
+	public static void calculate_binary_bitwise_function(ChoisePoint iX, PrologVariable result, Term a1, Term a2, BinaryOperation operation) {
+		result.setNonBacktrackableValue(a1.blitWithTerm(a2,iX,operation));
 		// iX.pushTrail(nV);
 	}
 	//

@@ -3,8 +3,11 @@
 package morozov.system.gui.dialogs.errors;
 
 public class UndefinedDialogTableEntry extends RuntimeException {
-	public String dialogName;
+	public String entryName;
 	public UndefinedDialogTableEntry(String name) {
-		dialogName= name;
+		entryName= name;
+	}
+	public String toString() {
+		return this.getClass().toString() + "(" + entryName + ")";
 	}
 }

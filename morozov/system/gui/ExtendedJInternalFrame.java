@@ -34,7 +34,7 @@ public class ExtendedJInternalFrame extends JInternalFrame {
 	///////////////////////////////////////////////////////////////
 	//
 	public void quicklyRestoreSize(StaticContext context) {
-		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(context);
+		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(context);
 		if (desktop==null) {
 			return;
 		};

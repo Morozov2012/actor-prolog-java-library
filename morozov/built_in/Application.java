@@ -60,14 +60,14 @@ public abstract class Application extends Alpha {
 	// get/set command
 	//
 	public void setCommand1s(ChoisePoint iX, Term a1) {
-		ProcessBuilderCommand text= ProcessBuilderCommand.termToProcessBuilderCommand(a1,iX);
+		ProcessBuilderCommand text= ProcessBuilderCommand.argumentToProcessBuilderCommand(a1,iX);
 		setCommand(text);
 	}
 	public void setCommand(ProcessBuilderCommand value) {
 		command= value;
 	}
-	public void getCommand0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getCommand(iX).toTerm();
+	public void getCommand0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getCommand(iX).toTerm());
 	}
 	public void getCommand0fs(ChoisePoint iX) {
 	}
@@ -76,7 +76,7 @@ public abstract class Application extends Alpha {
 			return command;
 		} else {
 			Term value= getBuiltInSlot_E_command();
-			return ProcessBuilderCommand.termToProcessBuilderCommand(value,iX);
+			return ProcessBuilderCommand.argumentToProcessBuilderCommand(value,iX);
 		}
 	}
 	//
@@ -89,8 +89,8 @@ public abstract class Application extends Alpha {
 	public void setArguments(String value) {
 		arguments= value;
 	}
-	public void getArguments0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= new PrologString(getArguments(iX));
+	public void getArguments0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(new PrologString(getArguments(iX)));
 	}
 	public void getArguments0fs(ChoisePoint iX) {
 	}
@@ -106,14 +106,14 @@ public abstract class Application extends Alpha {
 	// get/set windowMode
 	//
 	public void setWindowMode1s(ChoisePoint iX, Term a1) {
-		WindowMode mode= WindowMode.termToWindowMode(a1,iX);
+		WindowMode mode= WindowMode.argumentToWindowMode(a1,iX);
 		setWindowMode(mode);
 	}
 	public void setWindowMode(WindowMode value) {
 		windowMode= value;
 	}
-	public void getWindowMode0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getWindowMode(iX).toTerm();
+	public void getWindowMode0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getWindowMode(iX).toTerm());
 	}
 	public void getWindowMode0fs(ChoisePoint iX) {
 	}
@@ -122,7 +122,7 @@ public abstract class Application extends Alpha {
 			return windowMode;
 		} else {
 			Term value= getBuiltInSlot_E_window_mode();
-			return WindowMode.termToWindowMode(value,iX);
+			return WindowMode.argumentToWindowMode(value,iX);
 		}
 	}
 	//
@@ -134,9 +134,9 @@ public abstract class Application extends Alpha {
 	public void setEnableMultipleInstances(boolean value) {
 		enableMultipleInstances= value;
 	}
-	public void getEnableMultipleInstances0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getEnableMultipleInstances0ff(ChoisePoint iX, PrologVariable result) {
 		boolean value= getEnableMultipleInstances(iX);
-		a1.value= YesNo.boolean2TermYesNo(value);
+		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(value));
 	}
 	public void getEnableMultipleInstances0fs(ChoisePoint iX) {
 	}
@@ -166,12 +166,12 @@ public abstract class Application extends Alpha {
 		activate(iX,command,arguments,true);
 	}
 	public void activate1s(ChoisePoint iX, Term a1) {
-		ProcessBuilderCommand command= ProcessBuilderCommand.termToProcessBuilderCommand(a1,iX);
+		ProcessBuilderCommand command= ProcessBuilderCommand.argumentToProcessBuilderCommand(a1,iX);
 		String arguments= getArguments(iX);
 		activate(iX,command,arguments,false);
 	}
 	public void activate2s(ChoisePoint iX, Term a1, Term a2) {
-		ProcessBuilderCommand command= ProcessBuilderCommand.termToProcessBuilderCommand(a1,iX);
+		ProcessBuilderCommand command= ProcessBuilderCommand.argumentToProcessBuilderCommand(a1,iX);
 		String arguments= Converters.argumentToString(a2,iX);
 		activate(iX,command,arguments,false);
 	}
@@ -180,7 +180,7 @@ public abstract class Application extends Alpha {
 			if (command.isExtensionSpecific) {
 				boolean backslashIsSeparator= getBackslashAlwaysIsSeparator(iX);
 				boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
-				SimpleFileName simpleFile= SimpleFileName.termToSimpleFileName(arguments,backslashIsSeparator,acceptOnlyURI);
+				SimpleFileName simpleFile= SimpleFileName.argumentToSimpleFileName(arguments,backslashIsSeparator,acceptOnlyURI);
 				String extension= command.text;
 				RelativeFileName relativeFile= simpleFile.formRelativeFileName(true,extension);
 				arguments= relativeFile.toString();
@@ -248,7 +248,7 @@ public abstract class Application extends Alpha {
 			try {
 				boolean backslashIsSeparator= getBackslashAlwaysIsSeparator(iX);
 				boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
-				SimpleFileName simpleFile= SimpleFileName.termToSimpleFileName(commandText,backslashIsSeparator,acceptOnlyURI);
+				SimpleFileName simpleFile= SimpleFileName.argumentToSimpleFileName(commandText,backslashIsSeparator,acceptOnlyURI);
 				ExtendedFileName extendedFile= simpleFile.formRealFileNameBasedOnPath(false,false,"",null,staticContext);
 				URL codeBase= applet.getCodeBase();
 				if (codeBase != null) {
@@ -269,7 +269,7 @@ public abstract class Application extends Alpha {
 			Desktop desktop= Desktop.getDesktop();
 			boolean backslashIsSeparator= getBackslashAlwaysIsSeparator(iX);
 			boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
-			SimpleFileName simpleFile= SimpleFileName.termToSimpleFileName(commandText,backslashIsSeparator,acceptOnlyURI);
+			SimpleFileName simpleFile= SimpleFileName.argumentToSimpleFileName(commandText,backslashIsSeparator,acceptOnlyURI);
 			try {
 				ExtendedFileName extendedFile= simpleFile.formRealFileNameBasedOnPath(false,false,"",null,staticContext);
 				if (extendedFile.getIsLocalResource()) {

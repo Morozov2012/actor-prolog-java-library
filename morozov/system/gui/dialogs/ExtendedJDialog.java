@@ -6,6 +6,8 @@ import morozov.run.*;
 import morozov.system.gui.*;
 
 import javax.swing.JDialog;
+import java.awt.Window;
+import java.awt.Component;
 import javax.swing.SwingUtilities;
 import java.awt.Dialog.ModalityType;
 import java.awt.Window;
@@ -47,9 +49,13 @@ public class ExtendedJDialog
 		staticContext= context;
 	}
 	//
+	public Window getWindow() {
+		return this;
+	}
+	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void addToDesktop(MainDesktopPane desktop) {
+	public void addToDesktopIfNecessary(StaticContext context) {
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -148,7 +154,7 @@ public class ExtendedJDialog
 	private void mousePressedOrReleased(MouseEvent event) {
 		if (event.getButton() == MouseEvent.BUTTON1) {
 			if (event.getClickCount() > 1) {
-				MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
+				Component desktop= StaticDesktopAttributes.retrieveTopLevelWindowOrDesktopPane(staticContext);
 				if (desktop==null) {
 					return;
 				};

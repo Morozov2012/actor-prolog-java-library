@@ -93,6 +93,14 @@ public enum BinaryOperation {
 			return new PrologReal(StrictMath.pow(n1,n2));
 		}
 	},
+	HYPOT {
+		public Term eval(BigInteger n1, BigInteger n2) {
+			return new PrologReal(StrictMath.hypot(n1.doubleValue(),n2.doubleValue()));
+		}
+		public Term eval(double n1, double n2) {
+			return new PrologReal(StrictMath.hypot(n1,n2));
+		}
+	},
 	BITAND {
 		public Term eval(BigInteger n1, BigInteger n2) {
 			return new PrologInteger(n1.and(n2));
@@ -118,7 +126,7 @@ public enum BinaryOperation {
 			return new PrologInteger(n1.shiftLeft(PrologInteger.toInteger(n2)));
 		}
 	};
-	public abstract Term eval(BigInteger n1, BigInteger n2);
+	abstract public Term eval(BigInteger n1, BigInteger n2);
 	public Term eval(double n1, double n2) {
 		throw new IllegalTypesOfArgumentsInBinaryOperation();
 	}

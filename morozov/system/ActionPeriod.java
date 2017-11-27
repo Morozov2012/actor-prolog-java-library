@@ -48,7 +48,7 @@ public class ActionPeriod extends TimeInterval {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static ActionPeriod termToActionPeriod(Term a, ChoisePoint iX) {
+	public static ActionPeriod argumentToActionPeriod(Term a, ChoisePoint iX) {
 		try {
 			long code= a.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_none) {
@@ -59,7 +59,7 @@ public class ActionPeriod extends TimeInterval {
 				throw new WrongArgumentIsNotActionPeriod(a);
 			}
 		} catch (TermIsNotASymbol b) {
-			return new ActionPeriod(termSecondsToTimeInterval(a,iX));
+			return new ActionPeriod(argumentSecondsToTimeInterval(a,iX));
 		}
 	}
 	//
@@ -67,7 +67,7 @@ public class ActionPeriod extends TimeInterval {
 	//
 	public BigDecimal toNanosecondsOrDefault(Term alternativeValue, BigDecimal defaultValue, ChoisePoint iX) {
 		if (isDefault) {
-			return ActionPeriod.termToActionPeriod(alternativeValue,iX).toNanosecondsOrDefault(defaultValue);
+			return ActionPeriod.argumentToActionPeriod(alternativeValue,iX).toNanosecondsOrDefault(defaultValue);
 		} else if (isNone) {
 			return decimalNoActionPeriod;
 		} else {
@@ -89,7 +89,7 @@ public class ActionPeriod extends TimeInterval {
 	//
 	public int toMillisecondsOrDefault(Term defaultActionPeriod, ChoisePoint iX) {
 		if (isDefault) {
-			return TimeInterval.termSecondsToTimeInterval(defaultActionPeriod,iX).toMillisecondsInteger();
+			return TimeInterval.argumentSecondsToTimeInterval(defaultActionPeriod,iX).toMillisecondsInteger();
 		} else if (isNone) {
 			return noActionPeriod;
 		} else {

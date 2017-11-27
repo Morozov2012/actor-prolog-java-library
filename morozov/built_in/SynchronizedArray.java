@@ -49,9 +49,10 @@ public abstract class SynchronizedArray extends LambdaArray {
 	public void setImplementProtectingPorts(boolean value) {
 		implementProtectingPorts= value;
 	}
-	public void getImplementProtectingPorts0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getImplementProtectingPorts0ff(ChoisePoint iX, PrologVariable result) {
 		boolean value= getImplementProtectingPorts(iX);
-		a1.value= YesNo.boolean2TermYesNo(value);
+		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(value));
+		// iX.pushTrail(a1);
 	}
 	public void getImplementProtectingPorts0fs(ChoisePoint iX) {
 	}
@@ -72,9 +73,10 @@ public abstract class SynchronizedArray extends LambdaArray {
 	public void setImplementSuspendingPorts(boolean value) {
 		implementSuspendingPorts= value;
 	}
-	public void getImplementSuspendingPorts0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getImplementSuspendingPorts0ff(ChoisePoint iX, PrologVariable result) {
 		boolean value= getImplementSuspendingPorts(iX);
-		a1.value= YesNo.boolean2TermYesNo(value);
+		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(value));
+		// iX.pushTrail(a1);
 	}
 	public void getImplementSuspendingPorts0fs(ChoisePoint iX) {
 	}

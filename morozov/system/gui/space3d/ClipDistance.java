@@ -39,7 +39,7 @@ public class ClipDistance {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static ClipDistance termToClipDistance(Term argument, ChoisePoint iX) {
+	public static ClipDistance argumentToClipDistance(Term argument, ChoisePoint iX) {
 		try {
 			double v= Converters.termToReal(argument,iX);
 			return new ClipDistance(v);

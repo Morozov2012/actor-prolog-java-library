@@ -94,7 +94,7 @@ public class HashSetTable extends DatabaseTable {
 	//
 	protected void retractCurrentRecord(DatabaseRecord currentRecord, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
-		databaseHash.remove(currentRecord.value);
+		databaseHash.remove(currentRecord.content);
 		super.retractCurrentRecord(currentRecord,currentProcess,false,iX);
 	}
 	//

@@ -39,7 +39,7 @@ public class ActiveDiagram implements ProcessStateListener {
 	}
 	//
 	public void showDescription(String identifier) {
-		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(staticContext);
+		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(staticContext);
 		DiagramUtils.showNote(desktop,identifier,staticContext);
 	}
 	//

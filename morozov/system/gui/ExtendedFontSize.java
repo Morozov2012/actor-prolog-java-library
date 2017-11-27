@@ -52,20 +52,20 @@ public class ExtendedFontSize {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static ExtendedFontSize termToExtendedFontSizeSafe(Term value, ChoisePoint iX) {
+	public static ExtendedFontSize argumentToExtendedFontSizeSafe(Term value, ChoisePoint iX) {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
 			return new ExtendedFontSize();
 		} else {
 			try {
-				return termToExtendedFontSize(value,iX);
+				return argumentToExtendedFontSize(value,iX);
 			} catch (RuntimeException e) {
 				return new ExtendedFontSize();
 			}
 		}
 	}
 	//
-	public static Term termToExtendedFontSizeOrFail(Term value, ChoisePoint iX) throws Backtracking {
+	public static Term argumentToExtendedFontSizeOrFail(Term value, ChoisePoint iX) throws Backtracking {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable()) {
 			throw Backtracking.instance;
@@ -73,7 +73,7 @@ public class ExtendedFontSize {
 			return termDefault;
 		} else {
 			try {
-				return new PrologInteger(termToFontSize(value,iX));
+				return new PrologInteger(argumentToFontSize(value,iX));
 			} catch (TermIsSymbolDefault e) {
 				return termDefault;
 			} catch (RuntimeException e) {
@@ -82,28 +82,28 @@ public class ExtendedFontSize {
 		}
 	}
 	//
-	public static ExtendedFontSize termToExtendedFontSize(Term value, ChoisePoint iX) {
+	public static ExtendedFontSize argumentToExtendedFontSize(Term value, ChoisePoint iX) {
 		try {
-			return new ExtendedFontSize(termToFontSize(value,iX));
+			return new ExtendedFontSize(argumentToFontSize(value,iX));
 		} catch (TermIsSymbolDefault e) {
 			return new ExtendedFontSize();
 		}
 	}
 	//
-	public static int termToFontSizeSafe(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
+	public static int argumentToFontSizeSafe(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
 			throw TermIsSymbolDefault.instance;
 		} else {
 			try {
-				return termToFontSize(value,iX);
+				return argumentToFontSize(value,iX);
 			} catch (RuntimeException e) {
 				throw TermIsSymbolDefault.instance;
 			}
 		}
 	}
 	//
-	public static int termToFontSize(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
+	public static int argumentToFontSize(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		try {
 			return value.getIntegerValue(iX).intValue();
 		} catch (TermIsNotAnInteger e1) {

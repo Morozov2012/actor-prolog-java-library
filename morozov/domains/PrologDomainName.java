@@ -46,7 +46,7 @@ public abstract class PrologDomainName implements Serializable {
 	public static final String tagDomainAlternative_AnySet		= "'any_set'";
 	public static final String tagDomainAlternative_Any		= "'any'";
 	//
-	public abstract String toString(CharsetEncoder encoder);
+	abstract public String toString(CharsetEncoder encoder);
 	//
 	public static PrologDomainName termToPrologDomainName(Term value, ChoisePoint iX) throws TermIsNotPrologDomainName {
 		try {

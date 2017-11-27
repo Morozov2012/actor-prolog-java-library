@@ -12,13 +12,15 @@ import java.util.Map;
 import java.util.Collections;
 
 public abstract class SymbolTable {
+	//
 	public static SymbolName[] initialContent;
 	public static Map<Integer,SymbolName> symbolNameHash= Collections.synchronizedMap(new HashMap<Integer,SymbolName>());
 	public static Map<String,Integer> symbolCodeHash= Collections.synchronizedMap(new HashMap<String,Integer>());
-	public static int staticTableSize;
-	public static int totalTableSize;
-	protected final static int firstSymbolCode = 100;
-	// public SymbolTable() {}
+	public static volatile int staticTableSize;
+	public static volatile int totalTableSize;
+	//
+	protected final static int firstSymbolCode= 100;
+	//
 	public static void initializeSymbolTable() {
 		synchronized(symbolCodeHash) {
 			// SymbolName[] initialContent= getStaticSymbolNames();
@@ -30,7 +32,7 @@ public abstract class SymbolTable {
 			totalTableSize= initialContent.length;
 		}
 	}
-	// public abstract SymbolName[] getStaticSymbolNames();
+	// abstract public SymbolName[] getStaticSymbolNames();
 	public static SymbolName retrieveSymbolName(long value) {
 		if (value - firstSymbolCode > Integer.MAX_VALUE) {
 			throw new IncorrecSymbolCode();

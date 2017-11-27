@@ -36,7 +36,7 @@ public class DatabasePlace {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static DatabasePlace termToDatabasePlace(Term value, Database database, PrologDomain domain, DatabaseType type, boolean reuseKN, ChoisePoint iX) {
+	public static DatabasePlace argumentToDatabasePlace(Term value, Database database, PrologDomain domain, DatabaseType type, boolean reuseKN, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_standalone) {

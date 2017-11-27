@@ -7,6 +7,7 @@
 package morozov.system.gui.dialogs.scalable;
 
 import morozov.run.*;
+import morozov.system.gui.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
 import morozov.terms.*;
@@ -53,10 +54,51 @@ public class ScalableRadioButton extends ScalableAbstractButton {
 		model.addActionListener(this);
 	}
 	//
-	// protected int getInitialTopBorder() {return 5;}
-	// protected int getInitialLeftBorder() {return 18;}
-	// protected int getInitialBottomBorder() {return 5;}
-	// protected int getInitialRightBorder() {return 18;}
+	///////////////////////////////////////////////////////////////
+	//
+	public void putValue(Term value, ChoisePoint iX) {
+	}
+	//
+	public Term getValue() {
+		return PrologUnknownValue.instance;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setAlarmColors(Color fc, Color bc) {
+		BasicRadioButtonUI ui= (BasicRadioButtonUI)((JRadioButton)component).getUI();
+		Icon defaultIcon= ui.getDefaultIcon();
+		if (defaultIcon!=null) {
+			if (defaultIcon instanceof ScalableToggleButtonIcon) {
+				ScalableToggleButtonIcon scalableIcon= (ScalableToggleButtonIcon)defaultIcon;
+				scalableIcon.setAlarmColors(fc,bc);
+			}
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setIndividualText(Term value, ChoisePoint iX) {
+		AnnotatedButton.safelyUpdateAbstractButton((JRadioButton)component,value,iX);
+		// ((JButton)component).invalidate();
+		// Без этой команды при изменении надписи на кнопке
+		// соседние кнопки сдвигаются, но перерисовываются
+		// некорректно; новое изображение кнопок ступенькой
+		// накладывается на старое.
+		targetDialog.safelyRevalidateAndRepaint();
+	}
+	//
+	public Term getIndividualText() {
+		if (component!=null) {
+			// String text= ((JRadioButton)component).getText();
+			String text= AnnotatedButton.safelyRestoreText((JRadioButton)component);
+			return new PrologString(text);
+		} else {
+			return termEmptyString;
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void setFont(Font font) {
 		super.setFont(font);
@@ -71,7 +113,9 @@ public class ScalableRadioButton extends ScalableAbstractButton {
 			}
 		}
 	}
+	//
 	public void setBackground(Color c) {
+		super.setBackground(c);
 		BasicRadioButtonUI ui= (BasicRadioButtonUI)((JRadioButton)component).getUI();
 		Icon defaultIcon= ui.getDefaultIcon();
 		if (defaultIcon!=null) {
@@ -79,24 +123,6 @@ public class ScalableRadioButton extends ScalableAbstractButton {
 				ScalableToggleButtonIcon scalableIcon= (ScalableToggleButtonIcon)defaultIcon;
 				scalableIcon.setBackground(component,c);
 			}
-		};
-		super.setBackground(c);
-	}
-	public void setAlarmColors(Color fc, Color bc) {
-		BasicRadioButtonUI ui= (BasicRadioButtonUI)((JRadioButton)component).getUI();
-		Icon defaultIcon= ui.getDefaultIcon();
-		if (defaultIcon!=null) {
-			if (defaultIcon instanceof ScalableToggleButtonIcon) {
-				ScalableToggleButtonIcon scalableIcon= (ScalableToggleButtonIcon)defaultIcon;
-				scalableIcon.setAlarmColors(fc,bc);
-			}
 		}
-	}
-	// public void stateChanged(ChangeEvent event) {
-	// }
-	public void putValue(Term value, ChoisePoint iX) {
-	}
-	public Term getValue() {
-		return PrologUnknownValue.instance;
 	}
 }

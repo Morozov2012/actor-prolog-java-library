@@ -19,6 +19,7 @@ import java.util.Set;
 import java.math.BigInteger;
 
 public abstract class DomainAlternative implements Serializable {
+	//
 	public void initiate() {
 	}
 	//
@@ -187,7 +188,7 @@ public abstract class DomainAlternative implements Serializable {
 		return false;
 	}
 	//
-	public static DomainAlternative termToDomainAlternative(Term value, ChoisePoint iX) throws TermIsNotDomainAlternative {
+	public static DomainAlternative argumentToDomainAlternative(Term value, ChoisePoint iX) throws TermIsNotDomainAlternative {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_integer) {
@@ -254,7 +255,7 @@ public abstract class DomainAlternative implements Serializable {
 						String domainName= arguments[1].getStringValue(iX);
 						return new DomainSet(key,domainName);
 					} else if (functor==SymbolCodes.symbolCode_E_optimized_set) {
-						long[] keys= Converters.termToLongIntegers(arguments[0],iX);
+						long[] keys= Converters.argumentToLongIntegers(arguments[0],iX);
 						String[] domainNames= Converters.termToStrings(arguments[1],iX);
 						return new DomainOptimizedSet(keys,domainNames);
 					} else {
@@ -282,5 +283,5 @@ public abstract class DomainAlternative implements Serializable {
 		}
 	}
 	//
-	public abstract String toString(CharsetEncoder encoder);
+	abstract public String toString(CharsetEncoder encoder);
 }

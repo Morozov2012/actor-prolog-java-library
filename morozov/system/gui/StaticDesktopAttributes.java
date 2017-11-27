@@ -4,6 +4,7 @@ package morozov.system.gui;
 
 import morozov.run.*;
 
+import java.awt.Component;
 import java.awt.Window;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
@@ -15,6 +16,7 @@ public class StaticDesktopAttributes extends StaticAttributes {
 	private ReentrantLock desktopGuard= new ReentrantLock();
 	private int previousDefaultPosition= -1;
 	private Window mainWindow;
+	private Window topLevelWindow;
 	private static final String staticIdentifier= "_Desktop";
 	private boolean exitOnClose= true;
 	//
@@ -31,13 +33,13 @@ public class StaticDesktopAttributes extends StaticAttributes {
 		};
 		return (StaticDesktopAttributes)attributes;
 	}
-	public static void setDesktopPane(MainDesktopPane desktop, StaticContext context) {
+	public static void setMainDesktopPane(MainDesktopPane desktop, StaticContext context) {
 		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
 		synchronized(attributes) {
 			attributes.desktop= desktop;
 		}
 	}
-	public static MainDesktopPane retrieveDesktopPane(StaticContext context) {
+	public static MainDesktopPane retrieveMainDesktopPane(StaticContext context) {
 		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
 		MainDesktopPane desktop;
 		synchronized(attributes) {
@@ -110,6 +112,32 @@ public class StaticDesktopAttributes extends StaticAttributes {
 			window= attributes.mainWindow;
 		};
 		return window;
+	}
+	public static void setTopLevelWindow(Window window, StaticContext context) {
+		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
+		synchronized(attributes) {
+			attributes.topLevelWindow= window;
+		}
+	}
+	public static Window retrieveTopLevelWindow(StaticContext context) {
+		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
+		Window window;
+		synchronized(attributes) {
+			window= attributes.topLevelWindow;
+		};
+		return window;
+	}
+	public static Component retrieveTopLevelWindowOrDesktopPane(StaticContext context) {
+		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
+		synchronized(attributes) {
+			Window window= attributes.topLevelWindow;
+			if (window != null) {
+				return window;
+			} else {
+				MainDesktopPane desktop= attributes.desktop;
+				return desktop;
+			}
+		}
 	}
 	public static void setExitOnClose(boolean mode, StaticContext context) {
 		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);

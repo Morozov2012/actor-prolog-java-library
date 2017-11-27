@@ -4,6 +4,7 @@ package morozov.system.gui;
 
 import morozov.built_in.*;
 import morozov.system.gui.dialogs.*;
+import morozov.system.gui.dialogs.scalable.*;
 import morozov.system.gui.errors.*;
 import java.awt.Rectangle;
 import java.awt.Point;
@@ -20,16 +21,16 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.lang.reflect.InvocationTargetException;
 
 public abstract class CanvasSpace {
+	//
+	protected CustomControlComponent customControlComponent;
 	protected Component control;
 	protected AtomicReference<Component> owner= new AtomicReference<Component>();
 	protected AbstractDialog dialog;
 	protected CustomControl targetWorld;
 	//
-	public CanvasSpace() {
+	public CanvasSpace(CustomControlComponent customComponent) {
+		customControlComponent= customComponent;
 	}
-	// public CanvasSpace(Component c) {
-	//	super(c);
-	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -50,6 +51,50 @@ public abstract class CanvasSpace {
 	}
 	public CustomControl getTargetWorld() {
 		return targetWorld;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void safelyRefineWidth(final double ratio) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			quicklyRefineWidth(ratio);
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						quicklyRefineWidth(ratio);
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	protected void quicklyRefineWidth(double ratio) {
+		if (customControlComponent != null) {
+			customControlComponent.refineWidth(ratio);
+		}
+	}
+	//
+	public void safelyRefineHeight(final double ratio) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			quicklyRefineHeight(ratio);
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						quicklyRefineHeight(ratio);
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			}
+		}
+	}
+	protected void quicklyRefineHeight(double ratio) {
+		if (customControlComponent != null) {
+			customControlComponent.refineHeight(ratio);
+		}
 	}
 	//
 	///////////////////////////////////////////////////////////////

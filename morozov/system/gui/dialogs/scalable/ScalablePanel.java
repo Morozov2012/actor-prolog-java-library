@@ -12,21 +12,44 @@ package morozov.system.gui.dialogs.scalable;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import target.*;
+
+import morozov.run.*;
+import morozov.system.gui.*;
+import morozov.system.gui.dialogs.*;
+import morozov.system.gui.dialogs.errors.*;
+import morozov.system.signals.*;
+import morozov.terms.*;
+
 import javax.swing.JPanel;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.font.TextAttribute;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.awt.Color;
+
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.HashMap;
+import java.util.Map;
 
-public class ScalablePanel extends JPanel {
+public class ScalablePanel extends JPanel implements ActiveComponentInterface {
+	//
+	protected AbstractDialog targetDialog= null;
 	//
 	protected GridBagLayout gridBagLayout;
+	//
+	protected Font colourlessFont;
+	protected Color textColor;
+	protected Color spaceColor;
+	//
+	protected Color individualTextColor;
+	protected Color individualSpaceColor;
+	protected Color individualBackgroundColor;
 	//
 	protected boolean isTop= false;
 	protected boolean isLeft= false;
@@ -46,8 +69,92 @@ public class ScalablePanel extends JPanel {
 	protected AtomicBoolean isTransparent= new AtomicBoolean(true);
 	protected AtomicReference<Color> hatchColor= new AtomicReference<Color>();
 	//
-	public ScalablePanel() {
+	protected static Term termEmptyString= new PrologString("");
+	protected static Term termDefault= new PrologSymbol(SymbolCodes.symbolCode_E_default);
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public ScalablePanel(AbstractDialog tD) {
+		targetDialog= tD;
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
+		return value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
+	}
+	public Term standardizeRange(Term value, ChoisePoint iX) throws RejectRange {
+		return value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void putValue(DialogControlOperation operation, Term value, ChoisePoint iX) {
+		switch (operation) {
+			case VALUE:
+				break;
+			case TEXT:
+				setIndividualText(value,iX);
+				break;
+			case TEXT_COLOR:
+				setIndividualTextColor(value,iX);
+				break;
+			case SPACE_COLOR:
+				setIndividualSpaceColor(value,iX);
+				break;
+			case BACKGROUND_COLOR:
+				setIndividualBackgroundColor(value,iX);
+				break;
+		}
+	}
+	//
+	public Term getValue(DialogControlOperation operation) {
+		switch (operation) {
+			case VALUE:
+				return PrologUnknownValue.instance;
+			case TEXT:
+				return getIndividualText();
+			case TEXT_COLOR:
+				return getIndividualTextColor();
+			case SPACE_COLOR:
+				return getIndividualSpaceColor();
+			case BACKGROUND_COLOR:
+				return getIndividualBackgroundColor();
+		};
+		throw new UnknownDialogControlOperation();
+	}
+	//
+	public void putRange(Term value, ChoisePoint iX) {
+	}
+	public Term getRange() {
+		return PrologUnknownValue.instance;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setIsEnabled(boolean mode) {
+		if (mode) {
+			setEnabled(true);
+		} else {
+			setEnabled(false);
+		}
+	}
+	//
+	public boolean isEnabled(boolean mode) {
+		return (isEnabled() == mode);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setTransparency(boolean flag) {
+		isTransparent.set(flag);
+	}
+	//
+	public void setHatchColor(Color c) {
+		hatchColor.set(c);
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void setPadding(
 			GridBagLayout gBL,
@@ -61,19 +168,18 @@ public class ScalablePanel extends JPanel {
 		horizontalPadding= valueHorizontal;
 		verticalPadding= valueVertical;
 	}
-	// public boolean isTitledPanel() {
-	//	return false;
-	// }
+	//
 	public void setScaling(double valueHorizontal, double valueVertical) {
 		horizontalScaling= valueHorizontal;
 		verticalScaling= valueVertical;
 	}
-	// public void setSpaceColor(Color c) {
-	// }
-	public void setFont(Font font) {
-		super.setFont(font);
-		if (gridBagLayout!=null) {
-			//
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setGeneralFont(Font font) {
+		colourlessFont= font;
+		font= DialogUtils.refineTextAndSpaceColors(font,individualSpaceColor,spaceColor,individualTextColor,textColor);
+		if (gridBagLayout != null) {
 			GridBagConstraints gBC= gridBagLayout.getConstraints(this);
 			FontMetrics metrics= getFontMetrics(font);
 			gBC.insets= LayoutUtils.calculateLayoutInsets(
@@ -94,17 +200,115 @@ public class ScalablePanel extends JPanel {
 				getInitialRightBorder());
 			gridBagLayout.setConstraints(this,gBC);
 		};
-		invalidate();
+		setFont(font);
+		//// component.setMinimumSize(component.getPreferredSize());
+		//// Предположительно, это может помочь в борьбе
+		//// с проблемой схлопывания текстовых полей:
 		// setMinimumSize(getPreferredSize());
+		invalidate();
 	}
-	public void setTransparency(boolean flag) {
-		isTransparent.set(flag);
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setGeneralForeground(Color c) {
+		textColor= c;
+		if (individualTextColor==null) {
+			setForeground(c);
+		} else {
+			setForeground(individualTextColor);
+		};
+		if (colourlessFont==null) {
+			colourlessFont= getFont();
+		};
+		setGeneralFont(colourlessFont);
 	}
-	public void setHatchColor(Color c) {
-		hatchColor.set(c);
+	//
+	public void setGeneralSpaceColor(Color c) {
+		spaceColor= c;
+		if (colourlessFont==null) {
+			colourlessFont= getFont();
+		};
+		setGeneralFont(colourlessFont);
 	}
+	//
+	public void setGeneralBackground(Color c) {
+		if (individualBackgroundColor==null) {
+			setBackground(c);
+		} else {
+			setBackground(individualBackgroundColor);
+		}
+	}
+	//
 	public void setAlarmColors(Color fc, Color bc) {
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setIndividualText(Term value, ChoisePoint iX) {
+	}
+	//
+	public Term getIndividualText() {
+		return termEmptyString;
+	}
+	//
+	public void setIndividualTextColor(Term value, ChoisePoint iX) {
+		try {
+			individualTextColor= ExtendedColor.argumentToColorSafe(value,iX);
+			setForeground(individualTextColor);
+		} catch (TermIsSymbolDefault e) {
+			individualTextColor= null;
+		};
+		if (colourlessFont==null) {
+			colourlessFont= getFont();
+		};
+		setGeneralFont(colourlessFont);
+	}
+	public void setIndividualSpaceColor(Term value, ChoisePoint iX) {
+		try {
+			individualSpaceColor= ExtendedColor.argumentToColorSafe(value,iX);
+		} catch (TermIsSymbolDefault e) {
+			individualSpaceColor= null;
+		};
+		if (colourlessFont==null) {
+			colourlessFont= getFont();
+		};
+		setGeneralFont(colourlessFont);
+	}
+	public void setIndividualBackgroundColor(Term value, ChoisePoint iX) {
+		try {
+			individualBackgroundColor= ExtendedColor.argumentToColorSafe(value,iX);
+			setBackground(individualBackgroundColor);
+		} catch (TermIsSymbolDefault e) {
+			individualBackgroundColor= null;
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public Term getIndividualTextColor() {
+		if (individualTextColor != null) {
+			return ExtendedColor.colorToTerm(individualTextColor);
+		} else {
+			return termDefault;
+		}
+	}
+	public Term getIndividualSpaceColor() {
+		if (individualSpaceColor != null) {
+			return ExtendedColor.colorToTerm(individualSpaceColor);
+		} else {
+			return termDefault;
+		}
+	}
+	public Term getIndividualBackgroundColor() {
+		if (individualBackgroundColor != null) {
+			return ExtendedColor.colorToTerm(individualBackgroundColor);
+		} else {
+			return termDefault;
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void paint(Graphics g0) {
 		if (!isTransparent.get()) {
 			Graphics2D g2= (Graphics2D)g0;

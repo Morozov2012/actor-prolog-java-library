@@ -494,7 +494,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 	///////////////////////////////////////////////////////////////
 	//
 	public void safelyRestoreSize(StaticContext context) {
-		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(context);
+		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(context);
 		if (desktop==null) {
 			return;
 		};

@@ -33,7 +33,7 @@ import java.util.HashMap;
 
 public class DatabaseTable implements Serializable, Cloneable {
 	//
-	protected DatabaseRecord content;
+	protected DatabaseRecord tableContent;
 	protected DatabaseRecord ultimateRecord;
 	//
 	protected PrologDomain prologDomain;
@@ -96,8 +96,8 @@ public class DatabaseTable implements Serializable, Cloneable {
 			throw new DatabaseTableHasDifferentDomain(prologDomain,domain);
 		};
 		if (tableContainsWorlds) {
-			if (content != null) {
-				content.checkDomain(domain,iX);
+			if (tableContent != null) {
+				tableContent.checkDomain(domain,iX);
 			}
 		}
 	}
@@ -107,13 +107,13 @@ public class DatabaseTable implements Serializable, Cloneable {
 	public DatabaseRecord insertRecord(Term copy, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX, boolean isInnerOperation) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
 		DatabaseRecord newRecord= new DatabaseRecord(copy);
-		if (content != null) {
-			content.previousRecord= newRecord;
-			newRecord.nextRecord= content;
-			content= newRecord;
+		if (tableContent != null) {
+			tableContent.previousRecord= newRecord;
+			newRecord.nextRecord= tableContent;
+			tableContent= newRecord;
 		} else {
-			content= newRecord;
-			ultimateRecord= content;
+			tableContent= newRecord;
+			ultimateRecord= tableContent;
 		};
 		return newRecord;
 	}
@@ -121,28 +121,29 @@ public class DatabaseTable implements Serializable, Cloneable {
 	public DatabaseRecord appendRecord(Term copy, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX, boolean isInnerOperation) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
 		DatabaseRecord newRecord= new DatabaseRecord(copy);
-		if (content != null) {
+		if (tableContent != null) {
 			ultimateRecord.nextRecord= newRecord;
 			newRecord.previousRecord= ultimateRecord;
 			ultimateRecord= newRecord;
 		} else {
-			content= newRecord;
-			ultimateRecord= content;
+			tableContent= newRecord;
+			ultimateRecord= tableContent;
 		};
 		return newRecord;
 	}
 	//
 	public void findRecord(PrologVariable outputResult, Term inputResult, boolean hasOutputArgument, Continuation c0, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) throws Backtracking {
 		container.claimReadingAccess(currentProcess,checkPrivileges);
-		DatabaseRecord currentRecord= content;
+		DatabaseRecord currentRecord= tableContent;
 		ChoisePoint newIx= new ChoisePoint(iX);
 		while (true) {
 			if (currentRecord != null) {
 				if (hasOutputArgument) {
-					outputResult.value= currentRecord.value;
+					outputResult.setBacktrackableValue(currentRecord.content,newIx);
+					//newIx.pushTrail(outputResult);
 				} else {
 					try {
-						inputResult.unifyWith(currentRecord.value,newIx);
+						inputResult.unifyWith(currentRecord.content,newIx);
 					} catch (Backtracking b) {
 						newIx.freeTrail();
 						currentRecord= getNextValidRecord(currentRecord);
@@ -153,7 +154,8 @@ public class DatabaseTable implements Serializable, Cloneable {
 					c0.execute(newIx);
 				} catch (Backtracking b) {
 					if (hasOutputArgument) {
-						outputResult.value= null;
+						outputResult.clear();
+						//newIx.pushTrail(outputResult);
 					};
 					if (newIx.isEnabled()) {
 						newIx.freeTrail();
@@ -167,7 +169,7 @@ public class DatabaseTable implements Serializable, Cloneable {
 				return;
 			} else {
 				if (hasOutputArgument) {
-					outputResult.value= null;
+					outputResult.clear();
 				};
 				throw Backtracking.instance;
 			}
@@ -176,7 +178,7 @@ public class DatabaseTable implements Serializable, Cloneable {
 	//
 	public void matchRecord(PrologVariable result, Term pattern, boolean isFunctionCall, Continuation c0, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) throws Backtracking {
 		container.claimReadingAccess(currentProcess,checkPrivileges);
-		DatabaseRecord currentRecord= content;
+		DatabaseRecord currentRecord= tableContent;
 		ChoisePoint newIx= new ChoisePoint(iX);
 		// 2015.02.01 This check is not implemented in VIP!
 		if (!prologDomain.coversTerm(pattern,newIx,true)) {
@@ -186,13 +188,14 @@ public class DatabaseTable implements Serializable, Cloneable {
 		while (true) {
 			if (currentRecord != null) {
 				if (isFunctionCall) {
-					result.value= currentRecord.value;
+					result.setNonBacktrackableValue(currentRecord.content);
+					// newIx.pushTrail(result);
 				};
 				try {
 					c0.execute(newIx);
 				} catch (Backtracking b) {
 					if (isFunctionCall) {
-						result.value= null;
+						result.clear();
 					};
 					if (newIx.isEnabled()) {
 						newIx.freeTrail();
@@ -211,7 +214,7 @@ public class DatabaseTable implements Serializable, Cloneable {
 				return;
 			} else {
 				if (isFunctionCall) {
-					result.value= null;
+					result.clear();
 				};
 				throw Backtracking.instance;
 			}
@@ -220,15 +223,16 @@ public class DatabaseTable implements Serializable, Cloneable {
 	//
 	public void retractRecord(PrologVariable outputResult, Term inputResult, boolean hasOutputArgument, Continuation c0, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) throws Backtracking {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
-		DatabaseRecord currentRecord= content;
+		DatabaseRecord currentRecord= tableContent;
 		ChoisePoint newIx= new ChoisePoint(iX);
 		while (true) {
 			if (currentRecord != null) {
 				if (hasOutputArgument) {
-					outputResult.value= currentRecord.value;
+					outputResult.setBacktrackableValue(currentRecord.content,newIx);
+					//newIx.pushTrail(outputResult);
 				} else {
 					try {
-						inputResult.unifyWith(currentRecord.value,newIx);
+						inputResult.unifyWith(currentRecord.content,newIx);
 					} catch (Backtracking b) {
 						newIx.freeTrail();
 						currentRecord= getNextValidRecord(currentRecord);
@@ -240,7 +244,7 @@ public class DatabaseTable implements Serializable, Cloneable {
 					c0.execute(newIx);
 				} catch (Backtracking b) {
 					if (hasOutputArgument) {
-						outputResult.value= null;
+						outputResult.clear();
 					};
 					if (newIx.isEnabled()) {
 						newIx.freeTrail();
@@ -253,7 +257,7 @@ public class DatabaseTable implements Serializable, Cloneable {
 				return;
 			} else {
 				if (hasOutputArgument) {
-					outputResult.value= null;
+					outputResult.clear();
 				};
 				throw Backtracking.instance;
 			}
@@ -262,24 +266,24 @@ public class DatabaseTable implements Serializable, Cloneable {
 	//
 	public void retractAll(ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
-		if (content != null) {
-			content.retractAll();
-			content= null;
+		if (tableContent != null) {
+			tableContent.retractAll();
+			tableContent= null;
 			ultimateRecord= null;
 		}
 	}
 	public void retractAll(Term pattern, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
-		DatabaseRecord currentRecord= content;
+		DatabaseRecord currentRecord= tableContent;
 		ChoisePoint newIx= new ChoisePoint(iX);
 		if (!prologDomain.coversTerm(pattern,newIx,true)) {
 			throw new DatabaseSearchPatternIsOfWrongDomain();
 		};
 		while (true) {
 			if (currentRecord != null) {
-				if (currentRecord.value != null) {
+				if (currentRecord.content != null) {
 					try {
-						pattern.unifyWith(currentRecord.value,newIx);
+						pattern.unifyWith(currentRecord.content,newIx);
 					} catch (Backtracking b1) {
 						newIx.freeTrail();
 						try {
@@ -305,38 +309,38 @@ public class DatabaseTable implements Serializable, Cloneable {
 	//
 	public void sortBy(Term targetKey, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
-		long key= DatabaseUtils.termToSortingKey(targetKey,iX);
+		long key= DatabaseUtils.argumentToSortingKey(targetKey,iX);
 		ArrayList<ComparablePair> pairs= new ArrayList<ComparablePair>();
 		ArrayList<Term> rest= new ArrayList<Term>();
-		content.retrieveComparablePairs(key,pairs,rest,iX);
+		tableContent.retrieveComparablePairs(key,pairs,rest,iX);
 		Collections.sort(pairs);
-		if (content != null) {
-			content.retractAll();
-			content= null;
+		if (tableContent != null) {
+			tableContent.retractAll();
+			tableContent= null;
 			ultimateRecord= null;
 		};
 		for (int k=0; k < pairs.size(); k++) {
 			Term newItem= pairs.get(k).value;
-			if (content != null) {
+			if (tableContent != null) {
 				DatabaseRecord newRecord= new DatabaseRecord(newItem);
 				ultimateRecord.nextRecord= newRecord;
 				newRecord.previousRecord= ultimateRecord;
 				ultimateRecord= newRecord;
 			} else {
-				content= new DatabaseRecord(newItem);
-				ultimateRecord= content;
+				tableContent= new DatabaseRecord(newItem);
+				ultimateRecord= tableContent;
 			}
 		};
 		for (int k=0; k < rest.size(); k++) {
 			Term newItem= rest.get(k);
-			if (content != null) {
+			if (tableContent != null) {
 				DatabaseRecord newRecord= new DatabaseRecord(newItem);
 				ultimateRecord.nextRecord= newRecord;
 				newRecord.previousRecord= ultimateRecord;
 				ultimateRecord= newRecord;
 			} else {
-				content= new DatabaseRecord(newItem);
-				ultimateRecord= content;
+				tableContent= new DatabaseRecord(newItem);
+				ultimateRecord= tableContent;
 			}
 		}
 	}
@@ -344,12 +348,12 @@ public class DatabaseTable implements Serializable, Cloneable {
 	public void saveContent(ExtendedFileName fileName, CharacterSet requestedCharacterSet, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) {
 		container.claimReadingAccess(currentProcess,checkPrivileges);
 		StringBuilder textBuffer= new StringBuilder();
-		if (content != null) {
+		if (tableContent != null) {
 			if (requestedCharacterSet.isDummy()) {
-				content.saveToTextBuffer(textBuffer,iX,null);
+				tableContent.saveToTextBuffer(textBuffer,iX,null);
 			} else {
 				CharsetEncoder encoder= requestedCharacterSet.toCharSet().newEncoder();
-				content.saveToTextBuffer(textBuffer,iX,encoder);
+				tableContent.saveToTextBuffer(textBuffer,iX,encoder);
 			}
 		};
 		try {
@@ -387,8 +391,8 @@ public class DatabaseTable implements Serializable, Cloneable {
 			textBuffer.append(localDomain.toString(encoder));
 			textBuffer.append(");\n");
 		};
-		if (content != null) {
-			content.saveToTextBuffer(textBuffer,true,iX,encoder);
+		if (tableContent != null) {
+			tableContent.saveToTextBuffer(textBuffer,true,iX,encoder);
 		}
 	}
 	//
@@ -425,7 +429,7 @@ public class DatabaseTable implements Serializable, Cloneable {
 		while (true) {
 			if (currentRecord==null) {
 				throw Backtracking.instance;
-			} else if (currentRecord.value != null) {
+			} else if (currentRecord.content != null) {
 				return currentRecord;
 			} else {
 				DatabaseRecord nextRecord= currentRecord.nextRecord;
@@ -443,9 +447,9 @@ public class DatabaseTable implements Serializable, Cloneable {
 		while (true) {
 			if (currentRecord==null) {
 				throw Backtracking.instance;
-			} else if (currentRecord.value != null) {
+			} else if (currentRecord.content != null) {
 				try {
-					currentRecord.value.unifyWith(pattern,iX);
+					currentRecord.content.unifyWith(pattern,iX);
 					// iX.freeTrail();
 					return currentRecord;
 				} catch (Backtracking b) {
@@ -469,14 +473,14 @@ public class DatabaseTable implements Serializable, Cloneable {
 		if (previousRecord != null) {
 			previousRecord.nextRecord= nextRecord;
 		} else {
-			content= nextRecord;
+			tableContent= nextRecord;
 		};
 		if (nextRecord != null) {
 			nextRecord.previousRecord= previousRecord;
 		} else {
 			ultimateRecord= previousRecord;
 		};
-		currentRecord.value= null;
+		currentRecord.content= null;
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -520,14 +524,14 @@ public class DatabaseTable implements Serializable, Cloneable {
 		} catch (CloneNotSupportedException e) {
 			throw new CloningError();
 		};
-		o.content= null;
+		o.tableContent= null;
 		o.ultimateRecord= null;
 		o.currentEntryName= null;
 		return o;
 	}
 	public void copyContent(DatabaseTable copyOfTable, ActiveWorld currentProcess, ChoisePoint iX) {
-		if (content != null) {
-			content.copyContent(copyOfTable,currentProcess,iX);
+		if (tableContent != null) {
+			tableContent.copyContent(copyOfTable,currentProcess,iX);
 		}
 	}
 }

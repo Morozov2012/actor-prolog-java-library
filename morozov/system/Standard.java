@@ -81,7 +81,7 @@ public class Standard {
 	//
 	public static void getbacktrack(ChoisePoint iX, PrologVariable result) {
 		long n= iX.getChoisePointNumber();
-		result.value= new PrologInteger(n);
+		result.setNonBacktrackableValue(new PrologInteger(n));
 	}
 	//
 	public static void cutbacktrack(ChoisePoint iX, Term n1) {

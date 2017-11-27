@@ -26,7 +26,7 @@ public class NodeLabel {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static NodeLabel termToNodeLabel(Term value, ChoisePoint iX) {
+	public static NodeLabel argumentToNodeLabel(Term value, ChoisePoint iX) {
 		try {
 			BigInteger number= value.getIntegerValue(iX);
 			return new NodeLabel(number);

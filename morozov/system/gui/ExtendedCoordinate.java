@@ -109,7 +109,7 @@ public class ExtendedCoordinate {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static ExtendedCoordinate termToExtendedCoordinateSafe(Term value, ChoisePoint iX) {
+	public static ExtendedCoordinate argumentToExtendedCoordinateSafe(Term value, ChoisePoint iX) {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
 			ExtendedCoordinate coordinate= new ExtendedCoordinate();
@@ -117,7 +117,7 @@ public class ExtendedCoordinate {
 			return coordinate;
 		} else {
 			try {
-				return termToExtendedCoordinate(value,iX);
+				return argumentToExtendedCoordinate(value,iX);
 			} catch (RuntimeException e) {
 				ExtendedCoordinate coordinate= new ExtendedCoordinate();
 				coordinate.useDefaultLocation();
@@ -126,7 +126,7 @@ public class ExtendedCoordinate {
 		}
 	}
 	//
-	public static Term termToExtendedCoordinateOrFail(Term value, ChoisePoint iX) throws Backtracking {
+	public static Term argumentToExtendedCoordinateOrFail(Term value, ChoisePoint iX) throws Backtracking {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable()) {
 			throw Backtracking.instance;
@@ -134,14 +134,14 @@ public class ExtendedCoordinate {
 			return termDefault;
 		} else {
 			try {
-				return termToExtendedCoordinate(value,iX).toTerm();
+				return argumentToExtendedCoordinate(value,iX).toTerm();
 			} catch (RuntimeException e) {
 				return termDefault;
 			}
 		}
 	}
 	//
-	public static ExtendedCoordinate termToExtendedCoordinate(Term value, ChoisePoint iX) {
+	public static ExtendedCoordinate argumentToExtendedCoordinate(Term value, ChoisePoint iX) {
 		ExtendedCoordinate coordinate= new ExtendedCoordinate();
 		try {
 			long code= value.getSymbolValue(iX);

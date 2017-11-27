@@ -24,10 +24,11 @@ import javax.swing.Icon;
 
 public class ScalableLabel extends ActiveComponent {
 	//
-	protected AbstractDialog dialog;
 	protected String text= "";
 	protected double length= 0;
 	protected TextAlignment alignment= TextAlignment.RIGHT;
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public ScalableLabel(AbstractDialog tD) {
 		this(tD,"",null,SwingConstants.LEADING);
@@ -46,7 +47,6 @@ public class ScalableLabel extends ActiveComponent {
 	}
 	public ScalableLabel(AbstractDialog tD, String cT, Icon icon, int horizontalAlignment) {
 		super(tD);
-		dialog= tD;
 		text= cT;
 		length= text.length();
 		JLabel label= new JLabel(text,null,SwingConstants.LEADING);
@@ -55,7 +55,6 @@ public class ScalableLabel extends ActiveComponent {
 	}
 	public ScalableLabel(AbstractDialog tD, String cT, double l, TextAlignment a) {
 		super(tD);
-		dialog= tD;
 		text= cT;
 		length= l;
 		alignment= a;
@@ -64,22 +63,56 @@ public class ScalableLabel extends ActiveComponent {
 		component= label;
 	}
 	//
-	// protected int getInitialTopBorder() {return 5;}
-	// protected int getInitialLeftBorder() {return 5;}
-	// protected int getInitialBottomBorder() {return 5;}
-	// protected int getInitialRightBorder() {return 5;}
+	///////////////////////////////////////////////////////////////
+	//
+	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
+		value= value.dereferenceValue(iX);
+		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
+			return new PrologString("");
+		} else {
+			return new PrologString(value.toString(iX));
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void putValue(Term value, ChoisePoint iX) {
+		text= value.toString(iX);
+		if (component!=null) {
+			((JLabel)component).setText(alignText(text));
+			// targetDialog.invalidate(); // 2012.03.05
+			// targetDialog.repaint(); // 2013.09.04
+			targetDialog.safelyInvalidateAndRepaint();
+		}
+	}
+	//
+	public Term getValue() {
+		return new PrologString(text);
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public String alignText(String text1) {
 		double delta= length - text1.length();
 		if (delta > 0) {
 			switch(alignment) {
 				case LEFT: {
-					String f= String.format("%%-%ds",(long)length);
-					return String.format(f,text1);
+					long longLength= (long)length;
+					if (longLength > 0) {
+						String f= String.format("%%-%ds",longLength);
+						return String.format(f,text1);
+					} else {
+						return text1;
+					}
 				}
 				case RIGHT: {
-					String f= String.format("%%%ds",(long)length);
-					return String.format(f,text1);
+					long longLength= (long)length;
+					if (longLength > 0) {
+						String f= String.format("%%%ds",longLength);
+						return String.format(f,text1);
+					} else {
+						return text1;
+					}
 				}
 				default: {
 					long n= (long)(delta / 2);
@@ -93,29 +126,6 @@ public class ScalableLabel extends ActiveComponent {
 			}
 		} else {
 			return text1;
-		}
-	}
-	//
-	public void putValue(Term value, ChoisePoint iX) {
-		text= value.toString(iX);
-		if (component!=null) {
-			((JLabel)component).setText(alignText(text));
-			// dialog.invalidate(); // 2012.03.05
-			// dialog.repaint(); // 2013.09.04
-			dialog.safelyInvalidateAndRepaint();
-		}
-	}
-	//
-	public Term getValue() {
-		return new PrologString(text);
-	}
-	//
-	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-		value= value.dereferenceValue(iX);
-		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
-			return new PrologString("");
-		} else {
-			return new PrologString(value.toString(iX));
 		}
 	}
 }

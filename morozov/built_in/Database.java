@@ -21,22 +21,26 @@ public abstract class Database extends DataAbstraction {
 	//
 	protected DatabaseTableContainer databaseTableContainer= null;
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Database() {
 	}
 	public Database(GlobalWorldIdentifier id) {
 		super(id);
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	// abstract public long entry_s_Update_0();
 	//
 	// abstract protected Term getBuiltInSlot_E_name();
 	// abstract protected Term getBuiltInSlot_E_extension();
-	// abstract protected Term getBuiltInSlot_E_max_waiting_time();
+	// abstract protected Term getBuiltInSlot_E_maximal_waiting_time();
 	// abstract protected Term getBuiltInSlot_E_character_set();
 	// abstract protected Term getBuiltInSlot_E_backslash_always_is_separator();
 	// protected Term getBuiltInSlot_E_transaction_waiting_period()
 	// abstract protected Term getBuiltInSlot_E_transaction_sleep_period();
-	// abstract protected Term getBuiltInSlot_E_transaction_max_retry_number();
+	// abstract protected Term getBuiltInSlot_E_transaction_maximal_retry_number();
 	abstract protected Term getBuiltInSlot_E_place();
 	abstract protected PrologDomain getBuiltInSlotDomain_E_target_data();
 	//
@@ -52,13 +56,13 @@ public abstract class Database extends DataAbstraction {
 		PrologDomain domain= getBuiltInSlotDomain_E_target_data();
 		DatabaseType type= getDatabaseType();
 		boolean reuseKN= getReuseKeyNumbers(iX);
-		setPlace(DatabasePlace.termToDatabasePlace(a1,this,domain,type,reuseKN,iX));
+		setPlace(DatabasePlace.argumentToDatabasePlace(a1,this,domain,type,reuseKN,iX));
 	}
 	public void setPlace(DatabasePlace value) {
 		place= value;
 	}
-	public void getPlace0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getPlace(iX).toTerm();
+	public void getPlace0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getPlace(iX).toTerm());
 	}
 	public void getPlace0fs(ChoisePoint iX) {
 	}
@@ -70,7 +74,7 @@ public abstract class Database extends DataAbstraction {
 			PrologDomain domain= getBuiltInSlotDomain_E_target_data();
 			DatabaseType type= getDatabaseType();
 			boolean reuseKN= getReuseKeyNumbers(iX);
-			return DatabasePlace.termToDatabasePlace(value,this,domain,type,reuseKN,iX);
+			return DatabasePlace.argumentToDatabasePlace(value,this,domain,type,reuseKN,iX);
 		}
 	}
 	//
@@ -84,8 +88,8 @@ public abstract class Database extends DataAbstraction {
 	public void setReuseKeyNumbers(boolean value) {
 		reuseKeyNumbers= value;
 	}
-	public void getReuseKeyNumbers0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= YesNo.boolean2TermYesNo(getReuseKeyNumbers(iX));
+	public void getReuseKeyNumbers0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getReuseKeyNumbers(iX)));
 	}
 	public void getReuseKeyNumbers0fs(ChoisePoint iX) {
 	}
@@ -136,7 +140,7 @@ public abstract class Database extends DataAbstraction {
 			return place.databaseTableContainer.getTable();
 		} else {
 			Term value= getBuiltInSlot_E_place();
-			return DatabaseTableContainer.termToDatabaseTable(value,this,iX);
+			return DatabaseTableContainer.argumentToDatabaseTable(value,this,iX);
 		}
 	}
 	//
@@ -148,18 +152,18 @@ public abstract class Database extends DataAbstraction {
 			PrologDomain domain= getBuiltInSlotDomain_E_target_data();
 			DatabaseType type= getDatabaseType();
 			boolean reuseKN= getReuseKeyNumbers(iX);
-			return DatabaseTableContainer.termToDatabaseTableContainer(value,this,domain,type,reuseKN,iX);
+			return DatabaseTableContainer.argumentToDatabaseTableContainer(value,this,domain,type,reuseKN,iX);
 		}
 	}
 	//
-	public void beginDatabaseTableTransaction(DatabaseAccessMode accessMode, TimeInterval waitingPeriod, TimeInterval sleepPeriod, BigInteger maxRetryNumber, ActiveWorld currentProcess, ChoisePoint iX) throws Backtracking {
+	public void beginDatabaseTableTransaction(DatabaseAccessMode accessMode, TimeInterval waitingPeriod, TimeInterval sleepPeriod, BigInteger maximalRetryNumber, ActiveWorld currentProcess, ChoisePoint iX) throws Backtracking {
 		if (place != null) {
-			place.beginTransaction(accessMode,waitingPeriod,sleepPeriod,maxRetryNumber,this,currentProcess,iX);
+			place.beginTransaction(accessMode,waitingPeriod,sleepPeriod,maximalRetryNumber,this,currentProcess,iX);
 		} else {
 			Term value= getBuiltInSlot_E_place();
 			PrologDomain domain= getBuiltInSlotDomain_E_target_data();
 			boolean reuseKN= getReuseKeyNumbers(iX);
-			DatabaseTableContainer.convertTermToDatabaseTableAndBeginTransaction(value,domain,getDatabaseType(),reuseKN,this,accessMode,waitingPeriod,sleepPeriod,maxRetryNumber,currentProcess,iX);
+			DatabaseTableContainer.convertTermToDatabaseTableAndBeginTransaction(value,domain,getDatabaseType(),reuseKN,this,accessMode,waitingPeriod,sleepPeriod,maximalRetryNumber,currentProcess,iX);
 		}
 	}
 	//
@@ -252,21 +256,21 @@ public abstract class Database extends DataAbstraction {
 	}
 	//
 	public class Match1ff extends Match {
-		public Match1ff(Continuation aC, PrologVariable a1, Term a2) {
-			super(aC,a2);
-			result= a1;
+		public Match1ff(Continuation aC, PrologVariable result, Term a1) {
+			super(aC,a1);
+			argumentResult= result;
 			isFunctionCall= true;
 		}
 	}
 	public class Match1fs extends Match {
-		public Match1fs(Continuation aC, Term a2) {
-			super(aC,a2);
+		public Match1fs(Continuation aC, Term a1) {
+			super(aC,a1);
 			isFunctionCall= false;
 		}
 	}
 	public class Match extends Continuation {
 		// private Continuation c0;
-		protected PrologVariable result;
+		protected PrologVariable argumentResult;
 		protected Term pattern;
 		protected boolean isFunctionCall;
 		//
@@ -276,7 +280,7 @@ public abstract class Database extends DataAbstraction {
 		}
 		//
 		public void execute(ChoisePoint iX) throws Backtracking {
-			getDatabaseTable(iX).matchRecord(result,pattern,isFunctionCall,c0,currentProcess,true,iX);
+			getDatabaseTable(iX).matchRecord(argumentResult,pattern,isFunctionCall,c0,currentProcess,true,iX);
 		}
 	}
 	//
@@ -326,13 +330,13 @@ public abstract class Database extends DataAbstraction {
 	//
 	public void load0s(ChoisePoint iX) {
 		ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
-		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		CharacterSet requestedCharacterSet= getCharacterSet(iX);
 		getDatabaseTableContainer(iX).loadContent(fileName,timeout,requestedCharacterSet,staticContext,currentProcess,true,iX);
 	}
 	public void load1s(ChoisePoint iX, Term a1) {
 		ExtendedFileName fileName= retrieveRealGlobalFileName(a1,iX);
-		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		CharacterSet requestedCharacterSet= getCharacterSet(iX);
 		getDatabaseTableContainer(iX).loadContent(fileName,timeout,requestedCharacterSet,staticContext,currentProcess,true,iX);
 	}
@@ -347,11 +351,11 @@ public abstract class Database extends DataAbstraction {
 	///////////////////////////////////////////////////////////////
 	//
 	public void beginTransaction1s(ChoisePoint iX, Term a1) throws Backtracking {
-		DatabaseAccessMode accessMode= DatabaseAccessMode.termToDatabaseAccessMode(a1,iX);
+		DatabaseAccessMode accessMode= DatabaseAccessMode.argumentToDatabaseAccessMode(a1,iX);
 		TimeInterval waitingPeriod= getTransactionWaitingPeriod(iX);
 		TimeInterval sleepPeriod= getTransactionSleepPeriod(iX);
-		BigInteger maxRetryNumber= getTransactionMaxRetryNumber(iX);
-		beginDatabaseTableTransaction(accessMode,waitingPeriod,sleepPeriod,maxRetryNumber,currentProcess,iX);
+		BigInteger maximalRetryNumber= getTransactionMaximalRetryNumber(iX);
+		beginDatabaseTableTransaction(accessMode,waitingPeriod,sleepPeriod,maximalRetryNumber,currentProcess,iX);
 	}
 	//
 	public void endTransaction0s(ChoisePoint iX) {

@@ -181,14 +181,14 @@ public abstract class LoadableContainer implements Serializable, Cloneable {
 	public void recentLoadingError(PrologVariable a1, PrologVariable a2, PrologVariable a3, PrologVariable a4, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) throws Backtracking {
 		claimReadingAccess(currentProcess,checkPrivileges);
 		if (recentErrorException != null && recentErrorText != null) {
-			a1.value= new PrologString(recentErrorText);
-			a2.value= new PrologInteger(recentErrorPosition);
-			a3.value= new PrologString(recentErrorException.toString());
-			a4.value= new PrologString(recentErrorException.toString());
-			iX.pushTrail(a1);
-			iX.pushTrail(a2);
-			iX.pushTrail(a3);
-			iX.pushTrail(a4);
+			a1.setBacktrackableValue(new PrologString(recentErrorText),iX);
+			a2.setBacktrackableValue(new PrologInteger(recentErrorPosition),iX);
+			a3.setBacktrackableValue(new PrologString(recentErrorException.toString()),iX);
+			a4.setBacktrackableValue(new PrologString(recentErrorException.toString()),iX);
+			//iX.pushTrail(a1);
+			//iX.pushTrail(a2);
+			//iX.pushTrail(a3);
+			//iX.pushTrail(a4);
 		} else {
 			throw Backtracking.instance;
 		}
@@ -196,12 +196,12 @@ public abstract class LoadableContainer implements Serializable, Cloneable {
 	public void recentLoadingError(PrologVariable a1, PrologVariable a2, PrologVariable a3, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) throws Backtracking {
 		claimReadingAccess(currentProcess,checkPrivileges);
 		if (recentErrorException != null && recentErrorText != null) {
-			a1.value= new PrologString(recentErrorText);
-			a2.value= new PrologInteger(recentErrorPosition);
-			a3.value= new PrologString(recentErrorException.toString());
-			iX.pushTrail(a1);
-			iX.pushTrail(a2);
-			iX.pushTrail(a3);
+			a1.setBacktrackableValue(new PrologString(recentErrorText),iX);
+			a2.setBacktrackableValue(new PrologInteger(recentErrorPosition),iX);
+			a3.setBacktrackableValue(new PrologString(recentErrorException.toString()),iX);
+			//iX.pushTrail(a1);
+			//iX.pushTrail(a2);
+			//iX.pushTrail(a3);
 		} else {
 			throw Backtracking.instance;
 		}

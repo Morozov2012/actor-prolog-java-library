@@ -23,6 +23,7 @@ import java.nio.charset.Charset;
 import java.nio.file.DirectoryStream;
 import java.nio.file.DirectoryIteratorException;
 import java.nio.file.FileAlreadyExistsException;
+import java.nio.charset.StandardCharsets;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -67,7 +68,7 @@ public class SimpleFileName {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static SimpleFileName termToSimpleFileName(Term value, boolean backslashIsSeparator, boolean acceptOnlyURI, ChoisePoint iX) {
+	public static SimpleFileName argumentToSimpleFileName(Term value, boolean backslashIsSeparator, boolean acceptOnlyURI, ChoisePoint iX) {
 		try {
 			String name= value.getStringValue(iX);
 			return new SimpleFileName(name,backslashIsSeparator,acceptOnlyURI);
@@ -91,7 +92,7 @@ public class SimpleFileName {
 			}
 		}
 	}
-	public static SimpleFileName termToSimpleFileName(String name, boolean backslashIsSeparator, boolean acceptOnlyURI) {
+	public static SimpleFileName argumentToSimpleFileName(String name, boolean backslashIsSeparator, boolean acceptOnlyURI) {
 		return new SimpleFileName(name,backslashIsSeparator,acceptOnlyURI);
 	}
 	//
@@ -309,17 +310,34 @@ public class SimpleFileName {
 	}
 	//
 	protected static List<Path> listSourceFiles(Path dir) {
-		return listSourceFiles(dir,null);
+		return listSourceFiles(dir,null,true);
 	}
 	//
-	protected static List<Path> listSourceFiles(Path dir, String mask) {
+	protected static List<Path> listSourceFiles(Path dir, String mask, boolean backslashIsSeparator) {
+		if (mask != null) {
+			int p1= mask.lastIndexOf(':');
+			int p2= mask.lastIndexOf('/');
+			p1= StrictMath.max(p1,p2);
+			if (backslashIsSeparator) {
+				p2= mask.lastIndexOf('\\');
+				p1= StrictMath.max(p1,p2);
+			};
+			if (p1 >= 0) {
+				dir= dir.resolve(mask.substring(0,p1+1));
+				mask= mask.substring(p1+1);
+			}
+		};
 		List<Path> result= new ArrayList<Path>();
 		try {
 			DirectoryStream<Path> stream;
 			if (mask==null) {
 				stream= Files.newDirectoryStream(dir);
 			} else {
-				stream= Files.newDirectoryStream(dir,mask);
+				if (mask.isEmpty()) {
+					stream= Files.newDirectoryStream(dir);
+				} else {
+					stream= Files.newDirectoryStream(dir,mask);
+				}
 			};
 			try {
 				for (Path entry: stream) {
@@ -360,6 +378,12 @@ public class SimpleFileName {
 			byte[] bytes= Files.readAllBytes(path);
 			if (characterSet.isDummy()) {
 				return new String(bytes);
+			} else if (characterSet.isDefault()) {
+				if (has_UTF_Coding(bytes)) {
+					return new String(bytes,StandardCharsets.UTF_16);
+				} else {
+					return new String(bytes,characterSet.toCharSet());
+				}
 			} else {
 				return new String(bytes,characterSet.toCharSet());
 			}
@@ -411,18 +435,8 @@ public class SimpleFileName {
 	public static String readStringFromUniversalResource(URL_Attributes attributes) throws Throwable {
 		CharacterSet requestedCharacterSet= attributes.characterSet;
 		if (attributes.isLocalResource) {
-			if (requestedCharacterSet.isDummyOrDefault()) {
-				if (attributes.has_UTF_Coding) {
-					Path filePath= ExtendedFileName.urlToPath(attributes.url);
-					return readStringFromLocalFile(filePath,new CharacterSet(CharacterSetType.UTF_16));
-				} else {
-					Path filePath= ExtendedFileName.urlToPath(attributes.url);
-					return readStringFromLocalFile(filePath,requestedCharacterSet);
-				}
-			} else {
-				Path filePath= ExtendedFileName.urlToPath(attributes.url);
-				return readStringFromLocalFile(filePath,requestedCharacterSet);
-			}
+			Path filePath= ExtendedFileName.urlToPath(attributes.url);
+			return readStringFromLocalFile(filePath,requestedCharacterSet);
 		} else {
 			URLConnection connection= attributes.url.openConnection();
 			int timeout= attributes.maxWaitingInterval;
@@ -528,6 +542,23 @@ public class SimpleFileName {
 		}
 	}
 	//
+	protected static InputStream getInputStreamFromUniversalResource(URL_Attributes attributes) throws Throwable {
+		if (attributes.isLocalResource) {
+			Path path= ExtendedFileName.urlToPath(attributes.url);
+			InputStream inputStream= Files.newInputStream(path);
+			return inputStream;
+		} else {
+			URLConnection connection= attributes.url.openConnection();
+			int timeout= attributes.maxWaitingInterval;
+			if (timeout >= 0) {
+				connection.setConnectTimeout(timeout);
+				connection.setReadTimeout(timeout);
+			};
+			InputStream inputStream= connection.getInputStream();
+			return inputStream;
+		}
+	}
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	protected String appendExtensionIfNecessary(boolean appendExtension, String extension) {
@@ -615,28 +646,15 @@ public class SimpleFileName {
 		}
 	}
 	//
-	protected static boolean has_UTF_Coding(InputStream stream) {
-		try {
-			byte[] prefix;
-			int k= 0;
-			try {
-				int bufferSize= 2;
-				prefix= new byte[bufferSize];
-				k= stream.read(prefix);
-			} finally {
-				stream.close();
-			};
-			if (k==2) {
-				if	((Byte.compare(prefix[0],(byte)0xFF)==0 && Byte.compare(prefix[1],(byte)0xFE)==0) ||
-					 (Byte.compare(prefix[0],(byte)0xFE)==0 && Byte.compare(prefix[1],(byte)0xFF)==0)) {
-					return true;
-				} else {
-					return false;
-				}
+	protected static boolean has_UTF_Coding(byte[] prefix) {
+		if (prefix.length >= 2) {
+			if	((Byte.compare(prefix[0],(byte)0xFF)==0 && Byte.compare(prefix[1],(byte)0xFE)==0) ||
+				 (Byte.compare(prefix[0],(byte)0xFE)==0 && Byte.compare(prefix[1],(byte)0xFF)==0)) {
+				return true;
 			} else {
 				return false;
 			}
-		} catch (IOException e) {
+		} else {
 			return false;
 		}
 	}

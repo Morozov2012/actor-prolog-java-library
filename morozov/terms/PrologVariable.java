@@ -16,8 +16,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class PrologVariable extends Term {
-	public Term value;
-	// private Term value;
+	// public Term value;
+	private Term value;
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -763,11 +763,10 @@ public class PrologVariable extends Term {
 		} else if (t.thisIsFreeVariable()) {
 			PrologVariable newNode= new PrologVariable();
 			value= newNode;
-			t.setValue(newNode);
 			cp.pushTrail(this);
-			cp.pushTrail(t);
+			t.setBacktrackableValue(newNode,cp);
+			// cp.pushTrail(t);
 		} else {
-			// t.unifyWith(this,cp);
 			value= t;
 			cp.pushTrail(this);
 		}
@@ -775,6 +774,9 @@ public class PrologVariable extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public Term getValueOfVariable() {
+		return value;
+	}
 	public boolean thisIsFreeVariable() {
 		if (value == null) {
 			return true;
@@ -785,9 +787,16 @@ public class PrologVariable extends Term {
 	public void clear() {
 		value= null;
 	}
-	public void setValue(Term newNode) {
-		value= newNode;
+	public void setBacktrackableValue(Term v, ChoisePoint iX) {
+		value= v;
+		iX.pushTrail(this);
 	}
+	public void setNonBacktrackableValue(Term v) {
+		value= v;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void registerVariables(ActiveWorld process, boolean isSuspending, boolean isProtecting) {
 		if (value != null) {
 			value.registerVariables(process,isSuspending,isProtecting);

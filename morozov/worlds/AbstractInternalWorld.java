@@ -15,14 +15,14 @@ public abstract class AbstractInternalWorld extends OwnWorld {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public abstract Continuation createContinuation(Continuation aC);
-	public abstract void extractWorlds(AbstractProcess process, LinkedHashSet<AbstractInternalWorld> list);
-	public abstract long getPackageCode();
+	abstract public Continuation createContinuation(Continuation aC);
+	abstract public void extractWorlds(AbstractProcess process, LinkedHashSet<AbstractInternalWorld> list);
+	abstract public long getPackageCode();
 	//
-	public abstract Term getSlotByName(String name);
+	abstract public Term getSlotByName(String name);
 	//
-	public abstract long entry_s_Goal_0();
-	public abstract long entry_s_Alarm_1_i();
+	abstract public long entry_s_Goal_0();
+	abstract public long entry_s_Alarm_1_i();
 	//
 	public long entry_s_Show_2_ii() {
 		throw new TheShowEntryIsNotDefined();

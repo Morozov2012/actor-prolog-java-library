@@ -117,6 +117,7 @@ public class Space2DWriter {
 	}
 	//
 	public void dispose() {
+		writer.reset(); // 2017-03-04
 		writer.dispose();
 	}
 	//

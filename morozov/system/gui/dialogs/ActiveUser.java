@@ -112,6 +112,11 @@ public class ActiveUser extends ActiveWorld {
 	}
 	//
 	public void registerPortsAndRecoverPortValues(AbstractDialog dialog, Dialog targetWorld, DialogEntry[] userDefinedSlots, DialogEntry[] systemSlots) {
+		synchronized (this) {
+			quicklyRegisterPortsAndRecoverPortValues(dialog,targetWorld,userDefinedSlots,systemSlots);
+		}
+	}
+	public void quicklyRegisterPortsAndRecoverPortValues(AbstractDialog dialog, Dialog targetWorld, DialogEntry[] userDefinedSlots, DialogEntry[] systemSlots) {
 		phaseInitiation();
 		targetDialog= dialog;
 		initiateSlotValues(targetWorld,userDefinedSlots);
@@ -127,7 +132,7 @@ public class ActiveUser extends ActiveWorld {
 			try {
 				actualizeValues(rootCP,slotVariable.getValue(rootCP));
 				DialogEntry item= slotMap.get(slotVariable);
-				item.putValue(slotVariable.copyValue(rootCP,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES),rootCP);
+				item.putValue(DialogControlOperation.VALUE,slotVariable.copyValue(rootCP,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES),rootCP);
 			} catch (Backtracking b) {
 			};
 		};
@@ -165,7 +170,7 @@ public class ActiveUser extends ActiveWorld {
 				value= value.extractSlotVariable();
 				// if (!value.thisIsSlotVariable()) {
 				// Constant slots are to be used too.
-				item.putValue(value.copyValue(rootCP,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES),rootCP);
+				item.putValue(DialogControlOperation.VALUE,value.copyValue(rootCP,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES),rootCP);
 				// }
 				//if (!value.thisIsSlotVariable()) {
 				//	item.putValue(value.copyValue(rootCP,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES),rootCP);
@@ -190,15 +195,20 @@ public class ActiveUser extends ActiveWorld {
 	// Process Flow Messages
 	//
 	protected void processFlowMessages(ChoisePoint iX) {
+		synchronized (this) {
+			quicklyProcessFlowMessages(iX);
+		}
+	}
+	protected void quicklyProcessFlowMessages(ChoisePoint iX) {
 		Iterator<SlotVariable> slotVariablesIterator= slotVariables.iterator();
 		while (slotVariablesIterator.hasNext()) {
 			SlotVariable slotVariable= slotVariablesIterator.next();
 			try {
 				actualizeValues(iX,slotVariable.getValue(iX));
 				DialogEntry item= slotMap.get(slotVariable);
-				item.putValue(slotVariable.copyValue(rootCP,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES),rootCP);
+				item.putValue(DialogControlOperation.VALUE,slotVariable.copyValue(rootCP,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES),rootCP);
 			} catch (Backtracking b) {
-			};
+			}
 		}
 	}
 	//
@@ -208,6 +218,11 @@ public class ActiveUser extends ActiveWorld {
 	}
 	//
 	protected void acceptTimerMessage() {
+		synchronized (this) {
+			quicklyAcceptTimerMessage();
+		}
+	}
+	protected void quicklyAcceptTimerMessage() {
 		DialogEvent[] messagesToBeProcessed= new DialogEvent[0];
 		synchronized(userInterfaceMessages) {
 			if (userInterfaceMessages.size() > 0) {
@@ -257,5 +272,18 @@ public class ActiveUser extends ActiveWorld {
 	}
 	//
 	public void registerActorToBeProved(ActorNumber actorNumber, ChoisePoint cp) {
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void putFieldValue(DialogControlOperation operation, Term identifier, Term fieldValue, ChoisePoint iX) {
+		synchronized (this) {
+			targetDialog.quicklyPutFieldValue(operation,identifier,fieldValue,iX);
+		}
+	}
+	public Term getFieldValue(DialogControlOperation operation, Term identifier, ChoisePoint iX) {
+		synchronized (this) {
+			return targetDialog.quicklyGetFieldValue(operation,identifier,iX);
+		}
 	}
 }

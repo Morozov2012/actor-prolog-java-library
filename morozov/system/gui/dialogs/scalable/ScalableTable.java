@@ -27,6 +27,8 @@ public class ScalableTable extends ActiveComponent {
 	//
 	protected boolean enableMultiselection= false;
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public ScalableTable(AbstractDialog tD, double length, double height, ScalableTableColors colors, ScalableTableColumnDescription[] columnDescriptions, Term initialValue, ChoisePoint iX) {
 		super(tD);
 		ATable table= new ATable(tD,this,length,height,colors,columnDescriptions,initialValue,iX);
@@ -35,66 +37,7 @@ public class ScalableTable extends ActiveComponent {
 		table.addFocusListener(this);
 	}
 	//
-	// protected int getInitialTopBorder() {return 5;}
-	// protected int getInitialLeftBorder() {return 5;}
-	// protected int getInitialBottomBorder() {return 5;}
-	// protected int getInitialRightBorder() {return 5;}
-	//
-	public void setMultipleSelection(boolean flag) {
-		enableMultiselection= flag;
-		if (component!=null) {
-			((ATable)component).setMultipleSelection(flag);
-		}
-	}
-	public void setSelectedIndex(int index) {
-		if (component!=null) {
-			((ATable)component).setSelectedIndex(index);
-		}
-	}
-	public void setSelectedIndices(int[] indices) {
-		if (component!=null) {
-			((ATable)component).setSelectedIndices(indices);
-		}
-	}
-	//
-	public void setFont(Font font) {
-		super.setFont(font);
-		if (component!=null) {
-			component.setFont(font);
-// Dimension size= component.getPreferredSize();
-// component.setMinimumSize(size);
-		}
-	}
-	//
-	public void putValue(Term value, ChoisePoint iX) {
-		if (component!=null) {
-			((ATable)component).putValue(value,iX);
-			// if (targetDialog!=null) {
-			//	targetDialog.reportValueUpdate(this);
-			// }
-		}
-	}
-	public void putRange(Term value, ChoisePoint iX) {
-		if (component!=null) {
-			((ATable)component).putRange(value,iX);
-		}
-	}
-	//
-	public Term getValue() {
-		if (component!=null) {
-			return ((ATable)component).getValue();
-		} else {
-			return PrologUnknownValue.instance;
-		}
-	}
-	public Term getRange() {
-		if (component!=null) {
-			return ((ATable)component).getRange();
-		} else {
-			// return PrologEmptyList.instance;
-			return PrologUnknownValue.instance;
-		}
-	}
+	///////////////////////////////////////////////////////////////
 	//
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		value= value.dereferenceValue(iX);
@@ -113,6 +56,7 @@ public class ScalableTable extends ActiveComponent {
 			}
 		}
 	}
+	//
 	public Term standardizeRange(Term value, ChoisePoint iX) {
 		try {
 			String text= value.getStringValue(iX);
@@ -120,6 +64,61 @@ public class ScalableTable extends ActiveComponent {
 		} catch (TermIsNotAString e1) {
 			ArrayList<ArrayList<String>> items= DialogUtils.tableToStringArray(value,iX);
 			return Converters.stringArrayToListOfList(items);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void putValue(Term value, ChoisePoint iX) {
+		if (component!=null) {
+			((ATable)component).putValue(value,iX);
+			// if (targetDialog!=null) {
+			//	targetDialog.reportValueUpdate(this);
+			// }
+		}
+	}
+	//
+	public void putRange(Term value, ChoisePoint iX) {
+		if (component!=null) {
+			((ATable)component).putRange(value,iX);
+		}
+	}
+	//
+	public Term getValue() {
+		if (component!=null) {
+			return ((ATable)component).getValue();
+		} else {
+			return PrologUnknownValue.instance;
+		}
+	}
+	//
+	public Term getRange() {
+		if (component!=null) {
+			return ((ATable)component).getRange();
+		} else {
+			// return PrologEmptyList.instance;
+			return PrologUnknownValue.instance;
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setMultipleSelection(boolean flag) {
+		enableMultiselection= flag;
+		if (component!=null) {
+			((ATable)component).setMultipleSelection(flag);
+		}
+	}
+	//
+	public void setSelectedIndex(int index) {
+		if (component!=null) {
+			((ATable)component).setSelectedIndex(index);
+		}
+	}
+	//
+	public void setSelectedIndices(int[] indices) {
+		if (component!=null) {
+			((ATable)component).setSelectedIndices(indices);
 		}
 	}
 }

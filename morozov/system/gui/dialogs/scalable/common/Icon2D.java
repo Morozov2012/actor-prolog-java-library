@@ -43,10 +43,6 @@ public class Icon2D implements Icon {
 		currentWidth= d.width;
 		currentHeight= d.height;
 	}
-	// public void setSize(int width, int height) {
-	//	currentWidth= width;
-	//	currentHeight= height;
-	// }
 	//
 	public int getIconHeight() {
 		return currentHeight;

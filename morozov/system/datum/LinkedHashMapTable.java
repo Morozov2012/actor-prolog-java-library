@@ -52,7 +52,8 @@ public class LinkedHashMapTable extends HashMapTable {
 		Term keyTerm= new PrologInteger(keyNumber);
 		Term mapTerm= new PrologStructure(SymbolCodes.symbolCode_E_map,new Term[]{keyTerm,valueTerm});
 		insertRecord(mapTerm,currentProcess,false,iX,true);
-		argumentKey.value= keyTerm;
+		argumentKey.setBacktrackableValue(keyTerm,iX);
+		//iX.pushTrail(argumentKey);
 	}
 	//
 	public DatabaseRecord insertRecord(Term copy, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX, boolean isInnerOperation) {
@@ -78,7 +79,8 @@ public class LinkedHashMapTable extends HashMapTable {
 		Term keyTerm= new PrologInteger(keyNumber);
 		Term mapTerm= new PrologStructure(SymbolCodes.symbolCode_E_map,new Term[]{keyTerm,valueTerm});
 		appendRecord(mapTerm,currentProcess,false,iX,true);
-		argumentKey.value= keyTerm;
+		argumentKey.setBacktrackableValue(keyTerm,iX);
+		//iX.pushTrail(argumentKey);
 	}
 	//
 	public DatabaseRecord appendRecord(Term copy, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX, boolean isInnerOperation) {
@@ -113,7 +115,8 @@ public class LinkedHashMapTable extends HashMapTable {
 				currentRecord.previousRecord= newRecord;
 				databaseHash.put(keyTerm,newRecord);
 			};
-			argumentNewKey.value= keyTerm;
+			argumentNewKey.setBacktrackableValue(keyTerm,iX);
+			//iX.pushTrail(argumentNewKey);
 		} else {
 			throw new GivenKeyDoesNotExistInTheDatabase();
 		}
@@ -139,7 +142,8 @@ public class LinkedHashMapTable extends HashMapTable {
 				nextRecord.previousRecord= newRecord;
 				databaseHash.put(keyTerm,newRecord);
 			};
-			argumentNewKey.value= keyTerm;
+			argumentNewKey.setBacktrackableValue(keyTerm,iX);
+			//iX.pushTrail(argumentNewKey);
 		} else {
 			throw new GivenKeyDoesNotExistInTheDatabase();
 		}
@@ -147,16 +151,17 @@ public class LinkedHashMapTable extends HashMapTable {
 	//
 	public void getFirstKey(PrologVariable argumentResult, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) throws Backtracking {
 		container.claimReadingAccess(currentProcess,checkPrivileges);
-		if (content != null) {
-			Term keyTerm= DatabaseUtils.extractMapKey(content.value,iX);
-			argumentResult.value= keyTerm;
+		if (tableContent != null) {
+			Term keyTerm= DatabaseUtils.extractMapKey(tableContent.content,iX);
+			argumentResult.setNonBacktrackableValue(keyTerm);
+			//iX.pushTrail(argumentResult);
 		} else {
 			throw Backtracking.instance;
 		}
 	}
 	public void getFirstKey(ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) throws Backtracking {
 		container.claimReadingAccess(currentProcess,checkPrivileges);
-		if (content==null) {
+		if (tableContent==null) {
 			throw Backtracking.instance;
 		}
 	}
@@ -164,8 +169,9 @@ public class LinkedHashMapTable extends HashMapTable {
 	public void getLastKey(PrologVariable argumentResult, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) throws Backtracking {
 		container.claimReadingAccess(currentProcess,checkPrivileges);
 		if (ultimateRecord != null) {
-			Term keyTerm= DatabaseUtils.extractMapKey(ultimateRecord.value,iX);
-			argumentResult.value= keyTerm;
+			Term keyTerm= DatabaseUtils.extractMapKey(ultimateRecord.content,iX);
+			argumentResult.setNonBacktrackableValue(keyTerm);
+			//iX.pushTrail(argumentResult);
 		} else {
 			throw Backtracking.instance;
 		}
@@ -186,8 +192,9 @@ public class LinkedHashMapTable extends HashMapTable {
 			if (nextRecord==null) {
 				throw Backtracking.instance;
 			} else {
-				Term keyTerm= DatabaseUtils.extractMapKey(nextRecord.value,iX);
-				argumentResult.value= keyTerm;
+				Term keyTerm= DatabaseUtils.extractMapKey(nextRecord.content,iX);
+				argumentResult.setNonBacktrackableValue(keyTerm);
+				//iX.pushTrail(argumentResult);
 			}
 		} else {
 			throw new GivenKeyDoesNotExistInTheDatabase();
@@ -216,8 +223,9 @@ public class LinkedHashMapTable extends HashMapTable {
 			if (previousRecord==null) {
 				throw Backtracking.instance;
 			} else {
-				Term keyTerm= DatabaseUtils.extractMapKey(previousRecord.value,iX);
-				argumentResult.value= keyTerm;
+				Term keyTerm= DatabaseUtils.extractMapKey(previousRecord.content,iX);
+				argumentResult.setNonBacktrackableValue(keyTerm);
+				//iX.pushTrail(argumentResult);
 			}
 		} else {
 			throw new GivenKeyDoesNotExistInTheDatabase();
@@ -242,7 +250,7 @@ public class LinkedHashMapTable extends HashMapTable {
 	protected void retractCurrentRecord(DatabaseRecord currentRecord, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
 		if (reuseKeyNumbers) {
-			Term keyTerm= DatabaseUtils.extractMapKey(currentRecord.value,iX);
+			Term keyTerm= DatabaseUtils.extractMapKey(currentRecord.content,iX);
 			try {
 				BigInteger keyNumber= keyTerm.getIntegerValue(iX);
 				freeKeyNumbers.add(keyNumber);

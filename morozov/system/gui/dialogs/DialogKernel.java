@@ -137,7 +137,7 @@ public abstract class DialogKernel extends DialogFoundation {
 					prospectiveFont= create_new_font();
 				};
 				if (previousFontSize != prospectiveFontSize) {
-					setNewFont(prospectiveFont);
+					setGeneralFont(prospectiveFont);
 				};
 				prefLS= dialogContainer.getRealPreferredSize();
 				dialogContainer.getSize(dimension);
@@ -155,7 +155,7 @@ public abstract class DialogKernel extends DialogFoundation {
 						} else {
 							prospectiveFont= create_new_font();
 						};
-						setNewFont(prospectiveFont);
+						setGeneralFont(prospectiveFont);
 					}
 					break;
 				}
@@ -164,7 +164,7 @@ public abstract class DialogKernel extends DialogFoundation {
 				previousActualSize.set(new Dimension(givenWidth,givenHeight));
 				// if (fontIsToBeModified) {
 				//	Font commonFont= approvedFonts.get(getCurrentFontSize()).font;
-				//	setNewFont(commonFont);
+				//	setGeneralFont(commonFont);
 				// };
 			};
 			safelyCentreMainPanelIfNecessary();

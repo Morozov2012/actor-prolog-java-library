@@ -111,13 +111,14 @@ public abstract class DataStore extends DataAbstraction {
 	// get/set access_mode
 	//
 	public void setAccessMode1s(ChoisePoint iX, Term a1) {
-		setAccessMode(DatabaseAccessMode.termToDatabaseAccessMode(a1,iX));
+		setAccessMode(DatabaseAccessMode.argumentToDatabaseAccessMode(a1,iX));
 	}
 	public void setAccessMode(DatabaseAccessMode value) {
 		accessMode= value;
 	}
-	public void getAccessMode0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getAccessMode(iX).toTerm();
+	public void getAccessMode0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getAccessMode(iX).toTerm());
+		// iX.pushTrail(a1);
 	}
 	public void getAccessMode0fs(ChoisePoint iX) {
 	}
@@ -126,20 +127,21 @@ public abstract class DataStore extends DataAbstraction {
 			return accessMode;
 		} else {
 			Term value= getBuiltInSlot_E_access_mode();
-			return DatabaseAccessMode.termToDatabaseAccessMode(value,iX);
+			return DatabaseAccessMode.argumentToDatabaseAccessMode(value,iX);
 		}
 	}
 	//
 	// get/set sharing_mode
 	//
 	public void setSharingMode1s(ChoisePoint iX, Term a1) {
-		setSharingMode(DatabaseSharingMode.termToDatabaseSharingMode(a1,iX));
+		setSharingMode(DatabaseSharingMode.argumentToDatabaseSharingMode(a1,iX));
 	}
 	public void setSharingMode(DatabaseSharingMode value) {
 		sharingMode= value;
 	}
-	public void getSharingMode0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= getSharingMode(iX).toTerm();
+	public void getSharingMode0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getSharingMode(iX).toTerm());
+		// iX.pushTrail(a1);
 	}
 	public void getSharingMode0fs(ChoisePoint iX) {
 	}
@@ -148,7 +150,7 @@ public abstract class DataStore extends DataAbstraction {
 			return sharingMode;
 		} else {
 			Term value= getBuiltInSlot_E_sharing_mode();
-			return DatabaseSharingMode.termToDatabaseSharingMode(value,iX);
+			return DatabaseSharingMode.argumentToDatabaseSharingMode(value,iX);
 		}
 	}
 	//
@@ -161,8 +163,9 @@ public abstract class DataStore extends DataAbstraction {
 	public void setReuseTableNumbers(boolean value) {
 		reuseTableNumbers= value;
 	}
-	public void getReuseTableNumbers0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= YesNo.boolean2TermYesNo(getReuseTableNumbers(iX));
+	public void getReuseTableNumbers0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getReuseTableNumbers(iX)));
+		// iX.pushTrail(a1);
 	}
 	public void getReuseTableNumbers0fs(ChoisePoint iX) {
 	}
@@ -226,7 +229,7 @@ public abstract class DataStore extends DataAbstraction {
 		return openedDataStore.get();
 	}
 	//
-	public void beginDatabaseTableTransaction(String entryName, PrologDomain domain, DatabaseType type, boolean reuseKN, DatabaseAccessMode transactionMode, TimeInterval waitingPeriod, TimeInterval sleepPeriod, BigInteger maxRetryNumber, ActiveWorld currentProcess, ChoisePoint iX) throws Backtracking {
+	public void beginDatabaseTableTransaction(String entryName, PrologDomain domain, DatabaseType type, boolean reuseKN, DatabaseAccessMode transactionMode, TimeInterval waitingPeriod, TimeInterval sleepPeriod, BigInteger maximalRetryNumber, ActiveWorld currentProcess, ChoisePoint iX) throws Backtracking {
 		OpenedDataStore dataStore= openedDataStore.get();
 		if (dataStore != null) {
 			if (transactionMode==DatabaseAccessMode.MODIFYING && dataStore.getAccessMode()==DatabaseAccessMode.READING) {
@@ -247,7 +250,7 @@ public abstract class DataStore extends DataAbstraction {
 					sendInternalMessage();
 				}
 			};
-			if (tableContainer.beginTransaction(transactionMode,waitingPeriod,sleepPeriod,maxRetryNumber,this,currentProcess,entryName,this,dataStore,reuseKN,iX)) {
+			if (tableContainer.beginTransaction(transactionMode,waitingPeriod,sleepPeriod,maximalRetryNumber,this,currentProcess,entryName,this,dataStore,reuseKN,iX)) {
 				checkDomain= true;
 			};
 			if (checkDomain) {
@@ -445,13 +448,13 @@ public abstract class DataStore extends DataAbstraction {
 			};
 			ChoisePoint newIx= new ChoisePoint(iX);
 			for (int n=0; n < arrayOfKeys.length; n++) {
-				resultName.value= new PrologString(arrayOfKeys[n]);
-				resultType.value= arrayOfTypes[n];
+				resultName.setBacktrackableValue(new PrologString(arrayOfKeys[n]),newIx);
+				resultType.setBacktrackableValue(arrayOfTypes[n],newIx);
 				try {
 					c0.execute(newIx);
 				} catch (Backtracking b) {
-					resultName.value= null;
-					resultType.value= null;
+					resultName.clear();
+					resultType.clear();
 					if (newIx.isEnabled()) {
 						newIx.freeTrail();
 						claimReadingAccess();
@@ -462,8 +465,8 @@ public abstract class DataStore extends DataAbstraction {
 				};
 				return;
 			};
-			resultName.value= null;
-			resultType.value= null;
+			resultName.clear();
+			resultType.clear();
 			throw Backtracking.instance;
 		}
 	}
@@ -497,7 +500,7 @@ public abstract class DataStore extends DataAbstraction {
 		String newEntryName= Converters.argumentToString(a2,iX);
 		TimeInterval waitingPeriod= getTransactionWaitingPeriod(iX);
 		TimeInterval sleepPeriod= getTransactionSleepPeriod(iX);
-		BigInteger maxRetryNumber= getTransactionMaxRetryNumber(iX);
+		BigInteger maximalRetryNumber= getTransactionMaximalRetryNumber(iX);
 		boolean reuseNumbers= getReuseTableNumbers(iX);
 		claimModifyingAccess();
 		HashMap<String,DatabaseTableContainer> hash= tableHash.get();
@@ -524,7 +527,7 @@ public abstract class DataStore extends DataAbstraction {
 				}
 			};
 			try {
-				copyOfTableContainer.beginTransaction(accessModesStack.peek().getDatabaseAccessMode(),waitingPeriod,sleepPeriod,maxRetryNumber,this,currentProcess,newEntryName,this,dataStore,reuseNumbers,iX);
+				copyOfTableContainer.beginTransaction(accessModesStack.peek().getDatabaseAccessMode(),waitingPeriod,sleepPeriod,maximalRetryNumber,this,currentProcess,newEntryName,this,dataStore,reuseNumbers,iX);
 				lockedTables.add(copyOfTableContainer);
 				hash.put(newEntryName,copyOfTableContainer);
 			} catch (Backtracking b) {
@@ -593,7 +596,7 @@ public abstract class DataStore extends DataAbstraction {
 	//
 	@SuppressWarnings("unchecked")
 	protected void loadContent(ExtendedFileName fileName, StaticContext staticContext, ChoisePoint iX) {
-		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		claimModifyingAccess();
 		tableHash.set((HashMap<String,DatabaseTableContainer>)fileName.readObject(timeout,staticContext));
 	}
@@ -644,7 +647,7 @@ public abstract class DataStore extends DataAbstraction {
 	@SuppressWarnings("unchecked")
 	protected void loadTextContent(ExtendedFileName fileName, StaticContext staticContext, ChoisePoint iX) {
 		CharacterSet requestedCharacterSet= getCharacterSet(iX);
-		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		claimModifyingAccess();
 		recentErrorText= "";
 		recentErrorPosition= -1;
@@ -711,14 +714,16 @@ public abstract class DataStore extends DataAbstraction {
 						currentTable= null;
 						currentContainer= null;
 					} else if (functor==SymbolCodes.symbolCode_E_database_type) {
-						currentDatabaseType= DatabaseType.termToDatabaseType(value,iX);
+						currentDatabaseType= DatabaseType.argumentToDatabaseType(value,iX);
 					} else if (functor==SymbolCodes.symbolCode_E_reuse_key_numbers) {
 						currentReuseKeyNumbers= YesNo.termYesNo2Boolean(value,iX);
 					} else if (functor==SymbolCodes.symbolCode_E_target_domain) {
 						try {
-							currentTargetDomain= PrologDomain.termToPrologDomain(value,iX);
+							currentTargetDomain= PrologDomain.argumentToPrologDomain(value,iX);
 						} catch (TermIsNotPrologDomain e) {
 							throw new DatabaseRecordDoesNotBelongToDomain(item,textBuffer.toString(),item.getPosition());
+						} catch (Throwable e) {
+							throw new DatabaseRecordDoesNotBelongToDomain(item,textBuffer.toString(),item.getPosition(),e);
 						}
 					} else if (functor==SymbolCodes.symbolCode_E_record) {
 						if (currentContainer == null) {
@@ -755,10 +760,12 @@ public abstract class DataStore extends DataAbstraction {
 					if (functor==SymbolCodes.symbolCode_E_domain) {
 						try {
 							String domainName= arguments[0].getStringValue(iX);
-							PrologDomain prologDomain= PrologDomain.termToPrologDomain(arguments[1],iX);
+							PrologDomain prologDomain= PrologDomain.argumentToPrologDomain(arguments[1],iX);
 							currentLocalDomainTable.put(domainName,prologDomain);
 						} catch (TermIsNotPrologDomain e) {
 							throw new DatabaseRecordDoesNotBelongToDomain(item,textBuffer.toString(),item.getPosition());
+						} catch (Throwable e) {
+							throw new DatabaseRecordDoesNotBelongToDomain(item,textBuffer.toString(),item.getPosition(),e);
 						}
 					} else {
 						throw new DatabaseRecordDoesNotBelongToDomain(item,textBuffer.toString(),item.getPosition());
@@ -785,14 +792,14 @@ public abstract class DataStore extends DataAbstraction {
 	public void recentLoadingError4s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3, PrologVariable a4) throws Backtracking {
 		claimReadingAccess();
 		if (recentErrorException != null && recentErrorText != null) {
-			a1.value= new PrologString(recentErrorText);
-			a2.value= new PrologInteger(recentErrorPosition);
-			a3.value= new PrologString(recentErrorException.toString());
-			a4.value= new PrologString(recentErrorException.toString());
-			iX.pushTrail(a1);
-			iX.pushTrail(a2);
-			iX.pushTrail(a3);
-			iX.pushTrail(a4);
+			a1.setBacktrackableValue(new PrologString(recentErrorText),iX);
+			a2.setBacktrackableValue(new PrologInteger(recentErrorPosition),iX);
+			a3.setBacktrackableValue(new PrologString(recentErrorException.toString()),iX);
+			a4.setBacktrackableValue(new PrologString(recentErrorException.toString()),iX);
+			//iX.pushTrail(a1);
+			//iX.pushTrail(a2);
+			//iX.pushTrail(a3);
+			//iX.pushTrail(a4);
 		} else {
 			throw Backtracking.instance;
 		}
@@ -800,12 +807,12 @@ public abstract class DataStore extends DataAbstraction {
 	public void recentLoadingError3s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3) throws Backtracking {
 		claimReadingAccess();
 		if (recentErrorException != null && recentErrorText != null) {
-			a1.value= new PrologString(recentErrorText);
-			a2.value= new PrologInteger(recentErrorPosition);
-			a3.value= new PrologString(recentErrorException.toString());
-			iX.pushTrail(a1);
-			iX.pushTrail(a2);
-			iX.pushTrail(a3);
+			a1.setBacktrackableValue(new PrologString(recentErrorText),iX);
+			a2.setBacktrackableValue(new PrologInteger(recentErrorPosition),iX);
+			a3.setBacktrackableValue(new PrologString(recentErrorException.toString()),iX);
+			//iX.pushTrail(a1);
+			//iX.pushTrail(a2);
+			//iX.pushTrail(a3);
 		} else {
 			throw Backtracking.instance;
 		}
@@ -813,40 +820,43 @@ public abstract class DataStore extends DataAbstraction {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void repair0ff(ChoisePoint iX, PrologVariable a1) {
+	public void repair0ff(ChoisePoint iX, PrologVariable result) {
 		ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
-		a1.value= new PrologInteger(repairContent(fileName,false,staticContext,iX));
+		result.setNonBacktrackableValue(new PrologInteger(repairContent(fileName,false,staticContext,iX)));
+		// iX.pushTrail(a1);
 	}
 	public void repair0fs(ChoisePoint iX) {
 		ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
 		repairContent(fileName,false,staticContext,iX);
 	}
 	//
-	public void repair1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
-		boolean reportActions= YesNo.termYesNo2Boolean(a2,iX);
+	public void repair1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		boolean reportActions= YesNo.termYesNo2Boolean(a1,iX);
 		ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
-		a1.value= new PrologInteger(repairContent(fileName,reportActions,staticContext,iX));
+		result.setNonBacktrackableValue(new PrologInteger(repairContent(fileName,reportActions,staticContext,iX)));
+		// iX.pushTrail(a1);
 	}
-	public void repair1fs(ChoisePoint iX, Term a2) {
-		boolean reportActions= YesNo.termYesNo2Boolean(a2,iX);
+	public void repair1fs(ChoisePoint iX, Term a1) {
+		boolean reportActions= YesNo.termYesNo2Boolean(a1,iX);
 		ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
 		repairContent(fileName,reportActions,staticContext,iX);
 	}
 	//
-	public void repair2ff(ChoisePoint iX, PrologVariable a1, Term a2, Term a3) {
-		boolean reportActions= YesNo.termYesNo2Boolean(a2,iX);
-		ExtendedFileName fileName= retrieveRealGlobalFileName(a3,iX);
-		a1.value= new PrologInteger(repairContent(fileName,reportActions,staticContext,iX));
+	public void repair2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
+		boolean reportActions= YesNo.termYesNo2Boolean(a1,iX);
+		ExtendedFileName fileName= retrieveRealGlobalFileName(a2,iX);
+		result.setNonBacktrackableValue(new PrologInteger(repairContent(fileName,reportActions,staticContext,iX)));
+		// iX.pushTrail(a1);
 	}
-	public void repair2fs(ChoisePoint iX, Term a2, Term a3) {
-		boolean reportActions= YesNo.termYesNo2Boolean(a2,iX);
-		ExtendedFileName fileName= retrieveRealGlobalFileName(a3,iX);
+	public void repair2fs(ChoisePoint iX, Term a1, Term a2) {
+		boolean reportActions= YesNo.termYesNo2Boolean(a1,iX);
+		ExtendedFileName fileName= retrieveRealGlobalFileName(a2,iX);
 		repairContent(fileName,reportActions,staticContext,iX);
 	}
 	//
 	@SuppressWarnings("unchecked")
 	protected long repairContent(ExtendedFileName fileName, boolean reportActions, StaticContext staticContext, ChoisePoint iX) {
-		int timeout= getMaxWaitingTimeInMilliseconds(iX);
+		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		claimModifyingAccess();
 		try {
 			tableHash.set((HashMap<String,DatabaseTableContainer>)fileName.readObject(timeout,staticContext));
@@ -945,15 +955,15 @@ public abstract class DataStore extends DataAbstraction {
 		openDataStore(fileName,getAccessMode(iX),getSharingMode(iX),DataStoreUnpackMode.ENABLED,iX);
 	}
 	public void open2s(ChoisePoint iX, Term a1, Term a2) {
-		DatabaseAccessMode access= DatabaseAccessMode.termToDatabaseAccessMode(a1,iX);
-		DatabaseSharingMode sharing= DatabaseSharingMode.termToDatabaseSharingMode(a2,iX);
+		DatabaseAccessMode access= DatabaseAccessMode.argumentToDatabaseAccessMode(a1,iX);
+		DatabaseSharingMode sharing= DatabaseSharingMode.argumentToDatabaseSharingMode(a2,iX);
 		ExtendedFileName fileName= retrieveRealLocalFileName(iX);
 		openDataStore(fileName,access,sharing,DataStoreUnpackMode.ENABLED,iX);
 	}
 	public void open3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(a1,iX);
-		DatabaseAccessMode access= DatabaseAccessMode.termToDatabaseAccessMode(a2,iX);
-		DatabaseSharingMode sharing= DatabaseSharingMode.termToDatabaseSharingMode(a3,iX);
+		DatabaseAccessMode access= DatabaseAccessMode.argumentToDatabaseAccessMode(a2,iX);
+		DatabaseSharingMode sharing= DatabaseSharingMode.argumentToDatabaseSharingMode(a3,iX);
 		openDataStore(fileName,access,sharing,DataStoreUnpackMode.ENABLED,iX);
 	}
 	//
@@ -1002,8 +1012,8 @@ public abstract class DataStore extends DataAbstraction {
 				};
 				TimeInterval waitingPeriod= getTransactionWaitingPeriod(iX);
 				TimeInterval sleepPeriod= getTransactionSleepPeriod(iX);
-				BigInteger maxRetryNumber= getTransactionMaxRetryNumber(iX);
-				newDataStore= new OpenedDataStore(fileName,dataStorePath,subdirectoryPath,currentProcess,access,sharing,waitingPeriod,sleepPeriod,maxRetryNumber);
+				BigInteger maximalRetryNumber= getTransactionMaximalRetryNumber(iX);
+				newDataStore= new OpenedDataStore(fileName,dataStorePath,subdirectoryPath,currentProcess,access,sharing,waitingPeriod,sleepPeriod,maximalRetryNumber);
 				openedDataStoreList.add(newDataStore);
 			};
 			synchronized (newDataStore) {
@@ -1050,11 +1060,11 @@ public abstract class DataStore extends DataAbstraction {
 	//
 	@SuppressWarnings("unchecked")
 	public void beginTransaction1s(ChoisePoint iX, Term a1) throws Backtracking {
-		DatabaseAccessMode transactionMode= DatabaseAccessMode.termToDatabaseAccessMode(a1,iX);
+		DatabaseAccessMode transactionMode= DatabaseAccessMode.argumentToDatabaseAccessMode(a1,iX);
 		boolean reuseNumbers= getReuseTableNumbers(iX);
 		TimeInterval waitingPeriod= getTransactionWaitingPeriod(iX);
 		TimeInterval sleepPeriod= getTransactionSleepPeriod(iX);
-		BigInteger maxRetryNumber= getTransactionMaxRetryNumber(iX);
+		BigInteger maximalRetryNumber= getTransactionMaximalRetryNumber(iX);
 		long nanosTimeout= waitingPeriod.toNanosecondsLong();
 		OpenedDataStore dataStore= openedDataStore.get();
 		if (dataStore != null) {
@@ -1085,12 +1095,12 @@ public abstract class DataStore extends DataAbstraction {
 							DatabaseTableContainer tableContainer= tableHashCopy.get(currentKey);
 							if (tableContainer != null) {
 								try {
-									tableContainer.beginTransaction(transactionMode,waitingPeriod,sleepPeriod,BigInteger.ZERO/*maxRetryNumber*/,this,currentProcess,currentKey,this,dataStore,reuseNumbers,iX);
+									tableContainer.beginTransaction(transactionMode,waitingPeriod,sleepPeriod,BigInteger.ZERO/*maximalRetryNumber*/,this,currentProcess,currentKey,this,dataStore,reuseNumbers,iX);
 									lockedTables.add(tableContainer);
 									iteratorOfSetOfKeysOfTableHashCopy.remove();
 								} catch (Backtracking b) {
 									numberOfUnsuccessfulAttempts= numberOfUnsuccessfulAttempts.add(BigInteger.ONE);
-									if (numberOfUnsuccessfulAttempts.compareTo(maxRetryNumber.multiply(BigInteger.valueOf(totalNumberOfEntries))) > 0) {
+									if (numberOfUnsuccessfulAttempts.compareTo(maximalRetryNumber.multiply(BigInteger.valueOf(totalNumberOfEntries))) > 0) {
 										unlockAllLockedTables(dataStore);
 										throw Backtracking.instance;
 									}
@@ -1450,7 +1460,7 @@ public abstract class DataStore extends DataAbstraction {
 		Path path2= fileName2.createSubdirectoryPath();
 		if (Files.exists(path1)) {
 			try {
-				Files.move(path1,path2,StandardCopyOption.ATOMIC_MOVE);
+				Files.move(path1,path2); // StandardCopyOption.ATOMIC_MOVE
 			// } catch (UnsupportedOperationException e) {
 			// } catch (FileAlreadyExistsException e) {
 			// } catch (AtomicMoveNotSupportedException e) {

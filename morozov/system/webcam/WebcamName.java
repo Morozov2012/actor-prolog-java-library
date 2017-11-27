@@ -39,7 +39,7 @@ public class WebcamName {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static WebcamName termToWebcamName(Term value, ChoisePoint iX) {
+	public static WebcamName argumentToWebcamName(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_default) {

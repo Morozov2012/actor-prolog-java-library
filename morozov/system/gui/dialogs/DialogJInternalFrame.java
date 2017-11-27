@@ -6,6 +6,7 @@ import morozov.run.*;
 import morozov.system.gui.*;
 
 import javax.swing.JInternalFrame;
+import java.awt.Window;
 import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.Container;
@@ -35,9 +36,14 @@ public class DialogJInternalFrame
 		staticContext= context;
 	}
 	//
+	public Window getWindow() {
+		return null;
+	}
+	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void addToDesktop(MainDesktopPane desktop) {
+	public void addToDesktopIfNecessary(StaticContext context) {
+		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(staticContext);
 		desktop.safelyAdd(this,DesktopUtils.DIALOG_LAYER);
 	}
 	//
@@ -78,7 +84,7 @@ public class DialogJInternalFrame
 	//
 	public Rectangle computeParentLayoutSize() {
 		//
-		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(dialog.staticContext);
+		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(dialog.staticContext);
 		//
 		Dimension parentDimension= new Dimension();
 		desktop.getSize(parentDimension);

@@ -12,8 +12,12 @@ package morozov.system.gui.dialogs.scalable;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import target.*;
+
 import morozov.run.*;
+import morozov.system.gui.*;
 import morozov.system.gui.dialogs.*;
+import morozov.system.gui.dialogs.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
 
@@ -38,18 +42,24 @@ import java.util.Map;
 
 public abstract class ActiveComponent
 		implements
+			ActiveComponentInterface,
 			ActionListener,
 			ChangeListener,
 			ListSelectionListener,
 			FocusListener {
 	//
-	// public JComponent component;
 	public Component component;
 	//
 	protected AbstractDialog targetDialog= null;
 	//
 	protected Font colourlessFont;
+	protected Color textColor;
 	protected Color spaceColor;
+	//
+	protected Color individualTextColor;
+	protected Color individualSpaceColor;
+	protected Color individualBackgroundColor;
+	//
 	protected GridBagLayout gridBagLayout;
 	protected boolean isTop= false;
 	protected boolean isLeft= false;
@@ -65,19 +75,77 @@ public abstract class ActiveComponent
 	protected int getInitialBottomBorder() {return 0;}
 	protected int getInitialRightBorder() {return 0;}
 	//
+	protected static Term termEmptyString= new PrologString("");
+	protected static Term termDefault= new PrologSymbol(SymbolCodes.symbolCode_E_default);
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public ActiveComponent(AbstractDialog tD) {
 		targetDialog= tD;
 	}
 	//
-	public abstract void putValue(Term value, ChoisePoint iX);
-	public abstract Term getValue();
+	///////////////////////////////////////////////////////////////
+	//
+	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
+		return value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
+	}
+	public Term standardizeRange(Term value, ChoisePoint iX) throws RejectRange {
+		return value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void putValue(DialogControlOperation operation, Term value, ChoisePoint iX) {
+		switch (operation) {
+			case VALUE:
+				putValue(value,iX);
+				break;
+			case TEXT:
+				setIndividualText(value,iX);
+				break;
+			case TEXT_COLOR:
+				setIndividualTextColor(value,iX);
+				break;
+			case SPACE_COLOR:
+				setIndividualSpaceColor(value,iX);
+				break;
+			case BACKGROUND_COLOR:
+				setIndividualBackgroundColor(value,iX);
+				break;
+		}
+	}
+	//
+	public Term getValue(DialogControlOperation operation) {
+		switch (operation) {
+			case VALUE:
+				return getValue();
+			case TEXT:
+				return getIndividualText();
+			case TEXT_COLOR:
+				return getIndividualTextColor();
+			case SPACE_COLOR:
+				return getIndividualSpaceColor();
+			case BACKGROUND_COLOR:
+				return getIndividualBackgroundColor();
+		};
+		throw new UnknownDialogControlOperation();
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void putValue(Term value, ChoisePoint iX) {
+	}
+	public Term getValue() {
+		return PrologUnknownValue.instance;
+	}
 	//
 	public void putRange(Term value, ChoisePoint iX) {
 	}
 	public Term getRange() {
-		// return PrologEmptyList.instance;
 		return PrologUnknownValue.instance;
 	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void setIsEnabled(boolean mode) {
 		if (component != null) {
@@ -97,6 +165,8 @@ public abstract class ActiveComponent
 		}
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void setPadding(
 			GridBagLayout gBL,
 			boolean flagTop, boolean flagLeft, boolean flagBottom, boolean flagRight,
@@ -113,21 +183,14 @@ public abstract class ActiveComponent
 		horizontalScaling= valueHorizontal;
 		verticalScaling= valueVertical;
 	}
-	// public double getHorizontalScaling() {
-	//	return horizontalScaling;
-	// }
-	// public double getVerticalScaling() {
-	//	return verticalScaling;
-	// }
-	public void setFont(Font font) {
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setGeneralFont(Font font) {
 		colourlessFont= font;
-		if (component!=null) {
-			if (spaceColor!=null) {
-				Map<TextAttribute,Object> map= new HashMap<TextAttribute,Object>();
-				map.put(TextAttribute.BACKGROUND,spaceColor);
-				font= font.deriveFont(map);
-			};
-			if (gridBagLayout!=null) {
+		if (component != null) {
+			font= DialogUtils.refineTextAndSpaceColors(font,individualSpaceColor,spaceColor,individualTextColor,textColor);
+			if (gridBagLayout != null) {
 				GridBagConstraints gBC= gridBagLayout.getConstraints(component);
 				FontMetrics metrics= component.getFontMetrics(font);
 				gBC.insets= LayoutUtils.calculateLayoutInsets(
@@ -148,7 +211,8 @@ public abstract class ActiveComponent
 					getInitialRightBorder());
 				gridBagLayout.setConstraints(component,gBC);
 			};
-			component.setFont(font);
+			setFont(font);
+			setMargin();
 			// component.setMinimumSize(component.getPreferredSize());
 			// Предположительно, это может помочь в борьбе
 			// с проблемой схлопывания текстовых полей:
@@ -159,8 +223,157 @@ public abstract class ActiveComponent
 		}
 	}
 	//
-	public boolean requestFocusInWindow() {
+	///////////////////////////////////////////////////////////////
+	//
+	public void setGeneralForeground(Color c) {
+		textColor= c;
+		if (component != null) {
+			if (individualTextColor==null) {
+				setForeground(c);
+			} else {
+				setForeground(individualTextColor);
+			};
+			if (colourlessFont==null) {
+				colourlessFont= component.getFont();
+			};
+			setGeneralFont(colourlessFont);
+		}
+	}
+	public void setGeneralSpaceColor(Color c) {
+		spaceColor= c;
+		if (component != null) {
+			if (colourlessFont==null) {
+				colourlessFont= component.getFont();
+			};
+			setGeneralFont(colourlessFont);
+		}
+	}
+	public void setGeneralBackground(Color c) {
+		if (component != null) {
+			if (individualBackgroundColor==null) {
+				setBackground(c);
+			} else {
+				setBackground(individualBackgroundColor);
+			}
+		}
+	}
+	public void setAlarmColors(Color fc, Color bc) {
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setIndividualText(Term value, ChoisePoint iX) {
+	}
+	//
+	public Term getIndividualText() {
+		return termEmptyString;
+	}
+	//
+	public void setIndividualTextColor(Term value, ChoisePoint iX) {
+		try {
+			individualTextColor= ExtendedColor.argumentToColorSafe(value,iX);
+			setForeground(individualTextColor);
+		} catch (TermIsSymbolDefault e) {
+			individualTextColor= null;
+			setForeground(null);
+		};
+		if (colourlessFont==null) {
+			colourlessFont= component.getFont();
+		};
+		setGeneralFont(colourlessFont);
+	}
+	//
+	public void setIndividualSpaceColor(Term value, ChoisePoint iX) {
+		try {
+			individualSpaceColor= ExtendedColor.argumentToColorSafe(value,iX);
+		} catch (TermIsSymbolDefault e) {
+			individualSpaceColor= null;
+		};
+		if (colourlessFont==null) {
+			colourlessFont= component.getFont();
+		};
+		setGeneralFont(colourlessFont);
+	}
+	//
+	public void setIndividualBackgroundColor(Term value, ChoisePoint iX) {
+		try {
+			individualBackgroundColor= ExtendedColor.argumentToColorSafe(value,iX);
+			setBackground(individualBackgroundColor);
+		} catch (TermIsSymbolDefault e) {
+			individualBackgroundColor= null;
+			setBackground(null);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public Term getIndividualTextColor() {
+		if (individualTextColor != null) {
+			return ExtendedColor.colorToTerm(individualTextColor);
+		} else {
+			return termDefault;
+		}
+	}
+	public Term getIndividualSpaceColor() {
+		if (individualSpaceColor != null) {
+			return ExtendedColor.colorToTerm(individualSpaceColor);
+		} else {
+			return termDefault;
+		}
+	}
+	public Term getIndividualBackgroundColor() {
+		if (individualBackgroundColor != null) {
+			return ExtendedColor.colorToTerm(individualBackgroundColor);
+		} else {
+			return termDefault;
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setFont(Font font) {
 		if (component!=null) {
+			component.setFont(font);
+		}
+	}
+	//
+	protected void setMargin() {
+	}
+	//
+	public void setForeground(Color c) {
+		if (component != null) {
+			component.setForeground(c);
+		}
+	}
+	//
+	public void setBackground(Color c) {
+		if (component != null) {
+			component.setBackground(c);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void actionPerformed(ActionEvent event) {
+		if (targetDialog != null) {
+			targetDialog.reportValueUpdate(this);
+		}
+	}
+	public void stateChanged(ChangeEvent event) {
+		if (targetDialog != null) {
+			targetDialog.reportValueUpdate(this);
+		}
+	}
+	public void valueChanged(ListSelectionEvent event) {
+		if (targetDialog != null) {
+			targetDialog.reportValueUpdate(this);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public boolean requestFocusInWindow() {
+		if (component != null) {
 			return component.requestFocusInWindow();
 		} else {
 			return false;
@@ -179,52 +392,5 @@ public abstract class ActiveComponent
 		// некорректно перерисовывается.
 		// См. пример test_117_45_enable_disable_01_jdk.a.
 		targetDialog.safelyRevalidateAndRepaint();
-	}
-	//
-	public void setForeground(Color c) {
-		if (component!=null) {
-			component.setForeground(c);
-		}
-	}
-	public void setSpaceColor(Color c) {
-		spaceColor= c;
-		if (component!=null && colourlessFont!=null) {
-			setFont(colourlessFont);
-		}
-	}
-	public void setBackground(Color c) {
-		if (component!=null) {
-			component.setBackground(c);
-		}
-	}
-	// public void setOpaque(boolean f) {
-	//	if (component!=null) {
-	//		component.setOpaque(f);
-	//	}
-	// }
-	public void setAlarmColors(Color fc, Color bc) {
-	}
-	//
-	public void actionPerformed(ActionEvent event) {
-		if (targetDialog!=null) {
-			targetDialog.reportValueUpdate(this);
-		}
-	}
-	public void stateChanged(ChangeEvent event) {
-		if (targetDialog!=null) {
-			targetDialog.reportValueUpdate(this);
-		}
-	}
-	public void valueChanged(ListSelectionEvent event) {
-		if (targetDialog!=null) {
-			targetDialog.reportValueUpdate(this);
-		}
-	}
-	//
-	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-		return value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
-	}
-	public Term standardizeRange(Term value, ChoisePoint iX) throws RejectRange {
-		return value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 	}
 }

@@ -2,4 +2,8 @@
 
 package morozov.system.gui.dialogs;
 
-public enum DialogEventType { CREATED_CONTROL, MODIFIED_CONTROL, NONE }
+public enum DialogEventType {
+	CREATED_CONTROL,
+	MODIFIED_CONTROL,
+	NONE
+}

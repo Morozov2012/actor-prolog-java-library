@@ -34,7 +34,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public abstract AbstractInternalWorld getMainWorld();
+	abstract public AbstractInternalWorld getMainWorld();
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -329,7 +329,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 					if (inputControlDirectMessagesHash.contains(newItem)) {
 						int index= inputControlDirectMessages.indexOf(newItem);
 						inputControlDirectMessages.set(index,newItem);
-						return;
+						// return;
 					} else {
 						inputControlDirectMessages.add(newItem);
 						inputControlDirectMessagesHash.add(newItem);
@@ -344,7 +344,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 					if (inputInformationDirectMessagesHash.contains(newItem)) {
 						int index= inputInformationDirectMessages.indexOf(newItem);
 						inputInformationDirectMessages.set(index,newItem);
-						return;
+						// return;
 					} else {
 						inputInformationDirectMessages.add(newItem);
 						inputInformationDirectMessagesHash.add(newItem);
@@ -431,6 +431,15 @@ public abstract class AbstractProcess extends ActiveWorld {
 				};
 				boolean recentState= isProven;
 				isProven= false;
+				synchronized(inputControlDirectMessages) {
+					if (inputControlDirectMessages.contains(directMessage)) {
+						inputControlDirectMessages.remove(directMessage);
+						if (!directMessage.useBuffer) {
+							inputControlDirectMessagesHash.remove(directMessage);
+						}
+					};
+					wakeUp();
+				};
 				try {
 					if (directMessage.isTheVerifyCommand()) {
 						processFlowMessages(rootCP);
@@ -450,15 +459,15 @@ public abstract class AbstractProcess extends ActiveWorld {
 							rootCP);
 					}
 				} finally {
-					synchronized(inputControlDirectMessages) {
-						if (inputControlDirectMessages.contains(directMessage)) {
-							inputControlDirectMessages.remove(directMessage);
-							if (!directMessage.useBuffer) {
-								inputControlDirectMessagesHash.remove(directMessage);
-							}
-						};
-						wakeUp();
-					};
+					// synchronized(inputControlDirectMessages) {
+						// if (inputControlDirectMessages.contains(directMessage)) {
+						//	inputControlDirectMessages.remove(directMessage);
+						//	if (!directMessage.useBuffer) {
+						//		inputControlDirectMessagesHash.remove(directMessage);
+						//	}
+						// };
+						// wakeUp();
+					// };
 					if (!isProven) {
 						if (recentState) {
 							unsuccessfullyFinishPhase();

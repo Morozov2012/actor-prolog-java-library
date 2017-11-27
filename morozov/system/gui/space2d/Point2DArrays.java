@@ -21,7 +21,7 @@ public class Point2DArrays {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static Point2DArrays termToPoint2DArrays(Term value, ChoisePoint iX) {
+	public static Point2DArrays argumentToPoint2DArrays(Term value, ChoisePoint iX) {
 		Term[] termArray= Converters.listToArray(value,iX);
 		double[] xPoints= new double[termArray.length];
 		double[] yPoints= new double[termArray.length];

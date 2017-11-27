@@ -18,7 +18,7 @@ public enum Canvas2DHorizontalAlignment {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static Canvas2DHorizontalAlignment termToHorizontalAlignment(Term value, ChoisePoint iX) {
+	public static Canvas2DHorizontalAlignment argumentToHorizontalAlignment(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_default) {

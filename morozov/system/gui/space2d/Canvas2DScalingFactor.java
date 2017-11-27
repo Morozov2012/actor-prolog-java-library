@@ -62,7 +62,7 @@ public enum Canvas2DScalingFactor {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static Canvas2DScalingFactor termToScalingFactor(Term value, ChoisePoint iX) {
+	public static Canvas2DScalingFactor argumentToScalingFactor(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_WIDTH) {

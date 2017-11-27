@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.math.BigInteger;
 
 public class NumericalValue implements Serializable {
+	//
 	protected boolean useDoubleValue= false;
 	protected BigInteger integerValue;
 	protected double doubleValue;
@@ -26,7 +27,7 @@ public class NumericalValue implements Serializable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static NumericalValue termToNumericalValue(Term value, ChoisePoint iX) {
+	public static NumericalValue argumentToNumericalValue(Term value, ChoisePoint iX) {
 		try {
 			BigInteger integerValue= value.getIntegerValue(iX);
 			return new NumericalValue(integerValue);
@@ -47,6 +48,14 @@ public class NumericalValue implements Serializable {
 			return new PrologReal(doubleValue);
 		} else {
 			return new PrologInteger(integerValue);
+		}
+	}
+	//
+	public long toLong(long coefficient) {
+		if (useDoubleValue) {
+			return PrologInteger.toLong(doubleValue * coefficient);
+		} else {
+			return PrologInteger.toLong(integerValue.multiply(BigInteger.valueOf(coefficient)));
 		}
 	}
 	//

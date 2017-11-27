@@ -8,24 +8,40 @@ import morozov.syntax.scanner.errors.*;
 import morozov.syntax.scanner.signals.*;
 import morozov.terms.*;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.math.BigInteger;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 
 public class LexicalScanner {
+	//
 	protected boolean robustMode= false;
+	protected HashSet<String> keywordHash;
+	protected HashSet<String> reservedNameHash;
+	//
 	protected int position;
 	protected int braceLevel;
 	protected boolean afterComment;
 	protected int tokenPosition;
 	protected int previousPosition;
 	protected boolean previousCharacterIsSupplementary;
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public LexicalScanner() {
 		robustMode= true;
 	}
 	public LexicalScanner(boolean rM) {
 		robustMode= rM;
 	}
+	public LexicalScanner(boolean rM, HashSet<String> hash1, HashSet<String> hash2) {
+		robustMode= rM;
+		keywordHash= hash1;
+		reservedNameHash= hash2;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public PrologToken[] analyse(String text) {
 		return analyse(text,false);
 	}
@@ -115,7 +131,7 @@ public class LexicalScanner {
 						throw new SpaceAndControlCharactersAreNotAllowedHere(position);
 					}
 				} else {
-					PrologToken numericalToken= new TokenInteger(BigInteger.valueOf(code),tokenPosition);
+					PrologToken numericalToken= new TokenCharacter(code,tokenPosition);
 					tokens.add(numericalToken);
 				}
 			// } else if (c >= '0' && c <= '9') {
@@ -201,13 +217,14 @@ while (true) { // Loop: Scan significand of the numerical token
 // ====================================================================
 BigInteger numericalValue;
 if (numberContainsExtraSymbols) {
+	String stringRepresentation= buffer.toString();
 	try {
-		numericalValue= new BigInteger(buffer.toString(),radix);
+		numericalValue= new BigInteger(stringRepresentation,radix);
 	} catch (NumberFormatException e) {
 		if (robustMode) {
 			throw TokenIsNotRecognized.instance;
 		} else {
-			throw new BigIntegerFormatException(tokenPosition);
+			throw new BigIntegerFormatException(stringRepresentation,radix,tokenPosition);
 		}
 	}
 } else {
@@ -219,7 +236,7 @@ if (numberContainsExtraSymbols) {
 		if (robustMode) {
 			throw TokenIsNotRecognized.instance;
 		} else {
-			throw new BigIntegerFormatException(tokenPosition);
+			throw new BigIntegerFormatException(stringRepresentation,radix,tokenPosition);
 		}
 	}
 };
@@ -227,13 +244,13 @@ if (numericalValue.compareTo(BigInteger.valueOf(Character.MAX_RADIX)) > 0) {
 	if (robustMode) {
 		throw TokenIsNotRecognized.instance;
 	} else {
-		throw new IntegerRadixIsTooBig(tokenPosition);
+		throw new IntegerRadixIsTooBig(numericalValue,tokenPosition);
 	}
 } else if (numericalValue.compareTo(BigInteger.valueOf(Character.MIN_RADIX)) < 0) {
 	if (robustMode) {
 		throw TokenIsNotRecognized.instance;
 	} else {
-		throw new IntegerRadixIsTooSmall(tokenPosition);
+		throw new IntegerRadixIsTooSmall(numericalValue,tokenPosition);
 	}
 } else {
 	radix= numericalValue.intValue();
@@ -665,7 +682,7 @@ while (true) { // Loop: Scan exponent
 				if (robustMode) {
 					throw TokenIsNotRecognized.instance;
 				} else {
-					throw new BigIntegerFormatException(tokenPosition);
+					throw new BigIntegerFormatException(stringExponent,10,tokenPosition);
 				}
 			};
 			// exponent= BigInteger.valueOf(scale).subtract(exponent);
@@ -705,7 +722,7 @@ if (afterDot) {
 		if (robustMode) {
 			throw TokenIsNotRecognized.instance;
 		} else {
-			throw new BigIntegerFormatException(tokenPosition);
+			throw new BigIntegerFormatException(stringRepresentation,radix,tokenPosition);
 		}
 	};
 	if (radix==10 && PrologInteger.isSmallInteger(scale)) {
@@ -716,7 +733,7 @@ if (afterDot) {
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new BigDecimalFormatException(tokenPosition);
+				throw new BigDecimalFormatException(integerRepresentation,scale,tokenPosition);
 			}
 		};
 		numericalToken= new TokenReal(decimalRepresentation.doubleValue(),tokenPosition);
@@ -735,22 +752,33 @@ if (afterDot) {
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new BigIntegerFormatException(tokenPosition);
+				throw new BigIntegerFormatException(stringRepresentation,radix,tokenPosition);
 			}
 		};
 		if (radix==10 && PrologInteger.isSmallInteger(scale)) {
 		// if (false) { // Debug 2011.04.17
 			BigDecimal decimalRepresentation;
+			int exponent= scale.intValue();
 			try {
-				decimalRepresentation= new BigDecimal(integerRepresentation,scale.intValue());
+				decimalRepresentation= new BigDecimal(integerRepresentation,exponent);
 			} catch (NumberFormatException e) {
 				if (robustMode) {
 					throw TokenIsNotRecognized.instance;
 				} else {
-					throw new BigDecimalFormatException(tokenPosition);
+					throw new BigDecimalFormatException(integerRepresentation,exponent,tokenPosition);
 				}
 			};
-			numericalToken= new TokenInteger(decimalRepresentation.toBigInteger(),tokenPosition);
+			// if (exponent==0) {
+			numericalToken= new TokenInteger10(
+				decimalRepresentation.toBigInteger(),
+				tokenPosition);
+			// } else {
+			//	numericalToken= new TokenInteger10(
+			//		decimalRepresentation.toBigInteger(),
+			//		integerRepresentation,
+			//		-exponent,
+			//		tokenPosition);
+			// }
 		} else {
 			BigInteger bigExponent;
 			BigInteger bigRadix= BigInteger.valueOf(radix);
@@ -770,8 +798,12 @@ if (afterDot) {
 				};
 				bigExponent= bigExponent.multiply(bigRadix.pow(positiveScale.intValue()));
 			};
-			integerRepresentation= integerRepresentation.multiply(bigExponent);
-			numericalToken= new TokenInteger(integerRepresentation,tokenPosition);
+			numericalToken= new TokenIntegerR(
+				integerRepresentation.multiply(bigExponent),
+				bigRadix,
+				stringRepresentation,
+				positiveScale,
+				tokenPosition);
 		}
 	// } else if (scale > 0) {
 	} else if (scale.compareTo(BigInteger.ZERO) > 0) {
@@ -781,16 +813,30 @@ if (afterDot) {
 			throw new IntegerCannotHaveNegativeExponent(tokenPosition);
 		}
 	} else { // (scale == 0)
+		BigInteger integerRepresentation;
 		try {
-			BigInteger bigInteger= new BigInteger(stringRepresentation,radix);
-			numericalToken= new TokenInteger(bigInteger,tokenPosition);
+			integerRepresentation= new BigInteger(stringRepresentation,radix);
 		} catch (NumberFormatException e) {
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new BigIntegerFormatException(tokenPosition);
+				throw new BigIntegerFormatException(stringRepresentation,radix,tokenPosition);
 			}
+		};
+		if (radix==10) {
+			numericalToken= new TokenInteger10(
+				integerRepresentation,
+				tokenPosition);
+		} else {
+			numericalToken= new TokenIntegerR(
+				integerRepresentation,
+				BigInteger.valueOf(radix),
+				stringRepresentation,
+				BigInteger.ZERO,
+				tokenPosition);
 		}
+
+
 	}
 };
 tokens.add(numericalToken);
@@ -970,13 +1016,14 @@ while (true) { // Loop: Scan significand of the numerical token
 // ====================================================================
 BigInteger numericalValue;
 if (numberContainsExtraSymbols) {
+	String stringRepresentation= auxiliaryBuffer.toString();
 	try {
-		numericalValue= new BigInteger(auxiliaryBuffer.toString(),radix);
+		numericalValue= new BigInteger(stringRepresentation,radix);
 	} catch (NumberFormatException e) {
 		if (robustMode) {
 			throw TokenIsNotRecognized.instance;
 		} else {
-			throw new BigIntegerFormatException(tokenPosition);
+			throw new BigIntegerFormatException(stringRepresentation,radix,tokenPosition);
 		}
 	}
 } else {
@@ -988,7 +1035,7 @@ if (numberContainsExtraSymbols) {
 		if (robustMode) {
 			throw TokenIsNotRecognized.instance;
 		} else {
-			throw new BigIntegerFormatException(tokenPosition);
+			throw new BigIntegerFormatException(stringRepresentation,radix,tokenPosition);
 		}
 	}
 };
@@ -996,13 +1043,13 @@ if (numericalValue.compareTo(BigInteger.valueOf(Character.MAX_RADIX)) > 0) {
 	if (robustMode) {
 		throw TokenIsNotRecognized.instance;
 	} else {
-		throw new IntegerRadixIsTooBig(beginningOfNumber);
+		throw new IntegerRadixIsTooBig(numericalValue,beginningOfNumber);
 	}
 } else if (numericalValue.compareTo(BigInteger.valueOf(Character.MIN_RADIX)) < 0) {
 	if (robustMode) {
 		throw TokenIsNotRecognized.instance;
 	} else {
-		throw new IntegerRadixIsTooSmall(beginningOfNumber);
+		throw new IntegerRadixIsTooSmall(numericalValue,beginningOfNumber);
 	}
 } else {
 	radix= numericalValue.intValue();
@@ -1219,7 +1266,7 @@ try {
 	if (robustMode) {
 		throw TokenIsNotRecognized.instance;
 	} else {
-		throw new BigIntegerFormatException(tokenPosition);
+		throw new BigIntegerFormatException(stringRepresentation,radix,tokenPosition);
 	}
 };
 if (numericalValue.compareTo(BigInteger.valueOf(Character.MAX_VALUE)) > 0) {
@@ -1397,11 +1444,34 @@ while (true) { // Loop: Scan symbol token
 	}
 }; // End of loop: Scan symbol
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+int symbolLength= StrictMath.min(position,textLength-1) - beginningOfSymbol + 1; // + 1;
+String stringRepresentation= new String(characters,beginningOfSymbol,symbolLength);
+boolean isKeyword= false;
+if (reservedNameHash != null) {
+	String lowerCaseText= stringRepresentation.toLowerCase();
+	if (reservedNameHash.contains(lowerCaseText)) {
+		isKeyword= true;
+		if (keywordHash != null) {
+			if (!keywordHash.contains(stringRepresentation)) {
+				if (robustMode) {
+					throw TokenIsNotRecognized.instance;
+				} else {
+					throw new KeywordContainsLettersOfIllegalCase(tokenPosition);
+				}
+			}
+		}
+	}
+};
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // ::: SYMBOL LITERAL (END)                                         :::
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-				int symbolLength= StrictMath.min(position,textLength-1) - beginningOfSymbol + 1; // + 1;
-				String stringRepresentation= new String(characters,beginningOfSymbol,symbolLength);
-				PrologToken textToken= new TokenSymbol(SymbolNames.insertSymbolName(stringRepresentation),false,tokenPosition);
+				int symbolCode= SymbolNames.insertSymbolName(stringRepresentation);
+				PrologToken textToken;
+				if (!isKeyword) {
+					textToken= new TokenSymbol(symbolCode,false,tokenPosition);
+				} else {
+					textToken= new TokenKeyword(symbolCode,tokenPosition);
+				};
 				tokens.add(textToken);
 			// } else if (	(c >= 'A' && c <= 'Z') ||
 			//		(c >= '€' && c <= '') ||	// DOS coding
@@ -1469,11 +1539,34 @@ while (true) { // Loop: Scan variable / domain name token
 	}
 }; // End of loop: Scan variable / domain name token
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+int variableLength= StrictMath.min(position,textLength-1) - beginningOfVariable + 1; // + 1;
+String stringRepresentation= new String(characters,beginningOfVariable,variableLength);
+boolean isKeyword= false;
+if (reservedNameHash != null) {
+	String lowerCaseText= stringRepresentation.toLowerCase();
+	if (reservedNameHash.contains(lowerCaseText)) {
+		isKeyword= true;
+		if (keywordHash != null) {
+			if (!keywordHash.contains(stringRepresentation)) {
+				if (robustMode) {
+					throw TokenIsNotRecognized.instance;
+				} else {
+					throw new KeywordContainsLettersOfIllegalCase(tokenPosition);
+				}
+			}
+		}
+	}
+};
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // ::: VARIABLE / DOMAIN NAME LITERAL (END)                         :::
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-				int variableLength= StrictMath.min(position,textLength-1) - beginningOfVariable + 1; // + 1;
-				String stringRepresentation= new String(characters,beginningOfVariable,variableLength);
-				PrologToken textToken= new TokenVariable(stringRepresentation,tokenPosition);
+				PrologToken textToken;
+				if (!isKeyword) {
+					textToken= new TokenVariable(stringRepresentation,tokenPosition);
+				} else {
+					int symbolCode= SymbolNames.insertSymbolName(stringRepresentation);
+					textToken= new TokenKeyword(symbolCode,tokenPosition);
+				};
 				tokens.add(textToken);
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // ::: MULTILINE COMMENT (BEGINNING)                                :::

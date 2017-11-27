@@ -30,10 +30,6 @@ import java.util.TimerTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
-class UnknownDialogSlotName extends RuntimeException {}
-class UnknownDialogEntryCode extends RuntimeException {}
-class UnknownDialogEntryName extends RuntimeException {}
-
 public abstract class AbstractDialog
 	extends
 		DialogKernel
@@ -51,14 +47,14 @@ public abstract class AbstractDialog
 	protected StaticContext staticContext;
 	protected ChoisePoint modalChoisePoint= null;
 	//
-	public AtomicBoolean insideThePutOperation= new AtomicBoolean(false);
+	protected AtomicInteger insideThePutOperation= new AtomicInteger(0);
 	//
 	protected java.util.Timer scheduler;
 	protected LocalDialogTask currentTask;
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public abstract void registerSlotVariables();
+	abstract public void registerSlotVariables();
 	//
 	public boolean isToBeModal() {
 		return false;
@@ -113,14 +109,14 @@ public abstract class AbstractDialog
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void safelyDisplay(final MainDesktopPane desktop, final ChoisePoint iX) {
+	public void safelyDisplay(final DialogInitialState initialState, final ChoisePoint iX, final StaticContext context) {
 		if (SwingUtilities.isEventDispatchThread()) {
-			quicklyDisplay(desktop,iX);
+			quicklyDisplay(initialState,iX,context);
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
-						quicklyDisplay(desktop,iX);
+						quicklyDisplay(initialState,iX,context);
 					}
 				});
 			} catch (InterruptedException e) {
@@ -128,24 +124,24 @@ public abstract class AbstractDialog
 			}
 		}
 	}
-	private void quicklyDisplay(MainDesktopPane desktop, ChoisePoint iX) {
+	private void quicklyDisplay(DialogInitialState initialState, ChoisePoint iX, StaticContext context) {
 		if (isInitiated.get()) {
 			modalChoisePoint= iX;
 			dialogContainer.safelySetVisible(true);
 			dialogContainer.toFront();
 		} else {
-			quicklyAddAndDisplay(desktop,iX);
+			quicklyAddAndDisplay(initialState,iX,context);
 		}
 	}
 	//
-	public void safelyAddAndDisplay(final MainDesktopPane desktop, final ChoisePoint iX) {
+	public void safelyAddAndDisplay(final DialogInitialState initialState, final ChoisePoint iX, final StaticContext context) {
 		if (SwingUtilities.isEventDispatchThread()) {
-			quicklyAddAndDisplay(desktop,iX);
+			quicklyAddAndDisplay(initialState,iX,context);
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
 					public void run() {
-						quicklyAddAndDisplay(desktop,iX);
+						quicklyAddAndDisplay(initialState,iX,context);
 					}
 				});
 			} catch (InterruptedException e) {
@@ -153,7 +149,7 @@ public abstract class AbstractDialog
 			}
 		}
 	}
-	private void quicklyAddAndDisplay(MainDesktopPane desktop, ChoisePoint iX) {
+	private void quicklyAddAndDisplay(DialogInitialState initialState, ChoisePoint iX, final StaticContext context) {
 		dialogContainer.setClosable(true);
 		dialogContainer.setResizable(true);
 		dialogContainer.setMaximizable(true);
@@ -169,7 +165,7 @@ public abstract class AbstractDialog
 		};
 		dialogContainer.addComponentListener(this);
 		//
-		dialogContainer.addToDesktop(desktop);
+		dialogContainer.addToDesktopIfNecessary(context);
 		//
 		modalChoisePoint= iX;
 		// defineDefaultButton();
@@ -180,6 +176,17 @@ public abstract class AbstractDialog
 		start();
 		safelyDefineDefaultButton(); // For modal dialogs
 		dialogContainer.safelySetVisible(true);
+		switch (initialState) {
+		case MINIMIZED:
+			dialogContainer.safelyMinimize();
+			break;
+		case MAXIMIZED:
+			dialogContainer.safelyMaximize();
+			break;
+		default:
+			break;
+		};
+		// dialogContainer.toFront();
 		safelyDefineDefaultButton(); // For modeless dialogs
 		// defineDefaultButton();
 	}
@@ -190,6 +197,12 @@ public abstract class AbstractDialog
 		staticContext= context;
 		dialogContainer.initiate(context);
 		specialProcess.initiate(currentProcess,context);
+		if (isTopLevelWindow) {
+			Window window= dialogContainer.getWindow();
+			if (window != null) {
+				StaticDesktopAttributes.setTopLevelWindow(window,context);
+			}
+		}
 	}
 	//
 	public void start() {
@@ -199,6 +212,20 @@ public abstract class AbstractDialog
 	//
 	public void receiveInitiatingMessage() {
 		specialProcess.receiveUserInterfaceMessage(null,true,DialogEventType.NONE);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void incrementTheInsideThePutOperationCounter() {
+		insideThePutOperation.incrementAndGet();
+	}
+	//
+	public void decrementTheInsideThePutOperationCounter() {
+		int counter= insideThePutOperation.decrementAndGet();
+		if (counter <= 0) {
+			// repaintAfterDelay();
+			safelyRepaint();
+		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -219,14 +246,14 @@ public abstract class AbstractDialog
 		};
 		if (entryIsFound) {
 			if (sendFlowMessage) {
-				if (!insideThePutOperation.get()) {
+				if (insideThePutOperation.intValue()<=0) {
 					entry.requestValueRefreshing();
 					specialProcess.receiveUserInterfaceMessage(entry,true,DialogEventType.MODIFIED_CONTROL);
 				} else {
 					specialProcess.receiveUserInterfaceMessage(entry,true,DialogEventType.NONE);
 				}
 			} else {
-				if (!insideThePutOperation.get()) {
+				if (insideThePutOperation.intValue()<=0) {
 					entry.requestValueRefreshing();
 					specialProcess.receiveUserInterfaceMessage(entry,false,DialogEventType.MODIFIED_CONTROL);
 				}
@@ -245,7 +272,7 @@ public abstract class AbstractDialog
 					DialogEntry e2= controlTable[i];
 					if (e2!=entry && e2.isSlotName) {
 						if (e2.name.equals(slotName)) {
-							e2.putValue(value,iX);
+							e2.putValue(DialogControlOperation.VALUE,value,iX);
 						}
 					}
 				}
@@ -256,51 +283,79 @@ public abstract class AbstractDialog
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void putFieldValue(Term identifier, Term fieldValue, ChoisePoint iX) {
+	public void putFieldValue(DialogControlOperation operation, Term identifier, Term fieldValue, ChoisePoint iX) {
+		specialProcess.putFieldValue(operation,identifier,fieldValue,iX);
+	}
+	public void quicklyPutFieldValue(DialogControlOperation operation, Term identifier, Term fieldValue, ChoisePoint iX) {
 		fieldValue= fieldValue.dereferenceValue(iX);
 		if (fieldValue.thisIsFreeVariable()) {
 			return;
 		};
 		try {
 			long code= identifier.getSymbolValue(iX);
-			String slotName= identifier.toString(iX);
+			String slotOrActionName= identifier.toString(iX);
+			boolean slotIsFound= false;
 			for (int i= 0; i < controlTable.length; i++) {
 				DialogEntry entry= controlTable[i];
 				if (entry.isSlotName) {
-					if (entry.name.equals(slotName)) {
-						entry.putValue(fieldValue,iX);
+					if (entry.name.equals(slotOrActionName)) {
+						entry.putValue(operation,fieldValue,iX);
 						specialProcess.receiveUserInterfaceMessage(entry,true,DialogEventType.NONE);
-						return;
+						slotIsFound= true;
+						// return;
 					}
 				}
 			};
-			throw new UnknownDialogSlotName();
+			if (slotIsFound) {
+				return;
+			};
+			for (int i= 0; i < controlTable.length; i++) {
+				DialogEntry entry= controlTable[i];
+				if (entry.isBuiltInAction()) {
+					if (entry.name.equals(slotOrActionName)) {
+						entry.putValue(operation,fieldValue,iX);
+						slotIsFound= true;
+						// return;
+					}
+				}
+			};
+			if (!slotIsFound) {
+				throw new UnknownDialogSlotOrActionName(slotOrActionName);
+			}
 		} catch (TermIsNotASymbol e1) {
 			try {
 				long number= identifier.getSmallIntegerValue(iX);
+				boolean slotIsFound= false;
 				for (int i= 0; i < controlTable.length; i++) {
 					DialogEntry entry= controlTable[i];
-					if (!entry.isSlotName && entry.isNumericCode) {
+					if (!entry.isSlotName && entry.isNumericalName) {
 						if (entry.code==number) {
-							entry.putValue(fieldValue,iX);
-							return;
+							entry.putValue(operation,fieldValue,iX);
+							slotIsFound= true;
+							// return;
 						}
 					}
 				};
-				throw new UnknownDialogEntryCode();
+				if (!slotIsFound) {
+					throw new UnknownDialogEntryCode(number);
+				}
 			} catch (TermIsNotAnInteger e2) {
 				try {
 					String name= identifier.getStringValue(iX);
+					boolean slotIsFound= false;
 					for (int i= 0; i < controlTable.length; i++) {
 						DialogEntry entry= controlTable[i];
-						if (!entry.isSlotName && !entry.isNumericCode) {
+						if (!entry.isSlotName && !entry.isNumericalName) {
 							if (entry.name.equals(name)) {
-								entry.putValue(fieldValue,iX);
-								return;
+								entry.putValue(operation,fieldValue,iX);
+								slotIsFound= true;
+								// return;
 							}
 						}
 					};
-					throw new UnknownDialogEntryName();
+					if (!slotIsFound) {
+						throw new UnknownDialogEntryName(name);
+					}
 				} catch (TermIsNotAString e3) {
 					throw new WrongArgumentIsNotDialogEntry(identifier);
 				}
@@ -308,61 +363,56 @@ public abstract class AbstractDialog
 		}
 	}
 	//
-	public void putSymbolicFieldValue(long code, Term fieldValue, ChoisePoint iX) {
-		SymbolName name= SymbolNames.retrieveSymbolName(code);
-		String slotName= name.identifier;
-		for (int i= 0; i < controlTable.length; i++) {
-			DialogEntry entry= controlTable[i];
-			if (entry.isSlotName) {
-				if (entry.name.equals(slotName)) {
-					entry.putValue(fieldValue,iX);
-					specialProcess.receiveUserInterfaceMessage(entry,true,DialogEventType.NONE);
-					return;
-				}
-			}
-		};
-		throw new UnknownDialogSlotName();
-	}
-	//
 	///////////////////////////////////////////////////////////////
 	//
-	public Term getFieldValue(Term identifier, ChoisePoint iX) {
+	public Term getFieldValue(DialogControlOperation operation, Term identifier, ChoisePoint iX) {
+		return specialProcess.getFieldValue(operation,identifier,iX);
+	}
+	public Term quicklyGetFieldValue(DialogControlOperation operation, Term identifier, ChoisePoint iX) {
 		try {
 			long code= identifier.getSymbolValue(iX);
-			String slotName= identifier.toString(iX);
+			String slotOrActionName= identifier.toString(iX);
 			for (int i= 0; i < controlTable.length; i++) {
-				DialogEntry e= controlTable[i];
-				if (e.isSlotName) {
-					if (e.name.equals(slotName)) {
-						return e.getVisibleValue();
+				DialogEntry entry= controlTable[i];
+				if (entry.isSlotName) {
+					if (entry.name.equals(slotOrActionName)) {
+						return entry.getVisibleValue(operation);
 					}
 				}
 			};
-			throw new UnknownDialogSlotName();
+			for (int i= 0; i < controlTable.length; i++) {
+				DialogEntry entry= controlTable[i];
+				if (entry.isBuiltInAction()) {
+					if (entry.name.equals(slotOrActionName)) {
+						return entry.getVisibleValue(operation);
+					}
+				}
+			};
+			throw new UnknownDialogSlotOrActionName(slotOrActionName);
 		} catch (TermIsNotASymbol e1) {
 			try {
 				long number= identifier.getSmallIntegerValue(iX);
 				for (int i= 0; i < controlTable.length; i++) {
-					DialogEntry e= controlTable[i];
-					if (!e.isSlotName && e.isNumericCode) {
-						if (e.code==number) {
-							return e.getVisibleValue();
+					DialogEntry entry= controlTable[i];
+					if (!entry.isSlotName && entry.isNumericalName) {
+						if (entry.code==number) {
+							return entry.getVisibleValue(operation);
 						}
 					}
 				};
-				throw new UnknownDialogEntryCode();
+				throw new UnknownDialogEntryCode(number);
 			} catch (TermIsNotAnInteger e2) {
 				try {
 					String name= identifier.getStringValue(iX);
 					for (int i= 0; i < controlTable.length; i++) {
-						DialogEntry e= controlTable[i];
-						if (!e.isSlotName && !e.isNumericCode) {
-							if (e.name.equals(name)) {
-								return e.getVisibleValue();
+						DialogEntry entry= controlTable[i];
+						if (!entry.isSlotName && !entry.isNumericalName) {
+							if (entry.name.equals(name)) {
+								return entry.getVisibleValue(operation);
 							}
 						}
 					};
-					throw new UnknownDialogEntryName();
+					throw new UnknownDialogEntryName(name);
 				} catch (TermIsNotAString e3) {
 					throw new WrongArgumentIsNotDialogEntry(identifier);
 				}
@@ -376,51 +426,67 @@ public abstract class AbstractDialog
 		try {
 			long code= identifier.getSymbolValue(iX);
 			String slotOrActionName= identifier.toString(iX);
+			boolean slotIsFound= false;
 			for (int i= 0; i < controlTable.length; i++) {
 				DialogEntry entry= controlTable[i];
 				if (entry.isSlotName) {
 					if (entry.name.equals(slotOrActionName)) {
 						entry.setFieldIsEnabled(mode);
-						return;
+						slotIsFound= true;
+						// return;
 					}
 				}
+			};
+			if (slotIsFound) {
+				return;
 			};
 			for (int i= 0; i < controlTable.length; i++) {
 				DialogEntry entry= controlTable[i];
 				if (entry.isBuiltInAction()) {
 					if (entry.name.equals(slotOrActionName)) {
 						entry.setFieldIsEnabled(mode);
-						return;
+						slotIsFound= true;
+						// return;
 					}
 				}
 			};
-			throw new UnknownDialogSlotName();
+			if (!slotIsFound) {
+				throw new UnknownDialogSlotOrActionName(slotOrActionName);
+			}
 		} catch (TermIsNotASymbol e1) {
 			try {
 				long number= identifier.getSmallIntegerValue(iX);
+				boolean slotIsFound= false;
 				for (int i= 0; i < controlTable.length; i++) {
 					DialogEntry entry= controlTable[i];
-					if (!entry.isSlotName && entry.isNumericCode) {
+					if (!entry.isSlotName && entry.isNumericalName) {
 						if (entry.code==number) {
 							entry.setFieldIsEnabled(mode);
-							return;
+							slotIsFound= true;
+							// return;
 						}
 					}
 				};
-				throw new UnknownDialogEntryCode();
+				if (!slotIsFound) {
+					throw new UnknownDialogEntryCode(number);
+				}
 			} catch (TermIsNotAnInteger e2) {
 				try {
 					String name= identifier.getStringValue(iX);
+					boolean slotIsFound= false;
 					for (int i= 0; i < controlTable.length; i++) {
 						DialogEntry entry= controlTable[i];
-						if (!entry.isSlotName && !entry.isNumericCode) {
+						if (!entry.isSlotName && !entry.isNumericalName) {
 							if (entry.name.equals(name)) {
 								entry.setFieldIsEnabled(mode);
-								return;
+								slotIsFound= true;
+								// return;
 							}
 						}
 					};
-					throw new UnknownDialogEntryName();
+					if (!slotIsFound) {
+						throw new UnknownDialogEntryName(name);
+					}
 				} catch (TermIsNotAString e3) {
 					throw new WrongArgumentIsNotDialogEntry(identifier);
 				}
@@ -454,13 +520,13 @@ public abstract class AbstractDialog
 					}
 				}
 			};
-			throw new UnknownDialogSlotName();
+			throw new UnknownDialogSlotOrActionName(slotOrActionName);
 		} catch (TermIsNotASymbol e1) {
 			try {
 				long number= identifier.getSmallIntegerValue(iX);
 				for (int i= 0; i < controlTable.length; i++) {
 					DialogEntry entry= controlTable[i];
-					if (!entry.isSlotName && entry.isNumericCode) {
+					if (!entry.isSlotName && entry.isNumericalName) {
 						if (entry.code==number) {
 							if (!entry.fieldIsEnabled(mode)) {
 								throw Backtracking.instance;
@@ -469,13 +535,13 @@ public abstract class AbstractDialog
 						}
 					}
 				};
-				throw new UnknownDialogEntryCode();
+				throw new UnknownDialogEntryCode(number);
 			} catch (TermIsNotAnInteger e2) {
 				try {
 					String name= identifier.getStringValue(iX);
 					for (int i= 0; i < controlTable.length; i++) {
 						DialogEntry entry= controlTable[i];
-						if (!entry.isSlotName && !entry.isNumericCode) {
+						if (!entry.isSlotName && !entry.isNumericalName) {
 							if (entry.name.equals(name)) {
 								if (!entry.fieldIsEnabled(mode)) {
 									throw Backtracking.instance;
@@ -484,7 +550,7 @@ public abstract class AbstractDialog
 							}
 						}
 					};
-					throw new UnknownDialogEntryName();
+					throw new UnknownDialogEntryName(name);
 				} catch (TermIsNotAString e3) {
 					throw new WrongArgumentIsNotDialogEntry(identifier);
 				}
@@ -497,15 +563,15 @@ public abstract class AbstractDialog
 	public void prepareAndSendFlowMessages() {
 		specialProcess.phaseInitiation();
 		for (int i= 0; i < controlTable.length; i++) {
-			DialogEntry e= controlTable[i];
-			if (e.isSlotName) {
+			DialogEntry entry= controlTable[i];
+			if (entry.isSlotName) {
 				Term value= null;
-				Term slot= targetWorld.getSlotByName(e.name);
+				Term slot= targetWorld.getSlotByName(entry.name);
 				slot= slot.extractSlotVariable();
 				if (slot.thisIsSlotVariable()) {
 					SlotVariable slotVariable= (SlotVariable)slot;
 					try {
-						value= e.getExistedValue();
+						value= entry.getExistedValue();
 						specialProcess.prepareFlowMessage(slotVariable,value);
 					} catch (Backtracking b) {
 					}
@@ -615,6 +681,11 @@ public abstract class AbstractDialog
 		Term[] arguments= null;
 		if (name.equals("close")) {
 			dialogContainer.safelySetVisible(false);
+			// 2017.02.10:
+			if (exitOnClose) {
+				Runtime runtime= Runtime.getRuntime();
+				runtime.exit(0);
+			};
 			return;
 		} else if (name.equals("verify")) {
 			isSystemCommand= true;

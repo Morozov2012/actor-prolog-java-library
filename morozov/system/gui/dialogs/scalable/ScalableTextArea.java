@@ -20,12 +20,15 @@ import morozov.terms.*;
 
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import java.awt.Color;
 import java.awt.Font;
 
 public class ScalableTextArea extends ActiveComponent {
 	//
 	public JTextArea area= null;
 	protected boolean isEditable= false;
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public ScalableTextArea(AbstractDialog tD, String text, int visibleRowCount, int visibleColumnCount) {
 		super(tD);
@@ -37,42 +40,7 @@ public class ScalableTextArea extends ActiveComponent {
 		area.addFocusListener(this);
 	}
 	//
-	// protected int getInitialTopBorder() {return 5;}
-	// protected int getInitialLeftBorder() {return 5;}
-	// protected int getInitialBottomBorder() {return 5;}
-	// protected int getInitialRightBorder() {return 5;}
-	//
-	public void setEditable(boolean b) {
-		isEditable= b;
-		if (area!=null) {
-			area.setEditable(b);
-		}
-	}
-	//
-	public void setFont(Font font) {
-		super.setFont(font);
-		if (area!=null) {
-			area.setFont(font);
-			super.setFont(font);
-			if (component!=null) {
-				JScrollPane scrollPane= (JScrollPane)component;
-				scrollPane.setMinimumSize(scrollPane.getPreferredSize());
-			}
-		}
-	}
-	//
-	public void putValue(Term value, ChoisePoint iX) {
-		if (area!=null) {
-			area.setText(value.toString(iX));
-		}
-	}
-	public Term getValue() {
-		if (area!=null) {
-			return new PrologString(area.getText());
-		} else {
-			return new PrologString("");
-		}
-	}
+	///////////////////////////////////////////////////////////////
 	//
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		value= value.dereferenceValue(iX);
@@ -86,6 +54,24 @@ public class ScalableTextArea extends ActiveComponent {
 			return super.standardizeValue(value,iX);
 		}
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void putValue(Term value, ChoisePoint iX) {
+		if (area != null) {
+			area.setText(value.toString(iX));
+		}
+	}
+	//
+	public Term getValue() {
+		if (area != null) {
+			return new PrologString(area.getText());
+		} else {
+			return new PrologString("");
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void setIsEnabled(boolean mode) {
 		if (component != null && area != null) {
@@ -105,6 +91,41 @@ public class ScalableTextArea extends ActiveComponent {
 			return mode1 == mode2;
 		} else {
 			return false;
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setEditable(boolean b) {
+		isEditable= b;
+		if (area != null) {
+			area.setEditable(b);
+		}
+	}
+	//
+	public void setFont(Font font) {
+		super.setFont(font);
+		if (area != null) {
+			area.setFont(font);
+			// super.setGeneralFont(font);
+			if (component != null) {
+				JScrollPane scrollPane= (JScrollPane)component;
+				scrollPane.setMinimumSize(scrollPane.getPreferredSize());
+			}
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setForeground(Color c) {
+		if (area != null) {
+			area.setForeground(c);
+		}
+	}
+	//
+	public void setBackground(Color c) {
+		if (area != null) {
+			area.setBackground(c);
 		}
 	}
 }

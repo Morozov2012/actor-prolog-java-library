@@ -1,4 +1,4 @@
-// (c) 2015 IRE RAS Alexei A. Morozov
+// (c) 2015-2017 IRE RAS Alexei A. Morozov
 
 package morozov.worlds.remote;
 
@@ -9,7 +9,8 @@ import morozov.run.errors.*;
 import morozov.system.*;
 import morozov.system.datum.*;
 import morozov.system.gui.space2d.*;
-import morozov.system.vision.*;
+import morozov.system.vision.plain.*;
+import morozov.system.vision.vpm.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 import morozov.worlds.*;
@@ -156,7 +157,6 @@ public class OwnWorldWrapper
 	}
 	public void receiveAsyncCall(long domainSignatureNumber, boolean isControlCall, boolean useBuffer, byte[] argumentByteArray) {
 		Term[] arguments= Converters.deserializeArguments(argumentByteArray,domainSignatureNumber);
-		// ownWorld.receiveAsyncCall(new AsyncCall(domainSignatureNumber,ownWorld,ownWorld,isControlCall,useBuffer,arguments,true));
 		ChoisePoint iX= null;
 		ownWorld.transmitAsyncCall(new AsyncCall(domainSignatureNumber,ownWorld,ownWorld,isControlCall,useBuffer,arguments,true),iX);
 	}
@@ -195,773 +195,200 @@ public class OwnWorldWrapper
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void subtract(long frame, byte[] image, boolean takeFrameIntoAccount, GenericImageEncodingAttributes attributes) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
+	public void process(java.awt.image.BufferedImage nativeImage, long frameNumber, long timeInMilliseconds, boolean takeFrameIntoAccount, GenericImageEncodingAttributes attributes) throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.subtract(frame,image,takeFrameIntoAccount,iX,attributes);
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			vpm.process(nativeImage,frameNumber,timeInMilliseconds, takeFrameIntoAccount,iX,attributes);
 		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
+		}
+	}
+	public void process(byte[] bytes, long frameNumber, long timeInMilliseconds, boolean takeFrameIntoAccount, GenericImageEncodingAttributes attributes) throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
+			ChoisePoint iX= null;
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			vpm.process(bytes,frameNumber,timeInMilliseconds, takeFrameIntoAccount,iX,attributes);
+		} else {
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
 	//
-	public long getFrameNumber() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
+	public long getFrameNumber() throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			long frameNumber= subtractor.getFrameNumber(iX);
-			return frameNumber;
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			return vpm.getFrameNumber(iX);
 		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
 	//
-	public void commit() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
+	public void commit() throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.commit(iX);
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			vpm.commit(iX);
 		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
 	//
-	public void resetSettings() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
+	public void resetSettings() throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.resetSettings(iX);
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			vpm.resetSettings(iX);
 		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
+		}
+	}
+	public void resetStatistics() throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
+			ChoisePoint iX= null;
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			vpm.resetStatistics(iX);
+		} else {
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
+		}
+	}
+	public void resetResults() throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
+			ChoisePoint iX= null;
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			vpm.resetResults(iX);
+		} else {
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
+		}
+	}
+	public void resetAll() throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
+			ChoisePoint iX= null;
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			vpm.resetAll(iX);
+		} else {
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
 	//
-	public void resetStatistics() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
+	public byte[] getBlobs() throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.resetStatistics(iX);
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			return vpm.getSerializedBlobs(iX);
 		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
+		}
+	}
+	public byte[] getTracks() throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
+			ChoisePoint iX= null;
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			return vpm.getSerializedTracks(iX);
+		} else {
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
+		}
+	}
+	public byte[] getConnectedGraphs() throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
+			ChoisePoint iX= null;
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			return vpm.getSerializedConnectedGraphs(iX);
+		} else {
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
+		}
+	}
+	public byte[] getChronicle() throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
+			ChoisePoint iX= null;
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			return vpm.getSerializedChronicle(iX);
+		} else {
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
 	//
-	public void resetResults() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
+	public byte[] getRecentImage() throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.resetResults(iX);
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			return vpm.getSerializedRecentImage(iX);
 		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
+		}
+	}
+	public byte[] getPreprocessedImage() throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
+			ChoisePoint iX= null;
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			return vpm.getSerializedPreprocessedImage(iX);
+		} else {
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
+		}
+	}
+	public byte[] getForegroundImage() throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
+			ChoisePoint iX= null;
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			return vpm.getSerializedForegroundImage(iX);
+		} else {
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
+		}
+	}
+	public byte[] getSynthesizedImage() throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
+			ChoisePoint iX= null;
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			return vpm.getSerializedSynthesizedImage(iX);
+		} else {
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
 	//
-	public void resetAll() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
+	public byte[] getBackgroundImage(int layerNumber) throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.resetAll(iX);
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			return vpm.getSerializedBackgroundImage(layerNumber,iX);
 		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
+		}
+	}
+	public byte[] getSigmaImage(int layerNumber) throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
+			ChoisePoint iX= null;
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			return vpm.getSerializedSigmaImage(layerNumber,iX);
+		} else {
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
 	//
-	public byte[] getBlobs() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
+	public double[] physicalCoordinates(int pixelX, int pixelY) throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getSerializedBlobs(iX);
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			return vpm.physicalCoordinates(pixelX,pixelY,iX);
 		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
+		}
+	}
+	public double characteristicLength(int x, int y) throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
+			ChoisePoint iX= null;
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			return vpm.characteristicLength(x,y,iX);
+		} else {
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
 	//
-	public byte[] getTracks() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getSerializedTracks(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	//
-	public byte[] getConnectedGraphs() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getSerializedConnectedGraphs(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	//
-	public byte[] getRecentImage() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getSerializedRecentImage(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public byte[] getBackgroundImage() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getSerializedBackgroundImage(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public byte[] getSigmaImage() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getSerializedSigmaImage(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public byte[] getForegroundImage() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getSerializedForegroundImage(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public byte[] getSynthesizedImage() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getSerializedSynthesizedImage(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	//
-	public GenericImageEncodingAttributes getCurrentImageEncodingAttributes() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getCurrentImageEncodingAttributes();
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	//
-	public boolean getBlobExtractionMode() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getBlobExtractionMode(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public boolean getBlobTracingMode() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getBlobTracingMode(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public int getMinimalTrainingInterval() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getMinimalTrainingInterval(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public int getMaximalTrainingInterval() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getMaximalTrainingInterval(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public boolean getGrayscaleMode() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getGrayscaleMode(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public boolean getBackgroundGaussianFilteringMode() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getBackgroundGaussianFilteringMode(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public int getBackgroundGaussianFilterRadius() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getBackgroundGaussianFilterRadius(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public boolean getBackgroundRankFilteringMode() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getBackgroundRankFilteringMode(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public int getBackgroundRankFilterThreshold() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getBackgroundRankFilterThreshold(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public double getBackgroundStandardDeviationFactor() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getBackgroundStandardDeviationFactor(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public boolean getForegroundContouringMode() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getForegroundContouringMode(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public int getR2WindowHalfwidth() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getR2WindowHalfwidth(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public int getHorizontalBlobBorder() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getHorizontalBlobBorder(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public int getVerticalBlobBorder() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getVerticalBlobBorder(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public double getHorizontalExtraBorderCoefficient() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getHorizontalExtraBorderCoefficient(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public double getVerticalExtraBorderCoefficient() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getVerticalExtraBorderCoefficient(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public int getMinimalBlobIntersectionArea() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getMinimalBlobIntersectionArea(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public int getMinimalBlobSize() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getMinimalBlobSize(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public int getMinimalTrackDuration() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getMinimalTrackDuration(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public int getMaximalBlobInvisibilityInterval() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getMaximalBlobInvisibilityInterval(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public int getMaximalTrackRetentionInterval() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getMaximalTrackRetentionInterval(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public double[][] getInverseTransformationMatrix() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getInverseTransformationMatrix(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public byte[] getSerializedInverseTransformationMatrix() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getSerializedInverseTransformationMatrix(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public double getSamplingRate() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getSamplingRate(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public boolean getCharacteristicLengthMedianFilteringMode() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getCharacteristicLengthMedianFilteringMode(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public int getCharacteristicLengthMedianFilterHalfwidth() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getCharacteristicLengthMedianFilterHalfwidth(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public boolean getVelocityMedianFilteringMode() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getVelocityMedianFilteringMode(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public int getVelocityMedianFilterHalfwidth() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getVelocityMedianFilterHalfwidth(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public boolean getSlowTracksDeletionMode() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getSlowTracksDeletionMode(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public double getFuzzyVelocityThreshold() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getFuzzyVelocityThreshold(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public double getFuzzyDistanceThreshold() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getFuzzyDistanceThreshold(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public double getFuzzyThresholdBorder() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getFuzzyThresholdBorder(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public int getSynthesizedImageTransparency() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getSynthesizedImageTransparency(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public boolean getSynthesizedImageRectangularBlobsMode() throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			return subtractor.getSynthesizedImageRectangularBlobsMode(iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	//
-	public void setBlobExtractionMode(boolean mode) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setBlobExtractionMode(mode,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setBlobTracingMode(boolean mode) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setBlobTracingMode(mode,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setMinimalTrainingInterval(int frames) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setMinimalTrainingInterval(frames,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setMaximalTrainingInterval(int frames) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setMaximalTrainingInterval(frames,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setGrayscaleMode(boolean mode) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setGrayscaleMode(mode,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setBackgroundGaussianFilteringMode(boolean mode) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setBackgroundGaussianFilteringMode(mode,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setBackgroundGaussianFilterRadius(int radius) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setBackgroundGaussianFilterRadius(radius,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setBackgroundRankFilteringMode(boolean mode) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setBackgroundRankFilteringMode(mode,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setBackgroundRankFilterThreshold(int threshold) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setBackgroundRankFilterThreshold(threshold,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setBackgroundStandardDeviationFactor(double factor) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setBackgroundStandardDeviationFactor(factor,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setForegroundContouringMode(boolean mode) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setForegroundContouringMode(mode,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setR2WindowHalfwidth(int halfwidth) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setR2WindowHalfwidth(halfwidth,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setHorizontalBlobBorder(int size) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setHorizontalBlobBorder(size,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setVerticalBlobBorder(int size) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setVerticalBlobBorder(size,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setHorizontalExtraBorderCoefficient(double coefficient) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setHorizontalExtraBorderCoefficient(coefficient,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setVerticalExtraBorderCoefficient(double coefficient) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setVerticalExtraBorderCoefficient(coefficient,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setMinimalBlobIntersectionArea(int size) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setMinimalBlobIntersectionArea(size,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setMinimalBlobSize(int size) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setMinimalBlobSize(size,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setMinimalTrackDuration(int frames) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setMinimalTrackDuration(frames,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setMaximalBlobInvisibilityInterval(int frames) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setMaximalBlobInvisibilityInterval(frames,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setMaximalTrackRetentionInterval(int frames) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setMaximalTrackRetentionInterval(frames,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setInverseTransformationMatrix(double[][] matrix) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setInverseTransformationMatrix(matrix,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setSerializedInverseTransformationMatrix(byte[] matrix) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setSerializedInverseTransformationMatrix(matrix,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setSamplingRate(double rate) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setSamplingRate(rate,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setCharacteristicLengthMedianFilteringMode(boolean mode) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setCharacteristicLengthMedianFilteringMode(mode,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setCharacteristicLengthMedianFilterHalfwidth(int halfwidth) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setCharacteristicLengthMedianFilterHalfwidth(halfwidth,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setVelocityMedianFilteringMode(boolean mode) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setVelocityMedianFilteringMode(mode,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setVelocityMedianFilterHalfwidth(int halfwidth) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setVelocityMedianFilterHalfwidth(halfwidth,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setSlowTracksDeletionMode(boolean mode) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setSlowTracksDeletionMode(mode,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setFuzzyVelocityThreshold(double threshold) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setFuzzyVelocityThreshold(threshold,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setFuzzyDistanceThreshold(double threshold) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setFuzzyDistanceThreshold(threshold,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setFuzzyThresholdBorder(double threshold) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setFuzzyThresholdBorder(threshold,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setSynthesizedImageTransparency(int transparency) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setSynthesizedImageTransparency(transparency,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
-		}
-	}
-	public void setSynthesizedImageRectangularBlobsMode(boolean mode) throws OwnWorldIsNotImageSubtractor {
-		if (ownWorld instanceof ImageSubtractorOperations) {
-			ChoisePoint iX= null;
-			ImageSubtractorOperations subtractor= (ImageSubtractorOperations)ownWorld;
-			subtractor.setSynthesizedImageRectangularBlobsMode(mode,iX);
-		} else {
-			throw OwnWorldIsNotImageSubtractor.instance;
+	public GenericImageEncodingAttributes getCurrentImageEncodingAttributes() throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			return vpm.getCurrentImageEncodingAttributes();
+		} else {
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
 	//
@@ -1013,10 +440,4 @@ public class OwnWorldWrapper
 	public boolean isNumberOfTemporaryActor() {
 		return ownWorld.isNumberOfTemporaryActor();
 	}
-	//
-	///////////////////////////////////////////////////////////////
-	//
-	// private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-	//	stream.defaultReadObject();
-	// }
 }

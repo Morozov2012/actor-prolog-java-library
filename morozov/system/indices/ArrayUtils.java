@@ -26,10 +26,10 @@ public class ArrayUtils {
 				BigInteger right= null;
 				try {
 					Term leftBound= nextHead.getNextListHead(iX);
-					left= termToIndexBound(iX,leftBound,false);
+					left= argumentToIndexBound(iX,leftBound,false);
 					Term internalListTail= nextHead.getNextListTail(iX);
 					Term rightBound= internalListTail.getNextListHead(iX);
-					right= termToIndexBound(iX,rightBound,true);
+					right= argumentToIndexBound(iX,rightBound,true);
 					internalListTail= internalListTail.getNextListTail(iX);
 					// String description= nextHead.getStringValue(iX);
 				} catch (EndOfList e) {
@@ -48,7 +48,7 @@ public class ArrayUtils {
 		};
 		return list.toArray(new IndexRange[0]);
 	}
-	public static BigInteger termToIndexBound(ChoisePoint iX, Term value, boolean isRightBound) {
+	public static BigInteger argumentToIndexBound(ChoisePoint iX, Term value, boolean isRightBound) {
 		value= value.dereferenceValue(iX);
 		try {
 			return value.getIntegerValue(iX);

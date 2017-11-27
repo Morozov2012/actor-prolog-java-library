@@ -30,7 +30,7 @@ public class InternalFrame2D
 		super(title);
 		targetWorld= target;
 		scalingFactor= scaling;
-		ExtendedSpace2D extendedSpace2D= new ExtendedSpace2D(targetWorld,commandList,scalingFactor,target.sceneAntialiasingIsEnabled);
+		ExtendedSpace2D extendedSpace2D= new ExtendedSpace2D(null,targetWorld,commandList,scalingFactor,target.sceneAntialiasingIsEnabled);
 		canvasSpace= extendedSpace2D;
 		safelyAdd(extendedSpace2D);
 	}

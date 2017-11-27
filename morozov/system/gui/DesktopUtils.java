@@ -46,12 +46,12 @@ public class DesktopUtils {
 	protected static final int viewerTitleHeight= 39;
 	//
 	public static MainDesktopPane createPaneIfNecessary(StaticContext context) {
-		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(context);
+		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(context);
 		if (desktop==null) {
 			ReentrantLock lock= StaticDesktopAttributes.retrieveDesktopGuard(context);
 			lock.lock();
 			try {
-				desktop= StaticDesktopAttributes.retrieveDesktopPane(context);
+				desktop= StaticDesktopAttributes.retrieveMainDesktopPane(context);
 				if (desktop==null) {
 					// LookAndFeelUtils.assignLookAndFeel();
 					JApplet applet= StaticContext.retrieveApplet(context);
@@ -74,7 +74,7 @@ public class DesktopUtils {
 							applet.setSize(bounds.width-borderSize*2,bounds.height-borderSize*2-viewerTitleHeight);
 						};
 						desktop= new MainDesktopPane(context);
-						StaticDesktopAttributes.setDesktopPane(desktop,context);
+						StaticDesktopAttributes.setMainDesktopPane(desktop,context);
 						applet.getContentPane().add(desktop,BorderLayout.CENTER);
 						// desktop.setVisible(true);
 						safelySetVisible(true,desktop);
@@ -102,7 +102,7 @@ public class DesktopUtils {
 	}
 	//
 	public static GraphicsConfiguration getGraphicsConfiguration(StaticContext context) {
-		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(context);
+		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(context);
 		if (desktop != null) {
 			return desktop.getGraphicsConfiguration();
 		} else {
@@ -181,7 +181,7 @@ public class DesktopUtils {
 	//
 	public static void actionPerformed(ActionEvent e, StaticContext context) {
 		String name= e.getActionCommand();
-		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(context);
+		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(context);
 		if (name.equals("Cascade")) {
 			if (desktop!=null) {
 				cascade(desktop,JLayeredPane.DEFAULT_LAYER);
@@ -342,7 +342,7 @@ public class DesktopUtils {
 		restoreFrames(context,DIALOG_LAYER);
 	}
 	public static void restoreFrames(StaticContext context, int layer) {
-		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(context);
+		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(context);
 		if (desktop==null) {
 			return;
 		};
@@ -368,7 +368,7 @@ public class DesktopUtils {
 	}
 	//
 	public static void selectNextInternalFrame(StaticContext context) {
-		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(context);
+		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(context);
 		JInternalFrame[] frames= desktop.getAllFramesInLayer(JLayeredPane.DEFAULT_LAYER);
 		// Arrays.sort(frames,new ZOrderComparator(desktop));
 		Arrays.sort(frames,new InverseZOrderComparator(desktop));
@@ -690,6 +690,7 @@ public class DesktopUtils {
 		try {
 			window.setMaximum(true);
 		} catch (PropertyVetoException e) {
+		// } catch (Throwable e) {
 		}
 	}
 	protected static void maximize(Frame window) {

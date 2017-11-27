@@ -13,7 +13,7 @@ public abstract class Continuation {
 	public Continuation() {
 	}
 	//
-	public abstract void execute(ChoisePoint iX) throws Backtracking;
+	abstract public void execute(ChoisePoint iX) throws Backtracking;
 	public boolean isPhaseTermination() {
 			return false;
 		}

@@ -24,13 +24,9 @@ public class OwnResidentWrapper
 	//
 	public static HashMap<ExternalResidentInterface,ForeignResidentWrapper> foreignResidentRegister= new HashMap<>();
 	//
-	// protected transient MethodSignature[] methodSignatures= null;
-	// protected transient HashMap<String,MethodSignature[]> methodHash= new HashMap<>();
-	//
 	///////////////////////////////////////////////////////////////
 	//
 	public OwnResidentWrapper(Resident w) {
-		// super(w.getGlobalWorldIdentifier());
 		ownResident= w;
 	}
 	//
@@ -110,18 +106,9 @@ public class OwnResidentWrapper
 	public void withdrawRequest(Resident resident) {
 		ownResident.withdrawRequest(resident);
 	}
-	//
-	// public void transmitAsyncCall(AsyncCall item, ChoisePoint iX) {
-	//	ownResident.transmitAsyncCall(item,iX);
-	// }
-	//
 	public void receiveAsyncCall(AsyncCall item) {
 		ownResident.receiveAsyncCall(item);
 	}
-	//
-	//public void receiveAsyncCall(long domainSignatureNumber, boolean isControlCall, boolean useBuffer, byte[] argumentByteArray) {
-	//	ownResident.receiveAsyncCall(domainSignatureNumber,isControlCall,useBuffer,argumentByteArray);
-	//}
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -163,10 +150,4 @@ public class OwnResidentWrapper
 	public boolean isNumberOfTemporaryActor() {
 		return ownResident.isNumberOfTemporaryActor();
 	}
-	//
-	///////////////////////////////////////////////////////////////
-	//
-	// private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
-	//	stream.defaultReadObject();
-	// }
 }

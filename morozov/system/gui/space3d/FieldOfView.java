@@ -39,7 +39,7 @@ public class FieldOfView {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static FieldOfView termToFieldOfView(Term argument, ChoisePoint iX) {
+	public static FieldOfView argumentToFieldOfView(Term argument, ChoisePoint iX) {
 		try {
 			double v= Converters.termToReal(argument,iX);
 			return new FieldOfView(v);

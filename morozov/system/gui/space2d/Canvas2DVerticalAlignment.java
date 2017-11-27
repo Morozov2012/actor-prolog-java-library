@@ -19,7 +19,7 @@ public enum Canvas2DVerticalAlignment {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static Canvas2DVerticalAlignment termToVerticalAlignment(Term value, ChoisePoint iX) {
+	public static Canvas2DVerticalAlignment argumentToVerticalAlignment(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_default) {

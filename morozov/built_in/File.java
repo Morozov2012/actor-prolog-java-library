@@ -79,8 +79,9 @@ public abstract class File extends Text {
 	public void setRandomAccess(boolean value) {
 		randomAccess= value;
 	}
-	public void getRandomAccess0ff(ChoisePoint iX, PrologVariable a1) {
-		a1.value= OnOff.boolean2TermOnOff(getRandomAccess(iX));
+	public void getRandomAccess0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(OnOff.boolean2TermOnOff(getRandomAccess(iX)));
+		// iX.pushTrail(a1);
 	}
 	public void getRandomAccess0fs(ChoisePoint iX) {
 	}
@@ -110,6 +111,7 @@ public abstract class File extends Text {
 		String text= Converters.argumentToString(inputText,iX);
 		CharacterSet requiredCharacterSet= getCharacterSet(iX);
 		try {
+			fileName.create_BAK_File();
 			fileName.writeTextFile(text,requiredCharacterSet);
 		} catch (IOException e) {
 			throw new FileInputOutputError(fileName.toString(),e);
@@ -120,25 +122,26 @@ public abstract class File extends Text {
 		String text= Converters.argumentToString(inputText,iX);
 		CharacterSet requiredCharacterSet= getCharacterSet(iX);
 		try {
+			fileName.create_BAK_File();
 			fileName.writeTextFile(text,requiredCharacterSet);
 		} catch (IOException e) {
 			throw new FileInputOutputError(fileName.toString(),e);
 		}
 	}
 	//
-	public void getString0ff(ChoisePoint iX, PrologVariable outputText) {
+	public void getString0ff(ChoisePoint iX, PrologVariable result) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(iX);
 		CharacterSet requiredCharacterSet= getCharacterSet(iX);
-		outputText.value= fileName.getString(requiredCharacterSet);
+		result.setNonBacktrackableValue(fileName.getString(requiredCharacterSet));
 	}
 	public void getString0fs(ChoisePoint iX) {
 	}
-	public void getString1ff(ChoisePoint iX, PrologVariable outputText, Term a2) {
-		ExtendedFileName fileName= retrieveRealLocalFileName(a2,iX);
+	public void getString1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		ExtendedFileName fileName= retrieveRealLocalFileName(a1,iX);
 		CharacterSet requiredCharacterSet= getCharacterSet(iX);
-		outputText.value= fileName.getString(requiredCharacterSet);
+		result.setNonBacktrackableValue(fileName.getString(requiredCharacterSet));
 	}
-	public void getString1fs(ChoisePoint iX, PrologVariable outputText, Term name) {
+	public void getString1fs(ChoisePoint iX, Term a1) {
 	}
 	//
 	public void open0s(ChoisePoint iX) {
@@ -149,14 +152,14 @@ public abstract class File extends Text {
 	}
 	public void open1s(ChoisePoint iX, Term mode) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(iX);
-		FileAccessMode requiredFileAccessMode= FileAccessMode.termToFileAccessMode(mode,iX);
+		FileAccessMode requiredFileAccessMode= FileAccessMode.argumentToFileAccessMode(mode,iX);
 		boolean requiredRandomAccessMode= getRandomAccess(iX);
 		CharacterSet requiredCharacterSet= getCharacterSet(iX);
 		openFile(fileName,requiredFileAccessMode,requiredRandomAccessMode,requiredCharacterSet);
 	}
 	public void open2s(ChoisePoint iX, Term a1, Term mode) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(a1,iX);
-		FileAccessMode requiredMode= FileAccessMode.termToFileAccessMode(mode,iX);
+		FileAccessMode requiredMode= FileAccessMode.argumentToFileAccessMode(mode,iX);
 		boolean requiredRandomAccessMode= getRandomAccess(iX);
 		CharacterSet requiredCharacterSet= getCharacterSet(iX);
 		openFile(fileName,requiredMode,requiredRandomAccessMode,requiredCharacterSet);
@@ -452,8 +455,8 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void readByte0ff(ChoisePoint iX, PrologVariable c) throws Backtracking {
-		c.value= new PrologInteger(readByte());
+	public void readByte0ff(ChoisePoint iX, PrologVariable result) throws Backtracking {
+		result.setNonBacktrackableValue(new PrologInteger(readByte()));
 	}
 	public void readByte0fs(ChoisePoint iX) throws Backtracking {
 		readByte();
@@ -514,8 +517,8 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void readCharacter0ff(ChoisePoint iX, PrologVariable c) throws Backtracking {
-		c.value= new PrologInteger(readCharacter());
+	public void readCharacter0ff(ChoisePoint iX, PrologVariable result) throws Backtracking {
+		result.setNonBacktrackableValue(new PrologInteger(readCharacter()));
 	}
 	public void readCharacter0fs(ChoisePoint iX) throws Backtracking {
 		readCharacter();
@@ -579,8 +582,8 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void readLine0ff(ChoisePoint iX, PrologVariable s) throws Backtracking {
-		s.value= new PrologString(readLine());
+	public void readLine0ff(ChoisePoint iX, PrologVariable result) throws Backtracking {
+		result.setNonBacktrackableValue(new PrologString(readLine()));
 	}
 	public void readLine0fs(ChoisePoint iX) throws Backtracking {
 		readLine();
@@ -698,8 +701,8 @@ public abstract class File extends Text {
 		return input.toString();
         }
 	//
-	public void readTerm0ff(ChoisePoint iX, PrologVariable t) throws Backtracking {
-		t.value= readTerm();
+	public void readTerm0ff(ChoisePoint iX, PrologVariable result) throws Backtracking {
+		result.setNonBacktrackableValue(readTerm());
 	}
 	public void readTerm0fs(ChoisePoint iX) throws Backtracking {
 		readTerm();
@@ -742,8 +745,8 @@ public abstract class File extends Text {
 		}
 	}
 	//
-	public void readTerms0ff(ChoisePoint iX, PrologVariable t) throws Backtracking {
-		t.value= readTerms();
+	public void readTerms0ff(ChoisePoint iX, PrologVariable result) throws Backtracking {
+		result.setNonBacktrackableValue(readTerms());
 	}
 	public void readTerms0fs(ChoisePoint iX) throws Backtracking {
 		readTerms();
@@ -784,39 +787,38 @@ public abstract class File extends Text {
 	//
 	public void recentReadingError4s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3, PrologVariable a4) throws Backtracking {
 		if (recentErrorException != null && recentErrorText != null) {
-			a1.value= new PrologString(recentErrorText);
-			a2.value= new PrologInteger(recentErrorPosition);
-			a3.value= new PrologString(recentErrorException.toString());
-			a4.value= new PrologString(recentErrorException.toString());
-			iX.pushTrail(a1);
-			iX.pushTrail(a2);
-			iX.pushTrail(a3);
-			iX.pushTrail(a4);
+			a1.setBacktrackableValue(new PrologString(recentErrorText),iX);
+			a2.setBacktrackableValue(new PrologInteger(recentErrorPosition),iX);
+			a3.setBacktrackableValue(new PrologString(recentErrorException.toString()),iX);
+			a4.setBacktrackableValue(new PrologString(recentErrorException.toString()),iX);
+			//iX.pushTrail(a1);
+			//iX.pushTrail(a2);
+			//iX.pushTrail(a3);
+			//iX.pushTrail(a4);
 		} else {
 			throw Backtracking.instance;
 		}
 	}
 	public void recentReadingError3s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3) throws Backtracking {
 		if (recentErrorException != null && recentErrorText != null) {
-			a1.value= new PrologString(recentErrorText);
-			a2.value= new PrologInteger(recentErrorPosition);
-			a3.value= new PrologString(recentErrorException.toString());
-			iX.pushTrail(a1);
-			iX.pushTrail(a2);
-			iX.pushTrail(a3);
+			a1.setBacktrackableValue(new PrologString(recentErrorText),iX);
+			a2.setBacktrackableValue(new PrologInteger(recentErrorPosition),iX);
+			a3.setBacktrackableValue(new PrologString(recentErrorException.toString()),iX);
+			//iX.pushTrail(a1);
+			//iX.pushTrail(a2);
+			//iX.pushTrail(a3);
 		} else {
 			throw Backtracking.instance;
 		}
 	}
 	//
-	public void getPosition0ff(ChoisePoint iX, PrologVariable p) {
+	public void getPosition0ff(ChoisePoint iX, PrologVariable result) {
 		if (currentFileAccessMode != null) {
 			try {
 				if (!currentFileName.isStandardFile()) {
 					if (currentRandomAccessMode) {
-						// p.value= new PrologInteger(randomAccessFile.getFilePointer());
-						p.value= new PrologInteger(randomAccessFile.position());
-						// iX.pushTrail(p);
+						result.setNonBacktrackableValue(new PrologInteger(randomAccessFile.position()));
+						// iX.pushTrail(result);
 					} else {
 						throw new FileIsNotInRandomAccessMode();
 					}
@@ -836,7 +838,7 @@ public abstract class File extends Text {
 	public void setPosition2s(ChoisePoint iX, Term p, Term positioningMode) {
 		try {
 			long position= p.getLongIntegerValue(iX);
-			PositioningMode pM= PositioningMode.termToPositioningMode(positioningMode,iX);
+			PositioningMode pM= PositioningMode.argumentToPositioningMode(positioningMode,iX);
 			setPosition(position,pM);
 		} catch (TermIsNotAnInteger e) {
 			throw new WrongArgumentIsNotAnInteger(p);
@@ -1038,7 +1040,7 @@ public abstract class File extends Text {
 	public void doesExist0s(ChoisePoint iX) throws Backtracking {
 		try {
 			ExtendedFileName fileName= retrieveRealLocalFileName(iX);
-			int timeout= getMaxWaitingTimeInMilliseconds(iX);
+			int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 			CharacterSet characterSet= getCharacterSet(iX);
 			fileName.isExistentLocalResource(timeout,characterSet,staticContext);
 		} catch (Throwable e) {
@@ -1048,7 +1050,7 @@ public abstract class File extends Text {
 	public void doesExist1s(ChoisePoint iX, Term a1) throws Backtracking {
 		try {
 			ExtendedFileName fileName= retrieveRealLocalFileName(a1,iX);
-			int timeout= getMaxWaitingTimeInMilliseconds(iX);
+			int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 			CharacterSet characterSet= getCharacterSet(iX);
 			fileName.isExistentLocalResource(timeout,characterSet,staticContext);
 		} catch (Throwable e) {

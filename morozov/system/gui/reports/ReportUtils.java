@@ -167,19 +167,19 @@ public class ReportUtils {
 		}
 	}
 */
-	public static boolean termToAreaTypeSafe(Term value, ChoisePoint iX) {
+	public static boolean argumentToAreaTypeSafe(Term value, ChoisePoint iX) {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
 			return false;
 		} else {
 			try {
-				return termToAreaType(value,iX);
+				return argumentToAreaType(value,iX);
 			} catch (RuntimeException e) {
 				return false;
 			}
 		}
 	}
-	public static boolean termToAreaType(Term value, ChoisePoint iX) {
+	public static boolean argumentToAreaType(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_separate) {

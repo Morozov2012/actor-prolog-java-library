@@ -7,6 +7,7 @@ import morozov.system.errors.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 import morozov.worlds.*;
+import morozov.worlds.remote.*;
 
 import java.math.BigInteger;
 
@@ -102,6 +103,22 @@ public enum TermCheckOperation {
 			return false;
 		}
 	},
+	REMOTE_WORLD {
+		public boolean eval(ChoisePoint iX, Term value, ActiveWorld currentProcess) {
+			if (value instanceof ForeignWorldWrapper) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		public boolean eval(ChoisePoint iX, Term value) {
+			if (value instanceof ForeignWorldWrapper) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+	},
 	EVEN {
 		public boolean eval(ChoisePoint iX, Term value) {
 			try {
@@ -128,7 +145,7 @@ public enum TermCheckOperation {
 		public boolean eval(ChoisePoint iX, Term value) {
 			try {
 				double r= value.getRealValue(iX);
-				return Double.isNaN(r);
+				return Double.isNaN(r) || Double.isInfinite(r);
 			} catch (TermIsNotAReal b1) {
 				return false;
 			}
@@ -148,7 +165,7 @@ public enum TermCheckOperation {
 		public boolean eval(ChoisePoint iX, Term value) {
 			try {
 				double r= value.getRealValue(iX);
-				return !(Double.isInfinite(r));
+				return !(Double.isInfinite(r)) && !(Double.isNaN(r));
 			} catch (TermIsNotAReal b1) {
 				return false;
 			}

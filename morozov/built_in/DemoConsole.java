@@ -6,6 +6,7 @@ import morozov.run.*;
 import morozov.worlds.*;
 
 public abstract class DemoConsole extends Console {
+	//
 	public DemoConsole() {
 	}
 	public DemoConsole(GlobalWorldIdentifier id) {

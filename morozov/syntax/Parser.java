@@ -119,7 +119,7 @@ public class Parser {
 					};
 					arguments.add(new NamedTerm(0,result,beginningOfTerm));
 					return parseUnderdeterminedSet(arguments,beginningOfTerm);
-				} else if (frontToken.isIncludedIntoApostrophes()) {
+				} else if (frontToken.isInQuotes()) {
 					position++;
 					Term result= new PrologSymbol(frontToken.getSymbolCode());
 					if (!rememberTextPositions) {
@@ -286,7 +286,7 @@ public class Parser {
 					int symbolCode;
 					PrologToken nextToken= tokens[position+1];
 					if (nextToken.getType()==PrologTokenType.SYMBOL) {
-						if (nextToken.isIncludedIntoApostrophes()) {
+						if (nextToken.isInQuotes()) {
 							symbolCode= nextToken.getSymbolCode();
 						} else {
 							throw new SymbolShouldBeEnclosedInApostrophesHere(nextToken.getPosition());

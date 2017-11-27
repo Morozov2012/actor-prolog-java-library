@@ -2,29 +2,44 @@
 
 package morozov.syntax.scanner;
 
-import morozov.syntax.scanner.errors.*;
+import target.*;
 
+import morozov.syntax.scanner.errors.*;
+import morozov.syntax.scanner.signals.*;
+import morozov.terms.*;
+
+import java.util.HashSet;
 import java.math.BigInteger;
 
 public abstract class PrologToken {
+	//
 	public int position;
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public PrologToken(int p) {
 		position= p;
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public int getPosition() {
 		return position;
 	}
-	public abstract PrologTokenType getType();
+	abstract public PrologTokenType getType();
 	public BigInteger getIntegerValue() {
 		throw new WrongTokenIsNotAnInteger();
 	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public double getRealValue() {
 		throw new WrongTokenIsNotAReal();
 	}
 	public int getSymbolCode() {
 		throw new WrongTokenIsNotASymbol();
 	}
-	public boolean isIncludedIntoApostrophes() {
+	public boolean isInQuotes() {
 		throw new WrongTokenIsNotASymbol();
 	}
 	public String getStringValue() {
@@ -32,5 +47,16 @@ public abstract class PrologToken {
 	}
 	public String getVariableName() {
 		throw new WrongTokenIsNotAVariable();
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	abstract public Term toTerm();
+	//
+	public Term toTermTP() {
+		Term[] arguments= new Term[2];
+		arguments[0]= toTerm();
+		arguments[1]= new PrologInteger(position);
+		return new PrologStructure(SymbolCodes.symbolCode_E_t,arguments);
 	}
 }

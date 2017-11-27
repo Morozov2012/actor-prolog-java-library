@@ -41,29 +41,29 @@ public abstract class PrologLinkedHashMap extends PrologHashMap {
 		((LinkedHashMapTable)getDatabaseTable(iX)).insertAfter(a1,a2,a3,currentProcess,true,iX);
 	}
 	//
-	public void getFirstKey0ff(ChoisePoint iX, PrologVariable a1) throws Backtracking {
-		((LinkedHashMapTable)getDatabaseTable(iX)).getFirstKey(a1,currentProcess,true,iX);
+	public void getFirstKey0ff(ChoisePoint iX, PrologVariable result) throws Backtracking {
+		((LinkedHashMapTable)getDatabaseTable(iX)).getFirstKey(result,currentProcess,true,iX);
 	}
 	public void getFirstKey0fs(ChoisePoint iX) throws Backtracking {
 		((LinkedHashMapTable)getDatabaseTable(iX)).getFirstKey(currentProcess,true,iX);
 	}
 	//
-	public void getLastKey0ff(ChoisePoint iX, PrologVariable a1) throws Backtracking {
-		((LinkedHashMapTable)getDatabaseTable(iX)).getLastKey(a1,currentProcess,true,iX);
+	public void getLastKey0ff(ChoisePoint iX, PrologVariable result) throws Backtracking {
+		((LinkedHashMapTable)getDatabaseTable(iX)).getLastKey(result,currentProcess,true,iX);
 	}
 	public void getLastKey0fs(ChoisePoint iX) throws Backtracking {
 		((LinkedHashMapTable)getDatabaseTable(iX)).getLastKey(currentProcess,true,iX);
 	}
 	//
-	public void getNextKey1ff(ChoisePoint iX, PrologVariable a1, Term a2) throws Backtracking {
-		((LinkedHashMapTable)getDatabaseTable(iX)).getNextKey(a1,a2,currentProcess,true,iX);
+	public void getNextKey1ff(ChoisePoint iX, PrologVariable result, Term a1) throws Backtracking {
+		((LinkedHashMapTable)getDatabaseTable(iX)).getNextKey(result,a1,currentProcess,true,iX);
 	}
 	public void getNextKey1fs(ChoisePoint iX, Term a1) throws Backtracking {
 		((LinkedHashMapTable)getDatabaseTable(iX)).getNextKey(a1,currentProcess,true,iX);
 	}
 	//
-	public void getPreviousKey1ff(ChoisePoint iX, PrologVariable a1, Term a2) throws Backtracking {
-		((LinkedHashMapTable)getDatabaseTable(iX)).getPreviousKey(a1,a2,currentProcess,true,iX);
+	public void getPreviousKey1ff(ChoisePoint iX, PrologVariable result, Term a1) throws Backtracking {
+		((LinkedHashMapTable)getDatabaseTable(iX)).getPreviousKey(result,a1,currentProcess,true,iX);
 	}
 	public void getPreviousKey1fs(ChoisePoint iX, Term a1) throws Backtracking {
 		((LinkedHashMapTable)getDatabaseTable(iX)).getPreviousKey(a1,currentProcess,true,iX);

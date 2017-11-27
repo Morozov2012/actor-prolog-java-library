@@ -100,7 +100,7 @@ public class DiagramUtils {
 		if (identifier.isEmpty()) {
 			diagramWindow.getInternalFrame().setClosable(false);
 		};
-		MainDesktopPane desktop= StaticDesktopAttributes.retrieveDesktopPane(context);
+		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(context);
 		desktop.safelyAdd(diagramWindow.getInternalFrame());
 		// diagramWindow.setVisible(true);
 		// DesktopUtils.safelySetVisible(true,diagramWindow);

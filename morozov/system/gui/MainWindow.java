@@ -21,7 +21,7 @@ public class MainWindow extends JFrame {
 		Rectangle bounds= gc.getBounds();
 		setSize(bounds.width,bounds.height);
 		MainDesktopPane desktop= new MainDesktopPane(context);
-		StaticDesktopAttributes.setDesktopPane(desktop,context);
+		StaticDesktopAttributes.setMainDesktopPane(desktop,context);
 		setContentPane(desktop);
 		boolean exitOnClose= StaticDesktopAttributes.retrieveExitOnClose(context);
 		try {

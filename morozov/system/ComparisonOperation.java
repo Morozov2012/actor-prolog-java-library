@@ -63,7 +63,7 @@ public enum ComparisonOperation {
 			return ComparisonOperation.NE;
 		}
 	};
-	public abstract boolean eval(BigInteger n1, BigInteger n2);
-	public abstract boolean eval(double n1, double n2);
-	public abstract boolean eval(String n1, String n2);
+	abstract public boolean eval(BigInteger n1, BigInteger n2);
+	abstract public boolean eval(double n1, double n2);
+	abstract public boolean eval(String n1, String n2);
 }

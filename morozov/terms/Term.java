@@ -381,10 +381,13 @@ public abstract class Term implements Cloneable, Serializable {
 	public void clear() {
 		throw new WrongArgumentIsNotBoundVariable(this);
 	}
-	public void registerNewSlotVariable(HashSet<SlotVariable> slotVariables) {
-	}
-	public void setValue(Term newNode) {
+	public void setBacktrackableValue(Term v, ChoisePoint iX) {
 		throw new WrongArgumentIsNotFreeVariable(this);
+	}
+	public void setNonBacktrackableValue(Term v) {
+		throw new WrongArgumentIsNotFreeVariable(this);
+	}
+	public void registerNewSlotVariable(HashSet<SlotVariable> slotVariables) {
 	}
 	//
 	///////////////////////////////////////////////////////////////

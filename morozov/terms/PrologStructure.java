@@ -448,10 +448,10 @@ public class PrologStructure extends Term {
 				long timeInMillis= Converters.argumentsToTimeInMilliseconds(arguments[0],arguments[1],arguments[2],arguments[3],this,iX);
 				return op.eval(BigInteger.valueOf(timeInMillis),BigInteger.valueOf(a));
 			} else {
-				throw new OperationIsNotDefinedForTheArgument(this);
+				throw new WrongArgumentIsNotATime(this);
 			}
 		} else {
-			throw new OperationIsNotDefinedForTheArgument(this);
+			throw new WrongArgumentIsNotATime(this);
 		}
 	}
 	public Term reactBigIntegerWith(BigInteger a, ChoisePoint iX, BinaryOperation op) {
@@ -525,10 +525,10 @@ public class PrologStructure extends Term {
 				long timeInMillis= Converters.argumentsToTimeInMilliseconds(arguments[0],arguments[1],arguments[2],arguments[3],this,iX);
 				return op.eval(BigInteger.valueOf(a),BigInteger.valueOf(timeInMillis));
 			} else {
-				throw new OperationIsNotDefinedForTheArgument(this);
+				throw new WrongArgumentIsNotATime(this);
 			}
 		} else {
-			throw new OperationIsNotDefinedForTheArgument(this);
+			throw new WrongArgumentIsNotATime(this);
 		}
 	}
 	public Term reactListWith(Term aHead, Term aTail, ChoisePoint iX, BinaryOperation op) {

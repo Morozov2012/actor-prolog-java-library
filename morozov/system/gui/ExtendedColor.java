@@ -161,20 +161,20 @@ public class ExtendedColor {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static ExtendedColor termToExtendedColorSafe(Term value, ChoisePoint iX) {
+	public static ExtendedColor argumentToExtendedColorSafe(Term value, ChoisePoint iX) {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
 			return new ExtendedColor();
 		} else {
 			try {
-				return termToExtendedColor(value,iX);
+				return argumentToExtendedColor(value,iX);
 			} catch (RuntimeException e) {
 				return new ExtendedColor();
 			}
 		}
 	}
 	//
-	public static Term termToExtendedColorOrFail(Term value, ChoisePoint iX) throws Backtracking {
+	public static Term argumentToExtendedColorOrFail(Term value, ChoisePoint iX) throws Backtracking {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable()) {
 			throw Backtracking.instance;
@@ -182,7 +182,7 @@ public class ExtendedColor {
 			return termDefault;
 		} else {
 			try {
-				return colorToTerm(termToColor(value,iX));
+				return colorToTerm(argumentToColor(value,iX));
 			} catch (TermIsSymbolDefault e) {
 				return termDefault;
 			} catch (RuntimeException e) {
@@ -191,28 +191,28 @@ public class ExtendedColor {
 		}
 	}
 	//
-	public static ExtendedColor termToExtendedColor(Term value, ChoisePoint iX) {
+	public static ExtendedColor argumentToExtendedColor(Term value, ChoisePoint iX) {
 		try {
-			return new ExtendedColor(termToColor(value,iX));
+			return new ExtendedColor(argumentToColor(value,iX));
 		} catch (TermIsSymbolDefault e) {
 			return new ExtendedColor();
 		}
 	}
 	//
-	public static Color termToColorSafe(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
+	public static Color argumentToColorSafe(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
 			throw TermIsSymbolDefault.instance;
 		} else {
 			try {
-				return termToColor(value,iX);
+				return argumentToColor(value,iX);
 			} catch (RuntimeException e) {
 				throw TermIsSymbolDefault.instance;
 			}
 		}
 	}
 	//
-	public static Color termToColor(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
+	public static Color argumentToColor(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		try {
 			long code= value.getSymbolValue(iX);
 			try {
@@ -493,7 +493,7 @@ public class ExtendedColor {
 		}
 	}
 	//
-	protected static Term colorToTerm(Color value) {
+	public static Term colorToTerm(Color value) {
 		int code= 0;
 		boolean isStandardColor= true;
 		if (value.equals(colorRed)) {

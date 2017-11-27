@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class OwnDomainWrapper
-		// extends DomainAlternative
 		extends DomainAbstractWorld
 		implements ExternalDomainInterface {
 	//

@@ -184,7 +184,7 @@ public class PrologDomain implements Serializable {
 		}
 	}
 	//
-	public static PrologDomain termToPrologDomain(Term value, ChoisePoint iX) throws TermIsNotPrologDomain {
+	public static PrologDomain argumentToPrologDomain(Term value, ChoisePoint iX) throws TermIsNotPrologDomain {
 		try {
 			long functor= value.getStructureFunctor(iX);
 			if (functor==SymbolCodes.symbolCode_E_domain) {
@@ -198,7 +198,7 @@ public class PrologDomain implements Serializable {
 						while (true) {
 							currentTail= currentTail.dereferenceValue(iX);
 							nextHead= currentTail.getNextListHead(iX);
-							alternatives.add(DomainAlternative.termToDomainAlternative(nextHead,iX));
+							alternatives.add(DomainAlternative.argumentToDomainAlternative(nextHead,iX));
 							currentTail= currentTail.getNextListTail(iX);
 						}
 					} catch (EndOfList e) {

@@ -27,7 +27,7 @@ public class DialogIdentifierOrAuto {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static DialogIdentifierOrAuto termToDialogIdentifierOrAuto(Term value, ChoisePoint iX) {
+	public static DialogIdentifierOrAuto argumentToDialogIdentifierOrAuto(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_auto) {

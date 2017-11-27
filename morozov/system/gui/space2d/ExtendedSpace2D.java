@@ -7,6 +7,7 @@ import target.*;
 import morozov.built_in.*;
 import morozov.run.*;
 import morozov.system.gui.*;
+import morozov.system.gui.dialogs.scalable.*;
 import morozov.system.gui.errors.*;
 import morozov.terms.*;
 
@@ -30,12 +31,9 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.lang.reflect.InvocationTargetException;
 
 public class ExtendedSpace2D
-		extends CanvasSpace // JPanel
+		extends CanvasSpace
 		implements ActionListener, MouseListener, MouseMotionListener {
 	//
-	// protected Canvas2D targetWorld= null;
-	// protected Component owner;
-	// protected AbstractDialog dialog;
 	protected List<Java2DCommand> currentCommands= null;
 	protected AtomicReference<Java2DCommand[]> oldCommands= new AtomicReference<>(null);
 	protected AtomicReference<Canvas2DScalingFactor> scalingFactor;
@@ -44,7 +42,8 @@ public class ExtendedSpace2D
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public ExtendedSpace2D(boolean keepProportions) {
+	public ExtendedSpace2D(CustomControlComponent customControl, boolean keepProportions) {
+		super(customControl);
 		Canvas2DScalingFactor scaling;
 		// if (keepProportions) {
 		//	scaling= Canvas2DScalingFactor.MIN;
@@ -57,7 +56,8 @@ public class ExtendedSpace2D
 		sceneAntialiasingIsEnabled= new AtomicBoolean(false);
 		control= new ExtendedJPanel(owner,currentCommands,oldCommands,scalingFactor,sceneAntialiasingIsEnabled,redrawingIsSuspended);
 	}
-	public ExtendedSpace2D(Canvas2D target, List<Java2DCommand> commandList, AtomicReference<Canvas2DScalingFactor> scaling, AtomicBoolean enableAntialiasing) {
+	public ExtendedSpace2D(CustomControlComponent customControl, Canvas2D target, List<Java2DCommand> commandList, AtomicReference<Canvas2DScalingFactor> scaling, AtomicBoolean enableAntialiasing) {
+		super(customControl);
 		targetWorld= target;
 		currentCommands= commandList;
 		scalingFactor= scaling;
@@ -282,7 +282,6 @@ public class ExtendedSpace2D
 	protected void sendMouseEvent(MouseEvent ev, long domainSignature, long mouseTypeCode, boolean useBuffer) {
 		if (targetWorld != null) {
 			Dimension size= new Dimension();
-			// DesktopUtils.safelyGetSize(this,size);
 			safelyGetComponentSize(size);
 			int width= size.width;
 			int height= size.height;
@@ -346,7 +345,6 @@ public class ExtendedSpace2D
 		GraphicsConfiguration gc= o.getGraphicsConfiguration();
 		if (gc != null) {
 			java.awt.image.BufferedImage bufferedImage= gc.createCompatibleImage(integerWidth,integerHeight);
-			// Graphics g= bufferedImage.getGraphics();
 			Graphics g= DesktopUtils.safelyGetGraphics2D(bufferedImage);
 			try {
 				g.translate(x0,y0);

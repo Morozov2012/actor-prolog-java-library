@@ -41,7 +41,7 @@ public enum DatabaseAccessMode {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static DatabaseAccessMode termToDatabaseAccessMode(Term value, ChoisePoint iX) {
+	public static DatabaseAccessMode argumentToDatabaseAccessMode(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_reading) {

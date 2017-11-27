@@ -70,8 +70,8 @@ public enum ImageFileFormat implements Serializable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public abstract Space2DWriter createWriter(String defaultFormatName, ImageTypeSpecifier its);
-	public abstract Term toTerm();
+	abstract public Space2DWriter createWriter(String defaultFormatName, ImageTypeSpecifier its);
+	abstract public Term toTerm();
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -84,7 +84,7 @@ public enum ImageFileFormat implements Serializable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static ImageFileFormat termToImageFileFormat(Term value, ChoisePoint iX) {
+	public static ImageFileFormat argumentToImageFileFormat(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_default) {

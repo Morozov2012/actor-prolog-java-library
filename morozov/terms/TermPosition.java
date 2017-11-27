@@ -377,15 +377,18 @@ public class TermPosition extends Term {
 	public void clear() {
 		value.clear();
 	}
-	public void registerNewSlotVariable(HashSet<SlotVariable> slotVariables) {
-		value.registerNewSlotVariable(slotVariables);
+	public void setBacktrackableValue(Term v, ChoisePoint iX) {
+		value.setBacktrackableValue(v,iX);
 	}
-	public void setValue(Term newNode) {
-		value.setValue(newNode);
+	public void setNonBacktrackableValue(Term v) {
+		value.setNonBacktrackableValue(v);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public void registerNewSlotVariable(HashSet<SlotVariable> slotVariables) {
+		value.registerNewSlotVariable(slotVariables);
+	}
 	public void extractWorlds(AbstractProcess process, LinkedHashSet<AbstractInternalWorld> list) {
 		value.extractWorlds(process,list);
 	}

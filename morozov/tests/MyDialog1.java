@@ -94,7 +94,7 @@ public class MyDialog1 extends AbstractDialog {
 		//
 		// mainPanel
 		//
-		mainPanel= new ScalablePanel();
+		mainPanel= new ScalablePanel(this);
 		mainPanelLayout= new GridBagLayout();
 		mainPanel.setLayout(mainPanelLayout);
 		GridBagConstraints mainPanelConstraints= new GridBagConstraints();
@@ -103,7 +103,7 @@ public class MyDialog1 extends AbstractDialog {
 		//
 		// panel1
 		//
-		panel1= new ScalablePanel();
+		panel1= new ScalablePanel(this);
 		GridBagLayout gBL1= new GridBagLayout();
 		panel1.setLayout(gBL1);
 		GridBagConstraints gBC1= new GridBagConstraints();
@@ -155,7 +155,7 @@ public class MyDialog1 extends AbstractDialog {
 		//
 		// panel2
 		//
-		panel2= new ScalablePanel();
+		panel2= new ScalablePanel(this);
 		GridBagLayout gBL2= new GridBagLayout();
 		panel2.setLayout(gBL2);
 		GridBagConstraints gBC2= new GridBagConstraints();
@@ -175,7 +175,7 @@ public class MyDialog1 extends AbstractDialog {
 		//
 		// panel3
 		//
-		panel3= new ScalablePanel();
+		panel3= new ScalablePanel(this);
 		GridBagLayout gBL3= new GridBagLayout();
 		panel3.setLayout(gBL3);
 		GridBagConstraints gBC3= new GridBagConstraints();
@@ -195,7 +195,7 @@ public class MyDialog1 extends AbstractDialog {
 		//
 		// panel4
 		//
-		panel4= new ScalablePanel();
+		panel4= new ScalablePanel(this);
 		GridBagLayout gBL4= new GridBagLayout();
 		panel4.setLayout(gBL4);
 		GridBagConstraints gBC4= new GridBagConstraints();
@@ -215,7 +215,7 @@ public class MyDialog1 extends AbstractDialog {
 		//
 		// panel5
 		//
-		panel5= new ScalableTitledPanel("Text Areas");
+		panel5= new ScalableTitledPanel(this,"Text Areas");
 		GridBagLayout gBL5= new GridBagLayout();
 		panel5.setLayout(gBL5);
 		GridBagConstraints gBC5= new GridBagConstraints();
@@ -268,7 +268,7 @@ public class MyDialog1 extends AbstractDialog {
 		//
 		// panel6
 		//
-		panel6= new ScalablePanel();
+		panel6= new ScalablePanel(this);
 		GridBagLayout gBL6= new GridBagLayout();
 		panel6.setLayout(gBL6);
 		GridBagConstraints gBC6= new GridBagConstraints();
@@ -320,7 +320,7 @@ public class MyDialog1 extends AbstractDialog {
 		//
 		// panel7
 		//
-		panel7= new ScalablePanel();
+		panel7= new ScalablePanel(this);
 		GridBagLayout gBL7= new GridBagLayout();
 		panel7.setLayout(gBL7);
 		GridBagConstraints gBC7= new GridBagConstraints();
@@ -372,7 +372,7 @@ public class MyDialog1 extends AbstractDialog {
 		//
 		// panel8
 		//
-		panel8= new ScalablePanel();
+		panel8= new ScalablePanel(this);
 		GridBagLayout gBL8= new GridBagLayout();
 		panel8.setLayout(gBL8);
 		GridBagConstraints gBC8= new GridBagConstraints();
@@ -448,7 +448,7 @@ public class MyDialog1 extends AbstractDialog {
 		//
 		// panel9
 		//
-		panel9= new ScalablePanel();
+		panel9= new ScalablePanel(this);
 		GridBagLayout gBL9= new GridBagLayout();
 		panel9.setLayout(gBL9);
 		GridBagConstraints gBC9= new GridBagConstraints();
@@ -468,7 +468,7 @@ public class MyDialog1 extends AbstractDialog {
 		//
 		// panel10
 		//
-		panel10= new ScalablePanel();
+		panel10= new ScalablePanel(this);
 		GridBagLayout gBL10= new GridBagLayout();
 		panel10.setLayout(gBL10);
 		GridBagConstraints gBC10= new GridBagConstraints();
@@ -488,7 +488,7 @@ public class MyDialog1 extends AbstractDialog {
 		//
 		// panel11
 		//
-		panel11= new ScalableTitledPanel("Checkboxes");
+		panel11= new ScalableTitledPanel(this,"Checkboxes");
 		GridBagLayout gBL11= new GridBagLayout();
 		panel11.setLayout(gBL11);
 		GridBagConstraints gBC11= new GridBagConstraints();
@@ -541,7 +541,7 @@ public class MyDialog1 extends AbstractDialog {
 		//
 		// panel12
 		//
-		panel12= new ScalableTitledPanel("List Controls");
+		panel12= new ScalableTitledPanel(this,"List Controls");
 		GridBagLayout gBL12= new GridBagLayout();
 		panel12.setLayout(gBL12);
 		GridBagConstraints gBC12= new GridBagConstraints();
@@ -580,7 +580,7 @@ public class MyDialog1 extends AbstractDialog {
 		//
 		// panel13
 		//
-		panel13= new ScalablePanel();
+		panel13= new ScalablePanel(this);
 		GridBagLayout gBL13= new GridBagLayout();
 		panel13.setLayout(gBL13);
 		GridBagConstraints gBC13= new GridBagConstraints();
@@ -668,7 +668,7 @@ public class MyDialog1 extends AbstractDialog {
 		//
 		// panel14
 		//
-		panel14= new ScalablePanel();
+		panel14= new ScalablePanel(this);
 		GridBagLayout gBL14= new GridBagLayout();
 		panel14.setLayout(gBL14);
 		GridBagConstraints gBC14= new GridBagConstraints();
@@ -766,171 +766,171 @@ public class MyDialog1 extends AbstractDialog {
 		gBL14.setConstraints(control_14_4_0.component,gBC14);
 		panel14.add(control_14_4_0.component);
 	}
-	protected void setNewFont(Font newFont) {
-		mainPanel.setFont(newFont);
-		panel1.setFont(newFont);
-		control_1_0_1.setFont(newFont);
-		control_1_0_2.setFont(newFont);
-		panel2.setFont(newFont);
-		panel3.setFont(newFont);
-		panel4.setFont(newFont);
-		panel5.setFont(newFont);
-		control_5_1_1.setFont(newFont);
-		control_5_2_1.setFont(newFont);
-		panel6.setFont(newFont);
-		control_6_1_1.setFont(newFont);
-		control_6_1_2.setFont(newFont);
-		panel7.setFont(newFont);
-		control_7_1_1.setFont(newFont);
-		control_7_1_2.setFont(newFont);
-		panel8.setFont(newFont);
-		control_8_1_1.setFont(newFont);
-		control_8_2_1.setFont(newFont);
-		control_8_3_1.setFont(newFont);
-		panel9.setFont(newFont);
-		panel10.setFont(newFont);
-		panel11.setFont(newFont);
-		control_11_1_1.setFont(newFont);
-		control_11_1_2.setFont(newFont);
-		panel12.setFont(newFont);
-		control_12_1_1.setFont(newFont);
-		panel13.setFont(newFont);
-		control_13_1_1.setFont(newFont);
-		control_13_1_2.setFont(newFont);
-		control_2_2_1.setFont(newFont);
-		control_2_1_2.setFont(newFont);
-		panel14.setFont(newFont);
-		control_14_1_0.setFont(newFont);
-		control_14_2_0.setFont(newFont);
-		control_14_3_0.setFont(newFont);
-		control_14_4_0.setFont(newFont);
+	protected void setGeneralFont(Font font) {
+		mainPanel.setGeneralFont(font);
+		panel1.setGeneralFont(font);
+		control_1_0_1.setGeneralFont(font);
+		control_1_0_2.setGeneralFont(font);
+		panel2.setGeneralFont(font);
+		panel3.setGeneralFont(font);
+		panel4.setGeneralFont(font);
+		panel5.setGeneralFont(font);
+		control_5_1_1.setGeneralFont(font);
+		control_5_2_1.setGeneralFont(font);
+		panel6.setGeneralFont(font);
+		control_6_1_1.setGeneralFont(font);
+		control_6_1_2.setGeneralFont(font);
+		panel7.setGeneralFont(font);
+		control_7_1_1.setGeneralFont(font);
+		control_7_1_2.setGeneralFont(font);
+		panel8.setGeneralFont(font);
+		control_8_1_1.setGeneralFont(font);
+		control_8_2_1.setGeneralFont(font);
+		control_8_3_1.setGeneralFont(font);
+		panel9.setGeneralFont(font);
+		panel10.setGeneralFont(font);
+		panel11.setGeneralFont(font);
+		control_11_1_1.setGeneralFont(font);
+		control_11_1_2.setGeneralFont(font);
+		panel12.setGeneralFont(font);
+		control_12_1_1.setGeneralFont(font);
+		panel13.setGeneralFont(font);
+		control_13_1_1.setGeneralFont(font);
+		control_13_1_2.setGeneralFont(font);
+		control_2_2_1.setGeneralFont(font);
+		control_2_1_2.setGeneralFont(font);
+		panel14.setGeneralFont(font);
+		control_14_1_0.setGeneralFont(font);
+		control_14_2_0.setGeneralFont(font);
+		control_14_3_0.setGeneralFont(font);
+		control_14_4_0.setGeneralFont(font);
 	}
-	protected void setNewBackground(Color c) {
-		setBackground(c);
+	protected void setGeneralBackground(Color c) {
+		super.setGeneralBackground(c);
 		if (!isDraftMode) {
-			mainPanel.setBackground(c);
+			mainPanel.setGeneralBackground(c);
 		};
 		if (!isDraftMode) {
-			panel1.setBackground(c);
+			panel1.setGeneralBackground(c);
 		};
-		control_1_0_1.setBackground(c);
-		control_1_0_2.setBackground(c);
+		control_1_0_1.setGeneralBackground(c);
+		control_1_0_2.setGeneralBackground(c);
 		if (!isDraftMode) {
-			panel2.setBackground(c);
-		};
-		if (!isDraftMode) {
-			panel3.setBackground(c);
+			panel2.setGeneralBackground(c);
 		};
 		if (!isDraftMode) {
-			panel4.setBackground(c);
+			panel3.setGeneralBackground(c);
 		};
 		if (!isDraftMode) {
-			panel5.setBackground(c);
-		};
-		control_5_1_1.setBackground(c);
-		control_5_2_1.setBackground(c);
-		if (!isDraftMode) {
-			panel6.setBackground(c);
-		};
-		control_6_1_1.setBackground(c);
-		control_6_1_2.setBackground(c);
-		if (!isDraftMode) {
-			panel7.setBackground(c);
-		};
-		control_7_1_1.setBackground(c);
-		control_7_1_2.setBackground(c);
-		if (!isDraftMode) {
-			panel8.setBackground(c);
-		};
-		control_8_1_1.setBackground(c);
-		control_8_2_1.setBackground(c);
-		control_8_3_1.setBackground(c);
-		if (!isDraftMode) {
-			panel9.setBackground(c);
+			panel4.setGeneralBackground(c);
 		};
 		if (!isDraftMode) {
-			panel10.setBackground(c);
+			panel5.setGeneralBackground(c);
+		};
+		control_5_1_1.setGeneralBackground(c);
+		control_5_2_1.setGeneralBackground(c);
+		if (!isDraftMode) {
+			panel6.setGeneralBackground(c);
+		};
+		control_6_1_1.setGeneralBackground(c);
+		control_6_1_2.setGeneralBackground(c);
+		if (!isDraftMode) {
+			panel7.setGeneralBackground(c);
+		};
+		control_7_1_1.setGeneralBackground(c);
+		control_7_1_2.setGeneralBackground(c);
+		if (!isDraftMode) {
+			panel8.setGeneralBackground(c);
+		};
+		control_8_1_1.setGeneralBackground(c);
+		control_8_2_1.setGeneralBackground(c);
+		control_8_3_1.setGeneralBackground(c);
+		if (!isDraftMode) {
+			panel9.setGeneralBackground(c);
 		};
 		if (!isDraftMode) {
-			panel11.setBackground(c);
+			panel10.setGeneralBackground(c);
 		};
-		control_11_1_1.setBackground(c);
-		control_11_1_2.setBackground(c);
 		if (!isDraftMode) {
-			panel12.setBackground(c);
+			panel11.setGeneralBackground(c);
 		};
-		control_12_1_1.setBackground(c);
+		control_11_1_1.setGeneralBackground(c);
+		control_11_1_2.setGeneralBackground(c);
 		if (!isDraftMode) {
-			panel13.setBackground(c);
+			panel12.setGeneralBackground(c);
 		};
-		control_13_1_1.setBackground(c);
-		control_13_1_2.setBackground(c);
-		control_2_2_1.setBackground(c);
-		control_2_1_2.setBackground(c);
+		control_12_1_1.setGeneralBackground(c);
 		if (!isDraftMode) {
-			panel14.setBackground(c);
+			panel13.setGeneralBackground(c);
 		};
-		control_14_1_0.setBackground(c);
-		control_14_2_0.setBackground(c);
-		control_14_3_0.setBackground(c);
-		control_14_4_0.setBackground(c);
+		control_13_1_1.setGeneralBackground(c);
+		control_13_1_2.setGeneralBackground(c);
+		control_2_2_1.setGeneralBackground(c);
+		control_2_1_2.setGeneralBackground(c);
+		if (!isDraftMode) {
+			panel14.setGeneralBackground(c);
+		};
+		control_14_1_0.setGeneralBackground(c);
+		control_14_2_0.setGeneralBackground(c);
+		control_14_3_0.setGeneralBackground(c);
+		control_14_4_0.setGeneralBackground(c);
 	}
-	protected void setNewForeground(Color c) {
-		mainPanel.setForeground(c);
-		panel1.setForeground(c);
-		control_1_0_1.setForeground(c);
-		control_1_0_2.setForeground(c);
-		panel2.setForeground(c);
-		panel3.setForeground(c);
-		panel4.setForeground(c);
-		panel5.setForeground(c);
-		control_5_1_1.setForeground(c);
-		control_5_2_1.setForeground(c);
-		panel6.setForeground(c);
-		control_6_1_1.setForeground(c);
-		control_6_1_2.setForeground(c);
-		panel7.setForeground(c);
-		control_7_1_1.setForeground(c);
-		control_7_1_2.setForeground(c);
-		panel8.setForeground(c);
-		control_8_1_1.setForeground(c);
-		control_8_2_1.setForeground(c);
-		control_8_3_1.setForeground(c);
-		panel9.setForeground(c);
-		panel10.setForeground(c);
-		panel11.setForeground(c);
-		control_11_1_1.setForeground(c);
-		control_11_1_2.setForeground(c);
-		panel12.setForeground(c);
-		control_12_1_1.setForeground(c);
-		panel13.setForeground(c);
-		control_13_1_1.setForeground(c);
-		control_13_1_2.setForeground(c);
-		control_2_2_1.setForeground(c);
-		control_2_1_2.setForeground(c);
-		panel14.setForeground(c);
-		control_14_1_0.setForeground(c);
-		control_14_2_0.setForeground(c);
-		control_14_3_0.setForeground(c);
-		control_14_4_0.setForeground(c);
+	protected void setGeneralForeground(Color c) {
+		mainPanel.setGeneralForeground(c);
+		panel1.setGeneralForeground(c);
+		control_1_0_1.setGeneralForeground(c);
+		control_1_0_2.setGeneralForeground(c);
+		panel2.setGeneralForeground(c);
+		panel3.setGeneralForeground(c);
+		panel4.setGeneralForeground(c);
+		panel5.setGeneralForeground(c);
+		control_5_1_1.setGeneralForeground(c);
+		control_5_2_1.setGeneralForeground(c);
+		panel6.setGeneralForeground(c);
+		control_6_1_1.setGeneralForeground(c);
+		control_6_1_2.setGeneralForeground(c);
+		panel7.setGeneralForeground(c);
+		control_7_1_1.setGeneralForeground(c);
+		control_7_1_2.setGeneralForeground(c);
+		panel8.setGeneralForeground(c);
+		control_8_1_1.setGeneralForeground(c);
+		control_8_2_1.setGeneralForeground(c);
+		control_8_3_1.setGeneralForeground(c);
+		panel9.setGeneralForeground(c);
+		panel10.setGeneralForeground(c);
+		panel11.setGeneralForeground(c);
+		control_11_1_1.setGeneralForeground(c);
+		control_11_1_2.setGeneralForeground(c);
+		panel12.setGeneralForeground(c);
+		control_12_1_1.setGeneralForeground(c);
+		panel13.setGeneralForeground(c);
+		control_13_1_1.setGeneralForeground(c);
+		control_13_1_2.setGeneralForeground(c);
+		control_2_2_1.setGeneralForeground(c);
+		control_2_1_2.setGeneralForeground(c);
+		panel14.setGeneralForeground(c);
+		control_14_1_0.setGeneralForeground(c);
+		control_14_2_0.setGeneralForeground(c);
+		control_14_3_0.setGeneralForeground(c);
+		control_14_4_0.setGeneralForeground(c);
 	}
-	protected void setNewSpaceColor(Color c) {
-		control_1_0_1.setSpaceColor(c);
-		control_1_0_2.setSpaceColor(c);
-		panel5.setSpaceColor(c);
-		control_8_1_1.setSpaceColor(c);
-		control_8_2_1.setSpaceColor(c);
-		control_8_3_1.setSpaceColor(c);
-		panel11.setSpaceColor(c);
-		control_11_1_1.setSpaceColor(c);
-		control_11_1_2.setSpaceColor(c);
-		panel12.setSpaceColor(c);
-		control_14_1_0.setSpaceColor(c);
-		control_14_2_0.setSpaceColor(c);
-		control_14_3_0.setSpaceColor(c);
-		control_14_4_0.setSpaceColor(c);
+	protected void setGeneralSpaceColor(Color c) {
+		control_1_0_1.setGeneralSpaceColor(c);
+		control_1_0_2.setGeneralSpaceColor(c);
+		panel5.setGeneralSpaceColor(c);
+		control_8_1_1.setGeneralSpaceColor(c);
+		control_8_2_1.setGeneralSpaceColor(c);
+		control_8_3_1.setGeneralSpaceColor(c);
+		panel11.setGeneralSpaceColor(c);
+		control_11_1_1.setGeneralSpaceColor(c);
+		control_11_1_2.setGeneralSpaceColor(c);
+		panel12.setGeneralSpaceColor(c);
+		control_14_1_0.setGeneralSpaceColor(c);
+		control_14_2_0.setGeneralSpaceColor(c);
+		control_14_3_0.setGeneralSpaceColor(c);
+		control_14_4_0.setGeneralSpaceColor(c);
 	}
-	protected void setNewAlarmColors(Color fc, Color bc) {
+	protected void setAlarmColors(Color fc, Color bc) {
 		mainPanel.setAlarmColors(fc,bc);
 		panel1.setAlarmColors(fc,bc);
 		control_1_0_1.setAlarmColors(fc,bc);

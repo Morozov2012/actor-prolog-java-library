@@ -1,10 +1,11 @@
-// (c) 2010 IRE RAS Alexei A. Morozov
+// (c) 2016 IRE RAS Alexei A. Morozov
 
 package morozov.built_in;
 
 import morozov.run.*;
 import morozov.terms.*;
 import morozov.worlds.*;
+import morozov.worlds.remote.*;
 
 public abstract class JavaTestbed extends Alpha {
 	//
@@ -37,21 +38,22 @@ public abstract class JavaTestbed extends Alpha {
 		}
 	}
 	//
-	public static void writeOneTerm1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
-		System.out.printf("Argument1=%s, Argument2=%s\n",a1,a2);
-		a1.value= new PrologInteger(1000);
+	public static void writeOneTerm1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		System.out.printf("Argument1=%s, Argument2=%s\n",result,a1);
+		result.setNonBacktrackableValue(new PrologInteger(1000));
+		// iX.pushTrail(a1);
 	}
 	public static class WriteOneTerm1ff extends Continuation {
 		protected PrologVariable variable1;
 		protected Term variable2;
-		public WriteOneTerm1ff(Continuation aC, PrologVariable a1, Term a2) {
+		public WriteOneTerm1ff(Continuation aC, PrologVariable result, Term a1) {
 			c0= aC;
-			variable1= a1;
-			variable2= a2;
+			variable1= result;
+			variable2= a1;
 		}
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("Argument1=%s, Argument2=%s\n",variable1,variable2);
-			variable1.value= new PrologInteger(1000);
+			variable1.setNonBacktrackableValue(new PrologInteger(1000));
 			c0.execute(iX);
 		}
 	}
@@ -88,9 +90,10 @@ public abstract class JavaTestbed extends Alpha {
 		}
 	}
 	//
-	public static void writeTwoTerms2ff(ChoisePoint iX, PrologVariable a1, Term a2, Term a3) {
-		System.out.printf("Argument1=%s, Argument2=%s, Argument3=%s\n",a1,a2,a3);
-		a1.value= new PrologInteger(1000);
+	public static void writeTwoTerms2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
+		System.out.printf("Argument1=%s, Argument2=%s, Argument3=%s\n",result,a1,a2);
+		result.setNonBacktrackableValue(new PrologInteger(1000));
+		// iX.pushTrail(a1);
 	}
 	public static class WriteTwoTerms2ff extends Continuation {
 		protected PrologVariable variable1;
@@ -104,7 +107,7 @@ public abstract class JavaTestbed extends Alpha {
 		}
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("Argument1=%s, Argument2=%s, Argument3=%s\n",variable1,variable2,variable3);
-			variable1.value= new PrologInteger(1000);
+			variable1.setNonBacktrackableValue(new PrologInteger(1000));
 			c0.execute(iX);
 		}
 	}
@@ -132,7 +135,7 @@ public abstract class JavaTestbed extends Alpha {
 			System.out.printf("Argument %d: %s: %s\n",n+1,arguments[n].getClass(),arguments[n]);
 		};
 		if (subgoalIsCallOfFunction && clauseIsFunction) {
-			((PrologVariable)arguments[0]).value= new PrologInteger(1000);
+			((PrologVariable)arguments[0]).setNonBacktrackableValue(new PrologInteger(1000));
 		}
 	}
 	public static class WriteMetaPredicate extends Continuation {
@@ -155,7 +158,7 @@ public abstract class JavaTestbed extends Alpha {
 				System.out.printf("Argument %d: %s: %s\n",n+1,argumentList[n].getClass(),argumentList[n]);
 			};
 			if (subgoalIsCallOfFunction && clauseIsFunction) {
-				((PrologVariable)argumentList[0]).value= new PrologInteger(1000);
+				((PrologVariable)argumentList[0]).setNonBacktrackableValue(new PrologInteger(1000));
 			};
 			c0.execute(iX);
 		}
@@ -167,7 +170,7 @@ public abstract class JavaTestbed extends Alpha {
 			System.out.printf("Argument %d: %s: %s\n",n+1,arguments[n].getClass(),arguments[n]);
 		};
 		if (subgoalIsCallOfFunction && clauseIsFunction) {
-			((PrologVariable)arguments[0]).value= new PrologInteger(1000);
+			((PrologVariable)arguments[0]).setNonBacktrackableValue(new PrologInteger(1000));
 		}
 	}
 	public static class WriteMetaAtom extends Continuation {
@@ -190,21 +193,22 @@ public abstract class JavaTestbed extends Alpha {
 				System.out.printf("Argument %d: %s: %s\n",n+1,argumentList[n].getClass(),argumentList[n]);
 			};
 			if (subgoalIsCallOfFunction && clauseIsFunction) {
-				((PrologVariable)argumentList[0]).value= new PrologInteger(1000);
+				((PrologVariable)argumentList[0]).setNonBacktrackableValue(new PrologInteger(1000));
 			};
 			c0.execute(iX);
 		}
 	}
 	//
 	public static void returnOneNumber1s(ChoisePoint iX, PrologVariable a1) {
-		a1.value= new PrologInteger(100);
-		iX.pushTrail(a1);
+		a1.setBacktrackableValue(new PrologInteger(100),iX);
+		//iX.pushTrail(a1);
+		// iX.pushTrail(a1);
 	}
 	public static void returnOneNumber1s(ChoisePoint iX, Term a1) {
 		System.out.printf("Argument1=%s\n",a1);
 		if (a1 instanceof PrologVariable) {
-			((PrologVariable)a1).value= new PrologInteger(210);
-			iX.pushTrail(a1);
+			((PrologVariable)a1).setBacktrackableValue(new PrologInteger(210),iX);
+			//iX.pushTrail(a1);
 		}
 	}
 	public static class ReturnOneNumber1s extends Continuation {
@@ -216,41 +220,43 @@ public abstract class JavaTestbed extends Alpha {
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("Argument1=%s\n",variable1);
 			if (variable1 instanceof PrologVariable) {
-				((PrologVariable)variable1).value= new PrologInteger(270);
-				iX.pushTrail(variable1);
+				((PrologVariable)variable1).setBacktrackableValue(new PrologInteger(270),iX);
+				//iX.pushTrail(variable1);
 			};
 			c0.execute(iX);
 		}
 	}
 	//
-	public static void returnOneNumber1ff(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
-		System.out.printf("Argument1=%s, Argument2=%s\n",a1,a2);
-		a1.value= new PrologInteger(1000);
-		a2.value= new PrologInteger(100);
-		iX.pushTrail(a2);
+	public static void returnOneNumber1ff(ChoisePoint iX, PrologVariable result, PrologVariable a1) {
+		System.out.printf("Argument1=%s, Argument2=%s\n",result,a1);
+		result.setNonBacktrackableValue(new PrologInteger(1000));
+		a1.setBacktrackableValue(new PrologInteger(100),iX);
+		// iX.pushTrail(result);
+		//iX.pushTrail(a1);
 	}
-	public static void returnOneNumber1ff(ChoisePoint iX, PrologVariable a1, Term a2) {
-		System.out.printf("Argument1=%s, Argument2=%s\n",a1,a2);
-		a1.value= new PrologInteger(1000);
-		if (a2 instanceof PrologVariable) {
-			((PrologVariable)a2).value= new PrologInteger(210);
-			iX.pushTrail(a2);
+	public static void returnOneNumber1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		System.out.printf("Argument1=%s, Argument2=%s\n",result,a1);
+		result.setNonBacktrackableValue(new PrologInteger(1000));
+		// iX.pushTrail(a1);
+		if (a1 instanceof PrologVariable) {
+			((PrologVariable)a1).setBacktrackableValue(new PrologInteger(210),iX);
+			//iX.pushTrail(a1);
 		}
 	}
 	public static class ReturnOneNumber1ff extends Continuation {
 		protected PrologVariable variable1;
 		protected Term variable2;
-		public ReturnOneNumber1ff(Continuation aC, PrologVariable a1, Term a2) {
+		public ReturnOneNumber1ff(Continuation aC, PrologVariable result, Term a1) {
 			c0= aC;
-			variable1= a1;
-			variable2= a2;
+			variable1= result;
+			variable2= a1;
 		}
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("Argument1=%s, Argument2=%s\n",variable1,variable2);
-			variable1.value= new PrologInteger(1000);
+			variable1.setNonBacktrackableValue(new PrologInteger(1000));
 			if (variable2 instanceof PrologVariable) {
-				((PrologVariable)variable2).value= new PrologInteger(270);
-				iX.pushTrail(variable2);
+				((PrologVariable)variable2).setBacktrackableValue(new PrologInteger(270),iX);
+				//iX.pushTrail(variable2);
 			};
 			c0.execute(iX);
 		}
@@ -258,14 +264,14 @@ public abstract class JavaTestbed extends Alpha {
 	//
 	public static void returnOneNumber1fs(ChoisePoint iX, PrologVariable a1) {
 		System.out.printf("Argument1=%s\n",a1);
-		a1.value= new PrologInteger(100);
-		iX.pushTrail(a1);
+		a1.setBacktrackableValue(new PrologInteger(100),iX);
+		//iX.pushTrail(a1);
 	}
 	public static void returnOneNumber1fs(ChoisePoint iX, Term a1) {
 		System.out.printf("Argument1=%s\n",a1);
 		if (a1 instanceof PrologVariable) {
-			((PrologVariable)a1).value= new PrologInteger(210);
-			iX.pushTrail(a1);
+			((PrologVariable)a1).setBacktrackableValue(new PrologInteger(210),iX);
+			//iX.pushTrail(a1);
 		}
 	}
 	public static class ReturnOneNumber1fs extends Continuation {
@@ -277,28 +283,28 @@ public abstract class JavaTestbed extends Alpha {
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("Argument1=%s\n",variable1);
 			if (variable1 instanceof PrologVariable) {
-				((PrologVariable)variable1).value= new PrologInteger(270);
-				iX.pushTrail(variable1);
+				((PrologVariable)variable1).setBacktrackableValue(new PrologInteger(270),iX);
+				//iX.pushTrail(variable1);
 			};
 			c0.execute(iX);
 		}
 	}
 	//
 	public static void returnTwoNumbers2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
-		a1.value= new PrologInteger(110);
-		iX.pushTrail(a1);
-		a2.value= new PrologInteger(120);
-		iX.pushTrail(a2);
+		a1.setBacktrackableValue(new PrologInteger(110),iX);
+		a2.setBacktrackableValue(new PrologInteger(120),iX);
+		//iX.pushTrail(a1);
+		//iX.pushTrail(a2);
 	}
 	public static void returnTwoNumbers2s(ChoisePoint iX, Term a1, Term a2) {
 		System.out.printf("Argument1=%s, Argument2=%s\n",a1,a2);
 		if (a1 instanceof PrologVariable) {
-			((PrologVariable)a1).value= new PrologInteger(210);
-			iX.pushTrail(a1);
+			((PrologVariable)a1).setBacktrackableValue(new PrologInteger(210),iX);
+			//iX.pushTrail(a1);
 		};
 		if (a2 instanceof PrologVariable) {
-			((PrologVariable)a2).value= new PrologInteger(220);
-			iX.pushTrail(a2);
+			((PrologVariable)a2).setBacktrackableValue(new PrologInteger(220),iX);
+			//iX.pushTrail(a2);
 		}
 	}
 	public static class ReturnTwoNumbers2s extends Continuation {
@@ -312,57 +318,59 @@ public abstract class JavaTestbed extends Alpha {
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("Argument1=%s, Argument2=%s\n",variable1,variable2);
 			if (variable1 instanceof PrologVariable) {
-				((PrologVariable)variable1).value= new PrologInteger(210);
-				iX.pushTrail(variable1);
+				((PrologVariable)variable1).setBacktrackableValue(new PrologInteger(210),iX);
+				//iX.pushTrail(variable1);
 			};
 			if (variable2 instanceof PrologVariable) {
-				((PrologVariable)variable2).value= new PrologInteger(220);
-				iX.pushTrail(variable2);
+				((PrologVariable)variable2).setBacktrackableValue(new PrologInteger(220),iX);
+				//iX.pushTrail(variable2);
 			};
 			c0.execute(iX);
 		}
 	}
 	//
-	public static void returnTwoNumbers2ff(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3) {
-		System.out.printf("Argument1=%s, Argument2=%s, Argument3=%s\n",a1,a2,a3);
-		a1.value= new PrologInteger(1000);
-		a2.value= new PrologInteger(110);
-		iX.pushTrail(a2);
-		a3.value= new PrologInteger(120);
-		iX.pushTrail(a3);
+	public static void returnTwoNumbers2ff(ChoisePoint iX, PrologVariable result, PrologVariable a1, PrologVariable a2) {
+		System.out.printf("Argument1=%s, Argument2=%s, Argument3=%s\n",result,a1,a2);
+		result.setNonBacktrackableValue(new PrologInteger(1000));
+		a1.setBacktrackableValue(new PrologInteger(110),iX);
+		a2.setBacktrackableValue(new PrologInteger(120),iX);
+		// iX.pushTrail(result);
+		//iX.pushTrail(a1);
+		//iX.pushTrail(a2);
 	}
-	public static void returnTwoNumbers2ff(ChoisePoint iX, PrologVariable a1, Term a2, Term a3) {
-		System.out.printf("Argument1=%s, Argument2=%s, Argument3=%s\n",a1,a2,a3);
-		a1.value= new PrologInteger(1000);
-		if (a2 instanceof PrologVariable) {
-			((PrologVariable)a2).value= new PrologInteger(210);
-			iX.pushTrail(a2);
+	public static void returnTwoNumbers2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
+		System.out.printf("Argument1=%s, Argument2=%s, Argument3=%s\n",result,a1,a2);
+		result.setNonBacktrackableValue(new PrologInteger(1000));
+		// iX.pushTrail(a1);
+		if (a1 instanceof PrologVariable) {
+			((PrologVariable)a1).setBacktrackableValue(new PrologInteger(210),iX);
+			//iX.pushTrail(a1);
 		};
-		if (a3 instanceof PrologVariable) {
-			((PrologVariable)a3).value= new PrologInteger(220);
-			iX.pushTrail(a3);
+		if (a2 instanceof PrologVariable) {
+			((PrologVariable)a2).setBacktrackableValue(new PrologInteger(220),iX);
+			//iX.pushTrail(a2);
 		}
 	}
 	public static class ReturnTwoNumbers2ff extends Continuation {
 		protected PrologVariable variable1;
 		protected Term variable2;
 		protected Term variable3;
-		public ReturnTwoNumbers2ff(Continuation aC, PrologVariable a1, Term a2, Term a3) {
+		public ReturnTwoNumbers2ff(Continuation aC, PrologVariable result, Term a1, Term a2) {
 			c0= aC;
-			variable1= a1;
-			variable2= a2;
-			variable3= a3;
+			variable1= result;
+			variable2= a1;
+			variable3= a2;
 		}
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("Argument1=%s, Argument2=%s, Argument3=%s\n",variable1,variable2,variable3);
-			variable1.value= new PrologInteger(1000);
+			variable1.setNonBacktrackableValue(new PrologInteger(1000));
 			if (variable2 instanceof PrologVariable) {
-				((PrologVariable)variable2).value= new PrologInteger(210);
-				iX.pushTrail(variable2);
+				((PrologVariable)variable2).setBacktrackableValue(new PrologInteger(210),iX);
+				//iX.pushTrail(variable2);
 			};
 			if (variable3 instanceof PrologVariable) {
-				((PrologVariable)variable3).value= new PrologInteger(220);
-				iX.pushTrail(variable3);
+				((PrologVariable)variable3).setBacktrackableValue(new PrologInteger(220),iX);
+				//iX.pushTrail(variable3);
 			};
 			c0.execute(iX);
 		}
@@ -370,20 +378,20 @@ public abstract class JavaTestbed extends Alpha {
 	//
 	public static void returnTwoNumbers2fs(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
 		System.out.printf("Argument1=%s, Argument2=%s\n",a1,a2);
-		a1.value= new PrologInteger(110);
-		iX.pushTrail(a1);
-		a2.value= new PrologInteger(120);
-		iX.pushTrail(a2);
+		a1.setBacktrackableValue(new PrologInteger(110),iX);
+		a2.setBacktrackableValue(new PrologInteger(120),iX);
+		//iX.pushTrail(a1);
+		//iX.pushTrail(a2);
 	}
 	public static void returnTwoNumbers2fs(ChoisePoint iX, Term a1, Term a2) {
 		System.out.printf("Argument1=%s, Argument2=%s\n",a1,a2);
 		if (a1 instanceof PrologVariable) {
-			((PrologVariable)a1).value= new PrologInteger(210);
-			iX.pushTrail(a1);
+			((PrologVariable)a1).setBacktrackableValue(new PrologInteger(210),iX);
+			//iX.pushTrail(a1);
 		};
 		if (a2 instanceof PrologVariable) {
-			((PrologVariable)a2).value= new PrologInteger(220);
-			iX.pushTrail(a2);
+			((PrologVariable)a2).setBacktrackableValue(new PrologInteger(220),iX);
+			//iX.pushTrail(a2);
 		}
 	}
 	public static class ReturnTwoNumbers2fs extends Continuation {
@@ -397,12 +405,12 @@ public abstract class JavaTestbed extends Alpha {
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("Argument1=%s, Argument2=%s\n",variable1,variable2);
 			if (variable1 instanceof PrologVariable) {
-				((PrologVariable)variable1).value= new PrologInteger(210);
-				iX.pushTrail(variable1);
+				((PrologVariable)variable1).setBacktrackableValue(new PrologInteger(210),iX);
+				//iX.pushTrail(variable1);
 			};
 			if (variable2 instanceof PrologVariable) {
-				((PrologVariable)variable2).value= new PrologInteger(220);
-				iX.pushTrail(variable2);
+				((PrologVariable)variable2).setBacktrackableValue(new PrologInteger(220),iX);
+				//iX.pushTrail(variable2);
 			};
 			c0.execute(iX);
 		}
@@ -445,5 +453,10 @@ public abstract class JavaTestbed extends Alpha {
 			};
 			c0.execute(iX);
 		}
+	}
+	//
+	public void getJavaStub1s(ChoisePoint iX, PrologVariable a1) {
+		a1.setBacktrackableValue(new ForeignWorldWrapper(null),iX);
+		//iX.pushTrail(a1);
 	}
 }

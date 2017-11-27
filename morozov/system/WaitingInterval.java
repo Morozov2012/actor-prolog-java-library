@@ -49,7 +49,7 @@ public class WaitingInterval extends TimeInterval {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static WaitingInterval termToWaitingInterval(Term a, ChoisePoint iX) {
+	public static WaitingInterval argumentToWaitingInterval(Term a, ChoisePoint iX) {
 		try {
 			long code= a.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_any) {
@@ -60,7 +60,7 @@ public class WaitingInterval extends TimeInterval {
 				throw new WrongArgumentIsNotWaitingInterval(a);
 			}
 		} catch (TermIsNotASymbol b) {
-			return new WaitingInterval(termSecondsToTimeInterval(a,iX));
+			return new WaitingInterval(argumentSecondsToTimeInterval(a,iX));
 		}
 	}
 	//
@@ -80,7 +80,7 @@ public class WaitingInterval extends TimeInterval {
 	//
 	public int toMillisecondsIntegerOrDefault(Term defaultWaitingInterval, ChoisePoint iX) {
 		if (isDefault) {
-			return TimeInterval.termSecondsToTimeInterval(defaultWaitingInterval,iX).toMillisecondsInteger();
+			return TimeInterval.argumentSecondsToTimeInterval(defaultWaitingInterval,iX).toMillisecondsInteger();
 		} else if (isAny) {
 			return anyActionPeriod; // A timeout of zero is interpreted as an infinite timeout.
 		} else {
@@ -90,7 +90,7 @@ public class WaitingInterval extends TimeInterval {
 	//
 	public long toMillisecondsLongOrDefault(Term defaultWaitingInterval, ChoisePoint iX) {
 		if (isDefault) {
-			return TimeInterval.termSecondsToTimeInterval(defaultWaitingInterval,iX).toMillisecondsLong();
+			return TimeInterval.argumentSecondsToTimeInterval(defaultWaitingInterval,iX).toMillisecondsLong();
 		} else if (isAny) {
 			return anyActionPeriod; // A timeout of zero is interpreted as an infinite timeout.
 		} else {

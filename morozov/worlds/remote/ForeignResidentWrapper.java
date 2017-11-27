@@ -16,8 +16,6 @@ public class ForeignResidentWrapper extends Resident {
 	//
 	public ExternalResidentInterface stub;
 	//
-	// protected HashMap<Long,Long> signatureMap= new HashMap<>();
-	//
 	public ForeignResidentWrapper(ExternalResidentInterface s) {
 		stub= s;
 	}

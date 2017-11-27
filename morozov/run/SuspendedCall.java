@@ -8,5 +8,5 @@ public abstract class SuspendedCall {
 	public boolean isReleased= false;
 	public SuspendedCall() {
 	}
-	public abstract Continuation formContinuation(ActiveWorld currentProcess, ChoisePoint iX, Continuation c0);
+	abstract public Continuation formContinuation(ActiveWorld currentProcess, ChoisePoint iX, Continuation c0);
 }

@@ -109,7 +109,7 @@ public class RunTimeErrorDialog extends JDialog implements ActionListener {
 	public void activate() {
 		assemble();
 		pack();
-		setNewFont(getFont());
+		setGeneralFont(getFont());
 		setModalityType(ModalityType.DOCUMENT_MODAL);
 		pack();
 		SpecialUtils.centre(this);
@@ -460,30 +460,34 @@ public class RunTimeErrorDialog extends JDialog implements ActionListener {
 		}
 	}
 	//
-	protected void setNewFont(Font newFont) {
-		mainPanel.setFont(newFont);
-		panel1.setFont(newFont);
-		panel2.setFont(newFont);
-		panel3.setFont(newFont);
-		control_3_1_1.setFont(newFont);
-		area_3_2_1.setFont(newFont);
-		control_3_2_1.setFont(newFont);
-		control_3_1_2.setFont(newFont);
-		control_3_2_2.setFont(newFont);
-		control_3_1_3.setFont(newFont);
-		panel4.setFont(newFont);
-		control_4_1_3.setFont(newFont);
-		control_4_2_3.setFont(newFont);
-		control_3_1_4.setFont(newFont);
-		area_3_2_4.setFont(newFont);
-		control_3_2_4.setFont(newFont);
-		control_3_1_5.setFont(newFont);
-		area_3_2_5.setFont(newFont);
-		control_3_2_5.setFont(newFont);
-		panel5.setFont(newFont);
-		control_5_1_0.setFont(newFont);
-		control_5_2_0.setFont(newFont);
-		control_5_3_0.setFont(newFont);
+	protected void setGeneralFont(Font font) {
+		setFont(font);
+	}
+	//
+	public void setFont(Font font) {
+		mainPanel.setFont(font);
+		panel1.setFont(font);
+		panel2.setFont(font);
+		panel3.setFont(font);
+		control_3_1_1.setFont(font);
+		area_3_2_1.setFont(font);
+		control_3_2_1.setFont(font);
+		control_3_1_2.setFont(font);
+		control_3_2_2.setFont(font);
+		control_3_1_3.setFont(font);
+		panel4.setFont(font);
+		control_4_1_3.setFont(font);
+		control_4_2_3.setFont(font);
+		control_3_1_4.setFont(font);
+		area_3_2_4.setFont(font);
+		control_3_2_4.setFont(font);
+		control_3_1_5.setFont(font);
+		area_3_2_5.setFont(font);
+		control_3_2_5.setFont(font);
+		panel5.setFont(font);
+		control_5_1_0.setFont(font);
+		control_5_2_0.setFont(font);
+		control_5_3_0.setFont(font);
 	}
 	//
 	public void actionPerformed(ActionEvent e) {

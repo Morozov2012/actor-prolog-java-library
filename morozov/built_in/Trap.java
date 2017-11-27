@@ -144,15 +144,12 @@ public abstract class Trap extends Lambda {
 					alarmArguments[i+2]= args[i];
 				}
 			};
-			Continuation c2= new DomainSwitch(success,handlerDomainSignatureNumber,targetWorld,Trap.this,alarmArguments);
+			// 2017.11.04:
+			// Continuation c2= new DomainSwitch(success,handlerDomainSignatureNumber,targetWorld,Trap.this,alarmArguments);
+			Continuation c2= new DomainSwitch(success,handlerDomainSignatureNumber,handlerWorld,Trap.this,alarmArguments);
 			c2.execute(newIndex);
-			// newIndex.freeTrail();
-			// throw Backtracking.instance;
 		} catch (Backtracking b) {
-			// newIndex.freeTrail();
 			throw new ProcessedErrorExit(ee,c0);
-			// throw ee;
-			// throw Backtracking.instance;
 		} catch (ErrorExit e2) {
 			throw new ProcessedErrorExit(e2,c0);
 		} catch (Throwable e2) {

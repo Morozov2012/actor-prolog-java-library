@@ -53,7 +53,7 @@ public enum DatabaseType {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static DatabaseType termToDatabaseType(Term value, ChoisePoint iX) {
+	public static DatabaseType argumentToDatabaseType(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_Database) {

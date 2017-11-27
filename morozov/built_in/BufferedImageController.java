@@ -3,6 +3,7 @@
 package morozov.built_in;
 
 import morozov.run.*;
+import morozov.system.errors.*;
 import morozov.system.files.*;
 import morozov.system.files.errors.*;
 import morozov.system.gui.space2d.*;
@@ -51,15 +52,15 @@ public abstract class BufferedImageController extends DataResourceConsumer {
 	// get/set imageEncodingAttributes
 	//
 	public void setImageEncodingAttributes1s(ChoisePoint iX, Term a1) {
-		setImageEncodingAttributes(GenericImageEncodingAttributes.termToImageEncodingAttributes(a1,iX));
+		setImageEncodingAttributes(GenericImageEncodingAttributes.argumentToImageEncodingAttributes(a1,iX));
 	}
 	public void setImageEncodingAttributes(GenericImageEncodingAttributes value) {
 		imageEncodingAttributes= value;
 		setCurrentImageEncodingAttributes(imageEncodingAttributes);
 	}
-	public void getImageEncodingAttributes0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getImageEncodingAttributes0ff(ChoisePoint iX, PrologVariable result) {
 		GenericImageEncodingAttributes value= getImageEncodingAttributes(iX);
-		a1.value= value.toTerm();
+		result.setNonBacktrackableValue(value.toTerm());
 	}
 	public void getImageEncodingAttributes0fs(ChoisePoint iX) {
 	}
@@ -68,7 +69,7 @@ public abstract class BufferedImageController extends DataResourceConsumer {
 			return imageEncodingAttributes;
 		} else {
 			Term value= getBuiltInSlot_E_image_encoding_attributes();
-			return GenericImageEncodingAttributes.termToImageEncodingAttributes(value,iX);
+			return GenericImageEncodingAttributes.argumentToImageEncodingAttributes(value,iX);
 		}
 	}
 	//
@@ -134,6 +135,37 @@ public abstract class BufferedImageController extends DataResourceConsumer {
 			// }
 		} catch (IOException e) {
 			throw new FileInputOutputError(fileName.toString(),e);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	protected byte[] convertImageToBytes(java.awt.image.BufferedImage nativeImage) {
+		GenericImageEncodingAttributes attributes= getCurrentImageEncodingAttributes();
+		if (nativeImage != null && attributes != null) {
+			Space2DWriter writer= Space2DWriter.createSpace2DWriter(nativeImage,attributes);
+			try {
+				return writer.imageToBytes(nativeImage);
+			} finally {
+				writer.dispose();
+			}
+		} else {
+			return null;
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	protected void checkMatrix(double[][] matrix, Term matrixValue) {
+		int numberOfRows= matrix.length;
+		if (numberOfRows==0) {
+		} else if (numberOfRows==3) {
+			int numberOfColumns= matrix[0].length;
+			if (numberOfColumns != 3) {
+				throw new WrongArgumentIsNotAMatrix(matrixValue);
+			}
+		} else {
+			throw new WrongArgumentIsNotAMatrix(matrixValue);
 		}
 	}
 }

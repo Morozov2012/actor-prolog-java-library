@@ -7,6 +7,6 @@
 package morozov.system.gui.dialogs.scalable.common;
 
 public interface ActiveDocumentReportListener {
-	public abstract void reportSuccess();
-	public abstract void reportFailure();
+	abstract public void reportSuccess();
+	abstract public void reportFailure();
 }

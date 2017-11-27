@@ -11,6 +11,7 @@ import java.util.TreeSet;
 import java.util.Iterator;
 
 public abstract class UnderdeterminedSet extends Term {
+	//
 	public static final long keyNameCode= 0;
 	//
 	///////////////////////////////////////////////////////////////

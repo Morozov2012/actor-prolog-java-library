@@ -28,7 +28,8 @@ public abstract class DesktopWindow extends Alpha {
 			String name= a1.getStringValue(iX);
 			String value= System.getenv(name);
 			if (value != null) {
-				result.value= new PrologString(value);
+				result.setNonBacktrackableValue(new PrologString(value));
+				// iX.pushTrail(result);
 			} else {
 				throw Backtracking.instance;
 			}
@@ -53,7 +54,8 @@ public abstract class DesktopWindow extends Alpha {
 			String name= a1.getStringValue(iX);
 			String value= System.getProperty(name);
 			if (value != null) {
-				result.value= new PrologString(value);
+				result.setNonBacktrackableValue(new PrologString(value));
+				// iX.pushTrail(result);
 			} else {
 				throw Backtracking.instance;
 			}
@@ -97,9 +99,9 @@ public abstract class DesktopWindow extends Alpha {
 		StaticDesktopAttributes.setExitOnClose(mode,staticContext);
 	}
 	//
-	public void getExitOnClose0ff(ChoisePoint iX, PrologVariable a1) {
+	public void getExitOnClose0ff(ChoisePoint iX, PrologVariable result) {
 		boolean mode= StaticDesktopAttributes.retrieveExitOnClose(staticContext);
-		a1.value= YesNo.boolean2TermYesNo(mode);
+		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(mode));
 	}
 	public void getExitOnClose0fs(ChoisePoint iX) {
 	}

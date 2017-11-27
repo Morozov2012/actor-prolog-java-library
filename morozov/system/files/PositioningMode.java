@@ -14,7 +14,7 @@ public enum PositioningMode {
 	RELATIVE,
 	END;
 	//
-	public static PositioningMode termToPositioningMode(Term mode, ChoisePoint iX) {
+	public static PositioningMode argumentToPositioningMode(Term mode, ChoisePoint iX) {
 		try {
 			long code= mode.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_start) {

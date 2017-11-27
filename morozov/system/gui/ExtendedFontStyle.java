@@ -88,13 +88,13 @@ public class ExtendedFontStyle {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static ExtendedFontStyle termToExtendedFontStyleSafe(Term value, ChoisePoint iX) {
+	public static ExtendedFontStyle argumentToExtendedFontStyleSafe(Term value, ChoisePoint iX) {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
 			return new ExtendedFontStyle();
 		} else {
 			try {
-				return termToExtendedFontStyle(value,iX);
+				return argumentToExtendedFontStyle(value,iX);
 			// } catch (IsNotFontStyle e) {
 			//	return new ExtendedFontStyle();
 			} catch (RuntimeException e) {
@@ -103,7 +103,7 @@ public class ExtendedFontStyle {
 		}
 	}
 	//
-	public static Term termToExtendedFontStyleOrFail(Term value, ChoisePoint iX) throws Backtracking {
+	public static Term argumentToExtendedFontStyleOrFail(Term value, ChoisePoint iX) throws Backtracking {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable()) {
 			throw Backtracking.instance;
@@ -111,14 +111,14 @@ public class ExtendedFontStyle {
 			return termDefault;
 		} else {
 			try {
-				return termToExtendedFontStyle(value,iX).toTerm();
+				return argumentToExtendedFontStyle(value,iX).toTerm();
 			} catch (RuntimeException e) {
 				return termDefault;
 			}
 		}
 	}
 	//
-	public static ExtendedFontStyle termToExtendedFontStyle(Term value, ChoisePoint iX) {
+	public static ExtendedFontStyle argumentToExtendedFontStyle(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_default) {
@@ -165,7 +165,7 @@ public class ExtendedFontStyle {
 		}
 	}
 	//
-	public static int termToFontStyleSafe(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
+	public static int argumentToFontStyleSafe(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
 			throw TermIsSymbolDefault.instance;
