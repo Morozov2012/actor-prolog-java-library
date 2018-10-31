@@ -2,8 +2,6 @@
 
 package morozov.system.gui.dialogs.errors;
 
-import morozov.terms.*;
-
 public class UnknownDialogSlotOrActionName extends RuntimeException {
 	public String name;
 	public UnknownDialogSlotOrActionName(String n) {

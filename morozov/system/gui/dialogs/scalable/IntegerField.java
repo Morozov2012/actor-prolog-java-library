@@ -13,7 +13,7 @@ package morozov.system.gui.dialogs.scalable;
 */
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
 import morozov.system.signals.*;
@@ -33,7 +33,7 @@ public class IntegerField extends ActiveTextField {
 	//
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		try {
-			BigInteger number= Converters.termToRoundInteger(value,iX,false);
+			BigInteger number= GeneralConverters.termToRoundInteger(value,iX,false);
 			return new PrologInteger(number);
 		} catch (TermIsNotAnInteger e) {
 			throw RejectValue.instance;

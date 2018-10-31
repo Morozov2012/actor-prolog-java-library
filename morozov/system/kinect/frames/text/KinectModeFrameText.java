@@ -2,7 +2,6 @@
 
 package morozov.system.kinect.frames.text;
 
-import morozov.system.kinect.frames.data.*;
 import morozov.system.kinect.frames.interfaces.*;
 import morozov.system.kinect.frames.tools.*;
 import morozov.system.kinect.modes.*;

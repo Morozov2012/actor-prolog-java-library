@@ -17,7 +17,7 @@ public class StaticAttributes2D extends StaticAttributes {
 	private static StaticAttributes2D retrieveStaticAttributes2D(StaticContext context) {
 		StaticAttributes attributes= context.retrieveAttributes(staticIdentifier);
 		if (attributes==null) {
-			synchronized(context) {
+			synchronized (context) {
 				attributes= context.retrieveAttributes(staticIdentifier);
 				if (attributes==null) {
 					attributes= new StaticAttributes2D();
@@ -30,7 +30,7 @@ public class StaticAttributes2D extends StaticAttributes {
 	public static Map<AbstractWorld,InternalFrame2D> retrieveInnerWindows(StaticContext context) {
 		StaticAttributes2D attributes= retrieveStaticAttributes2D(context);
 		Map<AbstractWorld,InternalFrame2D> innerWindows;
-		synchronized(attributes) {
+		synchronized (attributes) {
 			innerWindows= attributes.innerWindows;
 		};
 		return innerWindows;

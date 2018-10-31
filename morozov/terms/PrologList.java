@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.math.BigInteger;
 
 public class PrologList extends Term {
+	//
 	private Term head;
 	public Term tail;
 	//
@@ -441,6 +442,30 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	public void compareWithBinary(byte[] a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		// head.compareWithBinary(a,iX,op);
+		// tail.compareWithBinary(a,iX,op);
+		head.compareWithBinary(a,iX,op);
+		Term nextItem= tail; // .dereferenceValue(cp);
+		while (true) {
+			if (nextItem instanceof PrologList) {
+				PrologList nextList= (PrologList)nextItem;
+				nextList.head.compareWithBinary(a,iX,op);
+				nextItem= nextList.tail; // .dereferenceValue(cp);
+			} else if (nextItem instanceof PrologVariable) {
+				PrologVariable nextList= (PrologVariable)nextItem;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
+				} else {
+					throw new WrongArgumentIsNotBoundVariable(nextList);
+				}
+			} else {
+				nextItem.compareWithBinary(a,iX,op);
+				return;
+			}
+		}
+	}
 	public void compareWithDate(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		// head.compareWithDate(a,iX,op);
 		// tail.compareWithDate(a,iX,op);
@@ -581,6 +606,30 @@ public class PrologList extends Term {
 				}
 			} else {
 				nextItem.compareStringWith(a,iX,op);
+				return;
+			}
+		}
+	}
+	public void compareBinaryWith(byte[] a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		// head.compareBinaryWith(a,iX,op);
+		// tail.compareBinaryWith(a,iX,op);
+		head.compareBinaryWith(a,iX,op);
+		Term nextItem= tail; // .dereferenceValue(cp);
+		while (true) {
+			if (nextItem instanceof PrologList) {
+				PrologList nextList= (PrologList)nextItem;
+				nextList.head.compareBinaryWith(a,iX,op);
+				nextItem= nextList.tail; // .dereferenceValue(cp);
+			} else if (nextItem instanceof PrologVariable) {
+				PrologVariable nextList= (PrologVariable)nextItem;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
+				} else {
+					throw new WrongArgumentIsNotBoundVariable(nextList);
+				}
+			} else {
+				nextItem.compareBinaryWith(a,iX,op);
 				return;
 			}
 		}
@@ -774,6 +823,35 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	public Term reactWithBinary(byte[] a, ChoisePoint iX, BinaryOperation op) {
+		// return new PrologList(
+		//	head.reactWithBinary(a,iX,op),
+		//	tail.reactWithBinary(a,iX,op));
+		PrologList result= new PrologList(head.reactWithBinary(a,iX,op),null);
+		PrologList createdList= result;
+		Term nextItem= tail; // .dereferenceValue(cp);
+		while (true) {
+			if (nextItem instanceof PrologList) {
+				PrologList nextList= (PrologList)nextItem;
+				PrologList newList= new PrologList(nextList.head.reactWithBinary(a,iX,op),null);
+				createdList.tail= newList;
+				nextItem= nextList.tail; // .dereferenceValue(cp);
+				createdList= newList;
+			} else if (nextItem instanceof PrologVariable) {
+				PrologVariable nextList= (PrologVariable)nextItem;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
+					continue;
+				} else {
+					throw new WrongArgumentIsNotBoundVariable(nextList);
+				}
+			} else {
+				createdList.tail= nextItem.reactWithBinary(a,iX,op);
+				return result;
+			}
+		}
+	}
 	public Term reactWithDate(long a, ChoisePoint iX, BinaryOperation op) {
 		// return new PrologList(
 		//	head.reactWithDate(a,iX,op),
@@ -944,6 +1022,35 @@ public class PrologList extends Term {
 				}
 			} else {
 				createdList.tail= nextItem.reactStringWith(a,iX,op);
+				return result;
+			}
+		}
+	}
+	public Term reactBinaryWith(byte[] a, ChoisePoint iX, BinaryOperation op) {
+		// return new PrologList(
+		//	head.reactBinaryWith(a,iX,op),
+		//	tail.reactBinaryWith(a,iX,op));
+		PrologList result= new PrologList(head.reactBinaryWith(a,iX,op),null);
+		PrologList createdList= result;
+		Term nextItem= tail; // .dereferenceValue(cp);
+		while (true) {
+			if (nextItem instanceof PrologList) {
+				PrologList nextList= (PrologList)nextItem;
+				PrologList newList= new PrologList(nextList.head.reactBinaryWith(a,iX,op),null);
+				createdList.tail= newList;
+				nextItem= nextList.tail; // .dereferenceValue(cp);
+				createdList= newList;
+			} else if (nextItem instanceof PrologVariable) {
+				PrologVariable nextList= (PrologVariable)nextItem;
+				Term nextValue= nextList.getValueOfVariable();
+				if (nextValue != null) {
+					nextItem= nextValue;
+					continue;
+				} else {
+					throw new WrongArgumentIsNotBoundVariable(nextList);
+				}
+			} else {
+				createdList.tail= nextItem.reactBinaryWith(a,iX,op);
 				return result;
 			}
 		}

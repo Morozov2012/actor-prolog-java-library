@@ -17,26 +17,15 @@ import static org.bytedeco.javacpp.swscale.*;
 import static org.bytedeco.javacpp.swresample.*;
 import org.bytedeco.javacpp.*;
 
-import morozov.built_in.*;
 import morozov.system.files.*;
-import morozov.system.files.errors.*;
 import morozov.system.ffmpeg.errors.*;
 
-import java.nio.file.FileSystems;
-import java.nio.file.FileSystem;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.ByteBuffer;
-import java.io.OutputStream;
-import java.io.BufferedOutputStream;
-import java.io.ObjectOutputStream;
-import java.io.IOException;
-
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class FFmpegFrameRecordingTask extends Thread {
 	//
@@ -47,6 +36,8 @@ public class FFmpegFrameRecordingTask extends Thread {
 	protected AtomicBoolean recordFrames= new AtomicBoolean(false);
 	//
 	protected ExtendedFileName extendedFileName;
+	//
+	protected AtomicLong videoFrameCounter= new AtomicLong(-1);
 	//
 	protected AtomicBoolean haveVideo= new AtomicBoolean(false);
 	protected AtomicBoolean haveAudio= new AtomicBoolean(false);
@@ -59,6 +50,10 @@ public class FFmpegFrameRecordingTask extends Thread {
 	protected AVCodec videoCodec;
 	//
 	protected AVFormatContext pFormatCtx;
+	protected AVIOContext bytestreamIOContext;
+	//
+	protected ByteBuffer imageBuffer;
+	protected BytePointer imageBufferData;
 	//
 	protected LinkedList<java.awt.image.BufferedImage> history= new LinkedList<>();
 	protected long frameNumber;
@@ -110,6 +105,7 @@ public class FFmpegFrameRecordingTask extends Thread {
 			//
 			String textURL= fileName.getPathOfLocalResource().toString();
 			prepareVideoFile(textURL,formatName,streams,options);
+			videoFrameCounter.set(-1);
 			recordFrames.set(true);
 			acceptFrames.set(true);
 		}
@@ -133,8 +129,8 @@ public class FFmpegFrameRecordingTask extends Thread {
 		} catch (Throwable e) {
 			e.printStackTrace();
 		};
-		recordFrames.set(false);
 		synchronized (nativeLibraryGuard) {
+			recordFrames.set(false);
 			completeVideoFile();
 			audioCodec= null;
 			videoCodec= null;
@@ -270,8 +266,8 @@ public class FFmpegFrameRecordingTask extends Thread {
 			// when implementing custom I/O. Normally these
 			// are set to the function pointers specified
 			// in avio_alloc_context()
-			AVIOContext pb= new AVIOContext(null);
-			int openingFlag= avio_open(pb,fileName,AVIO_FLAG_WRITE);
+			bytestreamIOContext= new AVIOContext(null);
+			int openingFlag= avio_open(bytestreamIOContext,fileName,AVIO_FLAG_WRITE);
 			if (openingFlag < 0) {
 				// av_err2str:
 				// Fill the provided buffer with
@@ -280,7 +276,7 @@ public class FFmpegFrameRecordingTask extends Thread {
 				// errnum.
 				throw new FFmpegAVIOOpenError(fileName,FFmpegTools.av_err2str(openingFlag));
 			};
-			pFormatCtx.pb(pb);
+			pFormatCtx.pb(bytestreamIOContext);
 		};
 		// avformat_write_header:
 		// Allocate the stream private data and write the
@@ -707,6 +703,17 @@ public class FFmpegFrameRecordingTask extends Thread {
 	///////////////////////////////////////////////////////////////
 	//
 	protected void completeVideoFile() {
+		if (videoStreamState != null) {
+			if (haveVideo.get()) {
+				writeAVFrame(null,pFormatCtx,videoStreamState,videoFrameCounter);
+			}
+		};
+		if (audioStreamState != null) {
+			if (haveAudio.get()) {
+				// audioStreamExport.stopDataTransfer();
+				// audioStreamExport.writeEOFAudioFrame();
+			}
+		};
 		// av_write_trailer:
 		// Write the stream trailer to an output media file
 		// and free the file private data.
@@ -732,10 +739,25 @@ public class FFmpegFrameRecordingTask extends Thread {
 		};
 		if (audioStreamState != null) {
 			if (haveAudio.get()) {
+				// audioStreamExportingTask.writeEOFAudioFrame();
 				closeStream(audioStreamState);
 			};
 			audioStreamState= null;
 		};
+		// if (bytestreamIOContext != null) {
+		//	// avio_flush:
+		//	// Force flushing of buffered data.
+		//	// For write streams, force the buffered
+		//	// data to be immediately written to the
+		//	// output, without to wait to fill the
+		//	// internal buffer.
+		//	// For read streams, discard all currently
+		//	// buffered data, and advance the reported
+		//	// file position to that of the underlying
+		//	// stream. This does not read new data,
+		//	// and does not perform any seeks.
+		//	avio_flush(bytestreamIOContext);
+		// };
 		if (pFormatCtx != null) {
 			// flags:
 			// can use flags: AVFMT_NOFILE,
@@ -780,6 +802,11 @@ public class FFmpegFrameRecordingTask extends Thread {
 			// Free the stream:
 			avformat_free_context(pFormatCtx);
 			pFormatCtx= null;
+			bytestreamIOContext= null;
+			imageBuffer= null;
+			imageBufferData= null;
+			System.runFinalization();
+			System.gc();
 		}
 	}
 	//
@@ -787,6 +814,17 @@ public class FFmpegFrameRecordingTask extends Thread {
 		if (outputStreamState==null) {
 			return;
 		};
+		// avcodec_flush_buffers:
+		// Reset the internal decoder state / flush internal
+		// buffers. Should be called e.g. when seeking or when
+		// switching to a different stream.
+		// Note: when refcounted frames are not used (i.e.
+		// avctx->refcounted_frames is 0), this invalidates
+		// the frames previously returned from the decoder.
+		// When refcounted frames are used, the decoder just
+		// releases any references it might keep internally,
+		// but the caller's reference remains valid.
+		avcodec_flush_buffers(outputStreamState.enc);
 		// avcodec_free_context:
 		// Free the codec context and everything associated
 		// with it and write NULL to the provided pointer.
@@ -826,10 +864,12 @@ public class FFmpegFrameRecordingTask extends Thread {
 		AVCodecContext avContext= videoStreamState.enc;
 		AVFrame avFrame= videoStreamState.frame;
 		java.awt.image.BufferedImage source= FFmpegTools.convertToType(image,java.awt.image.BufferedImage.TYPE_3BYTE_BGR);
-		ByteBuffer imageBuffer= FFmpegTools.createImageBuffer(source);
+		// ByteBuffer
+		imageBuffer= FFmpegTools.createImageBuffer(source);
 		int width= source.getWidth();
 		int height= source.getHeight();
-		BytePointer data= new BytePointer(imageBuffer);
+		// BytePointer
+		imageBufferData= new BytePointer(imageBuffer);
 		// av_frame_make_writable:
 		// Ensure that the frame data is writable,
 		// avoiding data copy if possible.
@@ -870,7 +910,7 @@ public class FFmpegFrameRecordingTask extends Thread {
 		// int codecWidth= avContext.width();
 		// int codecHeight= avContext.height();
 		// @deprecated use av_image_fill_arrays() instead.
-		// avpicture_fill(videoStreamState.tmp_picture,data,technicalPixelFormat,width,height);
+		// avpicture_fill(videoStreamState.tmp_picture,imageBufferData,technicalPixelFormat,width,height);
 		//
 		// av_image_fill_arrays:
 		// Setup the data pointers and linesizes based
@@ -904,7 +944,7 @@ public class FFmpegFrameRecordingTask extends Thread {
 		int flag= av_image_fill_arrays(
 			videoStreamState.tmp_frame.data(),
 			videoStreamState.tmp_frame.linesize(),
-			data,
+			imageBufferData,
 			technicalPixelFormat,
 			width,
 			height,
@@ -947,13 +987,13 @@ public class FFmpegFrameRecordingTask extends Thread {
 			avFrame.data(),
 			avFrame.linesize());
 		// AVFrame frame= FFmpegTools.getVideoFrame(videoStreamState);
-		writeAVFrame(avFrame,pFormatCtx,videoStreamState);
+		writeAVFrame(avFrame,pFormatCtx,videoStreamState,videoFrameCounter);
 	}
 	//
 	// Encode one video frame and send it to the muxer
 	// return 1 when encoding is finished, 0 otherwise.
 	//
-	protected static boolean writeAVFrame(AVFrame frame, AVFormatContext oc, FFmpegOutputStreamState outputStreamState) {
+	protected static boolean writeAVFrame(AVFrame frame, AVFormatContext oc, FFmpegOutputStreamState outputStreamState, AtomicLong frameCounter) {
 		AVCodecContext c= outputStreamState.enc;
 		AVPacket pkt= new AVPacket();
 		// av_init_packet:
@@ -1018,7 +1058,7 @@ public class FFmpegFrameRecordingTask extends Thread {
 		// the encoder so far.
 		// Note: the counter is not incremented if
 		// encoding/decoding resulted in an error.
-		int frameCounter= c.frame_number() - 1;
+		int auxiliaryCounter= c.frame_number() - 1;
 		while (true) {
 			// avcodec_receive_packet:
 			// Read encoded data from the encoder.
@@ -1056,7 +1096,26 @@ public class FFmpegFrameRecordingTask extends Thread {
 			//	FFmpegTools.av_ts2timestr(pkt.dts(),c.time_base()));
 			if (receivingFlag >= 0) {
 ///////////////////////////////////////////////////////////////////////
-frameCounter++;
+long frameNumber= frameCounter.incrementAndGet();
+// dts:
+// Decompression timestamp in AVStream->time_base
+// units; the time at which the packet is
+// decompressed. Can be AV_NOPTS_VALUE if it is not
+// stored in the file.
+pkt.dts(frameNumber);
+// pts:
+// Presentation timestamp in AVStream->time_base units;
+// the time at which the decompressed packet will be
+// presented to the user. Can be AV_NOPTS_VALUE if it
+// is not stored in the file. pts MUST be larger or
+// equal to dts as presentation cannot happen before
+// decompression, unless one wants to view hex dumps.
+// Some formats misuse the terms dts and pts/cts to
+// mean something different. Such timestamps must be
+// converted to true pts/dts before they are stored
+// in AVPacket.
+pkt.pts(frameNumber);
+auxiliaryCounter++;
 int writingFlag= writeSingleFrame(oc,c.time_base(),outputStreamState.st,pkt);
 if (writingFlag < 0) {
 	// av_err2str:
@@ -1070,7 +1129,7 @@ if (writingFlag < 0) {
 			//	break;
 			} else if (receivingFlag==AVERROR_EOF) {
 				break;
-			} else if (frameCounter >= updatedFrameNumber) {
+			} else if (auxiliaryCounter >= updatedFrameNumber) {
 				break;
 			} else {
 				// av_err2str:
@@ -1152,7 +1211,25 @@ if (writingFlag < 0) {
 			synchronized (history) {
 				length= history.size();
 				if (length > 0) {
-					currentFrame= history.removeLast();
+					currentFrame= history.getLast();
+				} else {
+					break;
+				}
+			};
+			synchronized (nativeLibraryGuard) {
+				if (recordFrames.get()) {
+					writeBufferedImage(currentFrame);
+				}
+			};
+			synchronized (history) {
+				length= history.size();
+				if (length > 0) {
+					try {
+						history.removeLast();
+						length= history.size();
+					} finally {
+						history.notify();
+					};
 					int superfluousLength= length - writeBufferSize.get();
 					if (superfluousLength > 0) {
 						bufferOverflow= true;
@@ -1162,30 +1239,30 @@ if (writingFlag < 0) {
 						int currentLength= superfluousLength;
 						int quantityOfRemovedItems= 0;
 						int auxiliaryCounter= step;
-						while (iteratorHistory.hasNext() && currentLength > 0) {
-							java.awt.image.BufferedImage previousFrame= iteratorHistory.next();
-							if (auxiliaryCounter >= step) {
-								auxiliaryCounter= 0;
-								iteratorHistory.remove();
-								currentLength--;
-								quantityOfRemovedItems++;
-							} else {
-								auxiliaryCounter++;
-							}
-						};
+						try {
+///////////////////////////////////////////////////////////////////////
+while (iteratorHistory.hasNext() && currentLength > 0) {
+	java.awt.image.BufferedImage previousFrame= iteratorHistory.next();
+	if (auxiliaryCounter >= step) {
+		auxiliaryCounter= 0;
+		iteratorHistory.remove();
+		currentLength--;
+		quantityOfRemovedItems++;
+	} else {
+		auxiliaryCounter++;
+	}
+}
+///////////////////////////////////////////////////////////////////////
+						} finally {
+							history.notify();
+						}
 					} else {
 						if (bufferOverflow) {
 							bufferOverflow= false;
 							owner.annulBufferOverflow();
 						}
-					};
-					history.notify();
-				} else {
-					break;
+					}
 				}
-			};
-			synchronized (nativeLibraryGuard) {
-				writeBufferedImage(currentFrame);
 			}
 		}
 	}

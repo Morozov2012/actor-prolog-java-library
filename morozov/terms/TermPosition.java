@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 
 public class TermPosition extends Term {
+	//
 	protected Term value;
 	protected long position;
 	//
@@ -41,11 +42,14 @@ public class TermPosition extends Term {
 	public boolean isEqualToReal(Double v2) {
 		return value.isEqualToReal(v2);
 	}
+	public boolean isEqualToSymbol(long v2) {
+		return value.isEqualToSymbol(v2);
+	}
 	public boolean isEqualToString(String v2) {
 		return value.isEqualToString(v2);
 	}
-	public boolean isEqualToSymbol(long v2) {
-		return value.isEqualToSymbol(v2);
+	public boolean isEqualToBinary(byte[] v2) {
+		return value.isEqualToBinary(v2);
 	}
 	public boolean isEqualToEmptyList() {
 		return value.isEqualToEmptyList();
@@ -80,6 +84,9 @@ public class TermPosition extends Term {
 	public int compareWithString(String v2) {
 		return value.compareWithString(v2);
 	}
+	public int compareWithBinary(byte[] v2) {
+		return value.compareWithBinary(v2);
+	}
 	public int compareWithSymbol(long v2) {
 		return value.compareWithSymbol(v2);
 	}
@@ -110,20 +117,38 @@ public class TermPosition extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public void isInteger(PrologInteger v, ChoisePoint cp) throws Backtracking {
+		value.isInteger(v,cp);
+	}
 	public void isInteger(int v, ChoisePoint cp) throws Backtracking {
 		value.isInteger(v,cp);
 	}
 	public void isInteger(BigInteger v, ChoisePoint cp) throws Backtracking {
 		value.isInteger(v,cp);
 	}
+	public void isReal(PrologReal v, ChoisePoint cp) throws Backtracking {
+		value.isReal(v,cp);
+	}
 	public void isReal(double v, ChoisePoint cp) throws Backtracking {
 		value.isReal(v,cp);
+	}
+	public void isSymbol(PrologSymbol v, ChoisePoint cp) throws Backtracking {
+		value.isSymbol(v,cp);
 	}
 	public void isSymbol(long v, ChoisePoint cp) throws Backtracking {
 		value.isSymbol(v,cp);
 	}
+	public void isString(PrologString v, ChoisePoint cp) throws Backtracking {
+		value.isString(v,cp);
+	}
 	public void isString(String v, ChoisePoint cp) throws Backtracking {
 		value.isString(v,cp);
+	}
+	public void isBinary(PrologBinary v, ChoisePoint cp) throws Backtracking {
+		value.isBinary(v,cp);
+	}
+	public void isBinary(byte[] v, ChoisePoint cp) throws Backtracking {
+		value.isBinary(v,cp);
 	}
 	public Term[] isStructure(long aFunctor, int arity, ChoisePoint cp) throws Backtracking {
 		return value.isStructure(aFunctor,arity,cp);
@@ -197,11 +222,14 @@ public class TermPosition extends Term {
 	public double getRealValue(ChoisePoint cp) throws TermIsNotAReal {
 		return value.getRealValue(cp);
 	}
-	public long getSymbolValue(ChoisePoint cp) throws TermIsNotASymbol {
-		return value.getSymbolValue(cp);
-	}
 	public String getStringValue(ChoisePoint cp) throws TermIsNotAString {
 		return value.getStringValue(cp);
+	}
+	public byte[] getBinaryValue(ChoisePoint cp) throws TermIsNotABinary {
+		return value.getBinaryValue(cp);
+	}
+	public long getSymbolValue(ChoisePoint cp) throws TermIsNotASymbol {
+		return value.getSymbolValue(cp);
 	}
 	public long getStructureFunctor(ChoisePoint cp) throws TermIsNotAStructure {
 		return value.getStructureFunctor(cp);
@@ -440,6 +468,9 @@ public class TermPosition extends Term {
 	public void compareWithString(String a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		value.compareWithString(a,iX,op);
 	}
+	public void compareWithBinary(byte[] a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		value.compareWithBinary(a,iX,op);
+	}
 	public void compareWithDate(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		value.compareWithDate(a,iX,op);
 	}
@@ -457,6 +488,9 @@ public class TermPosition extends Term {
 	}
 	public void compareStringWith(String a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		value.compareStringWith(a,iX,op);
+	}
+	public void compareBinaryWith(byte[] a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		value.compareBinaryWith(a,iX,op);
 	}
 	public void compareDateWith(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		value.compareDateWith(a,iX,op);
@@ -482,6 +516,9 @@ public class TermPosition extends Term {
 	public Term reactWithString(String a, ChoisePoint iX, BinaryOperation op) {
 		return value.reactWithString(a,iX,op);
 	}
+	public Term reactWithBinary(byte[] a, ChoisePoint iX, BinaryOperation op) {
+		return value.reactWithBinary(a,iX,op);
+	}
 	public Term reactWithDate(long a, ChoisePoint iX, BinaryOperation op) {
 		return value.reactWithDate(a,iX,op);
 	}
@@ -499,6 +536,9 @@ public class TermPosition extends Term {
 	}
 	public Term reactStringWith(String a, ChoisePoint iX, BinaryOperation op) {
 		return value.reactStringWith(a,iX,op);
+	}
+	public Term reactBinaryWith(byte[] a, ChoisePoint iX, BinaryOperation op) {
+		return value.reactBinaryWith(a,iX,op);
 	}
 	public Term reactDateWith(long a, ChoisePoint iX, BinaryOperation op) {
 		return value.reactDateWith(a,iX,op);

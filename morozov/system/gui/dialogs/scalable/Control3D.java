@@ -16,11 +16,9 @@ import morozov.built_in.*;
 import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.space3d.*;
-import morozov.system.signals.*;
 import morozov.terms.*;
 
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.GraphicsConfiguration;
 
 public class Control3D extends CustomControlComponent {

@@ -6,7 +6,7 @@ import target.*;
 
 import morozov.domains.*;
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.space2d.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
@@ -35,7 +35,7 @@ public class ForeignWorldWrapper extends AbstractWorld {
 		Long externalSignatureNumber= changeSignatureNumber(domainSignatureNumber);
                 try {
 			ExternalResidentInterface residentStub= OwnResidentWrapper.registerResident(resident);
-			byte[] byteArray= Converters.serializeArguments(arguments);
+			byte[] byteArray= GeneralConverters.serializeArguments(arguments);
 			stub.sendResidentRequest(
 				residentStub,
 				externalSignatureNumber,
@@ -58,7 +58,7 @@ public class ForeignWorldWrapper extends AbstractWorld {
 	public void receiveAsyncCall(AsyncCall item) {
 		long domainSignatureNumber= item.domainSignatureNumber;
 		Long externalSignatureNumber= changeSignatureNumber(domainSignatureNumber);
-		byte[] byteArray= Converters.serializeArguments(item.arguments);
+		byte[] byteArray= GeneralConverters.serializeArguments(item.arguments);
                 try {
 			stub.receiveAsyncCall(
 				externalSignatureNumber,
@@ -78,7 +78,7 @@ public class ForeignWorldWrapper extends AbstractWorld {
 			MethodSignature signature= MethodSignatures.getSignature(domainSignatureNumber);
 			HashMap<String,PrologDomain> localDomainTable= new HashMap<>();
 			signature.collectLocalDomainTable(localDomainTable);
-			byte[] arrayTable= Converters.serializeDomainTable(localDomainTable);
+			byte[] arrayTable= GeneralConverters.serializeDomainTable(localDomainTable);
 			try {
 				externalSignatureNumber= stub.selectSignature(signature,arrayTable);
 				signatureMap.put(domainSignatureNumber,externalSignatureNumber);
@@ -131,7 +131,7 @@ public class ForeignWorldWrapper extends AbstractWorld {
 	//
 	public void startProcesses() {
 	}
-	public void closeFiles() {
+	public void releaseSystemResources() {
 	}
 	public void stopProcesses() {
 	}

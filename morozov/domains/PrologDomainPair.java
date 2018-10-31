@@ -3,6 +3,7 @@
 package morozov.domains;
 
 public class PrologDomainPair {
+	//
 	protected PrologDomain firstDomain;
 	protected PrologDomain secondDomain;
 	//

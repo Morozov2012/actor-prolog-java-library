@@ -7,6 +7,7 @@ import target.*;
 import morozov.built_in.*;
 import morozov.run.*;
 import morozov.system.gui.space3d.errors.*;
+import morozov.system.gui.space3d.signals.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 
@@ -30,9 +31,10 @@ public class Utils3D extends PrincipalNode3D {
 	//
 	public static BranchGroup argumentToBranchGroupOrNodeList(Term value, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
 		try { // BranchGroup
-			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_BranchGroup,1,iX);
-			return attributesToBranchGroup(arguments[0],targetWorld,u,space3D,iX);
-		} catch (Backtracking b) {
+			// Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_BranchGroup,1,iX);
+			// return attributesToBranchGroup(arguments[0],targetWorld,u,space3D,iX);
+			return termToBranchGroup(value,targetWorld,u,space3D,iX);
+		} catch (TermIsNotBranchGroup e) {
 			BranchGroup branchGroup= new BranchGroup();
 			argumentToListOfNodes(branchGroup,branchGroup,value,targetWorld,u,space3D,null,iX);
 			return branchGroup;

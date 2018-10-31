@@ -70,14 +70,14 @@ public abstract class DynamicWorlds extends LambdaArray {
 		}
 	}
 	//
-	public void closeFiles() {
+	public void releaseSystemResources() {
 		Collection<AbstractWorld> allWorlds= createdWorlds.values();
 		Iterator<AbstractWorld> allWorldsIterator= allWorlds.iterator();
 		while(allWorldsIterator.hasNext()) {
 			AbstractWorld world= allWorldsIterator.next();
-			world.closeFiles();
+			world.releaseSystemResources();
 		};
-		super.closeFiles();
+		super.releaseSystemResources();
 	}
 	//
 	public void stopProcesses() {

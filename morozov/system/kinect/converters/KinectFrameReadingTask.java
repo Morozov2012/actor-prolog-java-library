@@ -2,11 +2,9 @@
 
 package morozov.system.kinect.converters;
 
-import morozov.built_in.*;
 import morozov.run.*;
 import morozov.system.*;
 import morozov.system.checker.signals.*;
-import morozov.system.kinect.frames.*;
 import morozov.system.kinect.frames.interfaces.*;
 import morozov.system.kinect.interfaces.*;
 import morozov.system.kinect.modes.*;
@@ -36,7 +34,7 @@ public class KinectFrameReadingTask extends Thread {
 	protected AtomicBoolean stopAfterSingleReading= new AtomicBoolean(false);
 	protected AtomicReference<Double> slowMotionCoefficient= new AtomicReference<>(-1.0);
 	protected AtomicBoolean inputIsOpen= new AtomicBoolean(false);
-	protected KinectDisplayingModeInterface displayingMode;
+	protected AtomicReference<KinectDisplayingModeInterface> displayingMode= new AtomicReference<>();
 	//
 	protected long initialRecordTime= -1;
 	protected long initialRealTime= -1;
@@ -57,11 +55,27 @@ public class KinectFrameReadingTask extends Thread {
 	protected ReentrantLock lock= new ReentrantLock();
 	protected Condition condition= lock.newCondition();
 	//
+	protected long currentRecordTime;
+	protected long currentRealTime;
+	protected long recordTimeDelta;
+	protected long currentTimeDelta;
+	protected long waitingPeriod;
+	protected long nanosTimeout;
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public KinectFrameReadingTask(KinectBufferInterface kinectBuffer) {
 		owner= kinectBuffer;
 		setDaemon(true);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public KinectDisplayingModeInterface getDisplayingMode() {
+		return displayingMode.get();
+	}
+	public void setDisplayingMode(KinectDisplayingModeInterface mode) {
+		displayingMode.set(mode);
 	}
 	//
 	public static long getDefaultMaximalWaitingPeriod() {
@@ -73,7 +87,7 @@ public class KinectFrameReadingTask extends Thread {
 	public void setMaximalWaitingPeriod(long number) {
 		maximalWaitingPeriod.set(number);
 	}
-	public void setMaximalWaitingPeriod(KinectIntegerAttributeInterface maximalFrameDelay) {
+	public void setMaximalWaitingPeriod(IntegerAttribute maximalFrameDelay) {
 		maximalWaitingPeriod.set(maximalFrameDelay.getValue(getDefaultMaximalWaitingPeriod()));
 	}
 	//
@@ -100,7 +114,7 @@ public class KinectFrameReadingTask extends Thread {
 	///////////////////////////////////////////////////////////////
 	//
 	public void startReading(ExtendedFileName fileName, int timeout, CharacterSet characterSet, KinectDisplayingModeInterface currentDisplayingMode, StaticContext staticContext) {
-		synchronized(this) {
+		synchronized (this) {
 			if (!inputIsOpen.get()) {
 				openReading(fileName,timeout,characterSet,currentDisplayingMode,staticContext);
 			};
@@ -111,7 +125,7 @@ public class KinectFrameReadingTask extends Thread {
 	}
 	//
 	public void activateReading() {
-		synchronized(this) {
+		synchronized (this) {
 			if (stopThisThread.get()) {
 				resetCounters();
 				stopThisThread.set(false);
@@ -128,14 +142,20 @@ public class KinectFrameReadingTask extends Thread {
 		}
 	}
 	//
-	public void pauseReading() {
+	public void suspendReading() {
 		stopThisThread.set(true);
 	}
 	//
 	public boolean isSuspended() {
-		return stopThisThread.get();
+		return inputIsOpen() && stopThisThread.get();
+	}
+	public boolean isNotSuspended() {
+		return !isSuspended();
 	}
 	//
+	public boolean inputIsOpen() {
+		return inputIsOpen.get();
+	}
 	public boolean eof() {
 		return !inputIsOpen.get();
 	}
@@ -154,7 +174,7 @@ public class KinectFrameReadingTask extends Thread {
 						inputStream= fileName.getInputStreamOfUniversalResource(timeout,staticContext);
 						bufferedInputStream= new BufferedInputStream(inputStream);
 						objectInputStream= new ObjectInputStream(bufferedInputStream);
-						displayingMode= currentDisplayingMode;
+						displayingMode.set(currentDisplayingMode);
 						inputIsOpen.set(true);
 					} catch (CannotRetrieveContent e) {
 						throw new FileInputOutputError(fileName.toString(),e);
@@ -170,16 +190,18 @@ public class KinectFrameReadingTask extends Thread {
 	}
 	//
 	protected void resetCounters() {
-		initialRecordTime= -1;
-		initialRealTime= -1;
-		totalNumberOfFrames= 0;
+		synchronized (this) {
+			initialRecordTime= -1;
+			initialRealTime= -1;
+			totalNumberOfFrames= 0;
+		};
 		synchronized (history) {
 			history.clear();
 		}
 	}
 	//
 	public void closeReading() {
-		pauseReading();
+		suspendReading();
 		synchronized (this) {
 			try {
 				inputIsOpen.set(false);
@@ -220,60 +242,26 @@ public class KinectFrameReadingTask extends Thread {
 							owner.sendFrame(frame);
 							continue;
 						} else {
-							if (displayingMode != null) {
-								if (!displayingMode.requiresFrameType(dataArrayType)) {
+							KinectDisplayingModeInterface currentDisplayingMode= displayingMode.get();
+							if (currentDisplayingMode != null) {
+								if (!currentDisplayingMode.requiresFrameType(dataArrayType)) {
 									continue;
 								}
 							}
 						};
-						long currentRecordTime= frame.getActingFrameTime();
+						currentRecordTime= frame.getActingFrameTime();
 						if (currentRecordTime < 0) {
 							owner.sendFrame(frame);
 							continue;
 						};
-						double coefficient= slowMotionCoefficient.get();
-						if (coefficient > 0.0) {
-							currentRecordTime= (long)(currentRecordTime*coefficient);
-						};
-						long currentRealTime= System.currentTimeMillis();
-						totalNumberOfFrames++;
-						if (totalNumberOfFrames <= 1) {
-							initialRealTime= currentRealTime;
-							initialRecordTime= currentRecordTime;
-						} else {
-							long recordTimeDelta= currentRecordTime - initialRecordTime;
-							long currentTimeDelta= currentRealTime - initialRealTime;
-							long waitingPeriod= recordTimeDelta - currentTimeDelta;
-							if (waitingPeriod > maximalWaitingPeriod.get()) {
-								initialRecordTime= initialRecordTime + waitingPeriod;
-								waitingPeriod= 0;
-							};
-							if (waitingPeriod > 0) { // && waitingPeriod <= maximalWaitingPeriod) {
-///////////////////////////////////////////////////////////////////////
-try {
-	long nanosTimeout= waitingPeriod * 1_000_000;
-	lock.lock();
-	try {
-		WaitingLoop: while (true) {
-			nanosTimeout= condition.awaitNanos(nanosTimeout);
-			if (nanosTimeout <= 0) {
-				break WaitingLoop;
-			}
-		}
-	} finally {
-		lock.unlock();
-	}
-} catch (InterruptedException e) {
-} catch (ThreadDeath e) {
-	return;
-}
-///////////////////////////////////////////////////////////////////////
-							}
-						}
+						delayReading(currentRecordTime);
 					} else {
 						stopThisThread.set(true);
 						continue;
 					}
+				};
+				if (stopAfterSingleReading.get()) {
+					stopThisThread.set(true);
 				};
 				if (owner.sendFrame(frame)) {
 					synchronized (history) {
@@ -281,9 +269,10 @@ try {
 						if (history.size() > readBufferSize.get()) {
 							history.removeFirst();
 						}
-					};
+					}
+				} else {
 					if (stopAfterSingleReading.get()) {
-						stopThisThread.set(true);
+						stopThisThread.set(false);
 					}
 				}
 			} catch (EOFException e) {
@@ -308,19 +297,73 @@ try {
 		}
 	}
 	//
+	protected void delayReading(long currentRecordTime) {
+		double coefficient= slowMotionCoefficient.get();
+		if (coefficient > 0.0) {
+			currentRecordTime= (long)(currentRecordTime*coefficient);
+		};
+		currentRealTime= System.currentTimeMillis();
+		totalNumberOfFrames++;
+		if (totalNumberOfFrames <= 1) {
+			initialRealTime= currentRealTime;
+			initialRecordTime= currentRecordTime;
+		} else {
+			recordTimeDelta= currentRecordTime - initialRecordTime;
+			currentTimeDelta= currentRealTime - initialRealTime;
+			waitingPeriod= recordTimeDelta - currentTimeDelta;
+			long waitingBound= maximalWaitingPeriod.get();
+			if (coefficient > 0.0) {
+				waitingBound= (long)(waitingBound * coefficient);
+			};
+			if (waitingPeriod > waitingBound) {
+				initialRecordTime= initialRecordTime + waitingPeriod;
+				waitingPeriod= 0;
+			};
+			if (waitingPeriod > 0) {
+///////////////////////////////////////////////////////////////////////
+try {
+	nanosTimeout= waitingPeriod * 1_000_000;
+	lock.lock();
+	try {
+		WaitingLoop: while (true) {
+			nanosTimeout= condition.awaitNanos(nanosTimeout);
+			if (nanosTimeout <= 0) {
+				break WaitingLoop;
+			}
+		}
+	} finally {
+		lock.unlock();
+	}
+} catch (InterruptedException e) {
+} catch (ThreadDeath e) {
+	return;
+}
+///////////////////////////////////////////////////////////////////////
+			}
+		}
+	}
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public boolean retrieveBufferedFrame(int number) {
-		if (number < 1) {
-			return false;
-		};
 		synchronized (history) {
-			if (history.size() < number) {
-				return false;
-			};
 			int relativeNumber= number - 1;
+			if (relativeNumber < 0) {
+				relativeNumber= 0;
+			};
+			int bufferSize= getReadBufferSize();
+			int historySize= history.size();
+			int maximalIndex= bufferSize - 1;
+			if (historySize < bufferSize) {
+				maximalIndex= historySize - 1;
+				relativeNumber= relativeNumber * historySize / bufferSize;
+			};
+			if (relativeNumber > maximalIndex) {
+				relativeNumber= maximalIndex;
+			};
+			int position= historySize-1-relativeNumber;
 			KinectFrameInterface frame= history.get(relativeNumber);
-			owner.transferBufferedFrame(frame,history.size()-1-relativeNumber);
+			owner.transferBufferedFrame(frame,position);
 		};
 		return true;
 	}

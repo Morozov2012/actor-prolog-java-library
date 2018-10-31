@@ -17,7 +17,7 @@ import java.util.AbstractCollection;
 public abstract class FindAll extends Lambda {
 	//
 	abstract public Term getBuiltInSlot_E_world();
-	abstract protected Term getBuiltInSlot_E_mode();
+	abstract public Term getBuiltInSlot_E_mode();
 	//
 	///////////////////////////////////////////////////////////////
 	//

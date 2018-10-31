@@ -5,12 +5,13 @@ package morozov.built_in;
 import target.*;
 
 import morozov.run.*;
-import morozov.system.errors.*;
+import morozov.system.*;
 import morozov.system.checker.errors.*;
+import morozov.system.command.*;
+import morozov.system.converters.*;
+import morozov.system.errors.*;
 import morozov.system.files.*;
 import morozov.system.files.errors.*;
-import morozov.system.command.*;
-import morozov.system.*;
 import morozov.terms.*;
 import morozov.worlds.*;
 
@@ -47,11 +48,11 @@ public abstract class Application extends Alpha {
 		super(id);
 	}
 	//
-	abstract protected Term getBuiltInSlot_E_command();
-	abstract protected Term getBuiltInSlot_E_arguments();
-	abstract protected Term getBuiltInSlot_E_window_mode();
-	abstract protected Term getBuiltInSlot_E_enable_multiple_instances();
-	// abstract protected Term getBuiltInSlot_E_backslash_always_is_separator();
+	abstract public Term getBuiltInSlot_E_command();
+	abstract public Term getBuiltInSlot_E_arguments();
+	abstract public Term getBuiltInSlot_E_window_mode();
+	abstract public Term getBuiltInSlot_E_enable_multiple_instances();
+	// abstract public Term getBuiltInSlot_E_backslash_always_is_separator();
 	//
 	abstract public long entry_s_End_1_i();
 	//
@@ -83,7 +84,7 @@ public abstract class Application extends Alpha {
 	// get/set arguments
 	//
 	public void setArguments1s(ChoisePoint iX, Term a1) {
-		String text= Converters.argumentToString(a1,iX);
+		String text= GeneralConverters.argumentToString(a1,iX);
 		setArguments(text);
 	}
 	public void setArguments(String value) {
@@ -99,7 +100,7 @@ public abstract class Application extends Alpha {
 			return arguments;
 		} else {
 			Term value= getBuiltInSlot_E_arguments();
-			return Converters.argumentToString(value,iX);
+			return GeneralConverters.argumentToString(value,iX);
 		}
 	}
 	//
@@ -150,14 +151,14 @@ public abstract class Application extends Alpha {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void closeFiles() {
+	public void releaseSystemResources() {
 		Iterator<PendingProcess> processList= supervisors.iterator();
 		while (processList.hasNext()) {
 			PendingProcess p= processList.next();
 			p.cancel();
 			p.interrupt();
 		};
-		super.closeFiles();
+		super.releaseSystemResources();
 	}
 	//
 	public void activate0s(ChoisePoint iX) {
@@ -172,7 +173,7 @@ public abstract class Application extends Alpha {
 	}
 	public void activate2s(ChoisePoint iX, Term a1, Term a2) {
 		ProcessBuilderCommand command= ProcessBuilderCommand.argumentToProcessBuilderCommand(a1,iX);
-		String arguments= Converters.argumentToString(a2,iX);
+		String arguments= GeneralConverters.argumentToString(a2,iX);
 		activate(iX,command,arguments,false);
 	}
 	protected void activate(ChoisePoint iX, ProcessBuilderCommand command, String arguments, boolean isAccountableSubprocess) {

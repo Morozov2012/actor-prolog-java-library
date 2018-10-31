@@ -19,18 +19,15 @@ public abstract class MultiArgumentDomainItem extends DomainAlternative {
 	}
 	//
 	public void initiate() {
-		// synchronized(this) {
 		if (null == domainItems) {
 			domainItems= new PrologDomain[domainTableEntries.length];
 			for (int n=0; n < domainTableEntries.length; n++) {
 				domainItems[n]= DomainTable.getDomainAlternatives(domainTableEntries[n]);
 			}
 		}
-		// }
 	}
 	//
 	public void collectLocalDomainTable(HashMap<String,PrologDomain> localDomainTable) {
-		// initiateDomainItemsIfNecessary();
 		for (int n=0; n < domainItems.length; n++) {
 			if (!localDomainTable.containsKey(domainTableEntries[n])) {
 				localDomainTable.put(domainTableEntries[n],domainItems[n]);
@@ -39,7 +36,6 @@ public abstract class MultiArgumentDomainItem extends DomainAlternative {
 		}
 	}
 	public void acceptLocalDomainTable(HashMap<String,PrologDomain> localDomainTable) {
-		// initiateDomainItemsIfNecessary();
 		if (domainItems == null) {
 			domainItems= new PrologDomain[domainTableEntries.length];
 			for (int n=0; n < domainItems.length; n++) {
@@ -51,7 +47,6 @@ public abstract class MultiArgumentDomainItem extends DomainAlternative {
 	abstract protected String getMultiArgumentDomainTag();
 	//
 	public String toString(CharsetEncoder encoder) {
-		// initiateDomainItemsIfNecessary();
 		StringBuffer buffer= new StringBuffer();
 		buffer.append(getMultiArgumentDomainTag());
 		buffer.append("([");

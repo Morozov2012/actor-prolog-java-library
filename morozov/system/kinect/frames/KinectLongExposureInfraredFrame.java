@@ -4,16 +4,17 @@ package morozov.system.kinect.frames;
 
 import morozov.system.kinect.frames.data.interfaces.*;
 import morozov.system.kinect.frames.interfaces.*;
-import morozov.system.kinect.frames.tools.*;
 import morozov.system.kinect.modes.*;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Locale;
 
 public class KinectLongExposureInfraredFrame extends KinectFrame implements KinectLongExposureInfraredFrameInterface {
 	//
 	protected short[] longExposureInfrared;
+	//
+	private static final long serialVersionUID= 0x56982EDF4760FD2DL; // 6239788820231945517L;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames","KinectLongExposureInfraredFrame");
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//

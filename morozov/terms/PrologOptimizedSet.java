@@ -23,9 +23,9 @@ import java.util.Iterator;
 class CannotCloneOptimizedSet extends RuntimeException{};
 
 public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
+	//
 	private Term[] elements;
 	private long[] keys;
-	// private Term tail;
 	//
 	public PrologOptimizedSet(long[] aKeys) {
 		elements= new Term[aKeys.length];

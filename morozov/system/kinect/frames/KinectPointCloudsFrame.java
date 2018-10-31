@@ -4,12 +4,17 @@ package morozov.system.kinect.frames;
 
 import morozov.system.kinect.frames.data.interfaces.*;
 import morozov.system.kinect.frames.interfaces.*;
-import morozov.system.kinect.frames.tools.*;
 import morozov.system.kinect.modes.*;
 
 public class KinectPointCloudsFrame extends KinectFrame implements KinectPointCloudsFrameInterface {
 	//
 	protected float[] xyz;
+	//
+	private static final long serialVersionUID= 0xEBEB4978A2744B01L; // -1446982072799048959L;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames","KinectPointCloudsFrame");
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//

@@ -6,11 +6,11 @@ import target.*;
 
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.errors.*;
 import morozov.system.files.*;
 import morozov.system.gui.*;
 import morozov.system.gui.errors.*;
-import morozov.system.gui.signals.*;
 import morozov.system.gui.space2d.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
@@ -61,16 +61,16 @@ public abstract class Canvas2D extends BufferedImageController {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	// abstract protected Term getBuiltInSlot_E_title();
-	// abstract protected Term getBuiltInSlot_E_x();
-	// abstract protected Term getBuiltInSlot_E_y();
-	// abstract protected Term getBuiltInSlot_E_width();
-	// abstract protected Term getBuiltInSlot_E_height();
-	// abstract protected Term getBuiltInSlot_E_background_color();
+	// abstract public Term getBuiltInSlot_E_title();
+	// abstract public Term getBuiltInSlot_E_x();
+	// abstract public Term getBuiltInSlot_E_y();
+	// abstract public Term getBuiltInSlot_E_width();
+	// abstract public Term getBuiltInSlot_E_height();
+	// abstract public Term getBuiltInSlot_E_background_color();
 	//
-	// abstract protected Term getBuiltInSlot_E_enable_scene_antialiasing();
+	// abstract public Term getBuiltInSlot_E_enable_scene_antialiasing();
 	//
-	abstract protected Term getBuiltInSlot_E_scaling_factor();
+	abstract public Term getBuiltInSlot_E_scaling_factor();
 	//
 	abstract public long entry_s_Action_1_i();
 	abstract public long entry_s_MouseClicked_1_i();
@@ -112,7 +112,7 @@ public abstract class Canvas2D extends BufferedImageController {
 	///////////////////////////////////////////////////////////////
 	//
 	public void clear0s(ChoisePoint iX) {
-		synchronized(this) {
+		synchronized (this) {
 			actualCommands.clear();
 			retractedCommands.clear();
 			implementDelayedCleaning= false;
@@ -124,7 +124,7 @@ public abstract class Canvas2D extends BufferedImageController {
 	public void clear1s(ChoisePoint iX, Term a1) {
 		boolean repaintImage= YesNo.termYesNo2Boolean(a1,iX);
 		if (repaintImage) {
-			synchronized(this) {
+			synchronized (this) {
 				actualCommands.clear();
 				retractedCommands.clear();
 				implementDelayedCleaning= false;
@@ -132,7 +132,7 @@ public abstract class Canvas2D extends BufferedImageController {
 			repaintAfterDelay(iX);
 			show0s(iX);
 		} else {
-			synchronized(this) {
+			synchronized (this) {
 				implementDelayedCleaning= true;
 				skipDelayedRepainting(iX);
 			}
@@ -142,8 +142,8 @@ public abstract class Canvas2D extends BufferedImageController {
 	///////////////////////////////////////////////////////////////
 	//
 	public void setMesh2s(ChoisePoint iX, Term columns, Term rows) {
-		double rColumns= Converters.argumentToReal(columns,iX);
-		double rRows= Converters.argumentToReal(rows,iX);
+		double rColumns= GeneralConverters.argumentToReal(columns,iX);
+		double rRows= GeneralConverters.argumentToReal(rows,iX);
 		appendCommand(new Java2DSetMesh(rColumns,rRows));
 		// repaintAfterDelay(iX);
 	}
@@ -155,24 +155,24 @@ public abstract class Canvas2D extends BufferedImageController {
 	}
 	//
 	public void translate2s(ChoisePoint iX, Term x1, Term y1) {
-		double rX1= Converters.argumentToReal(x1,iX);
-		double rY1= Converters.argumentToReal(y1,iX);
+		double rX1= GeneralConverters.argumentToReal(x1,iX);
+		double rY1= GeneralConverters.argumentToReal(y1,iX);
 		appendCommand(new Java2DTranslate(rX1,rY1));
 		repaintAfterDelay(iX);
 	}
 	//
 	public void drawPoint2s(ChoisePoint iX, Term x1, Term y1) {
-		double rX1= Converters.argumentToReal(x1,iX);
-		double rY1= Converters.argumentToReal(y1,iX);
+		double rX1= GeneralConverters.argumentToReal(x1,iX);
+		double rY1= GeneralConverters.argumentToReal(y1,iX);
 		appendCommand(new Java2DDrawPoint(rX1,rY1));
 		repaintAfterDelay(iX);
 	}
 	//
 	public void drawLine4s(ChoisePoint iX, Term x1, Term y1, Term x2, Term y2) {
-		double rX1= Converters.argumentToReal(x1,iX);
-		double rY1= Converters.argumentToReal(y1,iX);
-		double rX2= Converters.argumentToReal(x2,iX);
-		double rY2= Converters.argumentToReal(y2,iX);
+		double rX1= GeneralConverters.argumentToReal(x1,iX);
+		double rY1= GeneralConverters.argumentToReal(y1,iX);
+		double rX2= GeneralConverters.argumentToReal(x2,iX);
+		double rY2= GeneralConverters.argumentToReal(y2,iX);
 		appendCommand(new Java2DDrawLine(rX1,rY1,rX2,rY2));
 		repaintAfterDelay(iX);
 	}
@@ -184,30 +184,30 @@ public abstract class Canvas2D extends BufferedImageController {
 	}
 	//
 	public void drawRectangle4s(ChoisePoint iX, Term x1, Term y1, Term width, Term height) {
-		double rX1= Converters.argumentToReal(x1,iX);
-		double rY1= Converters.argumentToReal(y1,iX);
-		double rWidth= Converters.argumentToReal(width,iX);
-		double rHeight= Converters.argumentToReal(height,iX);
+		double rX1= GeneralConverters.argumentToReal(x1,iX);
+		double rY1= GeneralConverters.argumentToReal(y1,iX);
+		double rWidth= GeneralConverters.argumentToReal(width,iX);
+		double rHeight= GeneralConverters.argumentToReal(height,iX);
 		appendCommand(new Java2DDrawRectangle(rX1,rY1,rWidth,rHeight));
 		repaintAfterDelay(iX);
 	}
 	//
 	public void drawRoundRectangle6s(ChoisePoint iX, Term x1, Term y1, Term width, Term height, Term arcWidth, Term arcHeight) {
-		double rX1= Converters.argumentToReal(x1,iX);
-		double rY1= Converters.argumentToReal(y1,iX);
-		double rWidth= Converters.argumentToReal(width,iX);
-		double rHeight= Converters.argumentToReal(height,iX);
-		double rArcW= Converters.argumentToReal(arcWidth,iX);
-		double rArcH= Converters.argumentToReal(arcHeight,iX);
+		double rX1= GeneralConverters.argumentToReal(x1,iX);
+		double rY1= GeneralConverters.argumentToReal(y1,iX);
+		double rWidth= GeneralConverters.argumentToReal(width,iX);
+		double rHeight= GeneralConverters.argumentToReal(height,iX);
+		double rArcW= GeneralConverters.argumentToReal(arcWidth,iX);
+		double rArcH= GeneralConverters.argumentToReal(arcHeight,iX);
 		appendCommand(new Java2DDrawRoundRectangle(rX1,rY1,rWidth,rHeight,rArcW,rArcH));
 		repaintAfterDelay(iX);
 	}
 	//
 	public void drawEllipse4s(ChoisePoint iX, Term x1, Term y1, Term width, Term height) {
-		double rX1= Converters.argumentToReal(x1,iX);
-		double rY1= Converters.argumentToReal(y1,iX);
-		double rWidth= Converters.argumentToReal(width,iX);
-		double rHeight= Converters.argumentToReal(height,iX);
+		double rX1= GeneralConverters.argumentToReal(x1,iX);
+		double rY1= GeneralConverters.argumentToReal(y1,iX);
+		double rWidth= GeneralConverters.argumentToReal(width,iX);
+		double rHeight= GeneralConverters.argumentToReal(height,iX);
 		appendCommand(new Java2DDrawEllipse(rX1,rY1,rWidth,rHeight));
 		repaintAfterDelay(iX);
 	}
@@ -220,43 +220,43 @@ public abstract class Canvas2D extends BufferedImageController {
 		drawArc(x1,y1,width,height,start,extent,type,iX);
 	}
 	protected void drawArc(Term x1, Term y1, Term width, Term height, Term start, Term extent, int type, ChoisePoint iX) {
-		double rX1= Converters.argumentToReal(x1,iX);
-		double rY1= Converters.argumentToReal(y1,iX);
-		double rWidth= Converters.argumentToReal(width,iX);
-		double rHeight= Converters.argumentToReal(height,iX);
-		double rStart= Converters.argumentToReal(start,iX);
-		double rExtent= Converters.argumentToReal(extent,iX);
+		double rX1= GeneralConverters.argumentToReal(x1,iX);
+		double rY1= GeneralConverters.argumentToReal(y1,iX);
+		double rWidth= GeneralConverters.argumentToReal(width,iX);
+		double rHeight= GeneralConverters.argumentToReal(height,iX);
+		double rStart= GeneralConverters.argumentToReal(start,iX);
+		double rExtent= GeneralConverters.argumentToReal(extent,iX);
 		appendCommand(new Java2DDrawArc(rX1,rY1,rWidth,rHeight,rStart,rExtent,type));
 		repaintAfterDelay(iX);
 	}
 	//
 	public void drawQuadCurve6s(ChoisePoint iX, Term x1, Term y1, Term ctrlX1, Term ctrlY1, Term x2, Term y2) {
-		double rX1= Converters.argumentToReal(x1,iX);
-		double rY1= Converters.argumentToReal(y1,iX);
-		double rCtrlX1= Converters.argumentToReal(ctrlX1,iX);
-		double rCtrlY1= Converters.argumentToReal(ctrlY1,iX);
-		double rX2= Converters.argumentToReal(x2,iX);
-		double rY2= Converters.argumentToReal(y2,iX);
+		double rX1= GeneralConverters.argumentToReal(x1,iX);
+		double rY1= GeneralConverters.argumentToReal(y1,iX);
+		double rCtrlX1= GeneralConverters.argumentToReal(ctrlX1,iX);
+		double rCtrlY1= GeneralConverters.argumentToReal(ctrlY1,iX);
+		double rX2= GeneralConverters.argumentToReal(x2,iX);
+		double rY2= GeneralConverters.argumentToReal(y2,iX);
 		appendCommand(new Java2DDrawQuadCurve(rX1,rY1,rCtrlX1,rCtrlY1,rX2,rY2));
 		repaintAfterDelay(iX);
 	}
 	//
 	public void drawCubicCurve8s(ChoisePoint iX, Term x1, Term y1, Term ctrlX1, Term ctrlY1, Term ctrlX2, Term ctrlY2, Term x2, Term y2) {
-		double rX1= Converters.argumentToReal(x1,iX);
-		double rY1= Converters.argumentToReal(y1,iX);
-		double rCtrlX1= Converters.argumentToReal(ctrlX1,iX);
-		double rCtrlY1= Converters.argumentToReal(ctrlY1,iX);
-		double rCtrlX2= Converters.argumentToReal(ctrlX2,iX);
-		double rCtrlY2= Converters.argumentToReal(ctrlY2,iX);
-		double rX2= Converters.argumentToReal(x2,iX);
-		double rY2= Converters.argumentToReal(y2,iX);
+		double rX1= GeneralConverters.argumentToReal(x1,iX);
+		double rY1= GeneralConverters.argumentToReal(y1,iX);
+		double rCtrlX1= GeneralConverters.argumentToReal(ctrlX1,iX);
+		double rCtrlY1= GeneralConverters.argumentToReal(ctrlY1,iX);
+		double rCtrlX2= GeneralConverters.argumentToReal(ctrlX2,iX);
+		double rCtrlY2= GeneralConverters.argumentToReal(ctrlY2,iX);
+		double rX2= GeneralConverters.argumentToReal(x2,iX);
+		double rY2= GeneralConverters.argumentToReal(y2,iX);
 		appendCommand(new Java2DDrawCubicCurve(rX1,rY1,rCtrlX1,rCtrlY1,rCtrlX2,rCtrlY2,rX2,rY2));
 		repaintAfterDelay(iX);
 	}
 	//
 	public void drawText3s(ChoisePoint iX, Term x1, Term y1, Term text) {
-		double rX1= Converters.argumentToReal(x1,iX);
-		double rY1= Converters.argumentToReal(y1,iX);
+		double rX1= GeneralConverters.argumentToReal(x1,iX);
+		double rY1= GeneralConverters.argumentToReal(y1,iX);
 		String rText= text.toString(iX);
 		appendCommand(new Java2DDrawText(rX1,rY1,rText));
 		repaintAfterDelay(iX);
@@ -329,50 +329,50 @@ public abstract class Canvas2D extends BufferedImageController {
 		}
 	}
 	protected void drawImage(Term a1, Term a2, Term a3, ChoisePoint iX) {
-		double x1= Converters.argumentToReal(a2,iX);
-		double y1= Converters.argumentToReal(a3,iX);
+		double x1= GeneralConverters.argumentToReal(a2,iX);
+		double y1= GeneralConverters.argumentToReal(a3,iX);
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		if (nativeImage != null) {
 			appendCommand(new Java2DDrawImage(nativeImage,x1,y1));
 		}
 	}
 	protected void drawImage(Term a1, Term a2, Term a3, Color color, ChoisePoint iX) {
-		double x1= Converters.argumentToReal(a2,iX);
-		double y1= Converters.argumentToReal(a3,iX);
+		double x1= GeneralConverters.argumentToReal(a2,iX);
+		double y1= GeneralConverters.argumentToReal(a3,iX);
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		if (nativeImage != null) {
 			appendCommand(new Java2DDrawImage(nativeImage,x1,y1,color));
 		}
 	}
 	protected void drawImage(Term a1, Term a2, Term a3, Term a4, Term a5, ChoisePoint iX) {
-		double x1= Converters.argumentToReal(a2,iX);
-		double y1= Converters.argumentToReal(a3,iX);
-		double width= Converters.argumentToReal(a4,iX);
-		double height= Converters.argumentToReal(a5,iX);
+		double x1= GeneralConverters.argumentToReal(a2,iX);
+		double y1= GeneralConverters.argumentToReal(a3,iX);
+		double width= GeneralConverters.argumentToReal(a4,iX);
+		double height= GeneralConverters.argumentToReal(a5,iX);
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		if (nativeImage != null) {
 			appendCommand(new Java2DScaleAndDrawImage(nativeImage,x1,y1,width,height));
 		}
 	}
 	protected void drawImage(Term a1, Term a2, Term a3, Term a4, Term a5, Color color, ChoisePoint iX) {
-		double x1= Converters.argumentToReal(a2,iX);
-		double y1= Converters.argumentToReal(a3,iX);
-		double width= Converters.argumentToReal(a4,iX);
-		double height= Converters.argumentToReal(a5,iX);
+		double x1= GeneralConverters.argumentToReal(a2,iX);
+		double y1= GeneralConverters.argumentToReal(a3,iX);
+		double width= GeneralConverters.argumentToReal(a4,iX);
+		double height= GeneralConverters.argumentToReal(a5,iX);
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		if (nativeImage != null) {
 			appendCommand(new Java2DScaleAndDrawImage(nativeImage,x1,y1,width,height,color));
 		}
 	}
 	protected void drawImage(Term a1, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7, Term a8, Term a9, ChoisePoint iX) {
-		double destinationX1= Converters.argumentToReal(a2,iX);
-		double destinationY1= Converters.argumentToReal(a3,iX);
-		double destinationX2= Converters.argumentToReal(a4,iX);
-		double destinationY2= Converters.argumentToReal(a5,iX);
-		double sourceX1= Converters.argumentToReal(a6,iX);
-		double sourceY1= Converters.argumentToReal(a7,iX);
-		double sourceX2= Converters.argumentToReal(a8,iX);
-		double sourceY2= Converters.argumentToReal(a9,iX);
+		double destinationX1= GeneralConverters.argumentToReal(a2,iX);
+		double destinationY1= GeneralConverters.argumentToReal(a3,iX);
+		double destinationX2= GeneralConverters.argumentToReal(a4,iX);
+		double destinationY2= GeneralConverters.argumentToReal(a5,iX);
+		double sourceX1= GeneralConverters.argumentToReal(a6,iX);
+		double sourceY1= GeneralConverters.argumentToReal(a7,iX);
+		double sourceX2= GeneralConverters.argumentToReal(a8,iX);
+		double sourceY2= GeneralConverters.argumentToReal(a9,iX);
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		if (nativeImage != null) {
 			appendCommand(new Java2DPickOutAndDrawImage(
@@ -388,14 +388,14 @@ public abstract class Canvas2D extends BufferedImageController {
 		}
 	}
 	protected void drawImage(Term a1, Term a2, Term a3, Term a4, Term a5, Term a6, Term a7, Term a8, Term a9, Color color, ChoisePoint iX) {
-		double destinationX1= Converters.argumentToReal(a2,iX);
-		double destinationY1= Converters.argumentToReal(a3,iX);
-		double destinationX2= Converters.argumentToReal(a4,iX);
-		double destinationY2= Converters.argumentToReal(a5,iX);
-		double sourceX1= Converters.argumentToReal(a6,iX);
-		double sourceY1= Converters.argumentToReal(a7,iX);
-		double sourceX2= Converters.argumentToReal(a8,iX);
-		double sourceY2= Converters.argumentToReal(a9,iX);
+		double destinationX1= GeneralConverters.argumentToReal(a2,iX);
+		double destinationY1= GeneralConverters.argumentToReal(a3,iX);
+		double destinationX2= GeneralConverters.argumentToReal(a4,iX);
+		double destinationY2= GeneralConverters.argumentToReal(a5,iX);
+		double sourceX1= GeneralConverters.argumentToReal(a6,iX);
+		double sourceY1= GeneralConverters.argumentToReal(a7,iX);
+		double sourceX2= GeneralConverters.argumentToReal(a8,iX);
+		double sourceY2= GeneralConverters.argumentToReal(a9,iX);
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		if (nativeImage != null) {
 			appendCommand(new Java2DPickOutAndDrawImage(
@@ -445,7 +445,7 @@ public abstract class Canvas2D extends BufferedImageController {
 	}
 	public void setCompositingRule2s(ChoisePoint iX, Term a1, Term a2) {
 		int rule= Tools2D.argumentToCompositingRule(a1,iX);
-		float alpha= (float)Converters.argumentToReal(a2,iX);
+		float alpha= (float)GeneralConverters.argumentToReal(a2,iX);
 		appendCommand(new Java2DSetComposite(rule,alpha));
 	}
 	//
@@ -477,8 +477,8 @@ public abstract class Canvas2D extends BufferedImageController {
 	//
 	public void retractDrawing1s(ChoisePoint iX, Term a1) {
 		try {
-			synchronized(this) {
-				BigInteger marker= Converters.termToStrictInteger(a1,iX,false);
+			synchronized (this) {
+				BigInteger marker= GeneralConverters.termToStrictInteger(a1,iX,false);
 				int fromIndex= PrologInteger.toInteger(marker);
 				synchronized (actualCommands) {
 					int size= actualCommands.size();
@@ -505,8 +505,8 @@ public abstract class Canvas2D extends BufferedImageController {
 	}
 	//
 	public void undoDrawing0s(ChoisePoint iX) {
-		synchronized(this) {
-			synchronized(actualCommands) {
+		synchronized (this) {
+			synchronized (actualCommands) {
 				int size= actualCommands.size();
 				if (size > 0) {
 					retractedCommands.add(actualCommands.get(size-1));
@@ -521,7 +521,7 @@ public abstract class Canvas2D extends BufferedImageController {
 	}
 	//
 	public void redoDrawing0s(ChoisePoint iX) {
-		synchronized(this) {
+		synchronized (this) {
 			int size= retractedCommands.size();
 			if (size > 0) {
 				actualCommands.add(retractedCommands.get(size-1));
@@ -539,7 +539,7 @@ public abstract class Canvas2D extends BufferedImageController {
 			return;
 		} else {
 			createGraphicWindowIfNecessary(iX,false);
-			synchronized(this) {
+			synchronized (this) {
 				suspendRedrawing= true;
 				skipDelayedRepainting(iX);
 				if (canvasSpace != null) {
@@ -558,7 +558,7 @@ public abstract class Canvas2D extends BufferedImageController {
 	}
 	protected void createWindowAndDrawNow(ChoisePoint iX) {
 		createGraphicWindowIfNecessary(iX,false);
-		synchronized(this) {
+		synchronized (this) {
 			suspendRedrawing= false;
 			implementDelayedCleaning= false;
 			if (graphicWindow != null) {
@@ -583,10 +583,10 @@ public abstract class Canvas2D extends BufferedImageController {
 		modifyImage(a1,bufferedImage,iX);
 	}
 	public void getImage5s(ChoisePoint iX, Term a1, Term a2, Term a3, Term a4, Term a5) {
-		double x1= Converters.argumentToReal(a2,iX);
-		double y1= Converters.argumentToReal(a3,iX);
-		double width= Converters.argumentToReal(a4,iX);
-		double height= Converters.argumentToReal(a5,iX);
+		double x1= GeneralConverters.argumentToReal(a2,iX);
+		double y1= GeneralConverters.argumentToReal(a3,iX);
+		double width= GeneralConverters.argumentToReal(a4,iX);
+		double height= GeneralConverters.argumentToReal(a5,iX);
 		createWindowAndDrawNow(iX);
 		java.awt.image.BufferedImage bufferedImage= getBufferedImage(x1,y1,width,height);
 		modifyImage(a1,bufferedImage,iX);
@@ -606,7 +606,7 @@ public abstract class Canvas2D extends BufferedImageController {
 	}
 	protected void saveContent(ExtendedFileName fileName, GenericImageEncodingAttributes attributes, ChoisePoint iX) {
 		createWindowAndDrawNow(iX);
-		synchronized(this) {
+		synchronized (this) {
 			java.awt.image.BufferedImage bufferedImage= getBufferedImage();
 			if (bufferedImage != null) {
 				writeImage(fileName,bufferedImage,attributes);
@@ -718,7 +718,7 @@ public abstract class Canvas2D extends BufferedImageController {
 	///////////////////////////////////////////////////////////////
 	//
 	protected void appendCommand(Java2DCommand command) {
-		synchronized(this) {
+		synchronized (this) {
 			if (implementDelayedCleaning) {
 				actualCommands.clear();
 				retractedCommands.clear();
@@ -814,7 +814,7 @@ public abstract class Canvas2D extends BufferedImageController {
 		}
 	}
 	public void reviseMouseListenerStatus() {
-		synchronized(this) {
+		synchronized (this) {
 			if (	mouseClickedEventIsEnabled.get() ||
 				mouseEnteredEventIsEnabled.get() ||
 				mouseExitedEventIsEnabled.get() ||
@@ -835,7 +835,7 @@ public abstract class Canvas2D extends BufferedImageController {
 		}
 	}
 	public void reviseMouseMotionListenerStatus() {
-		synchronized(this) {
+		synchronized (this) {
 			if (	mouseDraggedEventIsEnabled.get() ||
 				mouseMovedEventIsEnabled.get()) {
 				if (graphicWindow != null) {

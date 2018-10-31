@@ -137,7 +137,7 @@ public class ExtendedFontSize {
 			} catch (TermIsNotAnInteger e1) {
 				try {
 					double number= value.getRealValue(iX);
-					// BigInteger bigInteger= Converters.doubleToBigInteger(number);
+					// BigInteger bigInteger= GeneralConverters.doubleToBigInteger(number);
 					// return new PrologReal(number);
 					return new PrologInteger((long)StrictMath.round(number));
 				} catch (TermIsNotAReal e2) {

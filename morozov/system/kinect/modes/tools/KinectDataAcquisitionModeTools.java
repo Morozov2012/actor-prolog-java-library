@@ -8,7 +8,6 @@ import morozov.system.kinect.modes.interfaces.*;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Locale;
 
 public class KinectDataAcquisitionModeTools {

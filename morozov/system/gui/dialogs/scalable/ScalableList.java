@@ -13,13 +13,12 @@ package morozov.system.gui.dialogs.scalable;
 */
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
 
-import java.awt.Font;
 import java.util.ArrayList;
 
 public class ScalableList extends ActiveComponent {
@@ -45,7 +44,7 @@ public class ScalableList extends ActiveComponent {
 		} else {
 			ArrayList<Term> items= DialogUtils.listToTermArray(value,iX);
 			if (enableMultiselection) {
-				return Converters.arrayListToTerm(items);
+				return GeneralConverters.arrayListToTerm(items);
 			} else {
 				if (items.size() >= 1) {
 					return items.get(items.size()-1);
@@ -58,7 +57,7 @@ public class ScalableList extends ActiveComponent {
 	//
 	public Term standardizeRange(Term value, ChoisePoint iX) {
 		ArrayList<String> items= DialogUtils.listToStringArray(value,iX);
-		return Converters.stringArrayToList(items);
+		return GeneralConverters.stringArrayToList(items);
 	}
 	//
 	///////////////////////////////////////////////////////////////

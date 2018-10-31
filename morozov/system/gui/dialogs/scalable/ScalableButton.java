@@ -9,17 +9,15 @@ package morozov.system.gui.dialogs.scalable;
 import morozov.run.*;
 import morozov.system.gui.*;
 import morozov.system.gui.dialogs.*;
-// import morozov.system.gui.dialogs.errors.*;
 import morozov.terms.*;
 
 import javax.swing.JButton;
+import javax.swing.AbstractButton;
 import javax.swing.Icon;
 import javax.swing.Action;
 
-import java.awt.Font;
 import java.awt.Insets;
 import java.awt.Dimension;
-import java.awt.Color;
 
 public class ScalableButton extends ScalableAbstractButton {
 	//
@@ -33,17 +31,17 @@ public class ScalableButton extends ScalableAbstractButton {
 	public ScalableButton(AbstractDialog tD) {
 		this(tD,null,null);
 	}
-	public ScalableButton(AbstractDialog tD, Icon icon) {
-		this(tD,null,icon);
-	}
-	public ScalableButton(AbstractDialog tD, String text) {
-		this(tD,text,null);
-	}
 	public ScalableButton(AbstractDialog tD, Action a) {
 		this(tD,null,null);
 		if (component!=null) {
 			((JButton)component).setAction(a);
 		}
+	}
+	public ScalableButton(AbstractDialog tD, Icon icon) {
+		this(tD,null,icon);
+	}
+	public ScalableButton(AbstractDialog tD, String text) {
+		this(tD,text,null);
 	}
 	public ScalableButton(AbstractDialog tD, String text, Icon icon) {
 		super(tD);
@@ -52,15 +50,10 @@ public class ScalableButton extends ScalableAbstractButton {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	// public void setGeneralForeground(Color c) {
-	// }
-	//
-	///////////////////////////////////////////////////////////////
-	//
 	protected void setMargin() {
 		if (component!=null) {
 			if (horizontalScaling > 0 && verticalScaling > 0) {
-				((JButton)component).setMargin(new Insets(initialTopMargin,initialLeftMargin,initialBottomMargin,initialRightMargin));
+				((AbstractButton)component).setMargin(new Insets(initialTopMargin,initialLeftMargin,initialBottomMargin,initialRightMargin));
 				Dimension preferredSize= component.getPreferredSize();
 				double scaledWidth= preferredSize.getWidth() * horizontalScaling;
 				double scaledHeight= preferredSize.getHeight() * verticalScaling;
@@ -70,7 +63,7 @@ public class ScalableButton extends ScalableAbstractButton {
 				int leftMargin= initialLeftMargin + deltaWidth;
 				int bottomMargin= initialBottomMargin + deltaHeight;
 				int rightMargin= initialRightMargin + deltaWidth;
-				((JButton)component).setMargin(new Insets(topMargin,leftMargin,bottomMargin,rightMargin));
+				((AbstractButton)component).setMargin(new Insets(topMargin,leftMargin,bottomMargin,rightMargin));
 			}
 		}
 	}
@@ -79,7 +72,7 @@ public class ScalableButton extends ScalableAbstractButton {
 	//
 	public void setIndividualText(Term value, ChoisePoint iX) {
 		if (component!=null) {
-			AnnotatedButton.safelyUpdateAbstractButton((JButton)component,value,iX);
+			AnnotatedButton.safelyUpdateAbstractButton((AbstractButton)component,value,iX);
 			// ((JButton)component).invalidate();
 			// Без этой команды при изменении надписи на кнопке
 			// соседние кнопки сдвигаются, но перерисовываются
@@ -94,7 +87,7 @@ public class ScalableButton extends ScalableAbstractButton {
 	//
 	public Term getIndividualText() {
 		if (component!=null) {
-			String text= AnnotatedButton.safelyRestoreText((JButton)component);
+			String text= AnnotatedButton.safelyRestoreText((AbstractButton)component);
 			return new PrologString(text);
 		} else {
 			return termEmptyString;

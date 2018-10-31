@@ -4,22 +4,17 @@ package morozov.system.vision.vpm;
 
 import target.*;
 
-import morozov.system.*;
-import morozov.system.vision.vpm.commands.*;
-import morozov.system.vision.vpm.converters.*;
+import morozov.system.converters.*;
 import morozov.terms.*;
 
 import java.awt.image.WritableRaster;
-import java.awt.image.SampleModel;
 import java.awt.Graphics2D;
 
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Set;
-import java.util.Collection;
 import java.util.Iterator;
-import java.util.ListIterator;
 import java.math.BigInteger;
 
 abstract public class GenericVideoProcessingMachineSnapshot {
@@ -152,7 +147,7 @@ abstract public class GenericVideoProcessingMachineSnapshot {
 		}
 	}
 	//
-	protected void createForegroundImageWithAllChannels(int[] alphaPixels) {
+	protected void fillUpForegroundImageWithAllChannels(int[] alphaPixels) {
 		Graphics2D g2= foregroundImage.createGraphics();
 		try {
 			if (preprocessedImage != null) {
@@ -202,18 +197,23 @@ abstract public class GenericVideoProcessingMachineSnapshot {
 				}
 			};
 			synthesizedImage= new java.awt.image.BufferedImage(operationalImageWidth,operationalImageHeight,java.awt.image.BufferedImage.TYPE_4BYTE_ABGR);
-			Graphics2D g2= synthesizedImage.createGraphics();
-			try {
-				g2.drawImage(recentImage,0,0,null);
-			} finally {
-				g2.dispose();
-			};
-			WritableRaster synthesizedImageRaster= synthesizedImage.getRaster();
-			//raster.setDataElements(0,0,foregroundImage.getRaster());
-			//WritableRaster recentImageRaster= recentImage.getRaster();
-			//synthesizedImageRaster.setDataElements(0,0,);
-			synthesizedImageRaster.setSamples(0,0,operationalImageWidth,operationalImageHeight,3,alphaPixels);
+			fillUpSynthesizedImage(alphaPixels);
 		}
+	}
+	//
+	protected void fillUpSynthesizedImage(int[] alphaPixels) {
+		Graphics2D g2= synthesizedImage.createGraphics();
+		try {
+			if (preprocessedImage != null) {
+				g2.drawImage(preprocessedImage,0,0,null);
+			} else {
+				g2.drawImage(recentImage,0,0,null);
+			}
+		} finally {
+			g2.dispose();
+		};
+		WritableRaster imageRaster= synthesizedImage.getRaster();
+		imageRaster.setSamples(0,0,operationalImageWidth,operationalImageHeight,3,alphaPixels);
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -284,7 +284,7 @@ abstract public class GenericVideoProcessingMachineSnapshot {
 				arrayOfBlobs.add(blobTerm);
 			}
 		};
-		Term termBlobs= Converters.arrayListToTerm(arrayOfBlobs);
+		Term termBlobs= GeneralConverters.arrayListToTerm(arrayOfBlobs);
 		Term result= PrologEmptySet.instance;
 		result= new PrologSet(-SymbolCodes.symbolCode_E_blobs,termBlobs,result);
 		result= new PrologSet(-SymbolCodes.symbolCode_E_time,termTime,result);

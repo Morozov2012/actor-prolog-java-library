@@ -68,7 +68,7 @@ public class ScalableTableModel extends AbstractTableModel {
 					targetDialog.withdrawRequest(resident);
 				};
 			};
-			synchronized(content) {
+			synchronized (content) {
 				content.clear();
 				try {
 					while (true) {
@@ -102,7 +102,7 @@ public class ScalableTableModel extends AbstractTableModel {
 		return numberOfColumns;
 	}
 	public int getRowCount() {
-		synchronized(content) {
+		synchronized (content) {
 			// return numberOfRows;
 			return content.size();
 		}
@@ -111,7 +111,7 @@ public class ScalableTableModel extends AbstractTableModel {
 		return columnNames[col];
 	}
 	public Object getValueAt(int row, int col) {
-		synchronized(content) {
+		synchronized (content) {
 			if (row + 1 <= content.size()) {
 				ArrayList<String> contentRow= content.get(row);
 				if (col + 1 <= contentRow.size()) {
@@ -129,7 +129,7 @@ public class ScalableTableModel extends AbstractTableModel {
 	}
 	public Term getRows(int[] selection) {
 		Term result= PrologEmptyList.instance;
-		synchronized(content) {
+		synchronized (content) {
 			for (int n=selection.length-1; n>=0; n--) {
 				int rowNumber= selection[n];
 				ArrayList<String> contentRow= content.get(rowNumber);
@@ -151,7 +151,7 @@ public class ScalableTableModel extends AbstractTableModel {
 	}
 	public Term getContent() {
 		Term result= PrologEmptyList.instance;
-		synchronized(content) {
+		synchronized (content) {
 			for (int rowNumber=content.size()-1; rowNumber>=0; rowNumber--) {
 				ArrayList<String> contentRow= content.get(rowNumber);
 				Term row= PrologEmptyList.instance;

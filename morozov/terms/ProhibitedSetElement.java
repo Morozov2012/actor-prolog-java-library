@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class ProhibitedSetElement extends UnderdeterminedSetItem {
+	//
 	public ProhibitedSetElement(long aName, Term aTail) {
 		name= aName;
 		tail= aTail;

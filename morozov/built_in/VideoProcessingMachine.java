@@ -4,6 +4,7 @@ package morozov.built_in;
 
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.space2d.*;
 import morozov.system.vision.vpm.*;
 import morozov.system.vision.vpm.commands.*;
@@ -16,7 +17,6 @@ import morozov.system.vision.vpm.converters.*;
 import morozov.terms.*;
 import morozov.worlds.*;
 
-// import java.util.Calendar;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
@@ -28,7 +28,8 @@ public abstract class VideoProcessingMachine
 	//
 	protected AtomicReference<VPM> vpm= new AtomicReference<>(null);
 	//
-	// protected long recentFrameNumber= 0;
+	protected Double brightnessHistogramTailCoefficient;
+	protected Double colorHistogramTailCoefficient;
 	//
 	protected List<VPM_FrameCommand> actualFrameCommands= Collections.synchronizedList(new ArrayList<VPM_FrameCommand>());
 	protected List<VPM_SnapshotCommand> actualSnapshotCommands= Collections.synchronizedList(new ArrayList<VPM_SnapshotCommand>());
@@ -44,6 +45,59 @@ public abstract class VideoProcessingMachine
 	}
 	public VideoProcessingMachine(GlobalWorldIdentifier id) {
 		super(id);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	abstract public Term getBuiltInSlot_E_brightness_histogram_tail_coefficient();
+	abstract public Term getBuiltInSlot_E_color_histogram_tail_coefficient();
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	// brightness_histogram_tail_coefficient
+	//
+	public void setBrightnessHistogramTailCoefficient1s(ChoisePoint iX, Term a1) {
+		setBrightnessHistogramTailCoefficient(GeneralConverters.argumentToReal(a1,iX));
+	}
+	public void setBrightnessHistogramTailCoefficient(double value) {
+		brightnessHistogramTailCoefficient= value;
+	}
+	public void getBrightnessHistogramTailCoefficient0ff(ChoisePoint iX, PrologVariable result) {
+		double value= getBrightnessHistogramTailCoefficient(iX);
+		result.setNonBacktrackableValue(new PrologReal(value));
+	}
+	public void getBrightnessHistogramTailCoefficient0fs(ChoisePoint iX) {
+	}
+	public double getBrightnessHistogramTailCoefficient(ChoisePoint iX) {
+		if (brightnessHistogramTailCoefficient != null) {
+			return brightnessHistogramTailCoefficient;
+		} else {
+			Term value= getBuiltInSlot_E_brightness_histogram_tail_coefficient();
+			return GeneralConverters.argumentToReal(value,iX);
+		}
+	}
+	//
+	// color_histogram_tail_coefficient
+	//
+	public void setColorHistogramTailCoefficient1s(ChoisePoint iX, Term a1) {
+		setColorHistogramTailCoefficient(GeneralConverters.argumentToReal(a1,iX));
+	}
+	public void setColorHistogramTailCoefficient(double value) {
+		colorHistogramTailCoefficient= value;
+	}
+	public void getColorHistogramTailCoefficient0ff(ChoisePoint iX, PrologVariable result) {
+		double value= getColorHistogramTailCoefficient(iX);
+		result.setNonBacktrackableValue(new PrologReal(value));
+	}
+	public void getColorHistogramTailCoefficient0fs(ChoisePoint iX) {
+	}
+	public double getColorHistogramTailCoefficient(ChoisePoint iX) {
+		if (colorHistogramTailCoefficient != null) {
+			return colorHistogramTailCoefficient;
+		} else {
+			Term value= getBuiltInSlot_E_color_histogram_tail_coefficient();
+			return GeneralConverters.argumentToReal(value,iX);
+		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -233,7 +287,7 @@ public abstract class VideoProcessingMachine
 	//	createVideoProcessingMachineIfNecessary(iX);
 	//	VPM machine= vpm.get();
 	//	double[][] matrix= machine.getInverseTransformationMatrix();
-	//	return Converters.serializeMatrix(matrix);
+	//	return GeneralConverters.serializeMatrix(matrix);
 	// }
 	//
 	// SamplingRate
@@ -373,7 +427,7 @@ public abstract class VideoProcessingMachine
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		long frameNumber;
 		if (a2 != null) {
-			frameNumber= PrologInteger.toLong(Converters.argumentToRoundInteger(a2,iX));
+			frameNumber= PrologInteger.toLong(GeneralConverters.argumentToRoundInteger(a2,iX));
 		} else {
 			recentFrameNumber++;
 			frameNumber= recentFrameNumber;
@@ -385,7 +439,7 @@ public abstract class VideoProcessingMachine
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		long timeInMilliseconds;
 		if (a2 != null) {
-			timeInMilliseconds= PrologInteger.toLong(Converters.argumentToRoundInteger(a2,iX));
+			timeInMilliseconds= PrologInteger.toLong(GeneralConverters.argumentToRoundInteger(a2,iX));
 		} else {
 			Calendar calendar= Calendar.getInstance();
 			timeInMilliseconds= calendar.getTimeInMillis();
@@ -427,29 +481,29 @@ public abstract class VideoProcessingMachine
 		if (vpm.get()==null) {
 			GenericImageEncodingAttributes attributes= getImageEncodingAttributes(iX);
 			setCurrentImageEncodingAttributes(attributes);
-			int minimalTrainingInterval= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_training_interval(),iX);
-			int maximalTrainingInterval= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_training_interval(),iX);
-			int horizontalBlobBorder= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_horizontal_blob_border(),iX);
-			int verticalBlobBorder= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_vertical_blob_border(),iX);
-			double horizontalExtraBorderCoefficient= Converters.argumentToReal(getBuiltInSlot_E_horizontal_extra_border_coefficient(),iX);
-			double verticalExtraBorderCoefficient= Converters.argumentToReal(getBuiltInSlot_E_vertical_extra_border_coefficient(),iX);
-			int minimalBlobIntersectionArea= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_blob_intersection_area(),iX);
-			int minimalBlobSize= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_blob_size(),iX);
-			int minimalTrackDuration= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_track_duration(),iX);
-			int maximalTrackDuration= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_track_duration(),iX);
+			int minimalTrainingInterval= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_training_interval(),iX);
+			int maximalTrainingInterval= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_training_interval(),iX);
+			int horizontalBlobBorder= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_horizontal_blob_border(),iX);
+			int verticalBlobBorder= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_vertical_blob_border(),iX);
+			double horizontalExtraBorderCoefficient= GeneralConverters.argumentToReal(getBuiltInSlot_E_horizontal_extra_border_coefficient(),iX);
+			double verticalExtraBorderCoefficient= GeneralConverters.argumentToReal(getBuiltInSlot_E_vertical_extra_border_coefficient(),iX);
+			int minimalBlobIntersectionArea= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_blob_intersection_area(),iX);
+			int minimalBlobSize= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_blob_size(),iX);
+			int minimalTrackDuration= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_track_duration(),iX);
+			int maximalTrackDuration= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_track_duration(),iX);
 			NumericalValue maximalChronicleLength= NumericalValue.argumentToNumericalValue(getBuiltInSlot_E_maximal_chronicle_length(),iX);
-			int maximalBlobInvisibilityInterval= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_blob_invisibility_interval(),iX);
-			int maximalTrackRetentionInterval= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_track_retention_interval(),iX);
+			int maximalBlobInvisibilityInterval= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_blob_invisibility_interval(),iX);
+			int maximalTrackRetentionInterval= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_track_retention_interval(),iX);
 			Term matrixValue= getBuiltInSlot_E_inverse_transformation_matrix();
-			double[][] inverseMatrix= Converters.argumentToMatrix(matrixValue,iX);
+			double[][] inverseMatrix= GeneralConverters.argumentToMatrix(matrixValue,iX);
 			checkMatrix(inverseMatrix,matrixValue);
-			double samplingRate= Converters.argumentToReal(getBuiltInSlot_E_sampling_rate(),iX);
-			int r2WindowHalfwidth= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_r2_window_halfwidth(),iX);
+			double samplingRate= GeneralConverters.argumentToReal(getBuiltInSlot_E_sampling_rate(),iX);
+			int r2WindowHalfwidth= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_r2_window_halfwidth(),iX);
 			boolean applyCharacteristicLengthMedianFiltering= YesNo.termYesNo2Boolean(getBuiltInSlot_E_apply_median_filtering_to_characteristic_length(),iX);
-			int characteristicLengthMedianFilterHalfwidth= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_characteristic_length_median_filter_halfwidth(),iX);
+			int characteristicLengthMedianFilterHalfwidth= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_characteristic_length_median_filter_halfwidth(),iX);
 			boolean applyVelocityMedianFiltering= YesNo.termYesNo2Boolean(getBuiltInSlot_E_apply_median_filtering_to_velocity(),iX);
-			int velocityMedianFilterHalfwidth= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_velocity_median_filter_halfwidth(),iX);
-			int synthesizedImageTransparency= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_synthesized_image_transparency(),iX);
+			int velocityMedianFilterHalfwidth= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_velocity_median_filter_halfwidth(),iX);
+			int synthesizedImageTransparency= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_synthesized_image_transparency(),iX);
 			boolean makeRectangularBlobsInSynthesizedImage= YesNo.termYesNo2Boolean(getBuiltInSlot_E_make_rectangular_blobs_in_synthesized_image(),iX);
 			vpm.set(new VPM(
 				actualFrameCommands,
@@ -513,29 +567,29 @@ public abstract class VideoProcessingMachine
 		if (!createVideoProcessingMachineIfNecessary(iX)) {
 			GenericImageEncodingAttributes attributes= getImageEncodingAttributes(iX);
 			setCurrentImageEncodingAttributes(attributes);
-			int minimalTrainingInterval= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_training_interval(),iX);
-			int maximalTrainingInterval= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_training_interval(),iX);
-			int horizontalBlobBorder= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_horizontal_blob_border(),iX);
-			int verticalBlobBorder= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_vertical_blob_border(),iX);
-			double horizontalExtraBorderCoefficient= Converters.argumentToReal(getBuiltInSlot_E_horizontal_extra_border_coefficient(),iX);
-			double verticalExtraBorderCoefficient= Converters.argumentToReal(getBuiltInSlot_E_vertical_extra_border_coefficient(),iX);
-			int minimalBlobIntersectionArea= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_blob_intersection_area(),iX);
-			int minimalBlobSize= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_blob_size(),iX);
-			int minimalTrackDuration= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_track_duration(),iX);
-			int maximalTrackDuration= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_track_duration(),iX);
+			int minimalTrainingInterval= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_training_interval(),iX);
+			int maximalTrainingInterval= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_training_interval(),iX);
+			int horizontalBlobBorder= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_horizontal_blob_border(),iX);
+			int verticalBlobBorder= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_vertical_blob_border(),iX);
+			double horizontalExtraBorderCoefficient= GeneralConverters.argumentToReal(getBuiltInSlot_E_horizontal_extra_border_coefficient(),iX);
+			double verticalExtraBorderCoefficient= GeneralConverters.argumentToReal(getBuiltInSlot_E_vertical_extra_border_coefficient(),iX);
+			int minimalBlobIntersectionArea= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_blob_intersection_area(),iX);
+			int minimalBlobSize= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_blob_size(),iX);
+			int minimalTrackDuration= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_track_duration(),iX);
+			int maximalTrackDuration= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_track_duration(),iX);
 			NumericalValue maximalChronicleLength= NumericalValue.argumentToNumericalValue(getBuiltInSlot_E_maximal_chronicle_length(),iX);
-			int maximalBlobInvisibilityInterval= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_blob_invisibility_interval(),iX);
-			int maximalTrackRetentionInterval= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_track_retention_interval(),iX);
+			int maximalBlobInvisibilityInterval= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_blob_invisibility_interval(),iX);
+			int maximalTrackRetentionInterval= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_track_retention_interval(),iX);
 			Term matrixValue= getBuiltInSlot_E_inverse_transformation_matrix();
-			double[][] inverseMatrix= Converters.argumentToMatrix(matrixValue,iX);
+			double[][] inverseMatrix= GeneralConverters.argumentToMatrix(matrixValue,iX);
 			checkMatrix(inverseMatrix,matrixValue);
-			double samplingRate= Converters.argumentToReal(getBuiltInSlot_E_sampling_rate(),iX);
-			int r2WindowHalfwidth= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_r2_window_halfwidth(),iX);
+			double samplingRate= GeneralConverters.argumentToReal(getBuiltInSlot_E_sampling_rate(),iX);
+			int r2WindowHalfwidth= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_r2_window_halfwidth(),iX);
 			boolean applyCharacteristicLengthMedianFiltering= YesNo.termYesNo2Boolean(getBuiltInSlot_E_apply_median_filtering_to_characteristic_length(),iX);
-			int characteristicLengthMedianFilterHalfwidth= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_characteristic_length_median_filter_halfwidth(),iX);
+			int characteristicLengthMedianFilterHalfwidth= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_characteristic_length_median_filter_halfwidth(),iX);
 			boolean applyVelocityMedianFiltering= YesNo.termYesNo2Boolean(getBuiltInSlot_E_apply_median_filtering_to_velocity(),iX);
-			int velocityMedianFilterHalfwidth= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_velocity_median_filter_halfwidth(),iX);
-			int synthesizedImageTransparency= Converters.argumentToSmallRoundInteger(getBuiltInSlot_E_synthesized_image_transparency(),iX);
+			int velocityMedianFilterHalfwidth= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_velocity_median_filter_halfwidth(),iX);
+			int synthesizedImageTransparency= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_synthesized_image_transparency(),iX);
 			boolean makeRectangularBlobsInSynthesizedImage= YesNo.termYesNo2Boolean(getBuiltInSlot_E_make_rectangular_blobs_in_synthesized_image(),iX);
 			VPM machine= vpm.get();
 			if (machine != null) {
@@ -578,6 +632,18 @@ public abstract class VideoProcessingMachine
 		VPM machine= vpm.get();
 		if (machine != null) {
 			return machine.getCommittedRecentFrameNumber();
+		} else {
+			return -1;
+		}
+	}
+	//
+	public Term getFrameTimeOrSpacer(ChoisePoint iX) {
+		return new PrologInteger(getFrameTime(iX));
+	}
+	public long getFrameTime(ChoisePoint iX) {
+		VPM machine= vpm.get();
+		if (machine != null) {
+			return machine.getCommittedRecentFrameTime();
 		} else {
 			return -1;
 		}
@@ -649,7 +715,7 @@ public abstract class VideoProcessingMachine
 	///////////////////////////////////////////////////////////////
 	//
 	public void getBackgroundImage2s(ChoisePoint iX, Term a1, Term a2) {
-		int layerNumber= Converters.argumentToSmallRoundInteger(a2,iX);
+		int layerNumber= GeneralConverters.argumentToSmallRoundInteger(a2,iX);
 		getBackgroundImage(a1,layerNumber,iX);
 	}
 	public void getBackgroundImage(Term image, int layerNumber, ChoisePoint iX) {
@@ -668,7 +734,7 @@ public abstract class VideoProcessingMachine
 	}
 	//
 	public void getSigmaImage2s(ChoisePoint iX, Term a1, Term a2) {
-		int layerNumber= Converters.argumentToSmallRoundInteger(a2,iX);
+		int layerNumber= GeneralConverters.argumentToSmallRoundInteger(a2,iX);
 		getSigmaImage(a1,layerNumber,iX);
 	}
 	public void getSigmaImage(Term image, int layerNumber, ChoisePoint iX) {
@@ -696,7 +762,7 @@ public abstract class VideoProcessingMachine
 		VPM machine= vpm.get();
 		if (machine != null) {
 			Term blobs= machine.getCommittedBlobs();
-			return Converters.serializeArgument(blobs);
+			return GeneralConverters.serializeArgument(blobs);
 		} else {
 			return null;
 		}
@@ -710,7 +776,7 @@ public abstract class VideoProcessingMachine
 		VPM machine= vpm.get();
 		if (machine != null) {
 			Term tracks= machine.getCommittedTracks();
-			return Converters.serializeArgument(tracks);
+			return GeneralConverters.serializeArgument(tracks);
 		} else {
 			return null;
 		}
@@ -724,7 +790,7 @@ public abstract class VideoProcessingMachine
 		VPM machine= vpm.get();
 		if (machine != null) {
 			Term tracks= machine.getCommittedChronicle();
-			return Converters.serializeArgument(tracks);
+			return GeneralConverters.serializeArgument(tracks);
 		} else {
 			return null;
 		}
@@ -738,7 +804,7 @@ public abstract class VideoProcessingMachine
 		VPM machine= vpm.get();
 		if (machine != null) {
 			Term tracks= machine.getCommittedConnectedGraphs();
-			return Converters.serializeArgument(tracks);
+			return GeneralConverters.serializeArgument(tracks);
 		} else {
 			return null;
 		}
@@ -759,21 +825,21 @@ public abstract class VideoProcessingMachine
 	///////////////////////////////////////////////////////////////
 	//
 	public void imgGetSubimage4s(ChoisePoint iX, Term a1, Term a2, Term a3, Term a4) {
-		int x= Converters.argumentToSmallInteger(a1,iX);
-		int y= Converters.argumentToSmallInteger(a2,iX);
-		int width= Converters.argumentToSmallInteger(a3,iX);
-		int height= Converters.argumentToSmallInteger(a4,iX);
+		int x= GeneralConverters.argumentToSmallInteger(a1,iX);
+		int y= GeneralConverters.argumentToSmallInteger(a2,iX);
+		int width= GeneralConverters.argumentToSmallInteger(a3,iX);
+		int height= GeneralConverters.argumentToSmallInteger(a4,iX);
 		appendFrameCommand(new VPMimgGetSubimage(x,y,width,height));
 	}
 	//
 	public void imgResizeImage2s(ChoisePoint iX, Term a1, Term a2) {
-		int width= Converters.argumentToSmallInteger(a1,iX);
-		int height= Converters.argumentToSmallInteger(a2,iX);
+		int width= GeneralConverters.argumentToSmallInteger(a1,iX);
+		int height= GeneralConverters.argumentToSmallInteger(a2,iX);
 		appendFrameCommand(new VPMimgResizeImage(width,height));
 	}
 	//
 	public void imgApplyGaussianFilter1s(ChoisePoint iX, Term a1) {
-		int radius= Converters.argumentToSmallInteger(a1,iX);
+		int radius= GeneralConverters.argumentToSmallInteger(a1,iX);
 		appendFrameCommand(new VPMimgApplyGaussianFilter(radius));
 	}
 	//
@@ -782,6 +848,33 @@ public abstract class VideoProcessingMachine
 	}
 	//
 	///////////////////////////////////////////////////////////////
+	//
+	public void pxlAdjustContrast0s(ChoisePoint iX) {
+		double coefficient= getBrightnessHistogramTailCoefficient(iX);
+		appendFrameCommand(new VPMpxlAdjustContrast(coefficient));
+	}
+	public void pxlAdjustContrast1s(ChoisePoint iX, Term a1) {
+		double quantile= GeneralConverters.argumentToReal(a1,iX);
+		appendFrameCommand(new VPMpxlAdjustContrast(quantile));
+	}
+	public void pxlAdjustContrast2s(ChoisePoint iX, Term a1, Term a2) {
+		int minimalValue= GeneralConverters.argumentToSmallInteger(a1,iX);
+		int maximalValue= GeneralConverters.argumentToSmallInteger(a2,iX);
+		appendFrameCommand(new VPMpxlAdjustContrast(minimalValue,maximalValue));
+	}
+	//
+	public void pxlAdjustLevels0s(ChoisePoint iX) {
+		double coefficient= getColorHistogramTailCoefficient(iX);
+		appendFrameCommand(new VPMpxlAdjustLevels(coefficient));
+	}
+	public void pxlAdjustLevels1s(ChoisePoint iX, Term a1) {
+		double quantile= GeneralConverters.argumentToReal(a1,iX);
+		appendFrameCommand(new VPMpxlAdjustLevels(quantile));
+	}
+	//
+	public void pxlInvertColors0s(ChoisePoint iX) {
+		appendFrameCommand(new VPMpxlInvertColors());
+	}
 	//
 	public void pxlSelectImageChannel1s(ChoisePoint iX, Term a1) {
 		ImageChannelName channelName= ImageChannelName.argumentToImageChannelName(a1,iX);
@@ -794,18 +887,18 @@ public abstract class VideoProcessingMachine
 	}
 	//
 	public void pxlSmoothImage1s(ChoisePoint iX, Term a1) {
-		int halfwidth= Converters.argumentToSmallInteger(a1,iX);
+		int halfwidth= GeneralConverters.argumentToSmallInteger(a1,iX);
 		appendFrameCommand(new VPMpxlSmoothImage(halfwidth));
 	}
 	//
 	public void pxlNormalizePixels2s(ChoisePoint iX, Term a1, Term a2) {
-		int minimalValue= Converters.argumentToSmallInteger(a1,iX);
-		int maximalValue= Converters.argumentToSmallInteger(a2,iX);
+		int minimalValue= GeneralConverters.argumentToSmallInteger(a1,iX);
+		int maximalValue= GeneralConverters.argumentToSmallInteger(a2,iX);
 		appendFrameCommand(new VPMpxlNormalizePixels(minimalValue,maximalValue));
 	}
 	//
-	public void imgWithdrawPixelPreprocessing0s(ChoisePoint iX) {
-		appendFrameCommand(new VPMimgWithdrawPixelPreprocessing());
+	public void pxlWithdrawPixelPreprocessing0s(ChoisePoint iX) {
+		appendFrameCommand(new VPMpxlWithdrawPixelPreprocessing());
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -827,51 +920,51 @@ public abstract class VideoProcessingMachine
 	}
 	//
 	public void mskSelectForeground2s(ChoisePoint iX, Term a1, Term a2) {
-		int lowerBound= Converters.argumentToSmallInteger(a1,iX);
-		int upperBound= Converters.argumentToSmallInteger(a2,iX);
+		int lowerBound= GeneralConverters.argumentToSmallInteger(a1,iX);
+		int upperBound= GeneralConverters.argumentToSmallInteger(a2,iX);
 		appendFrameCommand(new VPMmskSelectForeground(null,lowerBound,upperBound));
 	}
 	public void mskSelectForeground3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
 		ImageChannelName channelName= ImageChannelName.argumentToImageChannelName(a1,iX);
-		int lowerBound= Converters.argumentToSmallInteger(a2,iX);
-		int upperBound= Converters.argumentToSmallInteger(a3,iX);
+		int lowerBound= GeneralConverters.argumentToSmallInteger(a2,iX);
+		int upperBound= GeneralConverters.argumentToSmallInteger(a3,iX);
 		appendFrameCommand(new VPMmskSelectForeground(channelName,lowerBound,upperBound));
 	}
 	//
 	public void mskAddForeground2s(ChoisePoint iX, Term a1, Term a2) {
-		int lowerBound= Converters.argumentToSmallInteger(a1,iX);
-		int upperBound= Converters.argumentToSmallInteger(a2,iX);
+		int lowerBound= GeneralConverters.argumentToSmallInteger(a1,iX);
+		int upperBound= GeneralConverters.argumentToSmallInteger(a2,iX);
 		appendFrameCommand(new VPMmskAddForeground(null,lowerBound,upperBound));
 	}
 	public void mskAddForeground3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
 		ImageChannelName channelName= ImageChannelName.argumentToImageChannelName(a1,iX);
-		int lowerBound= Converters.argumentToSmallInteger(a2,iX);
-		int upperBound= Converters.argumentToSmallInteger(a3,iX);
+		int lowerBound= GeneralConverters.argumentToSmallInteger(a2,iX);
+		int upperBound= GeneralConverters.argumentToSmallInteger(a3,iX);
 		appendFrameCommand(new VPMmskAddForeground(channelName,lowerBound,upperBound));
 	}
 	//
 	public void mskExcludeForeground3s(ChoisePoint iX, Term a1, Term a2) {
 		ImageChannelName channelName= ImageChannelName.argumentToImageChannelName(a1,iX);
-		int lowerBound= Converters.argumentToSmallInteger(a1,iX);
-		int upperBound= Converters.argumentToSmallInteger(a2,iX);
+		int lowerBound= GeneralConverters.argumentToSmallInteger(a1,iX);
+		int upperBound= GeneralConverters.argumentToSmallInteger(a2,iX);
 		appendFrameCommand(new VPMmskExcludeForeground(null,lowerBound,upperBound));
 	}
 	public void mskExcludeForeground3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
 		ImageChannelName channelName= ImageChannelName.argumentToImageChannelName(a1,iX);
-		int lowerBound= Converters.argumentToSmallInteger(a2,iX);
-		int upperBound= Converters.argumentToSmallInteger(a3,iX);
+		int lowerBound= GeneralConverters.argumentToSmallInteger(a2,iX);
+		int upperBound= GeneralConverters.argumentToSmallInteger(a3,iX);
 		appendFrameCommand(new VPMmskExcludeForeground(channelName,lowerBound,upperBound));
 	}
 	//
 	public void mskFlipForeground2s(ChoisePoint iX, Term a1, Term a2) {
-		int lowerBound= Converters.argumentToSmallInteger(a1,iX);
-		int upperBound= Converters.argumentToSmallInteger(a2,iX);
+		int lowerBound= GeneralConverters.argumentToSmallInteger(a1,iX);
+		int upperBound= GeneralConverters.argumentToSmallInteger(a2,iX);
 		appendFrameCommand(new VPMmskFlipForeground(null,lowerBound,upperBound));
 	}
 	public void mskFlipForeground3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
 		ImageChannelName channelName= ImageChannelName.argumentToImageChannelName(a1,iX);
-		int lowerBound= Converters.argumentToSmallInteger(a2,iX);
-		int upperBound= Converters.argumentToSmallInteger(a3,iX);
+		int lowerBound= GeneralConverters.argumentToSmallInteger(a2,iX);
+		int upperBound= GeneralConverters.argumentToSmallInteger(a3,iX);
 		appendFrameCommand(new VPMmskFlipForeground(channelName,lowerBound,upperBound));
 	}
 	//
@@ -900,42 +993,42 @@ public abstract class VideoProcessingMachine
 	}
 	//
 	public void mskSubtractGaussianBackground1s(ChoisePoint iX, Term a1) {
-		double varianceFactor= Converters.argumentToReal(a1,iX);
+		double varianceFactor= GeneralConverters.argumentToReal(a1,iX);
 		appendFrameCommand(new VPMmskSubtractGaussianBackground(varianceFactor,-1,-1));
 	}
 	public void mskSubtractGaussianBackground2s(ChoisePoint iX, Term a1, Term a2) {
-		double varianceFactor= Converters.argumentToReal(a1,iX);
-		int stabilityInterval= Converters.argumentToSmallInteger(a2,iX);
+		double varianceFactor= GeneralConverters.argumentToReal(a1,iX);
+		int stabilityInterval= GeneralConverters.argumentToSmallInteger(a2,iX);
 		appendFrameCommand(new VPMmskSubtractGaussianBackground(varianceFactor,stabilityInterval,-1));
 	}
 	public void mskSubtractGaussianBackground3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
-		double varianceFactor= Converters.argumentToReal(a1,iX);
-		int stabilityInterval= Converters.argumentToSmallInteger(a2,iX);
-		int reductionCoefficient= Converters.argumentToSmallInteger(a3,iX);
+		double varianceFactor= GeneralConverters.argumentToReal(a1,iX);
+		int stabilityInterval= GeneralConverters.argumentToSmallInteger(a2,iX);
+		int reductionCoefficient= GeneralConverters.argumentToSmallInteger(a3,iX);
 		appendFrameCommand(new VPMmskSubtractGaussianBackground(varianceFactor,stabilityInterval,reductionCoefficient));
 	}
 	//
 	public void mskSubtractNonparametricBackground2s(ChoisePoint iX, Term a1, Term a2) {
-		int numberOfBins= Converters.argumentToSmallInteger(a1,iX);
-		double alphaLevel= Converters.argumentToReal(a2,iX);
+		int numberOfBins= GeneralConverters.argumentToSmallInteger(a1,iX);
+		double alphaLevel= GeneralConverters.argumentToReal(a2,iX);
 		appendFrameCommand(new VPMmskSubtractNonparametricBackground(numberOfBins,alphaLevel,-1,-1));
 	}
 	public void mskSubtractNonparametricBackground3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
-		int numberOfBins= Converters.argumentToSmallInteger(a1,iX);
-		double alphaLevel= Converters.argumentToReal(a2,iX);
-		int stabilityInterval= Converters.argumentToSmallInteger(a3,iX);
+		int numberOfBins= GeneralConverters.argumentToSmallInteger(a1,iX);
+		double alphaLevel= GeneralConverters.argumentToReal(a2,iX);
+		int stabilityInterval= GeneralConverters.argumentToSmallInteger(a3,iX);
 		appendFrameCommand(new VPMmskSubtractNonparametricBackground(numberOfBins,alphaLevel,stabilityInterval,-1));
 	}
 	public void mskSubtractNonparametricBackground4s(ChoisePoint iX, Term a1, Term a2, Term a3, Term a4) {
-		int numberOfBins= Converters.argumentToSmallInteger(a1,iX);
-		double alphaLevel= Converters.argumentToReal(a2,iX);
-		int stabilityInterval= Converters.argumentToSmallInteger(a3,iX);
-		int reductionCoefficient= Converters.argumentToSmallInteger(a3,iX);
+		int numberOfBins= GeneralConverters.argumentToSmallInteger(a1,iX);
+		double alphaLevel= GeneralConverters.argumentToReal(a2,iX);
+		int stabilityInterval= GeneralConverters.argumentToSmallInteger(a3,iX);
+		int reductionCoefficient= GeneralConverters.argumentToSmallInteger(a3,iX);
 		appendFrameCommand(new VPMmskSubtractNonparametricBackground(numberOfBins,alphaLevel,stabilityInterval,reductionCoefficient));
 	}
 	//
 	public void mskApplyRankFilter1s(ChoisePoint iX, Term a1) {
-		int threshold= Converters.argumentToSmallInteger(a1,iX);
+		int threshold= GeneralConverters.argumentToSmallInteger(a1,iX);
 		appendFrameCommand(new VPMmskApplyRankFilter(threshold));
 	}
 	//
@@ -943,11 +1036,11 @@ public abstract class VideoProcessingMachine
 		appendFrameCommand(new VPMmskDilateForeground(1,DilationAlgorithm.PLAIN_DILATION));
 	}
 	public void mskDilateForeground1s(ChoisePoint iX, Term a1) {
-		int halfwidth= Converters.argumentToSmallInteger(a1,iX);
+		int halfwidth= GeneralConverters.argumentToSmallInteger(a1,iX);
 		appendFrameCommand(new VPMmskDilateForeground(halfwidth,DilationAlgorithm.PLAIN_DILATION));
 	}
 	public void mskDilateForeground2s(ChoisePoint iX, Term a1, Term a2) {
-		int halfwidth= Converters.argumentToSmallInteger(a1,iX);
+		int halfwidth= GeneralConverters.argumentToSmallInteger(a1,iX);
 		DilationAlgorithm algorithm= DilationAlgorithm.argumentToDilationAlgorithm(a2,iX);
 		appendFrameCommand(new VPMmskDilateForeground(halfwidth,algorithm));
 	}
@@ -956,11 +1049,11 @@ public abstract class VideoProcessingMachine
 		appendFrameCommand(new VPMmskErodeForeground(1,ErodingAlgorithm.PLAIN_ERODING));
 	}
 	public void mskErodeForeground1s(ChoisePoint iX, Term a1) {
-		int halfwidth= Converters.argumentToSmallInteger(a1,iX);
+		int halfwidth= GeneralConverters.argumentToSmallInteger(a1,iX);
 		appendFrameCommand(new VPMmskErodeForeground(halfwidth,ErodingAlgorithm.PLAIN_ERODING));
 	}
 	public void mskErodeForeground2s(ChoisePoint iX, Term a1, Term a2) {
-		int halfwidth= Converters.argumentToSmallInteger(a1,iX);
+		int halfwidth= GeneralConverters.argumentToSmallInteger(a1,iX);
 		ErodingAlgorithm algorithm= ErodingAlgorithm.argumentToErodingAlgorithm(a2,iX);
 		appendFrameCommand(new VPMmskErodeForeground(halfwidth,algorithm));
 	}
@@ -988,16 +1081,16 @@ public abstract class VideoProcessingMachine
 	}
 	//
 	public void blbSelectFrontBlobs1s(ChoisePoint iX, Term a1) {
-		int numberOfBlobs= Converters.argumentToSmallRoundInteger(a1,iX);
+		int numberOfBlobs= GeneralConverters.argumentToSmallRoundInteger(a1,iX);
 		appendFrameCommand(new VPMblbSelectFrontBlobs(numberOfBlobs));
 	}
 	public void blbSelectFrontBlobs2s(ChoisePoint iX, Term a1, Term a2) {
-		int numberOfBlobs= Converters.argumentToSmallRoundInteger(a1,iX);
+		int numberOfBlobs= GeneralConverters.argumentToSmallRoundInteger(a1,iX);
 		BlobSortingCriterion sortingCriterion= BlobSortingCriterion.argumentToBlobSortingCriterion(a2,iX);
 		appendFrameCommand(new VPMblbSelectFrontBlobs(numberOfBlobs,sortingCriterion,SortingMode.DEFAULT));
 	}
 	public void blbSelectFrontBlobs3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
-		int numberOfBlobs= Converters.argumentToSmallRoundInteger(a1,iX);
+		int numberOfBlobs= GeneralConverters.argumentToSmallRoundInteger(a1,iX);
 		BlobSortingCriterion sortingCriterion= BlobSortingCriterion.argumentToBlobSortingCriterion(a2,iX);
 		SortingMode sortingMode= SortingMode.argumentToSortingMode(a3,iX);
 		appendFrameCommand(new VPMblbSelectFrontBlobs(numberOfBlobs,sortingCriterion,sortingMode));
@@ -1021,7 +1114,7 @@ public abstract class VideoProcessingMachine
 		appendFrameCommand(new VPMblbComputeColorHistograms(-1));
 	}
 	public void blbComputeColorHistograms1s(ChoisePoint iX, Term a1) {
-		int numberOfBins= Converters.argumentToSmallRoundInteger(a1,iX);
+		int numberOfBins= GeneralConverters.argumentToSmallRoundInteger(a1,iX);
 		appendFrameCommand(new VPMblbComputeColorHistograms(numberOfBins));
 	}
 	//
@@ -1030,33 +1123,33 @@ public abstract class VideoProcessingMachine
 	}
 	//
 	public void blbSetBlobBorders2s(ChoisePoint iX, Term a1, Term a2) {
-		int borderX= Converters.argumentToSmallRoundInteger(a1,iX);
-		int borderY= Converters.argumentToSmallRoundInteger(a2,iX);
+		int borderX= GeneralConverters.argumentToSmallRoundInteger(a1,iX);
+		int borderY= GeneralConverters.argumentToSmallRoundInteger(a2,iX);
 		appendFrameCommand(new VPMblbSetBlobBorders(borderX,borderY));
 	}
 	public void blbSetExtraBorderCoefficients2s(ChoisePoint iX, Term a1, Term a2) {
-		double coefX= Converters.argumentToReal(a1,iX);
-		double coefY= Converters.argumentToReal(a2,iX);
+		double coefX= GeneralConverters.argumentToReal(a1,iX);
+		double coefY= GeneralConverters.argumentToReal(a2,iX);
 		appendFrameCommand(new VPMblbSetExtraBorderCoefficients(coefX,coefY));
 	}
 	public void blbSetMinimalBlobIntersectionArea1s(ChoisePoint iX, Term a1) {
-		int area= Converters.argumentToSmallRoundInteger(a1,iX);
+		int area= GeneralConverters.argumentToSmallRoundInteger(a1,iX);
 		appendFrameCommand(new VPMblbSetMinimalBlobIntersectionArea(area));
 	}
 	public void blbSetMinimalBlobSize1s(ChoisePoint iX, Term a1) {
-		int size= Converters.argumentToSmallRoundInteger(a1,iX);
+		int size= GeneralConverters.argumentToSmallRoundInteger(a1,iX);
 		appendFrameCommand(new VPMblbSetMinimalBlobSize(size));
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
 	public void trkSelectFrontTracks2s(ChoisePoint iX, Term a1, Term a2) {
-		int numberOfTracks= Converters.argumentToSmallRoundInteger(a1,iX);
+		int numberOfTracks= GeneralConverters.argumentToSmallRoundInteger(a1,iX);
 		TrackSortingCriterion sortingCriterion= TrackSortingCriterion.argumentToTrackSortingCriterion(a2,iX);
 		appendSnapshotCommand(new VPMtrkSelectFrontTracks(numberOfTracks,sortingCriterion,SortingMode.DEFAULT));
 	}
 	public void trkSelectFrontTracks3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
-		int numberOfTracks= Converters.argumentToSmallRoundInteger(a1,iX);
+		int numberOfTracks= GeneralConverters.argumentToSmallRoundInteger(a1,iX);
 		TrackSortingCriterion sortingCriterion= TrackSortingCriterion.argumentToTrackSortingCriterion(a2,iX);
 		SortingMode sortingMode= SortingMode.argumentToSortingMode(a3,iX);
 		appendSnapshotCommand(new VPMtrkSelectFrontTracks(numberOfTracks,sortingCriterion,sortingMode));
@@ -1073,9 +1166,9 @@ public abstract class VideoProcessingMachine
 	}
 	//
 	public void trkRefuseSlowTracks3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
-		double velocityThreshold= Converters.argumentToReal(a1,iX);
-		double distanceThreshold= Converters.argumentToReal(a2,iX);
-		double fuzzyThresholdBorder= Converters.argumentToReal(a3,iX);
+		double velocityThreshold= GeneralConverters.argumentToReal(a1,iX);
+		double distanceThreshold= GeneralConverters.argumentToReal(a2,iX);
+		double fuzzyThresholdBorder= GeneralConverters.argumentToReal(a3,iX);
 		appendSnapshotCommand(new VPMtrkRefuseSlowTracks(velocityThreshold,distanceThreshold,fuzzyThresholdBorder));
 	}
 	//

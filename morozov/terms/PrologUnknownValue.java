@@ -9,6 +9,7 @@ import morozov.worlds.*;
 import java.nio.charset.CharsetEncoder;
 
 public final class PrologUnknownValue extends Term {
+	//
 	public static final PrologUnknownValue instance= new PrologUnknownValue();
 	//
 	private PrologUnknownValue() {

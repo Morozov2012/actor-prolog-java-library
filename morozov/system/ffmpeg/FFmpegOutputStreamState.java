@@ -7,7 +7,6 @@ import static org.bytedeco.javacpp.avutil.*;
 import static org.bytedeco.javacpp.avcodec.*;
 import static org.bytedeco.javacpp.swscale.*;
 import static org.bytedeco.javacpp.swresample.*;
-// import org.bytedeco.javacpp.*;
 
 // A wrapper around a single output AVStream:
 

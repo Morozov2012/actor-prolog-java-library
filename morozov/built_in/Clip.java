@@ -3,7 +3,7 @@
 package morozov.built_in;
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.files.*;
 import morozov.system.files.errors.*;
 import morozov.terms.*;
@@ -29,18 +29,18 @@ public abstract class Clip extends DataAbstraction {
 		super(id);
 	}
 	//
-	// abstract protected Term getBuiltInSlot_E_name();
-	// abstract protected Term getBuiltInSlot_E_extension();
-	// abstract protected Term getBuiltInSlot_E_maximal_waiting_time();
-	// abstract protected Term getBuiltInSlot_E_backslash_always_is_separator();
+	// abstract public Term getBuiltInSlot_E_name();
+	// abstract public Term getBuiltInSlot_E_extension();
+	// abstract public Term getBuiltInSlot_E_maximal_waiting_time();
+	// abstract public Term getBuiltInSlot_E_backslash_always_is_separator();
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void closeFiles() {
+	public void releaseSystemResources() {
 		if (commonClip != null) {
 			commonClip.close();
 		};
-		super.closeFiles();
+		super.releaseSystemResources();
 	}
 	//
 	public void open0s(ChoisePoint iX) {
@@ -77,7 +77,7 @@ public abstract class Clip extends DataAbstraction {
 	}
 	//
 	public void loop1s(ChoisePoint iX, Term value) {
-		BigInteger number= Converters.argumentToRoundInteger(value,iX);
+		BigInteger number= GeneralConverters.argumentToRoundInteger(value,iX);
 		int count= PrologInteger.toInteger(number);
 		if (count < 0) {
 			count= javax.sound.sampled.Clip.LOOP_CONTINUOUSLY;
@@ -211,7 +211,7 @@ public abstract class Clip extends DataAbstraction {
 	}
 	//
 	public void setFramePosition1s(ChoisePoint iX, Term value) {
-		BigInteger number= Converters.argumentToRoundInteger(value,iX);
+		BigInteger number= GeneralConverters.argumentToRoundInteger(value,iX);
 		int frames= PrologInteger.toInteger(number);
 		if (commonClip != null) {
 			commonClip.setFramePosition(frames);
@@ -221,7 +221,7 @@ public abstract class Clip extends DataAbstraction {
 	}
 	//
 	public void setMicrosecondPosition1s(ChoisePoint iX, Term value) {
-		BigInteger number= Converters.argumentToRoundInteger(value,iX);
+		BigInteger number= GeneralConverters.argumentToRoundInteger(value,iX);
 		long microseconds= PrologInteger.toLong(number);
 		if (commonClip != null) {
 			commonClip.setMicrosecondPosition(microseconds);
@@ -231,8 +231,8 @@ public abstract class Clip extends DataAbstraction {
 	}
 	//
 	public void setLoopPoints2s(ChoisePoint iX, Term a1, Term a2) {
-		BigInteger number1= Converters.argumentToRoundInteger(a1,iX);
-		BigInteger number2= Converters.argumentToRoundInteger(a2,iX);
+		BigInteger number1= GeneralConverters.argumentToRoundInteger(a1,iX);
+		BigInteger number2= GeneralConverters.argumentToRoundInteger(a2,iX);
 		int start= PrologInteger.toInteger(number1);
 		int end= PrologInteger.toInteger(number2);
 		if (commonClip != null) {

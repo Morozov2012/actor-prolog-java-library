@@ -8,6 +8,7 @@ import morozov.built_in.*;
 import morozov.domains.*;
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.datum.errors.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
@@ -54,7 +55,7 @@ public class DatabasePlace {
 						store= store.dereferenceValue(iX);
 						if (store instanceof DataStore) {
 							DataStore dataStore= (DataStore)store;
-							String entry= Converters.argumentToString(arguments[1],iX);
+							String entry= GeneralConverters.argumentToString(arguments[1],iX);
 							return new DatabasePlace(dataStore,entry,domain,type,reuseKN);
 						} else {
 							throw new WrongArgumentIsNotDataStore(value);

@@ -12,7 +12,7 @@ import org.bytedeco.javacpp.*;
 
 import morozov.system.ffmpeg.converters.*;
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.ffmpeg.errors.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
@@ -20,7 +20,6 @@ import morozov.terms.signals.*;
 import java.awt.Graphics2D;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
-import java.nio.ByteOrder;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -33,11 +32,13 @@ public class FFmpegTools {
 	//
 	public static Object codecOpeningGuard= new Object();
 	//
+	protected static int maximumAllowedNumeratorAndDenominator= (1 << 16) - 1;
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public static void initializeFFmpegIfNecessary() {
 		if (!theFFmpegLibraryIsInitialized.get()) {
-			synchronized(theFFmpegLibraryIsInitialized) {
+			synchronized (theFFmpegLibraryIsInitialized) {
 				if (!theFFmpegLibraryIsInitialized.get()) {
 					synchronized (codecOpeningGuard) {
 						// Initialize libavformat and register all the muxers,
@@ -183,7 +184,7 @@ if (id <= 0) {
 				};
 				index1++;
 			};
-			return Converters.arrayListToTerm(tagArray);
+			return GeneralConverters.arrayListToTerm(tagArray);
 		} else {
 			return PrologEmptyList.instance;
 		}
@@ -313,14 +314,15 @@ return result;
 	//
 	@SuppressWarnings("deprecation")
 	public static String retrieveCodecInformation(AVStream stream) {
-		AVCodecParameters codecParameters= stream.codecpar();
-		AVCodecContext codecContext= new AVCodecContext();
-		avcodec_parameters_to_context(codecContext,codecParameters);
-		codecContext.properties(stream.codec().properties());
-		codecContext.qmin(stream.codec().qmin());
-		codecContext.qmax(stream.codec().qmax());
-		codecContext.coded_width(stream.codec().coded_width());
-		codecContext.coded_height(stream.codec().coded_height());
+		// AVCodecParameters codecParameters= stream.codecpar();
+		// AVCodecContext codecContext= new AVCodecContext();
+		AVCodecContext codecContext= stream.codec();
+		// avcodec_parameters_to_context(codecContext,codecParameters);
+		// codecContext.properties(stream.codec().properties());
+		// codecContext.qmin(stream.codec().qmin());
+		// codecContext.qmax(stream.codec().qmax());
+		// codecContext.coded_width(stream.codec().coded_width());
+		// codecContext.coded_height(stream.codec().coded_height());
 		int bufferSize= 256*4;
 		byte[] buffer= new byte[bufferSize];
 		for (int k=0; k < bufferSize; k++) {
@@ -359,14 +361,30 @@ return result;
 	public static AVRational argumentToAVRational(Term value, ChoisePoint iX) {
 		try {
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_q,2,iX);
-			int givenNumerator= Converters.argumentToSmallInteger(arguments[0],iX);
-			int givenDenominator= Converters.argumentToSmallInteger(arguments[1],iX);
+			int givenNumerator= GeneralConverters.argumentToSmallInteger(arguments[0],iX);
+			int givenDenominator= GeneralConverters.argumentToSmallInteger(arguments[1],iX);
 			AVRational rational= new AVRational();
 			rational.num(givenNumerator);
 			rational.den(givenDenominator);
 			return rational;
-		} catch (Backtracking b) {
-			throw new WrongArgumentIsNotAVRational(value);
+		} catch (Backtracking b1) {
+			try {
+				double doubleValue= value.getRealValue(iX);
+				// av_d2q:
+				// Convert a double precision floating point
+				// number to a rational.
+				// In case of infinity, the returned value
+				// is expressed as {@code {1, 0}} or
+				// {@code {-1, 0}} depending on the sign.
+				// @param d {@code double} to convert
+				// @param max Maximum allowed numerator and
+				// denominator
+				// @return {@code d} in AVRational form
+				AVRational rational= av_d2q(doubleValue,maximumAllowedNumeratorAndDenominator);
+				return rational;
+			} catch (TermIsNotAReal e2) {
+				throw new WrongArgumentIsNotAVRational(value);
+			}
 		}
 	}
 	//
@@ -378,8 +396,8 @@ return result;
 		return time * base.den() / base.num() / 1000;
 	}
 	//
-	public static long computeTimeOfFrameInMilliseconds(long numberOfFrames, AVRational frameRate) {
-		return (long)(numberOfFrames * 1000.0 * frameRate.den() / frameRate.num());
+	public static long computeTimeOfFrameInMilliseconds(long numberOfFrames, AVRational base) {
+		return (long)(numberOfFrames * 1000.0 * base.den() / base.num());
 	}
 	//
 	///////////////////////////////////////////////////////////////

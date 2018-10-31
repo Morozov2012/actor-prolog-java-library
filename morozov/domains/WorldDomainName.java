@@ -12,6 +12,7 @@ import java.io.ObjectInputStream;
 import java.io.IOException;
 
 public class WorldDomainName extends PrologDomainName {
+	//
 	protected long unit;
 	//
 	public WorldDomainName(long u) {

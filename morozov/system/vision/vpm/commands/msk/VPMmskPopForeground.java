@@ -6,8 +6,6 @@ import morozov.system.vision.vpm.*;
 import morozov.system.vision.vpm.commands.*;
 import morozov.system.vision.vpm.converters.*;
 
-import java.util.Arrays;
-
 public class VPMmskPopForeground extends VPM_FrameCommand {
 	//
 	PopOperationMode mode;

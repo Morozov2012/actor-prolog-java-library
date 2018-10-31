@@ -62,19 +62,19 @@ public abstract class Report extends Text {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	// abstract protected Term getBuiltInSlot_E_title();
-	// abstract protected Term getBuiltInSlot_E_text_color();
-	// abstract protected Term getBuiltInSlot_E_space_color();
-	// abstract protected Term getBuiltInSlot_E_font_name();
-	// abstract protected Term getBuiltInSlot_E_font_size();
-	// abstract protected Term getBuiltInSlot_E_font_style();
-	// abstract protected Term getBuiltInSlot_E_x();
-	// abstract protected Term getBuiltInSlot_E_y();
-	// abstract protected Term getBuiltInSlot_E_width();
-	// abstract protected Term getBuiltInSlot_E_height();
-	// abstract protected Term getBuiltInSlot_E_background_color();
-	abstract protected Term getBuiltInSlot_E_maximal_line_number();
-	abstract protected Term getBuiltInSlot_E_area_type();
+	// abstract public Term getBuiltInSlot_E_title();
+	// abstract public Term getBuiltInSlot_E_text_color();
+	// abstract public Term getBuiltInSlot_E_space_color();
+	// abstract public Term getBuiltInSlot_E_font_name();
+	// abstract public Term getBuiltInSlot_E_font_size();
+	// abstract public Term getBuiltInSlot_E_font_style();
+	// abstract public Term getBuiltInSlot_E_x();
+	// abstract public Term getBuiltInSlot_E_y();
+	// abstract public Term getBuiltInSlot_E_width();
+	// abstract public Term getBuiltInSlot_E_height();
+	// abstract public Term getBuiltInSlot_E_background_color();
+	abstract public Term getBuiltInSlot_E_maximal_line_number();
+	abstract public Term getBuiltInSlot_E_area_type();
 	//
 	abstract public long entry_s_Action_1_i();
 	// abstract public long entry_s_Initialize_0();
@@ -184,7 +184,7 @@ public abstract class Report extends Text {
 			color= getDefaultBackgroundColor();
 		};
 		updateRootTextStyleBackground(color);
-		synchronized(this) {
+		synchronized (this) {
 			if (canvasSpace != null) {
 				// ReportUtils.safelySetBackground(color,canvasSpace.panel);
 				canvasSpace.safelySetBackground(color);
@@ -223,7 +223,7 @@ public abstract class Report extends Text {
 			}
 		};
 		updateRootTextStyleUnderline(isUnderlined);
-		synchronized(this) {
+		synchronized (this) {
 			if (canvasSpace != null) {
 				((ExtendedReportSpace)canvasSpace).setPanelFont(name,style,size,true);
 			}
@@ -232,7 +232,7 @@ public abstract class Report extends Text {
 	public void changeFontSize(ChoisePoint iX) {
 		// createGraphicWindowIfNecessary(iX,false);
 		int size= computeFontSize(iX);
-		synchronized(this) {
+		synchronized (this) {
 			if (canvasSpace != null) {
 				((ExtendedReportSpace)canvasSpace).setPanelFontSize(size,true);
 			}
@@ -243,7 +243,7 @@ public abstract class Report extends Text {
 		try {
 			size= getFontSize(iX).getValue();
 		} catch (UseDefaultFontSize e1) {
-			synchronized(this) {
+			synchronized (this) {
 				if (graphicWindow != null) {
 					try {
 						Term sizeOfFont= DefaultOptions.textFontSize;
@@ -263,7 +263,7 @@ public abstract class Report extends Text {
 	//
 	public void clear0s(ChoisePoint iX) {
 		createGraphicWindowIfNecessary(iX,false);
-		synchronized(this) {
+		synchronized (this) {
 			Document doc= ((ReportSpaceAttributes)spaceAttributes).getStyledDocument();
 			if (doc != null) {
 				safelySetText("",doc);
@@ -274,7 +274,7 @@ public abstract class Report extends Text {
 	public void setString1s(ChoisePoint iX, Term text) {
 		createGraphicWindowIfNecessary(iX,false);
 		String buffer= text.toString(iX);
-		synchronized(this) {
+		synchronized (this) {
 			Document doc= ((ReportSpaceAttributes)spaceAttributes).getStyledDocument();
 			if (doc != null) {
 				safelySetText(buffer,doc);
@@ -283,7 +283,7 @@ public abstract class Report extends Text {
 	}
 	//
 	public void getString0ff(ChoisePoint iX, PrologVariable result) {
-		synchronized(this) {
+		synchronized (this) {
 			String content;
 			Document doc= ((ReportSpaceAttributes)spaceAttributes).getStyledDocument();
 			if (doc != null) {
@@ -436,7 +436,7 @@ public abstract class Report extends Text {
 			colorOfSpace= getDefaultBackgroundColor();
 			useSpaceColor= false;
 		};
-		synchronized(this) {
+		synchronized (this) {
 			Document doc= ((ReportSpaceAttributes)spaceAttributes).getStyledDocument();
 			if (doc != null) {
 				boolean scrollPageToTheEndPosition= true;
@@ -455,7 +455,7 @@ public abstract class Report extends Text {
 					safelyRemoveSuperfluousLines(maximalLineNumber,doc);
 				} catch (UseWindowHeight e) {
 					if (canvasSpace != null) {
-						synchronized(canvasSpace) {
+						synchronized (canvasSpace) {
 							Boolean isSucceded= new Boolean(false);
 							((ExtendedReportSpace)canvasSpace).safelyRemoveSuperfluousLines(doc,isSucceded);
 							if (isSucceded) {
@@ -611,14 +611,14 @@ public abstract class Report extends Text {
 	///////////////////////////////////////////////////////////////
 	//
 	public void updateRootTextStyleUnderline(boolean isUnderlined) {
-		synchronized(this) {
+		synchronized (this) {
 			MutableAttributeSet style= rootTextStyle.get();
 			StyleConstants.setUnderline(style,isUnderlined);
 			rootTextStyle.set(style);
 		}
 	}
 	public void updateRootTextStyleBackground(Color color) {
-		synchronized(this) {
+		synchronized (this) {
 			MutableAttributeSet style= rootTextStyle.get();
 			StyleConstants.setBackground(style,color);
 			rootTextStyle.set(style);
@@ -626,7 +626,7 @@ public abstract class Report extends Text {
 	}
 	//
 	public MutableAttributeSet getOpaqueTextStyle(Color t, Color s) {
-		synchronized(this) {
+		synchronized (this) {
 			MutableAttributeSet textStyle= new SimpleAttributeSet();
 			textStyle.setResolveParent(rootTextStyle.get());
 			StyleConstants.setForeground(textStyle,t);
@@ -636,7 +636,7 @@ public abstract class Report extends Text {
 	}
 	//
 	public MutableAttributeSet getTransparentTextStyle(Color t) {
-		synchronized(this) {
+		synchronized (this) {
 			MutableAttributeSet textStyle= transparentTextStyles.get(t);
 			if (textStyle==null) {
 				textStyle= new SimpleAttributeSet();

@@ -16,7 +16,6 @@ import morozov.built_in.*;
 import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.reports.*;
-import morozov.system.signals.*;
 import morozov.terms.*;
 
 import java.awt.Dimension;
@@ -81,7 +80,7 @@ public class ReportControl extends CustomControlComponent {
 	}
 	protected void quicklyInitiateControlSize() {
 		Font dialogFont= targetDialog.quicklyGetFont();
-		Dimension dimension= LayoutUtils.computeDimension(dialogFont,space.getControl(),width,height);
+		Dimension dimension= LayoutUtils.computeDimension(dialogFont,space.getControl(),refinedWidth,refinedHeight);
 		space.getControl().setMinimumSize(dimension);
 		space.getControl().setPreferredSize(dimension);
 	}

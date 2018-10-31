@@ -2,7 +2,6 @@
 
 package morozov.system.vision.vpm.commands;
 
-import morozov.system.vision.vpm.*;
-
 public abstract class VPM_Command {
+	protected static final int maximalColor= 255;
 }

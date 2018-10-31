@@ -4,8 +4,8 @@ package morozov.built_in;
 
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.space2d.*;
-import morozov.system.vision.plain.*;
 import morozov.system.vision.plain.errors.*;
 import morozov.system.vision.vpm.*;
 import morozov.terms.*;
@@ -83,7 +83,7 @@ public abstract class SynchronizedImageSubtractor
 	//
 	protected void subtract(Term frame, Term image, boolean takeFrameIntoAccount, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
-		long frameNumber= PrologInteger.toLong(Converters.argumentToRoundInteger(frame,iX));
+		long frameNumber= PrologInteger.toLong(GeneralConverters.argumentToRoundInteger(frame,iX));
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(image,iX);
 		GenericImageEncodingAttributes attributes= getCurrentImageEncodingAttributes();
 		process(nativeImage,frameNumber,-1,takeFrameIntoAccount,iX,attributes);
@@ -143,6 +143,15 @@ public abstract class SynchronizedImageSubtractor
 	public Term getFrameNumberOrSpacer(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.getFrameNumberOrSpacer(iX);
+	}
+	//
+	public long getFrameTime(ChoisePoint iX) {
+		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
+		return subtractor.getFrameTime(iX);
+	}
+	public Term getFrameTimeOrSpacer(ChoisePoint iX) {
+		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
+		return subtractor.getFrameTimeOrSpacer(iX);
 	}
 	//
 	///////////////////////////////////////////////////////////////

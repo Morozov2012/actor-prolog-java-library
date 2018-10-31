@@ -10,6 +10,7 @@ import java.nio.charset.CharsetEncoder;
 import java.math.BigInteger;
 
 public final class PrologEmptyList extends Term {
+	//
 	public static final PrologEmptyList instance= new PrologEmptyList();
 	//
 	private PrologEmptyList() {
@@ -81,6 +82,8 @@ public final class PrologEmptyList extends Term {
 	}
 	public void compareWithString(String a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 	}
+	public void compareWithBinary(byte[] a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+	}
 	public void compareWithDate(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 	}
 	public void compareTermWith(Term a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
@@ -92,6 +95,8 @@ public final class PrologEmptyList extends Term {
 	public void compareDoubleWith(double a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 	}
 	public void compareStringWith(String a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+	}
+	public void compareBinaryWith(byte[] a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 	}
 	public void compareDateWith(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 	}
@@ -113,6 +118,9 @@ public final class PrologEmptyList extends Term {
 	public Term reactWithString(String a, ChoisePoint iX, BinaryOperation op) {
 		return instance;
 	}
+	public Term reactWithBinary(byte[] a, ChoisePoint iX, BinaryOperation op) {
+		return instance;
+	}
 	public Term reactWithDate(long a, ChoisePoint iX, BinaryOperation op) {
 		return instance;
 	}
@@ -129,6 +137,9 @@ public final class PrologEmptyList extends Term {
 		return instance;
 	}
 	public Term reactStringWith(String a, ChoisePoint iX, BinaryOperation op) {
+		return instance;
+	}
+	public Term reactBinaryWith(byte[] a, ChoisePoint iX, BinaryOperation op) {
 		return instance;
 	}
 	public Term reactDateWith(long a, ChoisePoint iX, BinaryOperation op) {

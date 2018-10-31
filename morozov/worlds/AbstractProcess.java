@@ -49,7 +49,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 	public void startProcesses() {
 		start();
 	}
-	public void closeFiles() {
+	public void releaseSystemResources() {
 	}
 	public void stopProcesses() {
 		stop();
@@ -217,7 +217,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 	}
 	//
 	public void sendResidentRequest(AbstractWorld target, Resident resident, long domainSignature, Term[] arguments, boolean sortAndReduceResultList) {
-		synchronized(inputResidentRequests) {
+		synchronized (inputResidentRequests) {
 			boolean addNewRequest= true;
 			Iterator<ResidentRequest> inputResidentRequestIterator= inputResidentRequests.iterator();
 			while (inputResidentRequestIterator.hasNext()) {
@@ -273,7 +273,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 	}
 	//
 	public void withdrawRequest(AbstractWorld target, Resident resident) {
-		synchronized(inputResidentRequests) {
+		synchronized (inputResidentRequests) {
 			forgetRequest(target,resident);
 		}
 	}
@@ -299,7 +299,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 	}
 	//
 	protected void resetResidentOwners() {
-		synchronized(inputResidentRequests) {
+		synchronized (inputResidentRequests) {
 			inputResidentRequests.addAll(processedResidentRequests);
 			processedResidentRequests.clear();
 			Iterator<ResidentRequest> inputResidentRequestIterator= inputResidentRequests.iterator();
@@ -311,7 +311,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 	}
 	//
 	public void sendStateRequest(ProcessStateListener listener, String identifier) {
-		synchronized(stateRequests) {
+		synchronized (stateRequests) {
 			stateRequests.add(new ProcessStateRequest(listener,identifier));
 		};
 		enableStateSending();
@@ -322,14 +322,13 @@ public abstract class AbstractProcess extends ActiveWorld {
 	//
 	public void receiveAsyncCall(AsyncCall newItem) {
 		if (newItem.isControlCall) {
-			synchronized(inputControlDirectMessages) {
+			synchronized (inputControlDirectMessages) {
 				if (newItem.useBuffer) {
 					inputControlDirectMessages.add(newItem);
 				} else {
 					if (inputControlDirectMessagesHash.contains(newItem)) {
 						int index= inputControlDirectMessages.indexOf(newItem);
 						inputControlDirectMessages.set(index,newItem);
-						// return;
 					} else {
 						inputControlDirectMessages.add(newItem);
 						inputControlDirectMessagesHash.add(newItem);
@@ -337,14 +336,13 @@ public abstract class AbstractProcess extends ActiveWorld {
 				}
 			}
 		} else {
-			synchronized(inputInformationDirectMessages) {
+			synchronized (inputInformationDirectMessages) {
 				if (newItem.useBuffer) {
 					inputInformationDirectMessages.add(newItem);
 				} else {
 					if (inputInformationDirectMessagesHash.contains(newItem)) {
 						int index= inputInformationDirectMessages.indexOf(newItem);
 						inputInformationDirectMessages.set(index,newItem);
-						// return;
 					} else {
 						inputInformationDirectMessages.add(newItem);
 						inputInformationDirectMessagesHash.add(newItem);
@@ -352,20 +350,23 @@ public abstract class AbstractProcess extends ActiveWorld {
 				}
 			}
 		};
+		if (debugThisProcess()) {
+			System.out.printf("%s: === wakeUp(); ===\n",this);
+		};
 		wakeUp();
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
 	public void receiveTimerMessage(AbstractInternalWorld target) {
-		synchronized(timerMessages) {
+		synchronized (timerMessages) {
 			timerMessages.add(target);
 		};
 		wakeUp();
 	}
 	//
 	public void cancelTimerMessage(AbstractInternalWorld target) {
-		synchronized(timerMessages) {
+		synchronized (timerMessages) {
 			timerMessages.remove(target);
 		}
 	}
@@ -373,19 +374,22 @@ public abstract class AbstractProcess extends ActiveWorld {
 	///////////////////////////////////////////////////////////////
 	//
 	public void acceptDirectMessage() {
+		if (debugThisProcess()) {
+			System.out.printf("%s: === acceptDirectMessage() ===\n",this);
+		};
 		boolean hasControlDirectMessage= false;
 		boolean hasResidentRequest= false;
 		boolean hasInformationDirectMessage= false;
 		AsyncCall directMessage= null;
 		ResidentRequest residentRequest= null;
-		synchronized(inputControlDirectMessages) {
+		synchronized (inputControlDirectMessages) {
 			if (inputControlDirectMessages.size() > 0) {
 				hasControlDirectMessage= true;
 				directMessage= inputControlDirectMessages.get(0);
 			}
 		};
 		if (!hasControlDirectMessage && isProven) {
-			synchronized(inputResidentRequests) {
+			synchronized (inputResidentRequests) {
 				if (inputResidentRequests.size() > 0) {
 					hasResidentRequest= true;
 					residentRequest= inputResidentRequests.get(0);
@@ -393,7 +397,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 			}
 		};
 		if (!hasControlDirectMessage && !hasResidentRequest && isProven) {
-			synchronized(inputInformationDirectMessages) {
+			synchronized (inputInformationDirectMessages) {
 				if (inputInformationDirectMessages.size() > 0) {
 					hasInformationDirectMessage= true;
 					directMessage= inputInformationDirectMessages.get(0);
@@ -431,7 +435,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 				};
 				boolean recentState= isProven;
 				isProven= false;
-				synchronized(inputControlDirectMessages) {
+				synchronized (inputControlDirectMessages) {
 					if (inputControlDirectMessages.contains(directMessage)) {
 						inputControlDirectMessages.remove(directMessage);
 						if (!directMessage.useBuffer) {
@@ -459,15 +463,6 @@ public abstract class AbstractProcess extends ActiveWorld {
 							rootCP);
 					}
 				} finally {
-					// synchronized(inputControlDirectMessages) {
-						// if (inputControlDirectMessages.contains(directMessage)) {
-						//	inputControlDirectMessages.remove(directMessage);
-						//	if (!directMessage.useBuffer) {
-						//		inputControlDirectMessagesHash.remove(directMessage);
-						//	}
-						// };
-						// wakeUp();
-					// };
 					if (!isProven) {
 						if (recentState) {
 							unsuccessfullyFinishPhase();
@@ -576,9 +571,8 @@ public abstract class AbstractProcess extends ActiveWorld {
 						resultList= new PrologList(currentResult,resultList);
 					};
 					residentRequest.resident.returnResultList(residentRequest.target,resultList);
-					//withdrawRequest(residentRequest.resident);
 				} finally {
-					synchronized(inputResidentRequests) {
+					synchronized (inputResidentRequests) {
 						if (inputResidentRequests.contains(residentRequest)) {
 							inputResidentRequests.remove(residentRequest);
 							processedResidentRequests.add(residentRequest);
@@ -627,7 +621,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 						directMessage.arguments,
 						rootCP);
 				} finally {
-					synchronized(inputInformationDirectMessages) {
+					synchronized (inputInformationDirectMessages) {
 						if (inputInformationDirectMessages.contains(directMessage)) {
 							inputInformationDirectMessages.remove(directMessage);
 							if (!directMessage.useBuffer) {
@@ -653,7 +647,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 		AbstractInternalWorld targetWorld= null;
 		Iterator<AbstractInternalWorld> iterator= null;
 		boolean flowMessageIsToBeProcessed= false;
-		synchronized(timerMessages) {
+		synchronized (timerMessages) {
 			if (timerMessages.size() > 0) {
 				boolean processWasSuspended= isSuspended;
 				if (isToBeSuspended()) {
@@ -707,7 +701,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 					new Term[0],
 					rootCP);
 			} finally {
-				synchronized(timerMessages) {
+				synchronized (timerMessages) {
 					if (timerMessages.size() > 0) {
 						wakeUp();
 					}
@@ -793,7 +787,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 		if (!stateIsToBeSend.compareAndSet(true,false)) {
 			return;
 		};
-		synchronized(stateRequests) {
+		synchronized (stateRequests) {
 			Iterator<ProcessStateRequest> iterator= stateRequests.iterator();
 			while (iterator.hasNext()) {
 				ProcessStateRequest request= iterator.next();
@@ -1016,7 +1010,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 		isProven= true;
 		processWasProvedOneTimeAtLeast= true;
 		wakeUp();
-		synchronized(inputResidentRequests) {
+		synchronized (inputResidentRequests) {
 			inputResidentRequests.addAll(processedResidentRequests);
 			processedResidentRequests.clear();
 		};

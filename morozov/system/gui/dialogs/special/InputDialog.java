@@ -6,7 +6,7 @@
 
 package morozov.system.gui.dialogs.special;
 
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.*;
 import morozov.terms.signals.*;
 
@@ -79,9 +79,9 @@ public class InputDialog extends JDialog implements PropertyChangeListener {
 					typedText= textField.getText();
 					try {
 						if (integerNumberExpected) {
-							BigInteger result= Converters.stringToStrictInteger(typedText);
+							BigInteger result= GeneralConverters.stringToStrictInteger(typedText);
 						} else {
-							double result= Converters.stringToReal(typedText);
+							double result= GeneralConverters.stringToReal(typedText);
 							if (Double.isNaN(result)) {
 								throw TermIsNotAReal.instance;
 							} else if (Double.isInfinite(result)) {

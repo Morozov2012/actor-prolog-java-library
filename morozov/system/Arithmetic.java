@@ -97,22 +97,18 @@ public class Arithmetic {
 	// Arithmetic operations
 	public static void calculate_nullary_arithmetic_function(ChoisePoint iX, PrologVariable result, NullaryArithmeticOperation operation) {
 		result.setNonBacktrackableValue(operation.eval());
-		// iX.pushTrail(nV);
 	}
 	//
 	public static void calculate_unary_function(ChoisePoint iX, PrologVariable result, Term a1, UnaryOperation operation) {
 		result.setNonBacktrackableValue(a1.evaluate(iX,operation));
-		// iX.pushTrail(nV);
 	}
 	//
 	public static void calculate_binary_arithmetic_function(ChoisePoint iX, PrologVariable result, Term a1, Term a2, BinaryOperation operation) {
 		result.setNonBacktrackableValue(a1.reactWithTerm(a2,iX,operation));
-		// iX.pushTrail(nV);
 	}
 	//
 	public static void calculate_binary_bitwise_function(ChoisePoint iX, PrologVariable result, Term a1, Term a2, BinaryOperation operation) {
 		result.setNonBacktrackableValue(a1.blitWithTerm(a2,iX,operation));
-		// iX.pushTrail(nV);
 	}
 	//
 	public static Term calculate_multi_argument_function(ChoisePoint iX, MultiArgumentArithmeticOperation operation, Term... args) {

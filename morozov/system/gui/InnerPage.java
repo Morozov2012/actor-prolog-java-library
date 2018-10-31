@@ -572,7 +572,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 	///////////////////////////////////////////////////////////////
 	//
 	public void repaintAfterDelay() {
-		synchronized(this) {
+		synchronized (this) {
 			if (currentTask != null) {
 				currentTask.cancel();
 				scheduler.purge();
@@ -582,7 +582,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		}
 	}
 	public void skipDelayedRepainting() {
-		synchronized(this) {
+		synchronized (this) {
 			if (currentTask != null) {
 				currentTask.cancel();
 				scheduler.purge();

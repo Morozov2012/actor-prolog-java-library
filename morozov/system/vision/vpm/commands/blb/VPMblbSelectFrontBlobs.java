@@ -7,8 +7,6 @@ import morozov.system.vision.vpm.commands.*;
 import morozov.system.vision.vpm.converters.*;
 
 import java.util.Arrays;
-import java.util.ArrayList;
-import java.math.BigInteger;
 
 public class VPMblbSelectFrontBlobs extends VPM_FrameCommand {
 	//

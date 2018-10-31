@@ -5,8 +5,8 @@ package morozov.system.kinect.frames.data.converters;
 import target.*;
 
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.kinect.frames.data.interfaces.*;
-import morozov.system.kinect.modes.*;
 import morozov.system.kinect.modes.interfaces.*;
 import morozov.terms.*;
 
@@ -106,12 +106,12 @@ public class CommittedSkeletons implements Serializable {
 			};
 			// trackKeySetIterator.remove();
 		};
-		Term committedTracksTerm= Converters.arrayListToTerm(arrayOfIncompleteTrackTerms);
+		Term committedTracksTerm= GeneralConverters.arrayListToTerm(arrayOfIncompleteTrackTerms);
 		Term[] arrayOfCommittedTrackTerms= new Term[arrayOfCompleteTrackTerms.size()];
 		for (int n=0; n < arrayOfCompleteTrackTerms.size(); n++) {
 			arrayOfCommittedTrackTerms[n]= arrayOfCompleteTrackTerms.get(n).getTerm();
 		};
-		committedTracksTerm= Converters.arrayToList(arrayOfCommittedTrackTerms,committedTracksTerm);
+		committedTracksTerm= GeneralConverters.arrayToList(arrayOfCommittedTrackTerms,committedTracksTerm);
 		return committedTracksTerm;
 	}
 	//
@@ -120,6 +120,9 @@ public class CommittedSkeletons implements Serializable {
 			return;
 		};
 		long longMaximalChronicleLength= maximalChronicleLength.toLong(1000);
+		if (longMaximalChronicleLength < 0) {
+			return;
+		};
 		long minimalTime= frameTime - longMaximalChronicleLength;
 		ListIterator<KinectFrameNumberAndTime> iteratorOfArrayOfTime= arrayOfTime.listIterator();
 		boolean thereWereObsoletePoints= false;
@@ -178,7 +181,7 @@ public class CommittedSkeletons implements Serializable {
 			arrayOfIncompleteTrackTerms.add(track.toTerm(false,givenFrameNumber,givenFrameTime));
 			recentSkeletonTermArray.add(track.getSkeletonTerm(givenFrameTime));
 		};
-		Term committedTracksTerm= Converters.arrayListToTerm(arrayOfIncompleteTrackTerms);
+		Term committedTracksTerm= GeneralConverters.arrayListToTerm(arrayOfIncompleteTrackTerms);
 		// ArrayList<TrackTerm> targetCompleteTrackTerms= new ArrayList<>();
 		// for (int n=0; n < arrayOfCompleteTrackTerms.size(); n++) {
 		//	TrackTerm trackTerm= arrayOfCompleteTrackTerms.get(n);
@@ -191,7 +194,7 @@ public class CommittedSkeletons implements Serializable {
 		// for (int n=0; n < targetCompleteTrackTerms.size(); n++) {
 		//	arrayOfCommittedTrackTerms[n]= targetCompleteTrackTerms.get(n).getTerm();
 		// };
-		// committedTracksTerm= Converters.arrayToList(arrayOfCommittedTrackTerms,committedTracksTerm);
+		// committedTracksTerm= GeneralConverters.arrayToList(arrayOfCommittedTrackTerms,committedTracksTerm);
 		return committedTracksTerm;
 	}
 	//
@@ -237,7 +240,7 @@ public class CommittedSkeletons implements Serializable {
 				arrayOfSkeletonFrames.add(skeletonTerm);
 			}
 		};
-		Term termSkeletons= Converters.arrayListToTerm(arrayOfSkeletonFrames);
+		Term termSkeletons= GeneralConverters.arrayListToTerm(arrayOfSkeletonFrames);
 		Term result= PrologEmptySet.instance;
 		result= new PrologSet(-SymbolCodes.symbolCode_E_skeletons,termSkeletons,result);
 		result= new PrologSet(-SymbolCodes.symbolCode_E_time,termTime,result);

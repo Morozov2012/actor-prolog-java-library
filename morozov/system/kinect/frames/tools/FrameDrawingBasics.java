@@ -2,9 +2,7 @@
 
 package morozov.system.kinect.frames.tools;
 
-import java.awt.Color;
 import java.awt.image.BufferedImage;
-import java.awt.image.WritableRaster;
 
 import java.util.Arrays;
 

@@ -5,7 +5,7 @@ package morozov.system.gui.space2d;
 import target.*;
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.space2d.errors.*;
 import morozov.terms.*;
 
@@ -22,14 +22,14 @@ public class Point2DArrays {
 	///////////////////////////////////////////////////////////////
 	//
 	public static Point2DArrays argumentToPoint2DArrays(Term value, ChoisePoint iX) {
-		Term[] termArray= Converters.listToArray(value,iX);
+		Term[] termArray= GeneralConverters.listToArray(value,iX);
 		double[] xPoints= new double[termArray.length];
 		double[] yPoints= new double[termArray.length];
 		for (int n=0; n < termArray.length; n++) {
 			try {
 				Term[] arguments= termArray[n].isStructure(SymbolCodes.symbolCode_E_p,2,iX);
-				xPoints[n]= Converters.argumentToReal(arguments[0],iX);
-				yPoints[n]= Converters.argumentToReal(arguments[1],iX);
+				xPoints[n]= GeneralConverters.argumentToReal(arguments[0],iX);
+				yPoints[n]= GeneralConverters.argumentToReal(arguments[1],iX);
 			} catch (Backtracking b) {
 				throw new WrongArgumentIsNotAPoint2D(value);
 			}

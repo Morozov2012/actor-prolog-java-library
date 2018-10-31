@@ -9,6 +9,7 @@ import morozov.terms.*;
 import java.nio.charset.CharsetEncoder;
 
 public class PrologAnyDomain extends PrologDomain {
+	//
 	public PrologAnyDomain() {
 		super(new AnonymousDomainName(), new DomainAlternative[0]);
 	}

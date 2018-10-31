@@ -323,7 +323,7 @@ public enum DialogEntryType {
 	},
 	IS_MODAL {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			dialog.getTargetWorld().setIsModal(YesNoDefault.term2YesNoDefault(value,iX));
+			dialog.getTargetWorld().setIsModal(YesNoDefault.argument2YesNoDefault(value,iX));
 		}
 		Term getValue(AbstractDialog dialog) {
 			throw new IllegalCallOfInternalMethod();
@@ -337,7 +337,7 @@ public enum DialogEntryType {
 	},
 	IS_TOP_LEVEL_WINDOW {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			dialog.getTargetWorld().setIsTopLevelWindow(YesNo.term2YesNo(value,iX));
+			dialog.getTargetWorld().setIsTopLevelWindow(YesNo.argument2YesNo(value,iX));
 		}
 		Term getValue(AbstractDialog dialog) {
 			throw new IllegalCallOfInternalMethod();
@@ -351,7 +351,7 @@ public enum DialogEntryType {
 	},
 	IS_EXIT_ON_CLOSE {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			dialog.getTargetWorld().setExitOnClose(YesNoDefault.term2YesNoDefault(value,iX));
+			dialog.getTargetWorld().setExitOnClose(YesNoDefault.argument2YesNoDefault(value,iX));
 		}
 		Term getValue(AbstractDialog dialog) {
 			throw new IllegalCallOfInternalMethod();

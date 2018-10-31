@@ -72,7 +72,7 @@ public class ActiveResource extends ActiveWorld {
 	}
 	public void startProcesses() {
 	}
-	public void closeFiles() {
+	public void releaseSystemResources() {
 	}
 	public void stopProcesses() {
 	}

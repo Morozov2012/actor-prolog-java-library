@@ -2,8 +2,6 @@
 
 package morozov.system.kinect.frames.text;
 
-import morozov.system.kinect.frames.data.*;
-//import morozov.system.kinect.frames.data.text.*;
 import morozov.system.kinect.frames.data.interfaces.*;
 import morozov.system.kinect.frames.data.tools.*;
 import morozov.system.kinect.frames.interfaces.*;
@@ -11,12 +9,11 @@ import morozov.system.kinect.frames.tools.*;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Locale;
 
 public class KinectForegroundPointCloudsFrameText {
 	//
-	public void writeText(KinectForegroundPointCloudsFrameInterface frame, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {
+	public static void writeText(KinectForegroundPointCloudsFrameInterface frame, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {
 		if (exportMode==ExportMode.SKELETONS) {
 			// super.writeText(writer,exportMode,locale);
 			KinectFrameText.writeRootFrameText(frame,writer,exportMode,locale);
@@ -25,7 +22,7 @@ public class KinectForegroundPointCloudsFrameText {
 		}
 	}
 	//
-	public void writeForegroundPointCloudsFrameText(KinectForegroundPointCloudsFrameInterface frame, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {
+	public static void writeForegroundPointCloudsFrameText(KinectForegroundPointCloudsFrameInterface frame, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {
 		writer.write("; FOREGROUND POINT CLOUDS FRAME:\n");
 		// super.writeText(writer,exportMode,locale);
 		KinectFrameText.writeRootFrameText(frame,writer,exportMode,locale);

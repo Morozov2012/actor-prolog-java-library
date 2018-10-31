@@ -7,11 +7,9 @@ import edu.ufl.digitalworlds.j4k.J4K1;
 import edu.ufl.digitalworlds.j4k.J4K2;
 import edu.ufl.digitalworlds.j4k.J4KSDK;
 
-import morozov.system.kinect.*;
 import morozov.system.kinect.frames.data.*;
 import morozov.system.kinect.frames.data.interfaces.*;
 import morozov.system.kinect.frames.tools.*;
-import morozov.system.kinect.modes.*;
 import morozov.system.kinect.modes.tools.*;
 
 import java.awt.Graphics2D;
@@ -20,7 +18,6 @@ import java.awt.Color;
 import java.awt.geom.Line2D;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Locale;
 
 public class GeneralSkeletonTools {
@@ -139,7 +136,7 @@ public class GeneralSkeletonTools {
 			thinLineStroke= thinLineStroke_DepthFrame;
 			heavyLineStroke= heavyLineStroke_DepthFrame;
 		};
-		Color color= ColorMapTools.getPersonDefaultColor(skeleton.getIdentifier());
+		Color color= KinectColorMapTools.getPersonDefaultColor(skeleton.getIdentifier());
 		g2.setColor(color);
 		int arrayLength= skeleton.getNumberOfJoints();
 		// 1 MAIN BODY: HIP_CENTER, SPINE, SHOULDER_CENTER, HEAD

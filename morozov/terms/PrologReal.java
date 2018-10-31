@@ -4,19 +4,25 @@ package morozov.terms;
 
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.terms.signals.*;
 
 import java.nio.charset.CharsetEncoder;
 import java.math.BigInteger;
 
 public class PrologReal extends Term {
+	//
 	private Double value;
+	//
 	public PrologReal(double v) {
 		value= v;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public Double getDoubleValue() {
+		return value;
+	}
 	public int hashCode() {
 		return value.hashCode();
 	}
@@ -43,8 +49,15 @@ public class PrologReal extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public void isReal(PrologReal v, ChoisePoint cp) throws Backtracking {
+		if ( Arithmetic.realsAreEqual(v.getDoubleValue(),value) ) {
+			return;
+		} else {
+			throw Backtracking.instance;
+		}
+	}
 	public void isReal(double v, ChoisePoint cp) throws Backtracking {
-		if (Arithmetic.realsAreEqual(v,value)) {
+		if ( Arithmetic.realsAreEqual(v,value) ) {
 			return;
 		} else {
 			throw Backtracking.instance;
@@ -81,7 +94,7 @@ public class PrologReal extends Term {
 		}
 	}
 	public void compareWithDate(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		if (!op.eval(Converters.doubleArgumentToBigInteger(value,this).multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(a))) {
+		if (!op.eval(GeneralConverters.doubleArgumentToBigInteger(value,this).multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(a))) {
 			throw Backtracking.instance;
 		}
 	}
@@ -104,7 +117,7 @@ public class PrologReal extends Term {
 		}
 	}
 	public void compareDateWith(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		if (!op.eval(BigInteger.valueOf(a),Converters.doubleArgumentToBigInteger(value,this).multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger))) {
+		if (!op.eval(BigInteger.valueOf(a),GeneralConverters.doubleArgumentToBigInteger(value,this).multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger))) {
 			throw Backtracking.instance;
 		}
 	}
@@ -128,13 +141,16 @@ public class PrologReal extends Term {
 		return op.eval(value,a);
 	}
 	public Term reactWithString(String a, ChoisePoint iX, BinaryOperation op) {
-		return op.eval(Converters.doubleArgumentToBigInteger(value,this),a);
+		return op.eval(GeneralConverters.doubleArgumentToBigInteger(value,this),a);
+	}
+	public Term reactWithBinary(byte[] a, ChoisePoint iX, BinaryOperation op) {
+		return op.eval(GeneralConverters.doubleArgumentToBigInteger(value,this),a);
 	}
 	public Term reactWithDate(long a, ChoisePoint iX, BinaryOperation op) {
-		return op.evalDate(Converters.doubleArgumentToBigInteger(value,this).multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(a));
+		return op.evalDate(GeneralConverters.doubleArgumentToBigInteger(value,this).multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(a));
 	}
 	public Term reactWithTime(long a, ChoisePoint iX, BinaryOperation op) {
-		return op.evalTime(Converters.doubleArgumentToBigInteger(value,this),BigInteger.valueOf(a));
+		return op.evalTime(GeneralConverters.doubleArgumentToBigInteger(value,this),BigInteger.valueOf(a));
 	}
 	public Term reactBigIntegerWith(BigInteger a, ChoisePoint iX, BinaryOperation op) {
 		return op.eval(a.doubleValue(),value);
@@ -146,13 +162,16 @@ public class PrologReal extends Term {
 		return op.eval(a,value);
 	}
 	public Term reactStringWith(String a, ChoisePoint iX, BinaryOperation op) {
-		return op.eval(a,Converters.doubleArgumentToBigInteger(value,this));
+		return op.eval(a,GeneralConverters.doubleArgumentToBigInteger(value,this));
+	}
+	public Term reactBinaryWith(byte[] a, ChoisePoint iX, BinaryOperation op) {
+		return op.eval(a,GeneralConverters.doubleArgumentToBigInteger(value,this));
 	}
 	public Term reactDateWith(long a, ChoisePoint iX, BinaryOperation op) {
-		return op.evalDate(BigInteger.valueOf(a),Converters.doubleArgumentToBigInteger(value,this).multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger));
+		return op.evalDate(BigInteger.valueOf(a),GeneralConverters.doubleArgumentToBigInteger(value,this).multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger));
 	}
 	public Term reactTimeWith(long a, ChoisePoint iX, BinaryOperation op) {
-		return op.evalTime(BigInteger.valueOf(a),Converters.doubleArgumentToBigInteger(value,this));
+		return op.evalTime(BigInteger.valueOf(a),GeneralConverters.doubleArgumentToBigInteger(value,this));
 	}
 	public Term reactListWith(Term aHead, Term aTail, ChoisePoint iX, BinaryOperation op) {
 		return new PrologList(
@@ -166,24 +185,24 @@ public class PrologReal extends Term {
 		return a.blitDoubleWith(value,iX,op);
 	}
 	public Term blitWithBigInteger(BigInteger a, ChoisePoint iX, BinaryOperation op) {
-		return op.eval(Converters.doubleArgumentToBigInteger(value,this),a);
+		return op.eval(GeneralConverters.doubleArgumentToBigInteger(value,this),a);
 	}
 	public Term blitWithLong(long a, ChoisePoint iX, BinaryOperation op) {
-		return op.eval(Converters.doubleArgumentToBigInteger(value,this),BigInteger.valueOf(a));
+		return op.eval(GeneralConverters.doubleArgumentToBigInteger(value,this),BigInteger.valueOf(a));
 	}
 	public Term blitWithDouble(double a, ChoisePoint iX, BinaryOperation op) {
-		BigInteger integerValue= Converters.doubleArgumentToBigInteger(value,this);
-		return op.eval(integerValue,Converters.doubleValueToBigInteger(a));
+		BigInteger integerValue= GeneralConverters.doubleArgumentToBigInteger(value,this);
+		return op.eval(integerValue,GeneralConverters.doubleValueToBigInteger(a));
 	}
 	public Term blitBigIntegerWith(BigInteger a, ChoisePoint iX, BinaryOperation op) {
-		return op.eval(a,Converters.doubleArgumentToBigInteger(value,this));
+		return op.eval(a,GeneralConverters.doubleArgumentToBigInteger(value,this));
 	}
 	public Term blitLongWith(long a, ChoisePoint iX, BinaryOperation op) {
-		return op.eval(BigInteger.valueOf(a),Converters.doubleArgumentToBigInteger(value,this));
+		return op.eval(BigInteger.valueOf(a),GeneralConverters.doubleArgumentToBigInteger(value,this));
 	}
 	public Term blitDoubleWith(double a, ChoisePoint iX, BinaryOperation op) {
-		BigInteger integerValue= Converters.doubleArgumentToBigInteger(value,this);
-		return op.eval(Converters.doubleValueToBigInteger(a),integerValue);
+		BigInteger integerValue= GeneralConverters.doubleArgumentToBigInteger(value,this);
+		return op.eval(GeneralConverters.doubleValueToBigInteger(a),integerValue);
 	}
 	public Term blitListWith(Term aHead, Term aTail, ChoisePoint iX, BinaryOperation op) {
 		return new PrologList(

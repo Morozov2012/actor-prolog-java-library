@@ -20,11 +20,7 @@ import morozov.terms.*;
 import javax.swing.border.TitledBorder;
 import javax.swing.BorderFactory;
 import java.awt.Font;
-import java.awt.font.TextAttribute;
 import java.awt.Color;
-
-import java.util.Map;
-import java.util.HashMap;
 
 public class ScalableTitledPanel extends ScalablePanel {
 	//

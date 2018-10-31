@@ -10,6 +10,7 @@ import morozov.domains.signals.*;
 import morozov.run.*;
 import morozov.system.*;
 import morozov.system.checker.signals.*;
+import morozov.system.converters.*;
 import morozov.system.files.*;
 import morozov.system.files.errors.*;
 import morozov.system.datum.*;
@@ -29,7 +30,6 @@ import java.nio.charset.CharsetEncoder;
 import java.nio.file.DirectoryNotEmptyException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.DirectoryIteratorException;
-import java.nio.file.StandardCopyOption;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -94,9 +94,9 @@ public abstract class DataStore extends DataAbstraction {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	abstract protected Term getBuiltInSlot_E_access_mode();
-	abstract protected Term getBuiltInSlot_E_sharing_mode();
-	abstract protected Term getBuiltInSlot_E_reuse_table_numbers();
+	abstract public Term getBuiltInSlot_E_access_mode();
+	abstract public Term getBuiltInSlot_E_sharing_mode();
+	abstract public Term getBuiltInSlot_E_reuse_table_numbers();
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -118,7 +118,6 @@ public abstract class DataStore extends DataAbstraction {
 	}
 	public void getAccessMode0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(getAccessMode(iX).toTerm());
-		// iX.pushTrail(a1);
 	}
 	public void getAccessMode0fs(ChoisePoint iX) {
 	}
@@ -141,7 +140,6 @@ public abstract class DataStore extends DataAbstraction {
 	}
 	public void getSharingMode0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(getSharingMode(iX).toTerm());
-		// iX.pushTrail(a1);
 	}
 	public void getSharingMode0fs(ChoisePoint iX) {
 	}
@@ -165,7 +163,6 @@ public abstract class DataStore extends DataAbstraction {
 	}
 	public void getReuseTableNumbers0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getReuseTableNumbers(iX)));
-		// iX.pushTrail(a1);
 	}
 	public void getReuseTableNumbers0fs(ChoisePoint iX) {
 	}
@@ -474,7 +471,7 @@ public abstract class DataStore extends DataAbstraction {
 	///////////////////////////////////////////////////////////////
 	//
 	public void deleteEntry1s(ChoisePoint iX, Term a1) {
-		String oldEntryName= Converters.argumentToString(a1,iX);
+		String oldEntryName= GeneralConverters.argumentToString(a1,iX);
 		claimModifyingAccess();
 		HashMap<String,DatabaseTableContainer> hash= tableHash.get();
 		DatabaseTableContainer oldTableContainer;
@@ -496,8 +493,8 @@ public abstract class DataStore extends DataAbstraction {
 	///////////////////////////////////////////////////////////////
 	//
 	public void copyEntry2s(ChoisePoint iX, Term a1, Term a2) {
-		String oldEntryName= Converters.argumentToString(a1,iX);
-		String newEntryName= Converters.argumentToString(a2,iX);
+		String oldEntryName= GeneralConverters.argumentToString(a1,iX);
+		String newEntryName= GeneralConverters.argumentToString(a2,iX);
 		TimeInterval waitingPeriod= getTransactionWaitingPeriod(iX);
 		TimeInterval sleepPeriod= getTransactionSleepPeriod(iX);
 		BigInteger maximalRetryNumber= getTransactionMaximalRetryNumber(iX);
@@ -540,8 +537,8 @@ public abstract class DataStore extends DataAbstraction {
 	///////////////////////////////////////////////////////////////
 	//
 	public void renameEntry2s(ChoisePoint iX, Term a1, Term a2) {
-		String oldEntryName= Converters.argumentToString(a1,iX);
-		String newEntryName= Converters.argumentToString(a2,iX);
+		String oldEntryName= GeneralConverters.argumentToString(a1,iX);
+		String newEntryName= GeneralConverters.argumentToString(a2,iX);
 		claimModifyingAccess();
 		HashMap<String,DatabaseTableContainer> hash= tableHash.get();
 		synchronized (hash) {
@@ -796,10 +793,6 @@ public abstract class DataStore extends DataAbstraction {
 			a2.setBacktrackableValue(new PrologInteger(recentErrorPosition),iX);
 			a3.setBacktrackableValue(new PrologString(recentErrorException.toString()),iX);
 			a4.setBacktrackableValue(new PrologString(recentErrorException.toString()),iX);
-			//iX.pushTrail(a1);
-			//iX.pushTrail(a2);
-			//iX.pushTrail(a3);
-			//iX.pushTrail(a4);
 		} else {
 			throw Backtracking.instance;
 		}
@@ -810,9 +803,6 @@ public abstract class DataStore extends DataAbstraction {
 			a1.setBacktrackableValue(new PrologString(recentErrorText),iX);
 			a2.setBacktrackableValue(new PrologInteger(recentErrorPosition),iX);
 			a3.setBacktrackableValue(new PrologString(recentErrorException.toString()),iX);
-			//iX.pushTrail(a1);
-			//iX.pushTrail(a2);
-			//iX.pushTrail(a3);
 		} else {
 			throw Backtracking.instance;
 		}
@@ -823,7 +813,6 @@ public abstract class DataStore extends DataAbstraction {
 	public void repair0ff(ChoisePoint iX, PrologVariable result) {
 		ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
 		result.setNonBacktrackableValue(new PrologInteger(repairContent(fileName,false,staticContext,iX)));
-		// iX.pushTrail(a1);
 	}
 	public void repair0fs(ChoisePoint iX) {
 		ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
@@ -834,7 +823,6 @@ public abstract class DataStore extends DataAbstraction {
 		boolean reportActions= YesNo.termYesNo2Boolean(a1,iX);
 		ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
 		result.setNonBacktrackableValue(new PrologInteger(repairContent(fileName,reportActions,staticContext,iX)));
-		// iX.pushTrail(a1);
 	}
 	public void repair1fs(ChoisePoint iX, Term a1) {
 		boolean reportActions= YesNo.termYesNo2Boolean(a1,iX);
@@ -846,7 +834,6 @@ public abstract class DataStore extends DataAbstraction {
 		boolean reportActions= YesNo.termYesNo2Boolean(a1,iX);
 		ExtendedFileName fileName= retrieveRealGlobalFileName(a2,iX);
 		result.setNonBacktrackableValue(new PrologInteger(repairContent(fileName,reportActions,staticContext,iX)));
-		// iX.pushTrail(a1);
 	}
 	public void repair2fs(ChoisePoint iX, Term a1, Term a2) {
 		boolean reportActions= YesNo.termYesNo2Boolean(a1,iX);
@@ -1219,7 +1206,7 @@ public abstract class DataStore extends DataAbstraction {
 		isInformed.set(false);
 		if (isActive.get()) {
 			long domainSignature= entry_s_Update_0();
-			AsyncCall call= new AsyncCall(domainSignature,this,true,false,new Term[0],true);
+			AsyncCall call= new AsyncCall(domainSignature,this,true,false,noArguments,true);
 			transmitAsyncCall(call,null);
 		}
 	}
@@ -1486,6 +1473,7 @@ public abstract class DataStore extends DataAbstraction {
 				}
 			}
 		};
+		System.runFinalization();
 		System.gc();
 	}
 	//

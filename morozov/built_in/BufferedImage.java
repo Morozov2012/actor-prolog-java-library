@@ -5,10 +5,10 @@ package morozov.built_in;
 import target.*;
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.files.*;
 import morozov.system.gui.*;
-import morozov.system.gui.signals.*;
+import morozov.system.signals.*;
 import morozov.system.gui.space2d.*;
 import morozov.terms.*;
 import morozov.worlds.*;
@@ -21,8 +21,6 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class BufferedImage extends BufferedImageController {
 	//
-	// public ExtendedSize width= null;
-	// public ExtendedSize height= null;
 	public Integer imageType= null;
 	public Integer imageTransparency= null;
 	//
@@ -37,12 +35,8 @@ public abstract class BufferedImage extends BufferedImageController {
 		super(id);
 	}
 	//
-	// abstract protected Term getBuiltInSlot_E_name();
-	// abstract protected Term getBuiltInSlot_E_extension();
-	// abstract protected Term getBuiltInSlot_E_width();
-	// abstract protected Term getBuiltInSlot_E_height();
-	abstract protected Term getBuiltInSlot_E_image_type();
-	abstract protected Term getBuiltInSlot_E_image_transparency();
+	abstract public Term getBuiltInSlot_E_image_type();
+	abstract public Term getBuiltInSlot_E_image_transparency();
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -111,7 +105,6 @@ public abstract class BufferedImage extends BufferedImageController {
 	}
 	protected java.awt.image.BufferedImage createImage(ExtendedSize eWidth, ExtendedSize eHeight, int imageType, ChoisePoint iX) {
 		GenericImageEncodingAttributes attributes= getImageEncodingAttributes(iX);
-		// currentImageEncodingAttributes.set(attributes);
 		setCurrentImageEncodingAttributes(attributes);
 		int width= computeWidth(eWidth,iX);
 		int height= computeHeight(eHeight,iX);
@@ -163,9 +156,6 @@ public abstract class BufferedImage extends BufferedImageController {
 	}
 	//
 	public java.awt.image.BufferedImage getImage() {
-		// if (bufferedImage.get()==null) {
-		//	bufferedImage.set(createImage(symbolDefault,symbolDefault,symbolDefault,iX));
-		// };
 		return bufferedImage.get();
 	}
 	public void setImage(java.awt.image.BufferedImage image, GenericImageEncodingAttributes attributes) {
@@ -224,8 +214,6 @@ public abstract class BufferedImage extends BufferedImageController {
 			a1.setBacktrackableValue(noValue,iX);
 			a2.setBacktrackableValue(noValue,iX);
 		}
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
 	}
 	public void getSizeInPixels2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
 		java.awt.image.BufferedImage image= bufferedImage.get();
@@ -236,19 +224,17 @@ public abstract class BufferedImage extends BufferedImageController {
 			a1.setBacktrackableValue(noValue,iX);
 			a2.setBacktrackableValue(noValue,iX);
 		}
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
 	}
 	//
 	public void setPixel5s(ChoisePoint iX, Term a1, Term a2, Term a3, Term a4, Term a5) {
 		if (bufferedImage.get()==null) {
 			bufferedImage.set(createImage(symbolDefault,symbolDefault,symbolDefault,iX));
 		};
-		int x= PrologInteger.toInteger(Converters.argumentToRoundInteger(a1,iX));
-		int y= PrologInteger.toInteger(Converters.argumentToRoundInteger(a2,iX));
-		int red= PrologInteger.toInteger(Converters.argumentToRoundInteger(a3,iX));
-		int green= PrologInteger.toInteger(Converters.argumentToRoundInteger(a4,iX));
-		int blue= PrologInteger.toInteger(Converters.argumentToRoundInteger(a5,iX));
+		int x= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a1,iX));
+		int y= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a2,iX));
+		int red= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a3,iX));
+		int green= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a4,iX));
+		int blue= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a5,iX));
 		Color color= new Color(red,green,blue);
 		bufferedImage.get().setRGB(x,y,color.getRGB());
 	}
@@ -256,10 +242,46 @@ public abstract class BufferedImage extends BufferedImageController {
 		if (bufferedImage.get()==null) {
 			bufferedImage.set(createImage(symbolDefault,symbolDefault,symbolDefault,iX));
 		};
-		int x= PrologInteger.toInteger(Converters.argumentToRoundInteger(a1,iX));
-		int y= PrologInteger.toInteger(Converters.argumentToRoundInteger(a2,iX));
-		int color= PrologInteger.toInteger(Converters.argumentToRoundInteger(a3,iX));
+		int x= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a1,iX));
+		int y= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a2,iX));
+		int color= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a3,iX));
 		bufferedImage.get().setRGB(x,y,color);
+	}
+	//
+	public void getPixel5s(ChoisePoint iX, Term a1, Term a2, Term a3, Term a4, Term a5) {
+		if (bufferedImage.get()==null) {
+			bufferedImage.set(createImage(symbolDefault,symbolDefault,symbolDefault,iX));
+		};
+		int x= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a1,iX));
+		int y= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a2,iX));
+		int rgb= getPixel(x,y);
+		int valueRed= rgb >>> 16 & 0x000000FF;
+		int valueGreen= rgb >>> 8 & 0x000000FF;
+		int valueBlue= rgb & 0x000000FF;
+		a3.setBacktrackableValue(new PrologInteger(valueRed),iX);
+		a4.setBacktrackableValue(new PrologInteger(valueGreen),iX);
+		a5.setBacktrackableValue(new PrologInteger(valueBlue),iX);
+	}
+	public void getPixel3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
+		if (bufferedImage.get()==null) {
+			bufferedImage.set(createImage(symbolDefault,symbolDefault,symbolDefault,iX));
+		};
+		int x= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a1,iX));
+		int y= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a2,iX));
+		int rgb= getPixel(x,y);
+		a3.setBacktrackableValue(new PrologInteger(rgb),iX);
+	}
+	protected int getPixel(int x, int y) {
+		java.awt.image.BufferedImage nativeImage= bufferedImage.get();
+		int width= nativeImage.getWidth();
+		int height= nativeImage.getHeight();
+		int rgb;
+		if (x >= 0 && x < width && y >= 0 && y < height) {
+			rgb= nativeImage.getRGB(x,y);
+		} else {
+			rgb= 0;
+		};
+		return rgb;
 	}
 	//
 	public void save0s(ChoisePoint iX) {
@@ -288,10 +310,25 @@ public abstract class BufferedImage extends BufferedImageController {
 		bufferedImage.set(readImage(a1,iX));
 	}
 	public void load5s(ChoisePoint iX, Term a1, Term a2, Term a3, Term a4, Term a5) {
-		int xSubsampling= Converters.argumentToSmallInteger(a2,iX);
-		int ySubsampling= Converters.argumentToSmallInteger(a3,iX);
-		int xOffset= Converters.argumentToSmallInteger(a4,iX);
-		int yOffset= Converters.argumentToSmallInteger(a5,iX);
+		int xSubsampling= GeneralConverters.argumentToSmallInteger(a2,iX);
+		int ySubsampling= GeneralConverters.argumentToSmallInteger(a3,iX);
+		int xOffset= GeneralConverters.argumentToSmallInteger(a4,iX);
+		int yOffset= GeneralConverters.argumentToSmallInteger(a5,iX);
 		bufferedImage.set(readImage(a1,xSubsampling,ySubsampling,xOffset,yOffset,iX));
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setBinary1s(ChoisePoint iX, Term a1) {
+		byte[] byteArray= GeneralConverters.argumentToBinary(a1,iX);
+		java.awt.image.BufferedImage nativeImage= Space2DWriter.bytesToImage(byteArray);
+		bufferedImage.set(nativeImage);
+	}
+	//
+	public void getBinary0ff(ChoisePoint iX, Term result) {
+		byte[] byteArray= Space2DWriter.imageToBytes(bufferedImage.get(),getCurrentImageEncodingAttributes());
+		result.setNonBacktrackableValue(new PrologBinary(byteArray));
+	}
+	public void getBinary0fs(ChoisePoint iX) {
 	}
 }

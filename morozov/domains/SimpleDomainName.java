@@ -7,6 +7,7 @@ import morozov.system.*;
 import java.nio.charset.CharsetEncoder;
 
 public class SimpleDomainName extends PrologDomainName {
+	//
 	protected String name;
 	//
 	public SimpleDomainName(String n) {

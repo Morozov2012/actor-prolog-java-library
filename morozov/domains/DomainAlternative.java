@@ -6,7 +6,7 @@ import target.*;
 
 import morozov.domains.signals.*;
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 import morozov.worlds.remote.*;
@@ -138,6 +138,9 @@ public abstract class DomainAlternative implements Serializable {
 	public boolean isEqualToString() {
 		return false;
 	}
+	public boolean isEqualToBinary() {
+		return false;
+	}
 	public boolean isEqualToStringConstant(String value) {
 		return false;
 	}
@@ -181,6 +184,9 @@ public abstract class DomainAlternative implements Serializable {
 	public boolean isCoveredByString() {
 		return false;
 	}
+	public boolean isCoveredByBinary() {
+		return false;
+	}
 	public boolean isCoveredBySymbol() {
 		return false;
 	}
@@ -199,6 +205,8 @@ public abstract class DomainAlternative implements Serializable {
 				return new DomainSymbol();
 			} else if (code==SymbolCodes.symbolCode_E_string) {
 				return new DomainString();
+			} else if (code==SymbolCodes.symbolCode_E_binary) {
+				return new DomainBinary();
 			} else if (code==SymbolCodes.symbolCode_E_empty_set) {
 				return new DomainEmptySet();
 			} else if (code==SymbolCodes.symbolCode_E_any_set) {
@@ -248,15 +256,15 @@ public abstract class DomainAlternative implements Serializable {
 						return new DomainRealRange(leftBound,rightBound);
 					} else if (functor==SymbolCodes.symbolCode_E_structure) {
 						long code= arguments[0].getSymbolValue(iX);
-						String[] domainNames= Converters.termToStrings(arguments[1],iX);
+						String[] domainNames= GeneralConverters.termToStrings(arguments[1],iX);
 						return new DomainStructure(code,domainNames);
 					} else if (functor==SymbolCodes.symbolCode_E_set) {
 						long key= arguments[0].getLongIntegerValue(iX);
 						String domainName= arguments[1].getStringValue(iX);
 						return new DomainSet(key,domainName);
 					} else if (functor==SymbolCodes.symbolCode_E_optimized_set) {
-						long[] keys= Converters.argumentToLongIntegers(arguments[0],iX);
-						String[] domainNames= Converters.termToStrings(arguments[1],iX);
+						long[] keys= GeneralConverters.argumentToLongIntegers(arguments[0],iX);
+						String[] domainNames= GeneralConverters.termToStrings(arguments[1],iX);
 						return new DomainOptimizedSet(keys,domainNames);
 					} else {
 						throw TermIsNotDomainAlternative.instance;

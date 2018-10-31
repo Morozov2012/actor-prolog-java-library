@@ -8,9 +8,7 @@ import morozov.built_in.*;
 import morozov.run.*;
 import morozov.system.kinect.converters.errors.*;
 import morozov.system.kinect.converters.interfaces.*;
-import morozov.system.kinect.frames.*;
 import morozov.system.kinect.frames.interfaces.*;
-import morozov.system.kinect.frames.tools.*;
 import morozov.system.kinect.interfaces.*;
 import morozov.system.kinect.modes.*;
 import morozov.system.kinect.modes.converters.*;
@@ -19,7 +17,6 @@ import morozov.system.kinect.modes.tools.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 
-import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 

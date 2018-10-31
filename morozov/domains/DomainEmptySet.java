@@ -11,6 +11,7 @@ import java.nio.charset.CharsetEncoder;
 import java.util.HashSet;
 
 public class DomainEmptySet extends DomainAlternative {
+	//
 	public DomainEmptySet() {
 	}
 	//

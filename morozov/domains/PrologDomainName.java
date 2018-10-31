@@ -13,6 +13,7 @@ import java.nio.charset.CharsetEncoder;
 import java.io.Serializable;
 
 public abstract class PrologDomainName implements Serializable {
+	//
 	public static final String tagDomainName_Simple			= "simple_domain";
 	public static final String tagDomainName_Cluster		= "cluster_domain";
 	public static final String tagDomainName_Interface		= "interface_domain";
@@ -33,6 +34,7 @@ public abstract class PrologDomainName implements Serializable {
 	public static final String tagDomainAlternative_RealConstant	= "real_constant";
 	public static final String tagDomainAlternative_RealRange	= "real_range";
 	public static final String tagDomainAlternative_String		= "'string'";
+	public static final String tagDomainAlternative_Binary		= "'binary'";
 	public static final String tagDomainAlternative_StringConstant	= "string_constant";
 	public static final String tagDomainAlternative_Symbol		= "'symbol'";
 	public static final String tagDomainAlternative_SymbolConstant	= "symbol_constant";

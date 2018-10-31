@@ -2,13 +2,9 @@
 
 package morozov.system.kinect.modes.converters;
 
-import edu.ufl.digitalworlds.j4k.J4KSDK;
-
 import target.*;
 
 import morozov.run.*;
-import morozov.system.kinect.frames.*;
-import morozov.system.kinect.frames.tools.*;
 import morozov.system.kinect.modes.*;
 import morozov.system.kinect.modes.converters.errors.*;
 import morozov.terms.*;

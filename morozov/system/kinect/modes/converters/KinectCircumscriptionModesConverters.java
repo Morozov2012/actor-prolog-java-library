@@ -2,21 +2,12 @@
 
 package morozov.system.kinect.modes.converters;
 
-import target.*;
-
 import morozov.run.*;
-import morozov.system.*;
-import morozov.system.kinect.frames.tools.*;
 import morozov.system.kinect.modes.*;
-import morozov.system.kinect.modes.converters.errors.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class KinectCircumscriptionModesConverters {
 	//

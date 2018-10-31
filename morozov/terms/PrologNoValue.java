@@ -8,6 +8,7 @@ import morozov.terms.signals.*;
 import java.nio.charset.CharsetEncoder;
 
 public final class PrologNoValue extends Term {
+	//
 	public static final PrologNoValue instance= new PrologNoValue();
 	public static final String namePrologNoValue= "~";
 	//

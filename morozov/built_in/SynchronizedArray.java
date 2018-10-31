@@ -52,7 +52,6 @@ public abstract class SynchronizedArray extends LambdaArray {
 	public void getImplementProtectingPorts0ff(ChoisePoint iX, PrologVariable result) {
 		boolean value= getImplementProtectingPorts(iX);
 		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(value));
-		// iX.pushTrail(a1);
 	}
 	public void getImplementProtectingPorts0fs(ChoisePoint iX) {
 	}
@@ -76,7 +75,6 @@ public abstract class SynchronizedArray extends LambdaArray {
 	public void getImplementSuspendingPorts0ff(ChoisePoint iX, PrologVariable result) {
 		boolean value= getImplementSuspendingPorts(iX);
 		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(value));
-		// iX.pushTrail(a1);
 	}
 	public void getImplementSuspendingPorts0fs(ChoisePoint iX) {
 	}
@@ -104,7 +102,6 @@ public abstract class SynchronizedArray extends LambdaArray {
 					checkArrayUsageMode(externalWorld);
 					variable= externalWorld.accessSlotVariable(arrayIndices,this,iX);
 					synchronizedVolume.put(arrayIndices,variable);
-					// iX.pushTrail(new HashMapState(synchronizedVolume,arrayIndices,element));
 					variable.registerVariables(currentProcess,isSuspendingPort,isProtectingPort);
 				} else {
 					throw new ContentIsNotAnInstanceOfSynchronizedArray();
@@ -127,7 +124,6 @@ public abstract class SynchronizedArray extends LambdaArray {
 			if (variable==null) {
 				variable= new SlotVariable();
 				synchronizedVolume.put(arrayIndices,variable);
-				// iX.pushTrail(new HashMapState(synchronizedVolume,arrayIndices,newSlot));
 			};
 			return variable;
 		}
@@ -148,8 +144,6 @@ public abstract class SynchronizedArray extends LambdaArray {
 				try {
 					SlotVariable variable= externalWorld.accessSlotVariable(arrayIndices,this,iX);
 					synchronizedVolume.put(arrayIndices,variable);
-					// element.registerVariables(currentProcess,isSuspendingPort,isProtectingPort);
-					// iX.pushTrail(new HashMapState(synchronizedVolume,arrayIndices,newSlot));
 				} catch (Backtracking b) {
 				}
 			} else {
@@ -253,7 +247,6 @@ public abstract class SynchronizedArray extends LambdaArray {
 					try {
 						variable= externalWorld.accessSlotVariable(arrayIndices,this,iX);
 						synchronizedVolume.put(arrayIndices,variable);
-						// iX.pushTrail(new HashMapState(synchronizedVolume,arrayIndices,element));
 						variable.registerVariables(currentProcess,true,false,false);
 					} catch (Backtracking b) {
 					}
@@ -280,7 +273,6 @@ public abstract class SynchronizedArray extends LambdaArray {
 					try {
 						variable= externalWorld.accessSlotVariable(arrayIndices,this,iX);
 						synchronizedVolume.put(arrayIndices,variable);
-						// iX.pushTrail(new HashMapState(synchronizedVolume,arrayIndices,element));
 						variable.registerVariables(currentProcess,true,false,true);
 					} catch (Backtracking b) {
 					}
@@ -307,7 +299,6 @@ public abstract class SynchronizedArray extends LambdaArray {
 					try {
 						variable= externalWorld.accessSlotVariable(arrayIndices,this,iX);
 						synchronizedVolume.put(arrayIndices,variable);
-						// iX.pushTrail(new HashMapState(synchronizedVolume,arrayIndices,element));
 						variable.registerVariables(currentProcess,true,true,false);
 					} catch (Backtracking b) {
 					}

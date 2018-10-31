@@ -7,34 +7,46 @@ import morozov.system.gui.*;
 import morozov.system.gui.dialogs.scalable.*;
 
 import javax.media.j3d.Screen3D;
-// import javax.media.j3d.RenderingError;
-// import javax.media.j3d.RenderingErrorListener;
+import javax.media.j3d.View;
 import com.sun.j3d.utils.universe.SimpleUniverse;
 
 import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsDevice;
-import java.awt.DisplayMode;
 import java.awt.Dimension;
-import java.awt.Point;
-import java.awt.ImageCapabilities;
 
 public class ExtendedSpace3D extends CanvasSpace {
 	protected javax.media.j3d.Canvas3D nativeCanvas3D;
 	protected OffScreenCanvas3D offScreenCanvas3D;
+	// protected GraphicsConfiguration graphicsConfiguration;
 	protected SimpleUniverse simpleUniverse;
 	public ExtendedSpace3D(CustomControlComponent customControl, Canvas3D world, GraphicsConfiguration configuration) {
 		super(customControl);
 		targetWorld= world;
+		// graphicsConfiguration= configuration;
 		nativeCanvas3D= new javax.media.j3d.Canvas3D(configuration);
 		control= nativeCanvas3D;
-		initializeOffScreenCanvas3D(configuration);
+		// initializeOffScreenCanvas3D(configuration);
 	}
 	public void setUniverse(SimpleUniverse universe) {
 		simpleUniverse= universe;
-		// Attach the offscreen canvas to the view:
-		simpleUniverse.getViewer().getView().addCanvas3D(offScreenCanvas3D);
+		attachOffScreenCanvas();
 	}
-	protected void initializeOffScreenCanvas3D(GraphicsConfiguration configuration) {
+	public void attachOffScreenCanvas() {
+		if (offScreenCanvas3D != null) {
+			View view= simpleUniverse.getViewer().getView();
+			int index= view.indexOfCanvas3D(offScreenCanvas3D);
+			if (index < 0) {
+				// Attach the offscreen canvas to the view:
+				view.addCanvas3D(offScreenCanvas3D);
+			}
+		}
+	}
+	public void detachOffScreenCanvas() {
+		if (offScreenCanvas3D != null) {
+			// Attach the offscreen canvas to the view:
+			simpleUniverse.getViewer().getView().removeCanvas3D(offScreenCanvas3D);
+		}
+	}
+	public void initializeOffScreenCanvas3D(GraphicsConfiguration configuration) {
 		if (nativeCanvas3D != null) {
 			offScreenCanvas3D= new OffScreenCanvas3D(configuration);
 			// Set the off-screen size:
@@ -61,19 +73,28 @@ public class ExtendedSpace3D extends CanvasSpace {
 		if (simpleUniverse != null && nativeCanvas3D != null) {
 			repairOffScreenCanvasIfNecessary();
 			Dimension dimension= nativeCanvas3D.getSize();
-			return offScreenCanvas3D.renderImage(dimension.width,dimension.height);
+			java.awt.image.BufferedImage nativeImage= offScreenCanvas3D.renderImage(dimension.width,dimension.height);
+			// detachOffScreenCanvas();
+			return nativeImage;
 		} else {
 			return null;
 		}
 	}
 	protected void repairOffScreenCanvasIfNecessary() {
-		if (!offScreenCanvas3D.isRendererRunning()) {
+		if (offScreenCanvas3D==null) {
+			GraphicsConfiguration configuration= nativeCanvas3D.getGraphicsConfiguration();
+			configuration= Canvas3D.refineGraphicsConfiguration(configuration);
+			initializeOffScreenCanvas3D(configuration);
+			attachOffScreenCanvas();
+		} else if (!offScreenCanvas3D.isRendererRunning()) {
 			offScreenCanvas3D.setOffScreenBuffer(null);
 			simpleUniverse.getViewer().getView().removeCanvas3D(offScreenCanvas3D);
 			GraphicsConfiguration configuration= nativeCanvas3D.getGraphicsConfiguration();
 			configuration= Canvas3D.refineGraphicsConfiguration(configuration);
 			initializeOffScreenCanvas3D(configuration);
-			simpleUniverse.getViewer().getView().addCanvas3D(offScreenCanvas3D);
+			attachOffScreenCanvas();
+		} else {
+			attachOffScreenCanvas();
 		}
 	}
 }

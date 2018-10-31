@@ -7,9 +7,7 @@ import morozov.system.kinect.frames.tools.*;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Locale;
-import java.util.Arrays;
 
 public class ForegroundPointCloudTools {
 	public static void writeText(ForegroundPointCloudInterface cloud, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {

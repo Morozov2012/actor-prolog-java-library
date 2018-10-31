@@ -2,7 +2,6 @@
 
 package morozov.system.kinect.modes;
 
-import morozov.system.kinect.modes.converters.*;
 import morozov.system.kinect.modes.interfaces.*;
 
 public class KinectDisplayingMode implements KinectDisplayingModeInterface {
@@ -128,7 +127,7 @@ public class KinectDisplayingMode implements KinectDisplayingModeInterface {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public String toString() {
-		return KinectDisplayingModeConverters.toTerm(this).toString();
-	}
+	// public String toString() {
+	//	return KinectDisplayingModeConverters.toTerm(this).toString();
+	// }
 }

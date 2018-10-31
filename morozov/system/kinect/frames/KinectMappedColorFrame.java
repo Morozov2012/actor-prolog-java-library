@@ -4,14 +4,15 @@ package morozov.system.kinect.frames;
 
 import morozov.system.kinect.frames.data.interfaces.*;
 import morozov.system.kinect.frames.interfaces.*;
-import morozov.system.kinect.frames.tools.*;
 import morozov.system.kinect.modes.*;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Locale;
-
 public class KinectMappedColorFrame extends KinectFrame implements KinectMappedColorFrameInterface {
+	//
+	private static final long serialVersionUID= 0xE00F2F240946023EL; // -2301569052742122946L;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames","KinectMappedColorFrame");
+	// }
 	//
 	public KinectMappedColorFrame(
 			long givenSerialNumber,

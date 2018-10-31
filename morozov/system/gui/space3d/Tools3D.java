@@ -6,8 +6,8 @@ import target.*;
 
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.errors.*;
-import morozov.system.gui.*;
 import morozov.system.gui.space3d.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
@@ -40,7 +40,7 @@ import com.sun.j3d.utils.geometry.Primitive;
 public class Tools3D {
 	//
 	public static Point3d[] term2Coordinates(Term value, ChoisePoint iX) {
-		Term[] termArray= Converters.listToArray(value,iX);
+		Term[] termArray= GeneralConverters.listToArray(value,iX);
 		Point3d[] points= new Point3d[termArray.length];
 		for (int n=0; n < termArray.length; n++) {
 			points[n]= term2Coordinate(termArray[n],iX);
@@ -53,9 +53,9 @@ public class Tools3D {
 	public static Point3d term2Coordinate(Term value, ChoisePoint iX) {
 		try { // Point3d
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_p,3,iX);
-			double x= Converters.argumentToReal(arguments[0],iX);
-			double y= Converters.argumentToReal(arguments[1],iX);
-			double z= Converters.argumentToReal(arguments[2],iX);
+			double x= GeneralConverters.argumentToReal(arguments[0],iX);
+			double y= GeneralConverters.argumentToReal(arguments[1],iX);
+			double z= GeneralConverters.argumentToReal(arguments[2],iX);
 			return new Point3d(x,y,z);
 		} catch (Backtracking b) {
 			throw new WrongArgumentIsNotAPoint3D(value);
@@ -67,9 +67,9 @@ public class Tools3D {
 	public static Point3f term2Coordinate3f(Term value, ChoisePoint iX) {
 		try { // Point3f
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_p,3,iX);
-			float x= (float)Converters.argumentToReal(arguments[0],iX);
-			float y= (float)Converters.argumentToReal(arguments[1],iX);
-			float z= (float)Converters.argumentToReal(arguments[2],iX);
+			float x= (float)GeneralConverters.argumentToReal(arguments[0],iX);
+			float y= (float)GeneralConverters.argumentToReal(arguments[1],iX);
+			float z= (float)GeneralConverters.argumentToReal(arguments[2],iX);
 			return new Point3f(x,y,z);
 		} catch (Backtracking b) {
 			throw new WrongArgumentIsNotAPoint3D(value);
@@ -79,7 +79,7 @@ public class Tools3D {
 	///////////////////////////////////////////////////////////////
 	//
 	public static int[] term2Indices(Term value, ChoisePoint iX) {
-		Term[] termArray= Converters.listToArray(value,iX);
+		Term[] termArray= GeneralConverters.listToArray(value,iX);
 		int[] indices= new int[termArray.length];
 		for (int n=0; n < termArray.length; n++) {
 			try {
@@ -94,7 +94,7 @@ public class Tools3D {
 	///////////////////////////////////////////////////////////////
 	//
 	public static int[] term2StripCounts(Term value, ChoisePoint iX) {
-		Term[] termArray= Converters.listToArray(value,iX);
+		Term[] termArray= GeneralConverters.listToArray(value,iX);
 		int[] counts= new int[termArray.length];
 		for (int n=0; n < termArray.length; n++) {
 			try {
@@ -109,7 +109,7 @@ public class Tools3D {
 	///////////////////////////////////////////////////////////////
 	//
 	public static Vector3f[] term2Normals(Term value, ChoisePoint iX) {
-		Term[] termArray= Converters.listToArray(value,iX);
+		Term[] termArray= GeneralConverters.listToArray(value,iX);
 		Vector3f[] normals= new Vector3f[termArray.length];
 		for (int n=0; n < termArray.length; n++) {
 			normals[n]= term2Vector3f(termArray[n],iX);
@@ -132,17 +132,17 @@ public class Tools3D {
 	public static Color3f term2Color3OrExit(Term value, ChoisePoint iX) throws TermIsSymbolDefault {
 		try { // Color3f
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_color3,3,iX);
-			float r= (float)Converters.argumentToReal(arguments[0],iX);
-			float g= (float)Converters.argumentToReal(arguments[1],iX);
-			float b= (float)Converters.argumentToReal(arguments[2],iX);
+			float r= (float)GeneralConverters.argumentToReal(arguments[0],iX);
+			float g= (float)GeneralConverters.argumentToReal(arguments[1],iX);
+			float b= (float)GeneralConverters.argumentToReal(arguments[2],iX);
 			return new Color3f(r,g,b);
 		} catch (Backtracking b1) {
 			try { // Color3f
 				Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_color4,4,iX);
-				float r= (float)Converters.argumentToReal(arguments[0],iX);
-				float g= (float)Converters.argumentToReal(arguments[1],iX);
-				float b= (float)Converters.argumentToReal(arguments[2],iX);
-				float a= (float)Converters.argumentToReal(arguments[3],iX);
+				float r= (float)GeneralConverters.argumentToReal(arguments[0],iX);
+				float g= (float)GeneralConverters.argumentToReal(arguments[1],iX);
+				float b= (float)GeneralConverters.argumentToReal(arguments[2],iX);
+				float a= (float)GeneralConverters.argumentToReal(arguments[3],iX);
 				return new Color3f(new Color(r,g,b,a));
 			} catch (Backtracking b2) {
 				Color color= ExtendedColor.argumentToColor(value,iX);
@@ -156,9 +156,9 @@ public class Tools3D {
 	public static Point3f term2Attenuation(Term value, ChoisePoint iX) {
 		try { // Attenuation
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_a,3,iX);
-			float constant= (float)Converters.argumentToReal(arguments[0],iX);
-			float linear= (float)Converters.argumentToReal(arguments[1],iX);
-			float quadratic= (float)Converters.argumentToReal(arguments[2],iX);
+			float constant= (float)GeneralConverters.argumentToReal(arguments[0],iX);
+			float linear= (float)GeneralConverters.argumentToReal(arguments[1],iX);
+			float quadratic= (float)GeneralConverters.argumentToReal(arguments[2],iX);
 			return new Point3f(constant,quadratic,quadratic);
 		} catch (Backtracking b) {
 			throw new WrongArgumentIsNotAnAttenuation(value);
@@ -168,11 +168,11 @@ public class Tools3D {
 	///////////////////////////////////////////////////////////////
 	//
 	public static Vector3d term2Vector3(Term value, ChoisePoint iX) {
-		Term[] termArray= Converters.listToArray(value,iX);
+		Term[] termArray= GeneralConverters.listToArray(value,iX);
 		if (termArray.length==3) {
-			double x= Converters.argumentToReal(termArray[0],iX);
-			double y= Converters.argumentToReal(termArray[1],iX);
-			double z= Converters.argumentToReal(termArray[2],iX);
+			double x= GeneralConverters.argumentToReal(termArray[0],iX);
+			double y= GeneralConverters.argumentToReal(termArray[1],iX);
+			double z= GeneralConverters.argumentToReal(termArray[2],iX);
 			return new Vector3d(x,y,z);
 		} else {
 			throw new WrongNumberOfElementsInList(value);
@@ -182,11 +182,11 @@ public class Tools3D {
 	///////////////////////////////////////////////////////////////
 	//
 	public static Vector3f term2Vector3f(Term value, ChoisePoint iX) {
-		Term[] termArray= Converters.listToArray(value,iX);
+		Term[] termArray= GeneralConverters.listToArray(value,iX);
 		if (termArray.length==3) {
-			float x= (float)Converters.argumentToReal(termArray[0],iX);
-			float y= (float)Converters.argumentToReal(termArray[1],iX);
-			float z= (float)Converters.argumentToReal(termArray[2],iX);
+			float x= (float)GeneralConverters.argumentToReal(termArray[0],iX);
+			float y= (float)GeneralConverters.argumentToReal(termArray[1],iX);
+			float z= (float)GeneralConverters.argumentToReal(termArray[2],iX);
 			return new Vector3f(x,y,z);
 		} else {
 			throw new WrongNumberOfElementsInList(value);
@@ -196,12 +196,12 @@ public class Tools3D {
 	///////////////////////////////////////////////////////////////
 	//
 	public static Vector4d term2Vector4(Term value, ChoisePoint iX) {
-		Term[] termArray= Converters.listToArray(value,iX);
+		Term[] termArray= GeneralConverters.listToArray(value,iX);
 		if (termArray.length==4) {
-			double x= Converters.argumentToReal(termArray[0],iX);
-			double y= Converters.argumentToReal(termArray[1],iX);
-			double z= Converters.argumentToReal(termArray[2],iX);
-			double w= Converters.argumentToReal(termArray[3],iX);
+			double x= GeneralConverters.argumentToReal(termArray[0],iX);
+			double y= GeneralConverters.argumentToReal(termArray[1],iX);
+			double z= GeneralConverters.argumentToReal(termArray[2],iX);
+			double w= GeneralConverters.argumentToReal(termArray[3],iX);
 			return new Vector4d(x,y,z,w);
 		} else {
 			throw new WrongNumberOfElementsInList(value);
@@ -211,12 +211,12 @@ public class Tools3D {
 	///////////////////////////////////////////////////////////////
 	//
 	public static AxisAngle4d term2AxisAngle4(Term value, ChoisePoint iX) {
-		Term[] termArray= Converters.listToArray(value,iX);
+		Term[] termArray= GeneralConverters.listToArray(value,iX);
 		if (termArray.length==4) {
-			double x= Converters.argumentToReal(termArray[0],iX);
-			double y= Converters.argumentToReal(termArray[1],iX);
-			double z= Converters.argumentToReal(termArray[2],iX);
-			double angle= Converters.argumentToReal(termArray[3],iX);
+			double x= GeneralConverters.argumentToReal(termArray[0],iX);
+			double y= GeneralConverters.argumentToReal(termArray[1],iX);
+			double z= GeneralConverters.argumentToReal(termArray[2],iX);
+			double angle= GeneralConverters.argumentToReal(termArray[3],iX);
 			return new AxisAngle4d(x,y,z,angle);
 		} else {
 			throw new WrongNumberOfElementsInList(value);

@@ -6,11 +6,8 @@
 
 package morozov.system.gui.dialogs.scalable;
 
-import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
-import morozov.system.signals.*;
-import morozov.terms.*;
 
 import javax.swing.AbstractButton;
 import javax.swing.JToggleButton;

@@ -19,11 +19,20 @@ public enum PrologTokenType {
 		}
 	},
 	REST_OF_TEXT {
-		String toText() throws TokenIsCompound {
-			throw TokenIsCompound.instance;
+		String toText() {
+			return "";
 		}
 		Term toTerm() throws TokenIsCompound {
-			throw TokenIsCompound.instance;
+			return termRestOfText;
+		}
+	},
+	END_OF_LINE {
+		String toText() {
+			return "\n";
+		}
+		Term toTerm() {
+			initiateStaticTermsIfNecessary();
+			return termEndOfLine;
 		}
 	},
 	INTEGER {
@@ -42,6 +51,14 @@ public enum PrologTokenType {
 			throw TokenIsCompound.instance;
 		}
 	},
+	SYMBOL {
+		String toText() throws TokenIsCompound {
+			throw TokenIsCompound.instance;
+		}
+		Term toTerm() throws TokenIsCompound {
+			throw TokenIsCompound.instance;
+		}
+	},
 	STRING {
 		String toText() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
@@ -50,7 +67,7 @@ public enum PrologTokenType {
 			throw TokenIsCompound.instance;
 		}
 	},
-	SYMBOL {
+	BINARY {
 		String toText() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
@@ -359,6 +376,8 @@ public enum PrologTokenType {
 	public static volatile boolean staticTermsAreInitiated= false;
 	public static volatile Object guard= new Object();
 	public static Term termEndOfText;
+	public static Term termRestOfText;
+	public static Term termEndOfLine;
 	public static Term termComma;
 	public static Term termDot;
 	public static Term termExclam;
@@ -398,6 +417,8 @@ public enum PrologTokenType {
 					return;
 				};
 				termEndOfText= new PrologSymbol(SymbolCodes.symbolCode_E_end_of_text);
+				termRestOfText= new PrologSymbol(SymbolCodes.symbolCode_E_rest_of_text);
+				termEndOfLine= new PrologSymbol(SymbolCodes.symbolCode_E_end_of_line);
 				termComma= new PrologSymbol(SymbolCodes.symbolCode_E_comma);
 				termDot= new PrologSymbol(SymbolCodes.symbolCode_E_dot);
 				termExclam= new PrologSymbol(SymbolCodes.symbolCode_E_exclam);

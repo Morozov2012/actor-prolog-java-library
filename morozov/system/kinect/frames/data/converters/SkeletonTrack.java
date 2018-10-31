@@ -5,17 +5,15 @@ package morozov.system.kinect.frames.data.converters;
 import target.*;
 
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.kinect.frames.data.*;
 import morozov.system.kinect.frames.data.interfaces.*;
 import morozov.system.kinect.frames.data.tools.*;
-import morozov.system.kinect.modes.*;
 import morozov.system.kinect.modes.interfaces.*;
 import morozov.terms.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
-import java.util.Iterator;
 import java.util.ListIterator;
 import java.io.Serializable;
 
@@ -519,7 +517,7 @@ public class SkeletonTrack implements Serializable {
 		for (int n=0; n < arrayOfSkeletonTerms.size(); n++) {
 			skeletonTerms[n]= arrayOfSkeletonTerms.get(n).getTerm();
 		};
-		Term termListOfSkeletons= Converters.arrayToList(skeletonTerms);
+		Term termListOfSkeletons= GeneralConverters.arrayToList(skeletonTerms);
 		Term result= PrologEmptySet.instance;
 		result= new PrologSet(-SymbolCodes.symbolCode_E_skeletons,termListOfSkeletons,result);
 		result= new PrologSet(-SymbolCodes.symbolCode_E_time2,termEndTime,result);
@@ -548,7 +546,7 @@ public class SkeletonTrack implements Serializable {
 		for (int n=0; n < targetSkeletonTerms.size(); n++) {
 			skeletonTerms[n]= targetSkeletonTerms.get(n).getTerm();
 		};
-		Term termListOfSkeletons= Converters.arrayToList(skeletonTerms);
+		Term termListOfSkeletons= GeneralConverters.arrayToList(skeletonTerms);
 		Term result= PrologEmptySet.instance;
 		result= new PrologSet(-SymbolCodes.symbolCode_E_skeletons,termListOfSkeletons,result);
 		result= new PrologSet(-SymbolCodes.symbolCode_E_time2,termEndTime,result);

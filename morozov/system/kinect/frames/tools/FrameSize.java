@@ -14,6 +14,13 @@ public class FrameSize {
 		height= h;
 	}
 	//
+	public int getWidth() {
+		return width;
+	}
+	public int getHeight() {
+		return height;
+	}
+	//
 	public static FrameSize computeDepthFrameSize(short[] depthFrame) {
 		int frameLength= depthFrame.length;
 		return computeFrameSize(frameLength,1);

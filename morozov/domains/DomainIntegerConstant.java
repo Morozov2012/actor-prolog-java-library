@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.math.BigInteger;
 
 public class DomainIntegerConstant extends DomainAlternative {
+	//
 	protected BigInteger constantValue;
 	//
 	public DomainIntegerConstant(BigInteger value) {

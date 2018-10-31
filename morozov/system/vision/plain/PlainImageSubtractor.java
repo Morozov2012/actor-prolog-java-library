@@ -11,28 +11,10 @@ import morozov.system.vision.vpm.commands.blb.*;
 import morozov.system.vision.vpm.converters.*;
 import morozov.terms.*;
 
-import java.awt.image.WritableRaster;
 import java.awt.image.Raster;
 import java.awt.image.ConvolveOp;
 import java.awt.image.Kernel;
-import java.awt.Image;
 import java.awt.Graphics2D;
-
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.concurrent.atomic.AtomicReference;
-import java.math.BigInteger;
-
-import java.awt.color.ColorSpace;
-import java.awt.image.ColorConvertOp;
-import java.util.Calendar;
-import java.io.PrintWriter;
-import java.io.IOException;
 
 public class PlainImageSubtractor extends GenericVideoProcessingMachine implements BlobHolder {
 	//

@@ -10,6 +10,7 @@ import morozov.run.*;
 import morozov.syntax.errors.*;
 import morozov.syntax.scanner.errors.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.datum.errors.*;
 import morozov.system.datum.signals.*;
 import morozov.terms.*;
@@ -86,7 +87,7 @@ public class DatabaseTableContainer extends LoadableContainer {
 						store= store.dereferenceValue(iX);
 						if (store instanceof DataStore) {
 							DataStore dataStore= (DataStore)store;
-							String entry= Converters.argumentToString(arguments[1],iX);
+							String entry= GeneralConverters.argumentToString(arguments[1],iX);
 							DatabaseTable databaseTable= dataStore.getDatabaseTable(entry);
 							return databaseTable;
 						} else {
@@ -122,7 +123,7 @@ public class DatabaseTableContainer extends LoadableContainer {
 						store= store.dereferenceValue(iX);
 						if (store instanceof DataStore) {
 							DataStore dataStore= (DataStore)store;
-							String entry= Converters.argumentToString(arguments[1],iX);
+							String entry= GeneralConverters.argumentToString(arguments[1],iX);
 							DatabaseTableContainer databaseTableContainer= dataStore.getDatabaseTableContainer(entry,domain,type,reuseKN,true);
 							return databaseTableContainer;
 						} else {
@@ -158,7 +159,7 @@ public class DatabaseTableContainer extends LoadableContainer {
 						store= store.dereferenceValue(iX);
 						if (store instanceof DataStore) {
 							DataStore dataStore= (DataStore)store;
-							String entry= Converters.argumentToString(arguments[1],iX);
+							String entry= GeneralConverters.argumentToString(arguments[1],iX);
 							dataStore.beginDatabaseTableTransaction(entry,domain,type,reuseKN,accessMode,waitingPeriod,sleepPeriod,maxRetryNumber,currentProcess,iX);
 						} else {
 							throw new WrongArgumentIsNotDataStore(value);
@@ -193,7 +194,7 @@ public class DatabaseTableContainer extends LoadableContainer {
 						store= store.dereferenceValue(iX);
 						if (store instanceof DataStore) {
 							DataStore dataStore= (DataStore)store;
-							String entry= Converters.argumentToString(arguments[1],iX);
+							String entry= GeneralConverters.argumentToString(arguments[1],iX);
 							dataStore.endDatabaseTableTransaction(entry,database,currentProcess,watchTable);
 						} else {
 							throw new WrongArgumentIsNotDataStore(value);
@@ -228,7 +229,7 @@ public class DatabaseTableContainer extends LoadableContainer {
 						store= store.dereferenceValue(iX);
 						if (store instanceof DataStore) {
 							DataStore dataStore= (DataStore)store;
-							String entry= Converters.argumentToString(arguments[1],iX);
+							String entry= GeneralConverters.argumentToString(arguments[1],iX);
 							dataStore.rollbackDatabaseTableCurrentTransaction(entry,currentProcess,watchTable);
 						} else {
 							throw new WrongArgumentIsNotDataStore(value);
@@ -263,7 +264,7 @@ public class DatabaseTableContainer extends LoadableContainer {
 						store= store.dereferenceValue(iX);
 						if (store instanceof DataStore) {
 							DataStore dataStore= (DataStore)store;
-							String entry= Converters.argumentToString(arguments[1],iX);
+							String entry= GeneralConverters.argumentToString(arguments[1],iX);
 							dataStore.rollbackDatabaseTableTransactionTree(entry,currentProcess,watchTable);
 						} else {
 							throw new WrongArgumentIsNotDataStore(value);
@@ -298,7 +299,7 @@ public class DatabaseTableContainer extends LoadableContainer {
 						store= store.dereferenceValue(iX);
 						if (store instanceof DataStore) {
 							DataStore dataStore= (DataStore)store;
-							String entry= Converters.argumentToString(arguments[1],iX);
+							String entry= GeneralConverters.argumentToString(arguments[1],iX);
 							dataStore.activateDatabaseTableWatcher(entry,domain,type,reuseKeyNumbers,database,currentProcess);
 						} else {
 							throw new WrongArgumentIsNotDataStore(value);
@@ -333,7 +334,7 @@ public class DatabaseTableContainer extends LoadableContainer {
 						store= store.dereferenceValue(iX);
 						if (store instanceof DataStore) {
 							DataStore dataStore= (DataStore)store;
-							String entry= Converters.argumentToString(arguments[1],iX);
+							String entry= GeneralConverters.argumentToString(arguments[1],iX);
 							dataStore.unregisterDatabaseTableWatcher(entry,database,currentProcess);
 						} else {
 							throw new WrongArgumentIsNotDataStore(value);

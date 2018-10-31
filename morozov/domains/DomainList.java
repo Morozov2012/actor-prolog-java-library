@@ -10,6 +10,7 @@ import morozov.terms.signals.*;
 import java.util.HashSet;
 
 public class DomainList extends MonoArgumentDomainItem {
+	//
 	public DomainList(String entry) {
 		super(entry);
 	}

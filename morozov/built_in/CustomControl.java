@@ -5,8 +5,9 @@ package morozov.built_in;
 import target.*;
 
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.*;
-import morozov.system.gui.signals.*;
+import morozov.system.signals.*;
 import morozov.run.*;
 import morozov.terms.*;
 import morozov.worlds.*;
@@ -128,7 +129,6 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	public void getTitle0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(getTitle(iX).toTerm());
-		// iX.pushTrail(a1);
 	}
 	public void getTitle0fs(ChoisePoint iX) {
 	}
@@ -161,7 +161,6 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	public void getX0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(getX(iX).toTerm());
-		// iX.pushTrail(a1);
 	}
 	public void getX0fs(ChoisePoint iX) {
 	}
@@ -194,7 +193,6 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	public void getY0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(getY(iX).toTerm());
-		// iX.pushTrail(a1);
 	}
 	public void getY0fs(ChoisePoint iX) {
 	}
@@ -226,15 +224,12 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	public void getDefaultPosition2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
 		a1.setBacktrackableValue(getX(iX).toTerm(),iX);
 		a2.setBacktrackableValue(getY(iX).toTerm(),iX);
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
 	}
 	//
 	// get/set backgroundColor
 	//
 	public void setBackgroundColor1s(ChoisePoint iX, Term a1) {
 		setBackgroundColor(ExtendedColor.argumentToExtendedColor(a1,iX));
-		// createGraphicWindowIfNecessary(iX,false);
 		changeBackgroundColor(iX);
 	}
 	public void setBackgroundColor(ExtendedColor value) {
@@ -242,7 +237,6 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	public void getBackgroundColor0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(getBackgroundColor(iX).toTerm());
-		// iX.pushTrail(a1);
 	}
 	public void getBackgroundColor0fs(ChoisePoint iX) {
 	}
@@ -278,10 +272,6 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		a2.setBacktrackableValue(getY(iX).toTerm(),iX);
 		a3.setBacktrackableValue(getWidth(iX).toTerm(),iX);
 		a4.setBacktrackableValue(getHeight(iX).toTerm(),iX);
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
-		//iX.pushTrail(a3);
-		//iX.pushTrail(a4);
 	}
 	//
 	// get/set textColor
@@ -295,7 +285,6 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	public void getTextColor0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(getTextColor(iX).toTerm());
-		// iX.pushTrail(a1);
 	}
 	public void getTextColor0fs(ChoisePoint iX) {
 	}
@@ -329,7 +318,6 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	public void getSpaceColor0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(getSpaceColor(iX).toTerm());
-		// iX.pushTrail(a1);
 	}
 	public void getSpaceColor0fs(ChoisePoint iX) {
 	}
@@ -365,7 +353,6 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	public void getFontName0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(getFontName(iX).toTerm());
-		// iX.pushTrail(a1);
 	}
 	public void getFontName0fs(ChoisePoint iX) {
 	}
@@ -399,7 +386,6 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	public void getFontSize0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(getFontSize(iX).toTerm());
-		// iX.pushTrail(a1);
 	}
 	public void getFontSize0fs(ChoisePoint iX) {
 	}
@@ -433,7 +419,6 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	public void getFontStyle0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(getFontStyle(iX).toTerm());
-		// iX.pushTrail(a1);
 	}
 	public void getFontStyle0fs(ChoisePoint iX) {
 	}
@@ -469,7 +454,6 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	public void getEnableSceneAntialiasing0ff(ChoisePoint iX, PrologVariable result) {
 		boolean value= getEnableSceneAntialiasing(iX);
 		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(value));
-		// iX.pushTrail(a1);
 	}
 	public void getEnableSceneAntialiasing0fs(ChoisePoint iX) {
 	}
@@ -497,7 +481,6 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	public void getMenu0ff(ChoisePoint iX, PrologVariable result) {
 		TranslatedMenuItem[] value= getMenu(iX);
 		result.setNonBacktrackableValue(TranslatedMenuItem.translatedMenuItemsToTerm(value));
-		// iX.pushTrail(a1);
 	}
 	public void getMenu0fs(ChoisePoint iX) {
 	}
@@ -512,7 +495,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	//
 	protected void addMenuIfNecessary(ChoisePoint iX, TranslatedMenuItem[] list) {
 		// createGraphicWindowIfNecessary(iX,false);
-		synchronized(this) {
+		synchronized (this) {
 			if (graphicWindow != null) {
 				if (list.length > 0) {
 					JMenuBar menuBar= TranslatedMenuItem.argumentToJMenuBar(list,graphicWindow);
@@ -531,7 +514,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		ExtendedCoordinate eX= ExtendedCoordinate.argumentToExtendedCoordinate(a1,iX);
 		ExtendedCoordinate eY= ExtendedCoordinate.argumentToExtendedCoordinate(a2,iX);
 		createGraphicWindowIfNecessary(iX,false);
-		synchronized(this) {
+		synchronized (this) {
 			if (graphicWindow != null) {
 				graphicWindow.logicalX.set(eX);
 				graphicWindow.logicalY.set(eY);
@@ -545,7 +528,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	public void getActualPosition2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
 		Point canvasLocation= new Point();
-		synchronized(this) {
+		synchronized (this) {
 			if (graphicWindow != null) {
 				graphicWindow.safelyGetComponentLocation(canvasLocation);
 			} else {
@@ -561,13 +544,11 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		double logicalY= CoordinateAndSize.reconstruct(canvasLocation.y,desktopSize.height,gridY);
 		a1.setBacktrackableValue(new PrologReal(logicalX),iX);
 		a2.setBacktrackableValue(new PrologReal(logicalY),iX);
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
 	}
 	//
 	public void getPositionInPixels2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
 		Point canvasLocation= new Point();
-		synchronized(this) {
+		synchronized (this) {
 			if (graphicWindow != null) {
 				graphicWindow.safelyGetComponentLocation(canvasLocation);
 			} else {
@@ -578,15 +559,13 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		};
 		a1.setBacktrackableValue(new PrologInteger(canvasLocation.x),iX);
 		a2.setBacktrackableValue(new PrologInteger(canvasLocation.y),iX);
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
 	}
 	//
 	public void setActualSize2s(ChoisePoint iX, Term a1, Term a2) {
 		ExtendedSize eWidth= ExtendedSize.argumentToExtendedSize(a1,iX);
 		ExtendedSize eHeight= ExtendedSize.argumentToExtendedSize(a2,iX);
 		createGraphicWindowIfNecessary(iX,false);
-		synchronized(this) {
+		synchronized (this) {
 			if (graphicWindow != null) {
 				graphicWindow.logicalWidth.set(eWidth);
 				graphicWindow.logicalHeight.set(eHeight);
@@ -600,7 +579,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	public void getActualSize2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
 		Dimension canvasSize= new Dimension();
-		synchronized(this) {
+		synchronized (this) {
 			if (graphicWindow != null) {
 				graphicWindow.safelyGetComponentSize(canvasSize);
 			} else {
@@ -616,13 +595,11 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		double logicalHeight= CoordinateAndSize.reconstruct(canvasSize.height,desktopSize.height,gridY);
 		a1.setBacktrackableValue(new PrologReal(logicalWidth),iX);
 		a2.setBacktrackableValue(new PrologReal(logicalHeight),iX);
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
 	}
 	//
 	public void getSizeInPixels2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
 		Dimension canvasSize= new Dimension();
-		synchronized(this) {
+		synchronized (this) {
 			if (graphicWindow != null) {
 				graphicWindow.safelyGetComponentSize(canvasSize);
 			} else {
@@ -633,8 +610,6 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		};
 		a1.setBacktrackableValue(new PrologInteger(canvasSize.width),iX);
 		a2.setBacktrackableValue(new PrologInteger(canvasSize.height),iX);
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
 	}
 	//
 	public void setActualBounds4s(ChoisePoint iX, Term a1, Term a2, Term a3, Term a4) {
@@ -643,7 +618,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		ExtendedSize eWidth= ExtendedSize.argumentToExtendedSize(a3,iX);
 		ExtendedSize eHeight= ExtendedSize.argumentToExtendedSize(a4,iX);
 		createGraphicWindowIfNecessary(iX,false);
-		synchronized(this) {
+		synchronized (this) {
 			if (graphicWindow != null) {
 				graphicWindow.logicalWidth.set(eWidth);
 				graphicWindow.logicalHeight.set(eHeight);
@@ -660,7 +635,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	public void getActualBounds4s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3, PrologVariable a4) {
 		Point canvasLocation= new Point();
 		Dimension canvasSize= new Dimension();
-		synchronized(this) {
+		synchronized (this) {
 			if (graphicWindow != null) {
 				graphicWindow.safelyGetComponentLocation(canvasLocation,canvasSize);
 			} else {
@@ -680,10 +655,6 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		a2.setBacktrackableValue(new PrologReal(logicalY),iX);
 		a3.setBacktrackableValue(new PrologReal(logicalWidth),iX);
 		a4.setBacktrackableValue(new PrologReal(logicalHeight),iX);
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
-		//iX.pushTrail(a3);
-		//iX.pushTrail(a4);
 	}
 	//
 	protected Dimension getSizeOfMainDesctopPane() {
@@ -700,7 +671,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	public void getBoundsInPixels4s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3, PrologVariable a4) {
 		Point canvasLocation= new Point();
 		Dimension canvasSize= new Dimension();
-		synchronized(this) {
+		synchronized (this) {
 			if (graphicWindow != null) {
 				graphicWindow.safelyGetComponentLocation(canvasLocation,canvasSize);
 			} else {
@@ -713,21 +684,17 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		a2.setBacktrackableValue(new PrologInteger(canvasLocation.y),iX);
 		a3.setBacktrackableValue(new PrologInteger(canvasSize.width),iX);
 		a4.setBacktrackableValue(new PrologInteger(canvasSize.height),iX);
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
-		//iX.pushTrail(a3);
-		//iX.pushTrail(a4);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void closeFiles() {
-		synchronized(this) {
+	public void releaseSystemResources() {
+		synchronized (this) {
 			if (graphicWindow != null) {
 				graphicWindow.safelyDispose();
 			}
 		};
-		super.closeFiles();
+		super.releaseSystemResources();
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -738,7 +705,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	protected void changeTitle(ExtendedTitle title, ChoisePoint iX) {
 		// createGraphicWindowIfNecessary(iX,false);
 		String text= title.getValueOrDefaultText("");
-		synchronized(this) {
+		synchronized (this) {
 			if (graphicWindow != null) {
 				graphicWindow.safelySetTitle(text);
 			}
@@ -761,7 +728,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		} catch (UseDefaultColor e) {
 			color= getDefaultBackgroundColor();
 		};
-		synchronized(this) {
+		synchronized (this) {
 			if (graphicWindow != null) {
 				graphicWindow.safelySetBackground(color);
 			} else if (canvasSpace != null) {
@@ -793,7 +760,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	//
 	public void redraw0s(ChoisePoint iX) {
 		createGraphicWindowIfNecessary(iX,false);
-		synchronized(this) {
+		synchronized (this) {
 			if (graphicWindow != null) {
 				refreshAttributesOfInternalFrame(graphicWindow,iX);
 				graphicWindow.safelyRestoreSize(staticContext);
@@ -810,7 +777,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return;
 		} else {
 			createGraphicWindowIfNecessary(iX,false);
-			synchronized(this) {
+			synchronized (this) {
 				if (graphicWindow != null) {
 					graphicWindow.safelySetVisible(false);
 				}
@@ -851,7 +818,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	//
 	public void maximize0s(ChoisePoint iX) {
 		createGraphicWindowIfNecessary(iX,true);
-		synchronized(this) {
+		synchronized (this) {
 			if (graphicWindow != null) {
 				graphicWindow.safelyMaximize();
 			}
@@ -860,7 +827,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	//
 	public void minimize0s(ChoisePoint iX) {
 		createGraphicWindowIfNecessary(iX,true);
-		synchronized(this) {
+		synchronized (this) {
 			if (graphicWindow != null) {
 				graphicWindow.safelyMinimize();
 			}
@@ -869,7 +836,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	//
 	public void restore0s(ChoisePoint iX) {
 		createGraphicWindowIfNecessary(iX,true);
-		synchronized(this) {
+		synchronized (this) {
 			if (graphicWindow != null) {
 				graphicWindow.safelyRestore();
 			}
@@ -880,7 +847,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		if (canvasSpaceDoesNotExist()) {
 			throw Backtracking.instance;
 		} else {
-			synchronized(this) {
+			synchronized (this) {
 				if (graphicWindow != null) {
 					if (!graphicWindow.safelyIsVisible()) {
 						throw Backtracking.instance;
@@ -895,7 +862,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	public void isHidden0s(ChoisePoint iX) throws Backtracking {
 		if (canvasSpaceDoesNotExist()) {
 		} else {
-			synchronized(this) {
+			synchronized (this) {
 				if (graphicWindow != null) {
 					if (!graphicWindow.safelyIsHidden()) {
 						throw Backtracking.instance;
@@ -909,7 +876,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		if (canvasSpaceDoesNotExist()) {
 			throw Backtracking.instance;
 		} else {
-			synchronized(this) {
+			synchronized (this) {
 				if (graphicWindow != null) {
 					if (!graphicWindow.safelyIsMaximized()) {
 						throw Backtracking.instance;
@@ -925,7 +892,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		if (canvasSpaceDoesNotExist()) {
 			throw Backtracking.instance;
 		} else {
-			synchronized(this) {
+			synchronized (this) {
 				if (graphicWindow != null) {
 					if(!graphicWindow.safelyIsMinimized()) {
 						throw Backtracking.instance;
@@ -941,7 +908,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		if (canvasSpaceDoesNotExist()) {
 			throw Backtracking.instance;
 		} else {
-			synchronized(this) {
+			synchronized (this) {
 				if (graphicWindow != null) {
 					if(!graphicWindow.safelyIsRestored()) {
 						throw Backtracking.instance;
@@ -956,7 +923,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	///////////////////////////////////////////////////////////////
 	//
 	protected void createGraphicWindowIfNecessary(ChoisePoint iX, boolean enableMovingWindowToFront) {
-		synchronized(this) {
+		synchronized (this) {
 			if (spaceAttributes != null) {
 				if (canvasSpaceDoesNotExist() && spaceAttributes.controlIsNotInitialized()) {
 					DesktopUtils.createPaneIfNecessary(staticContext);
@@ -1006,16 +973,16 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	///////////////////////////////////////////////////////////////
 	//
 	public void refineWidth1s(ChoisePoint iX, Term a1) {
-		double ratio= Converters.argumentToReal(a1,iX);
-		synchronized(this) {
+		double ratio= GeneralConverters.argumentToReal(a1,iX);
+		synchronized (this) {
 			if (canvasSpace != null) {
 				canvasSpace.safelyRefineWidth(ratio);
 			}
 		}
 	}
 	public void refineHeight1s(ChoisePoint iX, Term a1) {
-		double ratio= Converters.argumentToReal(a1,iX);
-		synchronized(this) {
+		double ratio= GeneralConverters.argumentToReal(a1,iX);
+		synchronized (this) {
 			if (canvasSpace != null) {
 				canvasSpace.safelyRefineHeight(ratio);
 			}
@@ -1025,7 +992,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	///////////////////////////////////////////////////////////////
 	//
 	public void registerCanvasSpace(CanvasSpace s, ChoisePoint iX) {
-		synchronized(this) {
+		synchronized (this) {
 			if (canvasSpaceDoesNotExist()) {
 				canvasSpace= s;
 				canvasSpace.setTargetWorld(this);
@@ -1047,7 +1014,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	//
 	public void release(boolean dialogIsModal, ChoisePoint modalChoisePoint) {
-		synchronized(this) {
+		synchronized (this) {
 			if (canvasSpace != null && graphicWindow==null) {
 				canvasSpace.skipDelayedRepainting();
 				disableMouseListeners();
@@ -1088,7 +1055,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	///////////////////////////////////////////////////////////////
 	//
 	public boolean canvasSpaceDoesNotExist() {
-		synchronized(this) {
+		synchronized (this) {
 			return (canvasSpace==null);
 		}
 	}
@@ -1099,7 +1066,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		} else {
 			if (!suspendRedrawing) {
 				createGraphicWindowIfNecessary(iX,false);
-				synchronized(this) {
+				synchronized (this) {
 					if (graphicWindow != null) {
 						graphicWindow.repaintAfterDelay();
 					} else if (canvasSpace != null) {
@@ -1114,7 +1081,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return;
 		} else {
 			createGraphicWindowIfNecessary(iX,false);
-			synchronized(this) {
+			synchronized (this) {
 				if (graphicWindow != null) {
 					graphicWindow.skipDelayedRepainting();
 				} else if (canvasSpace != null) {

@@ -14,13 +14,18 @@ import java.io.IOException;
 import java.nio.charset.CharsetEncoder;
 
 public class PrologSymbol extends Term {
+	//
 	private long value;
+	//
 	public PrologSymbol(long v) {
 		value= v;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public long getSymbolFunctor() {
+		return value;
+	}
 	public int hashCode() {
 		return calculateHashCode(value);
 	}
@@ -50,8 +55,12 @@ public class PrologSymbol extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public void isSymbol(PrologSymbol v, ChoisePoint cp) throws Backtracking {
+		if ( value != v.getSymbolFunctor() )
+			throw Backtracking.instance;
+	}
 	public void isSymbol(long v, ChoisePoint cp) throws Backtracking {
-		if (value != v)
+		if ( value != v )
 			throw Backtracking.instance;
 	}
 	public long getSymbolValue(ChoisePoint cp) throws TermIsNotASymbol {
@@ -72,13 +81,13 @@ public class PrologSymbol extends Term {
 	}
 	public void compareWithString(String a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		SymbolName name= SymbolNames.retrieveSymbolName(value);
-		if (!op.eval(name.identifier,a)) {
+		if ( !op.eval(name.identifier,a) ) {
 			throw Backtracking.instance;
 		}
 	}
 	public void compareStringWith(String a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		SymbolName name= SymbolNames.retrieveSymbolName(value);
-		if (!op.eval(a,name.identifier)) {
+		if ( !op.eval(a,name.identifier) ) {
 			throw Backtracking.instance;
 		}
 	}

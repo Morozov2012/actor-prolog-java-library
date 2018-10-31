@@ -9,6 +9,7 @@ import morozov.terms.*;
 import java.util.HashSet;
 
 public class DomainItem extends MonoArgumentDomainItem {
+	//
 	public DomainItem(String entry) {
 		super(entry);
 	}

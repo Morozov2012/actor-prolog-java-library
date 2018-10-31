@@ -37,7 +37,7 @@ public class PlayerDimensionsTools {
 				int maximalX_2D= playerDimensions.getMaximalX_2D();
 				int minimalY_2D= playerDimensions.getMinimalY_2D();
 				int maximalY_2D= playerDimensions.getMaximalY_2D();
-				Color color= ColorMapTools.getPersonDefaultColor(playerDimensions.getIdentifier());
+				Color color= KinectColorMapTools.getPersonDefaultColor(playerDimensions.getIdentifier());
 				g2.setColor(color);
 				if (playerDimensions.isInitialized_ColorParallelepiped()) {
 					g2.setStroke(solidLineStroke_ColorFrame);
@@ -67,7 +67,7 @@ public class PlayerDimensionsTools {
 				XY_Interface xy22= playerDimensions.getXY22();
 				XY_Interface xy23= playerDimensions.getXY23();
 				XY_Interface xy24= playerDimensions.getXY24();
-				Color color= ColorMapTools.getPersonDefaultColor(playerDimensions.getIdentifier());
+				Color color= KinectColorMapTools.getPersonDefaultColor(playerDimensions.getIdentifier());
 				g2.setColor(color);
 				if (playerDimensions.isInitialized_ColorParallelepiped()) {
 					g2.setStroke(solidLineStroke_ColorFrame);

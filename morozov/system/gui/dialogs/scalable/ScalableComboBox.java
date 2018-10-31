@@ -13,7 +13,7 @@ package morozov.system.gui.dialogs.scalable;
 */
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
 import morozov.system.signals.*;
@@ -29,7 +29,6 @@ import javax.swing.plaf.ComponentUI;
 import java.awt.Component;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
-import java.awt.Font;
 import java.awt.Color;
 
 import java.util.ArrayList;
@@ -87,7 +86,7 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 			throw RejectValue.instance;
 		} else {
 			ArrayList<Term> items= DialogUtils.listToTermArray(value,iX);
-			// return Converters.arrayListToTerm(items);
+			// return GeneralConverters.arrayListToTerm(items);
 			if (items.size() >= 1) {
 				return items.get(items.size()-1);
 			} else {
@@ -98,14 +97,14 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 	//
 	public Term standardizeRange(Term value, ChoisePoint iX) {
 		ArrayList<String> items= DialogUtils.listToStringArray(value,iX);
-		return Converters.stringArrayToList(items);
+		return GeneralConverters.stringArrayToList(items);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
 	public void putValue(Term value, ChoisePoint iX) {
 		if (component!=null) {
-			synchronized(component) {
+			synchronized (component) {
 				ListModel model= ((JComboBox)component).getModel();
 				try {
 					int number= value.getSmallIntegerValue(iX);
@@ -158,7 +157,7 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 	//
 	public void putRange(Term value, ChoisePoint iX) {
 		if (component!=null) {
-			synchronized(component) {
+			synchronized (component) {
 				addListOfItems(value,iX);
 			}
 		}
@@ -166,7 +165,7 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 	//
 	public Term getValue() {
 		if (component!=null) {
-			synchronized(component) {
+			synchronized (component) {
 				if (isEditable) {
 					Component textField= ((JComboBox)component).getEditor().getEditorComponent();
 					if (textField instanceof JTextField) {
@@ -210,7 +209,7 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 	//
 	public Term getRange() {
 		if (component!=null) {
-			synchronized(component) {
+			synchronized (component) {
 				ListModel model= ((JComboBox)component).getModel();
 				Term result= PrologEmptyList.instance;
 				for (int n=model.getSize()-1; n>=0; n--) {
@@ -265,7 +264,7 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 	//
 	@SuppressWarnings("unchecked")
 	protected void addListOfItems(Term list, ChoisePoint iX) {
-		String[] items= Converters.termToStrings(list,iX);
+		String[] items= GeneralConverters.termToStrings(list,iX);
 		if (enableSorting) {
 			// Arrays.sort(items,new AlphabeticComparator());
 			sortedStrings= new SortedStrings(items);

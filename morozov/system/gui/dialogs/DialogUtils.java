@@ -5,7 +5,7 @@ package morozov.system.gui.dialogs;
 import target.*;
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.*;
 import morozov.system.gui.signals.*;
 import morozov.system.gui.dialogs.signals.*;
@@ -164,7 +164,7 @@ public class DialogUtils {
 		} catch (TermIsNotAnInteger e1) {
 			try {
 				double number= StrictMath.round(tail.getRealValue(iX));
-				BigInteger bigInteger= Converters.doubleToBigInteger(number);
+				BigInteger bigInteger= GeneralConverters.doubleToBigInteger(number);
 				if (PrologInteger.isSmallInteger(bigInteger)) {
 					array.add(new PrologInteger(bigInteger));
 				} else {
@@ -220,7 +220,7 @@ public class DialogUtils {
 		} catch (TermIsNotAnInteger e1) {
 			try {
 				double number= StrictMath.round(tail.getRealValue(iX));
-				BigInteger bigInteger= Converters.doubleToBigInteger(number);
+				BigInteger bigInteger= GeneralConverters.doubleToBigInteger(number);
 				if (PrologInteger.isSmallInteger(bigInteger)) {
 					array.add(new PrologInteger(bigInteger));
 				} else {
@@ -272,7 +272,7 @@ public class DialogUtils {
 		} catch (TermIsNotAnInteger e1) {
 			try {
 				double number= StrictMath.round(tail.getRealValue(iX));
-				BigInteger bigInteger= Converters.doubleToBigInteger(number);
+				BigInteger bigInteger= GeneralConverters.doubleToBigInteger(number);
 				if (PrologInteger.isSmallInteger(bigInteger)) {
 					array.add(new PrologInteger(bigInteger));
 				} else {
@@ -325,7 +325,7 @@ public class DialogUtils {
 		} catch (TermIsNotAnInteger e1) {
 			try {
 				double number= StrictMath.round(value.getRealValue(iX));
-				BigInteger bigInteger= Converters.doubleToBigInteger(number);
+				BigInteger bigInteger= GeneralConverters.doubleToBigInteger(number);
 				if (PrologInteger.isSmallInteger(bigInteger)) {
 					return new PrologInteger(bigInteger);
 				} else {
@@ -373,7 +373,7 @@ public class DialogUtils {
 		} catch (TermIsNotAnInteger e1) {
 			try {
 				double number= StrictMath.round(value.getRealValue(iX));
-				BigInteger bigInteger= Converters.doubleToBigInteger(number);
+				BigInteger bigInteger= GeneralConverters.doubleToBigInteger(number);
 				if (PrologInteger.isSmallInteger(bigInteger)) {
 					return bigInteger.intValue();
 				} else {
@@ -388,8 +388,18 @@ public class DialogUtils {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static Font refineTextAndSpaceColors(Font font, Color individualSpaceColor, Color spaceColor, Color individualTextColor, Color textColor) {
-		if (individualSpaceColor != null) {
+	public static Font refineTextAndSpaceColors(
+			Font font,
+			Color individualSpaceColor,
+			Color spaceColor,
+			Color supervisoryTextColor,
+			Color individualTextColor,
+			Color textColor) {
+		if (supervisoryTextColor != null) {
+			Map<TextAttribute,Object> map= new HashMap<TextAttribute,Object>();
+			map.put(TextAttribute.FOREGROUND,supervisoryTextColor);
+			font= font.deriveFont(map);
+		} else if (individualSpaceColor != null) {
 			Map<TextAttribute,Object> map= new HashMap<TextAttribute,Object>();
 			map.put(TextAttribute.BACKGROUND,individualSpaceColor);
 			refineTextColor(map,individualTextColor,textColor);
@@ -411,7 +421,10 @@ public class DialogUtils {
 		return font;
 	}
 	//
-	public static void refineTextColor(Map<TextAttribute,Object> map, Color individualTextColor, Color textColor) {
+	public static void refineTextColor(
+			Map<TextAttribute,Object> map,
+			Color individualTextColor,
+			Color textColor) {
 		if (individualTextColor != null) {
 			map.put(TextAttribute.FOREGROUND,individualTextColor);
 		} else if (textColor != null) {

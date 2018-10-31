@@ -17,7 +17,7 @@ import java.util.Set;
 
 public class GenericImageEncodingAttributes implements Serializable {
 	//
-	static public GenericImageEncodingAttributes instance= new GenericImageEncodingAttributes();
+	public static GenericImageEncodingAttributes instance= new GenericImageEncodingAttributes();
 	//
 	public GenericImageEncodingAttributes() {
 	}

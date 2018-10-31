@@ -3,11 +3,14 @@
 package morozov.system.kinect.frames.data;
 
 import morozov.system.kinect.frames.data.interfaces.*;
-import morozov.system.kinect.frames.data.tools.*;
-
-import java.io.Serializable;
 
 public class KinectFrameWritableBaseAttributes extends KinectFrameBaseAttributes implements KinectFrameWritableBaseAttributesInterface {
+	//
+	private static final long serialVersionUID= 0x54D02B242B716927L; // 6111432128689432871L;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames.data","KinectFrameWritableBaseAttributes");
+	// }
 	//
 	public KinectFrameWritableBaseAttributes(
 			byte device,

@@ -2,19 +2,16 @@
 
 package morozov.worlds.remote;
 
-import morozov.built_in.*;
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.space2d.*;
 import morozov.system.vision.vpm.*;
 import morozov.system.vision.vpm.errors.*;
 import morozov.terms.*;
-import morozov.worlds.remote.*;
 import morozov.worlds.remote.errors.*;
 import morozov.worlds.remote.signals.*;
 
 import java.rmi.RemoteException;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class ForeignVideoProcessingMachine
 		extends ForeignBufferedImageController
@@ -115,6 +112,21 @@ public class ForeignVideoProcessingMachine
 	}
 	public Term getFrameNumberOrSpacer(ChoisePoint iX) {
 		return new PrologInteger(getFrameNumber(iX));
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public long getFrameTime(ChoisePoint iX) {
+		try {
+			return stub.getFrameTime();
+		} catch (OwnWorldIsNotVideoProcessingMachine e) {
+			throw new WrongArgumentIsNotVideoProcessingMachine(wrapper);
+		} catch (RemoteException e) {
+			throw new RemoteCallError(e);
+		}
+	}
+	public Term getFrameTimeOrSpacer(ChoisePoint iX) {
+		return new PrologInteger(getFrameTime(iX));
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -268,7 +280,7 @@ public class ForeignVideoProcessingMachine
 	///////////////////////////////////////////////////////////////
 	//
 	public Term getBlobs(ChoisePoint iX) {
-		return Converters.deserializeArgument(getSerializedBlobs(iX));
+		return GeneralConverters.deserializeArgument(getSerializedBlobs(iX));
 	}
 	public byte[] getSerializedBlobs(ChoisePoint iX) {
 		try {
@@ -281,7 +293,7 @@ public class ForeignVideoProcessingMachine
 	}
 	//
 	public Term getTracks(ChoisePoint iX) {
-		return Converters.deserializeArgument(getSerializedTracks(iX));
+		return GeneralConverters.deserializeArgument(getSerializedTracks(iX));
 	}
 	public byte[] getSerializedTracks(ChoisePoint iX) {
 		try {
@@ -294,7 +306,7 @@ public class ForeignVideoProcessingMachine
 	}
 	//
 	public Term getConnectedGraphs(ChoisePoint iX) {
-		return Converters.deserializeArgument(getSerializedConnectedGraphs(iX));
+		return GeneralConverters.deserializeArgument(getSerializedConnectedGraphs(iX));
 	}
 	public byte[] getSerializedConnectedGraphs(ChoisePoint iX) {
 		try {
@@ -307,7 +319,7 @@ public class ForeignVideoProcessingMachine
 	}
 	//
 	public Term getChronicle(ChoisePoint iX) {
-		return Converters.deserializeArgument(getSerializedChronicle(iX));
+		return GeneralConverters.deserializeArgument(getSerializedChronicle(iX));
 	}
 	public byte[] getSerializedChronicle(ChoisePoint iX) {
 		try {

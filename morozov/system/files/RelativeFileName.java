@@ -38,14 +38,10 @@ public class RelativeFileName extends SimpleFileName {
 				nameOfFile= toTerm();
 			}
 		} else {
-			// pathOfFile= "";
-			// nameOfFile= toTerm();
 			throw new StandardStreamIsNotAllowedInThisOperation();
 		};
 		a1.setBacktrackableValue(new PrologString(pathOfFile),iX);
 		a2.setBacktrackableValue(nameOfFile,iX);
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
 	}
 	//
 	public void extractFileExtension(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
@@ -74,19 +70,13 @@ public class RelativeFileName extends SimpleFileName {
 				};
 				a1.setBacktrackableValue(new PrologString(name),iX);
 				a2.setBacktrackableValue(new PrologString(extension),iX);
-				//iX.pushTrail(a1);
-				//iX.pushTrail(a2);
 				return;
 			} else {
 				a1.setBacktrackableValue(new PrologString(fullName),iX);
 				a2.setBacktrackableValue(new PrologString(""),iX);
-				//iX.pushTrail(a1);
-				//iX.pushTrail(a2);
 				return;
 			}
 		} else {
-			// iX.pushTrail(a1);
-			// iX.pushTrail(a2);
 			throw new StandardStreamIsNotAllowedInThisOperation();
 		}
 	}

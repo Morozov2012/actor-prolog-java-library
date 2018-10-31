@@ -18,7 +18,7 @@ public class StaticReportAttributes extends StaticAttributes {
 	private static StaticReportAttributes retrieveStaticReportAttributes(StaticContext context) {
 		StaticAttributes attributes= context.retrieveAttributes(staticIdentifier);
 		if (attributes==null) {
-			synchronized(context) {
+			synchronized (context) {
 				attributes= context.retrieveAttributes(staticIdentifier);
 				if (attributes==null) {
 					attributes= new StaticReportAttributes();
@@ -31,35 +31,35 @@ public class StaticReportAttributes extends StaticAttributes {
 	public static Map<AbstractWorld,InternalTextFrame> retrieveInnerWindows(StaticContext context) {
 		StaticReportAttributes attributes= retrieveStaticReportAttributes(context);
 		Map<AbstractWorld,InternalTextFrame> innerWindows;
-		synchronized(attributes) {
+		synchronized (attributes) {
 			innerWindows= attributes.innerWindows;
 		};
 		return innerWindows;
 	}
 	public static void setConsoleWindow(InternalTextFrame textWindow, StaticContext context) {
 		StaticReportAttributes attributes= retrieveStaticReportAttributes(context);
-		synchronized(attributes) {
+		synchronized (attributes) {
 			attributes.consoleWindow= textWindow;
 		}
 	}
 	public static InternalTextFrame retrieveConsoleWindow(StaticContext context) {
 		StaticReportAttributes attributes= retrieveStaticReportAttributes(context);
 		InternalTextFrame consoleWindow;
-		synchronized(attributes) {
+		synchronized (attributes) {
 			consoleWindow= attributes.consoleWindow;
 		};
 		return consoleWindow;
 	}
 	// public static void setFileChooser(ExtendedFileChooser chooser, StaticContext context) {
 	//	StaticReportAttributes attributes= retrieveStaticReportAttributes(context);
-	//	synchronized(attributes) {
+	//	synchronized (attributes) {
 	//		attributes.fileChooser= chooser;
 	//	}
 	// }
 	// public static ExtendedFileChooser retrieveFileChooser(StaticContext context) {
 	//	StaticReportAttributes attributes= retrieveStaticReportAttributes(context);
 	//	ExtendedFileChooser chooser;
-	//	synchronized(attributes) {
+	//	synchronized (attributes) {
 	//		chooser= attributes.fileChooser;
 	//	};
 	//	return chooser;

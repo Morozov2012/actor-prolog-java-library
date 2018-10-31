@@ -206,31 +206,20 @@ public class ConnectedSegment {
 	///////////////////////////////////////////////////////////////
 	//
 	public void excludeSegment() {
-		// if (!isFirst) {
-			// HashSet<ConnectedSegment> entries= getEntries();
-			// Iterator<ConnectedSegment> entriesIterator= entries.iterator();
-			// while (entriesIterator.hasNext()) {
-			//	ConnectedSegment entry= entriesIterator.next();
-			//	entry.deleteBranch(this);
-			//	entry.addBranches(branches);
-			// };
-			HashSet<ConnectedSegment> origins= getOrigins();
-			Iterator<ConnectedSegment> originsIterator= origins.iterator();
-			while (originsIterator.hasNext()) {
-				ConnectedSegment origin= originsIterator.next();
-				origin.deleteBranch(this);
-				origin.addBranches(branches);
-			};
-		// };
-		// if (!isLast) {
-			HashSet<ConnectedSegment> branches= getBranches();
-			Iterator<ConnectedSegment> branchesIterator= branches.iterator();
-			while (branchesIterator.hasNext()) {
-				ConnectedSegment branch= branchesIterator.next();
-				branch.deleteOrigin(this);
-				branch.addOrigins(origins);
-			}
-		// }
+		HashSet<ConnectedSegment> origins= getOrigins();
+		Iterator<ConnectedSegment> originsIterator= origins.iterator();
+		while (originsIterator.hasNext()) {
+			ConnectedSegment origin= originsIterator.next();
+			origin.deleteBranch(this);
+			origin.addBranches(branches);
+		};
+		HashSet<ConnectedSegment> branches= getBranches();
+		Iterator<ConnectedSegment> branchesIterator= branches.iterator();
+		while (branchesIterator.hasNext()) {
+			ConnectedSegment branch= branchesIterator.next();
+			branch.deleteOrigin(this);
+			branch.addOrigins(origins);
+		}
 	}
 	public void deleteOrigin(ConnectedSegment segment) {
 		origins.remove(segment);

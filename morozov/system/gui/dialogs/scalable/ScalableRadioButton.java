@@ -16,6 +16,7 @@ import java.awt.Font;
 import java.awt.Color;
 import javax.swing.Icon;
 import javax.swing.JRadioButton;
+import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.plaf.basic.BasicRadioButtonUI;
 
@@ -79,7 +80,7 @@ public class ScalableRadioButton extends ScalableAbstractButton {
 	///////////////////////////////////////////////////////////////
 	//
 	public void setIndividualText(Term value, ChoisePoint iX) {
-		AnnotatedButton.safelyUpdateAbstractButton((JRadioButton)component,value,iX);
+		AnnotatedButton.safelyUpdateAbstractButton((AbstractButton)component,value,iX);
 		// ((JButton)component).invalidate();
 		// Без этой команды при изменении надписи на кнопке
 		// соседние кнопки сдвигаются, но перерисовываются
@@ -91,7 +92,7 @@ public class ScalableRadioButton extends ScalableAbstractButton {
 	public Term getIndividualText() {
 		if (component!=null) {
 			// String text= ((JRadioButton)component).getText();
-			String text= AnnotatedButton.safelyRestoreText((JRadioButton)component);
+			String text= AnnotatedButton.safelyRestoreText((AbstractButton)component);
 			return new PrologString(text);
 		} else {
 			return termEmptyString;

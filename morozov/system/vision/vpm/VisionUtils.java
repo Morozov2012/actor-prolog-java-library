@@ -3,7 +3,6 @@
 package morozov.system.vision.vpm;
 
 import java.awt.image.SampleModel;
-// import java.awt.image.WritableRaster;
 import java.awt.image.Raster;
 import java.awt.Graphics2D;
 import java.util.Arrays;
@@ -372,12 +371,29 @@ public class VisionUtils {
 		return matrixRGB;
 	}
 	//
+	public static int[] convertRGBtoGrayscale(int[][] pixelsRGB) {
+		int numberOfBands= pixelsRGB.length;
+		if (numberOfBands < 3) {
+			return pixelsRGB[0];
+		};
+		int vectorLength= pixelsRGB[0].length;
+		int[] pixelsGray= new int[vectorLength];
+		for (int k=0; k < vectorLength; k++) {
+			int r= pixelsRGB[0][k];
+			int g= pixelsRGB[1][k];
+			int b= pixelsRGB[2][k];
+			int gray= (r + g + b) / 3;
+			pixelsGray[k]= gray;
+		};
+		return pixelsGray;
+	}
+	//
 	public static int[][] convertRGBtoHSB(int[][] pixelsRGB) {
 		int numberOfBands= pixelsRGB.length;
 		if (numberOfBands < 3) {
 			return pixelsRGB;
 		};
-		int vectorLength= pixelsRGB[1].length;
+		int vectorLength= pixelsRGB[0].length;
 		int[][] pixelsHSB= new int[numberOfBands][vectorLength];
 		if (numberOfBands > 3) {
 			for (int b=0; b < numberOfBands; b++) {
@@ -386,10 +402,10 @@ public class VisionUtils {
 				}
 			}
 		};
-		for (int n=0; n < vectorLength; n++) {
-			int r= pixelsRGB[0][n];
-			int g= pixelsRGB[1][n];
-			int b= pixelsRGB[2][n];
+		for (int k=0; k < vectorLength; k++) {
+			int r= pixelsRGB[0][k];
+			int g= pixelsRGB[1][k];
+			int b= pixelsRGB[2][k];
 			int hue;
 			int saturation;
 			int brightness;
@@ -425,9 +441,9 @@ public class VisionUtils {
 					hue= hue + maximalColor;
 				}
 			};
-			pixelsHSB[0][n]= hue;
-			pixelsHSB[1][n]= saturation;
-			pixelsHSB[2][n]= brightness;
+			pixelsHSB[0][k]= hue;
+			pixelsHSB[1][k]= saturation;
+			pixelsHSB[2][k]= brightness;
 		};
 		return pixelsHSB;
 	}

@@ -6,10 +6,9 @@ import morozov.built_in.*;
 import morozov.domains.*;
 import morozov.run.*;
 import morozov.run.errors.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.datum.*;
 import morozov.system.gui.space2d.*;
-import morozov.system.vision.plain.*;
 import morozov.system.vision.vpm.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
@@ -90,7 +89,7 @@ public class OwnWorldWrapper
 	///////////////////////////////////////////////////////////////
 	//
 	public long selectSignature(MethodSignature foreignSignature, byte[] arrayTable) {
-		HashMap<String,PrologDomain> foreignDomainTable= Converters.deserializeDomainTable(arrayTable);
+		HashMap<String,PrologDomain> foreignDomainTable= GeneralConverters.deserializeDomainTable(arrayTable);
 		foreignSignature.acceptLocalDomainTable(foreignDomainTable);
 		if (methodSignatures==null) {
 			methodSignatures= ownWorld.getMethodSignatures();
@@ -136,7 +135,7 @@ public class OwnWorldWrapper
 	}
 	public void sendResidentRequest(ExternalResidentInterface stub, long domainSignatureNumber, byte[] argumentByteArray, boolean sortAndReduceResultList) {
 		Resident resident= OwnResidentWrapper.registerWrapper(stub);
-		Term[] arguments= Converters.deserializeArguments(argumentByteArray,domainSignatureNumber);
+		Term[] arguments= GeneralConverters.deserializeArguments(argumentByteArray,domainSignatureNumber);
 		ownWorld.sendResidentRequest(resident,domainSignatureNumber,arguments,sortAndReduceResultList);
 	}
 	//
@@ -156,7 +155,7 @@ public class OwnWorldWrapper
 		ownWorld.receiveAsyncCall(item);
 	}
 	public void receiveAsyncCall(long domainSignatureNumber, boolean isControlCall, boolean useBuffer, byte[] argumentByteArray) {
-		Term[] arguments= Converters.deserializeArguments(argumentByteArray,domainSignatureNumber);
+		Term[] arguments= GeneralConverters.deserializeArguments(argumentByteArray,domainSignatureNumber);
 		ChoisePoint iX= null;
 		ownWorld.transmitAsyncCall(new AsyncCall(domainSignatureNumber,ownWorld,ownWorld,isControlCall,useBuffer,arguments,true),iX);
 	}
@@ -168,16 +167,7 @@ public class OwnWorldWrapper
 			BufferedImage bufferedImage= (BufferedImage)ownWorld;
 			java.awt.image.BufferedImage nativeImage= bufferedImage.getImage();
 			GenericImageEncodingAttributes attributes= bufferedImage.getCurrentImageEncodingAttributes();
-			if (nativeImage != null && attributes != null) {
-				Space2DWriter writer= Space2DWriter.createSpace2DWriter(nativeImage,attributes);
-				try {
-					return writer.imageToBytes(nativeImage);
-				} finally {
-					writer.dispose();
-				}
-			} else {
-				return null;
-			}
+			return Space2DWriter.imageToBytes(nativeImage,attributes);
 		} else {
 			throw OwnWorldIsNotBufferedImage.instance;
 		}
@@ -219,6 +209,16 @@ public class OwnWorldWrapper
 			ChoisePoint iX= null;
 			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
 			return vpm.getFrameNumber(iX);
+		} else {
+			throw OwnWorldIsNotVideoProcessingMachine.instance;
+		}
+	}
+	//
+	public long getFrameTime() throws OwnWorldIsNotVideoProcessingMachine {
+		if (ownWorld instanceof VideoProcessingMachineOperations) {
+			ChoisePoint iX= null;
+			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
+			return vpm.getFrameTime(iX);
 		} else {
 			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
@@ -397,8 +397,8 @@ public class OwnWorldWrapper
 	public void startProcesses() {
 		ownWorld.startProcesses();
 	}
-	public void closeFiles() {
-		ownWorld.closeFiles();
+	public void releaseSystemResources() {
+		ownWorld.releaseSystemResources();
 	}
 	public void stopProcesses() {
 		ownWorld.stopProcesses();

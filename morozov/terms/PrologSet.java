@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class PrologSet extends UnderdeterminedSetItem {
+	//
 	private Term value;
 	//
 	public PrologSet(long aName, Term aValue, Term aTail) {

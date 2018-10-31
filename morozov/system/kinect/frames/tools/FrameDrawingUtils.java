@@ -2,7 +2,6 @@
 
 package morozov.system.kinect.frames.tools;
 
-import morozov.system.kinect.frames.*;
 import morozov.system.kinect.frames.data.tools.*;
 import morozov.system.kinect.frames.interfaces.*;
 import morozov.system.kinect.frames.tools.errors.*;
@@ -14,9 +13,6 @@ import java.awt.Font;
 import java.awt.image.BufferedImage;
 import java.awt.image.WritableRaster;
 import java.awt.Graphics2D;
-import java.awt.geom.Ellipse2D;
-
-import edu.ufl.digitalworlds.j4k.J4K2;
 
 public class FrameDrawingUtils extends FrameDrawingBasics {
 	//
@@ -25,7 +21,7 @@ public class FrameDrawingUtils extends FrameDrawingBasics {
 /////////////////////////////////////////////////////////////////////
 // Kinect Frame -> Image                                           //
 /////////////////////////////////////////////////////////////////////
-	public static java.awt.image.BufferedImage getImage(KinectFrameInterface frame, KinectDisplayingModeInterface displayingMode, ColorMapInterface colorMap, ColorMapInterface peopleColors) {
+	public static java.awt.image.BufferedImage getImage(KinectFrameInterface frame, KinectDisplayingModeInterface displayingMode, KinectColorMap colorMap, KinectColorMap peopleColors) {
 		KinectPeopleIndexMode peopleIndexMode= displayingMode.getActingPeopleIndexMode();
 		int maximalNumberOfSkeletons= frame.getNumberOfSkeletons();
 		if (frame instanceof KinectColorFrameInterface) {
@@ -67,7 +63,7 @@ public class FrameDrawingUtils extends FrameDrawingBasics {
 // Short Array to Gray Buffered Image                              //
 // (tinctureRatio4)                                                //
 /////////////////////////////////////////////////////////////////////
-	public static BufferedImage shortArrayToGrayBufferedImage(short[] array, boolean computeQuantiles, KinectPeopleIndexMode currentPeopleIndexMode, byte[] playerIndex, boolean useWhiteBackground, byte[][] red1, byte[][] green1, byte[][] blue1, ColorMapInterface colorMap, ColorMapInterface peopleColors, int maximalNumberOfSkeletons) {
+	public static BufferedImage shortArrayToGrayBufferedImage(short[] array, boolean computeQuantiles, KinectPeopleIndexMode currentPeopleIndexMode, byte[] playerIndex, boolean useWhiteBackground, byte[][] red1, byte[][] green1, byte[][] blue1, KinectColorMap colorMap, KinectColorMap peopleColors, int maximalNumberOfSkeletons) {
 		if (playerIndex==null) {
 			currentPeopleIndexMode= KinectPeopleIndexMode.NONE;
 		};
@@ -261,7 +257,7 @@ blue2[counter3]= byte2int(blue1[w][h]);
 // Short Array to Coloured Buffered Image                          //
 // (tinctureRatio2)                                                //
 /////////////////////////////////////////////////////////////////////
-	public static BufferedImage shortArrayToColouredBufferedImage(short[] array, boolean computeQuantiles, KinectPeopleIndexMode currentPeopleIndexMode, byte[] playerIndex, boolean useWhiteBackground, byte[][] red1, byte[][] green1, byte[][] blue1, ColorMapInterface colorMap, ColorMapInterface peopleColors, int maximalNumberOfSkeletons) {
+	public static BufferedImage shortArrayToColouredBufferedImage(short[] array, boolean computeQuantiles, KinectPeopleIndexMode currentPeopleIndexMode, byte[] playerIndex, boolean useWhiteBackground, byte[][] red1, byte[][] green1, byte[][] blue1, KinectColorMap colorMap, KinectColorMap peopleColors, int maximalNumberOfSkeletons) {
 		if (playerIndex==null) {
 			currentPeopleIndexMode= KinectPeopleIndexMode.NONE;
 		};
@@ -468,7 +464,7 @@ if (index >= 0) {
 // Color Frame to Mapped Image                                     //
 // (tinctureRatio2)                                                //
 /////////////////////////////////////////////////////////////////////
-	public static BufferedImage colorFrameToMappedImage(byte[][] red1, byte[][] green1, byte[][] blue1, KinectPeopleIndexMode currentPeopleIndexMode, byte[] playerIndex, boolean useWhiteBackground, ColorMapInterface colorMap, ColorMapInterface peopleColors, int maximalNumberOfSkeletons) {
+	public static BufferedImage colorFrameToMappedImage(byte[][] red1, byte[][] green1, byte[][] blue1, KinectPeopleIndexMode currentPeopleIndexMode, byte[] playerIndex, boolean useWhiteBackground, KinectColorMap colorMap, KinectColorMap peopleColors, int maximalNumberOfSkeletons) {
 		if (red1==null || green1==null || blue1==null) {
 			return null;
 		};
@@ -629,7 +625,7 @@ if (index >= 0) {
 // Point Cloud to Mapped Buffered Image                            //
 // (tinctureRatio2)                                                //
 /////////////////////////////////////////////////////////////////////
-	public static BufferedImage pointCloudToMappedBufferedImage(float[] xyz, byte[][] red1, byte[][] green1, byte[][] blue1, KinectPeopleIndexMode currentPeopleIndexMode, byte[] playerIndex, boolean useWhiteBackground, float focalLengthX, float focalLengthY, int correctionX, int correctionY, ColorMapInterface colorMap, ColorMapInterface peopleColors, int maximalNumberOfSkeletons) {
+	public static BufferedImage pointCloudToMappedBufferedImage(float[] xyz, byte[][] red1, byte[][] green1, byte[][] blue1, KinectPeopleIndexMode currentPeopleIndexMode, byte[] playerIndex, boolean useWhiteBackground, float focalLengthX, float focalLengthY, int correctionX, int correctionY, KinectColorMap colorMap, KinectColorMap peopleColors, int maximalNumberOfSkeletons) {
 		if (red1==null || green1==null || blue1==null) {
 			return null;
 		};
@@ -798,7 +794,7 @@ if (index >= 0) {
 // Color Frame to Buffered Image                                   //
 // (tinctureRatio4)                                                //
 /////////////////////////////////////////////////////////////////////
-	public static BufferedImage colorFrameToBufferedImage(byte[] data, float[][] u, float v[][], KinectPeopleIndexMode currentPeopleIndexMode, byte[] playerIndex, boolean useWhiteBackground, ColorMapInterface colorMap, ColorMapInterface peopleColors, int maximalNumberOfSkeletons) {
+	public static BufferedImage colorFrameToBufferedImage(byte[] data, float[][] u, float v[][], KinectPeopleIndexMode currentPeopleIndexMode, byte[] playerIndex, boolean useWhiteBackground, KinectColorMap colorMap, KinectColorMap peopleColors, int maximalNumberOfSkeletons) {
 		FrameSize colorFrameSize= FrameSize.computeColorFrameSize(data);
 		int colorFrameWidth= colorFrameSize.width;
 		int colorFrameHeight= colorFrameSize.height;
@@ -1140,7 +1136,7 @@ for (int h=0; h < uvHeight; h++) {
 /////////////////////////////////////////////////////////////////////
 // Short Array to Empty Buffered Image                             //
 /////////////////////////////////////////////////////////////////////
-	public static BufferedImage shortArrayToEmptyBufferedImage(short[] array, KinectPeopleIndexMode currentPeopleIndexMode, byte[] playerIndex, boolean useWhiteBackground, byte[][] red1, byte[][] green1, byte[][] blue1, ColorMapInterface peopleColors, int maximalNumberOfSkeletons) {
+	public static BufferedImage shortArrayToEmptyBufferedImage(short[] array, KinectPeopleIndexMode currentPeopleIndexMode, byte[] playerIndex, boolean useWhiteBackground, byte[][] red1, byte[][] green1, byte[][] blue1, KinectColorMap peopleColors, int maximalNumberOfSkeletons) {
 		if (playerIndex==null) {
 			currentPeopleIndexMode= KinectPeopleIndexMode.NONE;
 		};

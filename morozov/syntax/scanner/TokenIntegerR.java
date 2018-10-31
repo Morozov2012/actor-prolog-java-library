@@ -4,7 +4,6 @@ package morozov.syntax.scanner;
 
 import target.*;
 
-import morozov.system.*;
 import morozov.terms.*;
 
 import java.math.BigInteger;
@@ -14,8 +13,6 @@ public class TokenIntegerR extends TokenInteger10 {
 	protected BigInteger radix;
 	protected String mantissa;
 	protected BigInteger exponent;
-	//
-	// protected static Term termIntegerZero= new PrologInteger(0);
 	//
 	///////////////////////////////////////////////////////////////
 	//

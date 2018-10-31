@@ -2,6 +2,8 @@
 
 package morozov.system;
 
+import morozov.terms.*;
+
 import java.math.BigInteger;
 
 public enum ComparisonOperation {
@@ -15,6 +17,9 @@ public enum ComparisonOperation {
 		public boolean eval(String s1, String s2) {
 			return s1.compareTo(s2) > 0;
 		}
+		public boolean eval(byte[] s1, byte[] s2) {
+			return PrologBinary.compareTwoBinaries(s1,s2) > 0;
+		}
 	},
 	GE {
 		public boolean eval(BigInteger n1, BigInteger n2) {
@@ -25,6 +30,9 @@ public enum ComparisonOperation {
 		}
 		public boolean eval(String s1, String s2) {
 			return s1.compareTo(s2) >= 0;
+		}
+		public boolean eval(byte[] s1, byte[] s2) {
+			return PrologBinary.compareTwoBinaries(s1,s2) >= 0;
 		}
 	},
 	LT {
@@ -37,6 +45,9 @@ public enum ComparisonOperation {
 		public boolean eval(String s1, String s2) {
 			return s1.compareTo(s2) < 0;
 		}
+		public boolean eval(byte[] s1, byte[] s2) {
+			return PrologBinary.compareTwoBinaries(s1,s2) < 0;
+		}
 	},
 	LE {
 		public boolean eval(BigInteger n1, BigInteger n2) {
@@ -47,6 +58,9 @@ public enum ComparisonOperation {
 		}
 		public boolean eval(String s1, String s2) {
 			return s1.compareTo(s2) <= 0;
+		}
+		public boolean eval(byte[] s1, byte[] s2) {
+			return PrologBinary.compareTwoBinaries(s1,s2) <= 0;
 		}
 	},
 	NE {
@@ -59,11 +73,17 @@ public enum ComparisonOperation {
 		public boolean eval(String s1, String s2) {
 			return s1.compareTo(s2) != 0;
 		}
+		public boolean eval(byte[] s1, byte[] s2) {
+			return PrologBinary.compareTwoBinaries(s1,s2) != 0;
+		}
+/*
 		public ComparisonOperation reverse() {
 			return ComparisonOperation.NE;
 		}
+*/
 	};
 	abstract public boolean eval(BigInteger n1, BigInteger n2);
 	abstract public boolean eval(double n1, double n2);
 	abstract public boolean eval(String n1, String n2);
+	abstract public boolean eval(byte[] n1, byte[] n2);
 }

@@ -19,10 +19,12 @@ import morozov.terms.*;
 
 import javax.swing.JTextArea;
 import javax.swing.text.Document;
+import java.awt.event.FocusListener;
+import java.awt.event.FocusEvent;
 
 public class ATextArea
 	extends JTextArea
-	implements ActiveDocumentReportListener {
+	implements ActiveDocumentReportListener, FocusListener {
 	//
 	AbstractDialog targetDialog= null;
 	ActiveComponent targetComponent= null;
@@ -36,6 +38,7 @@ public class ATextArea
 		targetComponent= tC;
 		ActivePlainDocument activeDocument= (ActivePlainDocument)getDocument();
 		activeDocument.addReportListener(this);
+		addFocusListener(this);
 	}
 	// Method to create default model
 	protected Document createDefaultModel() {
@@ -80,6 +83,14 @@ public class ATextArea
 	//	};
 	//	super.processComponentKeyEvent(evt);
 	// }
+	//
+	public void focusGained(FocusEvent e) {
+		// Invoked when a component gains the keyboard focus.
+	}
+	public void focusLost(FocusEvent e) {
+		// Invoked when a component loses the keyboard focus.
+		targetDialog.reportCompleteEditing(targetComponent);
+	}
 	//
 	// public void setFont(Font font) {
 	//	super.setFont(font);

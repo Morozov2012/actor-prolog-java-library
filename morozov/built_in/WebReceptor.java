@@ -10,6 +10,7 @@ import morozov.system.*;
 import morozov.system.checker.*;
 import morozov.system.checker.errors.*;
 import morozov.system.checker.signals.*;
+import morozov.system.converters.*;
 import morozov.system.files.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
@@ -86,12 +87,12 @@ public abstract class WebReceptor extends WebResource {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	abstract protected Term getBuiltInSlot_E_revision_period();
-	abstract protected Term getBuiltInSlot_E_attempt_period();
-	abstract protected Term getBuiltInSlot_E_tags();
-	abstract protected Term getBuiltInSlot_E_extract_attributes();
-	abstract protected Term getBuiltInSlot_E_coalesce_adjacent_strings();
-	abstract protected Term getBuiltInSlot_E_truncate_strings();
+	abstract public Term getBuiltInSlot_E_revision_period();
+	abstract public Term getBuiltInSlot_E_attempt_period();
+	abstract public Term getBuiltInSlot_E_tags();
+	abstract public Term getBuiltInSlot_E_extract_attributes();
+	abstract public Term getBuiltInSlot_E_coalesce_adjacent_strings();
+	abstract public Term getBuiltInSlot_E_truncate_strings();
 	//
 	abstract public long entry_s_UnpairedTagsTable_1_o();
 	abstract public long entry_s_FlatTagsTable_1_o();
@@ -111,7 +112,6 @@ public abstract class WebReceptor extends WebResource {
 	public void getRevisionPeriod0ff(ChoisePoint iX, PrologVariable result) {
 		ActionPeriod value= getRevisionPeriod(iX);
 		result.setNonBacktrackableValue(value.toTerm());
-		// iX.pushTrail(a1);
 	}
 	public void getRevisionPeriod0fs(ChoisePoint iX) {
 	}
@@ -135,7 +135,6 @@ public abstract class WebReceptor extends WebResource {
 	public void getAttemptPeriod0ff(ChoisePoint iX, PrologVariable result) {
 		ActionPeriod value= getAttemptPeriod(iX);
 		result.setNonBacktrackableValue(value.toTerm());
-		// iX.pushTrail(a1);
 	}
 	public void getAttemptPeriod0fs(ChoisePoint iX) {
 	}
@@ -151,14 +150,13 @@ public abstract class WebReceptor extends WebResource {
 	// get/set tags
 	//
 	public void setTags1s(ChoisePoint iX, Term a1) {
-		setTags(Converters.termToStrings(a1,iX,true));
+		setTags(GeneralConverters.termToStrings(a1,iX,true));
 	}
 	public void setTags(String[] value) {
 		tags= value;
 	}
 	public void getTags0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(Converters.stringArrayToList(getTags(iX)));
-		// iX.pushTrail(a1);
+		result.setNonBacktrackableValue(GeneralConverters.stringArrayToList(getTags(iX)));
 	}
 	public void getTags0fs(ChoisePoint iX) {
 	}
@@ -167,7 +165,7 @@ public abstract class WebReceptor extends WebResource {
 			return tags;
 		} else {
 			Term value= getBuiltInSlot_E_tags();
-			return Converters.termToStrings(value,iX,true);
+			return GeneralConverters.termToStrings(value,iX,true);
 		}
 	}
 	//
@@ -181,7 +179,6 @@ public abstract class WebReceptor extends WebResource {
 	}
 	public void getExtractAttributes0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getExtractAttributes(iX)));
-		// iX.pushTrail(a1);
 	}
 	public void getExtractAttributes0fs(ChoisePoint iX) {
 	}
@@ -204,7 +201,6 @@ public abstract class WebReceptor extends WebResource {
 	}
 	public void getCoalesceAdjacentStrings0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getCoalesceAdjacentStrings(iX)));
-		// iX.pushTrail(a1);
 	}
 	public void getCoalesceAdjacentStrings0fs(ChoisePoint iX) {
 	}
@@ -227,7 +223,6 @@ public abstract class WebReceptor extends WebResource {
 	}
 	public void getTruncateStrings0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getTruncateStrings(iX)));
-		// iX.pushTrail(a1);
 	}
 	public void getTruncateStrings0fs(ChoisePoint iX) {
 	}
@@ -256,21 +251,18 @@ public abstract class WebReceptor extends WebResource {
 	///////////////////////////////////////////////////////////////
 	//
 	public void getReferences2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
-		String mask= Converters.argumentToString(a2,iX);
+		String mask= GeneralConverters.argumentToString(a2,iX);
 		result.setNonBacktrackableValue(getResourceReferences(a1,mask,iX));
-		// iX.pushTrail(a1);
 	}
 	public void getReferences2fs(ChoisePoint iX, Term a1, Term a2) {
 	}
 	public void getReferences1ff(ChoisePoint iX, PrologVariable result, Term a1) {
 		result.setNonBacktrackableValue(getResourceReferences(a1,"*",iX));
-		// iX.pushTrail(a1);
 	}
 	public void getReferences1fs(ChoisePoint iX, Term a1) {
 	}
 	public void getReferences0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(getResourceReferences("*",iX));
-		// iX.pushTrail(a1);
 	}
 	public void getReferences0fs(ChoisePoint iX) {
 	}
@@ -342,7 +334,7 @@ public abstract class WebReceptor extends WebResource {
 			if (mask==null) {
 				wildcard= "*";
 			} else {
-				wildcard= Converters.argumentToString(mask,iX);
+				wildcard= GeneralConverters.argumentToString(mask,iX);
 			};
 			if (retrieveAddressFromSlotValue) {
 				content= getResourceReferences(wildcard,iX);
@@ -467,21 +459,18 @@ public abstract class WebReceptor extends WebResource {
 	///////////////////////////////////////////////////////////////
 	//
 	public void getTrees2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
-		String mask= Converters.argumentToString(a2,iX);
+		String mask= GeneralConverters.argumentToString(a2,iX);
 		result.setNonBacktrackableValue(getResourceTrees(a1,mask,iX));
-		// iX.pushTrail(a1);
 	}
 	public void getTrees2fs(ChoisePoint iX, Term a1, Term a2) {
 	}
 	public void getTrees1ff(ChoisePoint iX, PrologVariable result, Term a1) {
 		result.setNonBacktrackableValue(getResourceTrees(a1,"*",iX));
-		// iX.pushTrail(a1);
 	}
 	public void getTrees1fs(ChoisePoint iX, Term a1) {
 	}
 	public void getTrees0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(getResourceTrees("*",iX));
-		// iX.pushTrail(a1);
 	}
 	public void getTrees0fs(ChoisePoint iX) {
 	}

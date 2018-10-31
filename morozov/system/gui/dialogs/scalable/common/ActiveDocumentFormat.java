@@ -6,14 +6,14 @@
 
 package morozov.system.gui.dialogs.scalable.common;
 
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.terms.signals.*;
 
 public enum ActiveDocumentFormat {
 	INTEGER {
 		boolean verify(String text) {
 			try {
-				Converters.stringToStrictInteger(text);
+				GeneralConverters.stringToStrictInteger(text);
 				return true;
 			} catch (TermIsNotAnInteger e) {
 				return false;
@@ -23,7 +23,7 @@ public enum ActiveDocumentFormat {
 	REAL {
 		boolean verify(String text) {
 			try {
-				Converters.stringToReal(text);
+				GeneralConverters.stringToReal(text);
 				return true;
 			} catch (TermIsNotAReal e) {
 				return false;

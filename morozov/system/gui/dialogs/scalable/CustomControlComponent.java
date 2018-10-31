@@ -22,22 +22,30 @@ import java.awt.Font;
 
 public abstract class CustomControlComponent extends ActiveComponent {
 	//
-	protected double width= 0;
-	protected double height= 0;
+	protected double initialWidth= 0;
+	protected double initialHeight= 0;
+	//
+	protected double refinedWidth= 0;
+	protected double refinedHeight= 0;
 	//
 	protected boolean refineWidth= false;
 	protected boolean refineHeight= false;
 	protected double widthToHeightRatio= 1.0;
+	//
 	protected Font currentFont;
 	//
 	protected Dimension previousDimension;
+	//
+	protected double epsilon= 1e-10;
 	//
 	///////////////////////////////////////////////////////////////
 	//
 	public CustomControlComponent(AbstractDialog tD, double columns, double rows) {
 		super(tD);
-		width= columns;
-		height= rows;
+		initialWidth= columns;
+		initialHeight= rows;
+		refinedWidth= initialWidth;
+		refinedHeight= initialHeight;
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -54,15 +62,29 @@ public abstract class CustomControlComponent extends ActiveComponent {
 	///////////////////////////////////////////////////////////////
 	//
 	public void refineWidth(double ratio) {
+		if (refineWidth && !refineHeight) {
+			if (StrictMath.abs(widthToHeightRatio-ratio) < epsilon) {
+				return;
+			}
+		};
 		refineWidth= true;
 		refineHeight= false;
 		widthToHeightRatio= ratio;
+		refinedWidth= initialHeight * widthToHeightRatio;
+		refinedHeight= initialHeight;
 		computeAndSetDimension(currentFont);
 	}
 	public void refineHeight(double ratio) {
+		if (!refineWidth && refineHeight) {
+			if (StrictMath.abs(widthToHeightRatio-ratio) < epsilon) {
+				return;
+			}
+		};
 		refineWidth= false;
 		refineHeight= true;
 		widthToHeightRatio= ratio;
+		refinedWidth= initialWidth;
+		refinedHeight= initialWidth / widthToHeightRatio;
 		computeAndSetDimension(currentFont);
 	}
 	//
@@ -75,14 +97,7 @@ public abstract class CustomControlComponent extends ActiveComponent {
 	}
 	protected void computeAndSetDimension(Font font){
 		if (component!=null && font!=null) {
-			Dimension dimension= LayoutUtils.computeDimension(font,component,width,height);
-			if (refineWidth) {
-				double height= dimension.getHeight();
-				dimension.setSize(height * widthToHeightRatio,height);
-			} else if (refineHeight) {
-				double width= dimension.getWidth();
-				dimension.setSize(width,width/widthToHeightRatio);
-			};
+			Dimension dimension= LayoutUtils.computeDimension(font,component,refinedWidth,refinedHeight);
 			if (previousDimension==null || !previousDimension.equals(dimension)) {
 				setDimension(dimension);
 				component.revalidate();

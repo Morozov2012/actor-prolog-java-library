@@ -41,6 +41,12 @@ public class PlayerDimensions implements PlayerDimensionsInterface, Serializable
 	protected XY_Interface xy23;
 	protected XY_Interface xy24;
 	//
+	private static final long serialVersionUID= 0xD4082ABD2F7C533CL; // -3168235345821281476L;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames.data","PlayerDimensions");
+	// }
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public PlayerDimensions(int n) {

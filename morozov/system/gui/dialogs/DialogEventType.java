@@ -5,5 +5,6 @@ package morozov.system.gui.dialogs;
 public enum DialogEventType {
 	CREATED_CONTROL,
 	MODIFIED_CONTROL,
+	COMPLETE_EDITING,
 	NONE
 }

@@ -4,8 +4,8 @@ package morozov.built_in;
 
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.*;
-import morozov.system.gui.signals.*;
 import morozov.system.signals.*;
 import morozov.system.webcam.*;
 import morozov.system.webcam.errors.*;
@@ -39,8 +39,8 @@ public abstract class Webcam
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	abstract protected Term getBuiltInSlot_E_default_name();
-	abstract protected Term getBuiltInSlot_E_maximal_waiting_time();
+	abstract public Term getBuiltInSlot_E_default_name();
+	abstract public Term getBuiltInSlot_E_maximal_waiting_time();
 	//
 	abstract public long entry_s_WebcamAdded_1_i();
 	abstract public long entry_s_WebcamRemoved_1_i();
@@ -69,7 +69,6 @@ public abstract class Webcam
 	}
 	public void getDefaultName0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(getDefaultName(iX).toTerm());
-		// iX.pushTrail(a1);
 	}
 	public void getDefaultName0fs(ChoisePoint iX) {
 	}
@@ -98,8 +97,6 @@ public abstract class Webcam
 	public void getDefaultResolution2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
 		a1.setBacktrackableValue(getWidth(iX).toTerm(),iX);
 		a2.setBacktrackableValue(getHeight(iX).toTerm(),iX);
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -109,7 +106,6 @@ public abstract class Webcam
 		WaitingInterval interval= getMaximalWaitingTime(iX);
 		boolean value= open(webcamName,interval,iX);
 		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(value));
-		// iX.pushTrail(a1);
 	}
 	public void open0fs(ChoisePoint iX) {
 		WebcamName webcamName= getDefaultName(iX);
@@ -121,7 +117,6 @@ public abstract class Webcam
 		WaitingInterval interval= getMaximalWaitingTime(iX);
 		boolean value= open(webcamName,interval,iX);
 		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(value));
-		// iX.pushTrail(a1);
 	}
 	public void open1fs(ChoisePoint iX, Term a1) {
 		WebcamName webcamName= WebcamName.argumentToWebcamName(a1,iX);
@@ -133,7 +128,6 @@ public abstract class Webcam
 		WaitingInterval interval= WaitingInterval.argumentToWaitingInterval(a2,iX);
 		boolean value= open(webcamName,interval,iX);
 		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(value));
-		// iX.pushTrail(a1);
 	}
 	public void open2fs(ChoisePoint iX, Term a1, Term a2) {
 		WebcamName webcamName= WebcamName.argumentToWebcamName(a1,iX);
@@ -257,7 +251,6 @@ public abstract class Webcam
 		if (isOpen) {
 			if (currentWebcam != null) {
 				result.setNonBacktrackableValue(new PrologString(currentWebcam.getName()));
-				// iX.pushTrail(a1);
 			} else {
 				throw new WebcamIsNotOpen();
 			}
@@ -279,7 +272,6 @@ public abstract class Webcam
 		if (isOpen) {
 			if (currentWebcam != null) {
 				result.setNonBacktrackableValue(new PrologReal(currentWebcam.getFPS()));
-				// iX.pushTrail(a1);
 			} else {
 				throw new WebcamIsNotOpen();
 			}
@@ -319,8 +311,8 @@ public abstract class Webcam
 		setActualResolution(resolution.getWidth(),resolution.getHeight());
 	}
 	public void setActualResolution2s(ChoisePoint iX, Term a1, Term a2) {
-		int viewWidth= Converters.argumentToSmallInteger(a1,iX);
-		int viewHeight= Converters.argumentToSmallInteger(a2,iX);
+		int viewWidth= GeneralConverters.argumentToSmallInteger(a1,iX);
+		int viewHeight= GeneralConverters.argumentToSmallInteger(a2,iX);
 		setActualResolution(viewWidth,viewHeight);
 	}
 	//
@@ -352,8 +344,6 @@ public abstract class Webcam
 				Dimension size= currentWebcam.getViewSize();
 				a1.setBacktrackableValue(new PrologInteger(size.width),iX);
 				a2.setBacktrackableValue(new PrologInteger(size.height),iX);
-				//iX.pushTrail(a1);
-				//iX.pushTrail(a2);
 			} else {
 				throw new WebcamIsNotOpen();
 			}
@@ -366,8 +356,7 @@ public abstract class Webcam
 		if (isOpen) {
 			if (currentWebcam != null) {
 				Dimension[] sizes= currentWebcam.getViewSizes();
-				result.setNonBacktrackableValue(Converters.dimensionArrayToList(sizes));
-				// iX.pushTrail(a1);
+				result.setNonBacktrackableValue(GeneralConverters.dimensionArrayToList(sizes));
 			} else {
 				throw new WebcamIsNotOpen();
 			}
@@ -383,14 +372,12 @@ public abstract class Webcam
 	public void getWebcamList0ff(ChoisePoint iX, PrologVariable result) {
 		WaitingInterval interval= getMaximalWaitingTime(iX);
 		result.setNonBacktrackableValue(getWebcamList(interval));
-		// iX.pushTrail(a1);
 	}
 	public void getWebcamList0fs(ChoisePoint iX) {
 	}
 	public void getWebcamList1ff(ChoisePoint iX, PrologVariable result, Term a1) {
 		WaitingInterval interval= WaitingInterval.argumentToWaitingInterval(a1,iX);
 		result.setNonBacktrackableValue(getWebcamList(interval));
-		// iX.pushTrail(a1);
 	}
 	public void getWebcamList1fs(ChoisePoint iX, Term a1) {
 	}
@@ -410,7 +397,7 @@ public abstract class Webcam
 			for (com.github.sarxos.webcam.Webcam webcam : webcams) {
 				names.add(webcam.getName());
 			};
-			Term result= Converters.stringArrayToList(names);
+			Term result= GeneralConverters.stringArrayToList(names);
 			return result;
 		} catch (TimeoutException e) {
 			throw new WebcamTimeoutException();
@@ -425,10 +412,9 @@ public abstract class Webcam
 		} else {
 			a1.setBacktrackableValue(termNo,iX);
 		}
-		// iX.pushTrail(a1);
 	}
 	public void watchWebcamList1s(ChoisePoint iX, Term a1) {
-		YesNo mode= YesNo.term2YesNo(a1,iX);
+		YesNo mode= YesNo.argument2YesNo(a1,iX);
 		if (mode==YesNo.YES) {
 			if (!isWebcamArrayListener) {
 				com.github.sarxos.webcam.Webcam.getWebcams();
@@ -457,7 +443,8 @@ public abstract class Webcam
 	protected void processWebcamDiscoveryEvent(long domainSignature, WebcamDiscoveryEvent event) {
 		Term predicateArgument= new PrologString(event.getWebcam().getName());
 		Term[] arguments= new Term[]{predicateArgument};
-		AsyncCall call= new AsyncCall(domainSignature,this,true,false,arguments,true);
+		// 2018.10.30: AsyncCall call= new AsyncCall(domainSignature,this,true,false,arguments,true);
+		AsyncCall call= new AsyncCall(domainSignature,this,true,true,arguments,true);
 		transmitAsyncCall(call,null);
 	}
 	//
@@ -475,10 +462,9 @@ public abstract class Webcam
 		} else {
 			a1.setBacktrackableValue(termNo,iX);
 		}
-		//iX.pushTrail(a1);
 	}
 	public void watchWebcamState1s(ChoisePoint iX, Term a1) {
-		YesNo mode= YesNo.term2YesNo(a1,iX);
+		YesNo mode= YesNo.argument2YesNo(a1,iX);
 		if (isOpen) {
 			if (currentWebcam != null) {
 				if (mode==YesNo.YES) {
@@ -532,7 +518,8 @@ public abstract class Webcam
 	protected void processWebcamEvent(long domainSignature, WebcamEvent event) {
 		Term predicateArgument= new PrologString(event.getSource().getName());
 		Term[] arguments= new Term[]{predicateArgument};
-		AsyncCall call= new AsyncCall(domainSignature,this,true,false,arguments,true);
+		// 2018.10.30: AsyncCall call= new AsyncCall(domainSignature,this,true,false,arguments,true);
+		AsyncCall call= new AsyncCall(domainSignature,this,true,true,arguments,true);
 		transmitAsyncCall(call,null);
 	}
 	//

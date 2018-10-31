@@ -10,16 +10,22 @@ import java.nio.charset.CharsetEncoder;
 import java.math.BigInteger;
 
 public class PrologString extends Term {
+	//
 	private String value;
+	//
 	public PrologString(String v) {
 		value= v;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public String getStringValue() {
+		return value;
+	}
 	public int hashCode() {
 		return value.hashCode();
 	}
+	//
 	public boolean equals(Object o2) {
 		if (o2 instanceof Term) {
 			return ((Term)o2).isEqualToString(value);
@@ -27,6 +33,10 @@ public class PrologString extends Term {
 			return false;
 		}
 	}
+	public boolean isEqualToString(String v2) {
+		return value.equals(v2);
+	}
+	//
 	public int compare(Object o2) {
 		if (o2 instanceof Term) {
 			return -((Term)o2).compareWithString(value);
@@ -34,18 +44,21 @@ public class PrologString extends Term {
 			return 1;
 		}
 	}
-	public boolean isEqualToString(String v2) {
-		return value.equals(v2);
-	}
 	public int compareWithString(String v2) {
 		return value.compareTo(v2);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void isString(String v, ChoisePoint cp) throws Backtracking {
-		if ( !value.equals(v) )
+	public void isString(PrologString v, ChoisePoint cp) throws Backtracking {
+		if ( !value.equals(v.getStringValue()) ) {
 			throw Backtracking.instance;
+		}
+	}
+	public void isString(String v, ChoisePoint cp) throws Backtracking {
+		if ( !value.equals(v) ) {
+			throw Backtracking.instance;
+		}
 	}
 	public String getStringValue(ChoisePoint cp) throws TermIsNotAString {
 		return value;
@@ -63,12 +76,12 @@ public class PrologString extends Term {
 		a.compareStringWith(value,iX,op);
 	}
 	public void compareWithString(String a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		if (!op.eval(value,a)) {
+		if ( !op.eval(value,a) ) {
 			throw Backtracking.instance;
 		}
 	}
 	public void compareStringWith(String a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		if (!op.eval(a,value)) {
+		if ( !op.eval(a,value) ) {
 			throw Backtracking.instance;
 		}
 	}

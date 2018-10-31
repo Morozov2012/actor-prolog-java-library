@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public final class PrologEmptySet extends UnderdeterminedSet {
+	//
 	public static final PrologEmptySet instance= new PrologEmptySet();
 	//
 	private PrologEmptySet() {

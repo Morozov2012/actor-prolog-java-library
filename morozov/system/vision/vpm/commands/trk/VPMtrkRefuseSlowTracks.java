@@ -4,7 +4,6 @@ package morozov.system.vision.vpm.commands.trk;
 
 import morozov.system.vision.vpm.*;
 import morozov.system.vision.vpm.commands.*;
-import morozov.system.vision.vpm.converters.*;
 
 public class VPMtrkRefuseSlowTracks extends VPM_SnapshotCommand {
 	//

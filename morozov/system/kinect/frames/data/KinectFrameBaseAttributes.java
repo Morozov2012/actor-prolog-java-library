@@ -3,7 +3,6 @@
 package morozov.system.kinect.frames.data;
 
 import morozov.system.kinect.frames.data.interfaces.*;
-import morozov.system.kinect.frames.data.tools.*;
 
 import java.io.Serializable;
 
@@ -19,6 +18,12 @@ public class KinectFrameBaseAttributes implements KinectFrameBaseAttributesInter
 	protected int numberOfSkeletons;
 	protected int correctionX;
 	protected int correctionY;
+	//
+	private static final long serialVersionUID= 0x39291EC3E6ABC8BCL; // 4118857160944502972L;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames.data","KinectFrameBaseAttributes");
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//

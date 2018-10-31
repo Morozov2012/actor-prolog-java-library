@@ -4,7 +4,6 @@ package morozov.system.vision.vpm;
 
 import target.*;
 
-import morozov.system.vision.vpm.*;
 import morozov.system.vision.vpm.converters.*;
 import morozov.terms.*;
 
@@ -176,7 +175,7 @@ public class TrackSegment {
 		meanForegroundArea= meanForegroundArea / length;
 		meanContourLength= meanContourLength / length;
 		if (applyCharacteristicLengthMedianFiltering) {
-			if (length < characteristicLengthMedianFilterHalfwidth*2+1) {
+			if (length > characteristicLengthMedianFilterHalfwidth*2+1) {
 				double[] temporaryVector= new double[length];
 				for (int n=0; n < length; n++) {
 					temporaryVector[n]= VisionUtils.medianAbs(characteristicLengthValues,n-characteristicLengthMedianFilterHalfwidth,n+characteristicLengthMedianFilterHalfwidth);
@@ -272,7 +271,7 @@ public class TrackSegment {
 			rY122= rY222;
 		};
 		if (applyVelocityMedianFiltering) {
-			if (length < velocityMedianFilterHalfwidth*2+1) {
+			if (length > velocityMedianFilterHalfwidth*2+1) {
 				double[] temporaryVectorX11= new double[length];
 				double[] temporaryVectorX12= new double[length];
 				double[] temporaryVectorX21= new double[length];
@@ -349,10 +348,6 @@ public class TrackSegment {
 		BlobAttributes attributes1= attributeArray[0];
 		long frameNumber1= attributes1.getFrameNumber();
 		long timeInMilliseconds1= attributes1.getTimeInMilliseconds();
-//int xx1= attributes1.getCentroidX();
-//int yy1= attributes1.getCentroidY();
-//double rXX1= physicalMatrixX[yy1][xx1];
-//double rYY1= physicalMatrixY[yy1][xx1];
 		for (int n=1; n < length; n++) {
 			BlobAttributes attributes2= attributeArray[n];
 			long frameNumber2= attributes2.getFrameNumber();
@@ -385,18 +380,7 @@ public class TrackSegment {
 			if (dY > absDeltaY22) {
 				dY= absDeltaY22;
 			};
-//double dX= absDeltaX21;
-//double dY= absDeltaY21;
 			distanceValues[n]= StrictMath.hypot(dX,dY);
-//int xx2= attributes2.getCentroidX();
-//int yy2= attributes2.getCentroidY();
-//double rXX2= physicalMatrixX[yy2][xx2];
-//double rYY2= physicalMatrixY[yy2][xx2];
-//distanceValues[n]= StrictMath.hypot(rXX2-rXX1,rYY2-rYY1);
-//xx1= xx2;
-//yy1= yy2;
-//rXX1= rXX2;
-//rYY1= rYY2;
 			double velocityX;
 			double velocityY;
 			if (timeInMilliseconds1 >= 0 && timeInMilliseconds2 >= 0) {
@@ -421,7 +405,7 @@ public class TrackSegment {
 		velocityVectorX[0]= 0;
 		velocityVectorY[0]= 0;
 		if (applyVelocityMedianFiltering) {
-			if (length < velocityMedianFilterHalfwidth*2+1) {
+			if (length > velocityMedianFilterHalfwidth*2+1) {
 				double[] temporaryVectorX= new double[length];
 				double[] temporaryVectorY= new double[length];
 				for (int n=0; n < length; n++) {
@@ -452,7 +436,7 @@ public class TrackSegment {
 			velocityValues[0]= velocityValues[1];
 		};
 		if (applyVelocityMedianFiltering) {
-			if (length < velocityMedianFilterHalfwidth*2+1) {
+			if (length > velocityMedianFilterHalfwidth*2+1) {
 				double[] temporaryVector= new double[length];
 				for (int n=0; n < length; n++) {
 					temporaryVector[n]= VisionUtils.medianAbs(velocityValues,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth);
@@ -538,6 +522,117 @@ public class TrackSegment {
 			}
 		};
 		return null;
+	}
+	//
+	public long getFirstFrameNumber() {
+		if (attributeArray.length > 0) {
+			BlobAttributes attributes= attributeArray[0];
+			return attributes.getFrameNumber();
+		} else {
+			return -1;
+		}
+	}
+	public long getLastFrameNumber() {
+		int length= attributeArray.length;
+		if (length > 0) {
+			BlobAttributes attributes= attributeArray[length-1];
+			return attributes.getFrameNumber();
+		} else {
+			return -1;
+		}
+	}
+	public long getFirstTimeInMilliseconds() {
+		if (attributeArray.length > 0) {
+			BlobAttributes attributes= attributeArray[0];
+			return attributes.getTimeInMilliseconds();
+		} else {
+			return -1;
+		}
+	}
+	public long getLastTimeInMilliseconds() {
+		int length= attributeArray.length;
+		if (length > 0) {
+			BlobAttributes attributes= attributeArray[length-1];
+			return attributes.getTimeInMilliseconds();
+		} else {
+			return -1;
+		}
+	}
+	public long getFirstX() {
+		if (attributeArray.length > 0) {
+			BlobAttributes attributes= attributeArray[0];
+			int x1= attributes.getX1();
+			int x2= attributes.getX2();
+			return StrictMath.round((x1+x2)/2.0);
+		} else {
+			return -1;
+		}
+	}
+	public long getLastX() {
+		int length= attributeArray.length;
+		if (length > 0) {
+			BlobAttributes attributes= attributeArray[length-1];
+			int x1= attributes.getX1();
+			int x2= attributes.getX2();
+			return StrictMath.round((x1+x2)/2.0);
+		} else {
+			return -1;
+		}
+	}
+	public long getFirstY() {
+		if (attributeArray.length > 0) {
+			BlobAttributes attributes= attributeArray[0];
+			int y1= attributes.getY1();
+			int y2= attributes.getY2();
+			return StrictMath.round((y1+y2)/2.0);
+		} else {
+			return -1;
+		}
+	}
+	public long getLastY() {
+		int length= attributeArray.length;
+		if (length > 0) {
+			BlobAttributes attributes= attributeArray[length-1];
+			int y1= attributes.getY1();
+			int y2= attributes.getY2();
+			return StrictMath.round((y1+y2)/2.0);
+		} else {
+			return -1;
+		}
+	}
+	public long getFirstCentroidX() {
+		if (attributeArray.length > 0) {
+			BlobAttributes attributes= attributeArray[0];
+			return attributes.getCentroidX();
+		} else {
+			return -1;
+		}
+	}
+	public long getLastCentroidX() {
+		int length= attributeArray.length;
+		if (length > 0) {
+			BlobAttributes attributes= attributeArray[length-1];
+			return attributes.getCentroidX();
+		} else {
+			return -1;
+		}
+	}
+	public long getFirstCentroidY() {
+		if (attributeArray.length > 0) {
+			BlobAttributes attributes= attributeArray[0];
+			return attributes.getCentroidY();
+		} else {
+			return -1;
+		}
+	}
+	public long getLastCentroidY() {
+		int length= attributeArray.length;
+		if (length > 0) {
+			BlobAttributes attributes= attributeArray[length-1];
+			return attributes.getCentroidY();
+		} else {
+			return -1;
+		}
 	}
 	//
 	///////////////////////////////////////////////////////////////

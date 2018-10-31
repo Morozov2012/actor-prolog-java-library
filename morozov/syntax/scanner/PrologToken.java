@@ -5,10 +5,8 @@ package morozov.syntax.scanner;
 import target.*;
 
 import morozov.syntax.scanner.errors.*;
-import morozov.syntax.scanner.signals.*;
 import morozov.terms.*;
 
-import java.util.HashSet;
 import java.math.BigInteger;
 
 public abstract class PrologToken {
@@ -44,6 +42,9 @@ public abstract class PrologToken {
 	}
 	public String getStringValue() {
 		throw new WrongTokenIsNotAString();
+	}
+	public byte[] getBinaryValue() {
+		throw new WrongTokenIsNotABinary();
 	}
 	public String getVariableName() {
 		throw new WrongTokenIsNotAVariable();

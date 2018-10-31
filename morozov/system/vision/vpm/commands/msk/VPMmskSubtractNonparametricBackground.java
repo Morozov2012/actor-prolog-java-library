@@ -3,7 +3,6 @@
 package morozov.system.vision.vpm.commands.msk;
 
 import morozov.system.vision.vpm.*;
-import morozov.system.vision.vpm.commands.*;
 
 public class VPMmskSubtractNonparametricBackground extends VPMmskBackgroundSubtractionCommand {
 	//
@@ -20,9 +19,6 @@ public class VPMmskSubtractNonparametricBackground extends VPMmskBackgroundSubtr
 	protected int vectorLength;
 	protected int[] counters;
 	protected int[][] histograms;
-	//
-	protected static final int maximalColor= 255;
-	// protected static final int maximalSum= Integer.MAX_VALUE - 2;
 	//
 	protected static int maximalNumberOfBins= Integer.MAX_VALUE / 3;
 	protected static int defaultNumberOfBins= 10;

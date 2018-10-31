@@ -10,14 +10,14 @@ public class FFmpegFrame {
 	protected long time;
 	protected AVRational timeBase;
 	protected AVRational averageFrameRate;
-	// protected long beginningTime;
+	protected long number;
 	//
-	public FFmpegFrame(java.awt.image.BufferedImage i, long t, AVRational base, AVRational frameRate) {
+	public FFmpegFrame(java.awt.image.BufferedImage i, long t, AVRational base, AVRational frameRate, long n) {
 		image= i;
 		time= t;
 		timeBase= base;
 		averageFrameRate= frameRate;
-		// beginningTime= beginning;
+		number= n;
 	}
 	//
 	public java.awt.image.BufferedImage getImage() {
@@ -32,9 +32,9 @@ public class FFmpegFrame {
 	public AVRational getAverageFrameRate() {
 		return averageFrameRate;
 	}
-	// public long getBeginningTime() {
-	//	return beginningTime;
-	// }
+	public long getNumber() {
+		return number;
+	}
 	//
 	public double getTimeInSeconds() {
 		return FFmpegTools.computeTime(time,timeBase);

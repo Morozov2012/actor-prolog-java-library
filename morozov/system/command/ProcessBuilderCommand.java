@@ -5,7 +5,7 @@ package morozov.system.command;
 import target.*;
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.command.errors.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
@@ -58,7 +58,7 @@ public class ProcessBuilderCommand {
 					if (code==SymbolCodes.symbolCode_E_auto) {
 						Term[] argumentList= value.getStructureArguments(iX);
 						if (argumentList.length==1) {
-							String argument= Converters.argumentToString(argumentList[0],iX);
+							String argument= GeneralConverters.argumentToString(argumentList[0],iX);
 							return new ProcessBuilderCommand(argument,true);
 						} else {
 							throw new WrongArgumentIsNotACommand(value);

@@ -13,7 +13,7 @@ package morozov.system.gui.dialogs.scalable.common;
 */
 
 import morozov.run.*;
-import morozov.system.gui.*;
+import morozov.system.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
 

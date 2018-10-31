@@ -28,11 +28,11 @@ public abstract class FunctionModel extends Alpha {
 		super(id);
 	}
 	//
-	public void closeFiles() {
-		synchronized(this) {
+	public void releaseSystemResources() {
+		synchronized (this) {
 			DiagramUtils.safelyDisposeAllDiagrams(staticContext);
 		};
-		super.closeFiles();
+		super.releaseSystemResources();
 	}
 	//
 	public void registerComponents1s(ChoisePoint iX, Term value) {
@@ -91,7 +91,7 @@ public abstract class FunctionModel extends Alpha {
 	}
 	//
 	protected void createActiveDiagramIfNecessary() {
-		synchronized(this) {
+		synchronized (this) {
 			if (diagram==null) {
 				diagram= new ActiveDiagram(diagramComponents,staticContext);
 			}

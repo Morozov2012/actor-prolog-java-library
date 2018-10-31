@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.math.BigInteger;
 
 public class DomainIntegerRange extends DomainAlternative {
+	//
 	protected BigInteger leftBound;
 	protected BigInteger rightBound;
 	//

@@ -3,7 +3,7 @@
 package morozov.worlds.remote;
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.datum.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
@@ -84,7 +84,7 @@ public class OwnResidentWrapper
 	//
 	public void returnResultList(ExternalWorldInterface stub, byte[] argumentByteArray) {
 		AbstractWorld world= OwnWorldWrapper.registerWrapper(stub);
-		Term list= Converters.deserializeArgument(argumentByteArray,ownResident.domainSignature);
+		Term list= GeneralConverters.deserializeArgument(argumentByteArray,ownResident.domainSignature);
 		ownResident.returnResultList(world,list);
 	}
 	//
@@ -115,8 +115,8 @@ public class OwnResidentWrapper
 	public void startProcesses() {
 		ownResident.startProcesses();
 	}
-	public void closeFiles() {
-		ownResident.closeFiles();
+	public void releaseSystemResources() {
+		ownResident.releaseSystemResources();
 	}
 	public void stopProcesses() {
 		ownResident.stopProcesses();

@@ -11,13 +11,13 @@ public class ComponentState {
 		set(p,s);
 	}
 	public void set(boolean p, boolean s) {
-		synchronized(this) {
+		synchronized (this) {
 			isProven= p;
 			isSuspended= s;
 		}
 	}
 	public boolean equals(boolean p, boolean s) {
-		synchronized(this) {
+		synchronized (this) {
 			if (isProven==p && isSuspended==s) {
 				return true;
 			} else {
@@ -26,12 +26,12 @@ public class ComponentState {
 		}
 	}
 	public boolean isProven() {
-		synchronized(this) {
+		synchronized (this) {
 			return isProven;
 		}
 	}
 	public boolean isSuspended() {
-		synchronized(this) {
+		synchronized (this) {
 			return isSuspended;
 		}
 	}

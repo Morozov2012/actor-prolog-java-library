@@ -12,6 +12,12 @@ public class XY implements XY_Interface, Serializable {
 	protected int x;
 	protected int y;
 	//
+	private static final long serialVersionUID= 0x35878389751695F4L; // 3857196232264291828L;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames.data","XY");
+	// }
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public XY(int w, int h) {

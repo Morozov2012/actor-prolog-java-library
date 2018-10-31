@@ -5,7 +5,6 @@ package morozov.system.kinect.frames;
 import morozov.system.kinect.frames.data.interfaces.*;
 import morozov.system.kinect.frames.interfaces.*;
 import morozov.system.kinect.frames.text.*;
-import morozov.system.kinect.frames.tools.*;
 
 import java.io.Serializable;
 
@@ -17,6 +16,12 @@ public class KinectSkeletonsFrame implements KinectSkeletonsFrameInterface, Seri
 	protected GeneralSkeletonInterface[] skeletons;
 	protected DimensionsInterface dimensions;
 	protected KinectFrameBaseAttributesInterface baseAttributes;
+	//
+	private static final long serialVersionUID= 1;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames","KinectSkeletonsFrame");
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//

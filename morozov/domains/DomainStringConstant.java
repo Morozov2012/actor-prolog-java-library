@@ -11,6 +11,7 @@ import java.nio.charset.CharsetEncoder;
 import java.util.HashSet;
 
 public class DomainStringConstant extends DomainAlternative {
+	//
 	protected String constantText;
 	//
 	public DomainStringConstant(String text) {

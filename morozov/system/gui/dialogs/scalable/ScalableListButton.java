@@ -57,7 +57,7 @@ public class ScalableListButton extends ScalableComboBox {
 			targetDialog.reportValueUpdate(this);
 			// int modifiers= event.getModifiers();
 			if (component!=null && targetDialog.safelyIsShowing() && ((JComboBox)component).isPopupVisible()) {
-				synchronized(component) {
+				synchronized (component) {
 					Object selectedValue= ((JComboBox)component).getSelectedItem();
 					if (selectedValue!=null) {
 						String command= "name:" + selectedValue.toString();

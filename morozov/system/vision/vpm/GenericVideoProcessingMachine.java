@@ -603,6 +603,15 @@ abstract public class GenericVideoProcessingMachine implements BlobHolder {
 		return false;
 	}
 	//
+	public long getCommittedRecentFrameTime() {
+		GenericVideoProcessingMachineSnapshot snapshot= recentSnapshot.get();
+		if (snapshot != null) {
+			return snapshot.getRecentTimeInMilliseconds();
+		} else {
+			return -1;
+		}
+	}
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public java.awt.image.BufferedImage getCommittedRecentImage() {

@@ -4,7 +4,6 @@ package morozov.system.kinect.frames;
 
 import morozov.system.kinect.frames.data.interfaces.*;
 import morozov.system.kinect.frames.interfaces.*;
-import morozov.system.kinect.frames.tools.*;
 import morozov.system.kinect.modes.*;
 
 public class KinectColorFrame extends KinectFrame implements KinectColorFrameInterface {
@@ -12,6 +11,12 @@ public class KinectColorFrame extends KinectFrame implements KinectColorFrameInt
 	protected byte[] color;
 	protected float[][] u;
 	protected float[][] v;
+	//
+	private static final long serialVersionUID= 0x1AA1BBB236392CDDL; // 1919021290324831453L;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames","KinectColorFrame");
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//

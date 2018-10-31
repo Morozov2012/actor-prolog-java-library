@@ -42,6 +42,7 @@ public class FFmpegFrameReadingTask extends Thread {
 	protected AtomicBoolean internalLoopIsValid= new AtomicBoolean(false);
 	//
 	protected long beginningRecordTime_InMilliseconds= 0;
+	protected long beginningRecordNumber= 0;
 	//
 	protected long initialRecordTime_InTimeBaseUnits= -1;
 	protected long initialRecordTime_InMilliseconds= -1;
@@ -66,7 +67,7 @@ public class FFmpegFrameReadingTask extends Thread {
 	protected AVFrame pFrameRGB;
 	protected BytePointer imageBuffer;
 	protected SwsContext sws_ctx;
-	protected AVPacket packet;
+	protected AVPacket packet= new AVPacket();
 	//
 	protected ReentrantLock lock= new ReentrantLock();
 	protected Condition condition= lock.newCondition();
@@ -91,20 +92,23 @@ public class FFmpegFrameReadingTask extends Thread {
 	///////////////////////////////////////////////////////////////
 	//
 	public void openReading(ExtendedFileName fileName, int timeout, CharacterSet characterSet, String formatName, FFmpegStreamDefinition[] streams, FFmpegCodecOption[] options, StaticContext staticContext) {
-		synchronized(this) {
-			if (!inputIsOpen.get()) {
-				openInputFile(fileName,timeout,characterSet,formatName,streams,options,staticContext);
-			};
-			resetCounters();
+		if (!inputIsOpen.get()) {
+			synchronized (this) {
+				if (!inputIsOpen.get()) {
+					openInputFile(fileName,timeout,characterSet,formatName,streams,options,staticContext);
+				};
+				resetCounters();
+			}
 		}
 	}
 	//
 	public void activateReading() {
-		synchronized(this) {
-			if (stopThisThread.get()) {
-				resetCounters();
-				stopThisThread.set(false);
-				startProcessIfNecessary();
+		if (stopThisThread.get()) {
+			synchronized (this) {
+				if (stopThisThread.get()) {
+					stopThisThread.set(false);
+					startProcessIfNecessary();
+				}
 			}
 		}
 	}
@@ -117,10 +121,21 @@ public class FFmpegFrameReadingTask extends Thread {
 		}
 	}
 	//
-	public void pauseReading() {
+	public void suspendReading() {
 		stopThisThread.set(true);
 	}
 	//
+	public boolean isActive() {
+		return !stopThisThread.get();
+	}
+	//
+	public boolean isSuspended() {
+		return inputIsOpen() && stopThisThread.get();
+	}
+	//
+	public boolean inputIsOpen() {
+		return inputIsOpen.get();
+	}
 	public boolean eof() {
 		return !inputIsOpen.get();
 	}
@@ -144,24 +159,47 @@ public class FFmpegFrameReadingTask extends Thread {
 	}
 	//
 	protected void resetCounters() {
-		beginningRecordTime_InMilliseconds= 0;
-		initialRecordTime_InTimeBaseUnits= -1;
-		initialRecordTime_InMilliseconds= -1;
-		initialRealTime_InMilliseconds= -1;
-		totalNumberOfFrames= 0;
-		internalLoopIsValid.set(false);
+		synchronized (this) {
+			beginningRecordTime_InMilliseconds= 0;
+			beginningRecordNumber= 0;
+			initialRecordTime_InTimeBaseUnits= -1;
+			initialRecordTime_InMilliseconds= -1;
+			initialRealTime_InMilliseconds= -1;
+			totalNumberOfFrames= 0;
+			internalLoopIsValid.set(false);
+			copyOfFrameCounter= -1;
+		}
 	}
 	//
 	public void closeReading() {
-		pauseReading();
+		suspendReading();
 		synchronized (this) {
 			inputIsOpen.set(false);
-			packet= null;
-			// Free the swscaler context swsContext.
-			// If swsContext is NULL, then does nothing.
-			sws_freeContext(sws_ctx);
-			sws_ctx= null;
-			imageBuffer= null;
+			/*
+			if (packet != null) {
+				// av_packet_unref:
+				// Wipe the packet.
+				// Unreference the buffer referenced
+				// by the packet and reset the
+				// remaining packet fields to their
+				// default values.
+				// * @param pkt The packet to be
+				// unreferenced.
+				av_packet_unref(packet);
+				packet= null;
+			};
+			*/
+			if (sws_ctx != null) {
+				// Free the swscaler context swsContext.
+				// If swsContext is NULL, then does nothing.
+				sws_freeContext(sws_ctx);
+				sws_ctx= null;
+			};
+			if (imageBuffer != null) {
+				// av_freep(imageBuffer);
+				imageBuffer= null;
+			};
+			/**/
 			if (pFrameRGB != null) {
 				// Free the frame and any
 				// dynamically allocated objects
@@ -180,21 +218,45 @@ public class FFmpegFrameReadingTask extends Thread {
 				av_frame_free(pFrameInitial);
 				pFrameInitial= null;
 			};
+			/**/
 			if (pCodecCtx != null) {
 				// Free the codec context and everything
 				// associated with it and write NULL to the
 				// provided pointer.
-				avcodec_free_context(pCodecCtx);
+				// DO NOT USE IT:
+				// IT IS NOT NECESSARY,
+				// ALSO IT CRASHES THE PROGRAM UNDER W10
+				// avcodec_free_context(pCodecCtx);
 				pCodecCtx= null;
 			};
-			pCodec= null;
-			pCodecPrm= null;
+			if (pCodec != null) {
+				// av_freep(pCodec);
+				pCodec= null;
+			};
+			if (pCodecPrm != null) {
+				// av_freep(pCodecPrm);
+				pCodecPrm= null;
+			};
 			haveVideo= false;
-			stream= null;
-			streamDefinition= null;
+			if (stream != null) {
+				// av_freep(stream);
+				stream= null;
+			};
+			if (streamDefinition != null) {
+				streamDefinition= null;
+			};
 			videoStreamNumber= -1;
-			pFormatCtx= null;
+			if (pFormatCtx != null) {
+				// avformat_close_input:
+				// Close an opened input AVFormatContext.
+				// Free it and all its contents and
+				// set *s to NULL.
+				avformat_close_input(pFormatCtx);
+				pFormatCtx= null;
+			};
 			internalLoopIsValid.set(false);
+			// System.runFinalization();
+			System.gc();
 		}
 	}
 	//
@@ -206,10 +268,12 @@ public class FFmpegFrameReadingTask extends Thread {
 		// demuxers and protocols.
 		// av_register_all();
 		FFmpegTools.initializeFFmpegIfNecessary();
-		// Allocate Format I/O context.
-		// AVFormatContext extends Pointer.
-		// Pointer implements AutoCloseable.
-		pFormatCtx= new AVFormatContext(null);
+		if (pFormatCtx==null) {
+			// Allocate Format I/O context.
+			// AVFormatContext extends Pointer.
+			// Pointer implements AutoCloseable.
+			pFormatCtx= new AVFormatContext(null);
+		};
 		AVInputFormat inputFormat= null;
 		if (formatName != null) {
 			// av_find_input_format:
@@ -278,7 +342,7 @@ public class FFmpegFrameReadingTask extends Thread {
 		// AVCodecContext extends Pointer.
 		// Pointer implements AutoCloseable.
 		stream= pFormatCtx.streams(videoStreamNumber);
-		System.err.printf("Codec: %s\n",FFmpegTools.retrieveCodecInformation(stream));
+		// System.err.printf("Codec: %s\n",FFmpegTools.retrieveCodecInformation(stream));
 		pCodecPrm= stream.codecpar();
 		// pCodecCtx= stream.codec();
 		// Find a registered decoder with a matching codec ID.
@@ -339,23 +403,36 @@ public class FFmpegFrameReadingTask extends Thread {
 				haveVideo= true;
 			}
 		};
-		// Allocate an AVFrame and set its fields to
-		// default values. The resulting struct must be
-		// freed using av_frame_free().
-		pFrameInitial= av_frame_alloc();
 		if (pFrameInitial==null) {
-			throw new FFmpegCannotAllocateAVFrame();
+			// Allocate an AVFrame and set its fields to
+			// default values. The resulting struct must be
+			// freed using av_frame_free().
+			pFrameInitial= av_frame_alloc();
+			if (pFrameInitial==null) {
+				throw new FFmpegCannotAllocateAVFrame();
+			}
 		};
-		pFrameRGB= av_frame_alloc();
 		if (pFrameRGB==null) {
-			throw new FFmpegCannotAllocateAVFrame();
+			pFrameRGB= av_frame_alloc();
+			if (pFrameRGB==null) {
+				throw new FFmpegCannotAllocateAVFrame();
+			}
 		};
 		// Return the size in bytes of the amount of data required to
 		// store an image with the given parameters.
 		int numBytes= av_image_get_buffer_size(internalImageMode,pCodecCtx.width(),pCodecCtx.height(),1);
+		// av_malloc:
+		// Allocate a memory block with alignment suitable
+		// for all memory accesses (including vectors if
+		// available on the CPU).
+		// @param size Size in bytes for the memory block
+		// to be allocated
+		// @return Pointer to the allocated block, or
+		// {@code NULL} if the block cannot be allocated
+		Pointer imageByfferBytes= av_malloc(numBytes);
 		// BytePointer is the peer class to native pointers and
 		// arrays of signed char, including strings.
-		imageBuffer= new BytePointer(av_malloc(numBytes));
+		imageBuffer= new BytePointer(imageByfferBytes);
 		// Setup the data pointers and linesizes based on the
 		// specified image parameters and the provided array.
 		int flag= av_image_fill_arrays(
@@ -385,7 +462,7 @@ public class FFmpegFrameReadingTask extends Thread {
 			(DoublePointer)null);
 		if (sws_ctx==null) {
 			throw new FFmpegCannotInitializeSWSContext();
-		};
+		}
 		// The AVPacket structure stores compressed data. It is
 		// typically exported by demuxers and then passed as input
 		// to decoders, or received as output from encoders and
@@ -395,13 +472,14 @@ public class FFmpegFrameReadingTask extends Thread {
 		// empty packets, with no compressed data, containing only
 		// side data (e.g. to update some stream parameters at the
 		// end of encoding).
-		packet= new AVPacket();
+		// if (packet==null) {
+		//	packet= new AVPacket();
+		// }
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
 	public void run() {
-		copyOfFrameCounter= -1;
 		while (true) {
 			try {
 				synchronized (this) {
@@ -410,11 +488,11 @@ public class FFmpegFrameReadingTask extends Thread {
 						continue;
 					};
 					if (inputIsOpen.get()) {
-						boolean isEOF= readOnePacket(pCodecCtx,pFrameInitial,pFrameRGB,sws_ctx);
+						boolean isEOF= readOnePacket(pCodecCtx,pFrameInitial,pFrameRGB,sws_ctx,false);
 						if (isEOF) {
-							closeReading();
+							// closeReading();
 							stopThisThread.set(true);
-							owner.completeDataTransfer(totalNumberOfFrames);
+							owner.completeDataTransfer(beginningRecordNumber+totalNumberOfFrames-1);
 							continue;
 						}
 					} else {
@@ -425,13 +503,15 @@ public class FFmpegFrameReadingTask extends Thread {
 			} catch (InterruptedException e) {
 				closeReading();
 				stopThisThread.set(true);
-				owner.completeDataTransfer(totalNumberOfFrames);
+				owner.completeDataTransfer(beginningRecordNumber+totalNumberOfFrames-1);
 				return;
+			} catch (Throwable e) {
+				e.printStackTrace();
 			}
 		}
 	}
 	//
-	protected boolean readOnePacket(AVCodecContext pCodecCtx, AVFrame pFrameInitial, AVFrame pFrameRGB, SwsContext sws_ctx) throws InterruptedException {
+	protected boolean readOnePacket(AVCodecContext pCodecCtx, AVFrame pFrameInitial, AVFrame pFrameRGB, SwsContext sws_ctx, boolean isDummyReading) throws InterruptedException {
 		// The av_read_frame function returns the next frame of
 		// a stream. This function returns what is stored in the
 		// file, and does not validate that what is there are
@@ -450,39 +530,56 @@ public class FFmpegFrameReadingTask extends Thread {
 		// If the audio frames have a variable size (e.g. MPEG
 		// audio), then it contains one frame.
 		int frameReadingFlag= av_read_frame(pFormatCtx,packet);
-		boolean isEOF= false;
 		if (frameReadingFlag >= 0) {
-			if (packet.stream_index()==videoStreamNumber) {
-				// Supply raw packet data as input to a
-				// decoder. It returns 0 on success,
-				// otherwise a negative error code.
-				int ret= avcodec_send_packet(pCodecCtx,packet);
-				if (ret==AVERROR_EOF) {
-					return true;
-				} else if (ret < 0) {
+			try {
+				return readPacketFrames(pCodecCtx,pFrameInitial,pFrameRGB,sws_ctx,isDummyReading);
+			} catch (Throwable e) {
+				e.printStackTrace();
+				return true;
+			} finally {
+				av_packet_unref(packet);
+			}
+		} else if (frameReadingFlag==AVERROR_EOF) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	protected boolean readPacketFrames(AVCodecContext pCodecCtx, AVFrame pFrameInitial, AVFrame pFrameRGB, SwsContext sws_ctx, boolean isDummyReading) throws InterruptedException {
+		boolean isEOF= false;
+		if (packet.stream_index()==videoStreamNumber) {
+			// Supply raw packet data as input to a
+			// decoder. It returns 0 on success,
+			// otherwise a negative error code.
+			int ret= avcodec_send_packet(pCodecCtx,packet);
+			if (ret==AVERROR_EOF) {
+				return true;
+			} else if (ret < 0) {
+				return false;
+			};
+			internalLoopIsValid.set(true);
+			AVRational timeBase= stream.time_base();
+			AVRational averageFrameRate= stream.avg_frame_rate();
+			while (true) {
+				if (stopThisThread.get() && !isDummyReading) {
+					wait();
+					continue;
+				};
+				if (!inputIsOpen.get()) {
+					stopThisThread.set(true);
 					return false;
 				};
-				internalLoopIsValid.set(true);
-				AVRational timeBase= stream.time_base();
-				AVRational averageFrameRate= stream.avg_frame_rate();
-				while (true) {
-					if (stopThisThread.get()) {
-						wait();
-						continue;
-					};
-					if (!inputIsOpen.get()) {
-						stopThisThread.set(true);
-						return false;
-					};
-					if (!internalLoopIsValid.get()) {
-						return false;
-					};
-					// Return decoded output data from a
-					// decoder.
-					ret= avcodec_receive_frame(pCodecCtx,pFrameInitial);
-					int updatedFrameNumber= pCodecCtx.frame_number();
-					try {
-						if (ret >= 0) {
+				if (!internalLoopIsValid.get()) {
+					return false;
+				};
+				// Return decoded output data from a
+				// decoder.
+				ret= avcodec_receive_frame(pCodecCtx,pFrameInitial);
+				int updatedFrameNumber= pCodecCtx.frame_number();
+				try {
+					if (ret >= 0) {
+						totalNumberOfFrames++;
+						if (!isDummyReading) {
 ///////////////////////////////////////////////////////////////////////
 long currentRealTime_InMilliseconds= System.currentTimeMillis();
 double coefficient= slowMotionCoefficient.get();
@@ -503,34 +600,51 @@ sws_scale(
 	pFrameRGB.data(),
 	pFrameRGB.linesize());
 long currentRecordTime_InMilliseconds;
-totalNumberOfFrames++;
 if (totalNumberOfFrames <= 1) {
 	initialRealTime_InMilliseconds= currentRealTime_InMilliseconds;
 	if (currentRecordTime_InTimeBaseUnits==AV_NOPTS_VALUE) {
-	// if (true) { // DEBUG MODE
-		currentRecordTime_InMilliseconds= FFmpegTools.computeTimeOfFrameInMilliseconds(totalNumberOfFrames,averageFrameRate);
+		currentRecordTime_InMilliseconds=
+			FFmpegTools.computeTimeOfFrameInMilliseconds(
+				beginningRecordNumber,
+				averageFrameRate);
 		currentRecordTime_InTimeBaseUnits=
-			FFmpegTools.computeRelativeTime(beginningRecordTime_InMilliseconds+currentRecordTime_InMilliseconds,timeBase);
-		initialRecordTime_InTimeBaseUnits= currentRecordTime_InTimeBaseUnits;
-		initialRecordTime_InMilliseconds= FFmpegTools.computeTimeOfFrameInMilliseconds(totalNumberOfFrames,averageFrameRate);
+			FFmpegTools.computeRelativeTime(
+				currentRecordTime_InMilliseconds,
+				timeBase);
+		initialRecordTime_InMilliseconds=
+			currentRecordTime_InMilliseconds;
+		initialRecordTime_InTimeBaseUnits=
+			currentRecordTime_InTimeBaseUnits;
 	} else {
-		initialRecordTime_InTimeBaseUnits= currentRecordTime_InTimeBaseUnits;
-		currentRecordTime_InMilliseconds= (long)(FFmpegTools.computeTime(initialRecordTime_InTimeBaseUnits,timeBase)*1000);
-		initialRecordTime_InMilliseconds= currentRecordTime_InMilliseconds;
+		initialRecordTime_InTimeBaseUnits=
+			currentRecordTime_InTimeBaseUnits;
+		currentRecordTime_InMilliseconds=
+			(long)(FFmpegTools.computeTime(
+				currentRecordTime_InTimeBaseUnits,
+				timeBase)*1000);
+		initialRecordTime_InMilliseconds=
+			currentRecordTime_InMilliseconds;
 	}
 } else {
 	long realTimeDelta_InMilliseconds= currentRealTime_InMilliseconds - initialRealTime_InMilliseconds;
 	if (currentRecordTime_InTimeBaseUnits==AV_NOPTS_VALUE || initialRecordTime_InTimeBaseUnits==AV_NOPTS_VALUE) {
-	// if (true) { // DEBUG MODE
-		currentRecordTime_InMilliseconds= FFmpegTools.computeTimeOfFrameInMilliseconds(totalNumberOfFrames,averageFrameRate);
+		currentRecordTime_InMilliseconds= FFmpegTools.computeTimeOfFrameInMilliseconds(
+			beginningRecordNumber + totalNumberOfFrames - 1,
+			averageFrameRate);
 		currentRecordTime_InTimeBaseUnits=
-			FFmpegTools.computeRelativeTime(beginningRecordTime_InMilliseconds+currentRecordTime_InMilliseconds,timeBase);
+			FFmpegTools.computeRelativeTime(
+				currentRecordTime_InMilliseconds,
+				timeBase);
 	} else {
-		currentRecordTime_InMilliseconds= (long)(FFmpegTools.computeTime(currentRecordTime_InTimeBaseUnits,timeBase)*1000);
+		currentRecordTime_InMilliseconds= (long)(FFmpegTools.computeTime(
+			currentRecordTime_InTimeBaseUnits,
+			timeBase)*1000);
 	};
 	long recordTimeDelta_InMilliseconds= currentRecordTime_InMilliseconds - initialRecordTime_InMilliseconds;
 	long waitingPeriod_InMilliseconds= recordTimeDelta_InMilliseconds - realTimeDelta_InMilliseconds;
-	if (waitingPeriod_InMilliseconds > 0 && waitingPeriod_InMilliseconds <= maximalwaitingPeriod_InMilliseconds) {
+	if (	waitingPeriod_InMilliseconds > 0 &&
+		waitingPeriod_InMilliseconds <= maximalwaitingPeriod_InMilliseconds &&
+		!stopAfterSingleReading.get()) {
 		try {
 			long nanosTimeout= waitingPeriod_InMilliseconds * 1_000_000;
 			lock.lock();
@@ -557,30 +671,26 @@ if (!inputIsOpen.get()) {
 if (!internalLoopIsValid.get()) {
 	return false;
 };
-useFrame(currentRecordTime_InTimeBaseUnits,timeBase,averageFrameRate);
 if (stopAfterSingleReading.get()) {
 	stopThisThread.set(true);
 };
+useFrame(currentRecordTime_InTimeBaseUnits,timeBase,averageFrameRate);
 continue;
 ///////////////////////////////////////////////////////////////////////
-						} else if (ret==AVERROR_EOF) {
-							isEOF= true;
-							break;
-						} else if (copyOfFrameCounter==updatedFrameNumber) {
-							isEOF= false;
-							break;
-						} else {
-							continue;
 						}
-					} finally {
-						copyOfFrameCounter= updatedFrameNumber;
+					} else if (ret==AVERROR_EOF) {
+						isEOF= true;
+						break;
+					} else if (copyOfFrameCounter==updatedFrameNumber) {
+						isEOF= false;
+						break;
+					} else {
+						continue;
 					}
+				} finally {
+					copyOfFrameCounter= updatedFrameNumber;
 				}
 			}
-		} else if (frameReadingFlag==AVERROR_EOF) {
-			return true;
-		} else {
-			return false;
 		};
 		return isEOF;
 	}
@@ -606,14 +716,50 @@ continue;
 		intBuffer.get(iArray);
 		java.awt.image.BufferedImage bufferedImage= new java.awt.image.BufferedImage(width,height,java.awt.image.BufferedImage.TYPE_INT_ARGB);
 		bufferedImage.setRGB(0,0,width,height,iArray,0,width);
-		owner.sendFrame(new FFmpegFrame(bufferedImage,time,timeBase,averageFrameRate));
+		owner.sendFrame(new FFmpegFrame(bufferedImage,time,timeBase,averageFrameRate,beginningRecordNumber+totalNumberOfFrames-1));
 	}
 	//
-	public void seek(double targetTime) {
+	public void seekFrameNumber(long seekTarget) {
+		AVRational timeBase= stream.time_base();
+		long targetTime_InMilliseconds= FFmpegTools.computeTimeOfFrameInMilliseconds(seekTarget,timeBase);
+		double targetTime= targetTime_InMilliseconds / 1000.0;
+		seekFrame(seekTarget,targetTime,targetTime_InMilliseconds);
+	}
+	//
+	public void seekFrameTime(double targetTime) {
 		long targetTime_InMilliseconds= (long)(targetTime * 1000);
-		synchronized(this) {
-			AVRational timeBase= stream.time_base();
-			long seekTarget= FFmpegTools.computeRelativeTime(targetTime_InMilliseconds,timeBase);
+		AVRational timeBase= stream.time_base();
+		long seekTarget= FFmpegTools.computeRelativeTime(targetTime_InMilliseconds,timeBase);
+		seekFrame(seekTarget,targetTime,targetTime_InMilliseconds);
+	}
+	//
+	public void seekFrame(long seekTarget, double targetTime, long targetTime_InMilliseconds) {
+		// delay:
+		// Codec delay.
+		// Encoding: Number of frames delay there will be from
+		// the encoder input to the decoder output. (we assume
+		// the decoder matches the spec)
+		// Decoding: Number of frames delay in addition to what
+		// a standard decoder as specified in the spec would
+		// produce.
+		// Video:
+		// Number of frames the decoded output will be delayed
+		// relative to the encoded input.
+		// Audio:
+		// For encoding, this field is unused (see
+		// initial_padding).
+		// For decoding, this is the number of samples the
+		// decoder needs to output before the decoder's output
+		// is valid. When seeking, you should start decoding
+		// this many samples prior to your desired seek point.
+		// - encoding: Set by libavcodec.
+		// - decoding: Set by libavcodec.
+		int delay= pCodecCtx.delay();
+		seekTarget= seekTarget - delay;
+		boolean state1= stopThisThread.get();
+		stopThisThread.set(true);
+		synchronized (this) {
+			resetCounters();
 			// av_seek_frame:
 			// Seek to the keyframe at timestamp.
 			// 'timestamp' in 'stream_index'.
@@ -638,7 +784,7 @@ continue;
 			//
 			int flag= av_seek_frame(pFormatCtx,videoStreamNumber,seekTarget,0);
 			if (flag < 0) {
-				throw new FFmpegCannotSeekFrame(extendedFileName.toString(),targetTime);
+				throw new FFmpegCannotSeekFrame(extendedFileName.toString(),seekTarget,targetTime);
 			};
 			// avcodec_flush_buffers:
 			// Reset the internal decoder state / flush
@@ -654,9 +800,14 @@ continue;
 			// keep internally, but the caller's
 			// reference remains valid.
 			avcodec_flush_buffers(pCodecCtx);
-			resetCounters();
 			owner.resetBuffer();
-			beginningRecordTime_InMilliseconds= targetTime_InMilliseconds;
+			beginningRecordTime_InMilliseconds=
+				targetTime_InMilliseconds;
+			beginningRecordNumber= seekTarget;
+			boolean state2= stopThisThread.get();
+			boolean state3= state1 && state2;
+			stopThisThread.set(state3);
+			notify();
 		}
 	}
 }

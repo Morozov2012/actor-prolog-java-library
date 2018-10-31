@@ -185,10 +185,6 @@ public abstract class LoadableContainer implements Serializable, Cloneable {
 			a2.setBacktrackableValue(new PrologInteger(recentErrorPosition),iX);
 			a3.setBacktrackableValue(new PrologString(recentErrorException.toString()),iX);
 			a4.setBacktrackableValue(new PrologString(recentErrorException.toString()),iX);
-			//iX.pushTrail(a1);
-			//iX.pushTrail(a2);
-			//iX.pushTrail(a3);
-			//iX.pushTrail(a4);
 		} else {
 			throw Backtracking.instance;
 		}
@@ -199,9 +195,6 @@ public abstract class LoadableContainer implements Serializable, Cloneable {
 			a1.setBacktrackableValue(new PrologString(recentErrorText),iX);
 			a2.setBacktrackableValue(new PrologInteger(recentErrorPosition),iX);
 			a3.setBacktrackableValue(new PrologString(recentErrorException.toString()),iX);
-			//iX.pushTrail(a1);
-			//iX.pushTrail(a2);
-			//iX.pushTrail(a3);
 		} else {
 			throw Backtracking.instance;
 		}

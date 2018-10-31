@@ -2,8 +2,6 @@
 
 package morozov.system.vision.vpm.converters;
 
-import target.*;
-
 import morozov.run.*;
 import morozov.system.vision.vpm.converters.errors.*;
 import morozov.terms.*;

@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class PrologSetElement extends Term {
+	//
 	private Term element;
 	//
 	public PrologSetElement(Term aElement) {

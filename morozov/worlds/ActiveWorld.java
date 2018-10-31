@@ -166,13 +166,12 @@ public abstract class ActiveWorld extends OwnWorld {
 	}
 	//
 	public void sendFlowMessage(SlotVariable slotVariable, ChoisePoint iX, boolean sendEmptyValues) {
-		synchronized(slotVariable) {
+		synchronized (slotVariable) {
 			SlotVariableValue slotValue= slotVariable.get(this);
 			if (slotValue==null) {
 				if (debugThisProcess()) {
 					System.out.printf("%s: I will SEND F.M.; slotValue==NULL;\n",this);
 				};
-				// continue;
 				return;
 			};
 			Term newValue= null;
@@ -214,7 +213,6 @@ public abstract class ActiveWorld extends OwnWorld {
 			};
 			if (valuesAreEqual && sortsAreEqual) {
 				slotValue.portIsUpdated= false;
-				// continue;
 				return;
 			};
 			boolean ownersAreEqual= false;
@@ -222,7 +220,6 @@ public abstract class ActiveWorld extends OwnWorld {
 				ownersAreEqual= true;
 			};
 			if (portValueIsProtected && !flowMessageIsProtected && !ownersAreEqual) {
-				// continue;
 				return;
 			};
 			slotValue.portValue= newValue;
@@ -248,7 +245,6 @@ public abstract class ActiveWorld extends OwnWorld {
 				sortsAreEqual= true;
 			};
 			if (valuesAreEqual && sortsAreEqual) {
-				// continue;
 				return;
 			};
 			ActiveWorld globalValueOwner= slotVariable.globalValueOwner;
@@ -257,7 +253,6 @@ public abstract class ActiveWorld extends OwnWorld {
 				ownersAreEqual= true;
 			};
 			if (globalValueIsProtected && !flowMessageIsProtected && !ownersAreEqual) {
-				// continue;
 				return;
 			};
 			slotVariable.globalValue= newValue;
@@ -549,7 +544,7 @@ public abstract class ActiveWorld extends OwnWorld {
 	//
 	protected boolean acceptPortValue(SlotVariable slotVariable) {
 		boolean portIsUpdated= false;
-		synchronized(slotVariable) {
+		synchronized (slotVariable) {
 			SlotVariableValue slotValue= slotVariable.get(this);
 			if (slotValue==null) {
 				if (debugThisProcess()) {
@@ -569,7 +564,6 @@ public abstract class ActiveWorld extends OwnWorld {
 				if (debugThisProcess()) {
 					System.out.printf("%s: F.M.; Phase I; portValue=NULL\n",this);
 				}
-				// continue;
 			} else if (slotValue.portValueOwner==this) {
 				if (debugThisProcess()) {
 					System.out.printf("%s: F.M.; Phase I; slotValue.portValueOwner==THIS\n",this);

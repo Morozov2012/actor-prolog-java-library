@@ -86,7 +86,6 @@ public abstract class LambdaArray extends Lambda {
 		try {
 			Term value= accessArrayElement(arrayIndices,iX);
 			result.setNonBacktrackableValue(value);
-			// iX.pushTrail(result);
 		} catch (Backtracking b) {
 			throw new ImperativeProcedureFailed();
 		}
@@ -327,7 +326,6 @@ ArrayIndices arrayIndices= new ArrayIndices(currentIndexValue);
 Term value= accessArrayElement(arrayIndices,newIx);
 if (isFunctionCall) {
 	argumentResult.setNonBacktrackableValue(value);
-	// iX.pushTrail(argumentResult);
 };
 c0.execute(newIx);
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -409,7 +407,6 @@ if (!skipPass) {
 	Term value= accessArrayElement(arrayIndices,newIx);
 	if (isFunctionCall) {
 		argumentResult.setNonBacktrackableValue(value);
-		// iX.pushTrail(argumentResult);
 	};
 	try {
 		c0.execute(newIx);
@@ -421,7 +418,6 @@ if (!skipPass) {
 if (processBacktracking || skipPass) {
 	if (isFunctionCall) {
 		argumentResult.clear();
-		// iX.pushTrail(argumentResult);
 	};
 	if (newIx.isEnabled()) {
 		newIx.freeTrail();

@@ -13,7 +13,7 @@ package morozov.system.gui.dialogs.scalable.common;
 */
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.*;
 import morozov.terms.*;
@@ -37,7 +37,7 @@ public class ARealField extends ATextField {
 		try {
 			// return new PrologReal(new Double(activeDocument.getTextOrBacktrack()));
 			String text= activeDocument.getTextOrBacktrack();
-			double number= Converters.stringToReal(text);
+			double number= GeneralConverters.stringToReal(text);
 			return new PrologReal(number);
 		} catch (Backtracking b) {
 			return new PrologString(activeDocument.getText());

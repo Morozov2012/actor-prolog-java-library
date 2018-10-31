@@ -5,9 +5,7 @@ package morozov.system.kinect.modes.converters;
 import target.*;
 
 import morozov.run.*;
-import morozov.system.kinect.frames.tools.*;
 import morozov.system.kinect.modes.*;
-import morozov.system.kinect.modes.converters.*;
 import morozov.system.kinect.modes.converters.errors.*;
 import morozov.system.kinect.modes.interfaces.*;
 import morozov.system.kinect.modes.tools.*;

@@ -2,8 +2,6 @@
 
 package morozov.system.vision.vpm;
 
-import morozov.system.vision.vpm.*;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.HashMap;
@@ -50,14 +48,12 @@ public class ConnectedGraph {
 			BigInteger identifier= iterator1.next();
 			StableTrack track= tracks.get(identifier);
 			double velocity= track.computeMeanVelocity();
-			// double distance= track.computeTotalDistance();
 			double distance= track.computeTotalShiftInPixels();
 			double velosityHalfwidth= velocityThreshold * fuzzyThresholdBorder;
 			double distanceHalfwidth= distanceThreshold * fuzzyThresholdBorder;
 			double metrics1= VisionUtils.metrics(velocity,velocityThreshold,velosityHalfwidth);
 			double metrics2= VisionUtils.metrics(distance,distanceThreshold,distanceHalfwidth);
 			double commonMetrics= 1 - (1-metrics1) * (1-metrics2);
-			// if (commonMetrics < 0.75) {
 			if (commonMetrics < commonMetricsThreshold) {
 				refusedTracks.add(identifier);
 			}
@@ -69,14 +65,12 @@ public class ConnectedGraph {
 			BigInteger identifier= iterator1.next();
 			StableTrack track= tracks.get(identifier);
 			double velocity= track.computeMeanVelocity();
-			// double distance= track.computeTotalDistance();
 			double distance= track.computeTotalShiftInPixels();
 			double velosityHalfwidth= velocityThreshold * fuzzyThresholdBorder;
 			double distanceHalfwidth= distanceThreshold * fuzzyThresholdBorder;
 			double metrics1= VisionUtils.metrics(velocity,velocityThreshold,velosityHalfwidth);
 			double metrics2= VisionUtils.metrics(distance,distanceThreshold,distanceHalfwidth);
 			double commonMetrics= metrics1 * metrics2;
-			// if (commonMetrics < 0.75) {
 			if (commonMetrics < commonMetricsThreshold) {
 				refusedTracks.add(identifier);
 			}
@@ -89,7 +83,6 @@ public class ConnectedGraph {
 			ConnectedSegment c= connectedSegments.get(n);
 			TrackSegment s= c.getTrackSegment();
 			BigInteger owner= s.getOwner();
-			// if (!refusedTracks.contains(owner)) {
 			HashMap<Integer,ConnectedSegment> hash2= hash1.get(owner);
 			if (hash2==null) {
 				hash2= new HashMap<Integer,ConnectedSegment>();
@@ -97,9 +90,6 @@ public class ConnectedGraph {
 			int number= s.getNumber();
 			hash2.put(number,c);
 			hash1.put(owner,hash2);
-			// } else {
-			//	connectedSegments.remove(n);
-			// }
 		};
 		numberOfSegments= connectedSegments.size();
 		for (int n=0; n < numberOfSegments; n++) {
@@ -130,8 +120,6 @@ public class ConnectedGraph {
 			}
 		}
 	}
-	//public void deleteSlowSegments() {
-	//}
 	public void deleteSlowSegments() {
 		int numberOfSegments= connectedSegments.size();
 		for (int n=numberOfSegments-1; n >= 0; n--) {

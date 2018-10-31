@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.HashSet;
 
 public class DomainWorld extends DomainAbstractWorld {
+	//
 	protected long constantCode;
 	//
 	public DomainWorld(long code) {

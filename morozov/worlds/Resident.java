@@ -58,7 +58,7 @@ public class Resident extends ActiveWorld {
 		start();
 	}
 	//
-	public void closeFiles() {
+	public void releaseSystemResources() {
 		// stop();
 	}
 	//
@@ -154,7 +154,7 @@ public class Resident extends ActiveWorld {
 	}
 	//
 	public void returnResultList(AbstractWorld target, Term list) {
-		synchronized(resultLists) {
+		synchronized (resultLists) {
 			resultLists.put(target,list);
 		};
 		hasNewResults.set(true);
@@ -162,7 +162,7 @@ public class Resident extends ActiveWorld {
 	}
 	//
 	public void cancelResultList(AbstractWorld target) {
-		synchronized(resultLists) {
+		synchronized (resultLists) {
 			resultLists.remove(target);
 		};
 		hasNewResults.set(true);

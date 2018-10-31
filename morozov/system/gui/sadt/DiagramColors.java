@@ -4,6 +4,7 @@ package morozov.system.gui.sadt;
 
 import target.*;
 
+import morozov.system.*;
 import morozov.system.gui.*;
 import morozov.system.signals.*;
 

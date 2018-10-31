@@ -32,6 +32,11 @@ public enum TermCheckOperation {
 			return (value instanceof PrologString);
 		}
 	},
+	BINARY {
+		public boolean eval(ChoisePoint iX, Term value) {
+			return (value instanceof PrologBinary);
+		}
+	},
 	INTEGER {
 		public boolean eval(ChoisePoint iX, Term value) {
 			return (value instanceof PrologInteger);

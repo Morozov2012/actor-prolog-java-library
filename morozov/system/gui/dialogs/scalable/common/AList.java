@@ -128,7 +128,7 @@ public class AList extends JScrollPane {
 	//
 	public void putValue(Term value, ChoisePoint iX) {
 		if (list!=null) {
-			synchronized(list) {
+			synchronized (list) {
 				ListModel model= list.getModel();
 				if (model.getSize() > 0) {
 					try {
@@ -186,7 +186,7 @@ public class AList extends JScrollPane {
 				sortedStrings= new SortedStrings(stringList);
 				stringList= sortedStrings.sortedArray;
 			};
-			synchronized(list) {
+			synchronized (list) {
 				try {
 					list.setValueIsAdjusting(true);
 					list.clearSelection();
@@ -205,7 +205,7 @@ public class AList extends JScrollPane {
 	}
 	public Term getValue() {
 		if (list!=null) {
-			synchronized(list) {
+			synchronized (list) {
 				ListModel model= list.getModel();
 				int mode= list.getSelectionMode();
 				if (model.getSize() <= 0 || list.isSelectionEmpty()) {
@@ -236,7 +236,7 @@ public class AList extends JScrollPane {
 	}
 	public Term getRange() {
 		if (list!=null) {
-			synchronized(list) {
+			synchronized (list) {
 				ListModel model= list.getModel();
 				Term result= PrologEmptyList.instance;
 				for (int n=model.getSize()-1; n>=0; n--) {

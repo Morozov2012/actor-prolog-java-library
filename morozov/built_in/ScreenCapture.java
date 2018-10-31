@@ -2,15 +2,9 @@
 
 package morozov.built_in;
 
-//import target.*;
-
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.errors.*;
-//import morozov.system.files.*;
-//import morozov.system.gui.*;
-//import morozov.system.gui.signals.*;
-//import morozov.system.gui.space2d.*;
 import morozov.terms.*;
 import morozov.worlds.*;
 
@@ -18,12 +12,6 @@ import java.awt.AWTException;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
-
-//import java.awt.Color;
-//import java.awt.Rectangle;
-//import java.awt.GraphicsConfiguration;
-//import java.awt.Graphics2D;
-//import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class ScreenCapture extends BufferedImageController {
 	//
@@ -59,10 +47,10 @@ public abstract class ScreenCapture extends BufferedImageController {
 		modifyImage(a1,bufferedImage,iX);
 	}
 	public void getImage5s(ChoisePoint iX, Term a1, Term a2, Term a3, Term a4, Term a5) {
-		int x1= Converters.argumentToSmallInteger(a2,iX);
-		int y1= Converters.argumentToSmallInteger(a3,iX);
-		int width= Converters.argumentToSmallInteger(a4,iX);
-		int height= Converters.argumentToSmallInteger(a5,iX);
+		int x1= GeneralConverters.argumentToSmallInteger(a2,iX);
+		int y1= GeneralConverters.argumentToSmallInteger(a3,iX);
+		int width= GeneralConverters.argumentToSmallInteger(a4,iX);
+		int height= GeneralConverters.argumentToSmallInteger(a5,iX);
 		initializeRobotIfNecessary();
 		Rectangle screenbounds= new Rectangle(x1,y1,width,height);
 		java.awt.image.BufferedImage bufferedImage= getBufferedImage(screenbounds);

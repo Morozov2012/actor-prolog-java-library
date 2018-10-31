@@ -2,10 +2,9 @@
 
 package morozov.built_in;
 
-import target.*;
-
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
@@ -28,8 +27,8 @@ public abstract class Timer extends Alpha {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	abstract protected Term getBuiltInSlot_E_period();
-	abstract protected Term getBuiltInSlot_E_initial_delay();
+	abstract public Term getBuiltInSlot_E_period();
+	abstract public Term getBuiltInSlot_E_initial_delay();
 	//
 	abstract public long entry_s_Tick_0();
 	//
@@ -61,7 +60,6 @@ public abstract class Timer extends Alpha {
 	}
 	public void getPeriod0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(getPeriod(iX).toTerm());
-		// iX.pushTrail(a1);
 	}
 	public void getPeriod0fs(ChoisePoint iX) {
 	}
@@ -85,7 +83,6 @@ public abstract class Timer extends Alpha {
 	}
 	public void getInitialDelay0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(getInitialDelay(iX).toTerm());
-		// iX.pushTrail(a1);
 	}
 	public void getInitialDelay0fs(ChoisePoint iX) {
 	}
@@ -127,10 +124,11 @@ public abstract class Timer extends Alpha {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void closeFiles() {
+	public void releaseSystemResources() {
 		closeTimer();
-		super.closeFiles();
+		super.releaseSystemResources();
 	}
+	//
 	protected void closeTimer() {
 		if (scheduler != null) {
 			if (currentTask != null) {
@@ -220,20 +218,19 @@ public abstract class Timer extends Alpha {
 	public static void time3s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3) {
 		// Calendar calendar= new GregorianCalendar();
 		Calendar calendar= Calendar.getInstance();
-		int hours= calendar.get(Calendar.HOUR);
+		// int hours= calendar.get(Calendar.HOUR);
+		int hours= calendar.get(Calendar.HOUR_OF_DAY);
 		int minutes= calendar.get(Calendar.MINUTE);
 		int seconds= calendar.get(Calendar.SECOND);
 		a1.setBacktrackableValue(new PrologInteger(hours),iX);
 		a2.setBacktrackableValue(new PrologInteger(minutes),iX);
 		a3.setBacktrackableValue(new PrologInteger(seconds),iX);
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
-		//iX.pushTrail(a3);
 	}
 	public static void time4s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3, PrologVariable a4) {
 		// Calendar calendar= new GregorianCalendar();
 		Calendar calendar= Calendar.getInstance();
-		int hours= calendar.get(Calendar.HOUR);
+		// int hours= calendar.get(Calendar.HOUR);
+		int hours= calendar.get(Calendar.HOUR_OF_DAY);
 		int minutes= calendar.get(Calendar.MINUTE);
 		int seconds= calendar.get(Calendar.SECOND);
 		int milliseconds= calendar.get(Calendar.MILLISECOND);
@@ -241,20 +238,15 @@ public abstract class Timer extends Alpha {
 		a2.setBacktrackableValue(new PrologInteger(minutes),iX);
 		a3.setBacktrackableValue(new PrologInteger(seconds),iX);
 		a4.setBacktrackableValue(new PrologInteger(milliseconds),iX);
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
-		//iX.pushTrail(a3);
-		//iX.pushTrail(a4);
 	}
 	public static void time0ff(ChoisePoint iX, PrologVariable result) {
-		// Calendar calendar= new GregorianCalendar();
 		Calendar calendar= Calendar.getInstance();
-		int hours= calendar.get(Calendar.HOUR);
+		// int hours= calendar.get(Calendar.HOUR);
+		int hours= calendar.get(Calendar.HOUR_OF_DAY);
 		int minutes= calendar.get(Calendar.MINUTE);
 		int seconds= calendar.get(Calendar.SECOND);
 		long milliseconds= calendar.get(Calendar.MILLISECOND);
-		result.setNonBacktrackableValue(Converters.formTime(calendar));
-		// iX.pushTrail(argument);
+		result.setNonBacktrackableValue(GeneralConverters.formTime(calendar));
 	}
 	public static void time0fs(ChoisePoint iX) {
 	}
@@ -263,34 +255,30 @@ public abstract class Timer extends Alpha {
 		Calendar calendar= Calendar.getInstance();
 		long milliseconds= calendar.getTimeInMillis();
 		result.setNonBacktrackableValue(new PrologInteger(milliseconds));
-		// iX.pushTrail(argument);
 	}
 	public static void milliseconds0fs(ChoisePoint iX) {
 	}
 	//
 	public static void convertToTime1ff(ChoisePoint iX, PrologVariable result, Term a1) {
-		BigInteger milliseconds= Converters.argumentToRoundInteger(a1,iX);
-		result.setNonBacktrackableValue(Converters.millisecondsToTime(milliseconds));
-		// iX.pushTrail(argument);
+		BigInteger milliseconds= GeneralConverters.argumentToRoundInteger(a1,iX);
+		result.setNonBacktrackableValue(GeneralConverters.millisecondsToTime(milliseconds));
 	}
 	public static void convertToTime1fs(ChoisePoint iX, Term a1) {
 	}
 	//
 	public static void convertToDate1ff(ChoisePoint iX, PrologVariable result, Term a1) {
-		BigInteger milliseconds= Converters.argumentToRoundInteger(a1,iX);
-		result.setNonBacktrackableValue(Converters.millisecondsToDate(milliseconds));
-		// iX.pushTrail(argument);
+		BigInteger milliseconds= GeneralConverters.argumentToRoundInteger(a1,iX);
+		result.setNonBacktrackableValue(GeneralConverters.millisecondsToDate(milliseconds));
 	}
 	public static void convertToDate1fs(ChoisePoint iX, Term a1) {
 	}
 	//
 	public static void convertToMilliseconds2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
 		Calendar calendar= Calendar.getInstance();
-		Converters.argumentToTimeInMilliseconds(a1,calendar,iX);
-		Converters.argumentToDateInMilliseconds(a2,calendar,iX);
+		GeneralConverters.argumentToTimeInMilliseconds(a1,calendar,iX);
+		GeneralConverters.argumentToDateInMilliseconds(a2,calendar,iX);
 		long milliseconds= calendar.getTimeInMillis();
 		result.setNonBacktrackableValue(new PrologInteger(milliseconds));
-		// iX.pushTrail(argument);
 	}
 	public static void convertToMilliseconds2fs(ChoisePoint iX, Term a1, Term a2) {
 	}
@@ -309,10 +297,6 @@ public abstract class Timer extends Alpha {
 		a2.setBacktrackableValue(new PrologInteger(month),iX);
 		a3.setBacktrackableValue(new PrologInteger(dayOfMonth),iX);
 		a4.setBacktrackableValue(new PrologInteger(dayOfWeek),iX);
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
-		//iX.pushTrail(a3);
-		//iX.pushTrail(a4);
 	}
 	public static void date3s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3) {
 		Calendar calendar= Calendar.getInstance();
@@ -322,14 +306,10 @@ public abstract class Timer extends Alpha {
 		a1.setBacktrackableValue(new PrologInteger(year),iX);
 		a2.setBacktrackableValue(new PrologInteger(month),iX);
 		a3.setBacktrackableValue(new PrologInteger(day),iX);
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
-		//iX.pushTrail(a3);
 	}
 	public static void date0ff(ChoisePoint iX, PrologVariable result) {
 		Calendar calendar= Calendar.getInstance();
-		result.setNonBacktrackableValue(Converters.formDate(calendar));
-		// iX.pushTrail(argument);
+		result.setNonBacktrackableValue(GeneralConverters.formDate(calendar));
 	}
 	public static void date0fs(ChoisePoint iX) {
 	}
@@ -343,7 +323,7 @@ public abstract class Timer extends Alpha {
 	//
 	public void setPriority1s(ChoisePoint iX, Term n1) {
 		try {
-			int priority= Converters.termToProcessPriority(n1,iX);
+			int priority= GeneralConverters.termToProcessPriority(n1,iX);
 			currentProcess.thread.setPriority(priority);
 		} catch (TermIsNotProcessPriority e) {
 			throw new WrongArgumentIsNotProcessPriority(n1);
@@ -351,7 +331,7 @@ public abstract class Timer extends Alpha {
 	}
 	//
 	public void getPriority0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(Converters.ProcessPriorityToTerm(currentProcess.thread.getPriority()));
+		result.setNonBacktrackableValue(GeneralConverters.ProcessPriorityToTerm(currentProcess.thread.getPriority()));
 	}
 	public void getPriority0fs(ChoisePoint iX) {
 	}

@@ -2,21 +2,14 @@
 
 package morozov.system.vision.plain;
 
-import target.*;
-
-import morozov.system.*;
 import morozov.system.vision.vpm.*;
-import morozov.system.vision.vpm.converters.*;
 import morozov.terms.*;
 
 import java.awt.image.WritableRaster;
+import java.awt.Graphics2D;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.Arrays;
-import java.util.Iterator;
-import java.util.ListIterator;
 import java.math.BigInteger;
 
 public class ImageSubtractorSnapshot extends GenericVideoProcessingMachineSnapshot {
@@ -239,5 +232,19 @@ public class ImageSubtractorSnapshot extends GenericVideoProcessingMachineSnapsh
 			foregroundImage= new java.awt.image.BufferedImage(operationalImageWidth,operationalImageHeight,java.awt.image.BufferedImage.TYPE_4BYTE_ABGR);
 			createForegroundImageWithAllChannels(alphaPixels);
 		}
+	}
+	protected void createForegroundImageWithAllChannels(int[] alphaPixels) {
+		Graphics2D g2= foregroundImage.createGraphics();
+		try {
+			if (preprocessedImage != null) {
+				g2.drawImage(preprocessedImage,0,0,null);
+			} else {
+				g2.drawImage(recentImage,0,0,null);
+			}
+		} finally {
+			g2.dispose();
+		};
+		WritableRaster imageRaster= foregroundImage.getRaster();
+		imageRaster.setSamples(0,0,operationalImageWidth,operationalImageHeight,3,alphaPixels);
 	}
 }

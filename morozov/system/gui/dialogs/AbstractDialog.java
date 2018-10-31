@@ -26,8 +26,6 @@ import java.awt.Dialog.ModalityType;
 import java.math.BigInteger;
 import java.lang.reflect.InvocationTargetException;
 
-import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public abstract class AbstractDialog
@@ -256,6 +254,36 @@ public abstract class AbstractDialog
 				if (insideThePutOperation.intValue()<=0) {
 					entry.requestValueRefreshing();
 					specialProcess.receiveUserInterfaceMessage(entry,false,DialogEventType.MODIFIED_CONTROL);
+				}
+			}
+		}
+	}
+	public void reportCompleteEditing(ActiveComponent currentComponent) {
+		boolean entryIsFound= false;
+		boolean sendFlowMessage= false;
+		DialogEntry entry= null;
+		for (int i= 0; i < controlTable.length; i++) {
+			entry= controlTable[i];
+			if (entry.component==currentComponent && entry.entryType==DialogEntryType.VALUE) {
+				entryIsFound= true;
+				if (entry.isSlotName) {
+					sendFlowMessage= true;
+				};
+				break;
+			}
+		};
+		if (entryIsFound) {
+			if (sendFlowMessage) {
+				if (insideThePutOperation.intValue()<=0) {
+					entry.requestValueRefreshing();
+					specialProcess.receiveUserInterfaceMessage(entry,true,DialogEventType.COMPLETE_EDITING);
+				} else {
+					specialProcess.receiveUserInterfaceMessage(entry,true,DialogEventType.NONE);
+				}
+			} else {
+				if (insideThePutOperation.intValue()<=0) {
+					entry.requestValueRefreshing();
+					specialProcess.receiveUserInterfaceMessage(entry,false,DialogEventType.COMPLETE_EDITING);
 				}
 			}
 		}
@@ -598,8 +626,28 @@ public abstract class AbstractDialog
 				};
 				newIx.freeTrail();
 			} else {
-				AsyncCall call= null;
-				call= new AsyncCall(domainSignature,targetWorld,true,true,arguments,true);
+				AsyncCall call= new AsyncCall(domainSignature,targetWorld,true,true,arguments,true);
+				// 2018.10.30: call= new AsyncCall(domainSignature,targetWorld,true,false,arguments,true);
+				targetWorld.transmitAsyncCall(call,iX);
+			}
+		}
+	}
+	//
+	public void sendCompleteEditingMessage(DialogEntry entry, ChoisePoint iX) {
+		if (entry!=null) {
+			Term predicateArgument= entry.toTerm();
+			Term[] arguments= new Term[]{predicateArgument};
+			long domainSignature= targetWorld.entry_s_CompleteEditing_1_i();
+			if (isModal) {
+				ChoisePoint newIx= new ChoisePoint(modalChoisePoint);
+				Continuation c1= new DomainSwitch(new SuccessTermination(),domainSignature,targetWorld,targetWorld,arguments);
+				try {
+					c1.execute(newIx);
+				} catch (Backtracking b) {
+				};
+				newIx.freeTrail();
+			} else {
+				AsyncCall call= new AsyncCall(domainSignature,targetWorld,true,true,arguments,true);
 				targetWorld.transmitAsyncCall(call,iX);
 			}
 		}
@@ -619,8 +667,7 @@ public abstract class AbstractDialog
 				};
 				newIx.freeTrail();
 			} else {
-				AsyncCall call= null;
-				call= new AsyncCall(domainSignature,targetWorld,true,true,arguments,true);
+				AsyncCall call= new AsyncCall(domainSignature,targetWorld,true,true,arguments,true);
 				targetWorld.transmitAsyncCall(call,iX);
 			}
 		}
@@ -629,7 +676,7 @@ public abstract class AbstractDialog
 	///////////////////////////////////////////////////////////////
 	//
 	public void repaintAfterDelay() {
-		synchronized(this) {
+		synchronized (this) {
 			if (currentTask != null) {
 				currentTask.cancel();
 				scheduler.purge();
@@ -640,7 +687,7 @@ public abstract class AbstractDialog
 	}
 	//
 	public void skipDelayedRepainting() {
-		synchronized(this) {
+		synchronized (this) {
 			if (currentTask != null) {
 				currentTask.cancel();
 				scheduler.purge();

@@ -18,7 +18,6 @@ import morozov.system.gui.dialogs.scalable.common.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
 
-import java.awt.Font;
 import java.awt.Color;
 
 public class ActiveTextField extends ActiveComponent {

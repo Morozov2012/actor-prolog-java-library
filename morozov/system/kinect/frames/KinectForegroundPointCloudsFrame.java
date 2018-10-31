@@ -6,18 +6,19 @@ import morozov.system.kinect.frames.interfaces.*;
 import morozov.system.kinect.frames.data.*;
 import morozov.system.kinect.frames.data.interfaces.*;
 import morozov.system.kinect.frames.tools.*;
-import morozov.system.kinect.modes.*;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
 
 import java.util.Arrays;
-import java.util.Locale;
 
 public class KinectForegroundPointCloudsFrame extends KinectPointCloudsFrame implements KinectForegroundPointCloudsFrameInterface {
 	//
 	protected ForegroundPointCloud[] pointClouds;
 	protected transient float[] xyz;
+	//
+	private static final long serialVersionUID= 0xBA203E2FCF66842DL; // -5034956008336227283L;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames","KinectForegroundPointCloudsFrame");
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//

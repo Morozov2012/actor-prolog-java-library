@@ -2,24 +2,13 @@
 
 package morozov.system.vision.vpm;
 
-import target.*;
-
-import morozov.system.*;
 import morozov.system.vision.vpm.commands.*;
 import morozov.system.vision.vpm.converters.*;
 import morozov.terms.*;
 
 import java.awt.image.WritableRaster;
-import java.awt.image.SampleModel;
-import java.awt.Graphics2D;
-
-import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Set;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.ListIterator;
 import java.math.BigInteger;
 
 public class VPM_Snapshot extends GenericVideoProcessingMachineSnapshot {
@@ -29,6 +18,10 @@ public class VPM_Snapshot extends GenericVideoProcessingMachineSnapshot {
 	protected int[] matrixGrayscale;
 	protected int[][] matrixRGB;
 	protected int[][] matrixHSB;
+	protected boolean imageWasAdjusted= false;
+	//
+	protected java.awt.image.BufferedImage adjustedImage;
+	//
 	protected ImageChannelName outputChannelName;
 	//
 	protected BlobGroup[] blobGroups;
@@ -51,6 +44,7 @@ public class VPM_Snapshot extends GenericVideoProcessingMachineSnapshot {
 			int[] mGrayscale,
 			int[][] mRGB,
 			int[][] mHSB,
+			boolean isAdjusted,
 			boolean[] mask,
 			ImageChannelName channelName,
 			ArrayList<VPM_FrameNumberAndTime> timeArray,
@@ -74,6 +68,7 @@ public class VPM_Snapshot extends GenericVideoProcessingMachineSnapshot {
 		matrixGrayscale= mGrayscale;
 		matrixRGB= mRGB;
 		matrixHSB= mHSB;
+		imageWasAdjusted= isAdjusted;
 		outputChannelName= channelName;
 		blobGroups= blobGroupArray.toArray(new BlobGroup[0]);
 		for (int k=0; k < actualSnapshotCommands.length; k++) {
@@ -138,7 +133,7 @@ public class VPM_Snapshot extends GenericVideoProcessingMachineSnapshot {
 			};
 			foregroundImage= new java.awt.image.BufferedImage(operationalImageWidth,operationalImageHeight,java.awt.image.BufferedImage.TYPE_4BYTE_ABGR);
 			if (outputChannelName==null) {
-				createForegroundImageWithAllChannels(alphaPixels);
+				fillUpForegroundImageWithAllChannels(alphaPixels);
 			} else {
 				WritableRaster imageRaster= foregroundImage.getRaster();
 				switch (outputChannelName) {
@@ -192,12 +187,36 @@ public class VPM_Snapshot extends GenericVideoProcessingMachineSnapshot {
 					imageRaster.setSamples(0,0,operationalImageWidth,operationalImageHeight,3,alphaPixels);
 					break;
 				case ALL:
-					createForegroundImageWithAllChannels(alphaPixels);
+					fillUpForegroundImageWithAllChannels(alphaPixels);
 					break;
 				default:
 					System.err.printf("Unknown channel name: %s\n",outputChannelName);
 				}
 			}
+		}
+	}
+	//
+	protected void fillUpForegroundImageWithAllChannels(int[] alphaPixels) {
+		if (imageWasAdjusted) {
+			WritableRaster imageRaster= foregroundImage.getRaster();
+			imageRaster.setSamples(0,0,operationalImageWidth,operationalImageHeight,0,matrixRGB[0]);
+			imageRaster.setSamples(0,0,operationalImageWidth,operationalImageHeight,1,matrixRGB[1]);
+			imageRaster.setSamples(0,0,operationalImageWidth,operationalImageHeight,2,matrixRGB[2]);
+			imageRaster.setSamples(0,0,operationalImageWidth,operationalImageHeight,3,alphaPixels);
+		} else {
+			super.fillUpForegroundImageWithAllChannels(alphaPixels);
+		}
+	}
+	//
+	protected void fillUpSynthesizedImage(int[] alphaPixels) {
+		if (imageWasAdjusted) {
+			WritableRaster imageRaster= synthesizedImage.getRaster();
+			imageRaster.setSamples(0,0,operationalImageWidth,operationalImageHeight,0,matrixRGB[0]);
+			imageRaster.setSamples(0,0,operationalImageWidth,operationalImageHeight,1,matrixRGB[1]);
+			imageRaster.setSamples(0,0,operationalImageWidth,operationalImageHeight,2,matrixRGB[2]);
+			imageRaster.setSamples(0,0,operationalImageWidth,operationalImageHeight,3,alphaPixels);
+		} else {
+			super.fillUpSynthesizedImage(alphaPixels);
 		}
 	}
 	//

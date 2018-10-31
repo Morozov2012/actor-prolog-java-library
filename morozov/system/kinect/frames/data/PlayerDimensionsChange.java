@@ -17,6 +17,12 @@ public class PlayerDimensionsChange implements PlayerDimensionsChangeInterface, 
 	protected float changeOfMinimalZ= 0;
 	protected float changeOfMaximalZ= 0;
 	//
+	private static final long serialVersionUID= 1;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames.data","PlayerDimensionsChange");
+	// }
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public PlayerDimensionsChange() {

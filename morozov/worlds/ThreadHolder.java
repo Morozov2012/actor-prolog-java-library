@@ -42,7 +42,7 @@ public class ThreadHolder extends Thread {
 						currentProcess.sendStateOfProcess();
 					}
 				} else {
-					synchronized(this) {
+					synchronized (this) {
 						while (!hasMessagesToBeProcessed.get() && !stopThisThread.get()) {
 							wait();
 						}
@@ -86,7 +86,7 @@ public class ThreadHolder extends Thread {
 	//
 	public final void wakeUp() {
 		hasMessagesToBeProcessed.set(true);
-		synchronized(this) {
+		synchronized (this) {
 			notify();
 		}
 	}

@@ -2,18 +2,20 @@
 
 package morozov.built_in;
 
-import target.*;
-
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
+import morozov.system.errors.*;
 import morozov.system.files.*;
-import morozov.system.kinect.*;
+import morozov.system.gui.space2d.*;
+import morozov.system.gui.space2d.errors.*;
+import morozov.system.gui.space3d.*;
+import morozov.system.gui.space3d.errors.*;
 import morozov.system.kinect.converters.*;
 import morozov.system.kinect.converters.errors.*;
 import morozov.system.kinect.converters.interfaces.*;
 import morozov.system.kinect.errors.*;
 import morozov.system.kinect.frames.*;
-import morozov.system.kinect.frames.data.*;
 import morozov.system.kinect.frames.data.converters.*;
 import morozov.system.kinect.frames.data.interfaces.*;
 import morozov.system.kinect.frames.interfaces.*;
@@ -32,11 +34,12 @@ import java.util.GregorianCalendar;
 import java.util.Date;
 import java.util.Locale;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.ListIterator;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
+
+import javax.media.j3d.Appearance;
 
 public abstract class KinectBuffer extends BufferedImageController implements KinectBufferInterface {
 	//
@@ -44,13 +47,9 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 	protected KinectDisplayingModeInterface displayingMode;
 	protected KinectDeviceInterface inputDevice;
 	protected KinectPerformanceOptimization dataAcquisitionOptimization;
-	protected KinectTextAttributeInterface description;
-	protected KinectTextAttributeInterface copyright;
-	protected KinectTextAttributeInterface registrationDate;
-	protected KinectTextAttributeInterface registrationTime;
-	protected ColorMapInterface colorMap;
-	protected ColorMapInterface peopleColors;
-	protected KinectIntegerAttributeInterface maximalFrameDelay;
+	protected KinectColorMap colorMap;
+	protected KinectColorMap peopleColors;
+	protected IntegerAttribute maximalFrameDelay;
 	//
 	protected Integer writeBufferSize;
 	protected Integer readBufferSize;
@@ -69,16 +68,15 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 	protected AtomicReference<KinectPeopleIndexMode> actingPeopleIndexMode= new AtomicReference<>();
 	protected AtomicReference<KinectCircumscriptionMode[]> actingCircumscriptionModes= new AtomicReference<>();
 	protected AtomicReference<KinectSkeletonsMode> actingSkeletonsMode= new AtomicReference<>();
-	protected AtomicReference<KinectTextAttributeInterface> actingDescription= new AtomicReference<>();
-	protected AtomicReference<KinectTextAttributeInterface> actingCopyright= new AtomicReference<>();
-	protected AtomicReference<KinectTextAttributeInterface> actingRegistrationDate= new AtomicReference<>();
-	protected AtomicReference<KinectTextAttributeInterface> actingRegistrationTime= new AtomicReference<>();
+	protected AtomicReference<TextAttribute> actingDescription= new AtomicReference<>();
+	protected AtomicReference<TextAttribute> actingCopyright= new AtomicReference<>();
+	protected AtomicReference<TextAttribute> actingRegistrationDate= new AtomicReference<>();
+	protected AtomicReference<TextAttribute> actingRegistrationTime= new AtomicReference<>();
 	//
 	protected AtomicReference<NumericalValue> actingMaximalChronicleLength= new AtomicReference<>();
-	protected AtomicReference<KinectDataReadingError> dataTransferError= new AtomicReference<>();
+	protected AtomicReference<FrameReadingError> dataTransferError= new AtomicReference<>();
 	//
 	protected ArrayList<KinectSkeletonsFrameInterface> rawSkeletonsHistory= new ArrayList<>();
-	// protected long beginningRawSkeletonTime= -1;
 	protected long recentRawSkeletonTime= -1;
 	protected boolean recentRawSkeletonsAreTracked= false;
 	//
@@ -101,6 +99,11 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 	protected Term committedSkeletonsTerm;
 	protected Term committedTracksTerm;
 	protected Term committedChronicleTerm;
+	//
+	protected KinectLookupTable kinectLookupTable= new KinectLookupTable();
+	protected AtomicReference<Appearance> sceneAppearance= new AtomicReference<>(null);
+	protected NumericalValue sceneDepthThreshold;
+	protected KinectSurfaceType sceneSurfaceType;
 	//
 	protected AtomicReference<KinectFrameType[]> deliveredDataAcquisitionMode= new AtomicReference<>();
 	protected AtomicReference<KinectPeopleIndexMode> deliveredPeopleIndexMode= new AtomicReference<>();
@@ -140,21 +143,19 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 	abstract public long entry_s_BufferDeallocation_0();
 	abstract public long entry_s_DataTransferError_1_i();
 	//
-	abstract protected Term getBuiltInSlot_E_operating_mode();
-	abstract protected Term getBuiltInSlot_E_displaying_mode();
-	abstract protected Term getBuiltInSlot_E_input_device();
-	abstract protected Term getBuiltInSlot_E_data_acquisition_optimization();
-	abstract protected Term getBuiltInSlot_E_description();
-	abstract protected Term getBuiltInSlot_E_copyright();
-	abstract protected Term getBuiltInSlot_E_registration_date();
-	abstract protected Term getBuiltInSlot_E_registration_time();
-	abstract protected Term getBuiltInSlot_E_color_map();
-	abstract protected Term getBuiltInSlot_E_people_colors();
-	abstract protected Term getBuiltInSlot_E_write_buffer_size();
-	abstract protected Term getBuiltInSlot_E_read_buffer_size();
-	abstract protected Term getBuiltInSlot_E_maximal_chronicle_length();
-	abstract protected Term getBuiltInSlot_E_slow_motion_coefficient();
-	abstract protected Term getBuiltInSlot_E_maximal_frame_delay();
+	abstract public Term getBuiltInSlot_E_operating_mode();
+	abstract public Term getBuiltInSlot_E_displaying_mode();
+	abstract public Term getBuiltInSlot_E_input_device();
+	abstract public Term getBuiltInSlot_E_data_acquisition_optimization();
+	abstract public Term getBuiltInSlot_E_color_map();
+	abstract public Term getBuiltInSlot_E_people_colors();
+	abstract public Term getBuiltInSlot_E_write_buffer_size();
+	abstract public Term getBuiltInSlot_E_read_buffer_size();
+	abstract public Term getBuiltInSlot_E_maximal_chronicle_length();
+	abstract public Term getBuiltInSlot_E_slow_motion_coefficient();
+	abstract public Term getBuiltInSlot_E_maximal_frame_delay();
+	abstract public Term getBuiltInSlot_E_scene_depth_threshold();
+	abstract public Term getBuiltInSlot_E_scene_surface_type();
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -252,142 +253,54 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 		}
 	}
 	//
-	// get/set description
-	//
-	public void setDescription1s(ChoisePoint iX, Term a1) {
-		setDescription(KinectTextAttributeConverters.argumentToKinectTextAttribute(a1,iX));
-	}
-	public void setDescription(KinectTextAttributeInterface value) {
-		description= value;
-	}
-	public void getDescription0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(KinectTextAttributeConverters.toTerm(getDescription(iX)));
-	}
-	public void getDescription0fs(ChoisePoint iX) {
-	}
-	public KinectTextAttributeInterface getDescription(ChoisePoint iX) {
-		if (description != null) {
-			return description;
-		} else {
-			Term value= getBuiltInSlot_E_description();
-			return KinectTextAttributeConverters.argumentToKinectTextAttribute(value,iX);
-		}
-	}
-	//
-	// get/set copyright
-	//
-	public void setCopyright1s(ChoisePoint iX, Term a1) {
-		setCopyright(KinectTextAttributeConverters.argumentToKinectTextAttribute(a1,iX));
-	}
-	public void setCopyright(KinectTextAttributeInterface value) {
-		copyright= value;
-	}
-	public void getCopyright0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(KinectTextAttributeConverters.toTerm(getCopyright(iX)));
-	}
-	public void getCopyright0fs(ChoisePoint iX) {
-	}
-	public KinectTextAttributeInterface getCopyright(ChoisePoint iX) {
-		if (copyright != null) {
-			return copyright;
-		} else {
-			Term value= getBuiltInSlot_E_copyright();
-			return KinectTextAttributeConverters.argumentToKinectTextAttribute(value,iX);
-		}
-	}
-	//
-	// get/set registration_date
-	//
-	public void setRegistrationDate1s(ChoisePoint iX, Term a1) {
-		setRegistrationDate(KinectTextAttributeConverters.argumentToKinectTextAttribute(a1,iX));
-	}
-	public void setRegistrationDate(KinectTextAttributeInterface value) {
-		registrationDate= value;
-	}
-	public void getRegistrationDate0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(KinectTextAttributeConverters.toTerm(getRegistrationDate(iX)));
-	}
-	public void getRegistrationDate0fs(ChoisePoint iX) {
-	}
-	public KinectTextAttributeInterface getRegistrationDate(ChoisePoint iX) {
-		if (registrationDate != null) {
-			return registrationDate;
-		} else {
-			Term value= getBuiltInSlot_E_registration_date();
-			return KinectTextAttributeConverters.argumentToKinectTextAttribute(value,iX);
-		}
-	}
-	//
-	// get/set registration_time
-	//
-	public void setRegistrationTime1s(ChoisePoint iX, Term a1) {
-		setRegistrationTime(KinectTextAttributeConverters.argumentToKinectTextAttribute(a1,iX));
-	}
-	public void setRegistrationTime(KinectTextAttributeInterface value) {
-		registrationTime= value;
-	}
-	public void getRegistrationTime0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(KinectTextAttributeConverters.toTerm(getRegistrationTime(iX)));
-	}
-	public void getRegistrationTime0fs(ChoisePoint iX) {
-	}
-	public KinectTextAttributeInterface getRegistrationTime(ChoisePoint iX) {
-		if (registrationTime != null) {
-			return registrationTime;
-		} else {
-			Term value= getBuiltInSlot_E_registration_time();
-			return KinectTextAttributeConverters.argumentToKinectTextAttribute(value,iX);
-		}
-	}
-	//
 	// get/set color_map
 	//
 	public void setColorMap1s(ChoisePoint iX, Term a1) {
-		setColorMap(ColorMapConverters.argumentToColorMap(a1,iX));
+		setColorMap(KinectColorMapConverters.argumentToKinectColorMap(a1,iX));
 	}
-	public void setColorMap(ColorMapInterface value) {
+	public void setColorMap(KinectColorMap value) {
 		colorMap= value;
 	}
 	public void getColorMap0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(ColorMapConverters.toTerm(getColorMap(iX)));
+		result.setNonBacktrackableValue(KinectColorMapConverters.toTerm(getColorMap(iX)));
 	}
 	public void getColorMap0fs(ChoisePoint iX) {
 	}
-	public ColorMapInterface getColorMap(ChoisePoint iX) {
+	public KinectColorMap getColorMap(ChoisePoint iX) {
 		if (colorMap != null) {
 			return colorMap;
 		} else {
 			Term value= getBuiltInSlot_E_color_map();
-			return ColorMapConverters.argumentToColorMap(value,iX);
+			return KinectColorMapConverters.argumentToKinectColorMap(value,iX);
 		}
 	}
 	//
 	// get/set people_colors
 	//
 	public void setPeopleColors1s(ChoisePoint iX, Term a1) {
-		setPeopleColors(ColorMapConverters.argumentToColorMap(a1,iX));
+		setPeopleColors(KinectColorMapConverters.argumentToKinectColorMap(a1,iX));
 	}
-	public void setPeopleColors(ColorMap value) {
+	public void setPeopleColors(KinectColorMap value) {
 		peopleColors= value;
 	}
 	public void getPeopleColors0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(ColorMapConverters.toTerm(getPeopleColors(iX)));
+		result.setNonBacktrackableValue(KinectColorMapConverters.toTerm(getPeopleColors(iX)));
 	}
 	public void getPeopleColors0fs(ChoisePoint iX) {
 	}
-	public ColorMapInterface getPeopleColors(ChoisePoint iX) {
+	public KinectColorMap getPeopleColors(ChoisePoint iX) {
 		if (peopleColors != null) {
 			return peopleColors;
 		} else {
 			Term value= getBuiltInSlot_E_people_colors();
-			return ColorMapConverters.argumentToColorMap(value,iX);
+			return KinectColorMapConverters.argumentToKinectColorMap(value,iX);
 		}
 	}
 	//
 	// get/set write_buffer_size
 	//
 	public void setWriteBufferSize1s(ChoisePoint iX, Term a1) {
-		setWriteBufferSize(Converters.argumentToSmallInteger(a1,iX));
+		setWriteBufferSize(GeneralConverters.argumentToSmallInteger(a1,iX));
 	}
 	public void setWriteBufferSize(int value) {
 		writeBufferSize= value;
@@ -403,14 +316,14 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 			return writeBufferSize;
 		} else {
 			Term value= getBuiltInSlot_E_write_buffer_size();
-			return Converters.argumentToSmallInteger(value,iX);
+			return GeneralConverters.argumentToSmallInteger(value,iX);
 		}
 	}
 	//
 	// get/set read_buffer_size
 	//
 	public void setReadBufferSize1s(ChoisePoint iX, Term a1) {
-		setReadBufferSize(Converters.argumentToSmallInteger(a1,iX));
+		setReadBufferSize(GeneralConverters.argumentToSmallInteger(a1,iX));
 	}
 	public void setReadBufferSize(int value) {
 		readBufferSize= value;
@@ -426,11 +339,9 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 			return readBufferSize;
 		} else {
 			Term value= getBuiltInSlot_E_read_buffer_size();
-			return Converters.argumentToSmallInteger(value,iX);
+			return GeneralConverters.argumentToSmallInteger(value,iX);
 		}
 	}
-	//
-	///////////////////////////////////////////////////////////////
 	//
 	// get/set maximal_chronicle_length
 	//
@@ -481,23 +392,67 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 	// get/set maximal_frame_delay
 	//
 	public void setMaximalFrameDelay1s(ChoisePoint iX, Term a1) {
-		setMaximalFrameDelay(KinectIntegerAttributeConverters.argumentToKinectIntegerAttribute(a1,iX));
+		setMaximalFrameDelay(IntegerAttribute.argumentToIntegerAttribute(a1,iX));
 	}
-	public void setMaximalFrameDelay(KinectIntegerAttributeInterface value) {
+	public void setMaximalFrameDelay(IntegerAttribute value) {
 		maximalFrameDelay= value;
 		frameReadingTask.setMaximalWaitingPeriod(value);
 	}
 	public void getMaximalFrameDelay0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(KinectIntegerAttributeConverters.toTerm(getMaximalFrameDelay(iX)));
+		result.setNonBacktrackableValue(getMaximalFrameDelay(iX).toTerm());
 	}
 	public void getMaximalFrameDelay0fs(ChoisePoint iX) {
 	}
-	public KinectIntegerAttributeInterface getMaximalFrameDelay(ChoisePoint iX) {
+	public IntegerAttribute getMaximalFrameDelay(ChoisePoint iX) {
 		if (maximalFrameDelay != null) {
 			return maximalFrameDelay;
 		} else {
 			Term value= getBuiltInSlot_E_maximal_frame_delay();
-			return KinectIntegerAttributeConverters.argumentToKinectIntegerAttribute(value,iX);
+			return IntegerAttribute.argumentToIntegerAttribute(value,iX);
+		}
+	}
+	//
+	// get/set scene_depth_threshold
+	//
+	public void setSceneDepthThreshold1s(ChoisePoint iX, Term a1) {
+		setSceneDepthThreshold(NumericalValue.argumentToNumericalValue(a1,iX));
+	}
+	public void setSceneDepthThreshold(NumericalValue value) {
+		sceneDepthThreshold= value;
+	}
+	public void getSceneDepthThreshold0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getSceneDepthThreshold(iX).toTerm());
+	}
+	public void getSceneDepthThreshold0fs(ChoisePoint iX) {
+	}
+	public NumericalValue getSceneDepthThreshold(ChoisePoint iX) {
+		if (sceneDepthThreshold != null) {
+			return sceneDepthThreshold;
+		} else {
+			Term value= getBuiltInSlot_E_scene_depth_threshold();
+			return NumericalValue.argumentToNumericalValue(value,iX);
+		}
+	}
+	//
+	// get/set scene_surface_type
+	//
+	public void setSceneSurfaceType1s(ChoisePoint iX, Term a1) {
+		setSceneSurfaceType(KinectSurfaceTypeConverters.argumentToKinectSurfaceType(a1,iX));
+	}
+	public void setSceneSurfaceType(KinectSurfaceType value) {
+		sceneSurfaceType= value;
+	}
+	public void getSceneSurfaceType0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(KinectSurfaceTypeConverters.toTerm(getSceneSurfaceType(iX)));
+	}
+	public void getSceneSurfaceType0fs(ChoisePoint iX) {
+	}
+	public KinectSurfaceType getSceneSurfaceType(ChoisePoint iX) {
+		if (sceneSurfaceType != null) {
+			return sceneSurfaceType;
+		} else {
+			Term value= getBuiltInSlot_E_scene_surface_type();
+			return KinectSurfaceTypeConverters.argumentToKinectSurfaceType(value,iX);
 		}
 	}
 	//
@@ -506,12 +461,10 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 	public void getComputedCorrection2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
 		a1.setBacktrackableValue(new PrologInteger(computedHorizontalCorrection),iX);
 		a2.setBacktrackableValue(new PrologInteger(computedVerticalCorrection),iX);
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
 	}
 	//
 	public void recentReadingError2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) throws Backtracking {
-		KinectDataReadingError error= dataTransferError.get();
+		FrameReadingError error= dataTransferError.get();
 		if (error != null) {
 			a1.setBacktrackableValue(new PrologInteger(error.getNumberOfFrameToBeAcquired()),iX);
 			a2.setBacktrackableValue(new PrologString(error.getException().toString()),iX);
@@ -599,18 +552,7 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 		KinectDeviceInterface currentDevice= getInputDevice(iX);
 		if (currentDevice != null) {
 			KinectDisplayingModeInterface currentDisplayingMode= getDisplayingMode(iX);
-			// int currentWriteBufferSize= getWriteBufferSize(iX);
 			KinectPerformanceOptimization currentPerformanceOptimization= getDataAcquisitionOptimization(iX);
-			// ExtendedFileName currentFileName= retrieveRealLocalFileName(iX);
-			// frameRecordingTask.setWriteBufferSize(currentWriteBufferSize);
-			// frameRecordingTask.reset(currentFileName);
-			// actingDevice.set(currentDevice);
-			// actingDescription.set(getDescription(iX));
-			// actingCopyright.set(getCopyright(iX));
-			// actingRegistrationDate.set(getRegistrationDate(iX));
-			// actingRegistrationTime.set(getRegistrationTime(iX));
-			// updateActingDisplayingMode(currentDisplayingMode,iX);
-			// updateActingDataAcquisitionMode(currentDevice.getDataAcquisitionMode());
 			currentDevice.registerListener(currentDisplayingMode,currentPerformanceOptimization,requireExclusiveAccess,iX);
 		} else {
 			throw new InputDeviceIsNotDefined();
@@ -656,7 +598,6 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 		int currentTimeout= getMaximalWaitingTimeInMilliseconds(iX);
 		CharacterSet currentCharacterSet= getCharacterSet(iX);
 		KinectDisplayingModeInterface currentDisplayingMode= getDisplayingMode(iX);
-		// int currentSkeletonReleaseTime= getSkeletonReleaseTime(iX);
 		int currentReadBufferSize= getReadBufferSize(iX);
 		NumericalValue currentMaximalChronicleLength= getMaximalChronicleLength(iX);
 		NumericalValue currentSlowMotionCoefficient= getSlowMotionCoefficient(iX);
@@ -682,8 +623,6 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 		if (currentDevice != null) {
 			KinectDisplayingModeInterface currentDisplayingMode= getDisplayingMode(iX);
 			KinectPerformanceOptimization currentPerformanceOptimization= getDataAcquisitionOptimization(iX);
-			// int currentSkeletonReleaseTime= getSkeletonReleaseTime(iX);
-			// int currentReadBufferSize= getReadBufferSize(iX);
 			NumericalValue currentMaximalChronicleLength= getMaximalChronicleLength(iX);
 			actingDevice.set(currentDevice);
 			currentDevice.registerListener(currentDisplayingMode,currentPerformanceOptimization,requireExclusiveAccess,iX);
@@ -713,6 +652,7 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 		actingPeopleIndexMode.set(currentPeopleIndexMode);
 		actingCircumscriptionModes.set(currentCircumscriptionModes);
 		updateActingSkeletonsMode(currentSkeletonsMode);
+		frameReadingTask.setDisplayingMode(currentDisplayingMode);
 	}
 	protected void updateActingSkeletonsMode(KinectSkeletonsMode currentSkeletonsMode) {
 		KinectSkeletonsMode previousSkeletonsMode= actingSkeletonsMode.get();
@@ -730,7 +670,6 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 	//
 	protected void resetBuffer() {
 		clearSkeletonHistory();
-		// synchronized(rawSkeletonsHistory) {
 		synchronized (numberOfRecentReceivedFrame) {
 			recentFrame= null;
 			numberOfRecentReceivedFrame.set(-1);
@@ -768,10 +707,8 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 	}
 	//
 	protected void clearSkeletonHistory() {
-		// synchronized(rawSkeletonsHistory) {
 		synchronized (numberOfRecentReceivedFrame) {
 			rawSkeletonsHistory.clear();
-			// beginningRawSkeletonTime= -1;
 			recentRawSkeletonTime= -1;
 			recentRawSkeletonsAreTracked= false;
 			committedSkeletons.clear();
@@ -796,7 +733,9 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 	}
 	//
 	public void pause0s(ChoisePoint iX) {
+//System.out.printf("KinectBuffer::[1]:pause\n");
 		KinectBufferOperatingMode currentOperatingMode= actingKinectBufferOperatingMode.get();
+//System.out.printf("KinectBuffer::[2]:pause %s\n",currentOperatingMode);
 		if (currentOperatingMode==null) {
 			return;
 		};
@@ -811,7 +750,8 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 			break;
 		case PLAYING:
 		case READING:
-			frameReadingTask.pauseReading();
+//System.out.printf("KinectBuffer::[3]:pause %s\n",currentOperatingMode);
+			frameReadingTask.suspendReading();
 			break;
 		case LISTENING:
 			{
@@ -864,8 +804,38 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 		KinectBufferOperatingMode currentOperatingMode= actingKinectBufferOperatingMode.get();
 		if (currentOperatingMode==null) {
 			throw Backtracking.instance;
-		}
+		};
+		switch (currentOperatingMode) {
+		case RECORDING:
+			{
+				KinectDeviceInterface device= actingDevice.get();
+				if (device != null) {
+					if (device.isNotSuspended()) {
+						return;
+					}
+				}
+			};
+			break;
+		case PLAYING:
+		case READING:
+			if (frameReadingTask.isNotSuspended()) {
+				return;
+			};
+			break;
+		case LISTENING:
+			{
+				KinectDeviceInterface device= actingDevice.get();
+				if (device != null) {
+					if (device.isNotSuspended()) {
+						return;
+					}
+				}
+			};
+			break;
+		};
+		throw Backtracking.instance;
 	}
+	//
 	public void isSuspended0s(ChoisePoint iX) throws Backtracking {
 		KinectBufferOperatingMode currentOperatingMode= actingKinectBufferOperatingMode.get();
 		if (currentOperatingMode==null) {
@@ -905,7 +875,7 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 	///////////////////////////////////////////////////////////////
 	//
 	public void retrieveBufferedFrame1s(ChoisePoint iX, Term a1) throws Backtracking {
-		int number= Converters.argumentToSmallInteger(a1,iX);
+		int number= GeneralConverters.argumentToSmallInteger(a1,iX);
 		if (!frameReadingTask.retrieveBufferedFrame(number)) {
 			throw Backtracking.instance;
 		}
@@ -923,11 +893,9 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 			throw Backtracking.instance;
 		case PLAYING:
 		case READING:
-			// if (actingDevice.get() != null) {
 			if (!frameReadingTask.eof()) {
 				throw Backtracking.instance;
 			};
-			// };
 			break;
 		case LISTENING:
 			throw Backtracking.instance;
@@ -970,11 +938,9 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 					break;
 				case DETECT_AND_TRACK_SKELETONS:
 					KinectSkeletonsFrameInterface[] copyOfRawSkeletonsHistory;
-					// synchronized (rawSkeletonsHistory) {
 					synchronized (numberOfRecentReceivedFrame) {
 						copyOfRawSkeletonsHistory= rawSkeletonsHistory.toArray(new KinectSkeletonsFrameInterface[0]);
 						rawSkeletonsHistory.clear();
-						// beginningRawSkeletonTime= -1;
 					};
 					for (int n=0; n < copyOfRawSkeletonsHistory.length; n++) {
 						KinectSkeletonsFrameInterface skeletonFrame= copyOfRawSkeletonsHistory[n];
@@ -992,7 +958,7 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 							currentDisplayingMode,
 							actingMaximalChronicleLength.get());
 						if (isLastElement) {
-							committedSkeletonsTerm= Converters.arrayListToTerm(recentSkeletonTermArray);
+							committedSkeletonsTerm= GeneralConverters.arrayListToTerm(recentSkeletonTermArray);
 						}
 					};
 					committedChronicleTerm= committedSkeletons.chronicleToTerm();
@@ -1015,11 +981,10 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 				case DETECT_AND_TRACK_SKELETONS:
 					ArrayList<Term> recentSkeletonTermArray= new ArrayList<>();
 					committedTracksTerm= committedSkeletons.analyseFrame(
-						// committedFrame.getReceivedFrameNumber(),
 						committedFrameNumber,
 						committedFrame.getSkeletonsFrameTime(),
 						recentSkeletonTermArray);
-					committedSkeletonsTerm= Converters.arrayListToTerm(recentSkeletonTermArray);
+					committedSkeletonsTerm= GeneralConverters.arrayListToTerm(recentSkeletonTermArray);
 					committedChronicleTerm= committedSkeletons.chronicleToTerm(numberOfRepeatedFrame);
 					break;
 				default:
@@ -1035,23 +1000,19 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 		}
 	}
 	//
-	// protected void throwRecentError() {
-	//	KinectDataReadingError recentError= dataTransferError.get();
-	//	if (recentError != null) {
-	//		throw recentError;
-	//	}
-	// }
-	//
 	///////////////////////////////////////////////////////////////
 	//
 	public void getRecentFrameNumber1s(ChoisePoint iX, PrologVariable a1) {
 		a1.setBacktrackableValue(new PrologInteger(committedFrameNumber),iX);
-		//iX.pushTrail(a1);
 	}
 	//
 	public void getRecentFrameTime1s(ChoisePoint iX, PrologVariable a1) {
 		a1.setBacktrackableValue(new PrologInteger(committedFrameTime),iX);
-		//iX.pushTrail(a1);
+	}
+	//
+	public void getRecentFrameRelativeTime1s(ChoisePoint iX, PrologVariable a1) {
+		long deltaTime= committedFrameTime - firstCommittedFrameTime;
+		a1.setBacktrackableValue(new PrologInteger(deltaTime),iX);
 	}
 	//
 	public void getRecentFrameRate1s(ChoisePoint iX, PrologVariable a1) {
@@ -1064,13 +1025,12 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 			rate= -1.0;
 		};
 		a1.setBacktrackableValue(new PrologReal(rate),iX);
-		//iX.pushTrail(a1);
 	}
 	//
 	public void getRecentImage1s(ChoisePoint iX, Term value) {
 		KinectDisplayingModeInterface currentDisplayingMode= getDisplayingMode(iX);
-		ColorMapInterface currentColorMap= getColorMap(iX);
-		ColorMapInterface currentPeopleColors= getPeopleColors(iX);
+		KinectColorMap currentColorMap= getColorMap(iX);
+		KinectColorMap currentPeopleColors= getPeopleColors(iX);
 		if (committedFrame != null) {
 			java.awt.image.BufferedImage nativeImage;
 			if (committedFrame instanceof KinectPointCloudsFrameInterface && currentDisplayingMode.getActingFrameType() == KinectFrameType.DEVICE_TUNING) {
@@ -1085,12 +1045,122 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 					nativeImage= null;
 				}
 			} else {
+// System.out.printf("KinectBuffer::%s; Mode: %s\n",committedFrame.getDataArrayType(),currentDisplayingMode.getActingFrameType());
 				nativeImage= FrameDrawingUtils.getImage(committedFrame,currentDisplayingMode,currentColorMap,currentPeopleColors);
 			};
 			modifyImage(value,nativeImage,iX);
 		} else {
 			throw new KinectFrameIsNotCommitted();
 		}
+	}
+	//
+	public void getRecentScene1s(ChoisePoint iX, Term a1) {
+		KinectDisplayingModeInterface currentDisplayingMode= getDisplayingMode(iX);
+		KinectColorMap currentColorMap= getColorMap(iX);
+		KinectColorMap currentPeopleColors= getPeopleColors(iX);
+		a1= a1.dereferenceValue(iX);
+		if (a1 instanceof BufferedScene) {
+			BufferedScene scene= (BufferedScene)a1;
+			if (committedFrame != null) {
+				Kinect2Java3D.setBufferedScene(scene,committedFrame,currentDisplayingMode,currentColorMap,currentPeopleColors,null,kinectLookupTable,getSceneDepthThreshold(iX),getSceneSurfaceType(iX),sceneAppearance.get());
+			} else {
+				throw new KinectFrameIsNotCommitted();
+			}
+		} else {
+			throw new WrongArgumentIsNotBufferedScene(a1);
+		}
+	}
+	public void getRecentScene2s(ChoisePoint iX, Term a1, Term a2) {
+		KinectDisplayingModeInterface currentDisplayingMode= getDisplayingMode(iX);
+		KinectColorMap currentColorMap= getColorMap(iX);
+		KinectColorMap currentPeopleColors= getPeopleColors(iX);
+		a1= a1.dereferenceValue(iX);
+		a2= a2.dereferenceValue(iX);
+		if (a1 instanceof BufferedScene) {
+			BufferedScene scene= (BufferedScene)a1;
+			if (a2 instanceof BufferedImage) {
+				BufferedImage bufferedImage= (BufferedImage)a2;
+				java.awt.image.BufferedImage nativeImage= bufferedImage.getImage();
+				if (committedFrame != null) {
+					Kinect2Java3D.setBufferedScene(scene,committedFrame,currentDisplayingMode,currentColorMap,currentPeopleColors,nativeImage,kinectLookupTable,getSceneDepthThreshold(iX),getSceneSurfaceType(iX),sceneAppearance.get());
+				} else {
+					throw new KinectFrameIsNotCommitted();
+				}
+			} else {
+				throw new WrongArgumentIsNotBufferedImage(a2);
+			}
+		} else {
+			throw new WrongArgumentIsNotBufferedScene(a1);
+		}
+	}
+	//
+	public void getRecentMapping1s(ChoisePoint iX, Term a1) {
+		KinectDisplayingModeInterface currentDisplayingMode= getDisplayingMode(iX);
+		KinectColorMap currentPeopleColors= getPeopleColors(iX);
+		a1= a1.dereferenceValue(iX);
+		if (a1 instanceof BufferedImage) {
+			BufferedImage mappedImage= (BufferedImage)a1;
+			if (committedFrame != null) {
+				java.awt.image.BufferedImage nativeMappedImage= Kinect2Java3D.computeMappedImage(committedFrame,currentDisplayingMode,/*currentColorMap,*/currentPeopleColors,null,kinectLookupTable);
+				GenericImageEncodingAttributes attributes= getImageEncodingAttributes(iX);
+				mappedImage.setImage(nativeMappedImage,attributes);
+			} else {
+				throw new KinectFrameIsNotCommitted();
+			}
+		} else {
+			throw new WrongArgumentIsNotBufferedImage(a1);
+		}
+	}
+	public void getRecentMapping2s(ChoisePoint iX, Term a1, Term a2) {
+		KinectDisplayingModeInterface currentDisplayingMode= getDisplayingMode(iX);
+		KinectColorMap currentPeopleColors= getPeopleColors(iX);
+		a1= a1.dereferenceValue(iX);
+		a2= a2.dereferenceValue(iX);
+		if (a1 instanceof BufferedImage) {
+			BufferedImage mappedImage= (BufferedImage)a1;
+			if (a2 instanceof BufferedImage) {
+				BufferedImage textureImage= (BufferedImage)a2;
+				java.awt.image.BufferedImage nativeTextureImage= textureImage.getImage();
+				if (committedFrame != null) {
+					java.awt.image.BufferedImage nativeMappedImage= Kinect2Java3D.computeMappedImage(committedFrame,currentDisplayingMode,/*currentColorMap,*/currentPeopleColors,nativeTextureImage,kinectLookupTable);
+					GenericImageEncodingAttributes attributes= getImageEncodingAttributes(iX);
+					mappedImage.setImage(nativeMappedImage,attributes);
+				} else {
+					throw new KinectFrameIsNotCommitted();
+				}
+			} else {
+				throw new WrongArgumentIsNotBufferedImage(a2);
+			}
+		} else {
+			throw new WrongArgumentIsNotBufferedImage(a1);
+		}
+	}
+	//
+	public void setLookupTable1s(ChoisePoint iX, Term a1) {
+		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
+		CharacterSet requestedCharacterSet= getCharacterSet(iX);
+		ExtendedFileName fileName= retrieveRealGlobalFileNameWithoutExtension(a1,iX);
+		kinectLookupTable.loadLookupTable(fileName,timeout,requestedCharacterSet,0,0,staticContext,iX);
+	}
+	public void setLookupTable3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
+		int correctionX= PrologInteger.toInteger(GeneralConverters.argumentToStrictInteger(a2,iX));
+		int correctionY= PrologInteger.toInteger(GeneralConverters.argumentToStrictInteger(a3,iX));
+		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
+		CharacterSet requestedCharacterSet= getCharacterSet(iX);
+		ExtendedFileName fileName= retrieveRealGlobalFileNameWithoutExtension(a1,iX);
+		kinectLookupTable.loadLookupTable(fileName,timeout,requestedCharacterSet,correctionX,correctionY,staticContext,iX);
+	}
+	//
+	public void resetLookupTable0s(ChoisePoint iX) {
+		kinectLookupTable.resetLookupTable();
+	}
+	//
+	public void setSceneAppearance1s(ChoisePoint iX, Term a1) {
+		Appearance appearance= AuxiliaryNode3D.argumentToAppearance(a1,this,iX);
+		sceneAppearance.set(appearance);
+	}
+	public void resetSceneAppearance0s(ChoisePoint iX) {
+		sceneAppearance.set(null);
 	}
 	//
 	public void getSkeletons1s(ChoisePoint iX, PrologVariable a1) {
@@ -1120,29 +1190,21 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 	///////////////////////////////////////////////////////////////
 	//
 	public void getDepthImageSizeInPixels2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
-		// synchronized (committedFramesSemaphore) {
 		if (committedFrame != null) {
 			a1.setBacktrackableValue(new PrologInteger(committedFrame.getDepthFrameWidth()),iX);
 			a2.setBacktrackableValue(new PrologInteger(committedFrame.getDepthFrameHeight()),iX);
 		} else {
 			throw new KinectFrameIsNotCommitted();
-		};
-		// };
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
+		}
 	}
 	//
 	public void getColorImageSizeInPixels2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
-		// synchronized (committedFramesSemaphore) {
 		if (committedFrame != null) {
 			a1.setBacktrackableValue(new PrologInteger(committedFrame.getColorFrameWidth()),iX);
 			a2.setBacktrackableValue(new PrologInteger(committedFrame.getColorFrameHeight()),iX);
 		} else {
 			throw new KinectFrameIsNotCommitted();
-		};
-		// };
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
+		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -1324,6 +1386,7 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 				frameRecordingTask.store(modeFrame);
 			};
 			frameRecordingTask.store(frame);
+			sendFrameObtained();
 			return true;
 		} else {
 			KinectFrameType currentActingFrameType= actingFrameType.get();
@@ -1359,15 +1422,14 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 		}
 	}
 	//
-	public void transferBufferedFrame(KinectFrameInterface frame, int relativeNumber) {
+	public void transferBufferedFrame(KinectFrameInterface frame, int position) {
 		KinectFrameType currentActingFrameType= actingFrameType.get();
 		if (currentActingFrameType.requiresFrameType(frame.getDataArrayType())) {
 			long recentFrameNumber;
 			synchronized (numberOfRecentReceivedFrame) {
 				recentFrame= frame;
-				// recentFrameNumber
 				recentFrameIsRepeated= true;
-				numberOfRepeatedFrame= numberOfRecentReceivedFrame.get() - relativeNumber;;
+				numberOfRepeatedFrame= numberOfRecentReceivedFrame.get() - position;
 			};
 			sendFrameObtained();
 		}
@@ -1377,7 +1439,6 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 		boolean thereAreTrackedSkeletons= frame.hasTrackedSkeletons();
 		if (thereAreTrackedSkeletons || recentRawSkeletonsAreTracked) {
 			long currentTime= frame.getSkeletonsFrameTime();
-			// synchronized (rawSkeletonsHistory) {
 			synchronized (numberOfRecentReceivedFrame) {
 				if (recentRawSkeletonTime < currentTime || currentTime < 0) {
 					if (currentTime >= 0) {
@@ -1398,6 +1459,9 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 		NumericalValue currentMaximalChronicleLength= actingMaximalChronicleLength.get();
 		if (currentMaximalChronicleLength != null) {
 			long longMaximalChronicleLength= currentMaximalChronicleLength.toLong(1000);
+			if (longMaximalChronicleLength < 0) {
+				return;
+			};
 			long minimalTime= currentTime - longMaximalChronicleLength;
 			ListIterator<KinectSkeletonsFrameInterface> iteratorOfRawSkeletonsHistory= rawSkeletonsHistory.listIterator();
 			while (iteratorOfRawSkeletonsHistory.hasNext()) {
@@ -1413,8 +1477,7 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 	//
 	protected void sendFrameObtained() {
 		long domainSignature= entry_s_FrameObtained_0();
-		Term[] arguments= new Term[0];
-		AsyncCall call= new AsyncCall(domainSignature,this,true,false,arguments,true);
+		AsyncCall call= new AsyncCall(domainSignature,this,true,false,noArguments,true);
 		transmitAsyncCall(call,null);
 	}
 	//
@@ -1426,32 +1489,30 @@ public abstract class KinectBuffer extends BufferedImageController implements Ki
 		actingKinectBufferOperatingMode.set(null);
 		dataTransferError.set(null);
 		long domainSignature= entry_s_DataTransferCompletion_0();
-		Term[] arguments= new Term[0];
-		AsyncCall call= new AsyncCall(domainSignature,this,true,false,arguments,true);
+		AsyncCall call= new AsyncCall(domainSignature,this,true,false,noArguments,true);
 		transmitAsyncCall(call,null);
 	}
 	public void completeDataTransfer(long numberOfFrameToBeAcquired, Throwable e) {
 		// frameReadingTask.closeReading();
 		actingDevice.set(null);
 		actingKinectBufferOperatingMode.set(null);
-		dataTransferError.set(new KinectDataReadingError(numberOfFrameToBeAcquired,e));
+		dataTransferError.set(new FrameReadingError(numberOfFrameToBeAcquired,e));
 		long domainSignature= entry_s_DataTransferError_1_i();
 		Term[] arguments= new Term[]{new PrologString(e.toString())};
-		AsyncCall call= new AsyncCall(domainSignature,this,true,false,arguments,true);
+		// 2018.10.30: AsyncCall call= new AsyncCall(domainSignature,this,true,false,arguments,true);
+		AsyncCall call= new AsyncCall(domainSignature,this,true,true,arguments,true);
 		transmitAsyncCall(call,null);
 	}
 	//
 	public void reportBufferOverflow() {
 		long domainSignature= entry_s_BufferOverflow_0();
-		Term[] arguments= new Term[0];
-		AsyncCall call= new AsyncCall(domainSignature,this,true,false,arguments,true);
+		AsyncCall call= new AsyncCall(domainSignature,this,true,false,noArguments,true);
 		transmitAsyncCall(call,null);
 	}
 	//
 	public void annulBufferOverflow() {
 		long domainSignature= entry_s_BufferDeallocation_0();
-		Term[] arguments= new Term[0];
-		AsyncCall call= new AsyncCall(domainSignature,this,true,false,arguments,true);
+		AsyncCall call= new AsyncCall(domainSignature,this,true,false,noArguments,true);
 		transmitAsyncCall(call,null);
 	}
 }

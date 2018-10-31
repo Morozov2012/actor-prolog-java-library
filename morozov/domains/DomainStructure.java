@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.HashSet;
 
 public class DomainStructure extends MultiArgumentDomainItem {
+	//
 	protected long functor;
 	//
 	public DomainStructure(long name, String[] entries) {

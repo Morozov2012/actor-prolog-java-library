@@ -7,6 +7,7 @@ import morozov.syntax.errors.*;
 import morozov.syntax.scanner.errors.*;
 import morozov.syntax.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.errors.*;
 import morozov.system.files.*;
 import morozov.system.files.errors.*;
@@ -62,12 +63,12 @@ public abstract class File extends Text {
 		super(id);
 	}
 	//
-	// abstract protected Term getBuiltInSlot_E_name();
-	// abstract protected Term getBuiltInSlot_E_extension();
-	// abstract protected Term getBuiltInSlot_E_type();
-	abstract protected Term getBuiltInSlot_E_random_access();
-	// abstract protected Term getBuiltInSlot_E_character_set();
-	// abstract protected Term getBuiltInSlot_E_backslash_always_is_separator();
+	// abstract public Term getBuiltInSlot_E_name();
+	// abstract public Term getBuiltInSlot_E_extension();
+	// abstract public Term getBuiltInSlot_E_type();
+	abstract public Term getBuiltInSlot_E_random_access();
+	// abstract public Term getBuiltInSlot_E_character_set();
+	// abstract public Term getBuiltInSlot_E_backslash_always_is_separator();
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -81,7 +82,6 @@ public abstract class File extends Text {
 	}
 	public void getRandomAccess0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(OnOff.boolean2TermOnOff(getRandomAccess(iX)));
-		// iX.pushTrail(a1);
 	}
 	public void getRandomAccess0fs(ChoisePoint iX) {
 	}
@@ -96,9 +96,9 @@ public abstract class File extends Text {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void closeFiles() {
+	public void releaseSystemResources() {
 		closeFile();
-		super.closeFiles();
+		super.releaseSystemResources();
 	}
 	//
 	public void clear0s(ChoisePoint iX) {
@@ -108,7 +108,7 @@ public abstract class File extends Text {
 	//
 	public void setString1s(ChoisePoint iX, Term inputText) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(iX);
-		String text= Converters.argumentToString(inputText,iX);
+		String text= GeneralConverters.argumentToString(inputText,iX);
 		CharacterSet requiredCharacterSet= getCharacterSet(iX);
 		try {
 			fileName.create_BAK_File();
@@ -119,7 +119,7 @@ public abstract class File extends Text {
 	}
 	public void setString2s(ChoisePoint iX, Term a1, Term inputText) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(a1,iX);
-		String text= Converters.argumentToString(inputText,iX);
+		String text= GeneralConverters.argumentToString(inputText,iX);
 		CharacterSet requiredCharacterSet= getCharacterSet(iX);
 		try {
 			fileName.create_BAK_File();
@@ -763,7 +763,7 @@ public abstract class File extends Text {
 			Parser parser= new Parser(true);
 			try {
 				Term[] terms= parser.stringToTerms(text);
-				return Converters.arrayToList(terms);
+				return GeneralConverters.arrayToList(terms);
 			} catch (LexicalScannerError e) {
 				long errorPosition= e.getPosition();
 				recentErrorText= text;
@@ -791,10 +791,6 @@ public abstract class File extends Text {
 			a2.setBacktrackableValue(new PrologInteger(recentErrorPosition),iX);
 			a3.setBacktrackableValue(new PrologString(recentErrorException.toString()),iX);
 			a4.setBacktrackableValue(new PrologString(recentErrorException.toString()),iX);
-			//iX.pushTrail(a1);
-			//iX.pushTrail(a2);
-			//iX.pushTrail(a3);
-			//iX.pushTrail(a4);
 		} else {
 			throw Backtracking.instance;
 		}
@@ -804,9 +800,6 @@ public abstract class File extends Text {
 			a1.setBacktrackableValue(new PrologString(recentErrorText),iX);
 			a2.setBacktrackableValue(new PrologInteger(recentErrorPosition),iX);
 			a3.setBacktrackableValue(new PrologString(recentErrorException.toString()),iX);
-			//iX.pushTrail(a1);
-			//iX.pushTrail(a2);
-			//iX.pushTrail(a3);
 		} else {
 			throw Backtracking.instance;
 		}
@@ -818,7 +811,6 @@ public abstract class File extends Text {
 				if (!currentFileName.isStandardFile()) {
 					if (currentRandomAccessMode) {
 						result.setNonBacktrackableValue(new PrologInteger(randomAccessFile.position()));
-						// iX.pushTrail(result);
 					} else {
 						throw new FileIsNotInRandomAccessMode();
 					}

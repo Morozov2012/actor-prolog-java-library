@@ -4,11 +4,12 @@ package morozov.built_in;
 
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.*;
-import morozov.system.gui.signals.*;
 import morozov.system.gui.space3d.*;
 import morozov.system.gui.space3d.errors.*;
 import morozov.system.gui.space3d.signals.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
 import morozov.worlds.*;
 
@@ -17,8 +18,6 @@ import java.awt.event.ComponentEvent;
 import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Image;
 
 import javax.media.j3d.Shape3D;
 import javax.media.j3d.BranchGroup;
@@ -35,8 +34,6 @@ import javax.media.j3d.ColoringAttributes;
 import javax.media.j3d.Font3D;
 import javax.media.j3d.View;
 import javax.media.j3d.GraphicsConfigTemplate3D;
-// import javax.media.j3d.J3DGraphics2D;
-import javax.media.j3d.ImageComponent2D;
 import javax.vecmath.Vector3d;
 import javax.vecmath.Color3f;
 import com.sun.j3d.utils.universe.SimpleUniverse;
@@ -75,7 +72,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	protected Boolean enableLocalEyeLighting= null;
 	//
 	// protected BigDecimal decimalDefaultMinimumFrameCycleTimeInSeconds= BigDecimal.ZERO;
-	// protected BigDecimal decimalDefaultMinimumFrameCycleTimeInNanos= decimalDefaultMinimumFrameCycleTimeInSeconds.multiply(Converters.oneNanoBig);
+	// protected BigDecimal decimalDefaultMinimumFrameCycleTimeInNanos= decimalDefaultMinimumFrameCycleTimeInSeconds.multiply(GeneralConverters.oneNanoBig);
 	protected long longDefaultMinimumFrameCycleTimeInMilliseconds= 0;
 	protected double defaultFieldOfView= Math.PI/4.0;
 	protected double defaultFrontClipDistance= 0.1;
@@ -103,27 +100,27 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	// abstract protected Term getBuiltInSlot_E_title();
-	// abstract protected Term getBuiltInSlot_E_x();
-	// abstract protected Term getBuiltInSlot_E_y();
-	// abstract protected Term getBuiltInSlot_E_width();
-	// abstract protected Term getBuiltInSlot_E_height();
-	// abstract protected Term getBuiltInSlot_E_background_color();
+	// abstract public Term getBuiltInSlot_E_title();
+	// abstract public Term getBuiltInSlot_E_x();
+	// abstract public Term getBuiltInSlot_E_y();
+	// abstract public Term getBuiltInSlot_E_width();
+	// abstract public Term getBuiltInSlot_E_height();
+	// abstract public Term getBuiltInSlot_E_background_color();
 	//
-	abstract protected Term getBuiltInSlot_E_projection_policy();
-	abstract protected Term getBuiltInSlot_E_window_resize_policy();
-	abstract protected Term getBuiltInSlot_E_window_movement_policy();
-	abstract protected Term getBuiltInSlot_E_visibility_policy();
-	abstract protected Term getBuiltInSlot_E_transparency_sorting_policy();
-	abstract protected Term getBuiltInSlot_E_minimum_frame_cycle_time();
+	abstract public Term getBuiltInSlot_E_projection_policy();
+	abstract public Term getBuiltInSlot_E_window_resize_policy();
+	abstract public Term getBuiltInSlot_E_window_movement_policy();
+	abstract public Term getBuiltInSlot_E_visibility_policy();
+	abstract public Term getBuiltInSlot_E_transparency_sorting_policy();
+	abstract public Term getBuiltInSlot_E_minimum_frame_cycle_time();
 	//
-	abstract protected Term getBuiltInSlot_E_field_of_view();
-	abstract protected Term getBuiltInSlot_E_front_clip_distance();
-	abstract protected Term getBuiltInSlot_E_back_clip_distance();
+	abstract public Term getBuiltInSlot_E_field_of_view();
+	abstract public Term getBuiltInSlot_E_front_clip_distance();
+	abstract public Term getBuiltInSlot_E_back_clip_distance();
 	//
-	// abstract protected Term getBuiltInSlot_E_enable_scene_antialiasing();
-	abstract protected Term getBuiltInSlot_E_enable_depth_buffer_freezing();
-	abstract protected Term getBuiltInSlot_E_enable_local_eye_lighting();
+	// abstract public Term getBuiltInSlot_E_enable_scene_antialiasing();
+	abstract public Term getBuiltInSlot_E_enable_depth_buffer_freezing();
+	abstract public Term getBuiltInSlot_E_enable_local_eye_lighting();
 	//
 	abstract public long entry_s_Action_1_i();
 	abstract public long entry_s_MouseClicked_1_i();
@@ -150,7 +147,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 		} catch (UseDefaultColor e) {
 			color= getDefaultBackgroundColor();
 		};
-		synchronized(this) {
+		synchronized (this) {
 			if (graphicWindow != null) {
 				graphicWindow.safelySetBackground(color);
 			} else if (canvasSpace != null) {
@@ -481,11 +478,11 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void closeFiles() {
+	public void releaseSystemResources() {
 		if (graphicWindow != null) {
 			graphicWindow.safelyDispose();
 		};
-		super.closeFiles();
+		super.releaseSystemResources();
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -535,7 +532,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	//
 	protected void showCanvasAndSaveTree(Term value, ChoisePoint iX) {
 		value= value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
-		synchronized(this) {
+		synchronized (this) {
 			showCanvas(value,iX);
 			currentSceneTree= value;
 		}
@@ -572,8 +569,8 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 			spin.addChild(specialBehavior);
 		};
 		if (simpleUniverse==null) {
-			ExtendedSpace3D spece3D= (ExtendedSpace3D)canvasSpace;
-			javax.media.j3d.Canvas3D control= (javax.media.j3d.Canvas3D)spece3D.getControl();
+			ExtendedSpace3D space3D= (ExtendedSpace3D)canvasSpace;
+			javax.media.j3d.Canvas3D control= (javax.media.j3d.Canvas3D)space3D.getControl();
 			simpleUniverse= new SimpleUniverse(control,0);
 			setViewAttributes(simpleUniverse,iX);
 			BranchGroup scene= Utils3D.argumentToBranchGroupOrNodeList(a1,this,simpleUniverse,control,iX);
@@ -583,7 +580,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 			branchGroup.setCapability(BranchGroup.ALLOW_DETACH);
 			branchGroup.addChild(spin);
 			simpleUniverse.addBranchGraph(branchGroup);
-			spece3D.setUniverse(simpleUniverse);
+			space3D.setUniverse(simpleUniverse);
 			simpleUniverse.addRenderingErrorListener(new OffScreenCanvas3DRenderingErrorListener());
 		} else {
 			releasePickCanvas();
@@ -601,9 +598,9 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 			graphicWindow.safelyRevalidate();
 		}
 	}
-	protected void setViewAttributes(SimpleUniverse simpleU, ChoisePoint iX) {
+	protected void setViewAttributes(SimpleUniverse su, ChoisePoint iX) {
 		//
-		Viewer viewer= simpleUniverse.getViewer();
+		Viewer viewer= su.getViewer();
 		View view= viewer.getView();
 		//
 		view.setProjectionPolicy(getProjectionPolicy(iX));
@@ -687,7 +684,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	//
 	public void redraw0s(ChoisePoint iX) {
 		createGraphicWindowIfNecessary(iX,false);
-		synchronized(this) {
+		synchronized (this) {
 			if (graphicWindow != null) {
 				refreshAttributesOfInternalFrame(graphicWindow,iX);
 				graphicWindow.safelyRestoreSize(staticContext);
@@ -704,7 +701,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	//		return;
 	//	} else {
 	//		createGraphicWindowIfNecessary(iX,false);
-	//		synchronized(this) {
+	//		synchronized (this) {
 	//			if (graphicWindow != null) {
 	//				graphicWindow.safelySetVisible(false);
 	//			}
@@ -714,7 +711,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	//
 	// public void maximize0s(ChoisePoint iX) {
 	//	createGraphicWindowIfNecessary(iX,true);
-	//	synchronized(this) {
+	//	synchronized (this) {
 	//		if (graphicWindow != null) {
 	//			DesktopUtils.safelyMaximize(graphicWindow);
 	//		}
@@ -723,7 +720,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	//
 	// public void minimize0s(ChoisePoint iX) {
 	//	createGraphicWindowIfNecessary(iX,true);
-	//	synchronized(this) {
+	//	synchronized (this) {
 	//		if (graphicWindow != null) {
 	//			DesktopUtils.safelyMinimize(graphicWindow);
 	//		}
@@ -732,7 +729,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	//
 	// public void restore0s(ChoisePoint iX) {
 	//	createGraphicWindowIfNecessary(iX,true);
-	//	synchronized(this) {
+	//	synchronized (this) {
 	//		if (graphicWindow != null) {
 	//			DesktopUtils.safelyRestore(graphicWindow);
 	//		}
@@ -743,7 +740,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	//	if (canvasSpaceDoesNotExist()) {
 	//		throw Backtracking.instance;
 	//	} else {
-	//		synchronized(this) {
+	//		synchronized (this) {
 	//			if (graphicWindow != null) {
 	//				if (!DesktopUtils.safelyIsVisible(graphicWindow)) {
 	//					throw Backtracking.instance;
@@ -758,7 +755,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	// public void isHidden0s(ChoisePoint iX) throws Backtracking {
 	//	if (canvasSpaceDoesNotExist()) {
 	//	} else {
-	//		synchronized(this) {
+	//		synchronized (this) {
 	//			if (graphicWindow != null) {
 	//				if (!DesktopUtils.safelyIsHidden(graphicWindow)) {
 	//					throw Backtracking.instance;
@@ -772,7 +769,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	//	if (canvasSpaceDoesNotExist()) {
 	//		throw Backtracking.instance;
 	//	} else {
-	//		synchronized(this) {
+	//		synchronized (this) {
 	//			if (graphicWindow != null) {
 	//				if (!DesktopUtils.safelyIsMaximized(graphicWindow)) {
 	//					throw Backtracking.instance;
@@ -788,7 +785,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	//	if (canvasSpaceDoesNotExist()) {
 	//		throw Backtracking.instance;
 	//	} else {
-	//		synchronized(this) {
+	//		synchronized (this) {
 	//			if (graphicWindow != null) {
 	//				if(!DesktopUtils.safelyIsMinimized(graphicWindow)) {
 	//					throw Backtracking.instance;
@@ -804,7 +801,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	//	if (canvasSpaceDoesNotExist()) {
 	//		throw Backtracking.instance;
 	//	} else {
-	//		synchronized(this) {
+	//		synchronized (this) {
 	//			if (graphicWindow != null) {
 	//				if(!DesktopUtils.safelyIsRestored(graphicWindow)) {
 	//					throw Backtracking.instance;
@@ -824,7 +821,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	//
 	public void setNode2s(ChoisePoint iX, Term a1, Term a2) {
 		NodeLabel nodeLabel= NodeLabel.argumentToNodeLabel(a1,iX);
-		synchronized(this) {
+		synchronized (this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
 				if (canvasSpace != null) {
@@ -846,7 +843,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	//
 	public void setTransform2s(ChoisePoint iX, Term a1, Term a2) {
 		NodeLabel nodeLabel= NodeLabel.argumentToNodeLabel(a1,iX);
-		synchronized(this) {
+		synchronized (this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
 				Transform3D transform= PrincipalNode3D.argumentToTransform3D(a2,iX);
@@ -859,7 +856,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	//
 	public void setTranslation2s(ChoisePoint iX, Term a1, Term a2) {
 		NodeLabel nodeLabel= NodeLabel.argumentToNodeLabel(a1,iX);
-		synchronized(this) {
+		synchronized (this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
 				// Transform3D transform= PrincipalNode3D.argumentToTransform3D(a2,iX);
@@ -873,7 +870,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	//
 	public void setAppearance2s(ChoisePoint iX, Term a1, Term a2) {
 		NodeLabel nodeLabel= NodeLabel.argumentToNodeLabel(a1,iX);
-		synchronized(this) {
+		synchronized (this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
 				Appearance appearance= AuxiliaryNode3D.argumentToAppearance(a2,this,iX);
@@ -886,7 +883,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	//
 	public void setColoringAttributes2s(ChoisePoint iX, Term a1, Term a2) {
 		NodeLabel nodeLabel= NodeLabel.argumentToNodeLabel(a1,iX);
-		synchronized(this) {
+		synchronized (this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
 				ColoringAttributes coloringAttributes= AuxiliaryNode3D.argumentToColoringAttributes(a2,iX);
@@ -899,7 +896,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	//
 	public void setFont3D2s(ChoisePoint iX, Term a1, Term a2) {
 		NodeLabel nodeLabel= NodeLabel.argumentToNodeLabel(a1,iX);
-		synchronized(this) {
+		synchronized (this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
 				Font3D font= AuxiliaryNode3D.argumentToFont3D(a2,iX);
@@ -912,7 +909,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	//
 	public void setString2s(ChoisePoint iX, Term a1, Term a2) {
 		NodeLabel nodeLabel= NodeLabel.argumentToNodeLabel(a1,iX);
-		synchronized(this) {
+		synchronized (this) {
 			NodeContainer c= localMemory.get(nodeLabel);
 			if (c != null) {
 				c.setString(a2.toString(iX));
@@ -925,7 +922,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	///////////////////////////////////////////////////////////////
 	//
 	// public void registerCanvas3D(ExtendedSpace3D s, ChoisePoint iX) {
-	//	synchronized(this) {
+	//	synchronized (this) {
 	//		if (canvasSpaceDoesNotExist()) {
 	//			canvasSpace= s;
 	//			if (currentSceneTree != null) {
@@ -942,7 +939,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	}
 	//
 	// public void release(boolean dialogIsModal, ChoisePoint modalChoisePoint) {
-	//	synchronized(this) {
+	//	synchronized (this) {
 	//		if (simpleUniverse!=null && graphicWindow==null) {
 	//			releasePickCanvas();
 	//			simpleUniverse.removeAllLocales();
@@ -991,7 +988,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 		boolean restoreWindow= false;
 		boolean moveWindowToFront= false;
 		if (graphicWindow==null) {
-			synchronized(this) {
+			synchronized (this) {
 				graphicWindow= innerWindows.get(this);
 				if (graphicWindow==null) {
 					graphicWindow= formInternalFrame(iX);
@@ -1058,31 +1055,37 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	}
 	//
 	public void rememberNode(NodeLabel label, TransformGroup node) {
-		synchronized(this) {
-			localMemory.put(label,new NodeContainer(node));
+		synchronized (this) {
+			NodeContainer previousValue= localMemory.put(label,new NodeContainer(node));
+			if (previousValue != null) {
+				Node previousNode= previousValue.getNode();
+				inverseTable.remove(previousNode);
+			};
 			inverseTable.put(node,label);
 		}
 	}
 	public void rememberNode(NodeLabel label, Group node) {
-		synchronized(this) {
-			localMemory.put(label,new NodeContainer(node));
+		synchronized (this) {
+			NodeContainer previousValue= localMemory.put(label,new NodeContainer(node));
+			if (previousValue != null) {
+				Node previousNode= previousValue.getNode();
+				inverseTable.remove(previousNode);
+			};
 			inverseTable.put(node,label);
 		}
 	}
 	public void rememberNode(NodeLabel label, Node node) {
-		synchronized(this) {
-			localMemory.put(label,new NodeContainer(node));
+		synchronized (this) {
+			NodeContainer previousValue= localMemory.put(label,new NodeContainer(node));
+			if (previousValue != null) {
+				Node previousNode= previousValue.getNode();
+				inverseTable.remove(previousNode);
+			};
 			inverseTable.put(node,label);
 		}
 	}
-	//public void rememberNode(NodeLabel label, Appearance node) {
-	//	synchronized(this) {
-	//		localMemory.put(label,new NodeContainer(node));
-	//		inverseTable.put(node,label);
-	//	}
-	//}
 	public Shape3D retrieveShape3D(NodeLabel label) {
-		synchronized(this) {
+		synchronized (this) {
 			NodeContainer c= localMemory.get(label);
 			if (c != null) {
 				return c.retrieveShape3D(label);
@@ -1092,7 +1095,7 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 		}
 	}
 	public PointLight retrievePointLight(NodeLabel label) {
-		synchronized(this) {
+		synchronized (this) {
 			NodeContainer c= localMemory.get(label);
 			if (c != null) {
 				return c.retrievePointLight(label);
@@ -1118,14 +1121,24 @@ public abstract class Canvas3D extends BufferedImageController { // DataResource
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public void attachOffScreenCanvas0s(ChoisePoint iX) {
+		createGraphicWindowIfNecessary(iX,false);
+		((ExtendedSpace3D)canvasSpace).attachOffScreenCanvas();
+	}
+	public void detachOffScreenCanvas0s(ChoisePoint iX) {
+		if (canvasSpace != null) {
+			((ExtendedSpace3D)canvasSpace).detachOffScreenCanvas();
+		}
+	}
+	//
 	public void getImage1s(ChoisePoint iX, Term a1) {
 		createGraphicWindowIfNecessary(iX,false);
 		java.awt.image.BufferedImage bufferedImage= ((ExtendedSpace3D)canvasSpace).createBufferedImage();
 		modifyImage(a1,bufferedImage,iX);
 	}
 	public void getImage3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
-		int width= Converters.argumentToSmallInteger(a2,iX);
-		int height= Converters.argumentToSmallInteger(a3,iX);
+		int width= GeneralConverters.argumentToSmallInteger(a2,iX);
+		int height= GeneralConverters.argumentToSmallInteger(a3,iX);
 		createGraphicWindowIfNecessary(iX,false);
 		java.awt.image.BufferedImage bufferedImage= ((ExtendedSpace3D)canvasSpace).createBufferedImage(width,height);
 		modifyImage(a1,bufferedImage,iX);

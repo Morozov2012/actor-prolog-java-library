@@ -4,6 +4,7 @@ package morozov.built_in;
 
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.errors.*;
 import morozov.system.files.*;
 import morozov.system.gui.*;
@@ -41,27 +42,26 @@ public abstract class Console extends Report {
 	///////////////////////////////////////////////////////////////
 	//
 	public void ask3ff(ChoisePoint iX, PrologVariable result, Term title, Term question, Term list) throws Backtracking {
-		String[] buttons= Converters.termToStrings(list,iX);
+		String[] buttons= GeneralConverters.termToStrings(list,iX);
 		result.setNonBacktrackableValue(askUser(question.toString(iX),title.toString(iX),buttons));
-		// iX.pushTrail(a1);
 	}
 	public void ask3fs(ChoisePoint iX, Term title, Term question, Term list) throws Backtracking {
-		String[] buttons= Converters.termToStrings(list,iX);
+		String[] buttons= GeneralConverters.termToStrings(list,iX);
 		askUser(question.toString(iX),title.toString(iX),buttons);
 	}
 	// public void ask2ff(ChoisePoint iX, PrologVariable result, Term question, Term list) throws Backtracking {
-	//	String[] buttons= Converters.termToStrings(list,iX);
+	//	String[] buttons= GeneralConverters.termToStrings(list,iX);
 	//	result.setNonBacktrackableValue(askUser(question.toString(iX),"",buttons));
 	// }
 	// public void ask2fs(ChoisePoint iX, Term question, Term list) throws Backtracking {
-	//	String[] buttons= Converters.termToStrings(list,iX);
+	//	String[] buttons= GeneralConverters.termToStrings(list,iX);
 	//	askUser(question.toString(iX),"",buttons);
 	// }
 	public void ask2s(ChoisePoint iX, Term title, Term question) throws Backtracking {
 		String[] buttons;
 		try {
 			question.getListHead(iX);
-			buttons= Converters.termToStrings(question,iX);
+			buttons= GeneralConverters.termToStrings(question,iX);
 		} catch (Backtracking b) {
 			askUser(question.toString(iX),title.toString(iX));
 			return;
@@ -102,7 +102,7 @@ public abstract class Console extends Report {
 	}
 	//
 	public void note2s(ChoisePoint iX, Term title, Term message) {
-		String dialogTitle= Converters.argumentToString(title,iX);
+		String dialogTitle= GeneralConverters.argumentToString(title,iX);
 		note(iX,dialogTitle,message);
 	}
 	public void note1s(ChoisePoint iX, Term message) {
@@ -117,7 +117,7 @@ public abstract class Console extends Report {
 	}
 	//
 	public void warning2s(ChoisePoint iX, Term title, Term message) {
-		String dialogTitle= Converters.argumentToString(title,iX);
+		String dialogTitle= GeneralConverters.argumentToString(title,iX);
 		warning(iX,dialogTitle,message);
 	}
 	public void warning1s(ChoisePoint iX, Term message) {
@@ -132,7 +132,7 @@ public abstract class Console extends Report {
 	}
 	//
 	public void error2s(ChoisePoint iX, Term title, Term message) {
-		String dialogTitle= Converters.argumentToString(title,iX);
+		String dialogTitle= GeneralConverters.argumentToString(title,iX);
 		error(iX,dialogTitle,message);
 	}
 	public void error1s(ChoisePoint iX, Term message) {
@@ -147,7 +147,7 @@ public abstract class Console extends Report {
 	}
 	//
 	public void inputString3ff(ChoisePoint iX, PrologVariable result, Term title, Term prompt, Term initialValue) throws Backtracking {
-		String dialogTitle= Converters.argumentToString(title,iX);
+		String dialogTitle= GeneralConverters.argumentToString(title,iX);
 		inputString(iX,result,dialogTitle,prompt,initialValue);
 	}
 	public void inputString3fs(ChoisePoint iX, Term title, Term prompt, Term initialValue) throws Backtracking {
@@ -173,13 +173,12 @@ public abstract class Console extends Report {
 		} else {
 			if (result != null) {
 				result.setNonBacktrackableValue(new PrologString(text));
-				// iX.pushTrail(result);
 			}
 		}
 	}
 	//
 	public void inputInteger4ff(ChoisePoint iX, PrologVariable result, Term title, Term prompt, Term initialValue, Term errorMessage) throws Backtracking {
-		String dialogTitle= Converters.argumentToString(title,iX);
+		String dialogTitle= GeneralConverters.argumentToString(title,iX);
 		inputInteger(iX,result,dialogTitle,prompt,initialValue,errorMessage);
 	}
 	public void inputInteger4fs(ChoisePoint iX, Term title, Term prompt, Term initialValue, Term errorMessage) throws Backtracking {
@@ -216,9 +215,8 @@ public abstract class Console extends Report {
 		} else {
 			if (result != null) {
 				try {
-					BigInteger value= Converters.stringToStrictInteger(text);
+					BigInteger value= GeneralConverters.stringToStrictInteger(text);
 					result.setNonBacktrackableValue(new PrologInteger(value));
-					// iX.pushTrail(result);
 				} catch (TermIsNotAnInteger error) {
 					throw Backtracking.instance;
 				}
@@ -227,7 +225,7 @@ public abstract class Console extends Report {
 	}
 	//
 	public void inputReal4ff(ChoisePoint iX, PrologVariable result, Term title, Term prompt, Term initialValue, Term errorMessage) throws Backtracking {
-		String dialogTitle= Converters.argumentToString(title,iX);
+		String dialogTitle= GeneralConverters.argumentToString(title,iX);
 		inputReal(iX,result,dialogTitle,prompt,initialValue,errorMessage);
 	}
 	public void inputReal4fs(ChoisePoint iX, Term title, Term prompt, Term initialValue, Term errorMessage) throws Backtracking {
@@ -264,9 +262,8 @@ public abstract class Console extends Report {
 		} else {
 			if (result != null) {
 				try {
-					double value= Converters.stringToReal(text);
+					double value= GeneralConverters.stringToReal(text);
 					result.setNonBacktrackableValue(new PrologReal(value));
-					// iX.pushTrail(result);
 				} catch (TermIsNotAReal error) {
 					throw Backtracking.instance;
 				}
@@ -275,23 +272,23 @@ public abstract class Console extends Report {
 	}
 	//
 	public void inputFileName7ff(ChoisePoint iX, PrologVariable result, Term title, Term mask, Term types, Term startPath, Term multiSel, PrologVariable selList, PrologVariable selType) throws Backtracking {
-		String dialogTitle= Converters.argumentToString(title,iX);
-		String dialogStartPath= Converters.argumentToString(startPath,iX);
+		String dialogTitle= GeneralConverters.argumentToString(title,iX);
+		String dialogStartPath= GeneralConverters.argumentToString(startPath,iX);
 		inputFileName(iX,result,dialogTitle,mask,types,dialogStartPath,false,multiSel,selList,selType);
 	}
 	public void inputFileName7fs(ChoisePoint iX, Term title, Term mask, Term types, Term startPath, Term multiSel, PrologVariable selList, PrologVariable selType) throws Backtracking {
 		inputFileName7ff(iX,null,title,mask,types,startPath,multiSel,selList,selType);
 	}
 	public void inputFileName4ff(ChoisePoint iX, PrologVariable result, Term title, Term mask, Term types, Term startPath) throws Backtracking {
-		String dialogTitle= Converters.argumentToString(title,iX);
-		String dialogStartPath= Converters.argumentToString(startPath,iX);
+		String dialogTitle= GeneralConverters.argumentToString(title,iX);
+		String dialogStartPath= GeneralConverters.argumentToString(startPath,iX);
 		inputFileName(iX,result,dialogTitle,mask,types,dialogStartPath,false,null,null,null);
 	}
 	public void inputFileName4fs(ChoisePoint iX, Term title, Term mask, Term types, Term startPath) throws Backtracking {
 		inputFileName4ff(iX,null,title,mask,types,startPath);
 	}
 	public void inputFileName3ff(ChoisePoint iX, PrologVariable result, Term title, Term mask, Term types) throws Backtracking {
-		String dialogTitle= Converters.argumentToString(title,iX);
+		String dialogTitle= GeneralConverters.argumentToString(title,iX);
 		inputFileName(iX,result,dialogTitle,mask,types,null,false,null,null,null);
 	}
 	public void inputFileName3fs(ChoisePoint iX, Term title, Term mask, Term types) throws Backtracking {
@@ -305,23 +302,23 @@ public abstract class Console extends Report {
 	}
 	//
 	public void inputNewFileName7ff(ChoisePoint iX, PrologVariable result, Term title, Term mask, Term types, Term startPath, Term multiSel, PrologVariable selList, PrologVariable selType) throws Backtracking {
-		String dialogTitle= Converters.argumentToString(title,iX);
-		String dialogStartPath= Converters.argumentToString(startPath,iX);
+		String dialogTitle= GeneralConverters.argumentToString(title,iX);
+		String dialogStartPath= GeneralConverters.argumentToString(startPath,iX);
 		inputFileName(iX,result,dialogTitle,mask,types,dialogStartPath,true,multiSel,selList,selType);
 	}
 	public void inputNewFileName7fs(ChoisePoint iX, Term title, Term mask, Term types, Term startPath, Term multiSel, PrologVariable selList, PrologVariable selType) throws Backtracking {
 		inputNewFileName7ff(iX,null,title,mask,types,startPath,multiSel,selList,selType);
 	}
 	public void inputNewFileName4ff(ChoisePoint iX, PrologVariable result, Term title, Term mask, Term types, Term startPath) throws Backtracking {
-		String dialogTitle= Converters.argumentToString(title,iX);
-		String dialogStartPath= Converters.argumentToString(startPath,iX);
+		String dialogTitle= GeneralConverters.argumentToString(title,iX);
+		String dialogStartPath= GeneralConverters.argumentToString(startPath,iX);
 		inputFileName(iX,result,dialogTitle,mask,types,dialogStartPath,true,null,null,null);
 	}
 	public void inputNewFileName4fs(ChoisePoint iX, Term title, Term mask, Term types, Term startPath) throws Backtracking {
 		inputNewFileName4ff(iX,null,title,mask,types,startPath);
 	}
 	public void inputNewFileName3ff(ChoisePoint iX, PrologVariable result, Term title, Term mask, Term types) throws Backtracking {
-		String dialogTitle= Converters.argumentToString(title,iX);
+		String dialogTitle= GeneralConverters.argumentToString(title,iX);
 		inputFileName(iX,result,dialogTitle,mask,types,null,true,null,null,null);
 	}
 	public void inputNewFileName3fs(ChoisePoint iX, Term title, Term mask, Term types) throws Backtracking {
@@ -335,7 +332,7 @@ public abstract class Console extends Report {
 	}
 	//
 	protected void inputFileName(ChoisePoint iX, PrologVariable result, String dialogTitle, Term mask, Term types, String startDirectory, boolean showSaveDialog, Term multiSel, PrologVariable selList, PrologVariable selType) throws Backtracking {
-		String initialMask= Converters.argumentToString(mask,iX);
+		String initialMask= GeneralConverters.argumentToString(mask,iX);
 		FileNameMask[] masks= FileUtils.argumentToFileNameMasks(types,iX);
 		JFileChooser chooser= new ExtendedFileChooser();
 		chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -388,55 +385,53 @@ public abstract class Console extends Report {
 			if (currentFilter instanceof FileNameMask) {
 				currentMask= (FileNameMask)currentFilter;
 			};
-			Path selectedPath= selectedFile.toPath();
-			if (selectedPath==null) {
-				throw Backtracking.instance;
-			};
-			String selectedName= selectedPath.toString();
-			if (currentMask != null) {
-				selectedName= currentMask.appendExtensionIfNecessary(selectedName);
-			};
-			if (result != null) {
-				result.setNonBacktrackableValue(new PrologString(selectedName));
-				// iX.pushTrail(result);
-			};
-			if (selList != null) {
-				if (chooser.isMultiSelectionEnabled()) {
-					java.io.File[] selectedFiles= chooser.getSelectedFiles();
-					Term list= PrologEmptyList.instance;
-					for (int n= selectedFiles.length-1; n >= 0; n--) {
-						String currentName= selectedFiles[n].toPath().toString();
-						if (currentMask != null) {
-							currentName= currentMask.appendExtensionIfNecessary(currentName);
-						};
-						list= new PrologList(new PrologString(currentName),list);
-					};
-					selList.setBacktrackableValue(list,iX);
-					//iX.pushTrail(selList);
-				} else {
-					selList.setBacktrackableValue(new PrologList(new PrologString(selectedName),PrologEmptyList.instance),iX);
-					//iX.pushTrail(selList);
-				}
-			};
-			if (selType != null) {
+			try {
+				Path selectedPath= selectedFile.toPath();
+				if (selectedPath==null) {
+					throw Backtracking.instance;
+				};
+				String selectedName= selectedPath.toString();
 				if (currentMask != null) {
-					boolean maskIsFound= false;
-					for (int n=0; n < masks.length; n++) {
-						if (masks[n]==currentMask) {
-							selType.setBacktrackableValue(new PrologInteger(n+1),iX);
-							//iX.pushTrail(selType);
-							maskIsFound= true;
-							break;
-						}
-					};
-					if (!maskIsFound) {
-						selType.setBacktrackableValue(new PrologInteger(1),iX); // Actor Prolog default value
-						//iX.pushTrail(selType);
+					selectedName= currentMask.appendExtensionIfNecessary(selectedName);
+				};
+				if (result != null) {
+					result.setNonBacktrackableValue(new PrologString(selectedName));
+				};
+				if (selList != null) {
+					if (chooser.isMultiSelectionEnabled()) {
+						java.io.File[] selectedFiles= chooser.getSelectedFiles();
+						Term list= PrologEmptyList.instance;
+						for (int n= selectedFiles.length-1; n >= 0; n--) {
+							String currentName= selectedFiles[n].toPath().toString();
+							if (currentMask != null) {
+								currentName= currentMask.appendExtensionIfNecessary(currentName);
+							};
+							list= new PrologList(new PrologString(currentName),list);
+						};
+						selList.setBacktrackableValue(list,iX);
+					} else {
+						selList.setBacktrackableValue(new PrologList(new PrologString(selectedName),PrologEmptyList.instance),iX);
 					}
-				} else {
-					selType.setBacktrackableValue(new PrologInteger(1),iX); // Actor Prolog default value
-					//iX.pushTrail(selType);
+				};
+				if (selType != null) {
+					if (currentMask != null) {
+						boolean maskIsFound= false;
+						for (int n=0; n < masks.length; n++) {
+							if (masks[n]==currentMask) {
+								selType.setBacktrackableValue(new PrologInteger(n+1),iX);
+								maskIsFound= true;
+								break;
+							}
+						};
+						if (!maskIsFound) {
+							selType.setBacktrackableValue(new PrologInteger(1),iX); // Actor Prolog default value
+						}
+					} else {
+						selType.setBacktrackableValue(new PrologInteger(1),iX); // Actor Prolog default value
+					}
 				}
+			} catch (Throwable e) {
+				throw Backtracking.instance;
 			}
 		} else {
 			throw Backtracking.instance;
@@ -444,15 +439,15 @@ public abstract class Console extends Report {
 	}
 	//
 	public void inputDirectoryName2ff(ChoisePoint iX, PrologVariable result, Term title, Term oldPath) throws Backtracking {
-		String dialogTitle= Converters.argumentToString(title,iX);
-		String initialPath= Converters.argumentToString(oldPath,iX);
+		String dialogTitle= GeneralConverters.argumentToString(title,iX);
+		String initialPath= GeneralConverters.argumentToString(oldPath,iX);
 		inputDirectoryName(iX,result,dialogTitle,initialPath);
 	}
 	public void inputDirectoryName2fs(ChoisePoint iX, Term title, Term oldPath) throws Backtracking {
 		inputDirectoryName2ff(iX,null,title,oldPath);
 	}
 	public void inputDirectoryName1ff(ChoisePoint iX, PrologVariable result, Term oldPath) throws Backtracking {
-		String initialPath= Converters.argumentToString(oldPath,iX);
+		String initialPath= GeneralConverters.argumentToString(oldPath,iX);
 		inputDirectoryName(iX,result,"",initialPath);
 	}
 	public void inputDirectoryName1fs(ChoisePoint iX, Term oldPath) throws Backtracking {
@@ -486,7 +481,6 @@ public abstract class Console extends Report {
 			String name= selectedFile.toString();
 			if (result != null) {
 				result.setNonBacktrackableValue(new PrologString(name));
-				// iX.pushTrail(result);
 			}
 		} else {
 			throw Backtracking.instance;
@@ -509,7 +503,6 @@ public abstract class Console extends Report {
 		} else {
 			if (result != null) {
 				result.setNonBacktrackableValue(new PrologInteger(newColor.getRGB()));
-				// iX.pushTrail(result);
 			}
 		}
 	}
@@ -529,14 +522,11 @@ public abstract class Console extends Report {
 				int fontSize= StyleConstants.getFontSize(a2);
 				outputVariable1.setBacktrackableValue(new PrologString(fontName),iX);
 				outputVariable2.setBacktrackableValue(new PrologInteger(fontSize),iX);
-				//iX.pushTrail(outputVariable1);
-				//iX.pushTrail(outputVariable2);
 				if (outputVariable3 != null) {
 					boolean isBold= StyleConstants.isBold(a2);
 					boolean isItalic= StyleConstants.isItalic(a2);
 					boolean isUnderline= StyleConstants.isUnderline(a2);
 					outputVariable3.setBacktrackableValue(ExtendedFontStyle.fontStyleToTerm(isBold,isItalic,isUnderline),iX);
-					//iX.pushTrail(outputVariable3);
 				}
 			}
 		} else {
@@ -564,19 +554,19 @@ public abstract class Console extends Report {
 	}
 	//
 	public void selectItem6s(ChoisePoint iX, Term title, Term message, Term list, Term initialPosition, PrologVariable selectedName, PrologVariable selectedPosition) throws Backtracking {
-		String dialogTitle= Converters.argumentToString(title,iX);
-		String dialogMessage= Converters.argumentToString(message,iX);
+		String dialogTitle= GeneralConverters.argumentToString(title,iX);
+		String dialogMessage= GeneralConverters.argumentToString(message,iX);
 		selectItem(iX,dialogTitle,dialogMessage,list,initialPosition,selectedName,selectedPosition);
 	}
 	public void selectItem5s(ChoisePoint iX, Term title, Term list, Term initialPosition, PrologVariable selectedName, PrologVariable selectedPosition) throws Backtracking {
-		String dialogTitle= Converters.argumentToString(title,iX);
+		String dialogTitle= GeneralConverters.argumentToString(title,iX);
 		selectItem(iX,dialogTitle,null,list,initialPosition,selectedName,selectedPosition);
 	}
 	public void selectItem4s(ChoisePoint iX, Term list, Term initialPosition, PrologVariable selectedName, PrologVariable selectedPosition) throws Backtracking {
 		selectItem(iX,"",null,list,initialPosition,selectedName,selectedPosition);
 	}
 	protected void selectItem(ChoisePoint iX, String dialogTitle, String dialogMessage, Term list, Term initialPosition, PrologVariable selectedName, PrologVariable selectedPosition) throws Backtracking {
-		String[] possibilities= Converters.termToStrings(list,iX);
+		String[] possibilities= GeneralConverters.termToStrings(list,iX);
 		try {
 			int iP= initialPosition.getSmallIntegerValue(iX);
 			String initialValue= null;
@@ -602,8 +592,6 @@ public abstract class Console extends Report {
 				if (selectedIndex > 0) {
 					selectedName.setBacktrackableValue(new PrologString(result),iX);
 					selectedPosition.setBacktrackableValue(new PrologInteger(selectedIndex),iX);
-					//iX.pushTrail(selectedName);
-					//iX.pushTrail(selectedPosition);
 				} else {
 					throw Backtracking.instance;
 				}

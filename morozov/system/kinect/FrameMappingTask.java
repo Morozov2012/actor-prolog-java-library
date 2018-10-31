@@ -243,7 +243,7 @@ public class FrameMappingTask extends Thread implements FrameMappingTaskInterfac
 	public void run() {
 		while (!stopThisThread.get()) {
 			try {
-				synchronized(this) {
+				synchronized (this) {
 					if (	!depthDataAreUpdated &&
 						!infraredDataAreUpdated &&
 						!longExposureInfraredDataAreUpdated &&

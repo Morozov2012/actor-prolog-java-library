@@ -6,6 +6,7 @@ import target.*;
 
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.terms.errors.*;
 import morozov.terms.signals.*;
 
@@ -29,6 +30,9 @@ public class PrologInteger extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public BigInteger getBigInteger() {
+		return value;
+	}
 	public int hashCode() {
 		return value.hashCode();
 	}
@@ -55,12 +59,16 @@ public class PrologInteger extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public void isInteger(PrologInteger v, ChoisePoint cp) throws Backtracking {
+		if ( !value.equals(v.getBigInteger()) )
+			throw Backtracking.instance;
+	}
 	public void isInteger(int v, ChoisePoint cp) throws Backtracking {
-		if (!value.equals(BigInteger.valueOf(v)))
+		if ( !value.equals(BigInteger.valueOf(v) ))
 			throw Backtracking.instance;
 	}
 	public void isInteger(BigInteger v, ChoisePoint cp) throws Backtracking {
-		if (!value.equals(v))
+		if ( !value.equals(v) )
 			throw Backtracking.instance;
 	}
 	//
@@ -270,6 +278,9 @@ public class PrologInteger extends Term {
 	public Term reactWithString(String a, ChoisePoint iX, BinaryOperation op) {
 		return op.eval(value,a);
 	}
+	public Term reactWithBinary(byte[] a, ChoisePoint iX, BinaryOperation op) {
+		return op.eval(value,a);
+	}
 	public Term reactWithDate(long a, ChoisePoint iX, BinaryOperation op) {
 		return op.evalDate(value.multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(a));
 	}
@@ -286,6 +297,9 @@ public class PrologInteger extends Term {
 		return op.eval(a,value.doubleValue());
 	}
 	public Term reactStringWith(String a, ChoisePoint iX, BinaryOperation op) {
+		return op.eval(a,value);
+	}
+	public Term reactBinaryWith(byte[] a, ChoisePoint iX, BinaryOperation op) {
 		return op.eval(a,value);
 	}
 	public Term reactDateWith(long a, ChoisePoint iX, BinaryOperation op) {
@@ -312,7 +326,7 @@ public class PrologInteger extends Term {
 		return op.eval(value,BigInteger.valueOf(a));
 	}
 	public Term blitWithDouble(double a, ChoisePoint iX, BinaryOperation op) {
-		return op.eval(value,Converters.doubleValueToBigInteger(a));
+		return op.eval(value,GeneralConverters.doubleValueToBigInteger(a));
 	}
 	public Term blitBigIntegerWith(BigInteger a, ChoisePoint iX, BinaryOperation op) {
 		return op.eval(a,value);
@@ -321,7 +335,7 @@ public class PrologInteger extends Term {
 		return op.eval(BigInteger.valueOf(a),value);
 	}
 	public Term blitDoubleWith(double a, ChoisePoint iX, BinaryOperation op) {
-		return op.eval(Converters.doubleValueToBigInteger(a),value);
+		return op.eval(GeneralConverters.doubleValueToBigInteger(a),value);
 	}
 	public Term blitListWith(Term aHead, Term aTail, ChoisePoint iX, BinaryOperation op) {
 		return new PrologList(

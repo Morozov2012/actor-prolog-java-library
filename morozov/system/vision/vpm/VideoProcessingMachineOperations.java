@@ -23,6 +23,9 @@ public interface VideoProcessingMachineOperations {
 	public long getFrameNumber(ChoisePoint iX);
 	public Term getFrameNumberOrSpacer(ChoisePoint iX);
 	//
+	public long getFrameTime(ChoisePoint iX);
+	public Term getFrameTimeOrSpacer(ChoisePoint iX);
+	//
 	public void getRecentImage(Term image, ChoisePoint iX);
 	public byte[] getSerializedRecentImage(ChoisePoint iX);
 	public void getPreprocessedImage(Term image, ChoisePoint iX);

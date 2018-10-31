@@ -4,6 +4,7 @@ package morozov.built_in;
 
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.errors.*;
 import morozov.system.files.*;
 import morozov.system.files.errors.*;
@@ -166,7 +167,7 @@ public abstract class DataAbstraction extends CustomControl {
 	// get/set transaction_maximal_retry_number
 	//
 	public void setTransactionMaximalRetryNumber1s(ChoisePoint iX, Term a1) {
-		setTransactionMaximalRetryNumber(Converters.argumentToStrictInteger(a1,iX));
+		setTransactionMaximalRetryNumber(GeneralConverters.argumentToStrictInteger(a1,iX));
 	}
 	public void setTransactionMaximalRetryNumber(BigInteger value) {
 		transactionMaximalRetryNumber= value;
@@ -181,7 +182,7 @@ public abstract class DataAbstraction extends CustomControl {
 			return transactionMaximalRetryNumber;
 		} else {
 			Term value= getBuiltInSlot_E_transaction_maximal_retry_number();
-			return Converters.argumentToStrictInteger(value,iX);
+			return GeneralConverters.argumentToStrictInteger(value,iX);
 		}
 	}
 	//
@@ -232,7 +233,14 @@ public abstract class DataAbstraction extends CustomControl {
 		SimpleFileName fileName= SimpleFileName.argumentToSimpleFileName(value,backslashAlwaysIsSeparator,acceptOnlyURI,iX);
 		return fileName.formRealFileNameBasedOnPath(false,true,getExtension(iX),currentDirectory,staticContext);
 	}
-	protected ExtendedFileName retrieveRealGlobalFileName(String value, ChoisePoint iX) {
+	protected ExtendedFileName retrieveRealGlobalFileNameWithoutExtension(Term value, ChoisePoint iX) {
+		boolean backslashAlwaysIsSeparator= getBackslashAlwaysIsSeparator(iX);
+		boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
+		// ExtendedFileName baseResource= retrieveRealGlobalFileName(iX);
+		SimpleFileName fileName= SimpleFileName.argumentToSimpleFileName(value,backslashAlwaysIsSeparator,acceptOnlyURI,iX);
+		return fileName.formRealFileNameBasedOnPath(false,false,"",currentDirectory,staticContext);
+	}
+	protected ExtendedFileName retrieveRealGlobalFileNameWithoutExtension(String value, ChoisePoint iX) {
 		boolean backslashAlwaysIsSeparator= getBackslashAlwaysIsSeparator(iX);
 		boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
 		// ExtendedFileName baseResource= retrieveRealGlobalFileName(iX);
@@ -360,17 +368,15 @@ public abstract class DataAbstraction extends CustomControl {
 	//
 	public void replaceExtension1ff(ChoisePoint iX, PrologVariable result, Term a1) {
 		RelativeFileName fileName= retrieveRelativeGlobalFileName(iX);
-		String newExtension= Converters.argumentToString(a1,iX);
+		String newExtension= GeneralConverters.argumentToString(a1,iX);
 		result.setNonBacktrackableValue(fileName.replaceFileExtension(newExtension));
-		// iX.pushTrail(result);
 	}
 	public void replaceExtension1fs(ChoisePoint iX, Term a1) {
 	}
 	public void replaceExtension2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
 		RelativeFileName fileName= retrieveRelativeGlobalFileName(a1,iX);
-		String newExtension= Converters.argumentToString(a2,iX);
+		String newExtension= GeneralConverters.argumentToString(a2,iX);
 		result.setNonBacktrackableValue(fileName.replaceFileExtension(newExtension));
-		// iX.pushTrail(result);
 	}
 	public void replaceExtension2fs(ChoisePoint iX, Term a1, Term a2) {
 	}

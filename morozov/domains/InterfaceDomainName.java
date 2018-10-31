@@ -13,6 +13,7 @@ import java.io.ObjectInputStream;
 import java.io.IOException;
 
 public class InterfaceDomainName extends PrologDomainName {
+	//
 	protected long unit;
 	protected String name;
 	//

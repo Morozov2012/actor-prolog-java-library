@@ -95,7 +95,6 @@ public class HashMapTable extends DatabaseTable {
 		DatabaseRecord result= databaseHash.get(copy2);
 		if (result != null) {
 			argumentResult.setNonBacktrackableValue(DatabaseUtils.extractSecondArgument(result.content,null));
-			// iX.pushTrail(argumentResult);
 		} else {
 			throw Backtracking.instance;
 		}

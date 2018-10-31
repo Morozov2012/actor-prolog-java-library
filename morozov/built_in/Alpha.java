@@ -8,6 +8,7 @@ import morozov.syntax.errors.*;
 import morozov.syntax.scanner.errors.*;
 import morozov.syntax.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.errors.*;
 import morozov.system.files.*;
 import morozov.system.gui.*;
@@ -36,6 +37,7 @@ public abstract class Alpha extends AbstractInternalWorld {
 	protected static Term termNone= new PrologSymbol(SymbolCodes.symbolCode_E_none);
 	protected static Term termDefault= new PrologSymbol(SymbolCodes.symbolCode_E_default);
 	protected static Term termEmptyString= new PrologString("");
+	protected static Term[] noArguments= new Term[0];
 	//
 	public Alpha() {
 	}
@@ -75,7 +77,6 @@ public abstract class Alpha extends AbstractInternalWorld {
 	public void getBackslashAlwaysIsSeparator0ff(ChoisePoint iX, PrologVariable result) {
 		boolean value= getBackslashAlwaysIsSeparator(iX);
 		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(value));
-		// iX.pushTrail(result);
 	}
 	public void getBackslashAlwaysIsSeparator0fs(ChoisePoint iX) {
 	}
@@ -99,7 +100,6 @@ public abstract class Alpha extends AbstractInternalWorld {
 	public void getAcceptOnlyUniformResourceIdentifiers0ff(ChoisePoint iX, PrologVariable result) {
 		boolean value= getAcceptOnlyUniformResourceIdentifiers(iX);
 		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(value));
-		// iX.pushTrail(result);
 	}
 	public void getAcceptOnlyUniformResourceIdentifiers0fs(ChoisePoint iX) {
 	}
@@ -123,7 +123,6 @@ public abstract class Alpha extends AbstractInternalWorld {
 	public void getMaximalWaitingTime0ff(ChoisePoint iX, PrologVariable result) {
 		WaitingInterval value= getMaximalWaitingTime(iX);
 		result.setNonBacktrackableValue(value.toTerm());
-		// iX.pushTrail(result);
 	}
 	public void getMaximalWaitingTime0fs(ChoisePoint iX) {
 	}
@@ -151,7 +150,6 @@ public abstract class Alpha extends AbstractInternalWorld {
 	public void getCharacterSet0ff(ChoisePoint iX, PrologVariable result) {
 		CharacterSet value= getCharacterSet(iX);
 		result.setNonBacktrackableValue(value.toTerm());
-		// iX.pushTrail(result);
 	}
 	public void getCharacterSet0fs(ChoisePoint iX) {
 	}
@@ -174,7 +172,6 @@ public abstract class Alpha extends AbstractInternalWorld {
 	}
 	public void getWidth0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(getWidth(iX).toTerm());
-		// iX.pushTrail(result);
 	}
 	public void getWidth0fs(ChoisePoint iX) {
 	}
@@ -198,7 +195,6 @@ public abstract class Alpha extends AbstractInternalWorld {
 	}
 	public void getHeight0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(getHeight(iX).toTerm());
-		// iX.pushTrail(result);
 	}
 	public void getHeight0fs(ChoisePoint iX) {
 	}
@@ -223,8 +219,6 @@ public abstract class Alpha extends AbstractInternalWorld {
 	public void getDefaultSize2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
 		a1.setBacktrackableValue(getWidth(iX).toTerm(),iX);
 		a2.setBacktrackableValue(getHeight(iX).toTerm(),iX);
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -281,80 +275,85 @@ public abstract class Alpha extends AbstractInternalWorld {
 	}
 	//
 	public void free1ms(ChoisePoint iX, Term... args) throws Backtracking {
-		Term[] array= Converters.termsToArray(iX,(Term[])args);
+		Term[] array= GeneralConverters.termsToArray(iX,(Term[])args);
 		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.FREE);
 	}
 	//
 	public void bound1ms(ChoisePoint iX, Term... args) throws Backtracking {
-		Term[] array= Converters.termsToArray(iX,(Term[])args);
+		Term[] array= GeneralConverters.termsToArray(iX,(Term[])args);
 		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.BOUND);
 	}
 	//
 	public void symbol1ms(ChoisePoint iX, Term... args) throws Backtracking {
-		Term[] array= Converters.termsToArray(iX,(Term[])args);
+		Term[] array= GeneralConverters.termsToArray(iX,(Term[])args);
 		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.SYMBOL);
 	}
 	//
 	public void string1ms(ChoisePoint iX, Term... args) throws Backtracking {
-		Term[] array= Converters.termsToArray(iX,(Term[])args);
+		Term[] array= GeneralConverters.termsToArray(iX,(Term[])args);
 		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.STRING);
 	}
 	//
+	public void binary1ms(ChoisePoint iX, Term... args) throws Backtracking {
+		Term[] array= GeneralConverters.termsToArray(iX,(Term[])args);
+		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.BINARY);
+	}
+	//
 	public void integer1ms(ChoisePoint iX, Term... args) throws Backtracking {
-		Term[] array= Converters.termsToArray(iX,(Term[])args);
+		Term[] array= GeneralConverters.termsToArray(iX,(Term[])args);
 		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.INTEGER);
 	}
 	//
 	public void real1ms(ChoisePoint iX, Term... args) throws Backtracking {
-		Term[] array= Converters.termsToArray(iX,(Term[])args);
+		Term[] array= GeneralConverters.termsToArray(iX,(Term[])args);
 		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.REAL);
 	}
 	//
 	public void numerical1ms(ChoisePoint iX, Term... args) throws Backtracking {
-		Term[] array= Converters.termsToArray(iX,(Term[])args);
+		Term[] array= GeneralConverters.termsToArray(iX,(Term[])args);
 		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.NUMERICAL);
 	}
 	//
 	public void classInstance1ms(ChoisePoint iX, Term... args) throws Backtracking {
-		Term[] array= Converters.termsToArray(iX,(Term[])args);
+		Term[] array= GeneralConverters.termsToArray(iX,(Term[])args);
 		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.CLASS_INSTANCE);
 	}
 	//
 	public void internalWorld1ms(ChoisePoint iX, Term... args) throws Backtracking {
-		Term[] array= Converters.termsToArray(iX,(Term[])args);
+		Term[] array= GeneralConverters.termsToArray(iX,(Term[])args);
 		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.INTERNAL_WORLD,currentProcess);
 	}
 	//
 	public void externalWorld1ms(ChoisePoint iX, Term... args) throws Backtracking {
-		Term[] array= Converters.termsToArray(iX,(Term[])args);
+		Term[] array= GeneralConverters.termsToArray(iX,(Term[])args);
 		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.EXTERNAL_WORLD,currentProcess);
 	}
 	//
 	public void remoteWorld1ms(ChoisePoint iX, Term... args) throws Backtracking {
-		Term[] array= Converters.termsToArray(iX,(Term[])args);
+		Term[] array= GeneralConverters.termsToArray(iX,(Term[])args);
 		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.REMOTE_WORLD,currentProcess);
 	}
 	//
 	public void even1ms(ChoisePoint iX, Term... args) throws Backtracking {
-		Term[] array= Converters.termsToArray(iX,(Term[])args);
+		Term[] array= GeneralConverters.termsToArray(iX,(Term[])args);
 		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.EVEN);
 	}
 	//
 	public void odd1ms(ChoisePoint iX, Term... args) throws Backtracking {
-		Term[] array= Converters.termsToArray(iX,(Term[])args);
+		Term[] array= GeneralConverters.termsToArray(iX,(Term[])args);
 		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.ODD);
 	}
 	//
 	public void nan1ms(ChoisePoint iX, Term... args) throws Backtracking {
-		Term[] array= Converters.termsToArray(iX,(Term[])args);
+		Term[] array= GeneralConverters.termsToArray(iX,(Term[])args);
 		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.NAN);
 	}
 	public void infinite1ms(ChoisePoint iX, Term... args) throws Backtracking {
-		Term[] array= Converters.termsToArray(iX,(Term[])args);
+		Term[] array= GeneralConverters.termsToArray(iX,(Term[])args);
 		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.INFINITE);
 	}
 	public void finite1ms(ChoisePoint iX, Term... args) throws Backtracking {
-		Term[] array= Converters.termsToArray(iX,(Term[])args);
+		Term[] array= GeneralConverters.termsToArray(iX,(Term[])args);
 		Arithmetic.check_all_arguments(iX,array,TermCheckOperation.FINITE);
 	}
 	//
@@ -542,6 +541,18 @@ public abstract class Alpha extends AbstractInternalWorld {
 	public void tan1fs(ChoisePoint iX, Term a1) {
 	}
 	//
+	public void arcsin1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		Arithmetic.calculate_unary_function(iX,result,a1,UnaryOperation.ARCSIN);
+	}
+	public void arcsin1fs(ChoisePoint iX, Term a1) {
+	}
+	//
+	public void arccos1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		Arithmetic.calculate_unary_function(iX,result,a1,UnaryOperation.ARCCOS);
+	}
+	public void arccos1fs(ChoisePoint iX, Term a1) {
+	}
+	//
 	public void arctan1ff(ChoisePoint iX, PrologVariable result, Term a1) {
 		Arithmetic.calculate_unary_function(iX,result,a1,UnaryOperation.ARCTAN);
 	}
@@ -557,7 +568,6 @@ public abstract class Alpha extends AbstractInternalWorld {
 	public void max1mff(ChoisePoint iX, PrologVariable result, Term... args) {
 		Term value= Arithmetic.calculate_multi_argument_function(iX,MultiArgumentArithmeticOperation.MAX,(Term[])args);
 		result.setNonBacktrackableValue(value);
-		// iX.pushTrail(result);
 	}
 	public void max1mfs(ChoisePoint iX, Term... args) {
 	}
@@ -565,7 +575,6 @@ public abstract class Alpha extends AbstractInternalWorld {
 	public void min1mff(ChoisePoint iX, PrologVariable result, Term... args) {
 		Term value= Arithmetic.calculate_multi_argument_function(iX,MultiArgumentArithmeticOperation.MIN,(Term[])args);
 		result.setNonBacktrackableValue(value);
-		// iX.pushTrail(result);
 	}
 	public void min1mfs(ChoisePoint iX, Term... args) {
 	}
@@ -620,7 +629,6 @@ public abstract class Alpha extends AbstractInternalWorld {
 			throw new WrongArgumentIsNotAString(a2);
 		};
 		a3.setBacktrackableValue(new PrologString(s1.concat(s2)),iX);
-		//iX.pushTrail(a3);
 	}
 	public void concat3s(ChoisePoint iX, Term a1, PrologVariable a2, Term a3) throws Backtracking {
 		String s1;
@@ -639,7 +647,6 @@ public abstract class Alpha extends AbstractInternalWorld {
 			throw Backtracking.instance;
 		};
 		a2.setBacktrackableValue(new PrologString(s3.substring(s1.length())),iX);
-		//iX.pushTrail(a2);
 	}
 	public void concat3s(ChoisePoint iX, PrologVariable a1, Term a2, Term a3) throws Backtracking {
 		String s2;
@@ -658,7 +665,6 @@ public abstract class Alpha extends AbstractInternalWorld {
 			throw Backtracking.instance;
 		};
 		a1.setBacktrackableValue(new PrologString(s3.substring(0,s3.length()-s2.length())),iX);
-		//iX.pushTrail(a1);
 	}
 	public void concat3s(ChoisePoint iX, Term a1, Term a2, Term a3) throws Backtracking {
 		String s1;
@@ -686,16 +692,15 @@ public abstract class Alpha extends AbstractInternalWorld {
 	//
 	public void convertToInteger1ff(ChoisePoint iX, PrologVariable result, Term a1) throws Backtracking {
 		try {
-			result.setNonBacktrackableValue(new PrologInteger(Converters.termToStrictInteger(a1,iX,true)));
-			// iX.pushTrail(result);
+			result.setNonBacktrackableValue(new PrologInteger(GeneralConverters.termToStrictInteger(a1,iX,true)));
 		} catch (TermIsNotAnInteger e) {
 			throw Backtracking.instance;
 		}
 	}
 	public void convertToInteger1fs(ChoisePoint iX, Term a1) throws Backtracking {
 		try {
-			// Converters.termToRoundInteger(a1,iX,true);
-			Converters.termToStrictInteger(a1,iX,true);
+			// GeneralConverters.termToRoundInteger(a1,iX,true);
+			GeneralConverters.termToStrictInteger(a1,iX,true);
 		} catch (TermIsNotAnInteger e) {
 			throw Backtracking.instance;
 		}
@@ -703,26 +708,24 @@ public abstract class Alpha extends AbstractInternalWorld {
 	//
 	public void convertToReal1ff(ChoisePoint iX, PrologVariable result, Term a1) throws Backtracking {
 		try {
-			result.setNonBacktrackableValue(new PrologReal(Converters.termToReal(a1,iX)));
-			// iX.pushTrail(result);
+			result.setNonBacktrackableValue(new PrologReal(GeneralConverters.termToReal(a1,iX)));
 		} catch (TermIsNotAReal e) {
 			throw Backtracking.instance;
 		}
 	}
 	public void convertToReal1fs(ChoisePoint iX, Term a1) throws Backtracking {
 		try {
-			Converters.termToReal(a1,iX);
+			GeneralConverters.termToReal(a1,iX);
 		} catch (TermIsNotAReal e) {
 			throw Backtracking.instance;
 		}
 	}
 	//
 	public void convertToNumerical1ff(ChoisePoint iX, PrologVariable result, Term a1) throws Backtracking {
-		result.setNonBacktrackableValue(Converters.termToNumerical(a1,iX,true));
-		// iX.pushTrail(result);
+		result.setNonBacktrackableValue(GeneralConverters.termToNumerical(a1,iX,true));
 	}
 	public void convertToNumerical1fs(ChoisePoint iX, Term a1) throws Backtracking {
-		Converters.termToNumerical(a1,iX,true);
+		GeneralConverters.termToNumerical(a1,iX,true);
 	}
 	//
 	public void stringToTerm1ff(ChoisePoint iX, PrologVariable result, Term a1) throws Backtracking {
@@ -734,7 +737,6 @@ public abstract class Alpha extends AbstractInternalWorld {
 				if (terms.length==1) {
 					if (a1 != null) {
 						result.setNonBacktrackableValue(terms[0]);
-						// iX.pushTrail(result);
 					}
 				} else {
 					throw Backtracking.instance;
@@ -759,8 +761,7 @@ public abstract class Alpha extends AbstractInternalWorld {
 			try {
 				Term[] terms= parser.stringToTerms(text);
 				if (a1 != null) {
-					result.setNonBacktrackableValue(Converters.arrayToList(terms));
-					// iX.pushTrail(result);
+					result.setNonBacktrackableValue(GeneralConverters.arrayToList(terms));
 				}
 			} catch (LexicalScannerError e) {
 				throw Backtracking.instance;
@@ -776,18 +777,16 @@ public abstract class Alpha extends AbstractInternalWorld {
 	}
 	//
 	public void stringsToText1ff(ChoisePoint iX, PrologVariable result, Term a1) {
-		String text= Converters.concatenateStringList(a1,"",iX);
+		String text= GeneralConverters.concatenateStringList(a1,"",iX);
 		result.setNonBacktrackableValue(new PrologString(text));
-		// iX.pushTrail(result);
 	}
 	public void stringsToText1fs(ChoisePoint iX, Term a1) {
 	}
 	public void stringsToText2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
 		try {
 			String infix= a2.getStringValue(iX);
-			String text= Converters.concatenateStringList(a1,infix,iX);
+			String text= GeneralConverters.concatenateStringList(a1,infix,iX);
 			result.setNonBacktrackableValue(new PrologString(text));
-			// iX.pushTrail(result);
 		} catch (TermIsNotAString e) {
 			throw new WrongArgumentIsNotAString(a2);
 		}
@@ -798,40 +797,41 @@ public abstract class Alpha extends AbstractInternalWorld {
 	public void convertToString1mff(ChoisePoint iX, PrologVariable result, Term... args) {
 		StringBuilder textBuffer= FormatOutput.termsToString(iX,(Term[])args);
 		result.setNonBacktrackableValue(new PrologString(textBuffer.toString()));
-		// iX.pushTrail(result);
 	}
 	public void convertToString1mfs(ChoisePoint iX, Term... args) {
 	}
 	//
 	public void codesToString1ff(ChoisePoint iX, PrologVariable result, Term a1) {
-		BigInteger[] codes= Converters.argumentToIntegers(a1,iX);
-		result.setNonBacktrackableValue(new PrologString(Converters.codesToString(codes)));
-		// iX.pushTrail(result);
+		try {
+			byte[] byteArray= a1.getBinaryValue(iX);
+			result.setNonBacktrackableValue(new PrologString(GeneralConverters.bytesToString(byteArray)));
+		} catch (TermIsNotABinary e) {
+			BigInteger[] codes= GeneralConverters.argumentToIntegers(a1,iX);
+			result.setNonBacktrackableValue(new PrologString(GeneralConverters.codesToString(codes)));
+		}
 	}
 	public void codesToString1fs(ChoisePoint iX, Term a1) {
 	}
 	//
 	public void sortList1ff(ChoisePoint iX, PrologVariable result, Term a1) {
-		Term[] array= Converters.listToArray(a1,iX);
+		Term[] array= GeneralConverters.listToArray(a1,iX);
 		Arrays.sort(array,new TermComparator(true));
-		result.setNonBacktrackableValue(Converters.arrayToList(array));
-		// iX.pushTrail(result);
+		result.setNonBacktrackableValue(GeneralConverters.arrayToList(array));
 	}
 	public void sortList1fs(ChoisePoint iX, Term a1) {
 	}
 	//
 	protected void callInternalProcedure(long domainSignature, boolean dialogIsModal, ChoisePoint modalChoisePoint) {
-		Term[] arguments= new Term[0];
 		if (dialogIsModal) {
 			ChoisePoint newIx= new ChoisePoint(modalChoisePoint);
-			Continuation c1= new DomainSwitch(new SuccessTermination(),domainSignature,this,this,arguments);
+			Continuation c1= new DomainSwitch(new SuccessTermination(),domainSignature,this,this,noArguments);
 			try {
 				c1.execute(newIx);
 			} catch (Backtracking b) {
 			};
 			newIx.freeTrail();
 		} else {
-			AsyncCall call= new AsyncCall(domainSignature,this,true,false/*true*/,arguments,true);
+			AsyncCall call= new AsyncCall(domainSignature,this,true,false/*true*/,noArguments,true);
 			transmitAsyncCall(call,modalChoisePoint);
 		}
 	}

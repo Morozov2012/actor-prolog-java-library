@@ -14,42 +14,51 @@ import java.math.BigDecimal;
 
 public class TimeInterval {
 	//
-	protected BigDecimal decimalValue;
-	protected double realValue;
 	protected boolean hasRealValue= false;
+	protected double realValue;
+	protected BigDecimal decimalValue;
 	protected TimeUnits units;
 	//
-	// public static final BigDecimal oneNanoBig= BigDecimal.valueOf(1_000_000_000);
-	//
-	public TimeInterval(BigDecimal value) {
-		hasRealValue= false;
-		decimalValue= value;
-		units= TimeUnits.SECONDS;
-	}
 	public TimeInterval(double value) {
 		hasRealValue= true;
 		realValue= value;
 		units= TimeUnits.SECONDS;
 	}
-	public TimeInterval(Term a, TimeUnits u, ChoisePoint iX) {
+	public TimeInterval(double value, TimeUnits u) {
+		hasRealValue= true;
+		realValue= value;
 		units= u;
-		try {
-			BigDecimal value= new BigDecimal(a.getIntegerValue(iX));
-			hasRealValue= false;
-			decimalValue= value;
-		} catch (TermIsNotAnInteger b1) {
-			try {
-				double value= a.getRealValue(iX);
-				hasRealValue= true;
-				realValue= value;
-			} catch (TermIsNotAReal b2) {
-				throw new WrongArgumentIsNotTimeInterval(a);
-			}
-		}
 	}
-	public TimeInterval(boolean r, TimeUnits u) {
-		hasRealValue= r;
+	public TimeInterval(BigDecimal value) {
+		hasRealValue= false;
+		decimalValue= value;
+		units= TimeUnits.SECONDS;
+	}
+	public TimeInterval(BigDecimal value, TimeUnits u) {
+		hasRealValue= false;
+		decimalValue= value;
 		units= u;
+	}
+	public TimeInterval(boolean hasRV, double real, BigDecimal decimal, TimeUnits u) {
+		hasRealValue= hasRV;
+		realValue= real;
+		decimalValue= decimal;
+		units= u;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public boolean hasRealValue() {
+		return hasRealValue;
+	}
+	public double getRealValue() {
+		return realValue;
+	}
+	public BigDecimal getDecimalValue() {
+		return decimalValue;
+	}
+	public TimeUnits getUnits() {
+		return units;
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -83,36 +92,51 @@ public class TimeInterval {
 					if (arguments.length > 1 || arguments.length < 1) {
 						throw new WrongArgumentIsNotTimeInterval(a);
 					};
+					Term firstArgument= arguments[0];
 					if (functor == SymbolCodes.symbolCode_E_seconds) {
-						return new TimeInterval(arguments[0],TimeUnits.SECONDS,iX);
+						return argumentToTimeInterval(firstArgument,TimeUnits.SECONDS,iX);
 					} else if (functor == SymbolCodes.symbolCode_E_milliseconds) {
-						return new TimeInterval(arguments[0],TimeUnits.MILLISECONDS,iX);
+						return argumentToTimeInterval(firstArgument,TimeUnits.MILLISECONDS,iX);
 					} else if (functor == SymbolCodes.symbolCode_E_microseconds) {
-						return new TimeInterval(arguments[0],TimeUnits.MICROSECONDS,iX);
+						return argumentToTimeInterval(firstArgument,TimeUnits.MICROSECONDS,iX);
 					} else if (functor == SymbolCodes.symbolCode_E_nanoseconds) {
-						return new TimeInterval(arguments[0],TimeUnits.NANOSECONDS,iX);
+						return argumentToTimeInterval(firstArgument,TimeUnits.NANOSECONDS,iX);
 					} else if (functor == SymbolCodes.symbolCode_E_picoseconds) {
-						return new TimeInterval(arguments[0],TimeUnits.PICOSECONDS,iX);
+						return argumentToTimeInterval(firstArgument,TimeUnits.PICOSECONDS,iX);
 					} else if (functor == SymbolCodes.symbolCode_E_femtoseconds) {
-						return new TimeInterval(arguments[0],TimeUnits.FEMTOSECONDS,iX);
+						return argumentToTimeInterval(firstArgument,TimeUnits.FEMTOSECONDS,iX);
 					} else if (functor == SymbolCodes.symbolCode_E_minutes) {
-						return new TimeInterval(arguments[0],TimeUnits.MINUTES,iX);
+						return argumentToTimeInterval(firstArgument,TimeUnits.MINUTES,iX);
 					} else if (functor == SymbolCodes.symbolCode_E_hours) {
-						return new TimeInterval(arguments[0],TimeUnits.HOURS,iX);
+						return argumentToTimeInterval(firstArgument,TimeUnits.HOURS,iX);
 					} else if (functor == SymbolCodes.symbolCode_E_days) {
-						return new TimeInterval(arguments[0],TimeUnits.DAYS,iX);
+						return argumentToTimeInterval(firstArgument,TimeUnits.DAYS,iX);
 					} else if (functor == SymbolCodes.symbolCode_E_weeks) {
-						return new TimeInterval(arguments[0],TimeUnits.WEEKS,iX);
+						return argumentToTimeInterval(firstArgument,TimeUnits.WEEKS,iX);
 					} else if (functor == SymbolCodes.symbolCode_E_months) {
-						return new TimeInterval(arguments[0],TimeUnits.MONTHS,iX);
+						return argumentToTimeInterval(firstArgument,TimeUnits.MONTHS,iX);
 					} else if (functor == SymbolCodes.symbolCode_E_years) {
-						return new TimeInterval(arguments[0],TimeUnits.YEARS,iX);
+						return argumentToTimeInterval(firstArgument,TimeUnits.YEARS,iX);
 					} else {
 						throw new WrongArgumentIsNotTimeInterval(a);
 					}
 				} catch (TermIsNotAStructure b3) {
 					throw new WrongArgumentIsNotTimeInterval(a);
 				}
+			}
+		}
+	}
+	//
+	public static TimeInterval argumentToTimeInterval(Term argument, TimeUnits u, ChoisePoint iX) {
+		try {
+			BigDecimal value= new BigDecimal(argument.getIntegerValue(iX));
+			return new TimeInterval(value,u);
+		} catch (TermIsNotAnInteger b1) {
+			try {
+				double value= argument.getRealValue(iX);
+				return new TimeInterval(value,u);
+			} catch (TermIsNotAReal b2) {
+				throw new WrongArgumentIsNotTimeInterval(argument);
 			}
 		}
 	}
@@ -129,10 +153,10 @@ public class TimeInterval {
 	//
 	public long toNanosecondsLong() {
 		if (hasRealValue) {
-			// return PrologInteger.toLong(realValue * Converters.oneMillionDouble);
+			// return PrologInteger.toLong(realValue * GeneralConverters.oneMillionDouble);
 			return units.toNanosecondsLong(realValue);
 		} else {
-			// return PrologInteger.toLong(decimalValue.multiply(Converters.oneNanoBig));
+			// return PrologInteger.toLong(decimalValue.multiply(GeneralConverters.oneNanoBig));
 			return units.toNanosecondsLong(decimalValue);
 		}
 	}
@@ -142,7 +166,7 @@ public class TimeInterval {
 			// return PrologInteger.toLong(realValue*Converters.oneMilliDouble);
 			return units.toMillisecondsLong(realValue);
 		} else {
-			// return PrologInteger.toLong(decimalValue.multiply(Converters.oneMilliBig));
+			// return PrologInteger.toLong(decimalValue.multiply(GeneralConverters.oneMilliBig));
 			return units.toMillisecondsLong(decimalValue);
 		}
 	}
@@ -152,7 +176,7 @@ public class TimeInterval {
 			// return PrologInteger.toInteger(realValue*Converters.oneMilliDouble);
 			return units.toMillisecondsInteger(realValue);
 		} else {
-			// return PrologInteger.toInteger(decimalValue.multiply(Converters.oneMilliBig));
+			// return PrologInteger.toInteger(decimalValue.multiply(GeneralConverters.oneMilliBig));
 			return units.toMillisecondsInteger(decimalValue);
 		}
 	}

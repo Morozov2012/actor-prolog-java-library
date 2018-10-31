@@ -17,27 +17,22 @@ public class WaitingInterval extends TimeInterval {
 	protected boolean isDefault= false;
 	protected boolean isAny= false;
 	//
-	public WaitingInterval(BigDecimal value) {
-		super(value);
+	public WaitingInterval(boolean d, boolean a) {
+		super(false,0.0,null,null);
+		isDefault= d;
+		isAny= a;
 	}
 	public WaitingInterval(double value) {
 		super(value);
 	}
-	public WaitingInterval(boolean d, boolean a) {
-		super(false,null);
-		isDefault= d;
-		isAny= a;
-	}
-	public WaitingInterval(Term t, TimeUnits u, ChoisePoint iX) {
-		super(t,u,iX);
+	public WaitingInterval(BigDecimal value) {
+		super(value);
 	}
 	public WaitingInterval(TimeInterval timeInterval) {
-		super(timeInterval.hasRealValue,timeInterval.units);
-		if (hasRealValue) {
-			realValue= timeInterval.realValue;
-		} else {
-			decimalValue= timeInterval.decimalValue;
-		}
+		super(	timeInterval.hasRealValue(),
+			timeInterval.getRealValue(),
+			timeInterval.getDecimalValue(),
+			timeInterval.getUnits());
 	}
 	//
 	///////////////////////////////////////////////////////////////

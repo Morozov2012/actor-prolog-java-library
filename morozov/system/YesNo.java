@@ -43,7 +43,7 @@ public enum YesNo {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static YesNo term2YesNo(Term value, ChoisePoint iX) {
+	public static YesNo argument2YesNo(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_yes) {

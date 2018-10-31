@@ -13,6 +13,12 @@ public class ExtendedCorrection implements ExtendedCorrectionInterface, Serializ
 	//
 	protected int value;
 	//
+	private static final long serialVersionUID= 1;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.modes","ExtendedCorrection");
+	// }
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public ExtendedCorrection() {

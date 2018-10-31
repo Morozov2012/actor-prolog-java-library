@@ -6,19 +6,12 @@ import morozov.system.vision.vpm.*;
 import morozov.system.vision.vpm.commands.*;
 import morozov.system.vision.vpm.converters.*;
 
-import java.math.BigInteger;
-
 public class VPMblbExtractBlobs extends VPM_FrameCommand {
 	//
 	protected long numberOfProcessedFrames= 0;
 	//
 	protected BlobType blobType;
 	protected BlobExtractionAlgorithm algorithm;
-	//
-	// protected int[] currentBlobSize;
-	// protected int[] currentTrackDurations;
-	// protected int[][] currentBlobRectangles;
-	// protected BigInteger[] currentBlobIdentifiers;
 	//
 	///////////////////////////////////////////////////////////////
 	//

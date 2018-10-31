@@ -40,7 +40,7 @@ public class URL_Checker extends ThreadHolder {
 			Calendar calendar= Calendar.getInstance();
 			BigInteger currentTime= BigInteger.valueOf(calendar.getTimeInMillis()).multiply(oneMillion);
 			if (firstKey==null) {
-				synchronized(this) {
+				synchronized (this) {
 					try {
 						wait();
 					} catch (InterruptedException e) {
@@ -53,7 +53,7 @@ public class URL_Checker extends ThreadHolder {
 				long timeout= PrologInteger.toLong(delayInMilliseconds);
 				int nanos= nanoDelay.intValue();
 				if (timeout > 0 || nanos > 0) {
-					synchronized(this) {
+					synchronized (this) {
 						try {
 							wait(timeout,nanos);
 						} catch (InterruptedException e) {
@@ -95,7 +95,7 @@ public class URL_Checker extends ThreadHolder {
 	}
 	//
 	public void addFutureEvent(BigInteger eT, ActorNumber actor, URL_Attributes attributes, BigDecimal rP, BigDecimal aP) {
-		synchronized(eventTable) {
+		synchronized (eventTable) {
 			addFutureEventUnsafely(eT,actor,attributes,rP,aP);
 		};
 		wakeUp();
@@ -117,7 +117,7 @@ public class URL_Checker extends ThreadHolder {
 	public void addFutureEvents(HashMap<ActorAndURI,WebReceptorRecord> actualRecords, BigInteger currentTime) {
 		Collection<WebReceptorRecord> actualRecordValues= actualRecords.values();
 		Iterator<WebReceptorRecord> actualRecordsIterator= actualRecordValues.iterator();
-		synchronized(eventTable) {
+		synchronized (eventTable) {
 			while(actualRecordsIterator.hasNext()) {
 				WebReceptorRecord currentRecord= actualRecordsIterator.next();
 				BigDecimal eT= (new BigDecimal(currentTime)).add(currentRecord.getCheckUpPeriod());
@@ -131,7 +131,7 @@ public class URL_Checker extends ThreadHolder {
 	public void checkAndAddFutureEvents(HashMap<ActorAndURI,WebReceptorRecord> actualRecords, BigInteger currentTime) {
 		Collection<WebReceptorRecord> actualRecordValues= actualRecords.values();
 		Iterator<WebReceptorRecord> actualRecordsIterator= actualRecordValues.iterator();
-		synchronized(eventTable) {
+		synchronized (eventTable) {
 			Set<Map.Entry<BigInteger,FutureEvent>> set= eventTable.entrySet();
 			Iterator<Map.Entry<BigInteger,FutureEvent>> iterator= set.iterator();
 			while(iterator.hasNext()) {
@@ -156,7 +156,7 @@ public class URL_Checker extends ThreadHolder {
 	}
 	//
 	public void forgetEvents(ActorNumber actor) {
-		synchronized(eventTable) {
+		synchronized (eventTable) {
 			Set<Map.Entry<BigInteger,FutureEvent>> set= eventTable.entrySet();
 			Iterator<Map.Entry<BigInteger,FutureEvent>> iterator= set.iterator();
 			while(iterator.hasNext()) {

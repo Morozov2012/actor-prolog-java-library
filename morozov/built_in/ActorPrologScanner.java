@@ -4,7 +4,7 @@ package morozov.built_in;
 
 import morozov.run.*;
 import morozov.syntax.scanner.*;
-// import morozov.syntax.scanner.signals.*;
+import morozov.system.converters.*;
 import morozov.system.*;
 import morozov.terms.*;
 import morozov.worlds.*;
@@ -27,22 +27,22 @@ public abstract class ActorPrologScanner extends Text {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	abstract protected Term getBuiltInSlot_E_keywords();
-	abstract protected Term getBuiltInSlot_E_keep_text_positions();
+	abstract public Term getBuiltInSlot_E_keywords();
+	abstract public Term getBuiltInSlot_E_keep_text_positions();
 	//
 	///////////////////////////////////////////////////////////////
 	//
 	// get/set keywords
 	//
 	public void setKeywords1s(ChoisePoint iX, Term a1) {
-		setKeywords(Converters.termToStrings(a1,iX));
+		setKeywords(GeneralConverters.termToStrings(a1,iX));
 	}
 	public void setKeywords(String[] value) {
 		keywords= value;
 	}
 	public void getKeywords0ff(ChoisePoint iX, PrologVariable result) {
 		String[] value= getKeywords(iX);
-		result.setNonBacktrackableValue(Converters.stringArrayToList(value));
+		result.setNonBacktrackableValue(GeneralConverters.stringArrayToList(value));
 	}
 	public void getKeywords0fs(ChoisePoint iX) {
 	}
@@ -51,7 +51,7 @@ public abstract class ActorPrologScanner extends Text {
 			return keywords;
 		} else {
 			Term value= getBuiltInSlot_E_keywords();
-			return Converters.termToStrings(value,iX);
+			return GeneralConverters.termToStrings(value,iX);
 		}
 	}
 	//
@@ -81,7 +81,7 @@ public abstract class ActorPrologScanner extends Text {
 	///////////////////////////////////////////////////////////////
 	//
 	public void convertToTokens1ff(ChoisePoint iX, PrologVariable result, Term a1) {
-		String text= Converters.argumentToString(a1,iX);
+		String text= GeneralConverters.argumentToString(a1,iX);
 		String[] keywordArray= getKeywords(iX);
 		boolean includeTextPositions= getKeepTextPositions(iX);
 		HashSet<String> keywordHash= new HashSet<>();

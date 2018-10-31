@@ -10,8 +10,6 @@ import morozov.run.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 
-import java.util.ArrayList;
-
 public class FFmpegMacroblockDecisionMode {
 	//
 	protected FFmpegMacroblockDecisionModeName name;

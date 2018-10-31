@@ -10,8 +10,6 @@ import morozov.run.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 
-import java.util.ArrayList;
-
 public class FFmpeg_IDCT_Algorithm {
 	//
 	protected FFmpeg_IDCT_AlgorithmName name;

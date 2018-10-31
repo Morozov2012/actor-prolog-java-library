@@ -3,7 +3,6 @@
 package morozov.system.gui.dialogs;
 
 import morozov.run.*;
-import morozov.system.gui.*;
 
 import java.awt.GraphicsConfiguration;
 import java.awt.Component;

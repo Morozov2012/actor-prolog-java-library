@@ -241,8 +241,6 @@ public class GrowingTrack {
 		if (minimalTime < 0) {
 			return false;
 		};
-		// int numberOfElementsToBeRemoved= numberOfPoints - maximalTrackDuration;
-		// if (numberOfElementsToBeRemoved > 0) {
 		int numberOfSegments= segments.size();
 		for (int n=0; n < numberOfSegments; n++) {
 			TrackSegment firstSegment= segments.get(0);
@@ -274,33 +272,6 @@ public class GrowingTrack {
 		};
 		return true;
 	}
-	/*
-	protected boolean checkNumberOfPoints(int label) {
-		int sum= 0;
-		int numberOfSegments= segments.size();
-		for (int n=0; n < numberOfSegments; n++) {
-			TrackSegment segment= segments.get(n);
-			int length= segment.getLength();
-			sum= sum + length;
-		};
-		sum= sum + recentPoints.size();
-		if (sum != numberOfPoints) {
-			System.err.printf("%s!!! sum: %s, numberOfPoints: %s\n",label,sum,numberOfPoints);
-			for (int n=0; n < numberOfSegments; n++) {
-				TrackSegment segment= segments.get(n);
-				int length= segment.getLength();
-				System.err.printf("%s!!! segmrnt: %s: length: %s\n",label,n,length);
-			};
-			System.err.printf("%s!!! recentPoints.size(): %s\n",label,recentPoints.size());
-			// return true;
-			//
-			throw new RuntimeException();
-		} else {
-			// System.err.printf("sum: %s, numberOfPoints: %s\n",sum,numberOfPoints);
-		};
-		return false;
-	}
-	*/
 	//
 	///////////////////////////////////////////////////////////////
 	//

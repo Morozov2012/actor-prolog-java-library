@@ -14,6 +14,7 @@ import java.util.Set;
 import java.util.Iterator;
 
 public class DomainAnySet extends DomainAlternative {
+	//
 	public DomainAnySet() {
 	}
 	//

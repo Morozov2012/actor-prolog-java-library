@@ -6,16 +6,12 @@ import morozov.system.vision.vpm.*;
 import morozov.system.vision.vpm.commands.*;
 import morozov.system.vision.vpm.converters.*;
 
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.math.BigInteger;
-
 public class VPMblbComputeColorHistograms extends VPM_FrameCommand {
 	//
 	protected int numberOfBins;
 	//
 	protected static int defaultNumberOfBins= 16;
-	protected static int maximalColor= 255;
+	// protected static final int maximalColor= 255;
 	//
 	///////////////////////////////////////////////////////////////
 	//

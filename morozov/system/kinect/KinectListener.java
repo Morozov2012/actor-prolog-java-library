@@ -5,18 +5,12 @@ package morozov.system.kinect;
 import edu.ufl.digitalworlds.j4k.J4KSDK;
 
 import morozov.system.kinect.errors.*;
-import morozov.system.kinect.frames.*;
 import morozov.system.kinect.frames.data.*;
-import morozov.system.kinect.frames.tools.*;
 import morozov.system.kinect.interfaces.*;
-import morozov.system.kinect.modes.*;
 import morozov.system.kinect.modes.interfaces.*;
 import morozov.system.kinect.modes.tools.*;
 
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 
 public class KinectListener extends J4KSDK implements KinectListenerInterface {
 	//

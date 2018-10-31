@@ -7,7 +7,7 @@ import target.*;
 import morozov.built_in.*;
 import morozov.run.*;
 import morozov.system.*;
-import morozov.system.gui.*;
+import morozov.system.converters.*;
 import morozov.system.gui.space2d.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
@@ -23,7 +23,6 @@ import java.awt.Paint;
 import java.awt.TexturePaint;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-// import java.awt.image.BufferedImage;
 import java.awt.GradientPaint;
 import java.awt.LinearGradientPaint;
 import java.awt.RadialGradientPaint;
@@ -247,7 +246,7 @@ public class BrushAttributes {
 				if (pairName==SymbolCodes.symbolCode_E_center) {
 					center= Tools2D.argumentToPoint2D(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_radius) {
-					radius= (float)Converters.argumentToReal(pairValue,iX);
+					radius= (float)GeneralConverters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_focus) {
 					focus= Tools2D.argumentToPoint2D(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_fractions) {
@@ -314,9 +313,9 @@ public class BrushAttributes {
 				} else if (pairName==SymbolCodes.symbolCode_E_anchor) {
 					anchor= Tools2D.argumentToPoint2D(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_width) {
-					width= Converters.argumentToReal(pairValue,iX);
+					width= GeneralConverters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_height) {
-					height= Converters.argumentToReal(pairValue,iX);
+					height= GeneralConverters.argumentToReal(pairValue,iX);
 				} else {
 					throw new WrongArgumentIsUnknownTexturePaintAttribute(key);
 				}

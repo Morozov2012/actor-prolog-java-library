@@ -6,7 +6,6 @@ import morozov.run.*;
 import morozov.system.gui.*;
 
 import javax.swing.JDialog;
-import java.awt.Window;
 import java.awt.Component;
 import javax.swing.SwingUtilities;
 import java.awt.Dialog.ModalityType;
@@ -158,7 +157,7 @@ public class ExtendedJDialog
 				if (desktop==null) {
 					return;
 				};
-				synchronized(isMaximum) {
+				synchronized (isMaximum) {
 					if (isMaximum.get()) {
 						safelySetLocationAndSize(restoredLocation.get(),restoredSize.get());
 						isMaximum.set(false);

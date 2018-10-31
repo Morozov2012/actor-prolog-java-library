@@ -43,11 +43,39 @@ public class NumericalValue implements Serializable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public boolean useDoubleValue() {
+		return useDoubleValue;
+	}
+	public BigInteger getIntegerValue() {
+		return integerValue;
+	}
+	public double getDoubleValue() {
+		return doubleValue;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Term toTerm() {
 		if (useDoubleValue) {
 			return new PrologReal(doubleValue);
 		} else {
 			return new PrologInteger(integerValue);
+		}
+	}
+	//
+	public int toInteger() {
+		if (useDoubleValue) {
+			return PrologInteger.toInteger(doubleValue);
+		} else {
+			return PrologInteger.toInteger(integerValue);
+		}
+	}
+	//
+	public long toLong() {
+		if (useDoubleValue) {
+			return PrologInteger.toLong(doubleValue);
+		} else {
+			return PrologInteger.toLong(integerValue);
 		}
 	}
 	//
@@ -64,6 +92,14 @@ public class NumericalValue implements Serializable {
 			return doubleValue;
 		} else {
 			return integerValue.doubleValue();
+		}
+	}
+	//
+	public float toFloat() {
+		if (useDoubleValue) {
+			return (float)doubleValue;
+		} else {
+			return integerValue.floatValue();
 		}
 	}
 	//

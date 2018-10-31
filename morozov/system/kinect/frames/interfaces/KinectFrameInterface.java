@@ -2,8 +2,6 @@
 
 package morozov.system.kinect.frames.interfaces;
 
-import morozov.system.kinect.frames.data.interfaces.*;
-import morozov.system.kinect.frames.tools.*;
 import morozov.system.kinect.modes.*;
 
 public interface KinectFrameInterface extends KinectSkeletonsFrameInterface {

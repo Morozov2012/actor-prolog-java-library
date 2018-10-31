@@ -15,7 +15,7 @@ public abstract class PrologLinkedHashMap extends PrologHashMap {
 		super(id);
 	}
 	//
-	// abstract protected Term getBuiltInSlot_E_reuse_key_numbers();
+	// abstract public Term getBuiltInSlot_E_reuse_key_numbers();
 	//
 	///////////////////////////////////////////////////////////////
 	//

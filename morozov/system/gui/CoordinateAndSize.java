@@ -3,6 +3,7 @@
 package morozov.system.gui;
 
 import morozov.system.gui.signals.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
 
 public class CoordinateAndSize {

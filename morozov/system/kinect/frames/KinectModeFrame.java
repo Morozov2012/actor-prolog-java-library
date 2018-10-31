@@ -5,13 +5,7 @@ package morozov.system.kinect.frames;
 import morozov.system.kinect.frames.data.interfaces.*;
 import morozov.system.kinect.frames.interfaces.*;
 import morozov.system.kinect.frames.text.*;
-import morozov.system.kinect.frames.tools.*;
 import morozov.system.kinect.modes.*;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-
-import java.util.Locale;
 
 public class KinectModeFrame extends KinectFrame implements KinectModeFrameInterface {
 	//
@@ -34,6 +28,12 @@ public class KinectModeFrame extends KinectFrame implements KinectModeFrameInter
 	protected String copyright;
 	protected String registrationDate;
 	protected String registrationTime;
+	//
+	private static final long serialVersionUID= 0xB8B17DAD003F62DAL; // -5138187517866056998L;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames","KinectModeFrame");
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//

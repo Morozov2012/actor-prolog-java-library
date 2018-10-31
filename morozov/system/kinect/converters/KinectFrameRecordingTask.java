@@ -2,10 +2,8 @@
 
 package morozov.system.kinect.converters;
 
-import morozov.built_in.*;
 import morozov.system.files.*;
 import morozov.system.files.errors.*;
-import morozov.system.kinect.frames.*;
 import morozov.system.kinect.frames.interfaces.*;
 import morozov.system.kinect.interfaces.*;
 
@@ -18,7 +16,6 @@ import java.io.BufferedOutputStream;
 import java.io.ObjectOutputStream;
 import java.io.IOException;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Iterator;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -33,7 +30,7 @@ public class KinectFrameRecordingTask extends Thread {
 	protected AtomicBoolean recordFrames= new AtomicBoolean(false);
 	//
 	protected LinkedList<KinectFrameInterface> history= new LinkedList<>();
-	protected int defaultWriteBufferSize= 100; // 80; // 100; 30;
+	protected int defaultWriteBufferSize= 100;
 	protected AtomicInteger writeBufferSize= new AtomicInteger(defaultWriteBufferSize);
 	protected boolean bufferOverflow= false;
 	//
@@ -125,7 +122,7 @@ public class KinectFrameRecordingTask extends Thread {
 		if (acceptFrames.get()) {
 			synchronized (history) {
 				history.addFirst(frame);
-				history.notifyAll();
+				history.notify();
 			}
 		}
 	}
@@ -133,7 +130,7 @@ public class KinectFrameRecordingTask extends Thread {
 	public void run() {
 		while (true) {
 			try {
-				synchronized(history) {
+				synchronized (history) {
 					if (history.isEmpty()) {
 						history.wait();
 					}
@@ -156,45 +153,7 @@ public class KinectFrameRecordingTask extends Thread {
 			synchronized (history) {
 				length= history.size();
 				if (length > 0) {
-					try {
-						currentFrame= history.removeLast();
-					} finally {
-						history.notifyAll();
-					};
-					int superfluousLength= length - writeBufferSize.get();
-					if (superfluousLength > 0) {
-						bufferOverflow= true;
-						owner.reportBufferOverflow();
-						Iterator<KinectFrameInterface> iteratorHistory= history.iterator();
-						int step= length / superfluousLength;
-						int currentLength= superfluousLength;
-						int quantityOfRemovedItems= 0;
-						int auxiliaryCounter= step;
-						try {
-							while (iteratorHistory.hasNext() && currentLength > 0) {
-								KinectFrameInterface previousFrame= iteratorHistory.next();
-								if (!previousFrame.isLightweightFrame()) {
-									if (auxiliaryCounter >= step) {
-										auxiliaryCounter= 0;
-										iteratorHistory.remove();
-System.err.printf("Warning: frame %s is lost.\n",previousFrame.getActingFrameNumber());
-										currentLength--;
-										quantityOfRemovedItems++;
-									} else {
-										auxiliaryCounter++;
-									}
-								}
-							}
-						} finally {
-							history.notifyAll();
-						}
-System.err.printf("Warning: Buffer overflow (%s); %s frames are lost.\n",length,quantityOfRemovedItems);
-					} else {
-						if (bufferOverflow) {
-							bufferOverflow= false;
-							owner.annulBufferOverflow();
-						}
-					}
+					currentFrame= history.getLast();
 				} else {
 					break;
 				}
@@ -206,8 +165,55 @@ System.err.printf("Warning: Buffer overflow (%s); %s frames are lost.\n",length,
 				}
 			} catch (IOException e) {
 				throw new FileInputOutputError(outputFilePath.toString(),e);
-			}
+			};
 System.err.printf("RECORDED:Number:%s,Type:%s;Queue:%s\n",frameNumber,currentFrame.getDataArrayType(),length);
+			synchronized (history) {
+				length= history.size();
+				if (length > 0) {
+					try {
+						history.removeLast();
+						length= history.size();
+					} finally {
+						history.notify();
+					};
+					int superfluousLength= length - writeBufferSize.get();
+					if (superfluousLength > 0) {
+						bufferOverflow= true;
+						owner.reportBufferOverflow();
+						Iterator<KinectFrameInterface> iteratorHistory= history.iterator();
+						int step= length / superfluousLength;
+						int currentLength= superfluousLength;
+						int quantityOfRemovedItems= 0;
+						int auxiliaryCounter= step;
+						try {
+///////////////////////////////////////////////////////////////////////
+while (iteratorHistory.hasNext() && currentLength > 0) {
+	KinectFrameInterface previousFrame= iteratorHistory.next();
+	if (!previousFrame.isLightweightFrame()) {
+		if (auxiliaryCounter >= step) {
+			auxiliaryCounter= 0;
+			iteratorHistory.remove();
+System.err.printf("Warning: frame %s is lost.\n",previousFrame.getActingFrameNumber());
+			currentLength--;
+			quantityOfRemovedItems++;
+		} else {
+			auxiliaryCounter++;
+		}
+	}
+}
+///////////////////////////////////////////////////////////////////////
+						} finally {
+							history.notify();
+						}
+System.err.printf("Warning: Buffer overflow (%s); %s frames are lost.\n",length,quantityOfRemovedItems);
+					} else {
+						if (bufferOverflow) {
+							bufferOverflow= false;
+							owner.annulBufferOverflow();
+						}
+					}
+				}
+			}
 		}
 	}
 }

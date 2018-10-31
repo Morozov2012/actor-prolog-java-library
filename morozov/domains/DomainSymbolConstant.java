@@ -15,6 +15,7 @@ import java.io.IOException;
 import java.util.HashSet;
 
 public class DomainSymbolConstant extends DomainAlternative {
+	//
 	protected long constantCode;
 	//
 	public DomainSymbolConstant(long code) {

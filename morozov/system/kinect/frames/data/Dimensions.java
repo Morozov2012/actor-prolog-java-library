@@ -5,11 +5,7 @@ package morozov.system.kinect.frames.data;
 import morozov.system.kinect.frames.data.interfaces.*;
 import morozov.system.kinect.frames.data.tools.*;
 
-import java.awt.Graphics2D;
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.Locale;
 
 public class Dimensions implements DimensionsInterface, Serializable {
 	//
@@ -18,6 +14,12 @@ public class Dimensions implements DimensionsInterface, Serializable {
 	protected PlayerDimensionsInterface[] skeletonsDepthDimensions;
 	protected PlayerDimensionsInterface[] totalColorDimensions;
 	protected PlayerDimensionsInterface[] skeletonsColorDimensions;
+	//
+	private static final long serialVersionUID= 0x600F9BD28ABB579BL; // 6921922480864712603L;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames.data","Dimensions");
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//

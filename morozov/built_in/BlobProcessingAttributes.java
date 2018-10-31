@@ -4,6 +4,7 @@ package morozov.built_in;
 
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.terms.*;
 import morozov.worlds.*;
 
@@ -45,7 +46,7 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// MinimalTrainingInterval
 	//
 	public void setMinimalTrainingInterval1s(ChoisePoint iX, Term value) {
-		setMinimalTrainingInterval(Converters.argumentToSmallRoundInteger(value,iX),iX);
+		setMinimalTrainingInterval(GeneralConverters.argumentToSmallRoundInteger(value,iX),iX);
 	}
 	abstract public void setMinimalTrainingInterval(int frames, ChoisePoint iX);
 	//
@@ -59,7 +60,7 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// MaximalTrainingInterval
 	//
 	public void setMaximalTrainingInterval1s(ChoisePoint iX, Term value) {
-		setMaximalTrainingInterval(Converters.argumentToSmallRoundInteger(value,iX),iX);
+		setMaximalTrainingInterval(GeneralConverters.argumentToSmallRoundInteger(value,iX),iX);
 	}
 	abstract public void setMaximalTrainingInterval(int frames, ChoisePoint iX);
 	//
@@ -73,7 +74,7 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// HorizontalBlobBorder
 	//
 	public void setHorizontalBlobBorder1s(ChoisePoint iX, Term value) {
-		setHorizontalBlobBorder(Converters.argumentToSmallRoundInteger(value,iX),iX);
+		setHorizontalBlobBorder(GeneralConverters.argumentToSmallRoundInteger(value,iX),iX);
 	}
 	abstract public void setHorizontalBlobBorder(int size, ChoisePoint iX);
 	//
@@ -87,7 +88,7 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// VerticalBlobBorder
 	//
 	public void setVerticalBlobBorder1s(ChoisePoint iX, Term value) {
-		setVerticalBlobBorder(Converters.argumentToSmallRoundInteger(value,iX),iX);
+		setVerticalBlobBorder(GeneralConverters.argumentToSmallRoundInteger(value,iX),iX);
 	}
 	abstract public void setVerticalBlobBorder(int size, ChoisePoint iX);
 	//
@@ -101,7 +102,7 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// HorizontalExtraBorderCoefficient
 	//
 	public void setHorizontalExtraBorderCoefficient1s(ChoisePoint iX, Term value) {
-		setHorizontalExtraBorderCoefficient(Converters.argumentToReal(value,iX),iX);
+		setHorizontalExtraBorderCoefficient(GeneralConverters.argumentToReal(value,iX),iX);
 	}
 	abstract public void setHorizontalExtraBorderCoefficient(double coefficient, ChoisePoint iX);
 	//
@@ -115,7 +116,7 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// VerticalExtraBorderCoefficient
 	//
 	public void setVerticalExtraBorderCoefficient1s(ChoisePoint iX, Term value) {
-		setVerticalExtraBorderCoefficient(Converters.argumentToReal(value,iX),iX);
+		setVerticalExtraBorderCoefficient(GeneralConverters.argumentToReal(value,iX),iX);
 	}
 	abstract public void setVerticalExtraBorderCoefficient(double coefficient, ChoisePoint iX);
 	//
@@ -129,7 +130,7 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// MinimalBlobIntersectionArea
 	//
 	public void setMinimalBlobIntersectionArea1s(ChoisePoint iX, Term value) {
-		setMinimalBlobIntersectionArea(Converters.argumentToSmallRoundInteger(value,iX),iX);
+		setMinimalBlobIntersectionArea(GeneralConverters.argumentToSmallRoundInteger(value,iX),iX);
 	}
 	abstract public void setMinimalBlobIntersectionArea(int size, ChoisePoint iX);
 	//
@@ -143,7 +144,7 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// MinimalBlobSize
 	//
 	public void setMinimalBlobSize1s(ChoisePoint iX, Term value) {
-		setMinimalBlobSize(Converters.argumentToSmallRoundInteger(value,iX),iX);
+		setMinimalBlobSize(GeneralConverters.argumentToSmallRoundInteger(value,iX),iX);
 	}
 	abstract public void setMinimalBlobSize(int size, ChoisePoint iX);
 	//
@@ -157,7 +158,7 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// MinimalTrackDuration
 	//
 	public void setMinimalTrackDuration1s(ChoisePoint iX, Term value) {
-		setMinimalTrackDuration(Converters.argumentToSmallRoundInteger(value,iX),iX);
+		setMinimalTrackDuration(GeneralConverters.argumentToSmallRoundInteger(value,iX),iX);
 	}
 	abstract public void setMinimalTrackDuration(int frames, ChoisePoint iX);
 	//
@@ -171,7 +172,7 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// MaximalTrackDuration
 	//
 	public void setMaximalTrackDuration1s(ChoisePoint iX, Term value) {
-		setMaximalTrackDuration(Converters.argumentToSmallRoundInteger(value,iX),iX);
+		setMaximalTrackDuration(GeneralConverters.argumentToSmallRoundInteger(value,iX),iX);
 	}
 	abstract public void setMaximalTrackDuration(int frames, ChoisePoint iX);
 	//
@@ -185,7 +186,7 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// MaximalBlobInvisibilityInterval
 	//
 	public void setMaximalBlobInvisibilityInterval1s(ChoisePoint iX, Term value) {
-		setMaximalBlobInvisibilityInterval(Converters.argumentToSmallRoundInteger(value,iX),iX);
+		setMaximalBlobInvisibilityInterval(GeneralConverters.argumentToSmallRoundInteger(value,iX),iX);
 	}
 	abstract public void setMaximalBlobInvisibilityInterval(int frames, ChoisePoint iX);
 	//
@@ -199,7 +200,7 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// MaximalTrackRetentionInterval
 	//
 	public void setMaximalTrackRetentionInterval1s(ChoisePoint iX, Term value) {
-		setMaximalTrackRetentionInterval(Converters.argumentToSmallRoundInteger(value,iX),iX);
+		setMaximalTrackRetentionInterval(GeneralConverters.argumentToSmallRoundInteger(value,iX),iX);
 	}
 	abstract public void setMaximalTrackRetentionInterval(int frames, ChoisePoint iX);
 	//
@@ -213,12 +214,12 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// InverseTransformationMatrix
 	//
 	public void setInverseTransformationMatrix1s(ChoisePoint iX, Term value) {
-		setInverseTransformationMatrix(Converters.argumentToMatrix(value,iX),iX);
+		setInverseTransformationMatrix(GeneralConverters.argumentToMatrix(value,iX),iX);
 	}
 	abstract public void setInverseTransformationMatrix(double[][] matrix, ChoisePoint iX);
 	//
 	public void getInverseTransformationMatrix0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(Converters.doubleMatrixToListOfList(getInverseTransformationMatrix(iX)));
+		result.setNonBacktrackableValue(GeneralConverters.doubleMatrixToListOfList(getInverseTransformationMatrix(iX)));
 	}
 	public void getInverseTransformationMatrix0fs(ChoisePoint iX) {
 	}
@@ -227,7 +228,7 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// SamplingRate
 	//
 	public void setSamplingRate1s(ChoisePoint iX, Term value) {
-		setSamplingRate(Converters.argumentToReal(value,iX),iX);
+		setSamplingRate(GeneralConverters.argumentToReal(value,iX),iX);
 	}
 	abstract public void setSamplingRate(double rate, ChoisePoint iX);
 	//
@@ -241,7 +242,7 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// R2WindowHalfwidth
 	//
 	public void setR2WindowHalfwidth1s(ChoisePoint iX, Term value) {
-		setR2WindowHalfwidth(Converters.argumentToSmallRoundInteger(value,iX),iX);
+		setR2WindowHalfwidth(GeneralConverters.argumentToSmallRoundInteger(value,iX),iX);
 	}
 	abstract public void setR2WindowHalfwidth(int halfwidth, ChoisePoint iX);
 	//
@@ -269,7 +270,7 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// CharacteristicLengthMedianFilterHalfwidth
 	//
 	public void setCharacteristicLengthMedianFilterHalfwidth1s(ChoisePoint iX, Term value) {
-		setCharacteristicLengthMedianFilterHalfwidth(Converters.argumentToSmallRoundInteger(value,iX),iX);
+		setCharacteristicLengthMedianFilterHalfwidth(GeneralConverters.argumentToSmallRoundInteger(value,iX),iX);
 	}
 	abstract public void setCharacteristicLengthMedianFilterHalfwidth(int halfwidth, ChoisePoint iX);
 	//
@@ -297,7 +298,7 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// VelocityMedianFilterHalfwidth
 	//
 	public void setVelocityMedianFilterHalfwidth1s(ChoisePoint iX, Term value) {
-		setVelocityMedianFilterHalfwidth(Converters.argumentToSmallRoundInteger(value,iX),iX);
+		setVelocityMedianFilterHalfwidth(GeneralConverters.argumentToSmallRoundInteger(value,iX),iX);
 	}
 	abstract public void setVelocityMedianFilterHalfwidth(int halfwidth, ChoisePoint iX);
 	//
@@ -311,7 +312,7 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// SynthesizedImageTransparency
 	//
 	public void setSynthesizedImageTransparency1s(ChoisePoint iX, Term value) {
-		setSynthesizedImageTransparency(Converters.argumentToSmallRoundInteger(value,iX),iX);
+		setSynthesizedImageTransparency(GeneralConverters.argumentToSmallRoundInteger(value,iX),iX);
 	}
 	abstract public void setSynthesizedImageTransparency(int transparency, ChoisePoint iX);
 	//

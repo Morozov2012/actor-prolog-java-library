@@ -159,6 +159,19 @@ public class Space2DWriter {
 		}
 	}
 	//
+	public static byte[] imageToBytes(java.awt.image.BufferedImage nativeImage, GenericImageEncodingAttributes attributes) {
+		if (nativeImage != null && attributes != null) {
+			Space2DWriter writer= Space2DWriter.createSpace2DWriter(nativeImage,attributes);
+			try {
+				return writer.imageToBytes(nativeImage);
+			} finally {
+				writer.dispose();
+			}
+		} else {
+			return null;
+		}
+	}
+	//
 	public static java.awt.image.BufferedImage bytesToImage(byte[] bytes) {
 		ByteArrayInputStream inputStream= new ByteArrayInputStream(bytes);
 		java.awt.image.BufferedImage nativeImage;

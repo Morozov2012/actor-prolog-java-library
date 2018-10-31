@@ -44,6 +44,9 @@ public abstract class Term implements Cloneable, Serializable {
 	public boolean isEqualToString(String v2) {
 		return false;
 	}
+	public boolean isEqualToBinary(byte[] v2) {
+		return false;
+	}
 	public boolean isEqualToSymbol(long v2) {
 		return false;
 	}
@@ -80,6 +83,9 @@ public abstract class Term implements Cloneable, Serializable {
 	public int compareWithString(String v2) {
 		return compareWithClass(PrologString.class);
 	}
+	public int compareWithBinary(byte[] v2) {
+		return compareWithClass(PrologBinary.class);
+	}
 	public int compareWithSymbol(long v2) {
 		return compareWithClass(PrologSymbol.class);
 	}
@@ -115,19 +121,37 @@ public abstract class Term implements Cloneable, Serializable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public void isInteger(PrologInteger v, ChoisePoint cp) throws Backtracking {
+		throw Backtracking.instance;
+	}
 	public void isInteger(int v, ChoisePoint cp) throws Backtracking {
 		throw Backtracking.instance;
 	}
 	public void isInteger(BigInteger v, ChoisePoint cp) throws Backtracking {
 		throw Backtracking.instance;
 	}
+	public void isReal(PrologReal v, ChoisePoint cp) throws Backtracking {
+		throw Backtracking.instance;
+	}
 	public void isReal(double v, ChoisePoint cp) throws Backtracking {
+		throw Backtracking.instance;
+	}
+	public void isSymbol(PrologSymbol v, ChoisePoint cp) throws Backtracking {
 		throw Backtracking.instance;
 	}
 	public void isSymbol(long v, ChoisePoint cp) throws Backtracking {
 		throw Backtracking.instance;
 	}
+	public void isString(PrologString v, ChoisePoint cp) throws Backtracking {
+		throw Backtracking.instance;
+	}
 	public void isString(String v, ChoisePoint cp) throws Backtracking {
+		throw Backtracking.instance;
+	}
+	public void isBinary(PrologBinary v, ChoisePoint cp) throws Backtracking {
+		throw Backtracking.instance;
+	}
+	public void isBinary(byte[] v, ChoisePoint cp) throws Backtracking {
 		throw Backtracking.instance;
 	}
 	public Term[] isStructure(long aFunctor, int arity, ChoisePoint cp) throws Backtracking {
@@ -235,11 +259,14 @@ public abstract class Term implements Cloneable, Serializable {
 	public double getRealValue(ChoisePoint cp) throws TermIsNotAReal {
 		throw TermIsNotAReal.instance;
 	}
-	public long getSymbolValue(ChoisePoint cp) throws TermIsNotASymbol {
-		throw TermIsNotASymbol.instance;
-	}
 	public String getStringValue(ChoisePoint cp) throws TermIsNotAString {
 		throw TermIsNotAString.instance;
+	}
+	public byte[] getBinaryValue(ChoisePoint cp) throws TermIsNotABinary {
+		throw TermIsNotABinary.instance;
+	}
+	public long getSymbolValue(ChoisePoint cp) throws TermIsNotASymbol {
+		throw TermIsNotASymbol.instance;
 	}
 	public long getStructureFunctor(ChoisePoint cp) throws TermIsNotAStructure {
 		throw TermIsNotAStructure.instance;
@@ -446,6 +473,9 @@ public abstract class Term implements Cloneable, Serializable {
 	public void compareWithString(String a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		throw new OperationIsNotDefinedForTheArgument(this);
 	}
+	public void compareWithBinary(byte[] a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		throw new OperationIsNotDefinedForTheArgument(this);
+	}
 	public void compareWithDate(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		throw new OperationIsNotDefinedForTheArgument(this);
 	}
@@ -462,6 +492,9 @@ public abstract class Term implements Cloneable, Serializable {
 		throw new OperationIsNotDefinedForTheArgument(this);
 	}
 	public void compareStringWith(String a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		throw new OperationIsNotDefinedForTheArgument(this);
+	}
+	public void compareBinaryWith(byte[] a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		throw new OperationIsNotDefinedForTheArgument(this);
 	}
 	public void compareDateWith(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
@@ -488,6 +521,9 @@ public abstract class Term implements Cloneable, Serializable {
 	public Term reactWithString(String a, ChoisePoint iX, BinaryOperation op) {
 		throw new OperationIsNotDefinedForTheArgument(this);
 	}
+	public Term reactWithBinary(byte[] a, ChoisePoint iX, BinaryOperation op) {
+		throw new OperationIsNotDefinedForTheArgument(this);
+	}
 	public Term reactWithDate(long a, ChoisePoint iX, BinaryOperation op) {
 		throw new OperationIsNotDefinedForTheArgument(this);
 	}
@@ -504,6 +540,9 @@ public abstract class Term implements Cloneable, Serializable {
 		throw new OperationIsNotDefinedForTheArgument(this);
 	}
 	public Term reactStringWith(String a, ChoisePoint iX, BinaryOperation op) {
+		throw new OperationIsNotDefinedForTheArgument(this);
+	}
+	public Term reactBinaryWith(byte[] a, ChoisePoint iX, BinaryOperation op) {
 		throw new OperationIsNotDefinedForTheArgument(this);
 	}
 	public Term reactDateWith(long a, ChoisePoint iX, BinaryOperation op) {

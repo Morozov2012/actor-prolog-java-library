@@ -20,6 +20,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 public class SlotVariable extends Term {
+	//
 	public HashMap<ActiveWorld,SlotVariableValue> processTable= new HashMap<ActiveWorld,SlotVariableValue>();
 	public ReentrantReadWriteLock processTableLock= new ReentrantReadWriteLock(false);
 	public Term globalValue;
@@ -118,6 +119,10 @@ public class SlotVariable extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public void isInteger(PrologInteger v, ChoisePoint cp) throws Backtracking {
+		Term value= getValue(cp);
+		value.isInteger(v,cp);
+	}
 	public void isInteger(int v, ChoisePoint cp) throws Backtracking {
 		Term value= getValue(cp);
 		value.isInteger(v,cp);
@@ -126,17 +131,37 @@ public class SlotVariable extends Term {
 		Term value= getValue(cp);
 		value.isInteger(v,cp);
 	}
+	public void isReal(PrologReal v, ChoisePoint cp) throws Backtracking {
+		Term value= getValue(cp);
+		value.isReal(v,cp);
+	}
 	public void isReal(double v, ChoisePoint cp) throws Backtracking {
 		Term value= getValue(cp);
 		value.isReal(v,cp);
+	}
+	public void isSymbol(PrologSymbol v, ChoisePoint cp) throws Backtracking {
+		Term value= getValue(cp);
+		value.isSymbol(v,cp);
 	}
 	public void isSymbol(long v, ChoisePoint cp) throws Backtracking {
 		Term value= getValue(cp);
 		value.isSymbol(v,cp);
 	}
+	public void isString(PrologString v, ChoisePoint cp) throws Backtracking {
+		Term value= getValue(cp);
+		value.isString(v,cp);
+	}
 	public void isString(String v, ChoisePoint cp) throws Backtracking {
 		Term value= getValue(cp);
 		value.isString(v,cp);
+	}
+	public void isBinary(PrologBinary v, ChoisePoint cp) throws Backtracking {
+		Term value= getValue(cp);
+		value.isBinary(v,cp);
+	}
+	public void isBinary(byte[] v, ChoisePoint cp) throws Backtracking {
+		Term value= getValue(cp);
+		value.isBinary(v,cp);
 	}
 	public Term[] isStructure(long aFunctor, int aArity, ChoisePoint cp) throws Backtracking {
 		Term value= getValue(cp);
@@ -184,13 +209,17 @@ public class SlotVariable extends Term {
 		Term value= getValue(cp);
 		return value.getRealValue(cp);
 	}
-	public long getSymbolValue(ChoisePoint cp) throws TermIsNotASymbol {
-		Term value= getValue(cp);
-		return value.getSymbolValue(cp);
-	}
 	public String getStringValue(ChoisePoint cp) throws TermIsNotAString {
 		Term value= getValue(cp);
 		return value.getStringValue(cp);
+	}
+	public byte[] getBinaryValue(ChoisePoint cp) throws TermIsNotABinary {
+		Term value= getValue(cp);
+		return value.getBinaryValue(cp);
+	}
+	public long getSymbolValue(ChoisePoint cp) throws TermIsNotASymbol {
+		Term value= getValue(cp);
+		return value.getSymbolValue(cp);
 	}
 	public long getStructureFunctor(ChoisePoint cp) throws TermIsNotAStructure {
 		Term value= getValue(cp);
@@ -467,6 +496,10 @@ public class SlotVariable extends Term {
 		Term value= getValue(iX);
 		value.compareWithString(a,iX,op);
 	}
+	public void compareWithBinary(byte[] a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		Term value= getValue(iX);
+		value.compareWithBinary(a,iX,op);
+	}
 	public void compareWithDate(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		Term value= getValue(iX);
 		value.compareWithDate(a,iX,op);
@@ -490,6 +523,10 @@ public class SlotVariable extends Term {
 	public void compareStringWith(String a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		Term value= getValue(iX);
 		value.compareStringWith(a,iX,op);
+	}
+	public void compareBinaryWith(byte[] a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		Term value= getValue(iX);
+		value.compareBinaryWith(a,iX,op);
 	}
 	public void compareDateWith(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		Term value= getValue(iX);
@@ -522,6 +559,10 @@ public class SlotVariable extends Term {
 		Term value= getValue(iX);
 		return value.reactWithString(a,iX,op);
 	}
+	public Term reactWithBinary(byte[] a, ChoisePoint iX, BinaryOperation op) {
+		Term value= getValue(iX);
+		return value.reactWithBinary(a,iX,op);
+	}
 	public Term reactWithDate(long a, ChoisePoint iX, BinaryOperation op) {
 		Term value= getValue(iX);
 		return value.reactWithDate(a,iX,op);
@@ -545,6 +586,10 @@ public class SlotVariable extends Term {
 	public Term reactStringWith(String a, ChoisePoint iX, BinaryOperation op) {
 		Term value= getValue(iX);
 		return value.reactStringWith(a,iX,op);
+	}
+	public Term reactBinaryWith(byte[] a, ChoisePoint iX, BinaryOperation op) {
+		Term value= getValue(iX);
+		return value.reactBinaryWith(a,iX,op);
 	}
 	public Term reactDateWith(long a, ChoisePoint iX, BinaryOperation op) {
 		Term value= getValue(iX);

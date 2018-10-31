@@ -3,6 +3,7 @@
 package morozov.built_in;
 
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.errors.*;
 import morozov.system.files.*;
 import morozov.system.files.errors.*;
@@ -26,6 +27,13 @@ public abstract class BufferedImageController extends DataResourceConsumer {
 	public GenericImageEncodingAttributes imageEncodingAttributes = null;
 	protected AtomicReference<GenericImageEncodingAttributes> currentImageEncodingAttributes= new AtomicReference<>(GenericImageEncodingAttributes.instance);
 	//
+	protected TextAttribute description;
+	protected TextAttribute copyright;
+	protected TextAttribute registrationDate;
+	protected TextAttribute registrationTime;
+	//
+	protected static final Term termEmptyString= new PrologString("");
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public BufferedImageController() {
@@ -36,7 +44,20 @@ public abstract class BufferedImageController extends DataResourceConsumer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	abstract protected Term getBuiltInSlot_E_image_encoding_attributes();
+	abstract public Term getBuiltInSlot_E_image_encoding_attributes();
+	//
+	protected Term getBuiltInSlot_E_description() {
+		return termEmptyString;
+	}
+	protected Term getBuiltInSlot_E_copyright() {
+		return termEmptyString;
+	}
+	protected Term getBuiltInSlot_E_registration_date() {
+		return termEmptyString;
+	}
+	protected Term getBuiltInSlot_E_registration_time() {
+		return termEmptyString;
+	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -75,6 +96,96 @@ public abstract class BufferedImageController extends DataResourceConsumer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	// get/set description
+	//
+	public void setDescription1s(ChoisePoint iX, Term a1) {
+		setDescription(TextAttribute.argumentToTextAttribute(a1,iX));
+	}
+	public void setDescription(TextAttribute value) {
+		description= value;
+	}
+	public void getDescription0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getDescription(iX).toTerm());
+	}
+	public void getDescription0fs(ChoisePoint iX) {
+	}
+	public TextAttribute getDescription(ChoisePoint iX) {
+		if (description != null) {
+			return description;
+		} else {
+			Term value= getBuiltInSlot_E_description();
+			return TextAttribute.argumentToTextAttribute(value,iX);
+		}
+	}
+	//
+	// get/set copyright
+	//
+	public void setCopyright1s(ChoisePoint iX, Term a1) {
+		setCopyright(TextAttribute.argumentToTextAttribute(a1,iX));
+	}
+	public void setCopyright(TextAttribute value) {
+		copyright= value;
+	}
+	public void getCopyright0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getCopyright(iX).toTerm());
+	}
+	public void getCopyright0fs(ChoisePoint iX) {
+	}
+	public TextAttribute getCopyright(ChoisePoint iX) {
+		if (copyright != null) {
+			return copyright;
+		} else {
+			Term value= getBuiltInSlot_E_copyright();
+			return TextAttribute.argumentToTextAttribute(value,iX);
+		}
+	}
+	//
+	// get/set registration_date
+	//
+	public void setRegistrationDate1s(ChoisePoint iX, Term a1) {
+		setRegistrationDate(TextAttribute.argumentToTextAttribute(a1,iX));
+	}
+	public void setRegistrationDate(TextAttribute value) {
+		registrationDate= value;
+	}
+	public void getRegistrationDate0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getRegistrationDate(iX).toTerm());
+	}
+	public void getRegistrationDate0fs(ChoisePoint iX) {
+	}
+	public TextAttribute getRegistrationDate(ChoisePoint iX) {
+		if (registrationDate != null) {
+			return registrationDate;
+		} else {
+			Term value= getBuiltInSlot_E_registration_date();
+			return TextAttribute.argumentToTextAttribute(value,iX);
+		}
+	}
+	//
+	// get/set registration_time
+	//
+	public void setRegistrationTime1s(ChoisePoint iX, Term a1) {
+		setRegistrationTime(TextAttribute.argumentToTextAttribute(a1,iX));
+	}
+	public void setRegistrationTime(TextAttribute value) {
+		registrationTime= value;
+	}
+	public void getRegistrationTime0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(getRegistrationTime(iX).toTerm());
+	}
+	public void getRegistrationTime0fs(ChoisePoint iX) {
+	}
+	public TextAttribute getRegistrationTime(ChoisePoint iX) {
+		if (registrationTime != null) {
+			return registrationTime;
+		} else {
+			Term value= getBuiltInSlot_E_registration_time();
+			return TextAttribute.argumentToTextAttribute(value,iX);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void modifyImage(Term value, java.awt.image.BufferedImage nativeImage, ChoisePoint iX) {
 		if (nativeImage != null) {
 			value= value.dereferenceValue(iX);
@@ -106,7 +217,8 @@ public abstract class BufferedImageController extends DataResourceConsumer {
 	public static void writeImage(ExtendedFileName fileName, java.awt.image.BufferedImage nativeImage, Space2DWriter writer) {
 		try {
 			OutputStream outputStream;
-			if (!fileName.isStandardFile()) {
+			boolean isStandardFile= fileName.isStandardFile();
+			if (!isStandardFile) {
 				Path path= fileName.getPathOfLocalResource();
 				outputStream= Files.newOutputStream(path);
 			} else {
@@ -130,7 +242,10 @@ public abstract class BufferedImageController extends DataResourceConsumer {
 			} finally {
 				output.flush();
 				output.close();
-				// writer.dispose();
+				if (!isStandardFile) {
+					outputStream.flush();
+					outputStream.close();
+				}
 			}
 			// }
 		} catch (IOException e) {

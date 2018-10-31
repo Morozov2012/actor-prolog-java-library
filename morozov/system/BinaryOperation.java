@@ -2,6 +2,7 @@
 
 package morozov.system;
 
+import morozov.system.converters.*;
 import morozov.system.errors.*;
 import morozov.terms.*;
 
@@ -26,11 +27,42 @@ public enum BinaryOperation {
 			int i2= n2.intValue();
 			return new PrologString(String.format("%s%c",n1,i2));
 		}
+		public Term eval(byte[] n1, byte[] n2) {
+			int length1= n1.length;
+			int length2= n2.length;
+			int totalLength= length1 + length2;
+			byte[] array= new byte[totalLength];
+			for (int k=0; k < length1; k++) {
+				array[k]= n1[k];
+			};
+			for (int k=0; k < length2; k++) {
+				array[k+length1]= n2[k];
+			};
+			return new PrologBinary(array);
+		}
+		public Term eval(BigInteger n1, byte[] n2) {
+			int i1= n1.intValue();
+			byte[] newArray= new byte[n2.length+1];
+			newArray[0]= (byte)i1;
+			for (int k=0; k < n2.length; k++) {
+				newArray[k+1]= n2[k];
+			};
+			return new PrologBinary(newArray);
+		}
+		public Term eval(byte[] n1, BigInteger n2) {
+			int i2= n2.intValue();
+			byte[] newArray= new byte[n1.length+1];
+			for (int k=0; k < n1.length; k++) {
+				newArray[k]= n1[k];
+			};
+			newArray[n1.length]= (byte)i2;
+			return new PrologBinary(newArray);
+		}
 		public Term evalDate(BigInteger n1, BigInteger n2) {
-			return Converters.millisecondsToDate(n1.add(n2));
+			return GeneralConverters.millisecondsToDate(n1.add(n2));
 		}
 		public Term evalTime(BigInteger n1, BigInteger n2) {
-			return Converters.millisecondsToTime(n1.add(n2));
+			return GeneralConverters.millisecondsToTime(n1.add(n2));
 		}
 		public Term evalDays(BigInteger n1, BigInteger n2) {
 			return new PrologInteger((n1.add(n2)).divide(TimeUnits.oneDayLengthInMillisecondsBigInteger));
@@ -44,10 +76,10 @@ public enum BinaryOperation {
 			return new PrologReal(n1 - n2);
 		}
 		public Term evalDate(BigInteger n1, BigInteger n2) {
-			return Converters.millisecondsToDate(n1.subtract(n2));
+			return GeneralConverters.millisecondsToDate(n1.subtract(n2));
 		}
 		public Term evalTime(BigInteger n1, BigInteger n2) {
-			return Converters.millisecondsToTime(n1.subtract(n2));
+			return GeneralConverters.millisecondsToTime(n1.subtract(n2));
 		}
 		public Term evalDays(BigInteger n1, BigInteger n2) {
 			return new PrologInteger((n1.subtract(n2)).divide(TimeUnits.oneDayLengthInMillisecondsBigInteger));
@@ -137,6 +169,15 @@ public enum BinaryOperation {
 		throw new IllegalTypesOfArgumentsInBinaryOperation();
 	}
 	public Term eval(String n1, BigInteger n2) {
+		throw new IllegalTypesOfArgumentsInBinaryOperation();
+	}
+	public Term eval(byte[] n1, byte[] n2) {
+		throw new IllegalTypesOfArgumentsInBinaryOperation();
+	}
+	public Term eval(BigInteger n1, byte[] n2) {
+		throw new IllegalTypesOfArgumentsInBinaryOperation();
+	}
+	public Term eval(byte[] n1, BigInteger n2) {
 		throw new IllegalTypesOfArgumentsInBinaryOperation();
 	}
 	public Term evalDate(BigInteger n1, BigInteger n2) {

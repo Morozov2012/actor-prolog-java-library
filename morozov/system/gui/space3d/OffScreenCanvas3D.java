@@ -6,8 +6,6 @@ import javax.media.j3d.Canvas3D;
 import javax.media.j3d.ImageComponent2D;
 import javax.media.j3d.ImageComponent;
 
-import javax.media.j3d.Screen3D;
-
 import java.awt.image.BufferedImage;
 import java.awt.GraphicsConfiguration;
 

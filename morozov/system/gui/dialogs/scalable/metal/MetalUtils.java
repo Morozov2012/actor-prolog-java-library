@@ -52,7 +52,7 @@ class MetalUtils {
 			return true;
 		};
 		Graphics2D g2= (Graphics2D)g0;
-		synchronized(c.getTreeLock()) {
+		synchronized (c.getTreeLock()) {
 			if (fillEllipse) {
 				drawVerticalOvalGradient(
 					g2,

@@ -24,10 +24,12 @@ import javax.swing.border.Border;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.event.KeyEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.FocusEvent;
 
 public class ATextField
 	extends JTextField
-	implements ActiveDocumentReportListener {
+	implements ActiveDocumentReportListener, FocusListener {
 	//
 	// CompoundBorder compoundBorder= null;
 	ActiveFieldErrorBorder outerBorder= null;
@@ -46,6 +48,7 @@ public class ATextField
 		initiateActiveTextField();
 		// setAlignmentX(JTextField.RIGHT_ALIGNMENT);
 		// setHorizontalAlignment(JTextField.RIGHT);
+		addFocusListener(this);
 	}
 	//
 	protected void initiateActiveTextField() {
@@ -112,16 +115,24 @@ public class ATextField
 		case KeyEvent.KEY_PRESSED:
 		case KeyEvent.KEY_RELEASED:
 			if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+				targetDialog.reportCompleteEditing(targetComponent);
 				return;
 			};
 			break;
 		case KeyEvent.KEY_TYPED:
 			if (evt.getKeyChar() == '\r') {
+				targetDialog.reportCompleteEditing(targetComponent);
 				return;
 			};
 			break;
 		};
 		super.processComponentKeyEvent(evt);
+	}
+	//
+	public void focusGained(FocusEvent e) {
+	}
+	public void focusLost(FocusEvent e) {
+		targetDialog.reportCompleteEditing(targetComponent);
 	}
 	//
 	public void setFont(Font font) {

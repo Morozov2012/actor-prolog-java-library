@@ -22,7 +22,6 @@ import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import java.awt.Dimension;
-import java.awt.Font;
 import java.lang.reflect.InvocationTargetException;
 
 public class ScalableImage extends CustomControlComponent {

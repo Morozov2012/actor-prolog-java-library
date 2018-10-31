@@ -83,7 +83,7 @@ public class DialogEntry {
 	//
 	public void putValue(final DialogControlOperation operation, final Term value, final ChoisePoint iX) {
 		if (operation != DialogControlOperation.VALUE) {
-			synchronized(currentValueGuard) {
+			synchronized (currentValueGuard) {
 				if (SwingUtilities.isEventDispatchThread()) {
 					dialog.incrementTheInsideThePutOperationCounter();
 					try {
@@ -109,7 +109,7 @@ public class DialogEntry {
 				}
 			}
 		} else if (entryType.isValueOrAction()) {
-			synchronized(currentValueGuard) {
+			synchronized (currentValueGuard) {
 				Term newValue;
 				try {
 					newValue= component.standardizeValue(value,iX);
@@ -158,7 +158,7 @@ public class DialogEntry {
 				}
 			}
 		} else if (entryType==DialogEntryType.RANGE) {
-			synchronized(currentRangeGuard) {
+			synchronized (currentRangeGuard) {
 				Term newRange;
 				try {
 					newRange= component.standardizeRange(value,iX);
@@ -207,7 +207,7 @@ public class DialogEntry {
 				}
 			}
 		} else {
-			synchronized(currentValueGuard) {
+			synchronized (currentValueGuard) {
 				Term newValue;
 				try {
 					newValue= entryType.standardizeValue(value,iX);
@@ -267,7 +267,7 @@ public class DialogEntry {
 	}
 	public Term getExistedValue(boolean refreshValue) throws Backtracking {
 		if (entryType.isValueOrAction()) {
-			synchronized(currentValueGuard) {
+			synchronized (currentValueGuard) {
 				if (currentValue==null || refreshValue || isToBeRefreshed.get()) {
 					if (SwingUtilities.isEventDispatchThread()) {
 						currentValue= component.getValue(DialogControlOperation.VALUE);
@@ -294,7 +294,7 @@ public class DialogEntry {
 				return currentValue;
 			}
 		} else if (entryType==DialogEntryType.RANGE) {
-			synchronized(currentRangeGuard) {
+			synchronized (currentRangeGuard) {
 				if (currentRange==null || refreshValue || isToBeRefreshed.get()) {
 					if (SwingUtilities.isEventDispatchThread()) {
 						currentRange= component.getRange();
@@ -324,7 +324,7 @@ public class DialogEntry {
 			if ((entryType==DialogEntryType.X || entryType==DialogEntryType.Y) && !isInitiated.get()) {
 				throw Backtracking.instance;
 			};
-			synchronized(currentValueGuard) {
+			synchronized (currentValueGuard) {
 				if (currentValue==null || refreshValue || isToBeRefreshed.get()) {
 					if (SwingUtilities.isEventDispatchThread()) {
 						currentValue= entryType.getValue(dialog);
@@ -354,7 +354,7 @@ public class DialogEntry {
 	}
 	public Term getVisibleValue(final DialogControlOperation operation) {
 		if (operation != DialogControlOperation.VALUE) {
-			synchronized(currentValueGuard) {
+			synchronized (currentValueGuard) {
 				if (SwingUtilities.isEventDispatchThread()) {
 					return component.getValue(operation);
 				} else {
@@ -380,7 +380,7 @@ public class DialogEntry {
 				}
 			}
 		} else if (entryType.isValueOrAction()) {
-			synchronized(currentValueGuard) {
+			synchronized (currentValueGuard) {
 				if (SwingUtilities.isEventDispatchThread()) {
 					return component.getValue(operation);
 				} else {
@@ -403,7 +403,7 @@ public class DialogEntry {
 				}
 			}
 		} else if (entryType==DialogEntryType.RANGE) {
-			synchronized(currentRangeGuard) {
+			synchronized (currentRangeGuard) {
 				if (SwingUtilities.isEventDispatchThread()) {
 					return component.getRange();
 				} else {
@@ -426,7 +426,7 @@ public class DialogEntry {
 				}
 			}
 		} else {
-			synchronized(currentValueGuard) {
+			synchronized (currentValueGuard) {
 				if (SwingUtilities.isEventDispatchThread()) {
 					return entryType.getValue(dialog);
 				} else {
@@ -457,7 +457,7 @@ public class DialogEntry {
 	//
 	public void setFieldIsEnabled(final boolean mode) {
 		if (entryType.isValueActionOrRange()) {
-			synchronized(currentValueGuard) {
+			synchronized (currentValueGuard) {
 				if (SwingUtilities.isEventDispatchThread()) {
 					component.setIsEnabled(mode);
 				} else {
@@ -477,7 +477,7 @@ public class DialogEntry {
 	//
 	public boolean fieldIsEnabled(final boolean mode) {
 		if (entryType.isValueActionOrRange()) {
-			synchronized(currentValueGuard) {
+			synchronized (currentValueGuard) {
 				if (SwingUtilities.isEventDispatchThread()) {
 					return component.isEnabled(mode);
 				} else {

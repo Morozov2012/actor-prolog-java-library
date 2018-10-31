@@ -77,7 +77,7 @@ public class ATable extends JScrollPane {
 	public void setSelectedIndex(int index) {
 		if (table!=null) {
 			if (!tableIsInitiated.get()) {
-				synchronized(tableIsInitiated) {
+				synchronized (tableIsInitiated) {
 					initiallySelectedIndices= new int[1];
 					initiallySelectedIndices[0]= index;
 				}
@@ -97,7 +97,7 @@ public class ATable extends JScrollPane {
 	public void setSelectedIndices(int[] indices) {
 		if (table!=null) {
 			if (!tableIsInitiated.get()) {
-				synchronized(tableIsInitiated) {
+				synchronized (tableIsInitiated) {
 					initiallySelectedIndices= indices;
 				}
 			};
@@ -157,7 +157,7 @@ public class ATable extends JScrollPane {
 	//
 	public void putValue(Term value, ChoisePoint iX) {
 		if (table!=null) {
-			synchronized(table) {
+			synchronized (table) {
 				if (table.getRowCount() > 0) {
 					try {
 						int number= value.getSmallIntegerValue(iX);
@@ -185,14 +185,14 @@ public class ATable extends JScrollPane {
 	}
 	public void putRange(Term value, boolean checkResidentValues, ChoisePoint iX) {
 		if (table!=null) {
-			synchronized(table) {
+			synchronized (table) {
 				ScalableTableModel tableModel= (ScalableTableModel)table.getModel();
 				ListSelectionModel selectionModel= table.getSelectionModel();
 				int[] selection;
 				if (tableIsInitiated.compareAndSet(false,true)) {
 					int selectionMode= selectionModel.getSelectionMode();
 					int length= initiallySelectedIndices.length;
-					synchronized(tableIsInitiated) {
+					synchronized (tableIsInitiated) {
 						if (selectionMode==ListSelectionModel.SINGLE_SELECTION) {
 							if (length > 1) {
 								length= 1;
@@ -237,7 +237,7 @@ public class ATable extends JScrollPane {
 	}
 	public Term getValue() {
 		if (table!=null) {
-			synchronized(table) {
+			synchronized (table) {
 				int[] selection= table.getSelectedRows();
 				for (int n= 0; n < selection.length; n++) {
 					selection[n] = table.convertRowIndexToModel(selection[n]);
@@ -251,7 +251,7 @@ public class ATable extends JScrollPane {
 	}
 	public Term getRange() {
 		if (table!=null) {
-			synchronized(table) {
+			synchronized (table) {
 				ScalableTableModel model= (ScalableTableModel)table.getModel();
 				return model.getContent();
 			}

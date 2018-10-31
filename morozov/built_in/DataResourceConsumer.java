@@ -16,8 +16,8 @@ public abstract class DataResourceConsumer extends DataAbstraction {
 		super(id);
 	}
 	//
-	// abstract protected Term getBuiltInSlot_E_maximal_waiting_time();
-	// abstract protected Term getBuiltInSlot_E_backslash_always_is_separator();
+	// abstract public Term getBuiltInSlot_E_maximal_waiting_time();
+	// abstract public Term getBuiltInSlot_E_backslash_always_is_separator();
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -37,7 +37,7 @@ public abstract class DataResourceConsumer extends DataAbstraction {
 		return fileName.readImage(timeout,staticContext);
 	}
 	public java.awt.image.BufferedImage readImage(String textName, ChoisePoint iX) {
-		ExtendedFileName fileName= retrieveRealGlobalFileName(textName,iX);
+		ExtendedFileName fileName= retrieveRealGlobalFileNameWithoutExtension(textName,iX);
 		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		return fileName.readImage(timeout,staticContext);
 	}

@@ -20,6 +20,7 @@ import javax.swing.Icon;
 import javax.swing.Action;
 import javax.swing.plaf.basic.BasicRadioButtonUI;
 import javax.swing.JCheckBox;
+import javax.swing.AbstractButton;
 
 import java.awt.Font;
 import java.awt.Color;
@@ -28,6 +29,12 @@ public class ScalableCheckBox extends ScalableAbstractButton {
 	//
 	public ScalableCheckBox(AbstractDialog tD) {
 		this(tD,null,null,false);
+	}
+	public ScalableCheckBox(AbstractDialog tD, Action a) {
+		this(tD,null,null,false);
+		if (component!=null) {
+			((JCheckBox)component).setAction(a);
+		}
 	}
 	public ScalableCheckBox(AbstractDialog tD, Icon icon) {
 		this(tD,null,icon,false);
@@ -43,12 +50,6 @@ public class ScalableCheckBox extends ScalableAbstractButton {
 	}
 	public ScalableCheckBox(AbstractDialog tD, String text, Icon icon) {
 		this(tD,text,icon,false);
-	}
-	public ScalableCheckBox(AbstractDialog tD, Action a) {
-		this(tD,null,null,false);
-		if (component!=null) {
-			((JCheckBox)component).setAction(a);
-		}
 	}
 	public ScalableCheckBox(AbstractDialog tD, String text, Icon icon, boolean selected) {
 		super(tD);
@@ -141,9 +142,6 @@ public class ScalableCheckBox extends ScalableAbstractButton {
 					setUncertain(true);
 				}
 			}
-			// if (targetDialog!=null) {
-			//	targetDialog.reportValueUpdate(this);
-			// }
 		}
 	}
 	//
@@ -180,13 +178,13 @@ public class ScalableCheckBox extends ScalableAbstractButton {
 	///////////////////////////////////////////////////////////////
 	//
 	public void setIndividualText(Term value, ChoisePoint iX) {
-		AnnotatedButton.safelyUpdateAbstractButton((JCheckBox)component,value,iX);
+		AnnotatedButton.safelyUpdateAbstractButton((AbstractButton)component,value,iX);
 		targetDialog.safelyRevalidateAndRepaint();
 	}
 	//
 	public Term getIndividualText() {
 		if (component!=null) {
-			String text= AnnotatedButton.safelyRestoreText((JCheckBox)component);
+			String text= AnnotatedButton.safelyRestoreText((AbstractButton)component);
 			return new PrologString(text);
 		} else {
 			return termEmptyString;

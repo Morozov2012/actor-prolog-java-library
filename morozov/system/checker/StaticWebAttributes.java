@@ -16,7 +16,7 @@ public class StaticWebAttributes extends StaticAttributes {
 	private static StaticWebAttributes retrieveStaticWebAttributes(StaticContext context) {
 		StaticAttributes attributes= context.retrieveAttributes(staticIdentifier);
 		if (attributes==null) {
-			synchronized(context) {
+			synchronized (context) {
 				attributes= context.retrieveAttributes(staticIdentifier);
 				if (attributes==null) {
 					attributes= new StaticWebAttributes();
@@ -28,14 +28,14 @@ public class StaticWebAttributes extends StaticAttributes {
 	}
 	public static void setCookieManager(CookieHandler manager, StaticContext context) {
 		StaticWebAttributes attributes= retrieveStaticWebAttributes(context);
-		synchronized(attributes) {
+		synchronized (attributes) {
 			attributes.manager= manager;
 		}
 	}
 	public static CookieHandler retrieveCookieManager(StaticContext context) {
 		StaticWebAttributes attributes= retrieveStaticWebAttributes(context);
 		CookieHandler manager;
-		synchronized(attributes) {
+		synchronized (attributes) {
 			manager= attributes.manager;
 		};
 		return manager;
@@ -43,7 +43,7 @@ public class StaticWebAttributes extends StaticAttributes {
 	public static ReentrantLock retrieveWebGuard(StaticContext context) {
 		StaticWebAttributes attributes= retrieveStaticWebAttributes(context);
 		ReentrantLock guard;
-		synchronized(attributes) {
+		synchronized (attributes) {
 			guard= attributes.webGuard;
 		};
 		return guard;

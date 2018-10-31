@@ -33,15 +33,15 @@ public abstract class Database extends DataAbstraction {
 	//
 	// abstract public long entry_s_Update_0();
 	//
-	// abstract protected Term getBuiltInSlot_E_name();
-	// abstract protected Term getBuiltInSlot_E_extension();
-	// abstract protected Term getBuiltInSlot_E_maximal_waiting_time();
-	// abstract protected Term getBuiltInSlot_E_character_set();
-	// abstract protected Term getBuiltInSlot_E_backslash_always_is_separator();
+	// abstract public Term getBuiltInSlot_E_name();
+	// abstract public Term getBuiltInSlot_E_extension();
+	// abstract public Term getBuiltInSlot_E_maximal_waiting_time();
+	// abstract public Term getBuiltInSlot_E_character_set();
+	// abstract public Term getBuiltInSlot_E_backslash_always_is_separator();
 	// protected Term getBuiltInSlot_E_transaction_waiting_period()
-	// abstract protected Term getBuiltInSlot_E_transaction_sleep_period();
-	// abstract protected Term getBuiltInSlot_E_transaction_maximal_retry_number();
-	abstract protected Term getBuiltInSlot_E_place();
+	// abstract public Term getBuiltInSlot_E_transaction_sleep_period();
+	// abstract public Term getBuiltInSlot_E_transaction_maximal_retry_number();
+	abstract public Term getBuiltInSlot_E_place();
 	abstract protected PrologDomain getBuiltInSlotDomain_E_target_data();
 	//
 	protected Term getBuiltInSlot_E_reuse_key_numbers() {

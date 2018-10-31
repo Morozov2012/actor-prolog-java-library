@@ -6,6 +6,7 @@ import target.*;
 
 import morozov.built_in.*;
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.gui.*;
 import morozov.system.gui.dialogs.errors.*;
 import morozov.system.gui.dialogs.scalable.*;
@@ -612,18 +613,18 @@ public abstract class DialogFoundation {
 	///////////////////////////////////////////////////////////////
 	//
 	public BigInteger getDepthCounter() {
-		synchronized(insideModalDialog) {
+		synchronized (insideModalDialog) {
 			return insideModalDialog;
 		}
 	}
 	public void increaseDepthCounter() {
-		synchronized(insideModalDialog) {
+		synchronized (insideModalDialog) {
 			BigInteger n= insideModalDialog;
 			insideModalDialog= n.add(BigInteger.ONE);
 		}
 	}
 	public void decreaseDepthCounter() {
-		synchronized(insideModalDialog) {
+		synchronized (insideModalDialog) {
 			BigInteger n= insideModalDialog;
 			insideModalDialog= n.subtract(BigInteger.ONE);
 		}
@@ -632,7 +633,7 @@ public abstract class DialogFoundation {
 	///////////////////////////////////////////////////////////////
 	//
 	public void rememberStateOfProcess(String identifier, boolean isProven, boolean isSuspended) {
-		synchronized(dialogIsProven) {
+		synchronized (dialogIsProven) {
 			if (dialogIsProven.get()==isProven && dialogIsSuspended.get()==isSuspended) {
 				return;
 			};
@@ -648,7 +649,7 @@ public abstract class DialogFoundation {
 	protected Color refineBackgroundColor(Color initialColor) {
 		BigInteger modalDialogCounter= getDepthCounter();
 		if (modalDialogCounter.compareTo(BigInteger.ZERO) <= 0) {
-			synchronized(dialogIsProven) {
+			synchronized (dialogIsProven) {
 				if (!dialogIsSuspended.get() && dialogIsProven.get()) {
 					if (initialColor==null) {
 						return UIManager.getColor("control");
@@ -671,7 +672,7 @@ public abstract class DialogFoundation {
 	protected Color hatchColor() {
 		BigInteger modalDialogCounter= getDepthCounter();
 		if (modalDialogCounter.compareTo(BigInteger.ZERO) <= 0) {
-			synchronized(dialogIsProven) {
+			synchronized (dialogIsProven) {
 				if (!dialogIsSuspended.get() && dialogIsProven.get()) {
 					return null;
 				} else {

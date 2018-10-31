@@ -10,6 +10,7 @@ import java.nio.charset.CharsetEncoder;
 import java.util.HashSet;
 
 public class DomainInteger extends DomainAlternative {
+	//
 	public DomainInteger() {
 	}
 	//

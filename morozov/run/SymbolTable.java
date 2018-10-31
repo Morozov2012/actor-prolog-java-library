@@ -22,7 +22,7 @@ public abstract class SymbolTable {
 	protected final static int firstSymbolCode= 100;
 	//
 	public static void initializeSymbolTable() {
-		synchronized(symbolCodeHash) {
+		synchronized (symbolCodeHash) {
 			// SymbolName[] initialContent= getStaticSymbolNames();
 			for (int n=0; n<initialContent.length; n++) {
 				symbolNameHash.put(n,initialContent[n]);
@@ -62,7 +62,7 @@ public abstract class SymbolTable {
 		}
 	}
 	public static int insertSymbolName(String name) {
-		synchronized(symbolCodeHash) {
+		synchronized (symbolCodeHash) {
 			Integer code= symbolCodeHash.get(name);
 			if (code==null) {
 				totalTableSize++;

@@ -9,6 +9,7 @@ import java.nio.charset.CharsetEncoder;
 import java.util.HashSet;
 
 public class DomainUnknownValue extends DomainAlternative {
+	//
 	public DomainUnknownValue() {
 	}
 	//

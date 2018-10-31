@@ -3,23 +3,11 @@
 package morozov.system.kinect.frames.data.converters;
 
 import edu.ufl.digitalworlds.j4k.Skeleton;
-import edu.ufl.digitalworlds.j4k.J4K1;
-import edu.ufl.digitalworlds.j4k.J4K2;
-import edu.ufl.digitalworlds.j4k.J4KSDK;
 
 import target.*;
 
 import morozov.system.kinect.frames.data.interfaces.*;
 import morozov.terms.*;
-
-import java.awt.Graphics2D;
-import java.awt.BasicStroke;
-import java.awt.Color;
-import java.awt.geom.Line2D;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.Locale;
 
 public class GeneralSkeletonConverters {
 	//
@@ -175,6 +163,7 @@ public class GeneralSkeletonConverters {
 		Term termPoint= new PrologStructure(SymbolCodes.symbolCode_E_p,new Term[]{termPointX,termPointY,termPointZ});
 		int[] x_Depth= skeleton.getDepthX();
 		int[] y_Depth= skeleton.getDepthY();
+		// int frameWidth= skeleton.getDepthFrameWidth();
 		int mapping1X= x_Depth[jointCode];
 		int mapping1Y= y_Depth[jointCode];
 		Term termMapping1X= new PrologInteger(mapping1X);
@@ -184,6 +173,7 @@ public class GeneralSkeletonConverters {
 		int[] x_Color= skeleton.getColorX();
 		int[] y_Color= skeleton.getColorY();
 		if (x_Color != null && y_Color != null) {
+			// int colorFrameWidth= skeleton.getColorFrameWidth();
 			int mapping2X= x_Color[jointCode];
 			int mapping2Y= y_Color[jointCode];
 			Term termMapping2X= new PrologInteger(mapping2X);

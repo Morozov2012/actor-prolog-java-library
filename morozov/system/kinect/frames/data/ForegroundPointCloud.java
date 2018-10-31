@@ -6,11 +6,7 @@ import morozov.system.kinect.frames.data.interfaces.*;
 import morozov.system.kinect.frames.data.tools.*;
 import morozov.system.kinect.frames.tools.*;
 
-import java.io.BufferedWriter;
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.Locale;
-import java.util.Arrays;
 
 public class ForegroundPointCloud implements ForegroundPointCloudInterface, Serializable {
 	//
@@ -23,6 +19,12 @@ public class ForegroundPointCloud implements ForegroundPointCloudInterface, Seri
 	protected float[][] matrixZ;
 	protected int frameWidth;
 	protected int frameHeight;
+	//
+	private static final long serialVersionUID= 0x32267A82CB8EEF69L; // 3613710453190881129L;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames.data","ForegroundPointCloud");
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//

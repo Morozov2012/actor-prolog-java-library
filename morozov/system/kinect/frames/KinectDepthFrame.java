@@ -4,12 +4,17 @@ package morozov.system.kinect.frames;
 
 import morozov.system.kinect.frames.data.interfaces.*;
 import morozov.system.kinect.frames.interfaces.*;
-import morozov.system.kinect.frames.tools.*;
 import morozov.system.kinect.modes.*;
 
 public class KinectDepthFrame extends KinectFrame implements KinectDepthFrameInterface {
 	//
 	protected short[] depth;
+	//
+	private static final long serialVersionUID= 0x9AED83F3E9867307L; // -7283019938770029817L;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames","KinectDepthFrame");
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//

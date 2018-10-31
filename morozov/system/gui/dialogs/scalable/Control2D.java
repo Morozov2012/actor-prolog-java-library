@@ -16,13 +16,11 @@ import morozov.run.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
 import morozov.system.gui.space2d.*;
-import morozov.system.signals.*;
 import morozov.terms.*;
 
 import javax.swing.JLabel;
 import javax.swing.SwingConstants;
 import java.awt.Dimension;
-import java.awt.Font;
 
 public class Control2D extends CustomControlComponent {
 	//

@@ -17,7 +17,7 @@ public class StaticAttributes3D extends StaticAttributes {
 	private static StaticAttributes3D retrieveStaticAttributes3D(StaticContext context) {
 		StaticAttributes attributes= context.retrieveAttributes(staticIdentifier);
 		if (attributes==null) {
-			synchronized(context) {
+			synchronized (context) {
 				attributes= context.retrieveAttributes(staticIdentifier);
 				if (attributes==null) {
 					attributes= new StaticAttributes3D();
@@ -30,7 +30,7 @@ public class StaticAttributes3D extends StaticAttributes {
 	public static Map<AbstractWorld,InternalFrame3D> retrieveInnerWindows(StaticContext context) {
 		StaticAttributes3D attributes= retrieveStaticAttributes3D(context);
 		Map<AbstractWorld,InternalFrame3D> innerWindows;
-		synchronized(attributes) {
+		synchronized (attributes) {
 			innerWindows= attributes.innerWindows;
 		};
 		return innerWindows;

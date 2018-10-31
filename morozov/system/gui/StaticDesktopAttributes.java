@@ -23,7 +23,7 @@ public class StaticDesktopAttributes extends StaticAttributes {
 	private static StaticDesktopAttributes retrieveStaticDesktopAttributes(StaticContext context) {
 		StaticAttributes attributes= context.retrieveAttributes(staticIdentifier);
 		if (attributes==null) {
-			synchronized(context) {
+			synchronized (context) {
 				attributes= context.retrieveAttributes(staticIdentifier);
 				if (attributes==null) {
 					attributes= new StaticDesktopAttributes();
@@ -35,14 +35,14 @@ public class StaticDesktopAttributes extends StaticAttributes {
 	}
 	public static void setMainDesktopPane(MainDesktopPane desktop, StaticContext context) {
 		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
-		synchronized(attributes) {
+		synchronized (attributes) {
 			attributes.desktop= desktop;
 		}
 	}
 	public static MainDesktopPane retrieveMainDesktopPane(StaticContext context) {
 		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
 		MainDesktopPane desktop;
-		synchronized(attributes) {
+		synchronized (attributes) {
 			desktop= attributes.desktop;
 		};
 		return desktop;
@@ -50,21 +50,21 @@ public class StaticDesktopAttributes extends StaticAttributes {
 	public static ReentrantLock retrieveDesktopGuard(StaticContext context) {
 		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
 		ReentrantLock guard;
-		synchronized(attributes) {
+		synchronized (attributes) {
 			guard= attributes.desktopGuard;
 		};
 		return guard;
 	}
 	public static void resetDefaultPosition(StaticContext context) {
 		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
-		synchronized(attributes) {
+		synchronized (attributes) {
 			attributes.previousDefaultPosition= -1;
 		}
 	}
 	public static int increaseDefaultPosition(StaticContext context, int step, int realWidth, int realHeight, int desktopWidth, int desktopHeight) {
 		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
 		int position;
-		synchronized(attributes) {
+		synchronized (attributes) {
 			position= attributes.previousDefaultPosition;
 			if (position < 0) {
 				position= 0;
@@ -84,7 +84,7 @@ public class StaticDesktopAttributes extends StaticAttributes {
 	public static int increaseDefaultPosition(StaticContext context, int step, int realSize, int desktopSize) {
 		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
 		int position;
-		synchronized(attributes) {
+		synchronized (attributes) {
 			position= attributes.previousDefaultPosition;
 			if (position < 0) {
 				position= 0;
@@ -101,35 +101,35 @@ public class StaticDesktopAttributes extends StaticAttributes {
 	}
 	public static void setMainWindow(Window window, StaticContext context) {
 		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
-		synchronized(attributes) {
+		synchronized (attributes) {
 			attributes.mainWindow= window;
 		}
 	}
 	public static Window retrieveMainWindow(StaticContext context) {
 		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
 		Window window;
-		synchronized(attributes) {
+		synchronized (attributes) {
 			window= attributes.mainWindow;
 		};
 		return window;
 	}
 	public static void setTopLevelWindow(Window window, StaticContext context) {
 		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
-		synchronized(attributes) {
+		synchronized (attributes) {
 			attributes.topLevelWindow= window;
 		}
 	}
 	public static Window retrieveTopLevelWindow(StaticContext context) {
 		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
 		Window window;
-		synchronized(attributes) {
+		synchronized (attributes) {
 			window= attributes.topLevelWindow;
 		};
 		return window;
 	}
 	public static Component retrieveTopLevelWindowOrDesktopPane(StaticContext context) {
 		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
-		synchronized(attributes) {
+		synchronized (attributes) {
 			Window window= attributes.topLevelWindow;
 			if (window != null) {
 				return window;
@@ -141,7 +141,7 @@ public class StaticDesktopAttributes extends StaticAttributes {
 	}
 	public static void setExitOnClose(boolean mode, StaticContext context) {
 		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
-		synchronized(attributes) {
+		synchronized (attributes) {
 			attributes.exitOnClose= mode;
 			Window mainWindow= attributes.mainWindow;
 			if (mainWindow != null) {
@@ -165,7 +165,7 @@ public class StaticDesktopAttributes extends StaticAttributes {
 	public static boolean retrieveExitOnClose(StaticContext context) {
 		StaticDesktopAttributes attributes= retrieveStaticDesktopAttributes(context);
 		boolean mode;
-		synchronized(attributes) {
+		synchronized (attributes) {
 			mode= attributes.exitOnClose;
 		};
 		return mode;

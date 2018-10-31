@@ -6,7 +6,7 @@ import target.*;
 
 import morozov.run.*;
 import morozov.system.*;
-import morozov.system.gui.*;
+import morozov.system.converters.*;
 import morozov.system.gui.space2d.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
@@ -57,17 +57,17 @@ public class StrokeAndColor extends BasicStroke {
 					} catch (TermIsSymbolDefault e1) {
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_lineWidth) {
-					lineWidth= (float)Converters.argumentToReal(pairValue,iX);
+					lineWidth= (float)GeneralConverters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_endCap) {
 					endCap= argumentToEndCap(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_lineJoin) {
 					lineJoin= argumentToLineJoin(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_miterLimit) {
-					miterLimit= (float)Converters.argumentToReal(pairValue,iX);
+					miterLimit= (float)GeneralConverters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_dashArray) {
 					dashArray= Tools2D.argumentToFloatArray(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_dashPhase) {
-					dashPhase= (float)Converters.argumentToReal(pairValue,iX);
+					dashPhase= (float)GeneralConverters.argumentToReal(pairValue,iX);
 				} else {
 					throw new WrongArgumentIsUnknownPenAttribute(key);
 				}

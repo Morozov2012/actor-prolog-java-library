@@ -13,6 +13,12 @@ public class SkeletonDimensionsChange implements SkeletonDimensionsChangeInterfa
 	protected PlayerDimensionsChangeInterface changeOfTotalColorDimensions= new PlayerDimensionsChange();
 	protected PlayerDimensionsChangeInterface changeOfSkeletonsColorDimensions= new PlayerDimensionsChange();
 	//
+	private static final long serialVersionUID= 1;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames.data","SkeletonDimensionsChange");
+	// }
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public SkeletonDimensionsChange() {

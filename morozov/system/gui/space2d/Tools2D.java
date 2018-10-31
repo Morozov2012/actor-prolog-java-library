@@ -7,6 +7,7 @@ import target.*;
 import morozov.built_in.*;
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.errors.*;
 import morozov.system.gui.*;
 import morozov.system.gui.space2d.errors.*;
@@ -72,8 +73,8 @@ public class Tools2D {
 	public static Point2D argumentToPoint2D(Term value, ChoisePoint iX) {
 		try {
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_p,2,iX);
-			double xPoint= Converters.argumentToReal(arguments[0],iX);
-			double yPoint= Converters.argumentToReal(arguments[1],iX);
+			double xPoint= GeneralConverters.argumentToReal(arguments[0],iX);
+			double yPoint= GeneralConverters.argumentToReal(arguments[1],iX);
 			return new Point2D.Double(xPoint,yPoint);
 		} catch (Backtracking b) {
 			throw new WrongArgumentIsNotAPoint2D(value);
@@ -83,10 +84,10 @@ public class Tools2D {
 	///////////////////////////////////////////////////////////////
 	//
 	public static float[] argumentToFloatArray(Term value, ChoisePoint iX) {
-		Term[] termArray= Converters.listToArray(value,iX);
+		Term[] termArray= GeneralConverters.listToArray(value,iX);
 		float[] result= new float[termArray.length];
 		for (int n=0; n < termArray.length; n++) {
-			result[n]= (float)Converters.argumentToReal(termArray[n],iX);
+			result[n]= (float)GeneralConverters.argumentToReal(termArray[n],iX);
 		};
 		return result;
 	}
@@ -127,7 +128,7 @@ public class Tools2D {
 					rh.put(RenderingHints.KEY_TEXT_ANTIALIASING,mode);
 				} else if (pairName==SymbolCodes.symbolCode_E_text_LCD_contrast) {
 					try {
-						BigInteger contrast= Converters.termToStrictInteger(pairValue,iX,false);
+						BigInteger contrast= GeneralConverters.termToStrictInteger(pairValue,iX,false);
 						Integer mode= PrologInteger.toInteger(contrast);
 						rh.put(RenderingHints.KEY_TEXT_LCD_CONTRAST,mode);
 					} catch (TermIsNotAnInteger e1) {
@@ -298,10 +299,10 @@ public class Tools2D {
 	///////////////////////////////////////////////////////////////
 	//
 	public static float[] argumentToFractions(Term value, ChoisePoint iX) {
-		Term[] termArray= Converters.listToArray(value,iX);
+		Term[] termArray= GeneralConverters.listToArray(value,iX);
 		float[] fractions= new float[termArray.length];
 		for (int n=0; n < termArray.length; n++) {
-			fractions[n]= (float)Converters.argumentToReal(termArray[n],iX);
+			fractions[n]= (float)GeneralConverters.argumentToReal(termArray[n],iX);
 		};
 		return fractions;
 	}
@@ -309,7 +310,7 @@ public class Tools2D {
 	///////////////////////////////////////////////////////////////
 	//
 	public static Color[] argumentToGradientColors(Term value, ChoisePoint iX) {
-		Term[] termArray= Converters.listToArray(value,iX);
+		Term[] termArray= GeneralConverters.listToArray(value,iX);
 		Color[] colors= new Color[termArray.length];
 		for (int n=0; n < termArray.length; n++) {
 			try {
@@ -367,14 +368,14 @@ public class Tools2D {
 	public static AffineTransform argumentToTransform2D(Term value, ChoisePoint iX) {
 		try { // rotation
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_rotation,1,iX);
-			double theta= Converters.argumentToReal(arguments[0],iX);
+			double theta= GeneralConverters.argumentToReal(arguments[0],iX);
 			AffineTransform transform= new AffineTransform();
 			transform.setToRotation(theta);
 			return transform;
 		} catch (Backtracking b1) {
 		try { // quadrantRotation
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_quadrantRotation,1,iX);
-			BigInteger quadrants= Converters.argumentToRoundInteger(arguments[0],iX);
+			BigInteger quadrants= GeneralConverters.argumentToRoundInteger(arguments[0],iX);
 			int numquadrants= PrologInteger.toInteger(quadrants);
 			AffineTransform transform= new AffineTransform();
 			transform.setToQuadrantRotation(numquadrants);
@@ -382,35 +383,35 @@ public class Tools2D {
 		} catch (Backtracking b2) {
 		try { // scale
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_scale,2,iX);
-			double sx= Converters.argumentToReal(arguments[0],iX);
-			double sy= Converters.argumentToReal(arguments[1],iX);
+			double sx= GeneralConverters.argumentToReal(arguments[0],iX);
+			double sy= GeneralConverters.argumentToReal(arguments[1],iX);
 			AffineTransform transform= new AffineTransform();
 			transform.setToScale(sx,sy);
 			return transform;
 		} catch (Backtracking b3) {
 		try { // shear
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_shear,2,iX);
-			double shx= Converters.argumentToReal(arguments[0],iX);
-			double shy= Converters.argumentToReal(arguments[1],iX);
+			double shx= GeneralConverters.argumentToReal(arguments[0],iX);
+			double shy= GeneralConverters.argumentToReal(arguments[1],iX);
 			AffineTransform transform= new AffineTransform();
 			transform.setToShear(shx,shy);
 			return transform;
 		} catch (Backtracking b4) {
 		try { // translation
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_translation,2,iX);
-			double tx= Converters.argumentToReal(arguments[0],iX);
-			double ty= Converters.argumentToReal(arguments[1],iX);
+			double tx= GeneralConverters.argumentToReal(arguments[0],iX);
+			double ty= GeneralConverters.argumentToReal(arguments[1],iX);
 			AffineTransform transform= new AffineTransform();
 			transform.setToTranslation(tx,ty);
 			return transform;
 		} catch (Backtracking b5) {
 			// TranslationMatrix
-			Term[] termArray= Converters.listToArray(value,iX);
+			Term[] termArray= GeneralConverters.listToArray(value,iX);
 			int numberOfRows= termArray.length;
 			double[][] rows= new double[numberOfRows][];
 			int numberOfColumns= -1;
 			for (int n=0; n < numberOfRows; n++) {
-				Term[] columnArray= Converters.listToArray(termArray[n],iX);
+				Term[] columnArray= GeneralConverters.listToArray(termArray[n],iX);
 				if (numberOfColumns >= 0) {
 					if (numberOfColumns != columnArray.length) {
 						throw new WrongArgumentIsNotAMatrix(value);
@@ -420,7 +421,7 @@ public class Tools2D {
 				};
 				rows[n]= new double[numberOfColumns];
 				for (int m=0; m < numberOfColumns; m++) {
-					rows[n][m]= Converters.argumentToReal(columnArray[m],iX);
+					rows[n][m]= GeneralConverters.argumentToReal(columnArray[m],iX);
 				}
 			};
 			if (numberOfRows==2 && numberOfColumns==2) {
@@ -611,7 +612,7 @@ public class Tools2D {
 				throw new WrongArgumentIsNotFontWeight2D(value);
 			}
 		} catch (TermIsNotASymbol e) {
-			return Converters.argumentToReal(value,iX);
+			return GeneralConverters.argumentToReal(value,iX);
 		}
 	}
 	//
@@ -632,7 +633,7 @@ public class Tools2D {
 				throw new WrongArgumentIsNotFontWidth2D(value);
 			}
 		} catch (TermIsNotASymbol e) {
-			return Converters.argumentToReal(value,iX);
+			return GeneralConverters.argumentToReal(value,iX);
 		}
 	}
 	//
@@ -647,7 +648,7 @@ public class Tools2D {
 				throw new WrongArgumentIsNotFontPosture2D(value);
 			}
 		} catch (TermIsNotASymbol e) {
-			return Converters.argumentToReal(value,iX);
+			return GeneralConverters.argumentToReal(value,iX);
 		}
 	}
 	//
@@ -663,7 +664,7 @@ public class Tools2D {
 			}
 		} catch (TermIsNotASymbol e1) {
 			try {
-				return PrologInteger.toInteger(Converters.termToRoundInteger(value,iX,false));
+				return PrologInteger.toInteger(GeneralConverters.termToRoundInteger(value,iX,false));
 			} catch (TermIsNotAnInteger e2) {
 				throw new WrongArgumentIsNotFontSuperscript2D(value);
 			}
@@ -692,7 +693,7 @@ public class Tools2D {
 			}
 		} catch (TermIsNotASymbol e1) {
 			try {
-				return PrologInteger.toInteger(Converters.termToRoundInteger(value,iX,false));
+				return PrologInteger.toInteger(GeneralConverters.termToRoundInteger(value,iX,false));
 			} catch (TermIsNotAnInteger e2) {
 				throw new WrongArgumentIsNotFontUnderline2D(value);
 			}
@@ -726,7 +727,7 @@ public class Tools2D {
 			}
 		} catch (TermIsNotASymbol e1) {
 			try {
-				return PrologInteger.toInteger(Converters.termToRoundInteger(value,iX,false));
+				return PrologInteger.toInteger(GeneralConverters.termToRoundInteger(value,iX,false));
 			} catch (TermIsNotAnInteger e2) {
 				throw new WrongArgumentIsNotFontBidiEmbedding2D(value);
 			}
@@ -744,7 +745,7 @@ public class Tools2D {
 				throw new WrongArgumentIsNotFontJustification2D(value);
 			}
 		} catch (TermIsNotASymbol e) {
-			return Converters.argumentToReal(value,iX);
+			return GeneralConverters.argumentToReal(value,iX);
 		}
 	}
 	//
@@ -770,7 +771,7 @@ public class Tools2D {
 			}
 		} catch (TermIsNotASymbol e1) {
 			try {
-				return PrologInteger.toInteger(Converters.termToRoundInteger(value,iX,false));
+				return PrologInteger.toInteger(GeneralConverters.termToRoundInteger(value,iX,false));
 			} catch (TermIsNotAnInteger e2) {
 				throw new WrongArgumentIsNotFontUnderline2D(value);
 			}
@@ -789,7 +790,7 @@ public class Tools2D {
 			}
 		} catch (TermIsNotASymbol e1) {
 			try {
-				return PrologInteger.toInteger(Converters.termToRoundInteger(value,iX,false));
+				return PrologInteger.toInteger(GeneralConverters.termToRoundInteger(value,iX,false));
 			} catch (TermIsNotAnInteger e2) {
 				throw new WrongArgumentIsNotFontKerning2D(value);
 			}
@@ -808,7 +809,7 @@ public class Tools2D {
 			}
 		} catch (TermIsNotASymbol e1) {
 			try {
-				return PrologInteger.toInteger(Converters.termToRoundInteger(value,iX,false));
+				return PrologInteger.toInteger(GeneralConverters.termToRoundInteger(value,iX,false));
 			} catch (TermIsNotAnInteger e2) {
 				throw new WrongArgumentIsNotFontLigatures2D(value);
 			}
@@ -830,7 +831,7 @@ public class Tools2D {
 				throw new WrongArgumentIsNotFontTracking2D(value);
 			}
 		} catch (TermIsNotASymbol e) {
-			return Converters.argumentToReal(value,iX);
+			return GeneralConverters.argumentToReal(value,iX);
 		}
 	}
 	//

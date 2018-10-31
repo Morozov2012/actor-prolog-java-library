@@ -8,6 +8,7 @@ import morozov.terms.errors.*;
 import java.nio.charset.CharsetEncoder;
 
 public class ArgumentNumber extends Term {
+	//
 	private long value;
 	//
 	public ArgumentNumber(long v) {

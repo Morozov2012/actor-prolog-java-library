@@ -29,7 +29,6 @@ public abstract class DesktopWindow extends Alpha {
 			String value= System.getenv(name);
 			if (value != null) {
 				result.setNonBacktrackableValue(new PrologString(value));
-				// iX.pushTrail(result);
 			} else {
 				throw Backtracking.instance;
 			}
@@ -55,7 +54,6 @@ public abstract class DesktopWindow extends Alpha {
 			String value= System.getProperty(name);
 			if (value != null) {
 				result.setNonBacktrackableValue(new PrologString(value));
-				// iX.pushTrail(result);
 			} else {
 				throw Backtracking.instance;
 			}

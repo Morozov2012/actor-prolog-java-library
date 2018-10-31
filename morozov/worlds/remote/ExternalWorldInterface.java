@@ -22,6 +22,7 @@ public interface ExternalWorldInterface extends Remote {
 	public void process(java.awt.image.BufferedImage nativeImage, long frameNumber, long timeInMilliseconds, boolean takeFrameIntoAccount, GenericImageEncodingAttributes attributes) throws RemoteException, OwnWorldIsNotVideoProcessingMachine;
 	public void process(byte[] bytes, long frameNumber, long timeInMilliseconds, boolean takeFrameIntoAccount, GenericImageEncodingAttributes attributes) throws RemoteException, OwnWorldIsNotVideoProcessingMachine;
 	public long getFrameNumber() throws RemoteException, OwnWorldIsNotVideoProcessingMachine;
+	public long getFrameTime() throws RemoteException, OwnWorldIsNotVideoProcessingMachine;
 	public void commit() throws RemoteException, OwnWorldIsNotVideoProcessingMachine;
 	public void resetSettings() throws RemoteException, OwnWorldIsNotVideoProcessingMachine;
 	public void resetStatistics() throws RemoteException, OwnWorldIsNotVideoProcessingMachine;

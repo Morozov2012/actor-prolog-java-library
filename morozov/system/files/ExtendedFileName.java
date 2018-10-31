@@ -10,8 +10,6 @@ import morozov.system.datum.*;
 import morozov.system.files.errors.*;
 import morozov.terms.*;
 
-import java.awt.Dimension;
-import javax.imageio.ImageIO;
 import javax.imageio.ImageReader;
 import javax.imageio.ImageReadParam;
 import javax.imageio.stream.MemoryCacheImageInputStream;
@@ -30,6 +28,7 @@ import java.nio.file.AccessDeniedException;
 import java.nio.charset.Charset;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.DataOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -45,12 +44,15 @@ import java.net.MalformedURLException;
 import java.util.List;
 
 public class ExtendedFileName extends RelativeFileName {
+	//
 	protected boolean hasScheme= false;
 	protected boolean endsWithSlash= false;
 	protected boolean isLocalResource= false;
 	protected Path filePath;
 	protected URI fileURI;
+	//
 	protected static String defaultGraphicsFormatName= "png";
+	//
 	protected static final Term termEmptyPrologString= new PrologString("");
 	protected static final Charset completeCharset= Charset.forName("ISO-8859-1");
 	//
@@ -666,7 +668,7 @@ public class ExtendedFileName extends RelativeFileName {
 			Path path1= getPathOfLocalResource();
 			Path path2= fileName2.getPathOfLocalResource();
 			try {
-				Files.copy(path1,path2,StandardCopyOption.COPY_ATTRIBUTES);
+				Files.copy(path1,path2,StandardCopyOption.COPY_ATTRIBUTES,StandardCopyOption.REPLACE_EXISTING);
 			// } catch (UnsupportedOperationException e) {
 			// } catch (FileAlreadyExistsException e) {
 			} catch (IOException e) {
@@ -941,20 +943,37 @@ public class ExtendedFileName extends RelativeFileName {
 		}
 	}
 	//
+	public void writeTextFile(String text, CharacterSet characterSet) throws IOException {
+		if (!isStandardFile) {
+			Path path= getPathOfLocalResource();
+			createDirectories(path,true);
+			byte[] dst;
+			if (characterSet.isDummy()) {
+				dst= new byte[text.length()];
+				dst= text.getBytes(completeCharset);
+			} else {
+				dst= text.getBytes(characterSet.toCharSet());
+			};
+			Files.write(path,dst);
+		} else {
+			if (systemName==StandardFileName.STDOUT) {
+				System.out.print(text);
+			} else if (systemName==StandardFileName.STDERR) {
+				System.err.print(text);
+			} else {
+				throw new StandardInputStreamDoesNotSupportThisOperation();
+			}
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public java.awt.image.BufferedImage readImage(int timeout, StaticContext staticContext) {
 		return readImage(timeout,1,1,0,0,staticContext);
 	}
 	public java.awt.image.BufferedImage readImage(int timeout, int xSubsampling, int ySubsampling, int xOffset, int yOffset, StaticContext staticContext) {
 		byte[] array= getByteContentOfUniversalResource(CharacterSet.NONE,timeout,staticContext);
 		InputStream inputStream= new ByteArrayInputStream(array);
-		// try {
-		//	java.awt.image.BufferedImage image= ImageIO.read(inputStream);
-		//	return image;
-		// } catch(IOException e) {
-		//	throw new FileInputOutputError(toString(),e);
-		// }
-		// IIORegistry iioRegistry= IIORegistry.getDefaultInstance();
-		// Iterator<ImageReader> iterator= ImageIO.getImageReadersByFormatName("jpg");
 		MemoryCacheImageInputStream imageStream= new MemoryCacheImageInputStream(inputStream);
 		Iterator<ImageReader> iterator= ImageIO.getImageReaders(imageStream);
 		if (!iterator.hasNext()) {
@@ -962,9 +981,6 @@ public class ExtendedFileName extends RelativeFileName {
 		};
 		ImageReader reader= iterator.next();
 		ImageReadParam readParam= reader.getDefaultReadParam();
-		// readParam.setSourceRenderSize(new Dimension(640,480));
-		// readParam.setSourceSubsampling(100,100,0,0);
-		// readParam.setSourceSubsampling(3,3,0,0);
 		readParam.setSourceSubsampling(xSubsampling,ySubsampling,xOffset,yOffset);
 		reader.setInput(imageStream);
 		try {
@@ -975,13 +991,30 @@ public class ExtendedFileName extends RelativeFileName {
 		}
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
+	public String extractGraphicsFormatName() {
+		if (!isStandardFile) {
+			String formatName= extractFileNameExtension();
+			if (formatName.length() > 0 && formatName.codePointAt(0)=='.') {
+				formatName= formatName.substring(1);
+			};
+			return formatName.toLowerCase();
+		} else {
+			return defaultGraphicsFormatName;
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public Object readObject(int timeout, StaticContext staticContext) {
 		try {
 			if (!isStandardFile) {
 				if (isLocalResource) {
 					Path path= getPathOfLocalResource();
 					InputStream inputStream= Files.newInputStream(path);
-					ObjectInputStream objectStream= new DataStoreInputStream(new BufferedInputStream(inputStream),true);
+					BufferedInputStream bufferedStream= new BufferedInputStream(inputStream);
+					ObjectInputStream objectStream= new DataStoreInputStream(bufferedStream,true);
 					try {
 						return objectStream.readObject();
 					} finally {
@@ -1009,49 +1042,13 @@ public class ExtendedFileName extends RelativeFileName {
 		}
 	}
 	//
-	public void writeTextFile(String text, CharacterSet characterSet) throws IOException {
-		if (!isStandardFile) {
-			Path path= getPathOfLocalResource();
-			createDirectories(path,true);
-			byte[] dst;
-			if (characterSet.isDummy()) {
-				dst= new byte[text.length()];
-				dst= text.getBytes(completeCharset);
-			} else {
-				dst= text.getBytes(characterSet.toCharSet());
-			};
-			Files.write(path,dst);
-		} else {
-			if (systemName==StandardFileName.STDOUT) {
-				System.out.print(text);
-			} else if (systemName==StandardFileName.STDERR) {
-				System.err.print(text);
-			} else {
-				throw new StandardInputStreamDoesNotSupportThisOperation();
-			}
-		}
-	}
-	//
-	///////////////////////////////////////////////////////////////
-	//
-	public String extractGraphicsFormatName() {
-		if (!isStandardFile) {
-			String formatName= extractFileNameExtension();
-			if (formatName.length() > 0 && formatName.codePointAt(0)=='.') {
-				formatName= formatName.substring(1);
-			};
-			return formatName.toLowerCase();
-		} else {
-			return defaultGraphicsFormatName;
-		}
-	}
-	//
 	public void writeObject(Object tableHash) {
 		try {
 			if (!isStandardFile) {
 				Path path= getPathOfLocalResource();
 				OutputStream outputStream= Files.newOutputStream(path);
-				ObjectOutputStream objectStream= new DataStoreOutputStream(new BufferedOutputStream(outputStream));
+				BufferedOutputStream bufferedStream= new BufferedOutputStream(outputStream);
+				ObjectOutputStream objectStream= new DataStoreOutputStream(new BufferedOutputStream(bufferedStream));
 				try {
 					objectStream.writeObject(tableHash);
 				} finally {
@@ -1074,6 +1071,30 @@ public class ExtendedFileName extends RelativeFileName {
 					} finally {
 						objectStream.flush();
 					}
+				}
+			}
+		} catch (IOException e) {
+			throw new FileInputOutputError(toString(),e);
+		}
+	}
+	//
+	public DataOutputStream getDataOutputStream() {
+		try {
+			if (!isStandardFile) {
+				Path path= getPathOfLocalResource();
+				OutputStream outputStream= Files.newOutputStream(path);
+				BufferedOutputStream bufferedStream= new BufferedOutputStream(outputStream);
+				DataOutputStream dataStream= new DataOutputStream(bufferedStream);
+				return dataStream;
+			} else {
+				if (systemName==StandardFileName.STDIN) {
+					throw new StandardInputStreamDoesNotSupportThisOperation();
+				} else if (systemName==StandardFileName.STDOUT) {
+					DataOutputStream dataStream= new DataOutputStream(new BufferedOutputStream(System.out));
+					return dataStream;
+				} else {
+					DataOutputStream dataStream= new DataOutputStream(new BufferedOutputStream(System.err));
+					return dataStream;
 				}
 			}
 		} catch (IOException e) {

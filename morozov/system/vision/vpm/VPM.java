@@ -4,24 +4,16 @@ package morozov.system.vision.vpm;
 
 import morozov.system.*;
 import morozov.system.vision.vpm.commands.*;
-import morozov.system.vision.vpm.commands.blb.*;
 import morozov.system.vision.vpm.commands.msk.*;
 import morozov.system.vision.vpm.converters.*;
 import morozov.system.vision.vpm.errors.*;
-import morozov.terms.*;
 
 import java.awt.image.WritableRaster;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Set;
 import java.util.List;
 import java.util.Iterator;
-import java.util.ListIterator;
 import java.util.ArrayList;
 import java.util.ArrayDeque;
 import java.util.NoSuchElementException;
-import java.util.concurrent.atomic.AtomicReference;
-import java.math.BigInteger;
 
 public class VPM extends GenericVideoProcessingMachine {
 	//
@@ -37,6 +29,7 @@ public class VPM extends GenericVideoProcessingMachine {
 	protected int[] matrixGrayscale;
 	protected int[][] matrixRGB;
 	protected int[][] matrixHSB;
+	protected boolean imageWasAdjusted= false;
 	//
 	protected ImageChannelName outputChannelName= ImageChannelName.ALL;
 	//
@@ -218,6 +211,7 @@ public class VPM extends GenericVideoProcessingMachine {
 		matrixGrayscale= null;
 		matrixRGB= null;
 		matrixHSB= null;
+		imageWasAdjusted= false;
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -271,6 +265,13 @@ public class VPM extends GenericVideoProcessingMachine {
 	public int[] getMatrixBlue() {
 		convertImageToRGBifNecessary();
 		return matrixRGB[2];
+	}
+	//
+	public void acceptMatrixRGB() {
+		operationalMatrix= null;
+		matrixGrayscale= null;
+		matrixHSB= null;
+		imageWasAdjusted= true;
 	}
 	//
 	public ImageChannelName getOutputChannelName() {
@@ -374,19 +375,27 @@ public class VPM extends GenericVideoProcessingMachine {
 	protected void convertImageToGrayscaleIfNecessary() {
 		if (matrixGrayscale==null) {
 			checkForegroundMaskSize();
-			matrixGrayscale= VisionUtils.convertImageToGrayscale(
-				operationalImageWidth,
-				operationalImageHeight,
-				preprocessedImage,
-				recentImage);
+			if (imageWasAdjusted) {
+				matrixGrayscale= VisionUtils.convertRGBtoGrayscale(matrixRGB);
+			} else {
+				matrixGrayscale= VisionUtils.convertImageToGrayscale(
+					operationalImageWidth,
+					operationalImageHeight,
+					preprocessedImage,
+					recentImage);
+			}
 		}
 	}
 	//
 	protected void convertImageToHSBifNecessary() {
 		if (matrixHSB==null) {
 			checkForegroundMaskSize();
-			convertImageToRGBifNecessary();
-			matrixHSB= VisionUtils.convertRGBtoHSB(matrixRGB);
+			if (imageWasAdjusted) {
+				matrixHSB= VisionUtils.convertRGBtoHSB(matrixRGB);
+			} else {
+				convertImageToRGBifNecessary();
+				matrixHSB= VisionUtils.convertRGBtoHSB(matrixRGB);
+			}
 		}
 	}
 	//
@@ -428,9 +437,9 @@ public class VPM extends GenericVideoProcessingMachine {
 	///////////////////////////////////////////////////////////////
 	//
 	synchronized public void commit() {
-		if (operationalMatrix==null) {
-			return;
-		};
+		// if (operationalMatrix==null) {
+		//	return;
+		// };
 		if (frameNumberIsIllegal(recentFrameNumber)){
 			return;
 		};
@@ -445,6 +454,7 @@ public class VPM extends GenericVideoProcessingMachine {
 			matrixGrayscale,
 			matrixRGB,
 			matrixHSB,
+			imageWasAdjusted,
 			foregroundMask,
 			outputChannelName,
 			arrayOfTime,

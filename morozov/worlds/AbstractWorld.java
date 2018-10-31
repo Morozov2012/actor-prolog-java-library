@@ -3,7 +3,7 @@
 package morozov.worlds;
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.datum.*;
 import morozov.system.errors.*;
 import morozov.terms.*;
@@ -47,7 +47,7 @@ public abstract class AbstractWorld extends ActorNumber {
 	abstract public void receiveAsyncCall(AsyncCall item);
 	abstract public boolean isInternalWorldOf(AbstractProcess currentProcess);
 	abstract public void startProcesses();
-	abstract public void closeFiles();
+	abstract public void releaseSystemResources();
 	abstract public void stopProcesses();
 	abstract public MethodSignature[] getMethodSignatures();
 	//
@@ -142,7 +142,7 @@ public abstract class AbstractWorld extends ActorNumber {
 				throw new DataSerializingError(e);
 			};
 			byte[] byteArray= outputStream.toByteArray();
-			String outputString= Converters.byteArray2String(byteArray);
+			String outputString= GeneralConverters.byteArray2String(byteArray);
 			return "('" + outputString + "')";
 		} else {
 			return super.toString(cp,isInner,provideStrictSyntax,encodeWorlds,encoder);

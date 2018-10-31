@@ -2,7 +2,6 @@
 
 package morozov.system.kinect.frames.data.tools;
 
-import morozov.system.kinect.frames.data.*;
 import morozov.system.kinect.frames.data.interfaces.*;
 
 public class SkeletonDimensionsChangeTools {

@@ -9,6 +9,7 @@ import java.nio.charset.CharsetEncoder;
 import java.util.HashSet;
 
 public class SlotVariableValueState extends Term {
+	//
 	protected HashSet<ActorNumber> table;
 	protected ActorNumber insertedActor;
 	//

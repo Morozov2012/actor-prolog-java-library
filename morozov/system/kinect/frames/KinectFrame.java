@@ -2,11 +2,9 @@
 
 package morozov.system.kinect.frames;
 
-import morozov.system.kinect.frames.data.*;
 import morozov.system.kinect.frames.data.interfaces.*;
 import morozov.system.kinect.frames.interfaces.*;
 import morozov.system.kinect.frames.text.*;
-import morozov.system.kinect.frames.tools.*;
 import morozov.system.kinect.modes.*;
 
 import java.io.Serializable;
@@ -31,7 +29,11 @@ public abstract class KinectFrame implements KinectFrameInterface, Serializable 
 	protected byte[][] mappedBlue;
 	protected KinectFrameBaseAttributesInterface baseAttributes;
 	//
-	// protected static GeneralSkeleton[] emptySkeletonArray= new GeneralSkeleton[0];
+	private static final long serialVersionUID= 0xE28D06C37FC2DDE9L; // -2122032412689768983L;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames","KinectFrame");
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//

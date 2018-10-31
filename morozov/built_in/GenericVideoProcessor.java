@@ -4,6 +4,7 @@ package morozov.built_in;
 
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.space2d.*;
 import morozov.system.vision.vpm.*;
 import morozov.terms.*;
@@ -53,7 +54,7 @@ public abstract class GenericVideoProcessor extends BufferedImageController {
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		long frameNumber;
 		if (a2 != null) {
-			frameNumber= PrologInteger.toLong(Converters.argumentToRoundInteger(a2,iX));
+			frameNumber= PrologInteger.toLong(GeneralConverters.argumentToRoundInteger(a2,iX));
 		} else {
 			recentFrameNumber++;
 			frameNumber= recentFrameNumber;
@@ -65,7 +66,7 @@ public abstract class GenericVideoProcessor extends BufferedImageController {
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		long timeInMilliseconds;
 		if (a2 != null) {
-			timeInMilliseconds= PrologInteger.toLong(Converters.argumentToRoundInteger(a2,iX));
+			timeInMilliseconds= PrologInteger.toLong(GeneralConverters.argumentToRoundInteger(a2,iX));
 		} else {
 			Calendar calendar= Calendar.getInstance();
 			timeInMilliseconds= calendar.getTimeInMillis();
@@ -114,6 +115,11 @@ public abstract class GenericVideoProcessor extends BufferedImageController {
 		a1.setBacktrackableValue(getFrameNumberOrSpacer(iX),iX);
 	}
 	abstract public Term getFrameNumberOrSpacer(ChoisePoint iX);
+	//
+	public void getRecentFrameTime1s(ChoisePoint iX, PrologVariable a1) {
+		a1.setBacktrackableValue(getFrameTimeOrSpacer(iX),iX);
+	}
+	abstract public Term getFrameTimeOrSpacer(ChoisePoint iX);
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -184,8 +190,8 @@ public abstract class GenericVideoProcessor extends BufferedImageController {
 	///////////////////////////////////////////////////////////////
 	//
 	public void physicalCoordinates4s(ChoisePoint iX, Term a1, Term a2, Term a3, Term a4) {
-		int pixelX= Converters.argumentToSmallRoundInteger(a1,iX);
-		int pixelY= Converters.argumentToSmallRoundInteger(a2,iX);
+		int pixelX= GeneralConverters.argumentToSmallRoundInteger(a1,iX);
+		int pixelY= GeneralConverters.argumentToSmallRoundInteger(a2,iX);
 		double[] coordinates= physicalCoordinates(pixelX,pixelY,iX);
 		a3.setBacktrackableValue(new PrologReal(coordinates[0]),iX);
 		a4.setBacktrackableValue(new PrologReal(coordinates[1]),iX);
@@ -193,8 +199,8 @@ public abstract class GenericVideoProcessor extends BufferedImageController {
 	abstract public double[] physicalCoordinates(int pixelX, int pixelY, ChoisePoint iX);
 	//
 	public void characteristicLength2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
-		int x= Converters.argumentToSmallRoundInteger(a1,iX);
-		int y= Converters.argumentToSmallRoundInteger(a2,iX);
+		int x= GeneralConverters.argumentToSmallRoundInteger(a1,iX);
+		int y= GeneralConverters.argumentToSmallRoundInteger(a2,iX);
 		result.setNonBacktrackableValue(new PrologReal(characteristicLength(x,y,iX)));
 	}
 	public void characteristicLength2fs(ChoisePoint iX, Term a1, Term a2) {

@@ -7,7 +7,7 @@
 package morozov.system.gui.dialogs.scalable;
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
 import morozov.system.signals.*;
@@ -16,7 +16,6 @@ import morozov.terms.signals.*;
 
 import javax.swing.ButtonModel;
 import javax.swing.AbstractButton;
-import java.awt.Font;
 
 import java.math.BigInteger;
 import java.util.Enumeration;
@@ -49,7 +48,7 @@ public class ScalableButtonGroup extends ActiveComponent {
 			} catch (TermIsNotAnInteger e1) {
 				try {
 					double number= StrictMath.round(value.getRealValue(iX));
-					BigInteger bigInteger= Converters.doubleToBigInteger(number);
+					BigInteger bigInteger= GeneralConverters.doubleToBigInteger(number);
 					if (PrologInteger.isSmallInteger(bigInteger)) {
 						return new PrologInteger(bigInteger);
 					} else {

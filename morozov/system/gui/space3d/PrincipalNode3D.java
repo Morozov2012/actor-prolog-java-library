@@ -7,9 +7,11 @@ import target.*;
 import morozov.built_in.*;
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.errors.*;
 import morozov.system.gui.*;
 import morozov.system.gui.space3d.errors.*;
+import morozov.system.gui.space3d.signals.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
 import morozov.terms.errors.*;
@@ -155,9 +157,10 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			return attributesToGroup(arguments[0],targetWorld,u,space3D,iX);
 		} catch (Backtracking b22) {
 		try { // BranchGroup
-			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_BranchGroup,1,iX);
-			return attributesToBranchGroup(arguments[0],targetWorld,u,space3D,iX);
-		} catch (Backtracking b23) {
+			// Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_BranchGroup,1,iX);
+			// return attributesToBranchGroup(arguments[0],targetWorld,u,space3D,iX);
+			return termToBranchGroup(value,targetWorld,u,space3D,iX);
+		} catch (TermIsNotBranchGroup e23) {
 		try { // MovingShadow
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_MovingShadow,1,iX);
 			return attributesToMovingShadow(arguments[0],group,targetWorld,iX);
@@ -331,11 +334,28 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 	}
 	//
 	public static BranchGroup argumentToBranchGroup(Term value, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
-		try { // BranchGroup
-			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_BranchGroup,1,iX);
-			return attributesToBranchGroup(arguments[0],targetWorld,u,space3D,iX);
-		} catch (Backtracking b) {
+		try {
+			return termToBranchGroup(value,targetWorld,u,space3D,iX);
+		} catch (TermIsNotBranchGroup e) {
 			throw new WrongArgumentIsNotBranchGroup(value);
+		}
+	}
+	public static BranchGroup termToBranchGroup(Term value, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) throws TermIsNotBranchGroup {
+		value= value.dereferenceValue(iX);
+		if (value instanceof BufferedScene) {
+			BufferedScene scene= (BufferedScene)value;
+			return scene.getBranchGroup();
+		//} else if (value instanceof ForeignWorldWrapper) {
+		//	GenericImageEncodingAttributes attributes= getImageEncodingAttributes(iX);
+		//	ForeignWorldWrapper wrapper= (ForeignWorldWrapper)value;
+		//	wrapper.setImage(nativeImage,attributes);
+		} else {
+			try { // BranchGroup
+				Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_BranchGroup,1,iX);
+				return attributesToBranchGroup(arguments[0],targetWorld,u,space3D,iX);
+			} catch (Backtracking b) {
+				throw TermIsNotBranchGroup.instance;
+			}
 		}
 	}
 	public static BranchGroup attributesToBranchGroup(Term attributes, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
@@ -452,7 +472,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_scale) {
-					scale= Converters.argumentToReal(pairValue,iX);
+					scale= GeneralConverters.argumentToReal(pairValue,iX);
 					iterator.remove();
 				// } else {
 				//	throw new WrongArgumentIsUnknownColorCubeAttribute(key);
@@ -522,11 +542,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 					node.setTransformAxis(transform3D);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_minimumAngle) {
-					float minimumAngle= (float)Converters.argumentToReal(pairValue,iX);
+					float minimumAngle= (float)GeneralConverters.argumentToReal(pairValue,iX);
 					node.setMinimumAngle(minimumAngle);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_maximumAngle) {
-					float maximumAngle= (float)Converters.argumentToReal(pairValue,iX);
+					float maximumAngle= (float)GeneralConverters.argumentToReal(pairValue,iX);
 					node.setMaximumAngle(maximumAngle);
 					iterator.remove();
 				// } else {
@@ -692,7 +712,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 					node.setConstantScaleEnable(constantScaleEnable);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_scale) {
-					double scale= Converters.argumentToReal(pairValue,iX);
+					double scale= GeneralConverters.argumentToReal(pairValue,iX);
 					node.setScale(scale);
 					iterator.remove();
 				}
@@ -779,7 +799,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_rectangleScaleFactor) {
-					float factor= (float)Converters.argumentToReal(pairValue,iX);
+					float factor= (float)GeneralConverters.argumentToReal(pairValue,iX);
 					node.setRectangleScaleFactor(factor);
 					iterator.remove();
 				}
@@ -1000,13 +1020,13 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_xdim) {
-					xdim= (float)Converters.argumentToReal(pairValue,iX);
+					xdim= (float)GeneralConverters.argumentToReal(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_ydim) {
-					ydim= (float)Converters.argumentToReal(pairValue,iX);
+					ydim= (float)GeneralConverters.argumentToReal(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_zdim) {
-					zdim= (float)Converters.argumentToReal(pairValue,iX);
+					zdim= (float)GeneralConverters.argumentToReal(pairValue,iX);
 					iterator.remove();
 				// } else {
 				//	throw new WrongArgumentIsUnknownBoxAttribute(key);
@@ -1058,10 +1078,10 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_radius) {
-					radius= (float)Converters.argumentToReal(pairValue,iX);
+					radius= (float)GeneralConverters.argumentToReal(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_height) {
-					height= (float)Converters.argumentToReal(pairValue,iX);
+					height= (float)GeneralConverters.argumentToReal(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_xdivisions) {
 					try {
@@ -1127,10 +1147,10 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_radius) {
-					radius= (float)Converters.argumentToReal(pairValue,iX);
+					radius= (float)GeneralConverters.argumentToReal(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_height) {
-					height= (float)Converters.argumentToReal(pairValue,iX);
+					height= (float)GeneralConverters.argumentToReal(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_xdivisions) {
 					try {
@@ -1194,7 +1214,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_radius) {
-					radius= (float)Converters.argumentToReal(pairValue,iX);
+					radius= (float)GeneralConverters.argumentToReal(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_divisions) {
 					try {
@@ -1442,11 +1462,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_zoomFactor) {
-					double factor= Converters.argumentToReal(pairValue,iX);
+					double factor= GeneralConverters.argumentToReal(pairValue,iX);
 					node.setZoomFactor(factor);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_minRadius) {
-					double radius= Converters.argumentToReal(pairValue,iX);
+					double radius= GeneralConverters.argumentToReal(pairValue,iX);
 					node.setMinRadius(radius);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_rotationCenter) {
@@ -1646,7 +1666,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 					plane= term2Vector4(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_standoff) {
-					standoff= Converters.argumentToReal(pairValue,iX);
+					standoff= GeneralConverters.argumentToReal(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_appearance) {
 					appearance= argumentToAppearance(pairValue,targetWorld,iX);
@@ -1711,7 +1731,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 						long timeInterval= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setPeriod(timeInterval);
 					} else if (pairName==SymbolCodes.symbolCode_E_tolerance) {
-						float tolerance= (float)Converters.argumentToReal(pairValue,iX);
+						float tolerance= (float)GeneralConverters.argumentToReal(pairValue,iX);
 						node.setTolerance(tolerance);
 					} else if (pairName==SymbolCodes.symbolCode_E_mode) {
 						int pickingMode= argumentToPickingMode(pairValue,iX);

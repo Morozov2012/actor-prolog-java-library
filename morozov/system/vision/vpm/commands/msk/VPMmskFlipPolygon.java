@@ -2,10 +2,6 @@
 
 package morozov.system.vision.vpm.commands.msk;
 
-import morozov.system.vision.vpm.*;
-import morozov.system.vision.vpm.commands.*;
-import morozov.system.vision.vpm.converters.*;
-
 public class VPMmskFlipPolygon extends VPMmskApplyPolygon {
 	//
 	public VPMmskFlipPolygon(double[] aX, double[] aY) {

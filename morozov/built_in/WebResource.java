@@ -3,7 +3,7 @@
 package morozov.built_in;
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.files.*;
 import morozov.terms.*;
 import morozov.worlds.*;
@@ -22,21 +22,21 @@ public abstract class WebResource extends SymbolicInformation {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	abstract protected Term getBuiltInSlot_E_location();
-	// abstract protected Term getBuiltInSlot_E_maximal_waiting_time();
-	// abstract protected Term getBuiltInSlot_E_character_set();
-	// abstract protected Term getBuiltInSlot_E_backslash_always_is_separator();
-	// abstract protected Term getBuiltInSlot_E_mask();
-	// abstract protected Term getBuiltInSlot_E_send_full_path();
-	// abstract protected Term getBuiltInSlot_E_query();
-	// abstract protected Term getBuiltInSlot_E_content_type();
+	abstract public Term getBuiltInSlot_E_location();
+	// abstract public Term getBuiltInSlot_E_maximal_waiting_time();
+	// abstract public Term getBuiltInSlot_E_character_set();
+	// abstract public Term getBuiltInSlot_E_backslash_always_is_separator();
+	// abstract public Term getBuiltInSlot_E_mask();
+	// abstract public Term getBuiltInSlot_E_send_full_path();
+	// abstract public Term getBuiltInSlot_E_query();
+	// abstract public Term getBuiltInSlot_E_content_type();
 	//
 	///////////////////////////////////////////////////////////////
 	//
 	// get/set location
 	//
 	public void setLocation1s(ChoisePoint iX, Term a1) {
-		setLocation(Converters.argumentToString(a1,iX));
+		setLocation(GeneralConverters.argumentToString(a1,iX));
 	}
 	public void setLocation(String value) {
 		location= value;
@@ -51,7 +51,7 @@ public abstract class WebResource extends SymbolicInformation {
 			return location;
 		} else {
 			Term value= getBuiltInSlot_E_location();
-			return Converters.argumentToString(value,iX);
+			return GeneralConverters.argumentToString(value,iX);
 		}
 	}
 	//

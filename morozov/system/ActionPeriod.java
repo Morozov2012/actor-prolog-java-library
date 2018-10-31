@@ -14,29 +14,30 @@ import java.math.BigDecimal;
 public class ActionPeriod extends TimeInterval {
 	//
 	protected boolean isDefault= false;
-	public boolean isNone= false;
+	protected boolean isNone= false;
 	//
-	public ActionPeriod(BigDecimal value) {
-		super(value);
+	public ActionPeriod(boolean d, boolean n) {
+		super(false,0.0,null,null);
+		isDefault= d;
+		isNone= n;
 	}
 	public ActionPeriod(double value) {
 		super(value);
 	}
-	public ActionPeriod(boolean d, boolean n) {
-		super(false,null);
-		isDefault= d;
-		isNone= n;
+	public ActionPeriod(double value, TimeUnits u) {
+		super(value,u);
 	}
-	public ActionPeriod(Term t, TimeUnits u, ChoisePoint iX) {
-		super(t,u,iX);
+	public ActionPeriod(BigDecimal value) {
+		super(value);
+	}
+	public ActionPeriod(BigDecimal value, TimeUnits u) {
+		super(value,u);
 	}
 	public ActionPeriod(TimeInterval timeInterval) {
-		super(timeInterval.hasRealValue,timeInterval.units);
-		if (hasRealValue) {
-			realValue= timeInterval.realValue;
-		} else {
-			decimalValue= timeInterval.decimalValue;
-		}
+		super(	timeInterval.hasRealValue(),
+			timeInterval.getRealValue(),
+			timeInterval.getDecimalValue(),
+			timeInterval.getUnits());
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -90,6 +91,16 @@ public class ActionPeriod extends TimeInterval {
 	public int toMillisecondsOrDefault(Term defaultActionPeriod, ChoisePoint iX) {
 		if (isDefault) {
 			return TimeInterval.argumentSecondsToTimeInterval(defaultActionPeriod,iX).toMillisecondsInteger();
+		} else if (isNone) {
+			return noActionPeriod;
+		} else {
+			return toMillisecondsInteger();
+		}
+	}
+	//
+	public int toMillisecondsOrDefault(int defaultActionPeriod) {
+		if (isDefault) {
+			return defaultActionPeriod;
 		} else if (isNone) {
 			return noActionPeriod;
 		} else {

@@ -4,16 +4,17 @@ package morozov.system.kinect.frames;
 
 import morozov.system.kinect.frames.data.interfaces.*;
 import morozov.system.kinect.frames.interfaces.*;
-import morozov.system.kinect.frames.tools.*;
 import morozov.system.kinect.modes.*;
-
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.util.Locale;
 
 public class KinectInfraredFrame extends KinectFrame implements KinectInfraredFrameInterface {
 	//
 	protected short[] infrared;
+	//
+	private static final long serialVersionUID= 0xD3B5292755B74FFBL; // -3191599512003588101L;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames","KinectInfraredFrame");
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//

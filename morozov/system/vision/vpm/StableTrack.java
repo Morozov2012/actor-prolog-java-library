@@ -38,6 +38,19 @@ public class StableTrack {
 	protected Double totalShift;
 	protected Double meanVelocity;
 	//
+	protected Long frame1;
+	protected Long time1;
+	protected Long x1;
+	protected Long y1;
+	protected Long centroidX1;
+	protected Long centroidY1;
+	protected Long frame2;
+	protected Long time2;
+	protected Long x2;
+	protected Long y2;
+	protected Long centroidX2;
+	protected Long centroidY2;
+	//
 	protected Term prologStableTrack;
 	protected Term prologTrackSegmentList;
 	//
@@ -191,6 +204,79 @@ public class StableTrack {
 		return meanVelocity;
 	}
 	//
+	public long getFrameNumber1() {
+		if (frame1==null) {
+			frame1= computeFrame1();
+		};
+		return frame1;
+	}
+	public long getFrameNumber2() {
+		if (frame2==null) {
+			frame2= computeFrame2();
+		};
+		return frame2;
+	}
+	public long getTime1() {
+		if (time1==null) {
+			time1= computeTime1();
+		};
+		return time1;
+	}
+	public long getTime2() {
+		if (time2==null) {
+			time2= computeTime2();
+		};
+		return time2;
+	}
+	public long getX1() {
+		if (x1==null) {
+			x1= computeX1();
+		};
+		return x1;
+	}
+	public long getX2() {
+		if (x2==null) {
+			x2= computeX2();
+		};
+		return x2;
+	}
+	public long getY1() {
+		if (y1==null) {
+			y1= computeY1();
+		};
+		return y1;
+	}
+	public long getY2() {
+		if (y2==null) {
+			y2= computeY2();
+		};
+		return y2;
+	}
+	public long getCentroidX1() {
+		if (centroidX1==null) {
+			centroidX1= computeCentroidX1();
+		};
+		return centroidX1;
+	}
+	public long getCentroidX2() {
+		if (centroidX2==null) {
+			centroidX2= computeCentroidX2();
+		};
+		return centroidX2;
+	}
+	public long getCentroidY1() {
+		if (centroidY1==null) {
+			centroidY1= computeCentroidY1();
+		};
+		return centroidY1;
+	}
+	public long getCentroidY2() {
+		if (centroidY2==null) {
+			centroidY2= computeCentroidY2();
+		};
+		return centroidY2;
+	}
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	protected int computeNumberOfFrames() {
@@ -322,6 +408,103 @@ public class StableTrack {
 		return averager.getMeanValue();
 	}
 	//
+	public long computeFrame1() {
+		int numberOfSegments= segments.length;
+		if (numberOfSegments <= 0) {
+			return -1;
+		};
+		TrackSegment s= segments[0];
+		return s.getFirstFrameNumber();
+	}
+	public long computeFrame2() {
+		int numberOfSegments= segments.length;
+		if (numberOfSegments <= 0) {
+			return -1;
+		};
+		TrackSegment s= segments[numberOfSegments-1];
+		return s.getLastFrameNumber();
+	}
+	public long computeTime1() {
+		int numberOfSegments= segments.length;
+		if (numberOfSegments <= 0) {
+			return -1;
+		};
+		TrackSegment s= segments[0];
+		return s.getFirstTimeInMilliseconds();
+	}
+	public long computeTime2() {
+		int numberOfSegments= segments.length;
+		if (numberOfSegments <= 0) {
+			return -1;
+		};
+		TrackSegment s= segments[numberOfSegments-1];
+		return s.getLastTimeInMilliseconds();
+	}
+	public long computeX1() {
+		int numberOfSegments= segments.length;
+		if (numberOfSegments <= 0) {
+			return -1;
+		};
+		TrackSegment s= segments[0];
+		return s.getFirstX();
+	}
+	public long computeX2() {
+		int numberOfSegments= segments.length;
+		if (numberOfSegments <= 0) {
+			return -1;
+		};
+		TrackSegment s= segments[numberOfSegments-1];
+		return s.getLastX();
+	}
+	public long computeY1() {
+		int numberOfSegments= segments.length;
+		if (numberOfSegments <= 0) {
+			return -1;
+		};
+		TrackSegment s= segments[0];
+		return s.getFirstY();
+	}
+	public long computeY2() {
+		int numberOfSegments= segments.length;
+		if (numberOfSegments <= 0) {
+			return -1;
+		};
+		TrackSegment s= segments[numberOfSegments-1];
+		return s.getLastY();
+	}
+	public long computeCentroidX1() {
+		int numberOfSegments= segments.length;
+		if (numberOfSegments <= 0) {
+			return -1;
+		};
+		TrackSegment s= segments[0];
+		return s.getFirstCentroidX();
+	}
+	public long computeCentroidX2() {
+		int numberOfSegments= segments.length;
+		if (numberOfSegments <= 0) {
+			return -1;
+		};
+		TrackSegment s= segments[numberOfSegments-1];
+		return s.getLastCentroidX();
+	}
+	public long computeCentroidY1() {
+		int numberOfSegments= segments.length;
+		if (numberOfSegments <= 0) {
+			return -1;
+		};
+		TrackSegment s= segments[0];
+		return s.getFirstCentroidY();
+	}
+	public long computeCentroidY2() {
+		int numberOfSegments= segments.length;
+		if (numberOfSegments <= 0) {
+			return -1;
+		};
+		TrackSegment s= segments[numberOfSegments-1];
+		return s.getLastCentroidY();
+	}
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public int[] getCurrentRectangle(long time) {
@@ -362,6 +545,18 @@ public class StableTrack {
 		Term prologIdentifier= new PrologInteger(identifier);
 		Term prologType= blobType.toTerm();
 		Term prologIsMature= YesNo.boolean2TermYesNo(isStrong);
+		Term prologFrame1= new PrologInteger(getFrameNumber1());
+		Term prologTime1= new PrologInteger(getTime1());
+		Term prologX1= new PrologInteger(getX1());
+		Term prologY1= new PrologInteger(getY1());
+		Term prologCentroidX1= new PrologInteger(getCentroidX1());
+		Term prologCentroidY1= new PrologInteger(getCentroidY1());
+		Term prologFrame2= new PrologInteger(getFrameNumber2());
+		Term prologTime2= new PrologInteger(getTime2());
+		Term prologX2= new PrologInteger(getX2());
+		Term prologY2= new PrologInteger(getY2());
+		Term prologCentroidX2= new PrologInteger(getCentroidX2());
+		Term prologCentroidY2= new PrologInteger(getCentroidY2());
 		Term trackSegmentList= trackSegmentListToTerm();
 		Term prologNumberOfFrames= new PrologInteger(getNumberOfFrames());
 		Term prologMeanBlobArea= new PrologReal(getMeanBlobArea());
@@ -379,6 +574,42 @@ public class StableTrack {
 			new PrologSet(
 			- SymbolCodes.symbolCode_E_is_mature,
 			prologIsMature,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_frame1,
+			prologFrame1,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_time1,
+			prologTime1,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_x1,
+			prologX1,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_y1,
+			prologY1,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_centroid_x1,
+			prologCentroidX1,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_centroid_y1,
+			prologCentroidY1,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_frame2,
+			prologFrame2,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_time2,
+			prologTime2,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_x2,
+			prologX2,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_y2,
+			prologY2,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_centroid_x2,
+			prologCentroidX2,
+			new PrologSet(
+			- SymbolCodes.symbolCode_E_centroid_y2,
+			prologCentroidY2,
 			new PrologSet(
 			- SymbolCodes.symbolCode_E_segments,
 			trackSegmentList,
@@ -403,7 +634,7 @@ public class StableTrack {
 			new PrologSet(
 			- SymbolCodes.symbolCode_E_mean_velocity,
 			prologMeanVelocity,
-			PrologEmptySet.instance)))))))))));
+			PrologEmptySet.instance)))))))))))))))))))))));
 		return prologStableTrack;
 	}
 	//

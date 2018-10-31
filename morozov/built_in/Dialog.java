@@ -32,23 +32,15 @@ public abstract class Dialog extends DataResourceConsumer {
 		super(id);
 	}
 	//
-	abstract protected Term getBuiltInSlot_E_identifier();
-	abstract protected Term getBuiltInSlot_E_is_modal();
-	abstract protected Term getBuiltInSlot_E_is_top_level_window();
-	abstract protected Term getBuiltInSlot_E_exit_on_close();
-	// abstract protected Term getBuiltInSlot_E_title();
-	// abstract protected Term getBuiltInSlot_E_text_color();
-	// abstract protected Term getBuiltInSlot_E_space_color();
-	// abstract protected Term getBuiltInSlot_E_font_name();
-	// abstract protected Term getBuiltInSlot_E_font_size();
-	// abstract protected Term getBuiltInSlot_E_font_style();
-	// abstract protected Term getBuiltInSlot_E_x();
-	// abstract protected Term getBuiltInSlot_E_y();
-	// abstract protected Term getBuiltInSlot_E_background_color();
+	abstract public Term getBuiltInSlot_E_identifier();
+	abstract public Term getBuiltInSlot_E_is_modal();
+	abstract public Term getBuiltInSlot_E_is_top_level_window();
+	abstract public Term getBuiltInSlot_E_exit_on_close();
 	//
 	abstract public long entry_s_Action_1_i();
 	abstract public long entry_s_CreatedControl_1_i();
 	abstract public long entry_s_ModifiedControl_1_i();
+	abstract public long entry_s_CompleteEditing_1_i();
 	abstract public long entry_f_DataRequest_1_i();
 	//
 	///////////////////////////////////////////////////////////////
@@ -64,7 +56,6 @@ public abstract class Dialog extends DataResourceConsumer {
 	public void getIdentifier0ff(ChoisePoint iX, PrologVariable result) {
 		DialogIdentifierOrAuto value= getIdentifier(iX);
 		result.setNonBacktrackableValue(value.toTerm());
-		// iX.pushTrail(a1);
 	}
 	public void getIdentifier0fs(ChoisePoint iX) {
 	}
@@ -80,7 +71,7 @@ public abstract class Dialog extends DataResourceConsumer {
 	// get/set isModal
 	//
 	public void setIsModal1s(ChoisePoint iX, Term a1) {
-		setIsModal(YesNoDefault.term2YesNoDefault(a1,iX));
+		setIsModal(YesNoDefault.argument2YesNoDefault(a1,iX));
 	}
 	public void setIsModal(YesNoDefault value) {
 		isModal= value;
@@ -88,7 +79,6 @@ public abstract class Dialog extends DataResourceConsumer {
 	public void getIsModal0ff(ChoisePoint iX, PrologVariable result) {
 		YesNoDefault value= getIsModal(iX);
 		result.setNonBacktrackableValue(value.toTerm());
-		// iX.pushTrail(a1);
 	}
 	public void getIsModal0fs(ChoisePoint iX) {
 	}
@@ -97,14 +87,14 @@ public abstract class Dialog extends DataResourceConsumer {
 			return isModal;
 		} else {
 			Term value= getBuiltInSlot_E_is_modal();
-			return YesNoDefault.term2YesNoDefault(value,iX);
+			return YesNoDefault.argument2YesNoDefault(value,iX);
 		}
 	}
 	//
 	// get/set isTopLevelWindow
 	//
 	public void setIsTopLevelWindow1s(ChoisePoint iX, Term a1) {
-		setIsTopLevelWindow(YesNo.term2YesNo(a1,iX));
+		setIsTopLevelWindow(YesNo.argument2YesNo(a1,iX));
 	}
 	public void setIsTopLevelWindow(YesNo value) {
 		isTopLevelWindow= value;
@@ -112,7 +102,6 @@ public abstract class Dialog extends DataResourceConsumer {
 	public void getIsTopLevelWindow0ff(ChoisePoint iX, PrologVariable result) {
 		YesNo value= getIsTopLevelWindow(iX);
 		result.setNonBacktrackableValue(value.toTerm());
-		// iX.pushTrail(a1);
 	}
 	public void getIsTopLevelWindow0fs(ChoisePoint iX) {
 	}
@@ -121,14 +110,14 @@ public abstract class Dialog extends DataResourceConsumer {
 			return isTopLevelWindow;
 		} else {
 			Term value= getBuiltInSlot_E_is_top_level_window();
-			return YesNo.term2YesNo(value,iX);
+			return YesNo.argument2YesNo(value,iX);
 		}
 	}
 	//
 	// get/set exitOnClose
 	//
 	public void setExitOnClose1s(ChoisePoint iX, Term a1) {
-		setExitOnClose(YesNoDefault.term2YesNoDefault(a1,iX));
+		setExitOnClose(YesNoDefault.argument2YesNoDefault(a1,iX));
 	}
 	public void setExitOnClose(YesNoDefault value) {
 		exitOnClose= value;
@@ -136,7 +125,6 @@ public abstract class Dialog extends DataResourceConsumer {
 	public void getExitOnClose0ff(ChoisePoint iX, PrologVariable result) {
 		YesNoDefault value= getExitOnClose(iX);
 		result.setNonBacktrackableValue(value.toTerm());
-		// iX.pushTrail(a1);
 	}
 	public void getExitOnClose0fs(ChoisePoint iX) {
 	}
@@ -145,17 +133,17 @@ public abstract class Dialog extends DataResourceConsumer {
 			return exitOnClose;
 		} else {
 			Term value= getBuiltInSlot_E_exit_on_close();
-			return YesNoDefault.term2YesNoDefault(value,iX);
+			return YesNoDefault.argument2YesNoDefault(value,iX);
 		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void closeFiles() {
+	public void releaseSystemResources() {
 		if (targetObject != null) {
 			targetObject.safelyDispose();
 		};
-		super.closeFiles();
+		super.releaseSystemResources();
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -163,7 +151,6 @@ public abstract class Dialog extends DataResourceConsumer {
 	public void setActualPosition2s(ChoisePoint iX, Term a1, Term a2) {
 		ExtendedCoordinate eX= ExtendedCoordinate.argumentToExtendedCoordinate(a1,iX);
 		ExtendedCoordinate eY= ExtendedCoordinate.argumentToExtendedCoordinate(a2,iX);
-		// createGraphicWindowIfNecessary(iX,false);
 		prepareDialogIfNecessary(false,iX);
 		if (targetObject != null) {
 			targetObject.changeActualPosition(eX,eY,iX);
@@ -187,8 +174,6 @@ public abstract class Dialog extends DataResourceConsumer {
 		};
 		a1.setBacktrackableValue(new PrologReal(x),iX);
 		a2.setBacktrackableValue(new PrologReal(y),iX);
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
 	}
 	//
 	public void getPositionInPixels2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
@@ -201,8 +186,6 @@ public abstract class Dialog extends DataResourceConsumer {
 		};
 		a1.setBacktrackableValue(new PrologInteger(x),iX);
 		a2.setBacktrackableValue(new PrologInteger(y),iX);
-		//iX.pushTrail(a1);
-		//iX.pushTrail(a2);
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -372,13 +355,13 @@ public abstract class Dialog extends DataResourceConsumer {
 				DialogIdentifierOrAuto value= DialogIdentifierOrAuto.argumentToDialogIdentifierOrAuto(fieldValue,iX);
 				setIdentifier(value);
 			} else if (code==SymbolCodes.symbolCode_E_is_modal) {
-				YesNoDefault value= YesNoDefault.term2YesNoDefault(fieldValue,iX);
+				YesNoDefault value= YesNoDefault.argument2YesNoDefault(fieldValue,iX);
 				setIsModal(value);
 			} else if (code==SymbolCodes.symbolCode_E_is_top_level_window) {
-				YesNo value= YesNo.term2YesNo(fieldValue,iX);
+				YesNo value= YesNo.argument2YesNo(fieldValue,iX);
 				setIsTopLevelWindow(value);
 			} else if (code==SymbolCodes.symbolCode_E_exit_on_close) {
-				YesNoDefault value= YesNoDefault.term2YesNoDefault(fieldValue,iX);
+				YesNoDefault value= YesNoDefault.argument2YesNoDefault(fieldValue,iX);
 				setExitOnClose(value);
 			} else {
 				prepareDialogIfNecessary(false,iX);
@@ -499,8 +482,10 @@ public abstract class Dialog extends DataResourceConsumer {
 	public void modifiedControl1s(ChoisePoint iX, Term actionName) {
 	}
 	//
+	public void completeEditing1s(ChoisePoint iX, Term actionName) {
+	}
+	//
 	public class Action1s extends Continuation {
-		// private Continuation c0;
 		//
 		public Action1s(Continuation aC) {
 			c0= aC;
@@ -604,7 +589,6 @@ public abstract class Dialog extends DataResourceConsumer {
 		}
 	}
 	public class DataRequest extends Continuation {
-		// private Continuation c0;
 		protected PrologVariable argumentResult;
 		protected Term tableName;
 		protected boolean isFunctionCall;
@@ -616,7 +600,6 @@ public abstract class Dialog extends DataResourceConsumer {
 		//
 		public void execute(ChoisePoint iX) throws Backtracking {
 			throw Backtracking.instance;
-			// c0.execute(iX);
 		}
 	}
 }

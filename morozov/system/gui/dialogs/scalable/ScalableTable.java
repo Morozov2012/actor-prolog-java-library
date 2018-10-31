@@ -13,14 +13,13 @@ package morozov.system.gui.dialogs.scalable;
 */
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 
-import java.awt.Font;
 import java.util.ArrayList;
 
 public class ScalableTable extends ActiveComponent {
@@ -46,7 +45,7 @@ public class ScalableTable extends ActiveComponent {
 		} else {
 			ArrayList<Term> items= DialogUtils.tableToTermArray(value,iX);
 			if (enableMultiselection) {
-				return Converters.arrayListToTerm(items);
+				return GeneralConverters.arrayListToTerm(items);
 			} else {
 				if (items.size() >= 1) {
 					return new PrologList(items.get(items.size()-1),PrologEmptyList.instance);
@@ -63,7 +62,7 @@ public class ScalableTable extends ActiveComponent {
 			return value.dereferenceValue(iX);
 		} catch (TermIsNotAString e1) {
 			ArrayList<ArrayList<String>> items= DialogUtils.tableToStringArray(value,iX);
-			return Converters.stringArrayToListOfList(items);
+			return GeneralConverters.stringArrayToListOfList(items);
 		}
 	}
 	//

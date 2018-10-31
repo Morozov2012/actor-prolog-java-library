@@ -6,10 +6,6 @@ import morozov.system.vision.vpm.*;
 import morozov.system.vision.vpm.commands.*;
 import morozov.system.vision.vpm.converters.*;
 
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.math.BigInteger;
-
 public class VPMblbFillBlobs extends VPM_FrameCommand {
 	//
 	public VPMblbFillBlobs() {

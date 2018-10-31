@@ -2,19 +2,12 @@
 
 package morozov.built_in;
 
-import edu.ufl.digitalworlds.j4k.J4KSDK;
-
-import target.*;
-
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.kinect.*;
-import morozov.system.kinect.converters.*;
 import morozov.system.kinect.converters.interfaces.*;
 import morozov.system.kinect.errors.*;
-import morozov.system.kinect.frames.*;
 import morozov.system.kinect.frames.interfaces.*;
-import morozov.system.kinect.frames.tools.*;
 import morozov.system.kinect.interfaces.*;
 import morozov.system.kinect.modes.*;
 import morozov.system.kinect.modes.converters.*;
@@ -50,16 +43,16 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	abstract protected Term getBuiltInSlot_E_skeleton_release_time();
-	abstract protected Term getBuiltInSlot_E_horizontal_correction();
-	abstract protected Term getBuiltInSlot_E_vertical_correction();
+	abstract public Term getBuiltInSlot_E_skeleton_release_time();
+	abstract public Term getBuiltInSlot_E_horizontal_correction();
+	abstract public Term getBuiltInSlot_E_vertical_correction();
 	//
 	///////////////////////////////////////////////////////////////
 	//
 	// get/set skeleton_release_time
 	//
 	public void setSkeletonReleaseTime1s(ChoisePoint iX, Term a1) {
-		setSkeletonReleaseTime(Converters.argumentToSmallInteger(a1,iX));
+		setSkeletonReleaseTime(GeneralConverters.argumentToSmallInteger(a1,iX));
 	}
 	public void setSkeletonReleaseTime(int value) {
 		skeletonReleaseTime= value;
@@ -75,7 +68,7 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 			return skeletonReleaseTime;
 		} else {
 			Term value= getBuiltInSlot_E_skeleton_release_time();
-			return Converters.argumentToSmallInteger(value,iX);
+			return GeneralConverters.argumentToSmallInteger(value,iX);
 		}
 	}
 	//

@@ -11,6 +11,7 @@ import java.nio.charset.CharsetEncoder;
 import java.util.HashSet;
 
 public class DomainRealConstant extends DomainAlternative {
+	//
 	protected double constantValue;
 	//
 	public DomainRealConstant(double value) {

@@ -4,7 +4,6 @@ package morozov.syntax.scanner;
 
 import target.*;
 
-import morozov.system.*;
 import morozov.terms.*;
 
 public class TokenKeyword extends TokenSymbol {

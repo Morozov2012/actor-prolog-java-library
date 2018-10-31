@@ -4,7 +4,7 @@ package morozov.system.kinect.frames.data.converters;
 
 import target.*;
 
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.kinect.frames.data.converters.errors.*;
 import morozov.system.kinect.frames.data.converters.signals.*;
 import morozov.system.kinect.frames.data.interfaces.*;
@@ -13,19 +13,11 @@ import morozov.system.kinect.modes.*;
 import morozov.system.kinect.modes.interfaces.*;
 import morozov.terms.*;
 
-import java.awt.Graphics2D;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.Locale;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 public class DimensionsConverters {
 	//
 	public static Term skeletonsAndDimensionsToTerm(GeneralSkeletonInterface[] skeletons, DimensionsInterface dimensions, KinectDisplayingModeInterface displayingMode) {
 		Term[] arrayOfSkeletons= skeletonsAndDimensionsToArray(skeletons,dimensions,displayingMode);
-		return Converters.sparseArrayToList(arrayOfSkeletons);
+		return GeneralConverters.sparseArrayToList(arrayOfSkeletons);
 	}
 	//
 	public static Term[] skeletonsAndDimensionsToArray(GeneralSkeletonInterface[] skeletons, DimensionsInterface dimensions, KinectDisplayingModeInterface displayingMode) {

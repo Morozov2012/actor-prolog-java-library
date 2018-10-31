@@ -6,7 +6,7 @@ import target.*;
 
 import morozov.syntax.errors.*;
 import morozov.syntax.scanner.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.datum.*;
 import morozov.terms.*;
 import morozov.worlds.*;
@@ -233,6 +233,27 @@ public class Parser {
 						return new TermPosition(result,beginningOfTerm);
 					}
 				}
+			} else if (frontTokenType==PrologTokenType.BINARY) {
+				if (position + 1 < numberOfTokens && tokens[position+1].getType()==PrologTokenType.L_BRACE) {
+					position= position + 2;
+					ArrayList<NamedTerm> arguments= new ArrayList<NamedTerm>();
+					// arguments.add(new NamedTerm(0,new PrologString(frontToken.getStringValue())));
+					Term result= new PrologBinary(frontToken.getBinaryValue());
+					if (rememberTextPositions) {
+						result= new TermPosition(result,beginningOfTerm);
+					};
+					arguments.add(new NamedTerm(0,result,beginningOfTerm));
+					return parseUnderdeterminedSet(arguments,beginningOfTerm);
+				} else {
+					position++;
+					// return new PrologString(frontToken.getStringValue());
+					Term result= new PrologBinary(frontToken.getBinaryValue());
+					if (!rememberTextPositions) {
+						return result;
+					} else {
+						return new TermPosition(result,beginningOfTerm);
+					}
+				}
 			} else if (frontTokenType==PrologTokenType.NUMBER_SIGN) {
 				if (position + 1 < numberOfTokens && tokens[position+1].getType()==PrologTokenType.L_BRACE) {
 					position= position + 2;
@@ -298,7 +319,7 @@ public class Parser {
 					if (closingToken.getType()==PrologTokenType.R_ROUND_BRACKET) {
 						position= position + 3;
 						String symbolText= SymbolNames.retrieveSymbolName(symbolCode).toRawString(null);
-						byte[] byteArray= Converters.string2ByteArray(symbolText);
+						byte[] byteArray= GeneralConverters.string2ByteArray(symbolText);
 						Term result;
 						InputStream inputStream= new ByteArrayInputStream(byteArray);
 						try {

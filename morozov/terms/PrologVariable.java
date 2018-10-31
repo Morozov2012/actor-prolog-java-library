@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 
 public class PrologVariable extends Term {
-	// public Term value;
+	//
 	private Term value;
 	//
 	///////////////////////////////////////////////////////////////
@@ -60,6 +60,13 @@ public class PrologVariable extends Term {
 	public boolean isEqualToString(String v2) {
 		if (value != null) {
 			return value.isEqualToString(v2);
+		} else {
+			throw new FreeVariableCannotBeCompared();
+		}
+	}
+	public boolean isEqualToBinary(byte[] v2) {
+		if (value != null) {
+			return value.isEqualToBinary(v2);
 		} else {
 			throw new FreeVariableCannotBeCompared();
 		}
@@ -148,6 +155,13 @@ public class PrologVariable extends Term {
 			throw new FreeVariableCannotBeCompared();
 		}
 	}
+	public int compareWithBinary(byte[] v2) {
+		if (value != null) {
+			return value.compareWithBinary(v2);
+		} else {
+			throw new FreeVariableCannotBeCompared();
+		}
+	}
 	public int compareWithSymbol(long v2) {
 		if (value != null) {
 			return value.compareWithSymbol(v2);
@@ -214,6 +228,14 @@ public class PrologVariable extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public void isInteger(PrologInteger v, ChoisePoint cp) throws Backtracking {
+		if (value != null) {
+			value.isInteger(v,cp);
+		} else {
+			value= v;
+			cp.pushTrail(this);
+		}
+	}
 	public void isInteger(int v, ChoisePoint cp) throws Backtracking {
 		if (value != null) {
 			value.isInteger(v,cp);
@@ -230,11 +252,27 @@ public class PrologVariable extends Term {
 			cp.pushTrail(this);
 		}
 	}
+	public void isReal(PrologReal v, ChoisePoint cp) throws Backtracking {
+		if (value != null) {
+			value.isReal(v,cp);
+		} else {
+			value= v;
+			cp.pushTrail(this);
+		}
+	}
 	public void isReal(double v, ChoisePoint cp) throws Backtracking {
 		if (value != null) {
 			value.isReal(v,cp);
 		} else {
 			value= new PrologReal(v);
+			cp.pushTrail(this);
+		}
+	}
+	public void isSymbol(PrologSymbol v, ChoisePoint cp) throws Backtracking {
+		if (value != null) {
+			value.isSymbol(v,cp);
+		} else {
+			value= v;
 			cp.pushTrail(this);
 		}
 	}
@@ -246,11 +284,35 @@ public class PrologVariable extends Term {
 			cp.pushTrail(this);
 		}
 	}
+	public void isString(PrologString v, ChoisePoint cp) throws Backtracking {
+		if (value != null) {
+			value.isString(v,cp);
+		} else {
+			value= v;
+			cp.pushTrail(this);
+		}
+	}
 	public void isString(String v, ChoisePoint cp) throws Backtracking {
 		if (value != null) {
 			value.isString(v,cp);
 		} else {
 			value= new PrologString(v);
+			cp.pushTrail(this);
+		}
+	}
+	public void isBinary(PrologBinary v, ChoisePoint cp) throws Backtracking {
+		if (value != null) {
+			value.isBinary(v,cp);
+		} else {
+			value= v;
+			cp.pushTrail(this);
+		}
+	}
+	public void isBinary(byte[] v, ChoisePoint cp) throws Backtracking {
+		if (value != null) {
+			value.isBinary(v,cp);
+		} else {
+			value= new PrologBinary(v);
 			cp.pushTrail(this);
 		}
 	}
@@ -391,6 +453,13 @@ public class PrologVariable extends Term {
 	public String getStringValue(ChoisePoint cp) throws TermIsNotAString {
 		if (value != null) {
 			return value.getStringValue(cp);
+		} else {
+			throw new WrongArgumentIsNotBoundVariable(this);
+		}
+	}
+	public byte[] getBinaryValue(ChoisePoint cp) throws TermIsNotABinary {
+		if (value != null) {
+			return value.getBinaryValue(cp);
 		} else {
 			throw new WrongArgumentIsNotBoundVariable(this);
 		}
@@ -900,6 +969,13 @@ public class PrologVariable extends Term {
 			throw new WrongArgumentIsNotBoundVariable(this);
 		}
 	}
+	public void compareWithBinary(byte[] a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		if (value != null) {
+			value.compareWithBinary(a,iX,op);
+		} else {
+			throw new WrongArgumentIsNotBoundVariable(this);
+		}
+	}
 	public void compareWithDate(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		if (value != null) {
 			value.compareWithDate(a,iX,op);
@@ -938,6 +1014,13 @@ public class PrologVariable extends Term {
 	public void compareStringWith(String a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		if (value != null) {
 			value.compareStringWith(a,iX,op);
+		} else {
+			throw new WrongArgumentIsNotBoundVariable(this);
+		}
+	}
+	public void compareBinaryWith(byte[] a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
+		if (value != null) {
+			value.compareBinaryWith(a,iX,op);
 		} else {
 			throw new WrongArgumentIsNotBoundVariable(this);
 		}
@@ -994,6 +1077,13 @@ public class PrologVariable extends Term {
 			throw new WrongArgumentIsNotBoundVariable(this);
 		}
 	}
+	public Term reactWithBinary(byte[] a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.reactWithBinary(a,iX,op);
+		} else {
+			throw new WrongArgumentIsNotBoundVariable(this);
+		}
+	}
 	public Term reactWithDate(long a, ChoisePoint iX, BinaryOperation op) {
 		if (value != null) {
 			return value.reactWithDate(a,iX,op);
@@ -1032,6 +1122,13 @@ public class PrologVariable extends Term {
 	public Term reactStringWith(String a, ChoisePoint iX, BinaryOperation op) {
 		if (value != null) {
 			return value.reactStringWith(a,iX,op);
+		} else {
+			throw new WrongArgumentIsNotBoundVariable(this);
+		}
+	}
+	public Term reactBinaryWith(byte[] a, ChoisePoint iX, BinaryOperation op) {
+		if (value != null) {
+			return value.reactBinaryWith(a,iX,op);
 		} else {
 			throw new WrongArgumentIsNotBoundVariable(this);
 		}

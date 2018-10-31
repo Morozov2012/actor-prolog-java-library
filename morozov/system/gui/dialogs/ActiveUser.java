@@ -43,7 +43,7 @@ public class ActiveUser extends ActiveWorld {
 	public void startProcesses() {
 		start();
 	}
-	public void closeFiles() {
+	public void releaseSystemResources() {
 	}
 	public void stopProcesses() {
 		stop();
@@ -91,8 +91,8 @@ public class ActiveUser extends ActiveWorld {
 	//
 	// Receiving User Interface Messages
 	//
-	public void receiveUserInterfaceMessage(DialogEntry entry, boolean sendFlowMessage,DialogEventType isControlModificationEvent) {
-		synchronized(userInterfaceMessages) {
+	public void receiveUserInterfaceMessage(DialogEntry entry, boolean sendFlowMessage, DialogEventType isControlModificationEvent) {
+		synchronized (userInterfaceMessages) {
 			userInterfaceMessages.add(new DialogEvent(entry,sendFlowMessage,isControlModificationEvent));
 		};
 		wakeUp();
@@ -224,7 +224,7 @@ public class ActiveUser extends ActiveWorld {
 	}
 	protected void quicklyAcceptTimerMessage() {
 		DialogEvent[] messagesToBeProcessed= new DialogEvent[0];
-		synchronized(userInterfaceMessages) {
+		synchronized (userInterfaceMessages) {
 			if (userInterfaceMessages.size() > 0) {
 				messagesToBeProcessed= userInterfaceMessages.toArray(messagesToBeProcessed);
 				userInterfaceMessages.clear();

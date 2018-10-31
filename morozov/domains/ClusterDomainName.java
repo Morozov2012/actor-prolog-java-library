@@ -7,6 +7,7 @@ import morozov.system.*;
 import java.nio.charset.CharsetEncoder;
 
 public class ClusterDomainName extends PrologDomainName {
+	//
 	protected long cluster;
 	protected String name;
 	//

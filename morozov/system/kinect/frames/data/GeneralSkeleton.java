@@ -35,6 +35,12 @@ public class GeneralSkeleton implements GeneralSkeletonInterface, Serializable {
 	//
 	protected KinectFrameBaseAttributesInterface baseAttributes;
 	//
+	private static final long serialVersionUID= 0x418B726549CC6503L; // 4722994413583492355L;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames.data","GeneralSkeleton");
+	// }
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public GeneralSkeleton() {

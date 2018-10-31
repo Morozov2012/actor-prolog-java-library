@@ -15,7 +15,7 @@ package morozov.system.gui.dialogs.scalable;
 import target.*;
 
 import morozov.run.*;
-import morozov.system.gui.*;
+import morozov.system.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.errors.*;
 import morozov.system.signals.*;
@@ -30,15 +30,11 @@ import javax.swing.event.ListSelectionEvent;
 import java.awt.Component;
 import java.awt.Font;
 import java.awt.FontMetrics;
-import java.awt.font.TextAttribute;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Color;
 import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public abstract class ActiveComponent
 		implements
@@ -55,10 +51,14 @@ public abstract class ActiveComponent
 	protected Font colourlessFont;
 	protected Color textColor;
 	protected Color spaceColor;
+	protected Color backgroundColor;
 	//
 	protected Color individualTextColor;
 	protected Color individualSpaceColor;
 	protected Color individualBackgroundColor;
+	//
+	protected Color supervisoryTextColor;
+	protected Color supervisoryBackgroundColor;
 	//
 	protected GridBagLayout gridBagLayout;
 	protected boolean isTop= false;
@@ -187,9 +187,18 @@ public abstract class ActiveComponent
 	///////////////////////////////////////////////////////////////
 	//
 	public void setGeneralFont(Font font) {
+		if (font==null) {
+			return;
+		};
 		colourlessFont= font;
 		if (component != null) {
-			font= DialogUtils.refineTextAndSpaceColors(font,individualSpaceColor,spaceColor,individualTextColor,textColor);
+			font= DialogUtils.refineTextAndSpaceColors(
+				font,
+				individualSpaceColor,
+				spaceColor,
+				supervisoryTextColor,
+				individualTextColor,
+				textColor);
 			if (gridBagLayout != null) {
 				GridBagConstraints gBC= gridBagLayout.getConstraints(component);
 				FontMetrics metrics= component.getFontMetrics(font);
@@ -222,16 +231,21 @@ public abstract class ActiveComponent
 			component.invalidate();
 		}
 	}
+	public void resetGeneralFont() {
+		setGeneralFont(colourlessFont);
+	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
 	public void setGeneralForeground(Color c) {
 		textColor= c;
 		if (component != null) {
-			if (individualTextColor==null) {
-				setForeground(c);
-			} else {
+			if (supervisoryTextColor != null) {
+				setForeground(supervisoryTextColor);
+			} else if (individualTextColor != null) {
 				setForeground(individualTextColor);
+			} else {
+				setForeground(c);
 			};
 			if (colourlessFont==null) {
 				colourlessFont= component.getFont();
@@ -249,11 +263,25 @@ public abstract class ActiveComponent
 		}
 	}
 	public void setGeneralBackground(Color c) {
+		backgroundColor= c;
 		if (component != null) {
-			if (individualBackgroundColor==null) {
-				setBackground(c);
-			} else {
+			if (supervisoryBackgroundColor != null) {
+				setBackground(supervisoryBackgroundColor);
+			} else if (individualBackgroundColor != null) {
 				setBackground(individualBackgroundColor);
+			} else {
+				setBackground(c);
+			}
+		}
+	}
+	public void resetGeneralBackground() {
+		if (component != null) {
+			if (supervisoryBackgroundColor != null) {
+				setBackground(supervisoryBackgroundColor);
+			} else if (individualBackgroundColor != null) {
+				setBackground(individualBackgroundColor);
+			} else {
+				setBackground(backgroundColor);
 			}
 		}
 	}
@@ -303,6 +331,15 @@ public abstract class ActiveComponent
 			individualBackgroundColor= null;
 			setBackground(null);
 		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void setSupervisoryTextColor(Color value) {
+		supervisoryTextColor= value;
+	}
+	public void setSupervisoryBackgroundColor(Color value) {
+		supervisoryBackgroundColor= value;
 	}
 	//
 	///////////////////////////////////////////////////////////////

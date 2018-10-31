@@ -2,6 +2,7 @@
 
 package morozov.system;
 
+import morozov.system.converters.*;
 import morozov.system.errors.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
@@ -128,6 +129,22 @@ public enum UnaryOperation {
 			return new PrologReal(StrictMath.tan(n1));
 		}
 	},
+	ARCSIN {
+		public Term eval(BigInteger n1) {
+			return new PrologReal(StrictMath.asin(n1.doubleValue()));
+		}
+		public Term eval(double n1) {
+			return new PrologReal(StrictMath.asin(n1));
+		}
+	},
+	ARCCOS {
+		public Term eval(BigInteger n1) {
+			return new PrologReal(StrictMath.acos(n1.doubleValue()));
+		}
+		public Term eval(double n1) {
+			return new PrologReal(StrictMath.acos(n1));
+		}
+	},
 	ARCTAN {
 		public Term eval(BigInteger n1) {
 			return new PrologReal(StrictMath.atan(n1.doubleValue()));
@@ -150,7 +167,7 @@ public enum UnaryOperation {
 		}
 		public Term eval(double n1) {
 			try {
-				BigInteger value= Converters.doubleToBigInteger(n1);
+				BigInteger value= GeneralConverters.doubleToBigInteger(n1);
 				return new PrologInteger(value.not());
 			} catch (TermIsNotAReal e) {
 				throw new WrongArgumentIsNotNumerical(new PrologReal(n1));

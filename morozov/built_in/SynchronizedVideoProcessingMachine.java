@@ -4,6 +4,7 @@ package morozov.built_in;
 
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.space2d.*;
 import morozov.system.vision.vpm.*;
 import morozov.system.vision.vpm.errors.*;
@@ -105,7 +106,7 @@ public abstract class SynchronizedVideoProcessingMachine
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		long frameNumber;
 		if (a2 != null) {
-			frameNumber= PrologInteger.toLong(Converters.argumentToRoundInteger(a2,iX));
+			frameNumber= PrologInteger.toLong(GeneralConverters.argumentToRoundInteger(a2,iX));
 		} else {
 			recentFrameNumber++;
 			frameNumber= recentFrameNumber;
@@ -117,7 +118,7 @@ public abstract class SynchronizedVideoProcessingMachine
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		long timeInMilliseconds;
 		if (a2 != null) {
-			timeInMilliseconds= PrologInteger.toLong(Converters.argumentToRoundInteger(a2,iX));
+			timeInMilliseconds= PrologInteger.toLong(GeneralConverters.argumentToRoundInteger(a2,iX));
 		} else {
 			Calendar calendar= Calendar.getInstance();
 			timeInMilliseconds= calendar.getTimeInMillis();
@@ -176,6 +177,15 @@ public abstract class SynchronizedVideoProcessingMachine
 		return vpm.getFrameNumber(iX);
 	}
 	//
+	public Term getFrameTimeOrSpacer(ChoisePoint iX) {
+		VideoProcessingMachineOperations vpm= getVideoProcessingMachine(iX);
+		return vpm.getFrameTimeOrSpacer(iX);
+	}
+	public long getFrameTime(ChoisePoint iX) {
+		VideoProcessingMachineOperations vpm= getVideoProcessingMachine(iX);
+		return vpm.getFrameTime(iX);
+	}
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public void getRecentImage(Term image, ChoisePoint iX) {
@@ -217,7 +227,7 @@ public abstract class SynchronizedVideoProcessingMachine
 	///////////////////////////////////////////////////////////////
 	//
 	public void getBackgroundImage2s(ChoisePoint iX, Term a1, Term a2) {
-		int layerNumber= Converters.argumentToSmallRoundInteger(a2,iX);
+		int layerNumber= GeneralConverters.argumentToSmallRoundInteger(a2,iX);
 		getBackgroundImage(a1,layerNumber,iX);
 	}
 	public void getBackgroundImage(Term image, int layerNumber, ChoisePoint iX) {
@@ -230,7 +240,7 @@ public abstract class SynchronizedVideoProcessingMachine
 	}
 	//
 	public void getSigmaImage2s(ChoisePoint iX, Term a1, Term a2) {
-		int layerNumber= Converters.argumentToSmallRoundInteger(a2,iX);
+		int layerNumber= GeneralConverters.argumentToSmallRoundInteger(a2,iX);
 		getSigmaImage(a1,layerNumber,iX);
 	}
 	public void getSigmaImage(Term image, int layerNumber, ChoisePoint iX) {

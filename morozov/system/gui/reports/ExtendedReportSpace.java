@@ -157,21 +157,28 @@ public class ExtendedReportSpace extends CanvasSpace implements MouseListener, A
 		popup.add(item2);
 		item_copy= item2;
 		//
-		JMenuItem item3= new JMenuItem("Select all");
+		JMenuItem item3= new JMenuItem("Select All");
 		item3.setMnemonic('E');
 		item3.setDisplayedMnemonicIndex(1);
 		item3.setActionCommand("SelectAll");
 		item3.addActionListener(listener);
 		popup.add(item3);
 		//
-		popup.addSeparator();
-		//
-		JMenuItem item4= new JMenuItem("Clear");
-		item4.setMnemonic('L');
-		item4.setDisplayedMnemonicIndex(2);
-		item4.setActionCommand("Clear");
+		JMenuItem item4= new JMenuItem("Select All & Copy");
+		item4.setMnemonic('A');
+		item4.setDisplayedMnemonicIndex(7);
+		item4.setActionCommand("SelectAllAndCopy");
 		item4.addActionListener(listener);
 		popup.add(item4);
+		//
+		popup.addSeparator();
+		//
+		JMenuItem item5= new JMenuItem("Clear");
+		item5.setMnemonic('L');
+		item5.setDisplayedMnemonicIndex(1);
+		item5.setActionCommand("Clear");
+		item5.addActionListener(listener);
+		popup.add(item5);
 		//
 		popup.addSeparator();
 		//
@@ -346,6 +353,11 @@ public class ExtendedReportSpace extends CanvasSpace implements MouseListener, A
 		} else if (name.equals("SelectAll")) {
 			if (panel != null) {
 				panel.selectAll();
+			}
+		} else if (name.equals("SelectAllAndCopy")) {
+			if (panel != null) {
+				panel.selectAll();
+				panel.copy();
 			}
 		} else if (name.equals("Clear")) {
 			if (panel != null) {

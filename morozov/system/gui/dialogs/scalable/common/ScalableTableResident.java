@@ -38,7 +38,7 @@ public class ScalableTableResident extends Resident {
 	public void initiate(Term aTarget, long signature, Term... args) {
 		// staticContext= context;
 		// output= aOutput;
-		synchronized(this) {
+		synchronized (this) {
 			previousResult= null;
 			target= aTarget;
 			domainSignature= signature;
@@ -50,27 +50,27 @@ public class ScalableTableResident extends Resident {
 	}
 	//
 	protected Term get_previous_result() {
-		synchronized(this) {
+		synchronized (this) {
 			return previousResult;
 		}
 	}
 	protected void set_previous_result(Term value) {
-		synchronized(this) {
+		synchronized (this) {
 			previousResult= value;
 		}
 	}
 	protected AbstractWorld get_target() {
-		synchronized(this) {
+		synchronized (this) {
 			return (AbstractWorld)target;
 		}
 	}
 	protected long get_domain_signature() {
-		synchronized(this) {
+		synchronized (this) {
 			return domainSignature;
 		}
 	}
 	protected Term[] get_arguments() {
-		synchronized(this) {
+		synchronized (this) {
 			return arguments;
 		}
 	}

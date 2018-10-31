@@ -16,7 +16,7 @@ public class StaticDiagramAttributes extends StaticAttributes {
 	private static StaticDiagramAttributes retrieveStaticDiagramAttributes(StaticContext context) {
 		StaticAttributes attributes= context.retrieveAttributes(staticIdentifier);
 		if (attributes==null) {
-			synchronized(context) {
+			synchronized (context) {
 				attributes= context.retrieveAttributes(staticIdentifier);
 				if (attributes==null) {
 					attributes= new StaticDiagramAttributes();
@@ -29,7 +29,7 @@ public class StaticDiagramAttributes extends StaticAttributes {
 	public static Map<String,InternalDiagramFrame> retrieveInnerWindows(StaticContext context) {
 		StaticDiagramAttributes attributes= retrieveStaticDiagramAttributes(context);
 		Map<String,InternalDiagramFrame> innerWindows;
-		synchronized(attributes) {
+		synchronized (attributes) {
 			innerWindows= attributes.innerWindows;
 		};
 		return innerWindows;

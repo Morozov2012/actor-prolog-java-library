@@ -2,20 +2,14 @@
 
 package morozov.system.ffmpeg;
 
-//import static org.bytedeco.javacpp.avformat.*;
 import static org.bytedeco.javacpp.avutil.*;
 import static org.bytedeco.javacpp.avcodec.*;
-//import static org.bytedeco.javacpp.swscale.*;
 import org.bytedeco.javacpp.*;
 
 import target.*;
 
-//import morozov.built_in.*;
 import morozov.run.*;
-import morozov.system.*;
-//import morozov.system.checker.signals.*;
-//import morozov.system.files.*;
-//import morozov.system.files.errors.*;
+import morozov.system.converters.*;
 import morozov.system.ffmpeg.converters.*;
 import morozov.system.ffmpeg.errors.*;
 import morozov.terms.*;
@@ -115,6 +109,7 @@ public class FFmpegStreamDefinition {
 	protected Integer nbSamples;
 	//
 	protected static FFmpegMediaType defaultCodecType= new FFmpegMediaType(FFmpegMediaTypeName.AVMEDIA_TYPE_VIDEO);
+	protected static FFmpegStreamDefinition[] defaultStreamDefinitionList= new FFmpegStreamDefinition[]{new FFmpegStreamDefinition()};
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -1026,7 +1021,7 @@ public class FFmpegStreamDefinition {
 				}
 			}
 		} else {
-			return new FFmpegStreamDefinition[]{new FFmpegStreamDefinition()};
+			return defaultStreamDefinitionList;
 		}
 	}
 	//
@@ -1149,53 +1144,53 @@ public class FFmpegStreamDefinition {
 				if (pairName==SymbolCodes.symbolCode_E_codec_type) {
 					givenCodecType= FFmpegMediaType.argumentToFFmpegMediaType(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_codec_id) {
-					givenCodecId= Converters.argumentToSmallInteger(pairValue,iX);
+					givenCodecId= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_codec_tag) {
-					givenCodecTag= Converters.argumentToSmallInteger(pairValue,iX);
+					givenCodecTag= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_bit_rate) {
-					givenBitRate= Converters.argumentToSmallInteger(pairValue,iX);
+					givenBitRate= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				// } else if (pairName==SymbolCodes.symbolCode_E_codec_options) {
 				//	givenCodecOptions= FFmpegCodecOption.argumentToCodecOptions(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_bit_rate_tolerance) {
-					givenBitRateTolerance= Converters.argumentToSmallInteger(pairValue,iX);
+					givenBitRateTolerance= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_global_quality) {
-					givenGlobalQuality= Converters.argumentToSmallInteger(pairValue,iX);
+					givenGlobalQuality= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_compression_level) {
-					givenCompressionLevel= Converters.argumentToSmallInteger(pairValue,iX);
+					givenCompressionLevel= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_time_base) {
 					givenTimeBase= FFmpegTools.argumentToAVRational(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_source_image_width) {
-					givenSourceImageWidth= Converters.argumentToSmallInteger(pairValue,iX);
+					givenSourceImageWidth= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_source_image_height) {
-					givenSourceImageHeight= Converters.argumentToSmallInteger(pairValue,iX);
+					givenSourceImageHeight= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_destination_image_width) {
-					givenDestinationImageWidth= Converters.argumentToSmallInteger(pairValue,iX);
+					givenDestinationImageWidth= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_destination_image_height) {
-					givenDestinationImageHeight= Converters.argumentToSmallInteger(pairValue,iX);
+					givenDestinationImageHeight= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_gop_size) {
-					givenGopSize= Converters.argumentToSmallInteger(pairValue,iX);
+					givenGopSize= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_pix_fmt) {
 					givenPixFmt= FFmpegPixelFormat.argumentToFFmpegPixelFormat(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_max_b_frames) {
-					givenMaxBFrames= Converters.argumentToSmallInteger(pairValue,iX);
+					givenMaxBFrames= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_b_quant_factor) {
-					givenBQuantFactor= Converters.argumentToReal(pairValue,iX);
+					givenBQuantFactor= GeneralConverters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_b_quant_offset) {
-					givenBQuantOffset= Converters.argumentToReal(pairValue,iX);
+					givenBQuantOffset= GeneralConverters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_i_quant_factor) {
-					givenIQuantFactor= Converters.argumentToReal(pairValue,iX);
+					givenIQuantFactor= GeneralConverters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_i_quant_offset) {
-					givenIQuantOffset= Converters.argumentToReal(pairValue,iX);
+					givenIQuantOffset= GeneralConverters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_lumi_masking) {
-					givenLumiMasking= Converters.argumentToReal(pairValue,iX);
+					givenLumiMasking= GeneralConverters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_temporal_cplx_masking) {
-					givenTemporalCplxMasking= Converters.argumentToReal(pairValue,iX);
+					givenTemporalCplxMasking= GeneralConverters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_spatial_cplx_masking) {
-					givenSpatialCplxMasking= Converters.argumentToReal(pairValue,iX);
+					givenSpatialCplxMasking= GeneralConverters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_p_masking) {
-					givenPMasking= Converters.argumentToReal(pairValue,iX);
+					givenPMasking= GeneralConverters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_dark_masking) {
-					givenDarkMasking= Converters.argumentToReal(pairValue,iX);
+					givenDarkMasking= GeneralConverters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_sample_aspect_ratio) {
 					givenSampleAspectRatio= FFmpegTools.argumentToAVRational(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_me_cmp) {
@@ -1207,85 +1202,85 @@ public class FFmpegStreamDefinition {
 				} else if (pairName==SymbolCodes.symbolCode_E_ildct_cmp) {
 					givenIldctCmp= FFmpegComparisonFunction.argumentToFFmpegComparisonFunction(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_dia_size) {
-					givenDiaSize= Converters.argumentToSmallInteger(pairValue,iX);
+					givenDiaSize= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_last_predictor_count) {
-					givenLastPredictorCount= Converters.argumentToSmallInteger(pairValue,iX);
+					givenLastPredictorCount= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_me_pre_cmp) {
 					givenMePreCmp= FFmpegComparisonFunction.argumentToFFmpegComparisonFunction(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_pre_dia_size) {
-					givenPreDiaSize= Converters.argumentToSmallInteger(pairValue,iX);
+					givenPreDiaSize= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_me_subpel_quality) {
-					givenMeSubpelQuality= Converters.argumentToSmallInteger(pairValue,iX);
+					givenMeSubpelQuality= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_me_range) {
-					givenMeRange= Converters.argumentToSmallInteger(pairValue,iX);
+					givenMeRange= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_mb_decision) {
 					givenMbDecision= FFmpegMacroblockDecisionMode.argumentToFFmpegMacroblockDecisionMode(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_intra_dc_precision) {
-					givenIntraDcPrecision= Converters.argumentToSmallInteger(pairValue,iX);
+					givenIntraDcPrecision= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_mb_lmin) {
-					givenMbLMin= Converters.argumentToSmallInteger(pairValue,iX);
+					givenMbLMin= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_mb_lmax) {
-					givenMbLMax= Converters.argumentToSmallInteger(pairValue,iX);
+					givenMbLMax= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_bidir_refine) {
-					givenBidirRefine= Converters.argumentToSmallInteger(pairValue,iX);
+					givenBidirRefine= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_keyint_min) {
-					givenKeyintMin= Converters.argumentToSmallInteger(pairValue,iX);
+					givenKeyintMin= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_refs) {
-					givenRefs= Converters.argumentToSmallInteger(pairValue,iX);
+					givenRefs= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_mv0_threshold) {
-					givenMv0Threshold= Converters.argumentToSmallInteger(pairValue,iX);
+					givenMv0Threshold= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_color_primaries) {
-					givenColorPrimaries= Converters.argumentToSmallInteger(pairValue,iX);
+					givenColorPrimaries= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_color_trc) {
-					givenColorTrc= Converters.argumentToSmallInteger(pairValue,iX);
+					givenColorTrc= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_colorspace) {
-					givenColorspace= Converters.argumentToSmallInteger(pairValue,iX);
+					givenColorspace= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_color_range) {
-					givenColorRange= Converters.argumentToSmallInteger(pairValue,iX);
+					givenColorRange= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_chroma_sample_location) {
-					givenChromaSampleLocation= Converters.argumentToSmallInteger(pairValue,iX);
+					givenChromaSampleLocation= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_slices) {
-					givenSlices= Converters.argumentToSmallInteger(pairValue,iX);
+					givenSlices= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_sample_rate) {
-					givenSampleRate= Converters.argumentToSmallInteger(pairValue,iX);
+					givenSampleRate= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_channels) {
-					givenChannels= Converters.argumentToSmallInteger(pairValue,iX);
+					givenChannels= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_sample_fmt) {
 					givenSampleFmt= FFmpegAudioSampleFormat.argumentToFFmpegAudioSampleFormat(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_cutoff) {
-					givenCutoff= Converters.argumentToSmallInteger(pairValue,iX);
+					givenCutoff= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_channel_layout) {
 					givenChannelLayout= FFmpegChannelLayout.argumentToFFmpegChannelLayout(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_audio_service_type) {
-					givenAudioServiceType= Converters.argumentToSmallInteger(pairValue,iX);
+					givenAudioServiceType= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_qcompress) {
-					givenQCompress= Converters.argumentToReal(pairValue,iX);
+					givenQCompress= GeneralConverters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_qblur) {
-					givenQBlur= Converters.argumentToReal(pairValue,iX);
+					givenQBlur= GeneralConverters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_qmin) {
-					givenQMin= Converters.argumentToSmallInteger(pairValue,iX);
+					givenQMin= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_qmax) {
-					givenQMax= Converters.argumentToSmallInteger(pairValue,iX);
+					givenQMax= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_max_qdiff) {
-					givenMaxQDiff= Converters.argumentToSmallInteger(pairValue,iX);
+					givenMaxQDiff= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_rc_buffer_size) {
-					givenRcBufferSize= Converters.argumentToSmallInteger(pairValue,iX);
+					givenRcBufferSize= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				// } else if (pairName==SymbolCodes.symbolCode_E_rc_override_count) {
-				//	givenRcOverrideCount= Converters.argumentToSmallInteger(pairValue,iX);
+				//	givenRcOverrideCount= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				// } else if (pairName==SymbolCodes.symbolCode_E_rc_override) {
-				//	givenRcOverride= Converters.argumentToSmallInteger(pairValue,iX);
+				//	givenRcOverride= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_rc_max_rate) {
-					givenRcMaxRate= Converters.argumentToSmallInteger(pairValue,iX);
+					givenRcMaxRate= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_rc_min_rate) {
-					givenRcMinRate= Converters.argumentToSmallInteger(pairValue,iX);
+					givenRcMinRate= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_rc_max_available_vbv_use) {
-					givenRcMaxAvailableVbvUse= Converters.argumentToReal(pairValue,iX);
+					givenRcMaxAvailableVbvUse= GeneralConverters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_rc_min_vbv_overflow_use) {
-					givenRcMinVbvOverflowUse= Converters.argumentToReal(pairValue,iX);
+					givenRcMinVbvOverflowUse= GeneralConverters.argumentToReal(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_rc_initial_buffer_occupancy) {
-					givenRcInitialBufferOccupancy= Converters.argumentToSmallInteger(pairValue,iX);
+					givenRcInitialBufferOccupancy= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_trellis) {
-					givenTrellis= Converters.argumentToSmallInteger(pairValue,iX);
+					givenTrellis= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_workaround_bugs) {
 					givenWorkaroundBugs= FFmpegTools.argumentToFFmpegWorkAroundBugs(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_strict_std_compliance) {
@@ -1297,15 +1292,15 @@ public class FFmpegStreamDefinition {
 				} else if (pairName==SymbolCodes.symbolCode_E_idct_algo) {
 					givenIdctAlgo= FFmpeg_IDCT_Algorithm.argumentToFFmpeg_IDCT_Algorithm(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_bits_per_raw_sample) {
-					givenBitsPerRawSample= Converters.argumentToSmallInteger(pairValue,iX);
+					givenBitsPerRawSample= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_thread_count) {
-					givenThreadCount= Converters.argumentToSmallInteger(pairValue,iX);
+					givenThreadCount= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_thread_type) {
 					givenThreadType= FFmpegThreadType.argumentToFFmpegThreadType(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_thread_safe_callbacks) {
-					givenThreadSafeCallbacks= Converters.argumentToSmallInteger(pairValue,iX);
+					givenThreadSafeCallbacks= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_nsse_weight) {
-					givenNsseWeight= Converters.argumentToSmallInteger(pairValue,iX);
+					givenNsseWeight= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_profile) {
 					givenProfile= FFmpegProfile.argumentToFFmpegProfile(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_level) {
@@ -1313,7 +1308,7 @@ public class FFmpegStreamDefinition {
 				} else if (pairName==SymbolCodes.symbolCode_E_sub_text_format) {
 					givenSubTextFormat= FFmpegSubtitleTextFormat.argumentToFFmpegSubtitleTextFormat(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_nb_samples) {
-					givenNBSamples= Converters.argumentToSmallInteger(pairValue,iX);
+					givenNBSamples= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else {
 					throw new WrongArgumentIsNotFFmpegStreamDefinitionAttribute(key);
 				}

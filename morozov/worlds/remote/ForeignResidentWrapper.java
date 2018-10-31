@@ -3,7 +3,7 @@
 package morozov.worlds.remote;
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 import morozov.worlds.*;
@@ -25,7 +25,7 @@ public class ForeignResidentWrapper extends Resident {
 	public void returnResultList(AbstractWorld world, Term list) {
                 try {
 			ExternalWorldInterface target= OwnWorldWrapper.registerWorld(world);
-			byte[] byteArray= Converters.serializeArgument(list);
+			byte[] byteArray= GeneralConverters.serializeArgument(list);
 			stub.returnResultList(target,byteArray);
 		} catch (RemoteException e) {
 			world.withdrawRequest(this);
@@ -56,7 +56,7 @@ public class ForeignResidentWrapper extends Resident {
 	//
 	public void startProcesses() {
 	}
-	public void closeFiles() {
+	public void releaseSystemResources() {
 	}
 	public void stopProcesses() {
 	}

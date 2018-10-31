@@ -26,6 +26,9 @@ public class DialogEvent {
 			case MODIFIED_CONTROL:
 				targetDialog.sendModifiedControlMessage(entry,rootCP);
 				break;
+			case COMPLETE_EDITING:
+				targetDialog.sendCompleteEditingMessage(entry,rootCP);
+				break;
 		}
 	}
 }

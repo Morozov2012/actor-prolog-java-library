@@ -15,7 +15,7 @@ package morozov.system.gui.dialogs.scalable;
 import target.*;
 
 import morozov.run.*;
-import morozov.system.gui.*;
+import morozov.system.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.errors.*;
 import morozov.system.signals.*;
@@ -24,7 +24,6 @@ import morozov.terms.*;
 import javax.swing.JPanel;
 import java.awt.Font;
 import java.awt.FontMetrics;
-import java.awt.font.TextAttribute;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Graphics;
@@ -34,8 +33,6 @@ import java.awt.Color;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.HashMap;
-import java.util.Map;
 
 public class ScalablePanel extends JPanel implements ActiveComponentInterface {
 	//
@@ -178,7 +175,13 @@ public class ScalablePanel extends JPanel implements ActiveComponentInterface {
 	//
 	public void setGeneralFont(Font font) {
 		colourlessFont= font;
-		font= DialogUtils.refineTextAndSpaceColors(font,individualSpaceColor,spaceColor,individualTextColor,textColor);
+		font= DialogUtils.refineTextAndSpaceColors(
+			font,
+			individualSpaceColor,
+			spaceColor,
+			null,
+			individualTextColor,
+			textColor);
 		if (gridBagLayout != null) {
 			GridBagConstraints gBC= gridBagLayout.getConstraints(this);
 			FontMetrics metrics= getFontMetrics(font);

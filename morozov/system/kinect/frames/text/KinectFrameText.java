@@ -17,20 +17,22 @@ public class KinectFrameText {
 		if (exportMode==ExportMode.SKELETONS) {
 			writeSkeletonsText(frame,writer,exportMode,locale);
 		} else {
-			if (frame instanceof KinectModeFrameInterface) {
-				KinectModeFrameText.writeText((KinectModeFrameInterface)frame,writer,exportMode,locale);
+			if (frame instanceof KinectColorFrameInterface) {
+				KinectColorFrameText.writeText((KinectColorFrameInterface)frame,writer,exportMode,locale);
 			} else if (frame instanceof KinectDepthFrameInterface) {
 				KinectDepthFrameText.writeText((KinectDepthFrameInterface)frame,writer,exportMode,locale);
+			} else if (frame instanceof KinectForegroundPointCloudsFrameInterface) {
+				KinectForegroundPointCloudsFrameText.writeText((KinectForegroundPointCloudsFrameInterface)frame,writer,exportMode,locale);
 			} else if (frame instanceof KinectInfraredFrameInterface) {
 				KinectInfraredFrameText.writeText((KinectInfraredFrameInterface)frame,writer,exportMode,locale);
 			} else if (frame instanceof KinectLongExposureInfraredFrameInterface) {
 				KinectLongExposureInfraredFrameText.writeText((KinectLongExposureInfraredFrameInterface)frame,writer,exportMode,locale);
 			} else if (frame instanceof KinectMappedColorFrameInterface) {
 				KinectMappedColorFrameText.writeText((KinectMappedColorFrameInterface)frame,writer,exportMode,locale);
+			} else if (frame instanceof KinectModeFrameInterface) {
+				KinectModeFrameText.writeText((KinectModeFrameInterface)frame,writer,exportMode,locale);
 			} else if (frame instanceof KinectPointCloudsFrameInterface) {
 				KinectPointCloudsFrameText.writeText((KinectPointCloudsFrameInterface)frame,writer,exportMode,locale);
-			} else if (frame instanceof KinectColorFrameInterface) {
-				KinectColorFrameText.writeText((KinectColorFrameInterface)frame,writer,exportMode,locale);
 			} else {
 				writeRootFrameText(frame,writer,exportMode,locale);
 			}

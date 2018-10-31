@@ -43,9 +43,12 @@ public class LexicalScanner {
 	///////////////////////////////////////////////////////////////
 	//
 	public PrologToken[] analyse(String text) {
-		return analyse(text,false);
+		return analyse(text,false,false);
 	}
 	public PrologToken[] analyse(String text, boolean extractFrontTokenOnly) {
+		return analyse(text,extractFrontTokenOnly,false);
+	}
+	public PrologToken[] analyse(String text, boolean extractFrontTokenOnly, boolean recognizeEndOfLine) {
 		position= 0;
 		boolean processSupplementaryCharacter= false;
 		braceLevel= 0;
@@ -92,7 +95,11 @@ public class LexicalScanner {
 			// is_special_code_letter('r',"\13"). +
 			// if (c == ' ' || c == '\t' || c == '\n' || c == '\r' || c == '\f' || c == '\b' || c == 11) {
 			// if (c == ' ' || ( c >= 8 && c <= 13)) {
-			if (Character.isWhitespace(code) || Character.isSpaceChar(code) || Character.isISOControl(code)) {
+			if (code == '\n') {
+				if (recognizeEndOfLine) {
+					tokens.add(new TokenPlain(PrologTokenType.END_OF_LINE,tokenPosition));
+				}
+			} else if (Character.isWhitespace(code) || Character.isSpaceChar(code) || Character.isISOControl(code)) {
 				// Skip white space.
 			} else if (code == '`') {
 				tokenPosition= position;
@@ -1478,6 +1485,152 @@ if (reservedNameHash != null) {
 			//		(c >= 'ê' && c <= 'ü') ||	// DOS coding
 			//		(c == '') ||			// DOS coding
 			//		(c == '_') ) {
+			} else if (code == '~') {
+// ====================================================================
+// === Binary                                                       ===
+// ====================================================================
+int numberOfDigits= 0;
+boolean afterDigit= false;
+int temporaryPosition= position;
+while (true) { // Loop: Scan extended number
+	if (Character.isDigit(code)) {
+		numberOfDigits++;
+		afterDigit= true;
+	} else if (code >= 'a' && code <= 'f') {
+		numberOfDigits++;
+		afterDigit= true;
+	} else if (code >= 'A' && code <= 'F') {
+		numberOfDigits++;
+		afterDigit= true;
+	} else if (code == '_') {
+		if (afterDigit) {
+			afterDigit= false;
+		} else {
+			if (robustMode) {
+				throw TokenIsNotRecognized.instance;
+			} else {
+				throw new UnderscoreCharacterIsNotAllowedHere(temporaryPosition);
+			}
+		}
+	} else {
+		if (afterDigit) {
+			break;
+		} else {
+			if (robustMode) {
+				throw TokenIsNotRecognized.instance;
+			} else {
+				throw new ExtendedDigitExpected(temporaryPosition);
+			}
+		}
+	};
+	if (processSupplementaryCharacter) {
+		temporaryPosition= temporaryPosition + 2;
+	} else {
+		temporaryPosition++;
+	};
+	if (temporaryPosition >= textLength) {
+		if (robustMode) {
+			throw TokenIsNotRecognized.instance;
+		} else {
+			throw new UnexpectedEndOfText(tokenPosition);
+		}
+	} else {
+		c1= characters[temporaryPosition];
+		if (	(temporaryPosition + 1 <= textLength - 1) &&
+			Character.isSurrogatePair(c1,characters[temporaryPosition+1])) {
+			c2= characters[temporaryPosition+1];
+			code= Character.toCodePoint(c1,c2);
+			processSupplementaryCharacter= true;
+		} else {
+			c2= 0;
+			code= c1;
+			processSupplementaryCharacter= false;
+		}
+	}
+};
+if ((numberOfDigits % 2) != 0) {
+	if (robustMode) {
+		throw TokenIsNotRecognized.instance;
+	} else {
+		throw new BinaryMustContainEvenNumberOfDigits(tokenPosition);
+	}
+};
+int arrayLength= numberOfDigits / 2;
+byte[] byteArray= new byte[arrayLength];
+int firstDigit= 0;
+boolean isSecondDigit= false;
+int index= -1;
+afterDigit= false;
+while (true) { // Loop: Scan extended number
+	int value= 0;
+	if (Character.isDigit(code)) {
+		value= code - '0';
+		afterDigit= true;
+	} else if (code >= 'a' && code <= 'f') {
+		value= code - 'a' + 10;
+		afterDigit= true;
+	} else if (code >= 'A' && code <= 'F') {
+		value= code - 'A' + 10;
+		afterDigit= true;
+	} else if (code == '_') {
+		if (afterDigit) {
+			afterDigit= false;
+		} else {
+			if (robustMode) {
+				throw TokenIsNotRecognized.instance;
+			} else {
+				throw new UnderscoreCharacterIsNotAllowedHere(position);
+			}
+		}
+	} else {
+		if (afterDigit) {
+			break;
+		} else {
+			if (robustMode) {
+				throw TokenIsNotRecognized.instance;
+			} else {
+				throw new ExtendedDigitExpected(position);
+			}
+		}
+	};
+	if (afterDigit) {
+		if (isSecondDigit) {
+			int element= firstDigit << 4 | value;
+			index++;
+			byteArray[index]= (byte)element;
+			isSecondDigit= false;
+		} else {
+			firstDigit= value;
+			isSecondDigit= true;
+		}
+	};
+	if (processSupplementaryCharacter) {
+		position= position + 2;
+	} else {
+		position++;
+	};
+	if (position >= textLength) {
+		if (robustMode) {
+			throw TokenIsNotRecognized.instance;
+		} else {
+			throw new UnexpectedEndOfText(tokenPosition);
+		}
+	} else {
+		c1= characters[position];
+		if (	(position + 1 <= textLength - 1) &&
+			Character.isSurrogatePair(c1,characters[position+1])) {
+			c2= characters[position+1];
+			code= Character.toCodePoint(c1,c2);
+			processSupplementaryCharacter= true;
+		} else {
+			c2= 0;
+			code= c1;
+			processSupplementaryCharacter= false;
+		}
+	}
+}; // End of loop: Scan binary
+// ====================================================================
+				tokens.add(new TokenBinary(byteArray,tokenPosition));
 			} else if (	(Character.isLetter(code) && (Character.isUpperCase(code) || Character.isTitleCase(code))) ||
 					code == '_') {
 				tokenPosition= position;

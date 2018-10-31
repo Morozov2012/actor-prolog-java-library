@@ -43,7 +43,7 @@ public enum OnOff {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static OnOff term2OnOff(Term value, ChoisePoint iX) {
+	public static OnOff argument2OnOff(Term value, ChoisePoint iX) {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_on) {

@@ -3,7 +3,6 @@
 package morozov.system.kinect.frames.interfaces;
 
 import morozov.system.kinect.frames.data.interfaces.*;
-import morozov.system.kinect.frames.tools.*;
 
 public interface KinectSkeletonsFrameInterface {
 	public long getReceivedFrameNumber();

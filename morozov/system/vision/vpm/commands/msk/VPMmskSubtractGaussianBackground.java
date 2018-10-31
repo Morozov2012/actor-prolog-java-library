@@ -3,7 +3,6 @@
 package morozov.system.vision.vpm.commands.msk;
 
 import morozov.system.vision.vpm.*;
-import morozov.system.vision.vpm.commands.*;
 
 public class VPMmskSubtractGaussianBackground extends VPMmskBackgroundSubtractionCommand {
 	//
@@ -21,7 +20,7 @@ public class VPMmskSubtractGaussianBackground extends VPMmskBackgroundSubtractio
 	protected int[] backgroundSum;
 	protected int[] backgroundSumX2;
 	//
-	protected static final int maximalColor= 255;
+	// protected static final int maximalColor= 255;
 	// protected static final int maximalSum= Integer.MAX_VALUE - 2;
 	//
 	protected static int maximalStabilityLevel= Integer.MAX_VALUE - maximalColor*maximalColor;

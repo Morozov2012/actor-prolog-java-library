@@ -5,7 +5,7 @@ package morozov.system.gui.space3d;
 import target.*;
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.space3d.errors.*;
 import morozov.system.gui.space3d.signals.*;
 import morozov.terms.*;
@@ -41,7 +41,7 @@ public class ClipDistance {
 	//
 	public static ClipDistance argumentToClipDistance(Term argument, ChoisePoint iX) {
 		try {
-			double v= Converters.termToReal(argument,iX);
+			double v= GeneralConverters.termToReal(argument,iX);
 			return new ClipDistance(v);
 		} catch (TermIsNotAReal e1) {
 			try {

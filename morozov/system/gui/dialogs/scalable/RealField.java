@@ -13,7 +13,7 @@ package morozov.system.gui.dialogs.scalable;
 */
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
 import morozov.system.signals.*;
@@ -31,7 +31,7 @@ public class RealField extends ActiveTextField {
 	//
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		try {
-			double number= Converters.termToReal(value,iX);
+			double number= GeneralConverters.termToReal(value,iX);
 			return new PrologReal(number);
 		} catch (TermIsNotAReal e) {
 			throw RejectValue.instance;

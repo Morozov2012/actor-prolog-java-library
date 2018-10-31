@@ -5,7 +5,7 @@ package morozov.system.ffmpeg;
 import target.*;
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.ffmpeg.errors.*;
 import morozov.terms.*;
 import morozov.terms.errors.*;
@@ -42,8 +42,8 @@ public class FFmpegCodecOption {
 	public static FFmpegCodecOption argumentToFFmpegCodecOption(Term value, ChoisePoint iX) {
 		try {
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_option,2,iX);
-			String givenName= Converters.argumentToString(arguments[0],iX);
-			String givenValue= Converters.argumentToString(arguments[1],iX);
+			String givenName= GeneralConverters.argumentToString(arguments[0],iX);
+			String givenValue= GeneralConverters.argumentToString(arguments[1],iX);
 			return new FFmpegCodecOption(givenName,givenValue);
 		} catch (Backtracking b) {
 			throw new WrongArgumentIsNotFFmpegCodecOption(value);
