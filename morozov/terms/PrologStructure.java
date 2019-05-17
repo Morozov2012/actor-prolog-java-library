@@ -24,6 +24,14 @@ public class PrologStructure extends Term {
 	private long functor;
 	private Term[] arguments;
 	//
+	private static final long serialVersionUID= 0xDB99B241209C67E0L; // -2622869315176863776L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","PrologStructure");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public PrologStructure(long aFunctor, Term[] aContents) {
 		functor= aFunctor;
 		arguments= aContents;

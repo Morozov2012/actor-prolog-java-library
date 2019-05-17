@@ -19,7 +19,6 @@ public interface ExternalWorldInterface extends Remote {
 	public byte[] getImage() throws RemoteException, OwnWorldIsNotBufferedImage;
 	public void setImage(byte[] array, GenericImageEncodingAttributes attributes) throws RemoteException, OwnWorldIsNotBufferedImage;
 	//
-	public void process(java.awt.image.BufferedImage nativeImage, long frameNumber, long timeInMilliseconds, boolean takeFrameIntoAccount, GenericImageEncodingAttributes attributes) throws RemoteException, OwnWorldIsNotVideoProcessingMachine;
 	public void process(byte[] bytes, long frameNumber, long timeInMilliseconds, boolean takeFrameIntoAccount, GenericImageEncodingAttributes attributes) throws RemoteException, OwnWorldIsNotVideoProcessingMachine;
 	public long getFrameNumber() throws RemoteException, OwnWorldIsNotVideoProcessingMachine;
 	public long getFrameTime() throws RemoteException, OwnWorldIsNotVideoProcessingMachine;

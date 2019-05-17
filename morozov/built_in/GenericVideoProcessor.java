@@ -3,7 +3,6 @@
 package morozov.built_in;
 
 import morozov.run.*;
-import morozov.system.*;
 import morozov.system.converters.*;
 import morozov.system.gui.space2d.*;
 import morozov.system.vision.vpm.*;
@@ -33,7 +32,7 @@ public abstract class GenericVideoProcessor extends BufferedImageController {
 		processNumberedFrame(a1,a2,true,iX);
 	}
 	public void processNumberedFrame3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
-		boolean takeFrameIntoAccount= YesNo.termYesNo2Boolean(a3,iX);
+		boolean takeFrameIntoAccount= YesNoConverters.termYesNo2Boolean(a3,iX);
 		processNumberedFrame(a1,a2,takeFrameIntoAccount,iX);
 	}
 	//
@@ -44,7 +43,7 @@ public abstract class GenericVideoProcessor extends BufferedImageController {
 		processRealtimeFrame(a1,a2,true,iX);
 	}
 	public void processRealtimeFrame3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
-		boolean takeFrameIntoAccount= YesNo.termYesNo2Boolean(a3,iX);
+		boolean takeFrameIntoAccount= YesNoConverters.termYesNo2Boolean(a3,iX);
 		processRealtimeFrame(a1,a2,takeFrameIntoAccount,iX);
 	}
 	//

@@ -18,6 +18,14 @@ public class PrologList extends Term {
 	private Term head;
 	public Term tail;
 	//
+	private static final long serialVersionUID= 0xD42AD1CDA0DC9006L; // -3158481507549671418L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","PrologList");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public PrologList(Term aHead, Term aTail) {
 		head= aHead;
 		tail= aTail;

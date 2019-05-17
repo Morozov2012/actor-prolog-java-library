@@ -10,9 +10,9 @@ public class SerialVersionChecker {
 		try {
 			Class<?> thisClass= Class.forName(packageName+"."+className);
         	        ObjectStreamClass c= ObjectStreamClass.lookup(thisClass);
-			String text1= String.format("%x",c.getSerialVersionUID());
+			String text1= String.format("%x (%d)",c.getSerialVersionUID(),c.getSerialVersionUID());
 			System.out.printf("*%s: serialVersionUID: %s\n",className,text1.toUpperCase());
-			String text2= String.format("%x",serialVersionUID);
+			String text2= String.format("%x (%d)",serialVersionUID,serialVersionUID);
 			System.out.printf("_%s: serialVersionUID: %s\n",className,text2.toUpperCase());
 			if (text1.equals(text2)) {
 				System.out.printf("%s: test O.K.\n",className);

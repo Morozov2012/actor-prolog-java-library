@@ -22,7 +22,7 @@ public class HTML_ExplorerTools {
 		int stackPosition= stack.size() - 1;
 		int indexBound= text.length() - 1;
 		int p1= stack.peek();
-		while(true) {
+		while (true) {
 			if (p1 <= indexBound && text.codePointAt(p1) <= 0x20) {
 				p1++;
 				continue;
@@ -88,7 +88,7 @@ public class HTML_ExplorerTools {
 			int indexBound= text.length() - 1;
 			int p0= stack.peek();
 			int p1= p0;
-			while(true) {
+			while (true) {
 				if (p1 <= indexBound) {
 					int code= text.codePointAt(p1);
 					if (isEndOfName(code)) {
@@ -123,7 +123,7 @@ public class HTML_ExplorerTools {
 		int indexBound= text.length() - 1;
 		int p1= stack.peek();
 		int p2= p1;
-		while(true) {
+		while (true) {
 			if (p2 <= indexBound) {
 				int code= text.codePointAt(p2);
 				if (isEndOfName(code)) {

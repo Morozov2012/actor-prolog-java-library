@@ -14,6 +14,12 @@ public class DomainStringConstant extends DomainAlternative {
 	//
 	protected String constantText;
 	//
+	private static final long serialVersionUID= 0x1233F66031952131L; // 1311662809504096561L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","DomainStringConstant");
+	// }
+	//
 	public DomainStringConstant(String text) {
 		constantText= text;
 	}

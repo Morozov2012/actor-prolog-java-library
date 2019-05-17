@@ -27,6 +27,12 @@ public class SlotVariable extends Term {
 	public boolean globalValueIsProtected= false;
 	public ActiveWorld globalValueOwner;
 	//
+	private static final long serialVersionUID= 0x2EA07D378F71C20L; // 209988937475103776L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","SlotVariable");
+	// }
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public int hashCode() {

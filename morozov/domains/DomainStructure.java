@@ -20,6 +20,12 @@ public class DomainStructure extends MultiArgumentDomainItem {
 	//
 	protected long functor;
 	//
+	private static final long serialVersionUID= 0xCAAF0336FD2A307CL; // -3841848422413225860L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","DomainStructure");
+	// }
+	//
 	public DomainStructure(long name, String[] entries) {
 		super(entries);
 		functor= name;

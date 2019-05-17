@@ -7,14 +7,21 @@ import morozov.system.converters.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 import morozov.worlds.*;
+import morozov.worlds.remote.errors.*;
 
 import java.rmi.RemoteException;
-
-class AnAttemptToExtractInternalWorldFromForeignResidentWrapper extends RuntimeException {}
 
 public class ForeignResidentWrapper extends Resident {
 	//
 	public ExternalResidentInterface stub;
+	//
+	private static final long serialVersionUID= 0x2E0FA9FBBF37F4D6L; // 3319058349105345750L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.worlds.remote","ForeignResidentWrapper");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public ForeignResidentWrapper(ExternalResidentInterface s) {
 		stub= s;

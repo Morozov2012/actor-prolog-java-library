@@ -38,6 +38,7 @@ public interface DialogOperations {
 	public boolean safelyIsMaximized();
 	public boolean safelyIsMinimized();
 	public boolean safelyIsRestored();
+	public void safelySetAlwaysOnTop(boolean b);
 	//
 	public Rectangle computeParentLayoutSize();
 	public GraphicsConfiguration getGraphicsConfiguration();

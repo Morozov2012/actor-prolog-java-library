@@ -39,10 +39,10 @@ public class DetailedColorMap implements Serializable {
 			YesNoDefault.NO,
 			TincturingCoefficient.instanceDefault);
 	//
-	// private static final long serialVersionUID= 1;
+	private static final long serialVersionUID= 0xA3ABA1BF08DFF680L; // -6653046182650055040L;
 	//
 	// static {
-	//	SerialVersionChecker.check(serialVersionUID,"morozov.system","ColorMap");
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system","DetailedColorMap");
 	// }
 	//
 	///////////////////////////////////////////////////////////////

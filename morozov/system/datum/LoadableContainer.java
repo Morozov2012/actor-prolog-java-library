@@ -7,6 +7,7 @@ import morozov.domains.errors.*;
 import morozov.run.*;
 import morozov.run.errors.*;
 import morozov.syntax.errors.*;
+import morozov.syntax.interfaces.*;
 import morozov.syntax.scanner.errors.*;
 import morozov.system.checker.signals.*;
 import morozov.system.files.*;
@@ -66,6 +67,12 @@ public abstract class LoadableContainer implements Serializable, Cloneable {
 	protected transient HashSet<DataAbstraction> linkedWorlds= new HashSet<DataAbstraction>();
 	//
 	protected static final String messageAnObsoleteFileIsErased= "An obsolete file is erased: %s\n";
+	//
+	private static final long serialVersionUID= 0x89C782A14974D48BL; // -8518696540914264949L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.datum","LoadableContainer");
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -139,7 +146,7 @@ public abstract class LoadableContainer implements Serializable, Cloneable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void loadContent(ExtendedFileName fileName, int timeout, CharacterSet requestedCharacterSet, StaticContext staticContext, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) {
+	public void loadContent(ExtendedFileName fileName, int timeout, CharacterSet requestedCharacterSet, StaticContext staticContext, ActiveWorld currentProcess, boolean checkPrivileges, ParserMasterInterface master, ChoisePoint iX) {
 		claimModifyingAccess(currentProcess,checkPrivileges);
 		recentErrorText= "";
 		recentErrorPosition= -1;
@@ -147,17 +154,12 @@ public abstract class LoadableContainer implements Serializable, Cloneable {
 		try {
 			String textBuffer= fileName.getTextData(timeout,requestedCharacterSet,staticContext);
 			try {
-				loadContent(textBuffer,currentProcess,checkPrivileges,iX);
-			} catch (LexicalScannerError e) {
+				loadContent(textBuffer,currentProcess,checkPrivileges,master,iX);
+			} catch (SyntaxError e) {
 				recentErrorText= textBuffer.toString();
 				recentErrorPosition= e.getPosition();
 				recentErrorException= e;
-				throw e;
-			} catch (ParserError e) {
-				recentErrorText= textBuffer.toString();
-				recentErrorPosition= e.getPosition();
-				recentErrorException= e;
-				throw e;
+				throw new ActorPrologParserError(e);
 			} catch (DatabaseRecordDoesNotBelongToDomain e) {
 				recentErrorText= e.text;
 				recentErrorPosition= e.position;
@@ -174,7 +176,7 @@ public abstract class LoadableContainer implements Serializable, Cloneable {
 		}
 	}
 	//
-	abstract protected void loadContent(String textBuffer, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) throws LexicalScannerError, ParserError, DatabaseRecordDoesNotBelongToDomain;
+	abstract protected void loadContent(String textBuffer, ActiveWorld currentProcess, boolean checkPrivileges, ParserMasterInterface master, ChoisePoint iX) throws SyntaxError, DatabaseRecordDoesNotBelongToDomain;
 	//
 	///////////////////////////////////////////////////////////////
 	//

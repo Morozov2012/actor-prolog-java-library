@@ -8,8 +8,18 @@ import morozov.worlds.errors.*;
 import java.util.ArrayList;
 
 public class SuspendedCallTableState extends Term {
+	//
 	private ArrayList<SuspendedCall> table;
 	private int currentSize;
+	//
+	private static final long serialVersionUID= 0xA10A10748C93A20BL; // -6842638591075311093L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.run","SuspendedCallTableState");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public SuspendedCallTableState(ArrayList<SuspendedCall> callTable) {
 		table= callTable;
 		currentSize= callTable.size();

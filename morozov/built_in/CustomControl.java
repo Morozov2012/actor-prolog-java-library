@@ -18,7 +18,6 @@ import java.awt.Color;
 import java.awt.event.ComponentListener;
 import java.awt.event.ComponentEvent;
 import javax.swing.JMenuBar;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class CustomControl extends Alpha implements ComponentListener {
@@ -30,6 +29,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	public AtomicReference<ExtendedCoordinate> x= new AtomicReference<>();
 	public AtomicReference<ExtendedCoordinate> y= new AtomicReference<>();
 	public AtomicReference<ExtendedColor> backgroundColor= new AtomicReference<>();
+	public Boolean usePixelMeasurements= null;
 	// public AtomicReference<ExtendedSize> width= new AtomicReference<>();
 	// public AtomicReference<ExtendedSize> height= new AtomicReference<>();
 	public AtomicReference<ExtendedColor> textColor= new AtomicReference<>();
@@ -39,7 +39,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	public AtomicReference<ExtendedFontSize> fontSize= new AtomicReference<>();
 	public AtomicReference<ExtendedFontStyle> fontStyle= new AtomicReference<>();
 	//
-	public AtomicBoolean sceneAntialiasingIsEnabled= new AtomicBoolean(false);
+	// public AtomicBoolean sceneAntialiasingIsEnabled= new AtomicBoolean(false);
 	//
 	// public AtomicBoolean mouseClickedEventIsEnabled= new AtomicBoolean(false);
 	// public AtomicBoolean mouseEnteredEventIsEnabled= new AtomicBoolean(false);
@@ -73,6 +73,9 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	protected Term getBuiltInSlot_E_background_color() {
 		return termDefault;
+	}
+	protected Term getBuiltInSlot_E_use_pixel_measurements() {
+		return termNo;
 	}
 	protected Term getBuiltInSlot_E_text_color() {
 		return termDefault;
@@ -256,6 +259,29 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		} else {
 			Term value= getBuiltInSlot_E_background_color();
 			return ExtendedColor.argumentToExtendedColorOrFail(value,iX);
+		}
+	}
+	//
+	// get/set usePixelMeasurements
+	//
+	public void setUsePixelMeasurements1s(ChoisePoint iX, Term a1) {
+		setUsePixelMeasurements(YesNoConverters.termYesNo2Boolean(a1,iX));
+	}
+	public void setUsePixelMeasurements(boolean value) {
+		usePixelMeasurements= value;
+	}
+	public void getUsePixelMeasurements0ff(ChoisePoint iX, PrologVariable result) {
+		boolean value= getUsePixelMeasurements(iX);
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(value));
+	}
+	public void getUsePixelMeasurements0fs(ChoisePoint iX) {
+	}
+	public boolean getUsePixelMeasurements(ChoisePoint iX) {
+		if (usePixelMeasurements != null) {
+			return usePixelMeasurements;
+		} else {
+			Term value= getBuiltInSlot_E_use_pixel_measurements();
+			return YesNoConverters.termYesNo2Boolean(value,iX);
 		}
 	}
 	//
@@ -446,14 +472,14 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	// get/set enableSceneAntialiasing
 	//
 	public void setEnableSceneAntialiasing1s(ChoisePoint iX, Term a1) {
-		setEnableSceneAntialiasing(YesNo.termYesNo2Boolean(a1,iX));
+		setEnableSceneAntialiasing(YesNoConverters.termYesNo2Boolean(a1,iX));
 	}
 	public void setEnableSceneAntialiasing(boolean value) {
 		enableSceneAntialiasing= value;
 	}
 	public void getEnableSceneAntialiasing0ff(ChoisePoint iX, PrologVariable result) {
 		boolean value= getEnableSceneAntialiasing(iX);
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(value));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(value));
 	}
 	public void getEnableSceneAntialiasing0fs(ChoisePoint iX) {
 	}
@@ -462,7 +488,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			return enableSceneAntialiasing;
 		} else {
 			Term value= getBuiltInSlot_E_enable_scene_antialiasing();
-			return YesNo.termYesNo2Boolean(value,iX);
+			return YesNoConverters.termYesNo2Boolean(value,iX);
 		}
 	}
 	//
@@ -527,6 +553,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		}
 	}
 	public void getActualPosition2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
+		boolean usePixelMeasurements= getUsePixelMeasurements(iX);
 		Point canvasLocation= new Point();
 		synchronized (this) {
 			if (graphicWindow != null) {
@@ -537,11 +564,18 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 				}
 			}
 		};
-		Dimension desktopSize= getSizeOfMainDesctopPane();
-		double gridX= DefaultOptions.gridWidth;
-		double gridY= DefaultOptions.gridHeight;
-		double logicalX= CoordinateAndSize.reconstruct(canvasLocation.x,desktopSize.width,gridX);
-		double logicalY= CoordinateAndSize.reconstruct(canvasLocation.y,desktopSize.height,gridY);
+		double logicalX;
+		double logicalY;
+		if (usePixelMeasurements) {
+			logicalX= canvasLocation.x;
+			logicalY= canvasLocation.y;
+		} else {
+			Dimension desktopSize= getSizeOfMainDesktopPane();
+			double gridX= DefaultOptions.gridWidth;
+			double gridY= DefaultOptions.gridHeight;
+			logicalX= CoordinateAndSize.reconstruct(canvasLocation.x,desktopSize.width,gridX);
+			logicalY= CoordinateAndSize.reconstruct(canvasLocation.y,desktopSize.height,gridY);
+		};
 		a1.setBacktrackableValue(new PrologReal(logicalX),iX);
 		a2.setBacktrackableValue(new PrologReal(logicalY),iX);
 	}
@@ -578,6 +612,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		}
 	}
 	public void getActualSize2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
+		boolean usePixelMeasurements= getUsePixelMeasurements(iX);
 		Dimension canvasSize= new Dimension();
 		synchronized (this) {
 			if (graphicWindow != null) {
@@ -588,11 +623,18 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 				}
 			}
 		};
-		Dimension desktopSize= getSizeOfMainDesctopPane();
-		double gridX= DefaultOptions.gridWidth;
-		double gridY= DefaultOptions.gridHeight;
-		double logicalWidth= CoordinateAndSize.reconstruct(canvasSize.width,desktopSize.width,gridX);
-		double logicalHeight= CoordinateAndSize.reconstruct(canvasSize.height,desktopSize.height,gridY);
+		double logicalWidth;
+		double logicalHeight;
+		if (usePixelMeasurements) {
+			logicalWidth= canvasSize.width;
+			logicalHeight= canvasSize.height;
+		} else {
+			Dimension desktopSize= getSizeOfMainDesktopPane();
+			double gridX= DefaultOptions.gridWidth;
+			double gridY= DefaultOptions.gridHeight;
+			logicalWidth= CoordinateAndSize.reconstruct(canvasSize.width,desktopSize.width,gridX);
+			logicalHeight= CoordinateAndSize.reconstruct(canvasSize.height,desktopSize.height,gridY);
+		};
 		a1.setBacktrackableValue(new PrologReal(logicalWidth),iX);
 		a2.setBacktrackableValue(new PrologReal(logicalHeight),iX);
 	}
@@ -633,6 +675,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		}
 	}
 	public void getActualBounds4s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3, PrologVariable a4) {
+		boolean usePixelMeasurements= getUsePixelMeasurements(iX);
 		Point canvasLocation= new Point();
 		Dimension canvasSize= new Dimension();
 		synchronized (this) {
@@ -644,20 +687,31 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 				}
 			}
 		};
-		Dimension desktopSize= getSizeOfMainDesctopPane();
-		double gridX= DefaultOptions.gridWidth;
-		double gridY= DefaultOptions.gridHeight;
-		double logicalX= CoordinateAndSize.reconstruct(canvasLocation.x,desktopSize.width,gridX);
-		double logicalY= CoordinateAndSize.reconstruct(canvasLocation.y,desktopSize.height,gridY);
-		double logicalWidth= CoordinateAndSize.reconstruct(canvasSize.width,desktopSize.width,gridX);
-		double logicalHeight= CoordinateAndSize.reconstruct(canvasSize.height,desktopSize.height,gridY);
+		double logicalX;
+		double logicalY;
+		double logicalWidth;
+		double logicalHeight;
+		if (usePixelMeasurements) {
+			logicalX= canvasLocation.x;
+			logicalY= canvasLocation.y;
+			logicalWidth= canvasSize.width;
+			logicalHeight= canvasSize.height;
+		} else {
+			Dimension desktopSize= getSizeOfMainDesktopPane();
+			double gridX= DefaultOptions.gridWidth;
+			double gridY= DefaultOptions.gridHeight;
+			logicalX= CoordinateAndSize.reconstruct(canvasLocation.x,desktopSize.width,gridX);
+			logicalY= CoordinateAndSize.reconstruct(canvasLocation.y,desktopSize.height,gridY);
+			logicalWidth= CoordinateAndSize.reconstruct(canvasSize.width,desktopSize.width,gridX);
+			logicalHeight= CoordinateAndSize.reconstruct(canvasSize.height,desktopSize.height,gridY);
+		};
 		a1.setBacktrackableValue(new PrologReal(logicalX),iX);
 		a2.setBacktrackableValue(new PrologReal(logicalY),iX);
 		a3.setBacktrackableValue(new PrologReal(logicalWidth),iX);
 		a4.setBacktrackableValue(new PrologReal(logicalHeight),iX);
 	}
 	//
-	protected Dimension getSizeOfMainDesctopPane() {
+	protected Dimension getSizeOfMainDesktopPane() {
 		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(staticContext);
 		Dimension desktopSize;
 		if (desktop==null) {
@@ -801,11 +855,13 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		ExtendedCoordinate eY= getY(iX);
 		ExtendedSize eWidth= getWidth(iX);
 		ExtendedSize eHeight= getHeight(iX);
+		boolean pixelMeasurements= getUsePixelMeasurements(iX);
 		//
 		graphicWindow.logicalWidth.set(eWidth);
 		graphicWindow.logicalHeight.set(eHeight);
 		graphicWindow.logicalX.set(eX);
 		graphicWindow.logicalY.set(eY);
+		graphicWindow.usePixelMeasurements.set(pixelMeasurements);
 		//
 		refreshAttributesOfCanvasSpace(iX);
 	}
@@ -859,7 +915,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		}
 	}
 	//
-	public void isHidden0s(ChoisePoint iX) throws Backtracking {
+	public void isHiddenCustomControl(ChoisePoint iX) throws Backtracking {
 		if (canvasSpaceDoesNotExist()) {
 		} else {
 			synchronized (this) {
@@ -867,6 +923,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 					if (!graphicWindow.safelyIsHidden()) {
 						throw Backtracking.instance;
 					}
+
 				}
 			}
 		}
@@ -968,6 +1025,13 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	public void start0s(ChoisePoint iX) {
 	}
 	public void stop0s(ChoisePoint iX) {
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void windowClosing0s(ChoisePoint iX) {
+	}
+	public void windowClosed0s(ChoisePoint iX) {
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -1094,6 +1158,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	///////////////////////////////////////////////////////////////
 	//
 	public void componentHidden(ComponentEvent e) {
+		sendTheWindowClosedMessage();
 		DesktopUtils.selectNextInternalFrame(staticContext);
 	}
 	public void componentMoved(ComponentEvent e) {
@@ -1101,6 +1166,11 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	public void componentResized(ComponentEvent e) {
 	}
 	public void componentShown(ComponentEvent e) {
+	}
+	//
+	protected void sendTheWindowClosingMessage() {
+	}
+	protected void sendTheWindowClosedMessage() {
 	}
 	//
 	///////////////////////////////////////////////////////////////

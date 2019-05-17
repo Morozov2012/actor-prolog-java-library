@@ -50,7 +50,6 @@ import javax.media.j3d.WakeupCondition;
 import javax.media.j3d.PolygonAttributes;
 import javax.media.j3d.ImageComponent2D;
 import com.sun.j3d.utils.universe.SimpleUniverse;
-import com.sun.j3d.utils.universe.ViewingPlatform;
 import com.sun.j3d.utils.geometry.ColorCube;
 import com.sun.j3d.utils.geometry.Box;
 import com.sun.j3d.utils.geometry.Cone;
@@ -273,31 +272,31 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			long pairName= - key;
 			Term pairValue= setPositiveMap.get(key);
 			if (pairName==SymbolCodes.symbolCode_E_allowChildrenExtend) {
-				boolean allowChildrenExtend= YesNo.termYesNo2Boolean(pairValue,iX);
+				boolean allowChildrenExtend= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				if (allowChildrenExtend) {
 					node.setCapability(Group.ALLOW_CHILDREN_EXTEND);
 				};
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_allowChildrenRead) {
-				boolean allowChildrenRead= YesNo.termYesNo2Boolean(pairValue,iX);
+				boolean allowChildrenRead= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				if (allowChildrenRead) {
 					node.setCapability(Group.ALLOW_CHILDREN_READ);
 				};
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_allowChildrenWrite) {
-				boolean allowChildrenWrite= YesNo.termYesNo2Boolean(pairValue,iX);
+				boolean allowChildrenWrite= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				if (allowChildrenWrite) {
 					node.setCapability(Group.ALLOW_CHILDREN_WRITE);
 				};
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_allowCollisionBoundsRead) {
-				boolean allowCollisionBoundsRead= YesNo.termYesNo2Boolean(pairValue,iX);
+				boolean allowCollisionBoundsRead= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				if (allowCollisionBoundsRead) {
 					node.setCapability(Group.ALLOW_COLLISION_BOUNDS_READ);
 				};
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_allowCollisionBoundsWrite) {
-				boolean allowCollisionBoundsWrite= YesNo.termYesNo2Boolean(pairValue,iX);
+				boolean allowCollisionBoundsWrite= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				if (allowCollisionBoundsWrite) {
 					node.setCapability(Group.ALLOW_COLLISION_BOUNDS_WRITE);
 				};
@@ -372,13 +371,13 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_allowDetach) {
-					boolean allowDetach= YesNo.termYesNo2Boolean(pairValue,iX);
+					boolean allowDetach= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					if (allowDetach) {
 						node.setCapability(BranchGroup.ALLOW_DETACH);
 					};
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_compile) {
-					compileBranchGroup= YesNo.termYesNo2Boolean(pairValue,iX);
+					compileBranchGroup= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_branches) {
 					argumentToListOfNodes(node,node,pairValue,targetWorld,u,space3D,null,iX);
@@ -418,13 +417,13 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_allowTransformRead) {
-					boolean allowTransformRead= YesNo.termYesNo2Boolean(pairValue,iX);
+					boolean allowTransformRead= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					if (allowTransformRead) {
 						node.setCapability(TransformGroup.ALLOW_TRANSFORM_READ);
 					};
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_allowTransformWrite) {
-					boolean allowTransformWrite= YesNo.termYesNo2Boolean(pairValue,iX);
+					boolean allowTransformWrite= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					if (allowTransformWrite) {
 						node.setCapability(TransformGroup.ALLOW_TRANSFORM_WRITE);
 					};
@@ -596,49 +595,49 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				node.setAppearance(appearance);
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_allowAppearanceOverrideRead) {
-				boolean allowAppearanceOverrideRead= YesNo.termYesNo2Boolean(pairValue,iX);
+				boolean allowAppearanceOverrideRead= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				if (allowAppearanceOverrideRead) {
 					node.setCapability(Shape3D.ALLOW_APPEARANCE_OVERRIDE_READ);
 				};
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_allowAppearanceOverrideWrite) {
-				boolean allowAppearanceOverrideWrite= YesNo.termYesNo2Boolean(pairValue,iX);
+				boolean allowAppearanceOverrideWrite= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				if (allowAppearanceOverrideWrite) {
 					node.setCapability(Shape3D.ALLOW_APPEARANCE_OVERRIDE_WRITE);
 				};
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_allowAppearanceRead) {
-				boolean allowAppearanceRead= YesNo.termYesNo2Boolean(pairValue,iX);
+				boolean allowAppearanceRead= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				if (allowAppearanceRead) {
 					node.setCapability(Shape3D.ALLOW_APPEARANCE_READ);
 				};
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_allowAppearanceWrite) {
-				boolean allowAppearanceWrite= YesNo.termYesNo2Boolean(pairValue,iX);
+				boolean allowAppearanceWrite= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				if (allowAppearanceWrite) {
 					node.setCapability(Shape3D.ALLOW_APPEARANCE_WRITE);
 				};
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_allowCollisionBoundsRead) {
-				boolean allowCollisionBoundsRead= YesNo.termYesNo2Boolean(pairValue,iX);
+				boolean allowCollisionBoundsRead= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				if (allowCollisionBoundsRead) {
 					node.setCapability(Shape3D.ALLOW_COLLISION_BOUNDS_READ);
 				};
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_allowCollisionBoundsWrite) {
-				boolean allowCollisionBoundsWrite= YesNo.termYesNo2Boolean(pairValue,iX);
+				boolean allowCollisionBoundsWrite= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				if (allowCollisionBoundsWrite) {
 					node.setCapability(Shape3D.ALLOW_COLLISION_BOUNDS_WRITE);
 				};
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_allowGeometryRead) {
-				boolean allowGeometryRead= YesNo.termYesNo2Boolean(pairValue,iX);
+				boolean allowGeometryRead= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				if (allowGeometryRead) {
 					node.setCapability(Shape3D.ALLOW_GEOMETRY_READ);
 				};
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_allowGeometryWrite) {
-				boolean allowGeometryWrite= YesNo.termYesNo2Boolean(pairValue,iX);
+				boolean allowGeometryWrite= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				if (allowGeometryWrite) {
 					node.setCapability(Shape3D.ALLOW_GEOMETRY_WRITE);
 				};
@@ -708,7 +707,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 					node.setAlignmentAxis(axis);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_enableConstantScale) {
-					boolean constantScaleEnable= YesNo.termYesNo2Boolean(pairValue,iX);
+					boolean constantScaleEnable= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					node.setConstantScaleEnable(constantScaleEnable);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_scale) {
@@ -984,7 +983,7 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 					System.out.printf("PrincipalNode3D::extractLightAttributes:node(%s).setInfluencingBounds(%s)\n",node,bounds);
 				}
 			} else if (pairName==SymbolCodes.symbolCode_E_lightOn) {
-				boolean flag= YesNo.termYesNo2Boolean(pairValue,iX);
+				boolean flag= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				node.setEnable(flag);
 				iterator.remove();
 				if (debugColors()) {
@@ -1399,31 +1398,31 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_enableRotate) {
-					enableRotate= YesNo.termYesNo2Boolean(pairValue,iX);
+					enableRotate= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_enableTranslate) {
-					enableTranslate= YesNo.termYesNo2Boolean(pairValue,iX);
+					enableTranslate= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_enableZoom) {
-					enableZoom= YesNo.termYesNo2Boolean(pairValue,iX);
+					enableZoom= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_proportionalZoom) {
-					proportionalZoom= YesNo.termYesNo2Boolean(pairValue,iX);
+					proportionalZoom= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_reverseAll) {
-					reverseAll= YesNo.termYesNo2Boolean(pairValue,iX);
+					reverseAll= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_reverseRotate) {
-					reverseRotate= YesNo.termYesNo2Boolean(pairValue,iX);
+					reverseRotate= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_reverseTranslate) {
-					reverseTranslate= YesNo.termYesNo2Boolean(pairValue,iX);
+					reverseTranslate= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_reverseZoom) {
-					reverseZoom= YesNo.termYesNo2Boolean(pairValue,iX);
+					reverseZoom= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_stopZoom) {
-					stopZoom= YesNo.termYesNo2Boolean(pairValue,iX);
+					stopZoom= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					iterator.remove();
 				}
 			};
@@ -1433,6 +1432,8 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 			};
 			if (!enableTranslate) {
 				flags |= OrbitBehavior.DISABLE_TRANSLATE;
+			//} else {
+			//	flags |= OrbitBehavior.ENABLE_TRANSLATE;
 			};
 			if (!enableZoom) {
 				flags |= OrbitBehavior.DISABLE_ZOOM;
@@ -1482,8 +1483,11 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 				}
 			};
 			extractNodeAttributes(node,group,nameList,setPositiveMap,targetWorld,iX);
+			/*
 			ViewingPlatform viewingPlatform= u.getViewingPlatform();
 			viewingPlatform.setViewPlatformBehavior(node);
+			*/
+			targetWorld.setViewPlatformBehavior(node);
 			return node;
 		} else {
 			throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
@@ -1712,21 +1716,21 @@ public class PrincipalNode3D extends AuxiliaryNode3D {
 					long pairName= - key;
 					Term pairValue= setPositiveMap.get(key);
 					if (pairName==SymbolCodes.symbolCode_E_handleMouseClicked) {
-						node.setHandleMouseClicked(YesNo.termYesNo2Boolean(pairValue,iX));
+						node.setHandleMouseClicked(YesNoConverters.termYesNo2Boolean(pairValue,iX));
 					} else if (pairName==SymbolCodes.symbolCode_E_handleMouseEntered) {
-						node.setHandleMouseEntered(YesNo.termYesNo2Boolean(pairValue,iX));
+						node.setHandleMouseEntered(YesNoConverters.termYesNo2Boolean(pairValue,iX));
 					} else if (pairName==SymbolCodes.symbolCode_E_handleMouseExited) {
-						node.setHandleMouseExited(YesNo.termYesNo2Boolean(pairValue,iX));
+						node.setHandleMouseExited(YesNoConverters.termYesNo2Boolean(pairValue,iX));
 					} else if (pairName==SymbolCodes.symbolCode_E_handleMousePressed) {
-						node.setHandleMousePressed(YesNo.termYesNo2Boolean(pairValue,iX));
+						node.setHandleMousePressed(YesNoConverters.termYesNo2Boolean(pairValue,iX));
 					} else if (pairName==SymbolCodes.symbolCode_E_handleMouseReleased) {
-						node.setHandleMouseReleased(YesNo.termYesNo2Boolean(pairValue,iX));
+						node.setHandleMouseReleased(YesNoConverters.termYesNo2Boolean(pairValue,iX));
 					} else if (pairName==SymbolCodes.symbolCode_E_handleMouseDragged) {
-						node.setHandleMouseDragged(YesNo.termYesNo2Boolean(pairValue,iX));
+						node.setHandleMouseDragged(YesNoConverters.termYesNo2Boolean(pairValue,iX));
 					} else if (pairName==SymbolCodes.symbolCode_E_handleMouseMoved) {
-						node.setHandleMouseMoved(YesNo.termYesNo2Boolean(pairValue,iX));
+						node.setHandleMouseMoved(YesNoConverters.termYesNo2Boolean(pairValue,iX));
 					} else if (pairName==SymbolCodes.symbolCode_E_isPassive) {
-						node.setIsPassive(YesNo.termYesNo2Boolean(pairValue,iX));
+						node.setIsPassive(YesNoConverters.termYesNo2Boolean(pairValue,iX));
 					} else if (pairName==SymbolCodes.symbolCode_E_period) {
 						long timeInterval= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setPeriod(timeInterval);

@@ -366,7 +366,7 @@ public abstract class Console extends Report {
 			chooser.setFileFilter(initialFilter);
 		};
 		if (multiSel != null) {
-			boolean enableMultipleSelection= OnOff.termOnOff2Boolean(multiSel,iX);
+			boolean enableMultipleSelection= OnOffConverters.termOnOff2Boolean(multiSel,iX);
 			chooser.setMultiSelectionEnabled(enableMultipleSelection);
 		};
 		int returnVal;

@@ -79,7 +79,7 @@ public class TVFilterImageHeader implements Serializable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static TVFilterImageHeader readTVFilterImageHeader(DataInputStream in, int lengthP) throws IOException {
+	public static TVFilterImageHeader readTVFilterImageHeader(DataInputStream in, int lengthP, boolean reportWarnings) throws IOException {
 		int length= Integer.reverseBytes(in.readInt());
 		int format= Integer.reverseBytes(in.readInt());
 		int columns= Integer.reverseBytes(in.readInt());
@@ -88,11 +88,11 @@ public class TVFilterImageHeader implements Serializable {
 		/*
 		System.out.printf("LENGTH: %s, FORMAT: %s, SIZE: %s x %s, LinesAreRows: %s\n",length,format,columns,rows,linesAreRows);
 		*/
-		TVImageHeader hdr= TVImageHeader.readTVImageHeader(in);
+		TVImageHeader hdr= TVImageHeader.readTVImageHeader(in,reportWarnings);
 		int lengthOfRest= lengthP - constantHeaderSize();
 		//int columns= hdr.getColumns();
 		//int rows= hdr.getRows();
-		TVVidImage image= TVVidImage.readTVVidImage(in,lengthOfRest);
+		TVVidImage image= TVVidImage.readTVVidImage(in,lengthOfRest,reportWarnings);
 		byte[] imageData= image.getImageData();
 		/*
 		int index= 0;

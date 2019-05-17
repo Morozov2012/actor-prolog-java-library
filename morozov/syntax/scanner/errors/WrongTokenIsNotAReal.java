@@ -2,7 +2,8 @@
 
 package morozov.syntax.scanner.errors;
 
-public class WrongTokenIsNotAReal extends RuntimeException {
-	public WrongTokenIsNotAReal() {
+public class WrongTokenIsNotAReal extends LexicalScannerError {
+	public WrongTokenIsNotAReal(int p) {
+		super(p);
 	}
 }

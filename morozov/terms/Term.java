@@ -18,6 +18,15 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 
 public abstract class Term implements Cloneable, Serializable {
+	//
+	private static final long serialVersionUID= 0x3F2E7183284885E7L; // 4552701081448646119L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","Term");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public int hashCode() {
 		return System.identityHashCode(this);
 	}

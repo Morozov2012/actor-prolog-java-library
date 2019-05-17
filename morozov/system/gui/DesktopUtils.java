@@ -994,6 +994,26 @@ public class DesktopUtils {
 			return false;
 		}
 	}
+	public static void safelySetAlwaysOnTop(final boolean value, final Window window) {
+		if (SwingUtilities.isEventDispatchThread()) {
+			if (window.isAlwaysOnTopSupported() && window.isAlwaysOnTop() != value) {
+				window.setAlwaysOnTop(value);
+			}
+		} else {
+			try {
+				SwingUtilities.invokeAndWait(new Runnable() {
+					public void run() {
+						if (window.isAlwaysOnTopSupported() && window.isAlwaysOnTop() != value) {
+							window.setAlwaysOnTop(value);
+						}
+					}
+				});
+			} catch (InterruptedException e) {
+			} catch (InvocationTargetException e) {
+			} catch (SecurityException e) {
+			}
+		}
+	}
 /*
 	public static void safelyMoveToFront(final InnerPage window) {
 		if (SwingUtilities.isEventDispatchThread()) {

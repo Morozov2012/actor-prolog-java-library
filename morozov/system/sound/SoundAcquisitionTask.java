@@ -13,6 +13,7 @@ import java.io.PipedOutputStream;
 import java.io.IOException;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SoundAcquisitionTask extends Thread {
@@ -23,6 +24,7 @@ public class SoundAcquisitionTask extends Thread {
 	protected int inputStreamBufferSize;
 	//
 	protected AtomicReference<AudioDataConsumerInterface> controlPanel= new AtomicReference<>();
+	protected AtomicInteger outputDebugInformation= new AtomicInteger(0);
 	//
 	protected AtomicBoolean stopThisThread= new AtomicBoolean(false);
 	protected AtomicBoolean deviceIsOpen= new AtomicBoolean(false);
@@ -32,7 +34,11 @@ public class SoundAcquisitionTask extends Thread {
 	protected int numberOfErrors= 0;
 	protected static int maximalNumberOfErrors= 100;
 	//
-	protected static int deviceOpeningAttemptDelay= 100;
+	protected static int deviceConnectionAttemptPeriod= 100;
+	//
+	protected static int reportCriticalErrorsLevel= 1;
+	protected static int reportAdmissibleErrorsLevel= 2;
+	protected static int reportWarningsLevel= 3;
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -42,15 +48,24 @@ public class SoundAcquisitionTask extends Thread {
 		try {
 			pipedOutputStream= new PipedOutputStream(pipedInputStream);
 		} catch (IOException e) {
-			writeLater(String.format("SoundAcquisitionTask:CannotCreatePipedOutputStream:%s\n",e));
+			if (reportCriticalErrors()) {
+				writeLater(String.format("SoundAcquisitionTask:CannotCreatePipedOutputStream:%s\n",e));
+			}
 		};
 		setDaemon(true);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void setControlPanel(AudioDataConsumerInterface panel) {
+	public void setDataConsumer(AudioDataConsumerInterface panel) {
 		controlPanel.set(panel);
+	}
+	//
+	public void setOutputDebugInformation(int value) {
+		outputDebugInformation.set(value);
+	}
+	public int getOutputDebugInformation() {
+		return outputDebugInformation.get();
 	}
 	//
 	public boolean dataTransferIsEnabled() {
@@ -63,7 +78,7 @@ public class SoundAcquisitionTask extends Thread {
 	public void startDataTransfer() {
 		synchronized (this) {
 			enableDataTransfer.set(true);
-			notify();
+			notifyAll();
 		}
 	}
 	//
@@ -72,7 +87,7 @@ public class SoundAcquisitionTask extends Thread {
 			if (microphone != null) {
 				closeMicrophone();
 				enableDataTransfer.set(false);
-				notify();
+				notifyAll();
 			}
 		}
 	}
@@ -82,7 +97,9 @@ public class SoundAcquisitionTask extends Thread {
 		try {
 			pipedOutputStream.flush();
 		} catch (IOException e) {
-			writeLater(String.format("SoundAcquisitionTask:CannotFlushPipedOutputStream:%s\n",e));
+			if (reportCriticalErrors()) {
+				writeLater(String.format("SoundAcquisitionTask:CannotFlushPipedOutputStream:%s\n",e));
+			}
 		}
 	}
 	//
@@ -91,7 +108,9 @@ public class SoundAcquisitionTask extends Thread {
 		try {
 			pipedOutputStream.flush();
 		} catch (IOException e) {
-			writeLater(String.format("SoundAcquisitionTask:CannotFlushPipedOutputStream:%s\n",e));
+			if (reportCriticalErrors()) {
+				writeLater(String.format("SoundAcquisitionTask:CannotFlushPipedOutputStream:%s\n",e));
+			}
 		}
 	}
 	//
@@ -110,30 +129,31 @@ public class SoundAcquisitionTask extends Thread {
 					try {
 						dataAcquisition();
 					} catch (Throwable e) {
-						e.printStackTrace();
-						writeLater(String.format("Sound acquisition error: %s\n",e));
+						if (reportCriticalErrors()) {
+							e.printStackTrace();
+							writeLater(String.format("Sound acquisition error: %s\n",e));
+						}
 					}
 				} else {
 					try {
                 	                	tryToOpenDevice();
 					} catch (LineUnavailableException e) {
 						reportMicrophoneAvailability(false);
-						// writeLater(String.format("LineUnavailableException: %s\n",e));
 					} catch (SecurityException e) {
 						reportMicrophoneAvailability(false);
-						// writeLater(String.format("SecurityException: %s\n",e));
 					} catch (IllegalArgumentException e) {
 						reportMicrophoneAvailability(false);
-						// writeLater(String.format("IllegalArgumentException: %s\n",e));
 					} catch (Throwable e) {
 						reportMicrophoneAvailability(false);
-						e.printStackTrace();
-						writeLater(String.format("Camera initialization error: %s\n",e));
+						if (reportAdmissibleErrors()) {
+							e.printStackTrace();
+							writeLater(String.format("Camera initialization error: %s\n",e));
+						};
 						deviceIsOpen.set(false);
 					};
 					if (!deviceIsOpen.get()) {
 						synchronized (this) {
-							wait(deviceOpeningAttemptDelay);
+							wait(deviceConnectionAttemptPeriod);
 						}
 					}
 				}
@@ -141,7 +161,9 @@ public class SoundAcquisitionTask extends Thread {
 		} catch (InterruptedException e) {
 		} catch (ThreadDeath e) {
 		} catch (Throwable e) {
-			e.printStackTrace();
+			if (reportCriticalErrors()) {
+				e.printStackTrace();
+			}
 		}
 	}
 	//
@@ -161,11 +183,8 @@ public class SoundAcquisitionTask extends Thread {
 			};
 			return true;
 		} catch (LineUnavailableException e) {
-			// writeLater(String.format("LineUnavailableException: %s\n",e));
 		} catch (SecurityException e) {
-			// writeLater(String.format("SecurityException: %s\n",e));
 		} catch (IllegalArgumentException e) {
-			// writeLater(String.format("IllegalArgumentException: %s\n",e));
 		};
 		return false;
 	}
@@ -198,7 +217,7 @@ public class SoundAcquisitionTask extends Thread {
 		if (numberOfReceivedBytes == m_buf.length) {
 			pipedOutputStream.write(m_buf,0,numberOfReceivedBytes);
 			synchronized (pipedInputStream) {
-				pipedInputStream.notify();
+				pipedInputStream.notifyAll();
 			}
 		};
 		if (numberOfReceivedBytes > 0) {
@@ -223,5 +242,24 @@ public class SoundAcquisitionTask extends Thread {
 				System.err.print(text);
 			}
 		});
+	}
+	public boolean reportCriticalErrors() {
+		return outputDebugInformation.get() >= reportCriticalErrorsLevel;
+	}
+	public boolean reportAdmissibleErrors() {
+		return outputDebugInformation.get() >= reportAdmissibleErrorsLevel;
+	}
+	public boolean reportWarnings() {
+		return outputDebugInformation.get() >= reportWarningsLevel;
+	}
+	//
+	public int getReportCriticalErrorsLevel() {
+		return reportCriticalErrorsLevel;
+	}
+	public int getReportAdmissibleErrorsLevel() {
+		return reportAdmissibleErrorsLevel;
+	}
+	public int getReportWarningsLevel() {
+		return reportWarningsLevel;
 	}
 }

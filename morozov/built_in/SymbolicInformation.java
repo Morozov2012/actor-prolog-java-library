@@ -7,6 +7,8 @@ import target.*;
 import morozov.run.*;
 import morozov.run.errors.*;
 import morozov.syntax.scanner.*;
+import morozov.syntax.scanner.interfaces.*;
+import morozov.syntax.scanner.errors.*;
 import morozov.system.*;
 import morozov.system.converters.*;
 import morozov.terms.*;
@@ -18,6 +20,8 @@ import java.util.Locale;
 public abstract class SymbolicInformation extends DataAbstraction {
 	//
 	public Boolean caseSensitivity= null;
+	//
+	protected static LexicalScannerMasterInterface dummyLexicalScannerMaster= new DummyLexicalScannerMaster();
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -38,13 +42,13 @@ public abstract class SymbolicInformation extends DataAbstraction {
 	// get/set case_sensitivity
 	//
 	public void setCaseSensitivity1s(ChoisePoint iX, Term a1) {
-		setCaseSensitivity(OnOff.termOnOff2Boolean(a1,iX));
+		setCaseSensitivity(OnOffConverters.termOnOff2Boolean(a1,iX));
 	}
 	public void setCaseSensitivity(boolean value) {
 		caseSensitivity= value;
 	}
 	public void getCaseSensitivity0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(OnOff.boolean2TermOnOff(getCaseSensitivity(iX)));
+		result.setNonBacktrackableValue(OnOffConverters.boolean2TermOnOff(getCaseSensitivity(iX)));
 	}
 	public void getCaseSensitivity0fs(ChoisePoint iX) {
 	}
@@ -53,7 +57,7 @@ public abstract class SymbolicInformation extends DataAbstraction {
 			return caseSensitivity;
 		} else {
 			Term value= getBuiltInSlot_E_case_sensitivity();
-			return OnOff.termOnOff2Boolean(value,iX);
+			return OnOffConverters.termOnOff2Boolean(value,iX);
 		}
 	}
 	//
@@ -64,6 +68,12 @@ public abstract class SymbolicInformation extends DataAbstraction {
 	}
 	//
 	///////////////////////////////////////////////////////////////
+	//
+	public void getString0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(termEmptyString);
+	}
+	public void getString0fs(ChoisePoint iX) {
+	}
 	//
 	public void length1ff(ChoisePoint iX, PrologVariable result, Term a1) {
 		String text= GeneralConverters.argumentToString(a1,iX);
@@ -223,7 +233,7 @@ public abstract class SymbolicInformation extends DataAbstraction {
 			int textLength= text.length();
 			ChoisePoint newIx= new ChoisePoint(iX);
 			int currentPosition= 0;
-			while(true) {
+			while (true) {
 				if (currentPosition <= textLength) {
 					int p1= SystemUtils.indexOf(text,target,currentPosition,caseSensitivity);
 					if (p1 >= 0) {
@@ -314,21 +324,21 @@ public abstract class SymbolicInformation extends DataAbstraction {
 	// (i,o,o)
 	public void extractFrontToken3s(ChoisePoint iX, Term a1, PrologVariable a2, PrologVariable a3) throws Backtracking {
 		String text= GeneralConverters.argumentToString(a1,iX);
-		String[] textSegments= extractFrontToken(text);
+		String[] textSegments= extractFrontToken(text,iX);
 		a2.setBacktrackableValue(new PrologString(textSegments[0]),iX);
 		a3.setBacktrackableValue(new PrologString(textSegments[1]),iX);
 	}
 	// (i,i,o)
 	public void extractFrontToken3s(ChoisePoint iX, Term a1, Term a2, PrologVariable a3) throws Backtracking {
 		String text= GeneralConverters.argumentToString(a1,iX);
-		String[] textSegments= extractFrontToken(text);
+		String[] textSegments= extractFrontToken(text,iX);
 		a2.isString(textSegments[0],iX);
 		a3.setBacktrackableValue(new PrologString(textSegments[1]),iX);
 	}
 	// (i,o,i)
 	public void extractFrontToken3s(ChoisePoint iX, Term a1, PrologVariable a2, Term a3) throws Backtracking {
 		String text= GeneralConverters.argumentToString(a1,iX);
-		String[] textSegments= extractFrontToken(text);
+		String[] textSegments= extractFrontToken(text,iX);
 		a2.setBacktrackableValue(new PrologString(textSegments[0]),iX);
 		a3.isString(textSegments[1],iX);
 	}
@@ -341,7 +351,7 @@ public abstract class SymbolicInformation extends DataAbstraction {
 	// (i,i,i)
 	public void extractFrontToken3s(ChoisePoint iX, Term a1, Term a2, Term a3) throws Backtracking {
 		String text= GeneralConverters.argumentToString(a1,iX);
-		String[] textSegments= extractFrontToken(text);
+		String[] textSegments= extractFrontToken(text,iX);
 		a2.isString(textSegments[0],iX);
 		a3.isString(textSegments[1],iX);
 	}
@@ -365,36 +375,40 @@ public abstract class SymbolicInformation extends DataAbstraction {
 		Term inputText= retrieveTextString(iX);
 		extractFrontToken3s(iX,inputText,token,rest);
 	}
-	protected String[] extractFrontToken(String text) throws Backtracking {
-		LexicalScanner scanner= new LexicalScanner(true);
-		PrologToken[] tokens= scanner.analyse(text,true);
-		if (tokens.length > 2) { // The last token is END_OF_TEXT/REST_OF_TEXT.
-			int p1= tokens[0].position;
-			int p2= tokens[1].position;
-			String[] result= new String[2];
-			result[0]= text.substring(p1,p2);
-			result[1]= text.substring(p2);
-			return result;
-		} else if (tokens.length==2) {
-			int p1= tokens[0].position;
-			int p2= tokens[1].position;
-			String[] result= new String[2];
-			if (p2 <= text.length()) {
+	protected String[] extractFrontToken(String text, ChoisePoint iX) throws Backtracking {
+		LexicalScanner scanner= new LexicalScanner(dummyLexicalScannerMaster,true);
+		try {
+			PrologToken[] tokens= scanner.analyse(text,true,iX);
+			if (tokens.length > 2) { // The last token is END_OF_TEXT/REST_OF_TEXT.
+				int p1= tokens[0].getPosition();
+				int p2= tokens[1].getPosition();
+				String[] result= new String[2];
 				result[0]= text.substring(p1,p2);
 				result[1]= text.substring(p2);
+				return result;
+			} else if (tokens.length==2) {
+				int p1= tokens[0].getPosition();
+				int p2= tokens[1].getPosition();
+				String[] result= new String[2];
+				if (p2 <= text.length()) {
+					result[0]= text.substring(p1,p2);
+					result[1]= text.substring(p2);
+				} else {
+					result[0]= text.substring(p1);
+					result[1]= "";
+				};
+				return result;
 			} else {
-				result[0]= text.substring(p1);
-				result[1]= "";
-			};
-			return result;
-		} else {
+				throw Backtracking.instance;
+			}
+		} catch (LexicalScannerError e) {
 			throw Backtracking.instance;
 		}
 	}
 	//
 	public void extractTokens1ff(ChoisePoint iX, PrologVariable result, Term a1) {
 		String text= GeneralConverters.argumentToString(a1,iX);
-		result.setNonBacktrackableValue(extractTokens(text));
+		result.setNonBacktrackableValue(extractTokens(text,iX));
 	}
 	public void extractTokens1fs(ChoisePoint iX, Term a1) {
 	}
@@ -404,11 +418,11 @@ public abstract class SymbolicInformation extends DataAbstraction {
 	}
 	public void extractTokens0fs(ChoisePoint iX) {
 	}
-	protected Term extractTokens(String text) {
+	protected Term extractTokens(String text, ChoisePoint iX) {
 		ArrayList<Term> tokens= new ArrayList<Term>(0);
 		while (true) {
 			try {
-				String[] textSegments= extractFrontToken(text);
+				String[] textSegments= extractFrontToken(text,iX);
 				tokens.add(new PrologString(textSegments[0]));
 				text= textSegments[1];
 			} catch (Backtracking b) {
@@ -482,6 +496,71 @@ public abstract class SymbolicInformation extends DataAbstraction {
 			buffer= new PrologList(new PrologString(value),buffer);
 		};
 		return buffer;
+	}
+	//
+	public void extractLine4s(ChoisePoint iX, Term a1, PrologVariable a2, PrologVariable a3, PrologVariable a4) throws Backtracking {
+		int textPosition= GeneralConverters.argumentToSmallInteger(a1,iX);
+		Term inputText= retrieveTextString(iX);
+		extractLine5s(iX,a1,inputText,a2,a3,a4);
+	}
+	public void extractLine5s(ChoisePoint iX, Term a1, Term a2, PrologVariable a3, PrologVariable a4, PrologVariable a5) throws Backtracking {
+		int textPosition= GeneralConverters.argumentToSmallInteger(a1,iX);
+		String inputText= GeneralConverters.argumentToString(a2,iX);
+		extractLine(textPosition,inputText,a3,a4,a5,iX);
+	}
+	protected void extractLine(int givenTextPosition, String text, PrologVariable lineText, PrologVariable lineNumber, PrologVariable positionInLine, ChoisePoint iX) throws Backtracking {
+		int currentLineNumber= 0;
+		int currentLineStart= 0;
+		int currentPositionInLine= 0;
+		char[] characters= text.toCharArray();
+		int textLength= characters.length;
+		int position= 0;
+		boolean processSupplementaryCharacter= false;
+		char c1;
+		char c2;
+		int code;
+		while (true) {
+			if (position==givenTextPosition) {
+				int endLinePosition= textLength;
+				for (int k=position; k < textLength; k++) {
+					if (characters[k]=='\n') {
+						endLinePosition= k;
+						break;
+					}
+				};
+				String line= text.substring(currentLineStart,endLinePosition);
+				lineText.setBacktrackableValue(new PrologString(line),iX);
+				lineNumber.setBacktrackableValue(new PrologInteger(currentLineNumber),iX);
+				positionInLine.setBacktrackableValue(new PrologInteger(currentPositionInLine),iX);
+				return;
+			};
+			if (position >= textLength) {
+				throw Backtracking.instance;
+			};
+			c1= characters[position];
+			if (	(position + 1 <= textLength - 1) &&
+				Character.isSurrogatePair(c1,characters[position+1])) {
+				c2= characters[position+1];
+				code= Character.toCodePoint(c1,c2);
+				processSupplementaryCharacter= true;
+			} else {
+				c2= 0;
+				code= c1;
+				processSupplementaryCharacter= false;
+			};
+			if (code == '\n') {
+				currentLineNumber++;
+				currentLineStart= position + 1;
+				currentPositionInLine= -1;
+			};
+			if (processSupplementaryCharacter) {
+				position= position + 2;
+				currentPositionInLine= currentPositionInLine + 2;
+			} else {
+				position++;
+				currentPositionInLine++;
+			}
+		}
 	}
 	//
 	// (i,o,o)

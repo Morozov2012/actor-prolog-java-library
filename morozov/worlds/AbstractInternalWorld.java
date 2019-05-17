@@ -13,6 +13,12 @@ public abstract class AbstractInternalWorld extends OwnWorld {
 	//
 	public AbstractProcess currentProcess;
 	//
+	private static final long serialVersionUID= 0xBCEFE35DEDAE866EL; // -4832393882586151314L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.worlds","AbstractInternalWorld");
+	// }
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	abstract public Continuation createContinuation(Continuation aC);

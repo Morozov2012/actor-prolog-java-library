@@ -142,7 +142,8 @@ public class ScalableToggleButton extends ScalableButton {
 				} catch (TermIsNotAString e2) {
 					setUncertain(true);
 				}
-			}
+			};
+			targetDialog.safelyInvalidateAndRepaint();
 			// if (targetDialog!=null) {
 			//	targetDialog.reportValueUpdate(this);
 			// }

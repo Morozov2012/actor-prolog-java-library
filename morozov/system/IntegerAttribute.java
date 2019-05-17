@@ -18,7 +18,9 @@ public class IntegerAttribute implements Serializable {
 	protected boolean useDefaultValue;
 	protected long value;
 	//
-	private static final long serialVersionUID= 1;
+	// private static final long serialVersionUID= 0x2964B349906196E2L; // 2982705981762410210L;
+	// private static final long serialVersionUID= 0x1L; // 1L
+	private static final long serialVersionUID= 0x2964B349906196E2L; // 2982705981762410210L
 	//
 	// static {
 	//	SerialVersionChecker.check(serialVersionUID,"morozov.system","IntegerAttribute");

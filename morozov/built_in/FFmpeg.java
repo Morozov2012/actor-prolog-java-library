@@ -2,7 +2,6 @@
 
 package morozov.built_in;
 
-import static org.bytedeco.javacpp.avformat.*;
 import static org.bytedeco.javacpp.avutil.*;
 
 import morozov.run.*;
@@ -10,30 +9,37 @@ import morozov.system.*;
 import morozov.system.converters.*;
 import morozov.system.ffmpeg.*;
 import morozov.system.ffmpeg.errors.*;
+import morozov.system.ffmpeg.interfaces.*;
 import morozov.system.files.*;
+import morozov.system.frames.interfaces.*;
+import morozov.system.frames.tools.*;
+import morozov.system.kinect.frames.interfaces.*;
 import morozov.terms.*;
 import morozov.worlds.*;
 
 import java.math.BigInteger;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
-public abstract class FFmpeg extends BufferedImageController implements FFmpegInterface {
+public abstract class FFmpeg extends ReadWriteBuffer implements FFmpegInterface {
 	//
 	protected FFmpegOperatingMode operatingMode;
-	protected NumericalValue slowMotionCoefficient;
+	// protected NumericalValue slowMotionCoefficient;
+	// protected IntegerAttribute maximalFrameDelay;
 	//
 	protected AtomicReference<FFmpegOperatingMode> actingFFmpegOperatingMode= new AtomicReference<>();
-	protected AtomicReference<FFmpegDataReadingError> dataTransferError= new AtomicReference<>();
+	// protected AtomicReference<FFmpegDataTransferError> dataReadingError= new AtomicReference<>();
+	// protected AtomicReference<FFmpegDataTransferError> dataWritingError= new AtomicReference<>();
 	//
 	protected FFmpegFrameReadingTask frameReadingTask= new FFmpegFrameReadingTask(this);
 	protected FFmpegFrameRecordingTask frameRecordingTask= new FFmpegFrameRecordingTask(this);
 	protected FFmpegVideoSizeEstimator videoSizeEstimator= new FFmpegVideoSizeEstimator(this);
 	//
 	protected FFmpegFrame recentFrame;
-	protected AtomicLong numberOfRecentReceivedFrame= new AtomicLong(-1);
+	// protected AtomicLong numberOfRecentReceivedFrame= new AtomicLong(-1);
 	//
-	protected FFmpegFrame committedFrame;
+	// protected AtomicBoolean containsNewFrame= new AtomicBoolean(false);
+	//
+	protected FFmpegFrameInterface committedFrame;
 	protected long committedFrameNumber= -1;
 	protected long committedFrameTime= -1;
 	protected AVRational committedTimeBase= null;
@@ -52,14 +58,15 @@ public abstract class FFmpeg extends BufferedImageController implements FFmpegIn
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	abstract public long entry_s_FrameObtained_0();
-	abstract public long entry_s_DataTransferCompletion_0();
-	abstract public long entry_s_BufferOverflow_0();
-	abstract public long entry_s_BufferDeallocation_0();
-	abstract public long entry_s_DataTransferError_1_i();
+	// abstract public long entry_s_FrameObtained_0();
+	// abstract public long entry_s_DataTransferCompletion_0();
+	// abstract public long entry_s_BufferOverflow_0();
+	// abstract public long entry_s_BufferDeallocation_0();
+	// abstract public long entry_s_DataTransferError_1_i();
 	//
 	abstract public Term getBuiltInSlot_E_operating_mode();
-	abstract public Term getBuiltInSlot_E_slow_motion_coefficient();
+	// abstract public Term getBuiltInSlot_E_slow_motion_coefficient();
+	// abstract public Term getBuiltInSlot_E_maximal_frame_delay();
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -85,39 +92,46 @@ public abstract class FFmpeg extends BufferedImageController implements FFmpegIn
 		}
 	}
 	//
-	// get/set slow_motion_coefficient
+	///////////////////////////////////////////////////////////////
 	//
-	public void setSlowMotionCoefficient1s(ChoisePoint iX, Term a1) {
-		setSlowMotionCoefficient(NumericalValue.argumentToNumericalValue(a1,iX));
+	public void setWriteBufferSize(int value) {
+		super.setWriteBufferSize(value);
+		frameRecordingTask.setWriteBufferSize(value);
 	}
+	//
+	public void setOutputDebugInformation(BigInteger value) {
+		super.setOutputDebugInformation(value);
+		int mode= PrologInteger.toInteger(value);
+		frameRecordingTask.setOutputDebugInformation(mode);
+	}
+	//
 	public void setSlowMotionCoefficient(NumericalValue value) {
-		slowMotionCoefficient= value;
-		frameReadingTask.setSlowMotionCoefficient(slowMotionCoefficient);
+		super.setSlowMotionCoefficient(value);
+		frameReadingTask.setSlowMotionCoefficient(value);
 	}
-	public void getSlowMotionCoefficient0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(getSlowMotionCoefficient(iX).toTerm());
-	}
-	public void getSlowMotionCoefficient0fs(ChoisePoint iX) {
-	}
-	public NumericalValue getSlowMotionCoefficient(ChoisePoint iX) {
-		if (slowMotionCoefficient != null) {
-			return slowMotionCoefficient;
-		} else {
-			Term value= getBuiltInSlot_E_slow_motion_coefficient();
-			return NumericalValue.argumentToNumericalValue(value,iX);
-		}
+	//
+	public void setMaximalFrameDelay(IntegerAttribute value) {
+		super.setMaximalFrameDelay(value);
+		frameReadingTask.setMaximalFrameDelay(value);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void recentReadingError2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) throws Backtracking {
-		FFmpegDataReadingError error= dataTransferError.get();
-		if (error != null) {
-			a1.setBacktrackableValue(new PrologInteger(error.getNumberOfFrameToBeAcquired()),iX);
-			a2.setBacktrackableValue(new PrologString(error.getException().toString()),iX);
-		} else {
-			throw Backtracking.instance;
+	public void resetCounters() {
+		synchronized (numberOfRecentReceivedFrame) {
+			super.resetCounters();
+			recentFrame= null;
+			committedFrame= null;
 		}
+	}
+	//
+	protected void resetFrameRate() {
+		committedTimeBase= null;
+		committedAverageFrameRate= null;
+		committedFrameNumber= -1;
+		committedFrameTime= -1;
+		firstCommittedFrameNumber= -1;
+		firstCommittedFrameTime= -1;
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -169,7 +183,7 @@ public abstract class FFmpeg extends BufferedImageController implements FFmpegIn
 			if (a4 != null) {
 				options= FFmpegCodecOption.argumentToCodecOptions(a4,iX);
 			};
-			resetBuffer();
+			resetCounters();
 			FFmpegOperatingMode currentOperatingMode= getOperatingMode(iX);
 			switch (currentOperatingMode) {
 			case PLAYING:
@@ -177,12 +191,16 @@ public abstract class FFmpeg extends BufferedImageController implements FFmpegIn
 				openReadingOrPlaying(currentOperatingMode,currentFileName,formatName,streams,options,iX);
 				break;
 			case READING:
+				frameReadingTask.setMaximalFrameDelay(getMaximalFrameDelay(iX));
 				frameReadingTask.setStopAfterSingleReading(true);
 				openReadingOrPlaying(currentOperatingMode,currentFileName,formatName,streams,options,iX);
 				break;
 			case WRITING:
 				actingFFmpegOperatingMode.set(currentOperatingMode);
-				frameRecordingTask.openWriting(currentFileName,formatName,streams,options);
+				setActingMetadata(iX);
+				MetadataDescription metadataDescription= createMetadataDescription();
+				frameRecordingTask.setWriteBufferSize(getWriteBufferSize(iX));
+				frameRecordingTask.openWriting(currentFileName,formatName,streams,options,metadataDescription);
 				break;
 			}
 		}
@@ -192,25 +210,11 @@ public abstract class FFmpeg extends BufferedImageController implements FFmpegIn
 		int currentTimeout= getMaximalWaitingTimeInMilliseconds(iX);
 		CharacterSet currentCharacterSet= getCharacterSet(iX);
 		NumericalValue currentSlowMotionCoefficient= getSlowMotionCoefficient(iX);
+		IntegerAttribute currentMaximalFrameDelay= getMaximalFrameDelay(iX);
 		actingFFmpegOperatingMode.set(currentOperatingMode);
 		frameReadingTask.setSlowMotionCoefficient(currentSlowMotionCoefficient);
+		frameReadingTask.setMaximalFrameDelay(currentMaximalFrameDelay);
 		frameReadingTask.openReading(currentFileName,currentTimeout,currentCharacterSet,formatName,streams,options,staticContext);
-	}
-	//
-	public void resetBuffer() {
-		synchronized (numberOfRecentReceivedFrame) {
-			recentFrame= null;
-			numberOfRecentReceivedFrame.set(-1);
-			committedFrame= null;
-			committedFrameNumber= -1;
-			committedFrameTime= -1;
-			committedTimeBase= null;
-			committedAverageFrameRate= null;
-			// committedBeginningTime= -1;
-			firstCommittedFrameNumber= -1;
-			firstCommittedFrameTime= -1;
-			dataTransferError.set(null);
-		}
 	}
 	//
 	public void start0s(ChoisePoint iX) {
@@ -222,10 +226,14 @@ public abstract class FFmpeg extends BufferedImageController implements FFmpegIn
 		switch (actingOperatingMode) {
 		case PLAYING:
 			frameReadingTask.setStopAfterSingleReading(false);
+			frameReadingTask.setSlowMotionCoefficient(getSlowMotionCoefficient(iX));
+			frameReadingTask.setMaximalFrameDelay(getMaximalFrameDelay(iX));
 			frameReadingTask.activateReading();
 			break;
 		case READING:
 			frameReadingTask.setStopAfterSingleReading(true);
+			frameReadingTask.setSlowMotionCoefficient(getSlowMotionCoefficient(iX));
+			frameReadingTask.setMaximalFrameDelay(getMaximalFrameDelay(iX));
 			frameReadingTask.activateReading();
 			break;
 		case WRITING:
@@ -250,6 +258,9 @@ public abstract class FFmpeg extends BufferedImageController implements FFmpegIn
 	//
 	public void seekFrameNumber1s(ChoisePoint iX, Term a1) {
 		BigInteger position= GeneralConverters.argumentToStrictInteger(a1,iX);
+		seekFrameNumber(position,iX);
+	}
+	protected void seekFrameNumber(BigInteger position, ChoisePoint iX) {
 		long targetNumber= PrologInteger.toLong(position);
 		FFmpegOperatingMode currentOperatingMode= actingFFmpegOperatingMode.get();
 		if (currentOperatingMode==null) {
@@ -268,6 +279,9 @@ public abstract class FFmpeg extends BufferedImageController implements FFmpegIn
 	//
 	public void seekFrameTime1s(ChoisePoint iX, Term a1) {
 		double targetTime= GeneralConverters.argumentToReal(a1,iX);
+		seekFrameTime(targetTime,iX);
+	}
+	protected void seekFrameTime(double targetTime, ChoisePoint iX) {
 		FFmpegOperatingMode currentOperatingMode= actingFFmpegOperatingMode.get();
 		if (currentOperatingMode==null) {
 			open(iX,null,null,null,null);
@@ -281,6 +295,27 @@ public abstract class FFmpeg extends BufferedImageController implements FFmpegIn
 		case WRITING:
 			throw new FFmpegFilesDoNotSupportThisOperationInWritingMode();
 		}
+	}
+	//
+	public void requestBufferedFrame1s(ChoisePoint iX, Term a1) {
+		BigInteger position= GeneralConverters.argumentToStrictInteger(a1,iX);
+		seekFrameNumber(position,iX);
+		frameReadingTask.setStopAfterSingleReading(true);
+		frameReadingTask.setSlowMotionCoefficient(getSlowMotionCoefficient(iX));
+		frameReadingTask.setMaximalFrameDelay(getMaximalFrameDelay(iX));
+	}
+	//
+	public void retrieveTimedFrame1s(ChoisePoint iX, Term a1) throws Backtracking {
+		double targetTime= GeneralConverters.argumentToReal(a1,iX);
+		seekFrameTime(targetTime,iX);
+		frameReadingTask.setStopAfterSingleReading(true);
+		frameReadingTask.setSlowMotionCoefficient(getSlowMotionCoefficient(iX));
+		frameReadingTask.setMaximalFrameDelay(getMaximalFrameDelay(iX));
+		containsNewFrame.set(false);
+		frameReadingTask.activateReading();
+		while (!containsNewFrame.get() && frameReadingTask.inputIsOpen() && frameReadingTask.isActive()) {
+		};
+		commit(iX);
 	}
 	//
 	public void getVideoSequenceSize1s(ChoisePoint iX, Term a1) {
@@ -303,7 +338,15 @@ public abstract class FFmpeg extends BufferedImageController implements FFmpegIn
 		a1.setBacktrackableValue(new PrologInteger(size),iX);
 	}
 	//
+	public void stop0s(ChoisePoint iX) {
+		stopAndClose(iX);
+	}
+	//
 	public void close0s(ChoisePoint iX) {
+		stopAndClose(iX);
+	}
+	//
+	protected void stopAndClose(ChoisePoint iX) {
 		FFmpegOperatingMode currentOperatingMode= actingFFmpegOperatingMode.get();
 		if (currentOperatingMode==null) {
 			return;
@@ -327,6 +370,18 @@ public abstract class FFmpeg extends BufferedImageController implements FFmpegIn
 		FFmpegOperatingMode currentOperatingMode= actingFFmpegOperatingMode.get();
 		if (currentOperatingMode==null) {
 			throw Backtracking.instance;
+		};
+		switch (currentOperatingMode) {
+		case PLAYING:
+		case READING:
+			if (!frameReadingTask.inputIsOpen()) {
+				throw Backtracking.instance;
+			};
+			break;
+		case WRITING:
+			if (!frameRecordingTask.outputIsOpen()) {
+				throw Backtracking.instance;
+			}
 		}
 	}
 	//
@@ -338,7 +393,9 @@ public abstract class FFmpeg extends BufferedImageController implements FFmpegIn
 		switch (currentOperatingMode) {
 		case PLAYING:
 		case READING:
-			if (!frameReadingTask.isActive()) {
+			if (!frameReadingTask.inputIsOpen()) {
+				throw Backtracking.instance;
+			} else if (frameReadingTask.stopThisThread()) {
 				throw Backtracking.instance;
 			};
 			break;
@@ -364,6 +421,22 @@ public abstract class FFmpeg extends BufferedImageController implements FFmpegIn
 		}
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void isCommitted0s(ChoisePoint iX) throws Backtracking {
+		synchronized (numberOfRecentReceivedFrame) {
+			if (committedFrameIsNull()) {
+				throw Backtracking.instance;
+			}
+		}
+	}
+	//
+	protected boolean committedFrameIsNull() {
+		return (committedFrame==null);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void eof0s(ChoisePoint iX) throws Backtracking {
 		FFmpegOperatingMode currentOperatingMode= actingFFmpegOperatingMode.get();
 		if (currentOperatingMode==null) {
@@ -388,13 +461,26 @@ public abstract class FFmpeg extends BufferedImageController implements FFmpegIn
 	///////////////////////////////////////////////////////////////
 	//
 	public void commit0s(ChoisePoint iX) throws Backtracking {
+		if (committedFrameWasAssignedDirectly.get()) {
+			if (committedFrame==null) {
+				throw Backtracking.instance;
+			}
+		} else {
+			commit(iX);
+		}
+	}
+	protected void commit(ChoisePoint iX) throws Backtracking {
+		containsNewFrame.set(false);
 		synchronized (numberOfRecentReceivedFrame) {
 			if (recentFrame==null) {
 				throw Backtracking.instance;
 			};
 			committedFrame= recentFrame;
 			committedFrameNumber= numberOfRecentReceivedFrame.get();
-		};
+			updateCommittedFrameTime();
+		}
+	}
+	protected void updateCommittedFrameTime() {
 		if (committedFrame != null) {
 			committedFrameTime= committedFrame.getTime();
 			committedTimeBase= committedFrame.getTimeBase();
@@ -424,6 +510,15 @@ public abstract class FFmpeg extends BufferedImageController implements FFmpegIn
 	}
 	//
 	public void getRecentFrameRate1s(ChoisePoint iX, PrologVariable a1) {
+		long deltaN;
+		long deltaTime;
+		synchronized (numberOfRecentReceivedFrame) {
+			deltaN= committedFrameNumber - firstCommittedFrameNumber;
+			deltaTime= committedFrameTime - firstCommittedFrameTime;
+		};
+		double rate= computeFrameRate(deltaN,deltaTime);
+		a1.setBacktrackableValue(new PrologReal(rate),iX);
+		/*
 		long deltaN= committedFrameNumber - firstCommittedFrameNumber;
 		double deltaTime= FFmpegTools.computeTime((committedFrameTime - firstCommittedFrameTime),committedTimeBase);
 		double rate;
@@ -433,6 +528,7 @@ public abstract class FFmpeg extends BufferedImageController implements FFmpegIn
 			rate= -1.0;
 		};
 		a1.setBacktrackableValue(new PrologReal(rate),iX);
+		*/
 	}
 	//
 	public void getAverageFrameRate1s(ChoisePoint iX, PrologVariable a1) {
@@ -483,60 +579,49 @@ public abstract class FFmpeg extends BufferedImageController implements FFmpegIn
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void frameObtained0s(ChoisePoint iX) {
-	}
-	public void dataTransferCompletion0s(ChoisePoint iX) {
-	}
-	public void bufferOverflow0s(ChoisePoint iX) {
-	}
-	public void bufferDeallocation0s(ChoisePoint iX) {
-	}
-	public void dataTransferError1s(ChoisePoint iX, Term a1) {
-	}
-	//
-	///////////////////////////////////////////////////////////////
-	//
-	public void sendFrame(FFmpegFrame frame) {
+	public void sendFFmpegFrame(FFmpegFrame frame) {
 		// FFmpegOperatingMode currentOperatingMode= actingFFmpegOperatingMode.get();
 		synchronized (numberOfRecentReceivedFrame) {
 			recentFrame= frame;
-			numberOfRecentReceivedFrame.set(frame.getNumber());
+			// numberOfRecentReceivedFrame.set(frame.getNumber());
+			numberOfRecentReceivedFrame.incrementAndGet();
+			numberOfRecentReceivedFrame.notifyAll();
 		};
 		sendFrameObtained();
 	}
 	//
-	protected void sendFrameObtained() {
-		long domainSignature= entry_s_FrameObtained_0();
-		AsyncCall call= new AsyncCall(domainSignature,this,true,false,noArguments,true);
-		transmitAsyncCall(call,null);
+	public boolean sendDataFrame(DataFrameInterface frame) {
+		return false;
+	}
+	public boolean sendCompoundFrame(CompoundFrameInterface frame) {
+		return false;
+	}
+	public boolean sendKinectFrame(KinectFrameInterface frame) {
+		return false;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void completeDataTransfer(long numberOfAcquiredFrames) {
-		dataTransferError.set(null);
-		long domainSignature= entry_s_DataTransferCompletion_0();
-		AsyncCall call= new AsyncCall(domainSignature,this,true,false,noArguments,true);
-		transmitAsyncCall(call,null);
-	}
-	public void completeDataTransfer(long numberOfFrameToBeAcquired, Throwable e) {
-		dataTransferError.set(new FFmpegDataReadingError(numberOfFrameToBeAcquired,e));
-		long domainSignature= entry_s_DataTransferError_1_i();
-		Term[] arguments= new Term[]{new PrologString(e.toString())};
-		// 2018.10.30: AsyncCall call= new AsyncCall(domainSignature,this,true,false,arguments,true);
-		AsyncCall call= new AsyncCall(domainSignature,this,true,true,arguments,true);
-		transmitAsyncCall(call,null);
+	public void extractFrame(String key, CompoundFrameInterface container) {
+		if (committedFrame != null) {
+			EnumeratedFFmpegFrame enumeratedFrame= new EnumeratedFFmpegFrame(
+				committedFrame,
+				this,
+				committedFrameNumber);
+			container.insertComponent(key,enumeratedFrame);
+		} else {
+			throw new FFmpegFrameIsNotCommitted();
+		}
 	}
 	//
-	public void reportBufferOverflow() {
-		long domainSignature= entry_s_BufferOverflow_0();
-		AsyncCall call= new AsyncCall(domainSignature,this,true,false,noArguments,true);
-		transmitAsyncCall(call,null);
-	}
-	//
-	public void annulBufferOverflow() {
-		long domainSignature= entry_s_BufferDeallocation_0();
-		AsyncCall call= new AsyncCall(domainSignature,this,true,false,noArguments,true);
-		transmitAsyncCall(call,null);
+	public void assignFrame(String key, CompoundFrameInterface container, ChoisePoint iX) {
+		EnumeratedFFmpegFrame enumeratedFrame= (EnumeratedFFmpegFrame)container.getComponent(key);
+		synchronized (numberOfRecentReceivedFrame) {
+			committedFrame= enumeratedFrame.getFrame();
+			committedFrameWasAssignedDirectly.set(true);
+			// committedFrameNumber= enumeratedFrame.getNumberOfFrame();
+			committedFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
+			updateCommittedFrameTime();
+		}
 	}
 }

@@ -12,6 +12,11 @@ public class ForeignDomainWrapper
 	//
 	public ExternalDomainInterface stub;
 	//
+	private static final long serialVersionUID= 0x62B9475553FB9EC5L; // 7113795518215200453L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.worlds.remote","ForeignDomainWrapper");
+	// }
 	public ForeignDomainWrapper(ExternalDomainInterface s) {
 		stub= s;
 	}

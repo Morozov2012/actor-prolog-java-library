@@ -14,6 +14,12 @@ public abstract class MonoArgumentDomainItem extends DomainAlternative {
 	protected String domainTableEntry;
 	protected transient PrologDomain domainItem;
 	//
+	private static final long serialVersionUID= 0xFC5963000F620330L; // -263070251315231952L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","MonoArgumentDomainItem");
+	// }
+	//
 	public MonoArgumentDomainItem(String entry) {
 		domainTableEntry= entry;
 	}

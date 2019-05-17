@@ -73,6 +73,7 @@ public abstract class CanvasSpace {
 	protected void quicklyRefineWidth(double ratio) {
 		if (customControlComponent != null) {
 			customControlComponent.refineWidth(ratio);
+			dialog.safelyInvalidateAndRepaint();
 		}
 	}
 	//
@@ -94,6 +95,7 @@ public abstract class CanvasSpace {
 	protected void quicklyRefineHeight(double ratio) {
 		if (customControlComponent != null) {
 			customControlComponent.refineHeight(ratio);
+			dialog.safelyInvalidateAndRepaint();
 		}
 	}
 	//

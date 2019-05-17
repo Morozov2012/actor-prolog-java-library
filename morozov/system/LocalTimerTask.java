@@ -16,6 +16,11 @@ public class LocalTimerTask extends TimerTask {
 	}
 	//
 	public void run() {
+// try {
+// System.err.printf("LocalTimerTask:run()\n");
 		currentProcess.receiveTimerMessage(targetWorld);
+// } catch (Throwable eee) {
+// eee.printStackTrace();
+// }
 	}
 }

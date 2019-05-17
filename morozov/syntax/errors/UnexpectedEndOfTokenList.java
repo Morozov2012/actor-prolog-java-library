@@ -2,8 +2,10 @@
 
 package morozov.syntax.errors;
 
+import morozov.syntax.scanner.*;
+
 public class UnexpectedEndOfTokenList extends ParserError {
-	public UnexpectedEndOfTokenList(int p) {
-		super(p);
+	public UnexpectedEndOfTokenList(PrologToken[] tokens) {
+		super(tokens[tokens.length-1].getPosition());
 	}
 }

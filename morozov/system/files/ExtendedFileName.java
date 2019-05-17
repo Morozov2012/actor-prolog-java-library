@@ -1014,7 +1014,7 @@ public class ExtendedFileName extends RelativeFileName {
 					Path path= getPathOfLocalResource();
 					InputStream inputStream= Files.newInputStream(path);
 					BufferedInputStream bufferedStream= new BufferedInputStream(inputStream);
-					ObjectInputStream objectStream= new DataStoreInputStream(bufferedStream,true);
+					ObjectInputStream objectStream= new DataStoreInputStream(bufferedStream/*,true*/);
 					try {
 						return objectStream.readObject();
 					} finally {
@@ -1029,7 +1029,7 @@ public class ExtendedFileName extends RelativeFileName {
 				}
 			} else {
 				if (systemName==StandardFileName.STDIN) {
-					ObjectInputStream objectStream= new DataStoreInputStream(new BufferedInputStream(System.in),true);
+					ObjectInputStream objectStream= new DataStoreInputStream(new BufferedInputStream(System.in)/*,true*/);
 					return objectStream.readObject();
 				} else {
 					throw new StandardOutputStreamDoesNotSupportThisOperation();

@@ -13,6 +13,12 @@ import java.math.BigInteger;
 
 public class DomainIntegerRange extends DomainAlternative {
 	//
+	private static final long serialVersionUID= 0x5A97EE04EFF3C150L; // 6527947889869832528L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","DomainIntegerRange");
+	// }
+	//
 	protected BigInteger leftBound;
 	protected BigInteger rightBound;
 	//

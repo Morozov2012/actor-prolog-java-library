@@ -12,6 +12,14 @@ public final class PrologNoValue extends Term {
 	public static final PrologNoValue instance= new PrologNoValue();
 	public static final String namePrologNoValue= "~";
 	//
+	private static final long serialVersionUID= 0x24584BCE49AC1715L; // 2618926532687304469L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","PrologNoValue");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	private PrologNoValue() {
 	}
 	//

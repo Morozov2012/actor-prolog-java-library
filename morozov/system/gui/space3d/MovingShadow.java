@@ -33,7 +33,7 @@ import javax.vecmath.SingularMatrixException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 
-class MovingShadow extends Group {
+public class MovingShadow extends Group {
 	public MovingShadow(Canvas3D targetWorld, NodeLabel dodecahedron, Node baseGroup, NodeLabel light, Vector4d plane, double standoff, Appearance appearance, Bounds bounds) {
 		setCapability(Group.ALLOW_CHILDREN_WRITE);
 		//

@@ -3,7 +3,7 @@
 package morozov.built_in;
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.errors.*;
 import morozov.system.gui.*;
 import morozov.terms.*;
@@ -93,13 +93,13 @@ public abstract class DesktopWindow extends Alpha {
 	}
 	//
 	public void setExitOnClose1s(ChoisePoint iX, Term a1) {
-		boolean mode= YesNo.termYesNo2Boolean(a1,iX);
+		boolean mode= YesNoConverters.termYesNo2Boolean(a1,iX);
 		StaticDesktopAttributes.setExitOnClose(mode,staticContext);
 	}
 	//
 	public void getExitOnClose0ff(ChoisePoint iX, PrologVariable result) {
 		boolean mode= StaticDesktopAttributes.retrieveExitOnClose(staticContext);
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(mode));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(mode));
 	}
 	public void getExitOnClose0fs(ChoisePoint iX) {
 	}
@@ -251,5 +251,10 @@ public abstract class DesktopWindow extends Alpha {
 		} else {
 			throw Backtracking.instance;
 		}
+	}
+	//
+	public void collectGarbage0s(ChoisePoint iX) {
+		System.runFinalization();
+		System.gc();
 	}
 }

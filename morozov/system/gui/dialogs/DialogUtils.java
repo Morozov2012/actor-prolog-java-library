@@ -25,10 +25,18 @@ public class DialogUtils {
 	//
 	protected static Term termDefault= new PrologSymbol(SymbolCodes.symbolCode_E_default);
 	//
-	public static int calculateRealCoordinate(ExtendedCoordinate lZ, int spaceBeginning, int spaceLimit, double gridZ, double rDZ)
+	public static int calculateAbsoluteCoordinate(ExtendedCoordinate lZ, int spaceBeginning, int spaceLimit, double gridZ, double rDZ)
 			throws UseDefaultLocation {
 		try {
 			return PrologInteger.toInteger(spaceBeginning + lZ.getDoubleValue() / gridZ * spaceLimit );
+		} catch (CentreFigure e) {
+			return PrologInteger.toInteger(spaceBeginning + ((double)spaceLimit - rDZ) / 2);
+		}
+	}
+	public static int calculateAbsoluteCoordinate(ExtendedCoordinate lZ, int spaceBeginning, int spaceLimit, double rDZ)
+			throws UseDefaultLocation {
+		try {
+			return PrologInteger.toInteger(spaceBeginning + lZ.getDoubleValue());
 		} catch (CentreFigure e) {
 			return PrologInteger.toInteger(spaceBeginning + ((double)spaceLimit - rDZ) / 2);
 		}
@@ -46,7 +54,7 @@ public class DialogUtils {
 			return;
 		};
 		try {
-			while(true) {
+			while (true) {
 				Term value= tail.getNextListHead(iX);
 				listToStringVector(array,value,iX);
 				tail= tail.getNextListTail(iX);
@@ -75,7 +83,7 @@ public class DialogUtils {
 			return;
 		};
 		try {
-			while(true) {
+			while (true) {
 				Term value= tail.getNextListHead(iX);
 				listToStringArray(array,value,iX);
 				tail= tail.getNextListTail(iX);
@@ -104,11 +112,11 @@ public class DialogUtils {
 			return;
 		};
 		try {
-			while(true) {
+			while (true) {
 				Term rowTail= tail.getNextListHead(iX);
 				ArrayList<String> columns= new ArrayList<String>();
 				try {
-					while(true) {
+					while (true) {
 						Term cell= rowTail.getNextListHead(iX);
 						cell= cell.dereferenceValue(iX);
 						if (	!cell.thisIsFreeVariable() &&
@@ -180,7 +188,7 @@ public class DialogUtils {
 						array.add(new PrologString(text));
 					} catch (TermIsNotAString e4) {
 						try {
-							while(true) {
+							while (true) {
 								Term value= tail.getNextListHead(iX);
 								listToTermArray(array,value,iX);
 								tail= tail.getNextListTail(iX);
@@ -237,7 +245,7 @@ public class DialogUtils {
 						array.add(new PrologString(name.identifier));
 					} catch (TermIsNotASymbol e4) {
 						try {
-							while(true) {
+							while (true) {
 								Term currentRow= tail.getNextListHead(iX);
 								rowToTermArray(array,currentRow,iX);
 								// listToTermArray(array,value,iX);

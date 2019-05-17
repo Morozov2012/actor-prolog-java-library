@@ -172,13 +172,13 @@ public abstract class WebReceptor extends WebResource {
 	// get/set extract_attributes
 	//
 	public void setExtractAttributes1s(ChoisePoint iX, Term a1) {
-		setExtractAttributes(YesNo.termYesNo2Boolean(a1,iX));
+		setExtractAttributes(YesNoConverters.termYesNo2Boolean(a1,iX));
 	}
 	public void setExtractAttributes(boolean value) {
 		extractAttributes= value;
 	}
 	public void getExtractAttributes0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getExtractAttributes(iX)));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(getExtractAttributes(iX)));
 	}
 	public void getExtractAttributes0fs(ChoisePoint iX) {
 	}
@@ -187,20 +187,20 @@ public abstract class WebReceptor extends WebResource {
 			return extractAttributes;
 		} else {
 			Term value= getBuiltInSlot_E_extract_attributes();
-			return YesNo.termYesNo2Boolean(value,iX);
+			return YesNoConverters.termYesNo2Boolean(value,iX);
 		}
 	}
 	//
 	// get/set coalesce_adjacent_strings
 	//
 	public void setCoalesceAdjacentStrings1s(ChoisePoint iX, Term a1) {
-		setCoalesceAdjacentStrings(YesNo.termYesNo2Boolean(a1,iX));
+		setCoalesceAdjacentStrings(YesNoConverters.termYesNo2Boolean(a1,iX));
 	}
 	public void setCoalesceAdjacentStrings(boolean value) {
 		coalesceAdjacentStrings= value;
 	}
 	public void getCoalesceAdjacentStrings0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getCoalesceAdjacentStrings(iX)));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(getCoalesceAdjacentStrings(iX)));
 	}
 	public void getCoalesceAdjacentStrings0fs(ChoisePoint iX) {
 	}
@@ -209,20 +209,20 @@ public abstract class WebReceptor extends WebResource {
 			return coalesceAdjacentStrings;
 		} else {
 			Term value= getBuiltInSlot_E_coalesce_adjacent_strings();
-			return YesNo.termYesNo2Boolean(value,iX);
+			return YesNoConverters.termYesNo2Boolean(value,iX);
 		}
 	}
 	//
 	// get/set truncate_strings
 	//
 	public void setTruncateStrings1s(ChoisePoint iX, Term a1) {
-		setTruncateStrings(YesNo.termYesNo2Boolean(a1,iX));
+		setTruncateStrings(YesNoConverters.termYesNo2Boolean(a1,iX));
 	}
 	public void setTruncateStrings(boolean value) {
 		truncateStrings= value;
 	}
 	public void getTruncateStrings0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getTruncateStrings(iX)));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(getTruncateStrings(iX)));
 	}
 	public void getTruncateStrings0fs(ChoisePoint iX) {
 	}
@@ -231,7 +231,7 @@ public abstract class WebReceptor extends WebResource {
 			return truncateStrings;
 		} else {
 			Term value= getBuiltInSlot_E_truncate_strings();
-			return YesNo.termYesNo2Boolean(value,iX);
+			return YesNoConverters.termYesNo2Boolean(value,iX);
 		}
 	}
 	//
@@ -342,7 +342,7 @@ public abstract class WebReceptor extends WebResource {
 				content= getResourceReferences(targetAddress,wildcard,iX);
 			};
 			ChoisePoint newIx= new ChoisePoint(iX);
-			while(true) {
+			while (true) {
 				try {
 					if (isFunctionCall) {
 						argumentResult.setNonBacktrackableValue(content.getNextListHead(iX));

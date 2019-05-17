@@ -8,8 +8,18 @@ import morozov.worlds.errors.*;
 import java.util.ArrayList;
 
 public class PredefinedClassBacktrackableState extends Term {
+	//
 	private ArrayList<PredefinedClassRecord> table;
 	private int currentSize;
+	//
+	private static final long serialVersionUID= 0x7E032CB9D9844490L; // 9080150450438947984L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.run","PredefinedClassBacktrackableState");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public PredefinedClassBacktrackableState(ArrayList<PredefinedClassRecord> stack) {
 		table= stack;
 		currentSize= stack.size();

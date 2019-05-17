@@ -2,7 +2,8 @@
 
 package morozov.syntax.scanner.errors;
 
-public class WrongTokenIsNotASymbol extends RuntimeException {
-	public WrongTokenIsNotASymbol() {
+public class WrongTokenIsNotASymbol extends LexicalScannerError {
+	public WrongTokenIsNotASymbol(int p) {
+		super(p);
 	}
 }

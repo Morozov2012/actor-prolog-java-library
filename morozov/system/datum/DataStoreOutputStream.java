@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.lang.SecurityException;
 
 public class DataStoreOutputStream extends ObjectOutputStream {
+	//
 	public DataStoreOutputStream() throws IOException, SecurityException {
 		enableReplaceObject(true);
 	}

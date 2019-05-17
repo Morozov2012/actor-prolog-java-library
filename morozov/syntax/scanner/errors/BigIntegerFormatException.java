@@ -4,8 +4,8 @@ package morozov.syntax.scanner.errors;
 
 public class BigIntegerFormatException extends LexicalScannerError {
 	//
-	String mantissa;
-	int radix;
+	protected String mantissa;
+	protected int radix;
 	//
 	///////////////////////////////////////////////////////////////
 	//

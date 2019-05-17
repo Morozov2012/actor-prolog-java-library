@@ -8,6 +8,9 @@ import morozov.domains.*;
 import morozov.domains.errors.*;
 import morozov.domains.signals.*;
 import morozov.run.*;
+import morozov.syntax.*;
+import morozov.syntax.errors.*;
+import morozov.syntax.scanner.errors.*;
 import morozov.system.*;
 import morozov.system.checker.signals.*;
 import morozov.system.converters.*;
@@ -16,9 +19,6 @@ import morozov.system.files.errors.*;
 import morozov.system.datum.*;
 import morozov.system.datum.errors.*;
 import morozov.system.datum.signals.*;
-import morozov.syntax.*;
-import morozov.syntax.errors.*;
-import morozov.syntax.scanner.errors.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 import morozov.worlds.*;
@@ -155,14 +155,14 @@ public abstract class DataStore extends DataAbstraction {
 	// get/set reuse_table_numbers
 	//
 	public void setReuseTableNumbers1s(ChoisePoint iX, Term a1) {
-		boolean reuseTN= YesNo.termYesNo2Boolean(a1,iX);
+		boolean reuseTN= YesNoConverters.termYesNo2Boolean(a1,iX);
 		setReuseTableNumbers(reuseTN);
 	}
 	public void setReuseTableNumbers(boolean value) {
 		reuseTableNumbers= value;
 	}
 	public void getReuseTableNumbers0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getReuseTableNumbers(iX)));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(getReuseTableNumbers(iX)));
 	}
 	public void getReuseTableNumbers0fs(ChoisePoint iX) {
 	}
@@ -171,7 +171,7 @@ public abstract class DataStore extends DataAbstraction {
 			return reuseTableNumbers;
 		} else {
 			Term value= getBuiltInSlot_E_reuse_table_numbers();
-			return YesNo.termYesNo2Boolean(value,iX);
+			return YesNoConverters.termYesNo2Boolean(value,iX);
 		}
 	}
 	//
@@ -655,16 +655,11 @@ public abstract class DataStore extends DataAbstraction {
 				HashMap<String,DatabaseTableContainer> hash= new HashMap<String,DatabaseTableContainer>();
 				loadContent(textBuffer,hash,iX);
 				tableHash.set(hash);
-			} catch (LexicalScannerError e) {
+			} catch (SyntaxError e) {
 				recentErrorText= textBuffer.toString();
 				recentErrorPosition= e.getPosition();
 				recentErrorException= e;
-				throw e;
-			} catch (ParserError e) {
-				recentErrorText= textBuffer.toString();
-				recentErrorPosition= e.getPosition();
-				recentErrorException= e;
-				throw e;
+				throw new ActorPrologParserError(e);
 			} catch (DatabaseRecordDoesNotBelongToDomain e) {
 				recentErrorText= e.text;
 				recentErrorPosition= e.position;
@@ -681,9 +676,9 @@ public abstract class DataStore extends DataAbstraction {
 		}
 	}
 	//
-	public void loadContent(String textBuffer, HashMap<String,DatabaseTableContainer> hash, ChoisePoint iX) throws LexicalScannerError, ParserError, DatabaseRecordDoesNotBelongToDomain {
-		Parser parser= new Parser(true);
-		Term[] terms= parser.stringToTerms(textBuffer);
+	public void loadContent(String textBuffer, HashMap<String,DatabaseTableContainer> hash, ChoisePoint iX) throws SyntaxError, DatabaseRecordDoesNotBelongToDomain {
+		GroundTermParser parser= new GroundTermParser(dummyParserMaster,true);
+		Term[] terms= parser.stringToTerms(textBuffer,null);
 		boolean optimizeSets= DefaultOptions.underdeterminedSetsOptimizationIsEnabled;
 		String currentEntry= null;
 		DatabaseType currentDatabaseType= DatabaseType.PLAIN;
@@ -713,7 +708,7 @@ public abstract class DataStore extends DataAbstraction {
 					} else if (functor==SymbolCodes.symbolCode_E_database_type) {
 						currentDatabaseType= DatabaseType.argumentToDatabaseType(value,iX);
 					} else if (functor==SymbolCodes.symbolCode_E_reuse_key_numbers) {
-						currentReuseKeyNumbers= YesNo.termYesNo2Boolean(value,iX);
+						currentReuseKeyNumbers= YesNoConverters.termYesNo2Boolean(value,iX);
 					} else if (functor==SymbolCodes.symbolCode_E_target_domain) {
 						try {
 							currentTargetDomain= PrologDomain.argumentToPrologDomain(value,iX);
@@ -820,23 +815,23 @@ public abstract class DataStore extends DataAbstraction {
 	}
 	//
 	public void repair1ff(ChoisePoint iX, PrologVariable result, Term a1) {
-		boolean reportActions= YesNo.termYesNo2Boolean(a1,iX);
+		boolean reportActions= YesNoConverters.termYesNo2Boolean(a1,iX);
 		ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
 		result.setNonBacktrackableValue(new PrologInteger(repairContent(fileName,reportActions,staticContext,iX)));
 	}
 	public void repair1fs(ChoisePoint iX, Term a1) {
-		boolean reportActions= YesNo.termYesNo2Boolean(a1,iX);
+		boolean reportActions= YesNoConverters.termYesNo2Boolean(a1,iX);
 		ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
 		repairContent(fileName,reportActions,staticContext,iX);
 	}
 	//
 	public void repair2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
-		boolean reportActions= YesNo.termYesNo2Boolean(a1,iX);
+		boolean reportActions= YesNoConverters.termYesNo2Boolean(a1,iX);
 		ExtendedFileName fileName= retrieveRealGlobalFileName(a2,iX);
 		result.setNonBacktrackableValue(new PrologInteger(repairContent(fileName,reportActions,staticContext,iX)));
 	}
 	public void repair2fs(ChoisePoint iX, Term a1, Term a2) {
-		boolean reportActions= YesNo.termYesNo2Boolean(a1,iX);
+		boolean reportActions= YesNoConverters.termYesNo2Boolean(a1,iX);
 		ExtendedFileName fileName= retrieveRealGlobalFileName(a2,iX);
 		repairContent(fileName,reportActions,staticContext,iX);
 	}

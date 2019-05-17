@@ -18,15 +18,18 @@ import org.bytedeco.javacpp.*;
 
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.files.*;
 import morozov.system.files.errors.*;
 import morozov.system.ffmpeg.errors.*;
+import morozov.system.ffmpeg.interfaces.*;
 
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ByteOrder;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.Condition;
@@ -35,11 +38,14 @@ public class FFmpegFrameReadingTask extends Thread {
 	//
 	protected FFmpegInterface owner;
 	//
-	protected AtomicBoolean stopThisThread= new AtomicBoolean(false);
+	protected AtomicBoolean stopThisThread= new AtomicBoolean(true);
 	protected AtomicBoolean stopAfterSingleReading= new AtomicBoolean(false);
 	protected AtomicReference<Double> slowMotionCoefficient= new AtomicReference<>(-1.0);
 	protected AtomicBoolean inputIsOpen= new AtomicBoolean(false);
 	protected AtomicBoolean internalLoopIsValid= new AtomicBoolean(false);
+	//
+	public static long defaultMaximalFrameDelay= 1000;
+	public AtomicLong maximalFrameDelay= new AtomicLong(defaultMaximalFrameDelay);
 	//
 	protected long beginningRecordTime_InMilliseconds= 0;
 	protected long beginningRecordNumber= 0;
@@ -51,7 +57,6 @@ public class FFmpegFrameReadingTask extends Thread {
 	protected int copyOfFrameCounter= -1;
 	//
 	protected int internalImageMode= AV_PIX_FMT_0RGB32;
-	protected long maximalwaitingPeriod_InMilliseconds= 1000;
 	//
 	protected ExtendedFileName extendedFileName;
 	//
@@ -85,8 +90,23 @@ public class FFmpegFrameReadingTask extends Thread {
 	//
 	public void setSlowMotionCoefficient(NumericalValue coefficient) {
 		if (coefficient != null) {
-			slowMotionCoefficient.set(coefficient.toDouble());
+			slowMotionCoefficient.set(NumericalValueConverters.toDouble(coefficient));
 		}
+	}
+	//
+	public static long getDefaultMaximalFrameDelay() {
+		return defaultMaximalFrameDelay;
+	}
+	//
+	public long getMaximalFrameDelay() {
+		return maximalFrameDelay.get();
+	}
+	//
+	public void setMaximalFrameDelay(long number) {
+		maximalFrameDelay.set(number);
+	}
+	public void setMaximalFrameDelay(IntegerAttribute delay) {
+		maximalFrameDelay.set(delay.getValue(getDefaultMaximalFrameDelay()));
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -135,6 +155,9 @@ public class FFmpegFrameReadingTask extends Thread {
 	//
 	public boolean inputIsOpen() {
 		return inputIsOpen.get();
+	}
+	public boolean stopThisThread() {
+		return stopThisThread.get();
 	}
 	public boolean eof() {
 		return !inputIsOpen.get();
@@ -326,6 +349,25 @@ public class FFmpegFrameReadingTask extends Thread {
 		// format, such as duration, bitrate, streams, container,
 		// programs, metadata, side data, codec, and time base.
 		av_dump_format(pFormatCtx,0,textURL,0);
+		AVDictionary metadata= pFormatCtx.metadata();
+		AVDictionaryEntry entry= null;
+		for (int k=0; k <= Integer.MAX_VALUE; k++) {
+			entry= av_dict_get(metadata,"",entry,AV_DICT_IGNORE_SUFFIX);
+			if (entry==null) {
+				break;
+			};
+			String key= entry.key().getString();
+			String value= entry.value().getString();
+			if (key.equalsIgnoreCase(FFmpegFrameRecordingTask.metadataTagComment)) {
+				owner.setDeliveredDescription(value);
+			} else if (key.equalsIgnoreCase(FFmpegFrameRecordingTask.metadataTagCopyright)) {
+				owner.setDeliveredCopyright(value);
+			} else if (key.equalsIgnoreCase(FFmpegFrameRecordingTask.metadataTagTime)) {
+				owner.setDeliveredRegistrationTime(value);
+			} else if (key.equalsIgnoreCase(FFmpegFrameRecordingTask.metadataTagDate)) {
+				owner.setDeliveredRegistrationDate(value);
+			}
+		};
 		// Find the first video stream:
 		videoStreamNumber= -1;
 		for (int n=0; n < pFormatCtx.nb_streams(); n++) {
@@ -492,7 +534,7 @@ public class FFmpegFrameReadingTask extends Thread {
 						if (isEOF) {
 							// closeReading();
 							stopThisThread.set(true);
-							owner.completeDataTransfer(beginningRecordNumber+totalNumberOfFrames-1);
+							owner.completeDataReading(computeCurrentFrameNumber());
 							continue;
 						}
 					} else {
@@ -503,12 +545,16 @@ public class FFmpegFrameReadingTask extends Thread {
 			} catch (InterruptedException e) {
 				closeReading();
 				stopThisThread.set(true);
-				owner.completeDataTransfer(beginningRecordNumber+totalNumberOfFrames-1);
+				owner.completeDataReading(computeCurrentFrameNumber());
 				return;
 			} catch (Throwable e) {
 				e.printStackTrace();
 			}
 		}
+	}
+	//
+	protected long computeCurrentFrameNumber() {
+		return beginningRecordNumber + totalNumberOfFrames - 1;
 	}
 	//
 	protected boolean readOnePacket(AVCodecContext pCodecCtx, AVFrame pFrameInitial, AVFrame pFrameRGB, SwsContext sws_ctx, boolean isDummyReading) throws InterruptedException {
@@ -629,7 +675,7 @@ if (totalNumberOfFrames <= 1) {
 	long realTimeDelta_InMilliseconds= currentRealTime_InMilliseconds - initialRealTime_InMilliseconds;
 	if (currentRecordTime_InTimeBaseUnits==AV_NOPTS_VALUE || initialRecordTime_InTimeBaseUnits==AV_NOPTS_VALUE) {
 		currentRecordTime_InMilliseconds= FFmpegTools.computeTimeOfFrameInMilliseconds(
-			beginningRecordNumber + totalNumberOfFrames - 1,
+			computeCurrentFrameNumber(),
 			averageFrameRate);
 		currentRecordTime_InTimeBaseUnits=
 			FFmpegTools.computeRelativeTime(
@@ -643,7 +689,7 @@ if (totalNumberOfFrames <= 1) {
 	long recordTimeDelta_InMilliseconds= currentRecordTime_InMilliseconds - initialRecordTime_InMilliseconds;
 	long waitingPeriod_InMilliseconds= recordTimeDelta_InMilliseconds - realTimeDelta_InMilliseconds;
 	if (	waitingPeriod_InMilliseconds > 0 &&
-		waitingPeriod_InMilliseconds <= maximalwaitingPeriod_InMilliseconds &&
+		waitingPeriod_InMilliseconds <= maximalFrameDelay.get() &&
 		!stopAfterSingleReading.get()) {
 		try {
 			long nanosTimeout= waitingPeriod_InMilliseconds * 1_000_000;
@@ -716,7 +762,7 @@ continue;
 		intBuffer.get(iArray);
 		java.awt.image.BufferedImage bufferedImage= new java.awt.image.BufferedImage(width,height,java.awt.image.BufferedImage.TYPE_INT_ARGB);
 		bufferedImage.setRGB(0,0,width,height,iArray,0,width);
-		owner.sendFrame(new FFmpegFrame(bufferedImage,time,timeBase,averageFrameRate,beginningRecordNumber+totalNumberOfFrames-1));
+		owner.sendFFmpegFrame(new FFmpegFrame(bufferedImage,time,timeBase,averageFrameRate,computeCurrentFrameNumber()));
 	}
 	//
 	public void seekFrameNumber(long seekTarget) {
@@ -800,7 +846,7 @@ continue;
 			// keep internally, but the caller's
 			// reference remains valid.
 			avcodec_flush_buffers(pCodecCtx);
-			owner.resetBuffer();
+			owner.resetCounters();
 			beginningRecordTime_InMilliseconds=
 				targetTime_InMilliseconds;
 			beginningRecordNumber= seekTarget;

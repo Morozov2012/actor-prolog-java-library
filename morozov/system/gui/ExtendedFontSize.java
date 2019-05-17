@@ -69,7 +69,7 @@ public class ExtendedFontSize {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable()) {
 			throw Backtracking.instance;
-		} if(value.thisIsUnknownValue()) {
+		} else if (value.thisIsUnknownValue()) {
 			return termDefault;
 		} else {
 			try {

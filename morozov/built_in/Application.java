@@ -2,10 +2,7 @@
 
 package morozov.built_in;
 
-import target.*;
-
 import morozov.run.*;
-import morozov.system.*;
 import morozov.system.checker.errors.*;
 import morozov.system.command.*;
 import morozov.system.converters.*;
@@ -24,7 +21,6 @@ import java.net.URL;
 import java.net.MalformedURLException;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.applet.AppletContext;
 import java.awt.Desktop;
 import javax.swing.JApplet;
@@ -130,14 +126,14 @@ public abstract class Application extends Alpha {
 	// get/set enableMultipleInstances
 	//
 	public void setEnableMultipleInstances1s(ChoisePoint iX, Term a1) {
-		setEnableMultipleInstances(YesNo.termYesNo2Boolean(a1,iX));
+		setEnableMultipleInstances(YesNoConverters.termYesNo2Boolean(a1,iX));
 	}
 	public void setEnableMultipleInstances(boolean value) {
 		enableMultipleInstances= value;
 	}
 	public void getEnableMultipleInstances0ff(ChoisePoint iX, PrologVariable result) {
 		boolean value= getEnableMultipleInstances(iX);
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(value));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(value));
 	}
 	public void getEnableMultipleInstances0fs(ChoisePoint iX) {
 	}
@@ -145,7 +141,7 @@ public abstract class Application extends Alpha {
 		if (enableMultipleInstances != null) {
 			return enableMultipleInstances;
 		} else {
-			return YesNo.termYesNo2Boolean(getBuiltInSlot_E_enable_multiple_instances(),iX);
+			return YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_enable_multiple_instances(),iX);
 		}
 	}
 	//
@@ -313,40 +309,5 @@ public abstract class Application extends Alpha {
 				// permission, or the calling thread is not allowed to create a subprocess.
 			}
 		}
-	}
-}
-
-class PendingProcess extends Thread {
-	//
-	protected Application targetWorld;
-	protected Process observedProcess;
-	protected long domainSignature;
-	protected HashSet<PendingProcess> supervisors;
-	protected AtomicBoolean isActual= new AtomicBoolean(true);
-	//
-	public PendingProcess(Application target, Process process, long signature, HashSet<PendingProcess> supervisorList) {
-		targetWorld= target;
-		observedProcess= process;
-		domainSignature= signature;
-		supervisors= supervisorList;
-	}
-	//
-	public void run() {
-		Term[] arguments= new Term[1];
-		try {
-			int exitValue= observedProcess.waitFor();
-			arguments[0]= new PrologInteger(exitValue);
-		} catch (InterruptedException e) {
-			arguments[0]= new PrologSymbol(SymbolCodes.symbolCode_E_interrupted_exception);
-		};
-		supervisors.remove(this);
-		if (isActual.get()) {
-			AsyncCall item= new AsyncCall(domainSignature,targetWorld,true,true,arguments,true);
-			targetWorld.transmitAsyncCall(item,null);
-		}
-	}
-	//
-	public void cancel() {
-		isActual.set(false);
 	}
 }

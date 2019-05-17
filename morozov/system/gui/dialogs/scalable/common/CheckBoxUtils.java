@@ -71,7 +71,7 @@ public class CheckBoxUtils {
 			// draw_Vs(W,X1,Y11,X2,Y12,X3,Y13,0,T2).
 			// win_SetPen(W,pen(1,ps_Solid,color_Black)),
 			int delta= 0;
-			while(true) {
+			while (true) {
 				if (y13 - delta <= t2) {
 					break;
 				};

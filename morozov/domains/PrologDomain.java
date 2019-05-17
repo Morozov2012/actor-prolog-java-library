@@ -20,6 +20,12 @@ public class PrologDomain implements Serializable {
 	protected PrologDomainName name;
 	protected DomainAlternative[] alternatives;
 	//
+	private static final long serialVersionUID= 0x49605D077377F8D3L; // 5287328249116358867L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","PrologDomain");
+	// }
+	//
 	public PrologDomain(PrologDomainName n, DomainAlternative[] list) {
 		name= n;
 		alternatives= list;

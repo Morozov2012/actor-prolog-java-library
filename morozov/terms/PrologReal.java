@@ -14,6 +14,14 @@ public class PrologReal extends Term {
 	//
 	private Double value;
 	//
+	private static final long serialVersionUID= 0xD1C3D82538EF8784L; // -3331581644943423612L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","PrologReal");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public PrologReal(double v) {
 		value= v;
 	}

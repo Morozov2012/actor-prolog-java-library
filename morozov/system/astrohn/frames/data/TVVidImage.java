@@ -41,13 +41,13 @@ public class TVVidImage implements Serializable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static TVVidImage readTVVidImage(DataInputStream in, int lengthOfRest) throws IOException {
+	public static TVVidImage readTVVidImage(DataInputStream in, int lengthOfRest, boolean reportWarnings) throws IOException {
 		int length= Integer.reverseBytes(in.readInt());
 		int expectedArrayLength= lengthOfRest - 4;
 		/*
 		System.out.printf("TVVidImage::length: %s (expected length = %s)\n",length,expectedArrayLength);
 		*/
-		if (length != expectedArrayLength) {
+		if (length != expectedArrayLength && reportWarnings) {
 			System.out.printf("WARNING: Unexpected image length %s (expected length = %s)\n",length,expectedArrayLength);
 		};
 		byte[] imageData= new byte[length];

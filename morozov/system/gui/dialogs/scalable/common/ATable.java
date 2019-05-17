@@ -316,7 +316,7 @@ public class ATable extends JScrollPane {
 			model.setValueIsAdjusting(true);
 			model.clearSelection();
 			try {
-				while(true) {
+				while (true) {
 					Term value= tail.getNextListHead(iX);
 					try {
 						int number= value.getSmallIntegerValue(iX);
@@ -371,7 +371,7 @@ public class ATable extends JScrollPane {
 	protected boolean isTargetRow(int rowNumber, Term tail, ChoisePoint iX, TableModel tableModel) {
 		int currentColumn= 0;
 		try {
-			while(true) {
+			while (true) {
 				Term value= tail.getNextListHead(iX);
 				value= value.dereferenceValue(iX);
 				if (value.thisIsFreeVariable()) {

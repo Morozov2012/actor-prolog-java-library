@@ -69,7 +69,7 @@ public class ExtendedFontName {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable()) {
 			throw Backtracking.instance;
-		} else if(value.thisIsUnknownValue()) {
+		} else if (value.thisIsUnknownValue()) {
 			return termDefault;
 		} else {
 			try {

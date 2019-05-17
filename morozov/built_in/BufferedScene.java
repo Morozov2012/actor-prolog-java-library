@@ -177,6 +177,7 @@ public abstract class BufferedScene extends DataResourceConsumer {
 	//
 	public void setSceneGroup1s(ChoisePoint iX, Term a1) {
 		BranchGroup branchGroup= PrincipalNode3D.argumentToBranchGroup(a1,null,null,null,iX);
+		branchGroup.compile(); // 2019-04-07
 		bufferedScene.set(branchGroup);
 	}
 	//

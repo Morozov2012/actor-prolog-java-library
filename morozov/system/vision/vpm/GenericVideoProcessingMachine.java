@@ -3,6 +3,7 @@
 package morozov.system.vision.vpm;
 
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.vision.vpm.commands.blb.*;
 import morozov.system.vision.vpm.converters.*;
 import morozov.system.vision.vpm.errors.*;
@@ -431,7 +432,7 @@ abstract public class GenericVideoProcessingMachine implements BlobHolder {
 		if (frameTime < 0 || tracks.isEmpty() || arrayOfTime.isEmpty() || maximalChronicleLength==null) {
 			return;
 		};
-		long longMaximalChronicleLength= maximalChronicleLength.toLong(1000);
+		long longMaximalChronicleLength= NumericalValueConverters.toLong(maximalChronicleLength,1000);
 		if (longMaximalChronicleLength < 0) {
 			return;
 		};
@@ -570,7 +571,7 @@ abstract public class GenericVideoProcessingMachine implements BlobHolder {
 		return currentBlobAttributes;
 	}
 	//
-	protected abstract void createBlobAttributesIfNecessary();
+	abstract protected void createBlobAttributesIfNecessary();
 	//
 	protected void clearBlobStore() {
 		currentBlobTypes= null;

@@ -15,6 +15,12 @@ public class DomainRealRange extends DomainAlternative {
 	protected double leftBound;
 	protected double rightBound;
 	//
+	private static final long serialVersionUID= 0x6C01A2926AAE3FC6L; // 7782680380811657158L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","DomainRealRange");
+	// }
+	//
 	public DomainRealRange(double left, double right) {
 		leftBound= left;
 		rightBound= right;

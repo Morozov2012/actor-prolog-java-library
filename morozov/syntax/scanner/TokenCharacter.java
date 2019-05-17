@@ -11,12 +11,12 @@ import java.math.BigInteger;
 public class TokenCharacter extends TokenInteger10 {
 	//
 	public TokenCharacter(int code, int position) {
-		super(BigInteger.valueOf(code),position);
+		super(BigInteger.valueOf(code),false,position);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public Term toTerm() {
+	public Term toActorPrologTerm() {
 		Term[] arguments= new Term[]{new PrologInteger(value)};
 		return new PrologStructure(SymbolCodes.symbolCode_E_character,arguments);
 	}

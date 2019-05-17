@@ -174,9 +174,17 @@ public abstract class DialogKernel extends DialogFoundation {
 			Rectangle parentLayoutSize= safelyComputeParentLayoutSize();
 			double gridX= DefaultOptions.gridWidth;
 			double gridY= DefaultOptions.gridHeight;
-			double newX= (double)p.x / ( ((double)(parentLayoutSize.width-parentLayoutSize.x)) / gridX );
-			double newY= (double)p.y / ( ((double)(parentLayoutSize.height-parentLayoutSize.y)) / gridY );
-			actualCoordinates.set(new ExtendedCoordinates(newX,newY));
+			boolean pixelMeasurements= usePixelMeasurements.get();
+			double newX;
+			double newY;
+			if (pixelMeasurements) {
+				newX= (double)p.x;
+				newY= (double)p.y;
+			} else {
+				newX= (double)p.x / ( ((double)(parentLayoutSize.width-parentLayoutSize.x)) / gridX );
+				newY= (double)p.y / ( ((double)(parentLayoutSize.height-parentLayoutSize.y)) / gridY );
+			};
+			actualCoordinates.set(new ExtendedCoordinates(newX,newY,pixelMeasurements));
 			if (previousPoint==null || previousPoint.x!=p.x) {
 				specialProcess.receiveUserInterfaceMessage(findDialogEntryX(),true,DialogEventType.NONE);
 			};
@@ -240,8 +248,13 @@ public abstract class DialogKernel extends DialogFoundation {
 		Rectangle parentLayoutSize= safelyComputeParentLayoutSize();
 		//
 		ExtendedCoordinates actualPoint= actualCoordinates.get();
-		x= DialogUtils.calculateRealCoordinate(actualPoint.x,parentLayoutSize.x,parentLayoutSize.width,gridX,initialWidth);
-		y= DialogUtils.calculateRealCoordinate(actualPoint.y,parentLayoutSize.y,parentLayoutSize.height,gridY,initialHeight);
+		if (actualCoordinates.get().usePixelMeasurements()) {
+			x= DialogUtils.calculateAbsoluteCoordinate(actualPoint.x,parentLayoutSize.x,parentLayoutSize.width,initialWidth);
+			y= DialogUtils.calculateAbsoluteCoordinate(actualPoint.y,parentLayoutSize.y,parentLayoutSize.height,initialHeight);
+		} else {
+			x= DialogUtils.calculateAbsoluteCoordinate(actualPoint.x,parentLayoutSize.x,parentLayoutSize.width,gridX,initialWidth);
+			y= DialogUtils.calculateAbsoluteCoordinate(actualPoint.y,parentLayoutSize.y,parentLayoutSize.height,gridY,initialHeight);
+		};
 		//
 		return new Point(x,y);
 	}

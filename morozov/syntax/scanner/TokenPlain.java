@@ -26,9 +26,9 @@ public class TokenPlain extends PrologToken {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public Term toTerm() {
+	public Term toActorPrologTerm() {
 		try {
-			return type.toTerm();
+			return type.toActorPrologTerm();
 		} catch (TokenIsCompound e) {
 			Term[] arguments= new Term[]{new PrologString(type.toString())};
 			return new PrologStructure(SymbolCodes.symbolCode_E_string,arguments);

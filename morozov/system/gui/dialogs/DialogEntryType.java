@@ -11,15 +11,15 @@ import target.*;
 import morozov.built_in.*;
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.*;
+import morozov.system.gui.dialogs.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 
 import java.awt.Color;
 import java.awt.Font;
-
-class IllegalCallOfInternalMethod extends RuntimeException {}
 
 public enum DialogEntryType {
 	VALUE {
@@ -323,44 +323,72 @@ public enum DialogEntryType {
 	},
 	IS_MODAL {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			dialog.getTargetWorld().setIsModal(YesNoDefault.argument2YesNoDefault(value,iX));
+			dialog.getTargetWorld().setIsModal(YesNoDefaultConverters.argument2YesNoDefault(value,iX));
 		}
 		Term getValue(AbstractDialog dialog) {
 			throw new IllegalCallOfInternalMethod();
 		}
 		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
-			return targetWorld.getIsModal(iX).toTerm();
+			return YesNoDefaultConverters.toTerm(targetWorld.getIsModal(iX));
 		}
 		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-			return YesNoDefault.standardizeValue(value,iX);
+			return YesNoDefaultConverters.standardizeValue(value,iX);
 		}
 	},
 	IS_TOP_LEVEL_WINDOW {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			dialog.getTargetWorld().setIsTopLevelWindow(YesNo.argument2YesNo(value,iX));
+			dialog.getTargetWorld().setIsTopLevelWindow(YesNoConverters.argument2YesNo(value,iX));
 		}
 		Term getValue(AbstractDialog dialog) {
 			throw new IllegalCallOfInternalMethod();
 		}
 		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
-			return targetWorld.getIsTopLevelWindow(iX).toTerm();
+			return YesNoConverters.toTerm(targetWorld.getIsTopLevelWindow(iX));
 		}
 		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-			return YesNo.standardizeValue(value,iX);
+			return YesNoConverters.standardizeValue(value,iX);
+		}
+	},
+	IS_ALWAYS_ON_TOP {
+		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
+			dialog.getTargetWorld().setIsAlwaysOnTop(YesNoConverters.argument2YesNo(value,iX));
+		}
+		Term getValue(AbstractDialog dialog) {
+			throw new IllegalCallOfInternalMethod();
+		}
+		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
+			return YesNoConverters.toTerm(targetWorld.getIsAlwaysOnTop(iX));
+		}
+		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
+			return YesNoConverters.standardizeValue(value,iX);
+		}
+	},
+	CLOSING_CONFIRMATION {
+		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
+			dialog.getTargetWorld().setClosingConfirmation(OnOffConverters.argument2OnOff(value,iX));
+		}
+		Term getValue(AbstractDialog dialog) {
+			throw new IllegalCallOfInternalMethod();
+		}
+		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
+			return OnOffConverters.toTerm(targetWorld.getClosingConfirmation(iX));
+		}
+		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
+			return YesNoConverters.standardizeValue(value,iX);
 		}
 	},
 	IS_EXIT_ON_CLOSE {
 		void putValue(AbstractDialog dialog, Term value, ChoisePoint iX) {
-			dialog.getTargetWorld().setExitOnClose(YesNoDefault.argument2YesNoDefault(value,iX));
+			dialog.getTargetWorld().setExitOnClose(YesNoDefaultConverters.argument2YesNoDefault(value,iX));
 		}
 		Term getValue(AbstractDialog dialog) {
 			throw new IllegalCallOfInternalMethod();
 		}
 		public Term getSlotByName(String name, Dialog targetWorld, ChoisePoint iX) {
-			return targetWorld.getExitOnClose(iX).toTerm();
+			return YesNoDefaultConverters.toTerm(targetWorld.getExitOnClose(iX));
 		}
 		public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
-			return YesNoDefault.standardizeValue(value,iX);
+			return YesNoDefaultConverters.standardizeValue(value,iX);
 		}
 	};
 	abstract void putValue(AbstractDialog dialog, Term value, ChoisePoint iX);

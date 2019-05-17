@@ -5,6 +5,7 @@ package morozov.run;
 import morozov.terms.*;
 
 public class ProcessedErrorExit extends ErrorExit {
+	//
 	public ErrorExit processedException;
 	public Continuation continuation;
 	//

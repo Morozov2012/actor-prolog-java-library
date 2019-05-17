@@ -12,6 +12,7 @@ import morozov.worlds.remote.*;
 import java.math.BigInteger;
 
 public enum TermCheckOperation {
+	//
 	FREE {
 		public boolean eval(ChoisePoint iX, Term value) {
 			return value.dereferenceValue(iX).thisIsFreeVariable();

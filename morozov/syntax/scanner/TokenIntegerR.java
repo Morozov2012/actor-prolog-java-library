@@ -11,22 +11,24 @@ import java.math.BigInteger;
 public class TokenIntegerR extends TokenInteger10 {
 	//
 	protected BigInteger radix;
-	protected String mantissa;
-	protected BigInteger exponent;
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public TokenIntegerR(BigInteger n, BigInteger r, String m, BigInteger e, int position) {
-		super(n,position);
+	public TokenIntegerR(BigInteger r, BigInteger n, boolean isExtended, int position) {
+		super(n,isExtended,position);
 		radix= r;
-		mantissa= m;
-		exponent= e;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public Term toTerm() {
-		Term[] arguments= new Term[]{new PrologInteger(value),new PrologInteger(radix),new PrologString(mantissa),new PrologInteger(exponent)};
+	public BigInteger getRadix() {
+		return radix;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public Term toActorPrologTerm() {
+		Term[] arguments= new Term[]{new PrologInteger(radix),new PrologInteger(value)};
 		return new PrologStructure(SymbolCodes.symbolCode_E_integer_R,arguments);
 	}
 }

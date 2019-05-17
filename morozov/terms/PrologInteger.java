@@ -21,6 +21,14 @@ public class PrologInteger extends Term {
 	public static PrologInteger ZERO= new PrologInteger(0);
 	public static PrologInteger ONE= new PrologInteger(1);
 	//
+	private static final long serialVersionUID= 0xFAE707ED44C5CCBEL; // -367316128964948802L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","PrologInteger");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public PrologInteger(long v) {
 		value= BigInteger.valueOf(v);
 	}

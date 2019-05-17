@@ -16,6 +16,14 @@ public final class PrologEmptySet extends UnderdeterminedSet {
 	//
 	public static final PrologEmptySet instance= new PrologEmptySet();
 	//
+	private static final long serialVersionUID= 0x921289D7BC45F8BCL; // -7921117234921604932L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","PrologEmptySet");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	private PrologEmptySet() {
 	}
 	//

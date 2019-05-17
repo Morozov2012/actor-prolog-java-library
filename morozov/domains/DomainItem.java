@@ -10,6 +10,12 @@ import java.util.HashSet;
 
 public class DomainItem extends MonoArgumentDomainItem {
 	//
+	private static final long serialVersionUID= 0xC1688AADFC0C46E3L; // -4510202546948913437L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","DomainItem");
+	// }
+	//
 	public DomainItem(String entry) {
 		super(entry);
 	}

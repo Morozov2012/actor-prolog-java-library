@@ -7,7 +7,9 @@ import morozov.terms.*;
 import java.math.BigInteger;
 
 public class CodedErrorExit extends ErrorExit {
+	//
 	private BigInteger numericCode;
+	//
 	public CodedErrorExit(ChoisePoint cp, BigInteger number) {
 		choisePoint= cp;
 		numericCode= number;

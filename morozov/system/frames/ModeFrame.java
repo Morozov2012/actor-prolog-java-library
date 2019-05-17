@@ -2,7 +2,6 @@
 
 package morozov.system.frames;
 
-import morozov.system.frames.*;
 import morozov.system.frames.data.interfaces.*;
 import morozov.system.frames.interfaces.*;
 import morozov.system.frames.text.*;

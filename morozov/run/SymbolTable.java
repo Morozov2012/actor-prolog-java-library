@@ -39,7 +39,11 @@ public abstract class SymbolTable {
 		};
 		int absoluteCode= (int)(value-firstSymbolCode);
 		if (SymbolNames.staticTableSize > absoluteCode) {
+if (initialContent.length > absoluteCode && absoluteCode >= 0) {
 			return initialContent[absoluteCode];
+} else {
+	return new SymbolName("???",false);
+}
 		} else {
 			SymbolName name= symbolNameHash.get(absoluteCode);
 			if (name==null) {

@@ -25,6 +25,12 @@ public class CommittedSkeletons implements Serializable {
 	// protected long beginningRawSkeletonTime= -1;
 	// protected long recentRawSkeletonTime= -1;
 	//
+	private static final long serialVersionUID= 0xA932C898F2141FB2L; // -6254716373242208334L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames.data.converters","CommittedSkeletons");
+	// }
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public CommittedSkeletons() {
@@ -119,7 +125,7 @@ public class CommittedSkeletons implements Serializable {
 		if (maximalChronicleLength==null) {
 			return;
 		};
-		long longMaximalChronicleLength= maximalChronicleLength.toLong(1000);
+		long longMaximalChronicleLength= NumericalValueConverters.toLong(maximalChronicleLength,1000);
 		if (longMaximalChronicleLength < 0) {
 			return;
 		};

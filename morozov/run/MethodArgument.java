@@ -15,6 +15,12 @@ public class MethodArgument implements Serializable {
 	public String domainName;
 	public transient PrologDomain domain;
 	//
+	private static final long serialVersionUID= 0x49B573A1B3B32849L; // 5311278473895159881L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.run","MethodArgument");
+	// }
+	//
 	public MethodArgument(MethodArgumentDirection f, String n, PrologDomain d) {
 		direction= f;
 		domainName= n;

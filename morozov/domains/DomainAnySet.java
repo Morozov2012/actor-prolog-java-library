@@ -15,6 +15,12 @@ import java.util.Iterator;
 
 public class DomainAnySet extends DomainAlternative {
 	//
+	private static final long serialVersionUID= 0x90439D5141FE90D9L; // -8051418736483200807L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","DomainAnySet");
+	// }
+	//
 	public DomainAnySet() {
 	}
 	//

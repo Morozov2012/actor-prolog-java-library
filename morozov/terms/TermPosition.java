@@ -20,6 +20,14 @@ public class TermPosition extends Term {
 	protected Term value;
 	protected long position;
 	//
+	private static final long serialVersionUID= 0x43CE5BE646BC6B7CL; // 4885943690330925948L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","TermPosition");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public TermPosition(Term t, long p) {
 		value= t;
 		position= p;

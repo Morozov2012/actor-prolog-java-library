@@ -25,7 +25,7 @@ public class ColorMapNameConverters {
 			return ColorMapName.AQUA;
 		} else if (code==SymbolCodes.symbolCode_E_AUTUMN) {
 			return ColorMapName.AUTUMN;
-		} if (code==SymbolCodes.symbolCode_E_BLACKHOT) {
+		} else if (code==SymbolCodes.symbolCode_E_BLACKHOT) {
 			return ColorMapName.BLACKHOT;
 		} else if (code==SymbolCodes.symbolCode_E_BLAZE) {
 			return ColorMapName.BLAZE;

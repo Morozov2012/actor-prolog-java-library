@@ -409,7 +409,7 @@ public class SimpleFileName {
 			BufferedInputStream stream= new BufferedInputStream(System.in);
 			int bufferSize= 10000;
 			byte[] readingBuffer= new byte[bufferSize];
-			while(true) {
+			while (true) {
 				int k= stream.read(readingBuffer);
 				if (k <= 0) {
 					break;
@@ -449,7 +449,7 @@ public class SimpleFileName {
 				int length= StrictMath.max(stream.available(),0xFFFF);
 				byte[] readingBuffer= new byte[length];
 				ArrayList<Byte> textBuffer= new ArrayList<Byte>();
-				while(true) {
+				while (true) {
 					int k= stream.read(readingBuffer,0,length);
 					if (k < 0) {
 						break;
@@ -494,7 +494,7 @@ public class SimpleFileName {
 				int length= StrictMath.max(stream.available(),0xFFFF);
 				byte[] readingBuffer= new byte[length];
 				ArrayList<Byte> totalBuffer= new ArrayList<Byte>();
-				while(true) {
+				while (true) {
 					int k= stream.read(readingBuffer,0,length);
 					if (k < 0) {
 						break;
@@ -519,7 +519,7 @@ public class SimpleFileName {
 		if (attributes.isLocalResource) {
 			Path path= ExtendedFileName.urlToPath(attributes.url);
 			InputStream inputStream= Files.newInputStream(path);
-			ObjectInputStream objectStream= new DataStoreInputStream(new BufferedInputStream(inputStream),true);
+			ObjectInputStream objectStream= new DataStoreInputStream(new BufferedInputStream(inputStream)/*,true*/);
 			try {
 				return objectStream.readObject();
 			} finally {
@@ -533,7 +533,7 @@ public class SimpleFileName {
 				connection.setReadTimeout(timeout);
 			};
 			InputStream inputStream= connection.getInputStream();
-			ObjectInputStream objectStream= new DataStoreInputStream(new BufferedInputStream(inputStream),true);
+			ObjectInputStream objectStream= new DataStoreInputStream(new BufferedInputStream(inputStream)/*,true*/);
 			try {
 				return objectStream.readObject();
 			} finally {

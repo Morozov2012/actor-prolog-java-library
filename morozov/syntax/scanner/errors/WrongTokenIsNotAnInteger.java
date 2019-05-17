@@ -2,7 +2,8 @@
 
 package morozov.syntax.scanner.errors;
 
-public class WrongTokenIsNotAnInteger extends RuntimeException {
-	public WrongTokenIsNotAnInteger() {
+public class WrongTokenIsNotAnInteger extends LexicalScannerError {
+	public WrongTokenIsNotAnInteger(int p) {
+		super(p);
 	}
 }

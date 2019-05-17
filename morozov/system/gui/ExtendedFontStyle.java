@@ -55,7 +55,8 @@ public class ExtendedFontStyle {
 			int style= Font.PLAIN;
 			if (isBold) {
 				style= style + Font.BOLD;
-			} if (isItalic) {
+			};
+			if (isItalic) {
 				style= style + Font.ITALIC;
 			};
 			return style;
@@ -107,7 +108,7 @@ public class ExtendedFontStyle {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable()) {
 			throw Backtracking.instance;
-		} else if(value.thisIsUnknownValue()) {
+		} else if (value.thisIsUnknownValue()) {
 			return termDefault;
 		} else {
 			try {

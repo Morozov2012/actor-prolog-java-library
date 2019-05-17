@@ -4,7 +4,9 @@ package morozov.syntax.scanner;
 
 import target.*;
 
+import morozov.run.*;
 import morozov.syntax.scanner.errors.*;
+import morozov.syntax.scanner.interfaces.*;
 import morozov.syntax.scanner.signals.*;
 import morozov.terms.*;
 
@@ -14,6 +16,8 @@ import java.math.BigInteger;
 import java.math.BigDecimal;
 
 public class LexicalScanner {
+	//
+	protected LexicalScannerMasterInterface master;
 	//
 	protected boolean robustMode= false;
 	protected HashSet<String> keywordHash;
@@ -28,13 +32,16 @@ public class LexicalScanner {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public LexicalScanner() {
+	public LexicalScanner(LexicalScannerMasterInterface m) {
+		master= m;
 		robustMode= true;
 	}
-	public LexicalScanner(boolean rM) {
+	public LexicalScanner(LexicalScannerMasterInterface m, boolean rM) {
+		master= m;
 		robustMode= rM;
 	}
-	public LexicalScanner(boolean rM, HashSet<String> hash1, HashSet<String> hash2) {
+	public LexicalScanner(LexicalScannerMasterInterface m, boolean rM, HashSet<String> hash1, HashSet<String> hash2) {
+		master= m;
 		robustMode= rM;
 		keywordHash= hash1;
 		reservedNameHash= hash2;
@@ -42,13 +49,13 @@ public class LexicalScanner {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public PrologToken[] analyse(String text) {
-		return analyse(text,false,false);
+	public PrologToken[] analyse(String text, ChoisePoint iX) throws LexicalScannerError {
+		return analyse(text,false,false,iX);
 	}
-	public PrologToken[] analyse(String text, boolean extractFrontTokenOnly) {
-		return analyse(text,extractFrontTokenOnly,false);
+	public PrologToken[] analyse(String text, boolean extractFrontTokenOnly, ChoisePoint iX) throws LexicalScannerError {
+		return analyse(text,extractFrontTokenOnly,false,iX);
 	}
-	public PrologToken[] analyse(String text, boolean extractFrontTokenOnly, boolean recognizeEndOfLine) {
+	public PrologToken[] analyse(String text, boolean extractFrontTokenOnly, boolean recognizeEndOfLine, ChoisePoint iX) throws LexicalScannerError {
 		position= 0;
 		boolean processSupplementaryCharacter= false;
 		braceLevel= 0;
@@ -59,13 +66,14 @@ public class LexicalScanner {
 		char c1;
 		char c2;
 		int code;
-		while(true) { // Loop: Extract tokens
+		while (true) { // Loop: Extract tokens
 			if (position >= textLength) {
-				if (processSupplementaryCharacter) {
-					position= position - 2;
-				} else {
-					position--;
-				};
+				// if (processSupplementaryCharacter) {
+				//	position= position - 2;
+				// } else {
+				//	position--;
+				// };
+				tokens.add(new TokenPlain(PrologTokenType.END_OF_TEXT,position));
 				break;
 			} else {
 				// c= characters[position];
@@ -114,7 +122,7 @@ public class LexicalScanner {
 					if (robustMode) {
 						throw TokenIsNotRecognized.instance;
 					} else {
-						throw new UnexpectedEndOfText(tokenPosition);
+						throw master.handleUnexpectedEndOfText(tokenPosition,iX);
 					}
 				} else {
 					// c= characters[position];
@@ -135,7 +143,7 @@ public class LexicalScanner {
 					if (robustMode) {
 						throw TokenIsNotRecognized.instance;
 					} else {
-						throw new SpaceAndControlCharactersAreNotAllowedHere(position);
+						master.handleError(new SpaceAndControlCharactersAreNotAllowedHere(position),iX);
 					}
 				} else {
 					PrologToken numericalToken= new TokenCharacter(code,tokenPosition);
@@ -154,6 +162,7 @@ public class LexicalScanner {
 				BigInteger scale= BigInteger.ZERO;
 				boolean afterDigit= false;
 				boolean afterDot= false;
+				boolean isExtendedNumber= false;
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // ::: NUMERICAL LITERAL (BEGINNING)                                :::
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -188,7 +197,7 @@ while (true) { // Loop: Scan significand of the numerical token
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new UnderscoreCharacterIsNotAllowedHere(position);
+				master.handleError(new UnderscoreCharacterIsNotAllowedHere(position),iX);
 			}
 		}
 	} else if (afterDigit && !afterDot) {
@@ -203,7 +212,7 @@ while (true) { // Loop: Scan significand of the numerical token
 				if (robustMode) {
 					throw TokenIsNotRecognized.instance;
 				} else {
-					throw new UnexpectedEndOfText(tokenPosition);
+					throw master.handleUnexpectedEndOfText(tokenPosition,iX);
 				}
 			} else {
 				// c= characters[position];
@@ -219,6 +228,7 @@ while (true) { // Loop: Scan significand of the numerical token
 					processSupplementaryCharacter= false;
 				}
 			};
+			isExtendedNumber= true;
 // ====================================================================
 // === Extended Number                                              ===
 // ====================================================================
@@ -228,11 +238,10 @@ if (numberContainsExtraSymbols) {
 	try {
 		numericalValue= new BigInteger(stringRepresentation,radix);
 	} catch (NumberFormatException e) {
-		if (robustMode) {
-			throw TokenIsNotRecognized.instance;
-		} else {
-			throw new BigIntegerFormatException(stringRepresentation,radix,tokenPosition);
-		}
+		if (!robustMode) {
+			master.handleError(new BigIntegerFormatException(stringRepresentation,radix,tokenPosition),iX);
+		};
+		throw TokenIsNotRecognized.instance;
 	}
 } else {
 	int numberLength= StrictMath.min(position,textLength-1) - beginningOfNumber - 1; // + 1;
@@ -240,24 +249,23 @@ if (numberContainsExtraSymbols) {
 	try {
 		numericalValue= new BigInteger(stringRepresentation,radix);
 	} catch (NumberFormatException e) {
-		if (robustMode) {
-			throw TokenIsNotRecognized.instance;
-		} else {
-			throw new BigIntegerFormatException(stringRepresentation,radix,tokenPosition);
-		}
+		if (!robustMode) {
+			master.handleError(new BigIntegerFormatException(stringRepresentation,radix,tokenPosition),iX);
+		};
+		throw TokenIsNotRecognized.instance;
 	}
 };
 if (numericalValue.compareTo(BigInteger.valueOf(Character.MAX_RADIX)) > 0) {
 	if (robustMode) {
 		throw TokenIsNotRecognized.instance;
 	} else {
-		throw new IntegerRadixIsTooBig(numericalValue,tokenPosition);
+		master.handleError(new IntegerRadixIsTooBig(numericalValue,tokenPosition),iX);
 	}
 } else if (numericalValue.compareTo(BigInteger.valueOf(Character.MIN_RADIX)) < 0) {
 	if (robustMode) {
 		throw TokenIsNotRecognized.instance;
 	} else {
-		throw new IntegerRadixIsTooSmall(numericalValue,tokenPosition);
+		master.handleError(new IntegerRadixIsTooSmall(numericalValue,tokenPosition),iX);
 	}
 } else {
 	radix= numericalValue.intValue();
@@ -332,7 +340,7 @@ while (true) { // Loop: Scan extended number
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new DotIsNotAllowedHere(position);
+				master.handleError(new DotIsNotAllowedHere(position),iX);
 			}
 		}
 	} else if (code == '_') {
@@ -350,7 +358,7 @@ while (true) { // Loop: Scan extended number
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new UnderscoreCharacterIsNotAllowedHere(position);
+				master.handleError(new UnderscoreCharacterIsNotAllowedHere(position),iX);
 			}
 		}
 	} else if (code == '#') {
@@ -361,14 +369,15 @@ while (true) { // Loop: Scan extended number
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new NumberSignIsNotAllowedHere(position);
+				master.handleError(new NumberSignIsNotAllowedHere(position),iX);
 			}
 		}
 	} else {
 		if (robustMode) {
 			throw TokenIsNotRecognized.instance;
 		} else {
-			throw new ExtendedDigitExpected(position);
+			master.handleError(new ExtendedDigitIsExpected(position),iX);
+			break; // 2019-05-10
 		}
 	};
 	// position++;
@@ -381,7 +390,7 @@ while (true) { // Loop: Scan extended number
 		if (robustMode) {
 			throw TokenIsNotRecognized.instance;
 		} else {
-			throw new UnexpectedEndOfText(tokenPosition);
+			throw master.handleUnexpectedEndOfText(tokenPosition,iX);
 		}
 	} else {
 		// c= characters[position];
@@ -405,7 +414,7 @@ while (true) { // Loop: Scan extended number
 				if (robustMode) {
 					throw TokenIsNotRecognized.instance;
 				} else {
-					throw new ExtendedDigitExpected(position);
+					master.handleError(new ExtendedDigitIsExpected(position),iX);
 				}
 			}
 		} else if (code == '.') {
@@ -440,7 +449,8 @@ while (true) { // Loop: Scan extended number
 		if (robustMode) {
 			throw TokenIsNotRecognized.instance;
 		} else {
-			throw new ExtendedDigitExpected(position);
+			// 2019-05-10
+			master.handleError(new DigitIsExpected(position),iX);
 		}
 	};
 	// position++;
@@ -456,7 +466,7 @@ while (true) { // Loop: Scan extended number
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new UnexpectedEndOfText(tokenPosition);
+				throw master.handleUnexpectedEndOfText(tokenPosition,iX);
 			}
 		}
 	} else {
@@ -519,7 +529,7 @@ if (position < textLength) {
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new UnexpectedEndOfText(tokenPosition);
+				throw master.handleUnexpectedEndOfText(tokenPosition,iX);
 			}
 		} else {
 			// c= characters[position];
@@ -566,7 +576,7 @@ if (position < textLength) {
 				if (robustMode) {
 					throw TokenIsNotRecognized.instance;
 				} else {
-					throw new UnexpectedEndOfText(tokenPosition);
+					throw master.handleUnexpectedEndOfText(tokenPosition,iX);
 				}
 			} else {
 				// c= characters[position];
@@ -616,7 +626,7 @@ while (true) { // Loop: Scan exponent
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new UnderscoreCharacterIsNotAllowedHere(position);
+				master.handleError(new UnderscoreCharacterIsNotAllowedHere(position),iX);
 			}
 		}
 	} else {
@@ -632,7 +642,7 @@ while (true) { // Loop: Scan exponent
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new DigitExpected(position);
+				master.handleError(new DigitIsExpected(position),iX);
 			}
 		}
 	};
@@ -649,7 +659,7 @@ while (true) { // Loop: Scan exponent
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new UnexpectedEndOfText(tokenPosition);
+				throw master.handleUnexpectedEndOfText(tokenPosition,iX);
 			}
 		}
 	} else {
@@ -672,7 +682,7 @@ while (true) { // Loop: Scan exponent
 				if (robustMode) {
 					throw TokenIsNotRecognized.instance;
 				} else {
-					throw new DigitExpected(position);
+					master.handleError(new DigitIsExpected(position),iX);
 				}
 			};
 			String stringExponent;
@@ -686,11 +696,10 @@ while (true) { // Loop: Scan exponent
 			try {
 				exponent= new BigInteger(stringExponent);
 			} catch (NumberFormatException e) {
-				if (robustMode) {
-					throw TokenIsNotRecognized.instance;
-				} else {
-					throw new BigIntegerFormatException(stringExponent,10,tokenPosition);
-				}
+				if (!robustMode) {
+					master.handleError(new BigIntegerFormatException(stringExponent,10,tokenPosition),iX);
+				};
+				throw TokenIsNotRecognized.instance;
 			};
 			// exponent= BigInteger.valueOf(scale).subtract(exponent);
 			exponent= scale.subtract(exponent);
@@ -698,13 +707,13 @@ while (true) { // Loop: Scan exponent
 			//	if (robustMode) {
 			//		throw TokenIsNotRecognized.instance;
 			//	} else {
-			//		throw new IntegerExponentIsTooBig(tokenPosition);
+			//		master.handleError(new IntegerExponentIsTooBig(tokenPosition),iX);
 			//	}
 			// } else if (exponent.compareTo(BigInteger.valueOf(Integer.MIN_VALUE)) < 0) {
 			//	if (robustMode) {
 			//		throw TokenIsNotRecognized.instance;
 			//	} else {
-			//		throw new IntegerExponentIsTooSmall(tokenPosition);
+			//		master.handleError(new IntegerExponentIsTooSmall(tokenPosition),iX);
 			//	}
 			// } else {
 				// scale= exponent.intValue();
@@ -726,29 +735,45 @@ if (afterDot) {
 	try {
 		integerRepresentation= new BigInteger(stringRepresentation,radix);
 	} catch (NumberFormatException e) {
-		if (robustMode) {
-			throw TokenIsNotRecognized.instance;
-		} else {
-			throw new BigIntegerFormatException(stringRepresentation,radix,tokenPosition);
-		}
-	};
-	if (radix==10 && PrologInteger.isSmallInteger(scale)) {
-		BigDecimal decimalRepresentation;
-		try {
-			decimalRepresentation= new BigDecimal(integerRepresentation,scale.intValue());
-		} catch (NumberFormatException e) {
-			if (robustMode) {
-				throw TokenIsNotRecognized.instance;
-			} else {
-				throw new BigDecimalFormatException(integerRepresentation,scale,tokenPosition);
-			}
+		if (!robustMode) {
+			master.handleError(new BigIntegerFormatException(stringRepresentation,radix,tokenPosition),iX);
 		};
-		numericalToken= new TokenReal(decimalRepresentation.doubleValue(),tokenPosition);
+		throw TokenIsNotRecognized.instance;
+	};
+	if (radix==10) {
+		if (PrologInteger.isSmallInteger(scale)) {
+			BigDecimal decimalRepresentation;
+			try {
+				decimalRepresentation= new BigDecimal(integerRepresentation,scale.intValue());
+			} catch (NumberFormatException e) {
+				if (!robustMode) {
+					master.handleError(new BigDecimalFormatException(integerRepresentation,scale,tokenPosition),iX);
+				};
+				throw TokenIsNotRecognized.instance;
+			};
+			numericalToken= new TokenReal10(
+				decimalRepresentation.doubleValue(),
+				isExtendedNumber,
+				tokenPosition);
+		} else {
+			double doubleValue= integerRepresentation.doubleValue();
+			BigInteger positiveScale= scale.negate();
+			doubleValue= doubleValue * StrictMath.pow(radix,positiveScale.doubleValue());
+			numericalToken= new TokenReal10(
+				doubleValue,
+				isExtendedNumber,
+				tokenPosition);
+			}
 	} else {
 		double doubleValue= integerRepresentation.doubleValue();
-		// doubleValue= doubleValue * StrictMath.pow(radix,-scale);
-		doubleValue= doubleValue * StrictMath.pow(radix,scale.negate().doubleValue());
-		numericalToken= new TokenReal(doubleValue,tokenPosition);
+		BigInteger bigRadix= BigInteger.valueOf(radix);
+		BigInteger positiveScale= scale.negate();
+		doubleValue= doubleValue * StrictMath.pow(radix,positiveScale.doubleValue());
+		numericalToken= new TokenRealR(
+			bigRadix,
+			doubleValue,
+			isExtendedNumber,
+			tokenPosition);
 	}
 } else {
 	if ((scale.compareTo(BigInteger.ZERO) < 0)) {
@@ -756,47 +781,58 @@ if (afterDot) {
 		try {
 			integerRepresentation= new BigInteger(stringRepresentation,radix);
 		} catch (NumberFormatException e) {
-			if (robustMode) {
-				throw TokenIsNotRecognized.instance;
-			} else {
-				throw new BigIntegerFormatException(stringRepresentation,radix,tokenPosition);
-			}
-		};
-		if (radix==10 && PrologInteger.isSmallInteger(scale)) {
-		// if (false) { // Debug 2011.04.17
-			BigDecimal decimalRepresentation;
-			int exponent= scale.intValue();
-			try {
-				decimalRepresentation= new BigDecimal(integerRepresentation,exponent);
-			} catch (NumberFormatException e) {
-				if (robustMode) {
-					throw TokenIsNotRecognized.instance;
-				} else {
-					throw new BigDecimalFormatException(integerRepresentation,exponent,tokenPosition);
-				}
+			if (!robustMode) {
+				master.handleError(new BigIntegerFormatException(stringRepresentation,radix,tokenPosition),iX);
 			};
-			// if (exponent==0) {
-			numericalToken= new TokenInteger10(
-				decimalRepresentation.toBigInteger(),
-				tokenPosition);
-			// } else {
-			//	numericalToken= new TokenInteger10(
-			//		decimalRepresentation.toBigInteger(),
-			//		integerRepresentation,
-			//		-exponent,
-			//		tokenPosition);
-			// }
+			throw TokenIsNotRecognized.instance;
+		};
+		if (radix==10) {
+			if (PrologInteger.isSmallInteger(scale)) {
+				BigDecimal decimalRepresentation;
+				int exponent= scale.intValue();
+				try {
+					decimalRepresentation= new BigDecimal(integerRepresentation,exponent);
+				} catch (NumberFormatException e) {
+					if (!robustMode) {
+						master.handleError(new BigDecimalFormatException(integerRepresentation,exponent,tokenPosition),iX);
+					};
+					throw TokenIsNotRecognized.instance;
+				};
+				numericalToken= new TokenInteger10(
+					decimalRepresentation.toBigInteger(),
+					isExtendedNumber,
+					tokenPosition);
+			} else {
+				BigInteger bigExponent;
+				BigInteger bigRadix= BigInteger.valueOf(radix);
+				BigInteger positiveScale= scale.negate();
+				if (PrologInteger.isSmallInteger(positiveScale)) {
+					bigExponent= bigRadix.pow(positiveScale.intValue());
+				} else {
+					bigExponent= BigInteger.ONE;
+					int increment= Integer.MAX_VALUE;
+					BigInteger bigMaxPoveredRadix= bigRadix.pow(increment);
+					BigInteger bigMaxInteger= BigInteger.valueOf(increment);
+					while(positiveScale.compareTo(bigMaxInteger) >= 0) {
+						bigExponent= bigExponent.multiply(bigMaxPoveredRadix);
+						positiveScale= positiveScale.subtract(bigMaxInteger);
+					};
+					bigExponent= bigExponent.multiply(bigRadix.pow(positiveScale.intValue()));
+				};
+				numericalToken= new TokenInteger10(
+					integerRepresentation.multiply(bigExponent),
+					isExtendedNumber,
+					tokenPosition);
+				}
 		} else {
 			BigInteger bigExponent;
 			BigInteger bigRadix= BigInteger.valueOf(radix);
 			BigInteger positiveScale= scale.negate();
 			if (PrologInteger.isSmallInteger(positiveScale)) {
-			// if (false) { // Debug 2011.04.17
 				bigExponent= bigRadix.pow(positiveScale.intValue());
 			} else {
 				bigExponent= BigInteger.ONE;
 				int increment= Integer.MAX_VALUE;
-				// int increment= 3; // Debug 2011.04.17
 				BigInteger bigMaxPoveredRadix= bigRadix.pow(increment);
 				BigInteger bigMaxInteger= BigInteger.valueOf(increment);
 				while(positiveScale.compareTo(bigMaxInteger) >= 0) {
@@ -806,40 +842,37 @@ if (afterDot) {
 				bigExponent= bigExponent.multiply(bigRadix.pow(positiveScale.intValue()));
 			};
 			numericalToken= new TokenIntegerR(
-				integerRepresentation.multiply(bigExponent),
 				bigRadix,
-				stringRepresentation,
-				positiveScale,
+				integerRepresentation.multiply(bigExponent),
+				isExtendedNumber,
 				tokenPosition);
 		}
 	// } else if (scale > 0) {
 	} else if (scale.compareTo(BigInteger.ZERO) > 0) {
-		if (robustMode) {
-			throw TokenIsNotRecognized.instance;
-		} else {
-			throw new IntegerCannotHaveNegativeExponent(tokenPosition);
-		}
+		if (!robustMode) {
+			master.handleError(new IntegerCannotHaveNegativeExponent(tokenPosition),iX);
+		};
+		throw TokenIsNotRecognized.instance;
 	} else { // (scale == 0)
 		BigInteger integerRepresentation;
 		try {
 			integerRepresentation= new BigInteger(stringRepresentation,radix);
 		} catch (NumberFormatException e) {
-			if (robustMode) {
-				throw TokenIsNotRecognized.instance;
-			} else {
-				throw new BigIntegerFormatException(stringRepresentation,radix,tokenPosition);
-			}
+			if (!robustMode) {
+				master.handleError(new BigIntegerFormatException(stringRepresentation,radix,tokenPosition),iX);
+			};
+			throw TokenIsNotRecognized.instance;
 		};
 		if (radix==10) {
 			numericalToken= new TokenInteger10(
 				integerRepresentation,
+				isExtendedNumber,
 				tokenPosition);
 		} else {
 			numericalToken= new TokenIntegerR(
-				integerRepresentation,
 				BigInteger.valueOf(radix),
-				stringRepresentation,
-				BigInteger.ZERO,
+				integerRepresentation,
+				isExtendedNumber,
 				tokenPosition);
 		}
 
@@ -869,7 +902,7 @@ tokens.add(numericalToken);
 					if (robustMode) {
 						throw TokenIsNotRecognized.instance;
 					} else {
-						throw new UnexpectedEndOfText(tokenPosition);
+						throw master.handleUnexpectedEndOfText(tokenPosition,iX);
 					}
 				} else {
 					// c= characters[position];
@@ -891,7 +924,7 @@ tokens.add(numericalToken);
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // ::: STRING SEGMENT / SYMBOLIC LITERAL (BEGINNING)                :::
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-while(true) { // Loop: Scan string segment token
+while (true) { // Loop: Scan string segment token
 	if (code == '"' && !isSymbol) {
 		break;
 	} else if (code == '\'' && isSymbol) {
@@ -915,7 +948,7 @@ while(true) { // Loop: Scan string segment token
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new StringOrSymbolicLiteralIsNotTerminated(tokenPosition);
+				master.handleError(new StringOrSymbolicLiteralIsNotTerminated(tokenPosition),iX);
 			}
 		} else {
 			// c= characters[position];
@@ -987,7 +1020,7 @@ while (true) { // Loop: Scan significand of the numerical token
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new UnderscoreCharacterIsNotAllowedHere(position);
+				master.handleError(new UnderscoreCharacterIsNotAllowedHere(position),iX);
 			}
 		}
 	} else if (afterDigit) {
@@ -1002,7 +1035,7 @@ while (true) { // Loop: Scan significand of the numerical token
 				if (robustMode) {
 					throw TokenIsNotRecognized.instance;
 				} else {
-					throw new UnexpectedEndOfText(tokenPosition);
+					throw master.handleUnexpectedEndOfText(tokenPosition,iX);
 				}
 			} else {
 				// c= characters[position];
@@ -1027,11 +1060,10 @@ if (numberContainsExtraSymbols) {
 	try {
 		numericalValue= new BigInteger(stringRepresentation,radix);
 	} catch (NumberFormatException e) {
-		if (robustMode) {
-			throw TokenIsNotRecognized.instance;
-		} else {
-			throw new BigIntegerFormatException(stringRepresentation,radix,tokenPosition);
-		}
+		if (!robustMode) {
+			master.handleError(new BigIntegerFormatException(stringRepresentation,radix,tokenPosition),iX);
+		};
+		throw TokenIsNotRecognized.instance;
 	}
 } else {
 	int numberLength= StrictMath.min(position,textLength-1) - beginningOfNumber - 1; // + 1;
@@ -1039,24 +1071,23 @@ if (numberContainsExtraSymbols) {
 	try {
 		numericalValue= new BigInteger(stringRepresentation,radix);
 	} catch (NumberFormatException e) {
-		if (robustMode) {
-			throw TokenIsNotRecognized.instance;
-		} else {
-			throw new BigIntegerFormatException(stringRepresentation,radix,tokenPosition);
-		}
+		if (!robustMode) {
+			master.handleError(new BigIntegerFormatException(stringRepresentation,radix,tokenPosition),iX);
+		};
+		throw TokenIsNotRecognized.instance;
 	}
 };
 if (numericalValue.compareTo(BigInteger.valueOf(Character.MAX_RADIX)) > 0) {
 	if (robustMode) {
 		throw TokenIsNotRecognized.instance;
 	} else {
-		throw new IntegerRadixIsTooBig(numericalValue,beginningOfNumber);
+		master.handleError(new IntegerRadixIsTooBig(numericalValue,beginningOfNumber),iX);
 	}
 } else if (numericalValue.compareTo(BigInteger.valueOf(Character.MIN_RADIX)) < 0) {
 	if (robustMode) {
 		throw TokenIsNotRecognized.instance;
 	} else {
-		throw new IntegerRadixIsTooSmall(numericalValue,beginningOfNumber);
+		master.handleError(new IntegerRadixIsTooSmall(numericalValue,beginningOfNumber),iX);
 	}
 } else {
 	radix= numericalValue.intValue();
@@ -1115,7 +1146,7 @@ while (true) { // Loop: Scan extended number
 		if (robustMode) {
 			throw TokenIsNotRecognized.instance;
 		} else {
-			throw new DotIsNotAllowedHere(position);
+			master.handleError(new DotIsNotAllowedHere(position),iX);
 		}
 	} else if (code == '_') {
 		if (afterDigit) {
@@ -1132,7 +1163,7 @@ while (true) { // Loop: Scan extended number
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new UnderscoreCharacterIsNotAllowedHere(position);
+				master.handleError(new UnderscoreCharacterIsNotAllowedHere(position),iX);
 			}
 		}
 	} else if (code == '#') {
@@ -1143,14 +1174,14 @@ while (true) { // Loop: Scan extended number
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new NumberSignIsNotAllowedHere(position);
+				master.handleError(new NumberSignIsNotAllowedHere(position),iX);
 			}
 		}
 	} else {
 		if (robustMode) {
 			throw TokenIsNotRecognized.instance;
 		} else {
-			throw new ExtendedDigitExpected(position);
+			master.handleError(new ExtendedDigitIsExpected(position),iX);
 		}
 	};
 	// position++;
@@ -1163,7 +1194,7 @@ while (true) { // Loop: Scan extended number
 		if (robustMode) {
 			throw TokenIsNotRecognized.instance;
 		} else {
-			throw new UnexpectedEndOfText(tokenPosition);
+			throw master.handleUnexpectedEndOfText(tokenPosition,iX);
 		}
 	} else {
 		// c= characters[position];
@@ -1187,14 +1218,14 @@ while (true) { // Loop: Scan extended number
 				if (robustMode) {
 					throw TokenIsNotRecognized.instance;
 				} else {
-					throw new ExtendedDigitExpected(position);
+					master.handleError(new ExtendedDigitIsExpected(position),iX);
 				}
 			}
 		} else if (code == '.') {
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new DotIsNotAllowedHere(position);
+				master.handleError(new DotIsNotAllowedHere(position),iX);
 			}
 		} else {
 			// position--;
@@ -1217,7 +1248,7 @@ while (true) { // Loop: Scan extended number
 		if (robustMode) {
 			throw TokenIsNotRecognized.instance;
 		} else {
-			throw new ExtendedDigitExpected(position);
+			master.handleError(new ExtendedDigitIsExpected(position),iX);
 		}
 	};
 	// position++;
@@ -1233,7 +1264,7 @@ while (true) { // Loop: Scan extended number
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new UnexpectedEndOfText(tokenPosition);
+				throw master.handleUnexpectedEndOfText(tokenPosition,iX);
 			}
 		}
 	} else {
@@ -1270,23 +1301,22 @@ BigInteger numericalValue;
 try {
 	numericalValue= new BigInteger(stringRepresentation,radix);
 } catch (NumberFormatException e) {
-	if (robustMode) {
-		throw TokenIsNotRecognized.instance;
-	} else {
-		throw new BigIntegerFormatException(stringRepresentation,radix,tokenPosition);
-	}
+	if (!robustMode) {
+		master.handleError(new BigIntegerFormatException(stringRepresentation,radix,tokenPosition),iX);
+	};
+	throw TokenIsNotRecognized.instance;
 };
 if (numericalValue.compareTo(BigInteger.valueOf(Character.MAX_VALUE)) > 0) {
 	if (robustMode) {
 		throw TokenIsNotRecognized.instance;
 	} else {
-		throw new CharacterCodeIsTooBig(beginningOfNumber);
+		master.handleError(new CharacterCodeIsTooBig(beginningOfNumber),iX);
 	}
 } else if (numericalValue.compareTo(BigInteger.valueOf(Character.MIN_VALUE)) < 0) {
 	if (robustMode) {
 		throw TokenIsNotRecognized.instance;
 	} else {
-		throw new CharacterCodeIsTooSmall(beginningOfNumber);
+		master.handleError(new CharacterCodeIsTooSmall(beginningOfNumber),iX);
 	}
 } else {
 	buffer.append((char)numericalValue.intValue());
@@ -1298,14 +1328,14 @@ if (numericalValue.compareTo(BigInteger.valueOf(Character.MAX_VALUE)) > 0) {
 				if (robustMode) {
 					throw TokenIsNotRecognized.instance;
 				} else {
-					throw new StringOrSymbolicLiteralIsNotTerminated(tokenPosition);
+					master.handleError(new StringOrSymbolicLiteralIsNotTerminated(tokenPosition),iX);
 				}
 			// } else if ( c >= 8 && c <= 13) {
 			} else if (Character.isISOControl(code)) {
 				if (robustMode) {
 					throw TokenIsNotRecognized.instance;
 				} else {
-					throw new ControlCharactersAreNotAllowedHere(position);
+					master.handleError(new ControlCharactersAreNotAllowedHere(position),iX);
 				}
 			} else {
 				// buffer.append((char)c);
@@ -1321,14 +1351,14 @@ if (numericalValue.compareTo(BigInteger.valueOf(Character.MAX_VALUE)) > 0) {
 		if (robustMode) {
 			throw TokenIsNotRecognized.instance;
 		} else {
-			throw new StringOrSymbolicLiteralIsNotTerminated(tokenPosition);
+			master.handleError(new StringOrSymbolicLiteralIsNotTerminated(tokenPosition),iX);
 		}
 	// } else if ( c >= 8 && c <= 13) {
 	} else if (Character.isISOControl(code)) {
 		if (robustMode) {
 			throw TokenIsNotRecognized.instance;
 		} else {
-			throw new ControlCharactersAreNotAllowedHere(position);
+			master.handleError(new ControlCharactersAreNotAllowedHere(position),iX);
 		}
 	} else {
 		if (segmentContainsExtraSymbols) {
@@ -1351,7 +1381,7 @@ if (numericalValue.compareTo(BigInteger.valueOf(Character.MAX_VALUE)) > 0) {
 		if (robustMode) {
 			throw TokenIsNotRecognized.instance;
 		} else {
-			throw new StringOrSymbolicLiteralIsNotTerminated(tokenPosition);
+			master.handleError(new StringOrSymbolicLiteralIsNotTerminated(tokenPosition),iX);
 		}
 	} else {
 		// c= characters[position];
@@ -1396,9 +1426,12 @@ if (numericalValue.compareTo(BigInteger.valueOf(Character.MAX_VALUE)) > 0) {
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // ::: SYMBOL LITERAL (BEGINNING)                                   :::
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+boolean afterUnderscore= false;
+int recentCode= code;
 while (true) { // Loop: Scan symbol token
 	// if (c >= '0' && c <= '9') {
 	if (Character.isLetterOrDigit(code)) {
+		afterUnderscore= false;
 		// Skip character
 	// } else if (c >= 'a' && c <= 'z') {
 	//	// Skip character
@@ -1415,8 +1448,15 @@ while (true) { // Loop: Scan symbol token
 	// } else if (c == 'ñ') { // DOS coding
 	// } else if (c == 'ð') { // DOS coding
 	} else if (code == '_') {
+		if (!robustMode) {
+			if (afterUnderscore) {
+				master.handleError(new DoubleUnderscoresAreNotAllowed(position),iX);
+			}
+		};
+		afterUnderscore= true;
 		// Skip character
 	} else if (Character.isIdentifierIgnorable(code)) {
+		afterUnderscore= false;
 		// Skip character
 	} else {
 		// position--;
@@ -1425,6 +1465,7 @@ while (true) { // Loop: Scan symbol token
 		} else {
 			position--;
 		};
+		afterUnderscore= false;
 		break;
 	};
 	// position++;
@@ -1448,8 +1489,14 @@ while (true) { // Loop: Scan symbol token
 			code= c1;
 			processSupplementaryCharacter= false;
 		}
-	}
+	};
+	recentCode= code;
 }; // End of loop: Scan symbol
+if (!robustMode) {
+	if (recentCode=='_' && afterUnderscore) {
+		master.handleError(new SymbolCannotBeCompletedByUnderscore(position),iX);
+	}
+};
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 int symbolLength= StrictMath.min(position,textLength-1) - beginningOfSymbol + 1; // + 1;
 String stringRepresentation= new String(characters,beginningOfSymbol,symbolLength);
@@ -1463,7 +1510,7 @@ if (reservedNameHash != null) {
 				if (robustMode) {
 					throw TokenIsNotRecognized.instance;
 				} else {
-					throw new KeywordContainsLettersOfIllegalCase(tokenPosition);
+					master.handleError(new KeywordContainsLettersOfIllegalCase(tokenPosition),iX);
 				}
 			}
 		}
@@ -1489,6 +1536,33 @@ if (reservedNameHash != null) {
 // ====================================================================
 // === Binary                                                       ===
 // ====================================================================
+// position++;
+tokenPosition= position;
+if (processSupplementaryCharacter) {
+	position= position + 2;
+} else {
+	position++;
+};
+if (position >= textLength) {
+	if (robustMode) {
+		throw TokenIsNotRecognized.instance;
+	} else {
+		throw master.handleUnexpectedEndOfText(tokenPosition,iX);
+	}
+} else {
+	// c= characters[position];
+	c1= characters[position];
+	if (	(position + 1 <= textLength - 1) &&
+		Character.isSurrogatePair(c1,characters[position+1])) {
+		c2= characters[position+1];
+		code= Character.toCodePoint(c1,c2);
+		processSupplementaryCharacter= true;
+	} else {
+		c2= 0;
+		code= c1;
+		processSupplementaryCharacter= false;
+	}
+};
 int numberOfDigits= 0;
 boolean afterDigit= false;
 int temporaryPosition= position;
@@ -1509,7 +1583,7 @@ while (true) { // Loop: Scan extended number
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new UnderscoreCharacterIsNotAllowedHere(temporaryPosition);
+				master.handleError(new UnderscoreCharacterIsNotAllowedHere(temporaryPosition),iX);
 			}
 		}
 	} else {
@@ -1519,7 +1593,7 @@ while (true) { // Loop: Scan extended number
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new ExtendedDigitExpected(temporaryPosition);
+				master.handleError(new ExtendedDigitIsExpected(temporaryPosition),iX);
 			}
 		}
 	};
@@ -1529,11 +1603,10 @@ while (true) { // Loop: Scan extended number
 		temporaryPosition++;
 	};
 	if (temporaryPosition >= textLength) {
-		if (robustMode) {
-			throw TokenIsNotRecognized.instance;
-		} else {
-			throw new UnexpectedEndOfText(tokenPosition);
-		}
+		if (!afterDigit && !robustMode) {
+			throw master.handleUnexpectedEndOfText(tokenPosition,iX);
+		};
+		break;
 	} else {
 		c1= characters[temporaryPosition];
 		if (	(temporaryPosition + 1 <= textLength - 1) &&
@@ -1552,11 +1625,31 @@ if ((numberOfDigits % 2) != 0) {
 	if (robustMode) {
 		throw TokenIsNotRecognized.instance;
 	} else {
-		throw new BinaryMustContainEvenNumberOfDigits(tokenPosition);
+		master.handleError(new BinaryMustContainEvenNumberOfDigits(tokenPosition),iX);
 	}
 };
 int arrayLength= numberOfDigits / 2;
 byte[] byteArray= new byte[arrayLength];
+if (position >= textLength) {
+	if (robustMode) {
+		throw TokenIsNotRecognized.instance;
+	} else {
+		throw master.handleUnexpectedEndOfText(tokenPosition,iX);
+	}
+} else {
+	// c= characters[position];
+	c1= characters[position];
+	if (	(position + 1 <= textLength - 1) &&
+		Character.isSurrogatePair(c1,characters[position+1])) {
+		c2= characters[position+1];
+		code= Character.toCodePoint(c1,c2);
+		processSupplementaryCharacter= true;
+	} else {
+		c2= 0;
+		code= c1;
+		processSupplementaryCharacter= false;
+	}
+};
 int firstDigit= 0;
 boolean isSecondDigit= false;
 int index= -1;
@@ -1579,17 +1672,22 @@ while (true) { // Loop: Scan extended number
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new UnderscoreCharacterIsNotAllowedHere(position);
+				master.handleError(new UnderscoreCharacterIsNotAllowedHere(position),iX);
 			}
 		}
 	} else {
 		if (afterDigit) {
+			if (processSupplementaryCharacter) {
+				position= position - 2;
+			} else {
+				position--;
+			};
 			break;
 		} else {
 			if (robustMode) {
 				throw TokenIsNotRecognized.instance;
 			} else {
-				throw new ExtendedDigitExpected(position);
+				master.handleError(new ExtendedDigitIsExpected(position),iX);
 			}
 		}
 	};
@@ -1610,11 +1708,14 @@ while (true) { // Loop: Scan extended number
 		position++;
 	};
 	if (position >= textLength) {
+		/*
 		if (robustMode) {
 			throw TokenIsNotRecognized.instance;
 		} else {
-			throw new UnexpectedEndOfText(tokenPosition);
+			throw master.handleUnexpectedEndOfText(tokenPosition,iX);
 		}
+		*/
+		break;
 	} else {
 		c1= characters[position];
 		if (	(position + 1 <= textLength - 1) &&
@@ -1639,9 +1740,12 @@ while (true) { // Loop: Scan extended number
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 // ::: VARIABLE / DOMAIN NAME LITERAL (BEGINNING)                   :::
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+boolean afterUnderscore= false;
+int recentCode= code;
 while (true) { // Loop: Scan variable / domain name token
 	// if (c >= '0' && c <= '9') {
 	if (Character.isLetterOrDigit(code)) {
+		afterUnderscore= false;
 		// Skip character
 	// } else if (c >= 'a' && c <= 'z') {
 	//	// Skip character
@@ -1658,6 +1762,12 @@ while (true) { // Loop: Scan variable / domain name token
 	// } else if (c == 'ñ') { // DOS coding
 	// } else if (c == 'ð') { // DOS coding
 	} else if (code == '_') {
+		if (!robustMode) {
+			if (afterUnderscore) {
+				master.handleError(new DoubleUnderscoresAreNotAllowed(position),iX);
+			}
+		};
+		afterUnderscore= true;
 		// Skip character
 	} else {
 		// position--;
@@ -1666,6 +1776,7 @@ while (true) { // Loop: Scan variable / domain name token
 		} else {
 			position--;
 		};
+		afterUnderscore= false;
 		break;
 	};
 	// position++;
@@ -1689,10 +1800,16 @@ while (true) { // Loop: Scan variable / domain name token
 			code= c1;
 			processSupplementaryCharacter= false;
 		}
-	}
+	};
+	recentCode= code;
 }; // End of loop: Scan variable / domain name token
-// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 int variableLength= StrictMath.min(position,textLength-1) - beginningOfVariable + 1; // + 1;
+if (!robustMode) {
+	if (recentCode=='_' && variableLength > 1 && afterUnderscore) {
+		master.handleError(new VariableCannotBeCompletedByUnderscore(position),iX);
+	}
+};
+// ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 String stringRepresentation= new String(characters,beginningOfVariable,variableLength);
 boolean isKeyword= false;
 if (reservedNameHash != null) {
@@ -1704,7 +1821,7 @@ if (reservedNameHash != null) {
 				if (robustMode) {
 					throw TokenIsNotRecognized.instance;
 				} else {
-					throw new KeywordContainsLettersOfIllegalCase(tokenPosition);
+					master.handleError(new KeywordContainsLettersOfIllegalCase(tokenPosition),iX);
 				}
 			}
 		}
@@ -1728,7 +1845,7 @@ if (reservedNameHash != null) {
 					(position + 1 < textLength) &&
 					characters[position+1]=='*') {
 				tokenPosition= position;
-				while(true) {
+				while (true) {
 					// position++;
 					if (processSupplementaryCharacter) {
 						position= position + 2;
@@ -1761,7 +1878,7 @@ if (reservedNameHash != null) {
 						if (robustMode) {
 							throw TokenIsNotRecognized.instance;
 						} else {
-							throw new MultilineCommentIsNotTerminated(tokenPosition);
+							master.handleError(new MultilineCommentIsNotTerminated(tokenPosition),iX);
 						}
 					}
 				}
@@ -1781,7 +1898,7 @@ if (reservedNameHash != null) {
 						if (robustMode) {
 							throw TokenIsNotRecognized.instance;
 						} else {
-							throw new SingleLineCommentIsNotAllowedAfterMinusSign(tokenPosition);
+							master.handleError(new SingleLineCommentIsNotAllowedAfterMinusSign(tokenPosition),iX);
 						}
 					}
 				};
@@ -1791,13 +1908,13 @@ if (reservedNameHash != null) {
 						if (robustMode) {
 							throw TokenIsNotRecognized.instance;
 						} else {
-							throw new SeparatorIsRequiredBeforeThisSingleLineComment(tokenPosition);
+							master.handleError(new SeparatorIsRequiredBeforeThisSingleLineComment(tokenPosition),iX);
 						}
 					} else if (previousCharacter1=='<') {
 						if (robustMode) {
 							throw TokenIsNotRecognized.instance;
 						} else {
-							throw new SeparatorIsRequiredBeforeThisSingleLineComment(tokenPosition);
+							master.handleError(new SeparatorIsRequiredBeforeThisSingleLineComment(tokenPosition),iX);
 						}
 					} else {
 						if (position > 1) {
@@ -1807,14 +1924,14 @@ if (reservedNameHash != null) {
 								if (robustMode) {
 									throw TokenIsNotRecognized.instance;
 								} else {
-									throw new SeparatorIsRequiredBeforeThisSingleLineComment(tokenPosition);
+									master.handleError(new SeparatorIsRequiredBeforeThisSingleLineComment(tokenPosition),iX);
 								}
 							} else if (	previousCharacter2=='<' &&
 									previousCharacter1=='-') {
 								if (robustMode) {
 									throw TokenIsNotRecognized.instance;
 								} else {
-									throw new SeparatorIsRequiredBeforeThisSingleLineComment(tokenPosition);
+									master.handleError(new SeparatorIsRequiredBeforeThisSingleLineComment(tokenPosition),iX);
 								}
 							}
 						}
@@ -1826,7 +1943,7 @@ if (reservedNameHash != null) {
 				// } else {
 				//	position++;
 				// };
-				while(true) {
+				while (true) {
 					// position++;
 					if (processSupplementaryCharacter) {
 						position= position + 2;
@@ -1862,7 +1979,7 @@ if (reservedNameHash != null) {
 						if (robustMode) {
 							throw TokenIsNotRecognized.instance;
 						} else {
-							throw new SingleLineCommentIsNotTerminatedByNewline(tokenPosition);
+							master.handleError(new SingleLineCommentIsNotTerminatedByNewline(tokenPosition),iX);
 						}
 					}
 				}
@@ -1966,7 +2083,7 @@ if (reservedNameHash != null) {
 							if (robustMode) {
 								throw TokenIsNotRecognized.instance;
 							} else {
-								throw new SeparatorIsRequiredBeforeMinusSign(tokenPosition);
+								master.handleError(new SeparatorIsRequiredBeforeMinusSign(tokenPosition),iX);
 							}
 						}
 					};
@@ -1981,7 +2098,7 @@ if (reservedNameHash != null) {
 						if (secondCharacter == '<') {
 							position++;
 							code= secondCharacter;
-							plainTokenType= PrologTokenType.INFORMATIONAL_MESSAGE;
+							plainTokenType= PrologTokenType.DATA_MESSAGE;
 							break;
 						} else if (secondCharacter == '-') {
 							position++;
@@ -2027,11 +2144,10 @@ if (reservedNameHash != null) {
 					plainTokenType= PrologTokenType.GT;
 					break;
 				default:
-					if (robustMode) {
-						throw TokenIsNotRecognized.instance;
-					} else {
-						throw new UnexpectedCharacter(position);
-					}
+					if (!robustMode) {
+						master.handleError(new UnexpectedCharacter(code,position),iX);
+					};
+					throw TokenIsNotRecognized.instance;
 				};
 				tokens.add(new TokenPlain(plainTokenType,tokenPosition));
 // ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -2122,7 +2238,7 @@ if (reservedNameHash != null) {
 		char c1;
 		char c2;
 		int code;
-		while(true) {
+		while (true) {
 			if (currentPosition >= textLength) {
 				return "";
 			} else {

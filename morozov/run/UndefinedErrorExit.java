@@ -7,6 +7,7 @@ import target.*;
 import morozov.terms.*;
 
 public class UndefinedErrorExit extends ErrorExit {
+	//
 	public UndefinedErrorExit(ChoisePoint cp) {
 		choisePoint= cp;
 	}

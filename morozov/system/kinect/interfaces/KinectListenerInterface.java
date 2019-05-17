@@ -2,6 +2,7 @@
 
 package morozov.system.kinect.interfaces;
 
+import morozov.system.kinect.frames.data.*;
 import morozov.system.kinect.modes.interfaces.*;
 
 public interface KinectListenerInterface {
@@ -16,4 +17,6 @@ public interface KinectListenerInterface {
 	public void stop();
 	public boolean isConnected();
 	public boolean frameMappingIsInitialized();
+	//
+	public KinectFrameWritableBaseAttributes createKinectFrameWritableBaseAttributes();
 }

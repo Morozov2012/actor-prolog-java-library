@@ -63,7 +63,6 @@ import javax.media.j3d.Background;
 import javax.media.j3d.Texture;
 import javax.media.j3d.Texture2D;
 import javax.media.j3d.ImageComponent2D;
-// import java.awt.image.BufferedImage;
 import com.sun.j3d.utils.geometry.GeometryInfo;
 import com.sun.j3d.utils.geometry.NormalGenerator;
 import com.sun.j3d.utils.geometry.Stripifier;
@@ -91,9 +90,9 @@ public class AuxiliaryNode3D extends Tools3D {
 					long pairName= - key;
 					Term pairValue= setPositiveMap.get(key);
 					if (pairName==SymbolCodes.symbolCode_E_increasingEnable) {
-						increasingEnable= YesNo.termYesNo2Boolean(pairValue,iX);
+						increasingEnable= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					} else if (pairName==SymbolCodes.symbolCode_E_decreasingEnable) {
-						decreasingEnable= YesNo.termYesNo2Boolean(pairValue,iX);
+						decreasingEnable= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					} else if (pairName==SymbolCodes.symbolCode_E_increasingAlphaDuration) {
 						// long increasingAlphaDuration= pairValue.getLongIntegerValue(iX);
 						long increasingAlphaDuration= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
@@ -217,8 +216,13 @@ public class AuxiliaryNode3D extends Tools3D {
 					long pairName= - key;
 					Term pairValue= setPositiveMap.get(key);
 					if (pairName==SymbolCodes.symbolCode_E_scale) {
-						double scale= GeneralConverters.argumentToReal(pairValue,iX);
-						node.setScale(scale);
+						try {
+							double scale= GeneralConverters.termToReal(pairValue,iX);
+							node.setScale(scale);
+						} catch (TermIsNotAReal e) {
+							Vector3d vector= term2Vector3(pairValue,iX);
+							node.setScale(vector);
+						};
 						iterator.remove();
 					}
 				};
@@ -233,46 +237,33 @@ public class AuxiliaryNode3D extends Tools3D {
 						iterator.remove();
 					}
 				};
+				double angleX= 0.0;
+				double angleY= 0.0;
+				double angleZ= 0.0;
+				boolean useEulerAngles= false;
 				iterator= nameList.iterator();
 				while(iterator.hasNext()) {
 					long key= iterator.next();
 					long pairName= - key;
 					Term pairValue= setPositiveMap.get(key);
 					if (pairName==SymbolCodes.symbolCode_E_rotX) {
-						double angle= GeneralConverters.argumentToReal(pairValue,iX);
-						Transform3D tempRotate= new Transform3D();
-						tempRotate.rotX(angle);
-						node.mul(tempRotate);
+						useEulerAngles= true;
+						angleX= GeneralConverters.argumentToReal(pairValue,iX);
 						iterator.remove();
-					}
-				};
-				iterator= nameList.iterator();
-				while(iterator.hasNext()) {
-					long key= iterator.next();
-					long pairName= - key;
-					Term pairValue= setPositiveMap.get(key);
-					if (pairName==SymbolCodes.symbolCode_E_rotY) {
-						double angle= GeneralConverters.argumentToReal(pairValue,iX);
-						Transform3D tempRotate= new Transform3D();
-						tempRotate.rotY(angle);
-						node.mul(tempRotate);
+					} else if (pairName==SymbolCodes.symbolCode_E_rotY) {
+						useEulerAngles= true;
+						angleY= GeneralConverters.argumentToReal(pairValue,iX);
 						iterator.remove();
-					}
-				};
-				iterator= nameList.iterator();
-				while(iterator.hasNext()) {
-					long key= iterator.next();
-					long pairName= - key;
-					Term pairValue= setPositiveMap.get(key);
-					if (pairName==SymbolCodes.symbolCode_E_rotZ) {
-						double angle= GeneralConverters.argumentToReal(pairValue,iX);
-						Transform3D tempRotate= new Transform3D();
-						tempRotate.rotZ(angle);
-						node.mul(tempRotate);
+					} else if (pairName==SymbolCodes.symbolCode_E_rotZ) {
+						useEulerAngles= true;
+						angleZ= GeneralConverters.argumentToReal(pairValue,iX);
 						iterator.remove();
 					} else {
 						throw new WrongArgumentIsUnknownTransform3DAttribute(key);
 					}
+				};
+				if (useEulerAngles) {
+					node.setEuler(new Vector3d(angleX,angleY,angleZ));
 				};
 				return node;
 			} else {
@@ -443,11 +434,11 @@ public class AuxiliaryNode3D extends Tools3D {
 						int[] stripCounts= term2StripCounts(pairValue,iX);
 						node.setStripCounts(stripCounts);
 					} else if (pairName==SymbolCodes.symbolCode_E_generateNormals) {
-						generateNormals= YesNo.termYesNo2Boolean(pairValue,iX);
+						generateNormals= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					} else if (pairName==SymbolCodes.symbolCode_E_creaseAngle) {
 						creaseAngle= GeneralConverters.argumentToReal(pairValue,iX);
 					} else if (pairName==SymbolCodes.symbolCode_E_stripify) {
-						stripify= YesNo.termYesNo2Boolean(pairValue,iX);
+						stripify= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					} else {
 						throw new WrongArgumentIsUnknownGeometryInfoAttribute(key);
 					}
@@ -504,52 +495,52 @@ public class AuxiliaryNode3D extends Tools3D {
 						Texture texture= argumentToTexture2D(pairValue,targetWorld,iX);
 						node.setTexture(texture);
 					} else if (pairName==SymbolCodes.symbolCode_E_allowMaterialRead) {
-						boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+						boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 						if (mode) {
 							node.setCapability(Appearance.ALLOW_MATERIAL_READ);
 						};
 					} else if (pairName==SymbolCodes.symbolCode_E_allowMaterialWrite) {
-						boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+						boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 						if (mode) {
 							node.setCapability(Appearance.ALLOW_MATERIAL_WRITE);
 						};
 					} else if (pairName==SymbolCodes.symbolCode_E_allowColoringAttributesRead) {
-						boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+						boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 						if (mode) {
 							node.setCapability(Appearance.ALLOW_COLORING_ATTRIBUTES_READ);
 						};
 					} else if (pairName==SymbolCodes.symbolCode_E_allowColoringAttributesWrite) {
-						boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+						boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 						if (mode) {
 							node.setCapability(Appearance.ALLOW_COLORING_ATTRIBUTES_WRITE);
 						};
 					} else if (pairName==SymbolCodes.symbolCode_E_allowPolygonAttributesRead) {
-						boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+						boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 						if (mode) {
 							node.setCapability(Appearance.ALLOW_POLYGON_ATTRIBUTES_READ);
 						};
 					} else if (pairName==SymbolCodes.symbolCode_E_allowPolygonAttributesWrite) {
-						boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+						boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 						if (mode) {
 							node.setCapability(Appearance.ALLOW_POLYGON_ATTRIBUTES_WRITE);
 						};
 					} else if (pairName==SymbolCodes.symbolCode_E_allowTransparencyAttributesRead) {
-						boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+						boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 						if (mode) {
 							node.setCapability(Appearance.ALLOW_TRANSPARENCY_ATTRIBUTES_READ);
 						};
 					} else if (pairName==SymbolCodes.symbolCode_E_allowTransparencyAttributesWrite) {
-						boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+						boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 						if (mode) {
 							node.setCapability(Appearance.ALLOW_TRANSPARENCY_ATTRIBUTES_WRITE);
 						};
 					} else if (pairName==SymbolCodes.symbolCode_E_allowTextureRead) {
-						boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+						boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 						if (mode) {
 							node.setCapability(Appearance.ALLOW_TEXTURE_READ);
 						};
 					} else if (pairName==SymbolCodes.symbolCode_E_allowTextureWrite) {
-						boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+						boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 						if (mode) {
 							node.setCapability(Appearance.ALLOW_TEXTURE_WRITE);
 						};
@@ -606,7 +597,7 @@ public class AuxiliaryNode3D extends Tools3D {
 						long pairName= - key;
 						Term pairValue= setPositiveMap.get(key);
 						if (pairName==SymbolCodes.symbolCode_E_enableTextureMapping) {
-							boolean enableTextureMapping= YesNo.termYesNo2Boolean(pairValue,iX);
+							boolean enableTextureMapping= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 							node.setEnable(enableTextureMapping);
 						} else if (pairName==SymbolCodes.symbolCode_E_magnificationFilter) {
 							int magFilter= argumentToMagnificationFilter(pairValue,iX);
@@ -733,7 +724,7 @@ public class AuxiliaryNode3D extends Tools3D {
 						float shininess= (float)GeneralConverters.argumentToReal(pairValue,iX);
 						node.setShininess(shininess);
 					} else if (pairName==SymbolCodes.symbolCode_E_lightingEnable) {
-						boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+						boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 						node.setLightingEnable(mode);
 					} else {
 						throw new WrongArgumentIsUnknownMaterialAttribute(key);
@@ -770,22 +761,22 @@ public class AuxiliaryNode3D extends Tools3D {
 						int model= argumentToShadeModel(pairValue,iX);
 						node.setShadeModel(model);
 					} else if (pairName==SymbolCodes.symbolCode_E_allowColorRead) {
-						boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+						boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 						if (mode) {
 							node.setCapability(ColoringAttributes.ALLOW_COLOR_READ);
 						};
 					} else if (pairName==SymbolCodes.symbolCode_E_allowColorWrite) {
-						boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+						boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 						if (mode) {
 							node.setCapability(ColoringAttributes.ALLOW_COLOR_WRITE);
 						};
 					} else if (pairName==SymbolCodes.symbolCode_E_allowShadeModelRead) {
-						boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+						boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 						if (mode) {
 							node.setCapability(ColoringAttributes.ALLOW_SHADE_MODEL_READ);
 						};
 					} else if (pairName==SymbolCodes.symbolCode_E_allowShadeModelWrite) {
-						boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+						boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 						if (mode) {
 							node.setCapability(ColoringAttributes.ALLOW_SHADE_MODEL_WRITE);
 						};
@@ -833,7 +824,7 @@ public class AuxiliaryNode3D extends Tools3D {
 						polygonOffsetFactor= (float)GeneralConverters.argumentToReal(pairValue,iX);
 						// iterator.remove();
 					} else if (pairName==SymbolCodes.symbolCode_E_backFaceNormalFlip) {
-						backFaceNormalFlip= YesNo.termYesNo2Boolean(pairValue,iX);
+						backFaceNormalFlip= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 						// iterator.remove();
 					} else {
 						throw new WrongArgumentIsUnknownPolygonAttribute(key);
@@ -1022,10 +1013,10 @@ public class AuxiliaryNode3D extends Tools3D {
 					};
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_includeVertexPositions) {
-					includeVertexPositions= YesNo.termYesNo2Boolean(pairValue,iX);
+					includeVertexPositions= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_includePerVertexNormals) {
-					includePerVertexNormals= YesNo.termYesNo2Boolean(pairValue,iX);
+					includePerVertexNormals= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					iterator.remove();
 				}
 			};
@@ -1104,10 +1095,10 @@ public class AuxiliaryNode3D extends Tools3D {
 					};
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_includeVertexPositions) {
-					includeVertexPositions= YesNo.termYesNo2Boolean(pairValue,iX);
+					includeVertexPositions= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_includePerVertexNormals) {
-					includePerVertexNormals= YesNo.termYesNo2Boolean(pairValue,iX);
+					includePerVertexNormals= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_stripVertexCounts) {
 					stripVertexCounts= term2StripCounts(pairValue,iX);
@@ -1189,10 +1180,10 @@ public class AuxiliaryNode3D extends Tools3D {
 					};
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_includeVertexPositions) {
-					includeVertexPositions= YesNo.termYesNo2Boolean(pairValue,iX);
+					includeVertexPositions= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_includePerVertexNormals) {
-					includePerVertexNormals= YesNo.termYesNo2Boolean(pairValue,iX);
+					includePerVertexNormals= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_indexCount) {
 					try {
@@ -1287,10 +1278,10 @@ public class AuxiliaryNode3D extends Tools3D {
 					};
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_includeVertexPositions) {
-					includeVertexPositions= YesNo.termYesNo2Boolean(pairValue,iX);
+					includeVertexPositions= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_includePerVertexNormals) {
-					includePerVertexNormals= YesNo.termYesNo2Boolean(pairValue,iX);
+					includePerVertexNormals= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_indexCount) {
 					try {
@@ -1423,85 +1414,85 @@ public class AuxiliaryNode3D extends Tools3D {
 					node.setCharacterSpacing(characterSpacing);
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_allowAlignmentRead) {
-					boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+					boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					if (mode) {
 						node.setCapability(Text3D.ALLOW_ALIGNMENT_READ);
 					};
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_allowAlignmentWrite) {
-					boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+					boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					if (mode) {
 						node.setCapability(Text3D.ALLOW_ALIGNMENT_WRITE);
 					};
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_allowBoundingBoxRead) {
-					boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+					boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					if (mode) {
 						node.setCapability(Text3D.ALLOW_BOUNDING_BOX_READ);
 					};
 					iterator.remove();
 				// } else if (pairName==SymbolCodes.symbolCode_E_allowBoundingBoxWrite) {
-				//	boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+				//	boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				//	if (mode) {
 				//		node.setCapability(Text3D.ALLOW_BOUNDING_BOX_WRITE);
 				//	};
 				//	iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_allowCharacterSpacingRead) {
-					boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+					boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					if (mode) {
 						node.setCapability(Text3D.ALLOW_CHARACTER_SPACING_READ);
 					};
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_allowCharacterSpacingWrite) {
-					boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+					boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					if (mode) {
 						node.setCapability(Text3D.ALLOW_CHARACTER_SPACING_WRITE);
 					};
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_allowFont3DRead) {
-					boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+					boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					if (mode) {
 						node.setCapability(Text3D.ALLOW_FONT3D_READ);
 					};
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_allowFont3DWrite) {
-					boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+					boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					if (mode) {
 						node.setCapability(Text3D.ALLOW_FONT3D_WRITE);
 					};
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_allowPathRead) {
-					boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+					boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					if (mode) {
 						node.setCapability(Text3D.ALLOW_PATH_READ);
 					};
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_allowPathWrite) {
-					boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+					boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					if (mode) {
 						node.setCapability(Text3D.ALLOW_PATH_WRITE);
 					};
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_allowPositionRead) {
-					boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+					boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					if (mode) {
 						node.setCapability(Text3D.ALLOW_POSITION_READ);
 					};
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_allowPositionWrite) {
-					boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+					boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					if (mode) {
 						node.setCapability(Text3D.ALLOW_POSITION_WRITE);
 					};
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_allowStringRead) {
-					boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+					boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					if (mode) {
 						node.setCapability(Text3D.ALLOW_STRING_READ);
 					};
 					iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_allowStringWrite) {
-					boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+					boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					if (mode) {
 						node.setCapability(Text3D.ALLOW_STRING_WRITE);
 					};
@@ -1719,7 +1710,7 @@ public class AuxiliaryNode3D extends Tools3D {
 			long pairName= - key;
 			Term pairValue= setPositiveMap.get(key);
 			if (pairName==SymbolCodes.symbolCode_E_allowIntersect) {
-				boolean mode= YesNo.termYesNo2Boolean(pairValue,iX);
+				boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				if (mode) {
 					node.setCapability(Geometry.ALLOW_INTERSECT);
 				}

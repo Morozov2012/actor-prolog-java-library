@@ -17,7 +17,8 @@ public class KinectSkeletonsFrame implements KinectSkeletonsFrameInterface, Seri
 	protected DimensionsInterface dimensions;
 	protected KinectFrameBaseAttributesInterface baseAttributes;
 	//
-	private static final long serialVersionUID= 1;
+	// private static final long serialVersionUID= 1;
+	private static final long serialVersionUID= 0xB55CA02725E99E1FL; // -5378247764986978785L
 	//
 	// static {
 	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames","KinectSkeletonsFrame");

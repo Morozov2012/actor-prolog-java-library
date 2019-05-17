@@ -14,6 +14,12 @@ public abstract class UnderdeterminedSetItem extends UnderdeterminedSetWithTail 
 	//
 	protected long name;
 	//
+	private static final long serialVersionUID= 0x7602FF0B9F24BE4FL; // 8503639471808626255L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","UnderdeterminedSetItem");
+	// }
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	private void writeObject(ObjectOutputStream stream) throws IOException {

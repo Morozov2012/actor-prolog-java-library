@@ -20,9 +20,15 @@ public abstract class ScalableMetalToggleButtonIcon extends ScalableToggleButton
 	//
 	protected java.util.List gradient= null;
 	//
+	private static final long serialVersionUID= 0x853F5D9FF4934E03L; // -8845248201547887101L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.gui.dialogs.scalable.metal","ScalableMetalToggleButtonIcon");
+	// }
+	//
 	public ScalableMetalToggleButtonIcon() {
 		gradient= (java.util.List)UIManager.get(getGradientKey());
 	}
 	//
-	protected abstract String getGradientKey();
+	abstract protected String getGradientKey();
 }

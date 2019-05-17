@@ -117,7 +117,7 @@ public class BrushAttributes {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_isCyclic) {
-					isCyclic= YesNo.termYesNo2Boolean(pairValue,iX);
+					isCyclic= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_point1) {
 					p1= Tools2D.argumentToPoint2D(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_point2) {

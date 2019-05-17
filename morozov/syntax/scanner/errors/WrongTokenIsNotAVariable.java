@@ -2,7 +2,8 @@
 
 package morozov.syntax.scanner.errors;
 
-public class WrongTokenIsNotAVariable extends RuntimeException {
-	public WrongTokenIsNotAVariable() {
+public class WrongTokenIsNotAVariable extends LexicalScannerError {
+	public WrongTokenIsNotAVariable(int p) {
+		super(p);
 	}
 }

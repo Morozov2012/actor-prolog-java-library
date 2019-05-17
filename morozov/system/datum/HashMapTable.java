@@ -15,7 +15,15 @@ public class HashMapTable extends DatabaseTable {
 	//
 	protected HashMap<Term,DatabaseRecord> databaseHash= new HashMap<Term,DatabaseRecord>();
 	//
-	protected static Term hashMapTerm= new PrologSymbol(SymbolCodes.symbolCode_E_HashMap);
+	protected static Term termHashMap= new PrologSymbol(SymbolCodes.symbolCode_E_HashMap);
+	//
+	private static final long serialVersionUID= 0x3D890F2BB70D64A3L; // 4434091988552082595L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.datum","HashMapTable");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public HashMapTable(PrologDomain domain, boolean reuseKN) {
 		super(domain,reuseKN);
@@ -27,7 +35,7 @@ public class HashMapTable extends DatabaseTable {
 	///////////////////////////////////////////////////////////////
 	//
 	public Term getType() {
-		return hashMapTerm;
+		return termHashMap;
 	}
 	//
 	///////////////////////////////////////////////////////////////

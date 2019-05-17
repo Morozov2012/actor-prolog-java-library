@@ -55,6 +55,49 @@ public class CoordinateAndSize {
 		};
 		return result;
 	}
+	public static CoordinateAndSize calculate(ExtendedCoordinate lZ, ExtendedSize lDZ, int spaceLimit) {
+		CoordinateAndSize result= new CoordinateAndSize();
+		try {
+			double logicalCoordinate= lZ.getDoubleValue();
+			result.coordinate= PrologInteger.toInteger(logicalCoordinate);
+			try {
+				double logicalSize= lDZ.getDoubleValue();
+				if (logicalSize < 0) {
+					result.size= PrologInteger.toInteger(spaceLimit - logicalCoordinate + logicalSize);
+				} else {
+					result.size= PrologInteger.toInteger(logicalSize);
+				}
+			} catch (UseDefaultSize e2) {
+				result.size= PrologInteger.toInteger(spaceLimit - logicalCoordinate);
+			}
+		} catch (CentreFigure e1) {
+			try {
+				double logicalSize= lDZ.getDoubleValue();
+				if (logicalSize < 0) {
+					result.size= PrologInteger.toInteger(spaceLimit + logicalSize);
+				} else {
+					result.size= PrologInteger.toInteger(logicalSize);
+				};
+				result.coordinate= (spaceLimit - result.size) / 2;
+			} catch (UseDefaultSize e2) {
+				result.coordinate= 0;
+				result.size= spaceLimit;
+			}
+		} catch (UseDefaultLocation e1) {
+			result.coordinateIsToBeCalculatedAutomatically= true;
+			try {
+				double logicalSize= lDZ.getDoubleValue();
+				if (logicalSize < 0) {
+					result.size= PrologInteger.toInteger(spaceLimit + logicalSize);
+				} else {
+					result.size= PrologInteger.toInteger(logicalSize);
+				}
+			} catch (UseDefaultSize e2) {
+				result.size= spaceLimit;
+			}
+		};
+		return result;
+	}
 	public static double reconstruct(double actualSize, double desktopSize, double gridSize) {
 		return actualSize * gridSize / desktopSize;
 	}

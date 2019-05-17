@@ -2,9 +2,7 @@
 
 package morozov.run;
 
-import java.io.Serializable;
-
-public enum MethodArgumentDirection implements Serializable {
+public enum MethodArgumentDirection {
 	INPUT,
-	OUTPUT
+	OUTPUT;
 }

@@ -5,10 +5,11 @@ package morozov.terms;
 import morozov.run.*;
 import morozov.worlds.*;
 
+import java.io.Serializable;
 import java.nio.charset.CharsetEncoder;
 import java.util.HashSet;
 
-public class SlotVariableValue {
+public class SlotVariableValue implements Cloneable, Serializable {
 	//
 	public ActiveWorld slotValueOwner;
 	// public Term visibleValue; // oldValue
@@ -22,6 +23,14 @@ public class SlotVariableValue {
 	public Term portValue;
 	public boolean portValueIsProtected= false;
 	public ActiveWorld portValueOwner;
+	//
+	private static final long serialVersionUID= 0xB7D96DBBA0C684CFL; // -5199003642198850353L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","SlotVariableValue");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public SlotVariableValue(ActiveWorld owner) {
 		slotValueOwner= owner;

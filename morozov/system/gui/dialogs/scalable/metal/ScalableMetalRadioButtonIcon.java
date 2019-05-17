@@ -29,6 +29,12 @@ import java.awt.RenderingHints;
 
 public class ScalableMetalRadioButtonIcon extends ScalableMetalToggleButtonIcon {
 	//
+	private static final long serialVersionUID= 0x9782EAEF5B228C2CL; // -7529197313262973908L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.gui.dialogs.scalable.metal","ScalableMetalRadioButtonIcon");
+	// }
+	//
 	public ScalableMetalRadioButtonIcon() {
 	}
 	//

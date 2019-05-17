@@ -42,6 +42,8 @@ public abstract class Report extends Text {
 	protected AtomicReference<MutableAttributeSet> rootTextStyle= new AtomicReference<MutableAttributeSet>(new SimpleAttributeSet());
 	protected Map<Color,MutableAttributeSet> transparentTextStyles= Collections.synchronizedMap(new HashMap<Color,MutableAttributeSet>());
 	//
+	protected ChoisePoint emptyChoisePoint= null;
+	//
 	// There are auxiliary constants:
 	//
 	protected static final Color defaultTextColor= Color.BLACK;
@@ -77,6 +79,7 @@ public abstract class Report extends Text {
 	abstract public Term getBuiltInSlot_E_area_type();
 	//
 	abstract public long entry_s_Action_1_i();
+	abstract public long entry_s_WindowClosed_0();
 	// abstract public long entry_s_Initialize_0();
 	// abstract public long entry_s_Start_0();
 	// abstract public long entry_s_Stop_0();
@@ -417,6 +420,14 @@ public abstract class Report extends Text {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	protected void sendTheWindowClosedMessage() {
+		long domainSignature= entry_s_WindowClosed_0();
+		AsyncCall call= new AsyncCall(domainSignature,this,true,true,noArguments,true);
+		transmitAsyncCall(call,emptyChoisePoint);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	protected void write_text_buffer(ChoisePoint iX, boolean appendNewLine, StringBuilder textBuffer) {
 		if (appendNewLine) {
 			textBuffer.append("\n");
@@ -646,5 +657,11 @@ public abstract class Report extends Text {
 			};
 			return textStyle;
 		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void isHidden0s(ChoisePoint iX) throws Backtracking {
+		isHiddenCustomControl(iX);
 	}
 }

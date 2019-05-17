@@ -25,6 +25,8 @@ import java.util.concurrent.atomic.AtomicReference;
 public class IPCameraDataAcquisition extends Thread {
 	//
 	protected IPCameraDataConsumerInterface dataConsumer;
+	protected AtomicInteger outputDebugInformation= new AtomicInteger(0);
+	//
 	protected AtomicBoolean stopThisThread= new AtomicBoolean(false);
 	protected AtomicBoolean deviceIsOpen= new AtomicBoolean(false);
 	//
@@ -43,11 +45,15 @@ public class IPCameraDataAcquisition extends Thread {
 	//
 	protected byte[] m_buf;
 	//
-	protected AtomicInteger deviceOpeningAttemptDelay= new AtomicInteger(100);
+	protected AtomicInteger deviceConnectionAttemptPeriod= new AtomicInteger(100);
 	//
 	protected byte[] lineByteBuffer= new byte[1024];
 	protected int lineByteBufferPosition= 0;
 	protected byte[] textContentLength= new byte[]{'C','o','n','t','e','n','t','-','L','e','n','g','t','h',':',' '};
+	//
+	protected static int reportCriticalErrorsLevel= 1;
+	protected static int reportAdmissibleErrorsLevel= 2;
+	protected static int reportWarningsLevel= 3;
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -65,7 +71,7 @@ public class IPCameraDataAcquisition extends Thread {
 	public void setServerAttributes(String url, int delay) {
 		synchronized (this) {
 			mjpgURL.set(url);
-			deviceOpeningAttemptDelay.set(delay);
+			deviceConnectionAttemptPeriod.set(delay);
 		}
 	}
 	//
@@ -73,11 +79,21 @@ public class IPCameraDataAcquisition extends Thread {
 		return mjpgURL.get();
 	}
 	public int getOpeningAttemptDelay() {
-		return deviceOpeningAttemptDelay.get();
+		return deviceConnectionAttemptPeriod.get();
 	}
 	//
-	public void activateDataTransfer() {
+	public void setOutputDebugInformation(int value) {
+		outputDebugInformation.set(value);
+	}
+	public int getOutputDebugInformation() {
+		return outputDebugInformation.get();
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void activateDataTransfer(int givenOutputDebugInformation) {
 		synchronized (this) {
+			outputDebugInformation.set(givenOutputDebugInformation);
 			enableDataTransfer.set(true);
 			deviceIsToBeClosed.set(false);
 			notify();
@@ -103,9 +119,9 @@ public class IPCameraDataAcquisition extends Thread {
 		return !enableDataTransfer.get();
 	}
 	//
-	public boolean isNotSuspended() {
-		return enableDataTransfer.get();
-	}
+	// public boolean isNotSuspended() {
+	//	return enableDataTransfer.get();
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -131,10 +147,12 @@ public class IPCameraDataAcquisition extends Thread {
 						if (dataConsumer != null) {
 							dataConsumer.setDataAcquisitionError(new DataAcquisitionError(e));
 						};
-						e.printStackTrace();
+						if (reportCriticalErrors()) {
+							e.printStackTrace();
+							writeLater(String.format("IP camera acquisition error: %s\n",e));
+						};
 						closeDevice();
 						deviceIsOpen.set(false);
-						writeLater(String.format("IP camera acquisition error: %s\n",e));
 					}
 				} else {
 					try {
@@ -143,8 +161,10 @@ public class IPCameraDataAcquisition extends Thread {
 						if (dataConsumer != null) {
 							dataConsumer.setDataAcquisitionError(new DataAcquisitionError(e1));
 						};
-						e1.printStackTrace();
-						writeLater(String.format("IP camera initialization error: %s\n",e1));
+						if (reportAdmissibleErrors()) {
+							e1.printStackTrace();
+							writeLater(String.format("IP camera initialization error: %s\n",e1));
+						};
 						try {
 							closeDevice();
 						} catch (Throwable e2) {
@@ -156,7 +176,7 @@ public class IPCameraDataAcquisition extends Thread {
 					};
 					if (!deviceIsOpen.get()) {
 						synchronized (this) {
-							wait(deviceOpeningAttemptDelay.get());
+							wait(deviceConnectionAttemptPeriod.get());
 						}
 					}
 				}
@@ -174,7 +194,9 @@ public class IPCameraDataAcquisition extends Thread {
 			if (dataConsumer != null) {
 				dataConsumer.setDataAcquisitionError(new DataAcquisitionError(e));
 			};
-			e.printStackTrace();
+			if (reportCriticalErrors()) {
+				e.printStackTrace();
+			}
 		}
 	}
 	//
@@ -201,7 +223,9 @@ public class IPCameraDataAcquisition extends Thread {
 					if (dataConsumer != null) {
 						dataConsumer.setDataAcquisitionError(new DataAcquisitionError(e));
 					};
-					e.printStackTrace();
+					if (reportCriticalErrors()) {
+						e.printStackTrace();
+					}
 				};
 				return false;
 			}
@@ -358,6 +382,26 @@ public class IPCameraDataAcquisition extends Thread {
 				System.err.print(text);
 			}
 		});
+	}
+	//
+	public boolean reportCriticalErrors() {
+		return outputDebugInformation.get() >= reportCriticalErrorsLevel;
+	}
+	public boolean reportAdmissibleErrors() {
+		return outputDebugInformation.get() >= reportAdmissibleErrorsLevel;
+	}
+	public boolean reportWarnings() {
+		return outputDebugInformation.get() >= reportWarningsLevel;
+	}
+	//
+	public int getReportCriticalErrorsLevel() {
+		return reportCriticalErrorsLevel;
+	}
+	public int getReportAdmissibleErrorsLevel() {
+		return reportAdmissibleErrorsLevel;
+	}
+	public int getReportWarningsLevel() {
+		return reportWarningsLevel;
 	}
 	//
 	///////////////////////////////////////////////////////////////

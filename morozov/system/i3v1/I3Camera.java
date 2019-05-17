@@ -244,6 +244,22 @@ public class I3Camera {
 		return m_EZUSB.reportUSBTransferDelays();
 	}
 	//
+	public int getReportCriticalErrorsLevel() {
+		return m_EZUSB.getReportCriticalErrorsLevel();
+	}
+	public int getReportAdmissibleErrorsLevel() {
+		return m_EZUSB.getReportAdmissibleErrorsLevel();
+	}
+	public int getReportWarningsLevel() {
+		return m_EZUSB.getReportWarningsLevel();
+	}
+	public int getReportFlashAttributesLevel() {
+		return m_EZUSB.getReportFlashAttributesLevel();
+	}
+	public int getReportUSBTransferDelaysLevel() {
+		return m_EZUSB.getReportUSBTransferDelaysLevel();
+	}
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public synchronized String[] findDevices() {
@@ -255,14 +271,14 @@ public class I3Camera {
 	public synchronized boolean findDevice(DeviceIdentifier identifier) {
 		return m_EZUSB.findDevice(identifier);
 	}
-	public synchronized boolean openDevice(DeviceIdentifier identifier) {
-		return m_EZUSB.openDevice(identifier);
+	public synchronized boolean connectDevice(DeviceIdentifier identifier) {
+		return m_EZUSB.connectDevice(identifier);
 	}
-	public synchronized boolean openDevice() {
-		return m_EZUSB.openDevice();
+	public synchronized boolean connectDevice() {
+		return m_EZUSB.connectDevice();
 	}
-	public synchronized void closeDevice() {
-		m_EZUSB.closeDevice();
+	public synchronized void disconnectDevice() {
+		m_EZUSB.disconnectDevice();
 	}
 	public synchronized void closeUSB() {
 		m_EZUSB.closeUSB();
@@ -515,11 +531,17 @@ public class I3Camera {
 				writer.close();
 			}
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			if (m_EZUSB.reportCriticalErrors()) {
+				e.printStackTrace();
+			}
 		} catch (FileNotFoundException e2) {
-			e2.printStackTrace();
+			if (m_EZUSB.reportCriticalErrors()) {
+				e2.printStackTrace();
+			}
 		} catch (IOException e3) {
-			e3.printStackTrace();
+			if (m_EZUSB.reportCriticalErrors()) {
+				e3.printStackTrace();
+			}
 		}
 	}
 	//
@@ -592,11 +614,17 @@ public class I3Camera {
 				reader.close();
 			}
 		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
+			if (m_EZUSB.reportCriticalErrors()) {
+				e.printStackTrace();
+			}
 		} catch (FileNotFoundException e2) {
-			e2.printStackTrace();
+			if (m_EZUSB.reportCriticalErrors()) {
+				e2.printStackTrace();
+			}
 		} catch (IOException e3) {
-			e3.printStackTrace();
+			if (m_EZUSB.reportCriticalErrors()) {
+				e3.printStackTrace();
+			}
 		}
 	}
 	public synchronized void loadSensorAttributes(DataInputStream reader) throws IOException {
@@ -828,7 +856,7 @@ public class I3Camera {
 	///////////////////////////////////////////////////////////////
 	//
 	public void calibrateDevice() {
-		if (m_EZUSB.isOpen()) {
+		if (m_EZUSB.isConnected()) {
 			setShutterCalibration(true);
 		}
 	}
@@ -966,6 +994,9 @@ public class I3Camera {
 			}
 		};
 		int length1= pos1 + 1;
+		if (length1 <= 0) {
+			return;
+		};
 		Arrays.sort(firstArray,0,length1);
 		double median;
 		if (length1 % 2 == 1) {
@@ -1019,6 +1050,9 @@ public class I3Camera {
 		// double[] m_TargetTemperatures= commData.m_TargetTemperatures;
 		double[] m_TargetTemperatures= shutterLess.computeTargetTemperatures(isCelsius.get());
 		int length0= m_TargetTemperatures.length;
+		if (length0 <= 0) {
+			return;
+		};
 		double[] firstArray= new double[length0];
 		int pos1= -1;
 		for (int pos0=0; pos0 < length0; pos0++) {
@@ -1029,6 +1063,9 @@ public class I3Camera {
 			}
 		};
 		int length1= pos1 + 1;
+		if (length1 <= 0) {
+			return;
+		};
 		Arrays.sort(firstArray,0,length1);
 		double median;
 		if (length1 % 2 == 1) {
@@ -1543,10 +1580,10 @@ for (int radius=1; radius <= maximalDeadPixelEliminationRadius; radius++) {
 	synchronized public int resetDevice() {
 		int result= 0;
 		// result= m_EZUSB.resetDevice();
-		closeDevice();
+		disconnectDevice();
 		closeUSB();
 		m_EZUSB.initializeLibUSB();
-		openDevice();
+		connectDevice();
 		initCamera();
 		return result;
 	}

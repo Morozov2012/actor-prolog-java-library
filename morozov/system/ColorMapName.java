@@ -6,6 +6,7 @@ import morozov.system.colormaps.*;
 import morozov.system.modes.*;
 
 public enum ColorMapName {
+	//
 	AQUA {
 		public int[][] toColors(int size) {
 			return colorMapAqua.getColorMap(size,colorMapAlpha);

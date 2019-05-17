@@ -25,7 +25,8 @@ public class AstrohnDataAcquisition extends Thread {
 	//
 	protected AtomicReference<String> serverAddress= new AtomicReference<>("192.168.10.227");
 	protected AtomicInteger serverPort= new AtomicInteger(41865);
-	protected AtomicInteger deviceOpeningAttemptDelay= new AtomicInteger(100);
+	protected AtomicInteger deviceConnectionAttemptPeriod= new AtomicInteger(100);
+	protected AtomicInteger outputDebugInformation= new AtomicInteger(0);
 	//
 	protected AtomicBoolean stopThisThread= new AtomicBoolean(false);
 	protected AtomicBoolean deviceIsOpen= new AtomicBoolean(false);
@@ -39,6 +40,10 @@ public class AstrohnDataAcquisition extends Thread {
 	protected DataInputStream input;
 	//
 	protected byte[] m_buf;
+	//
+	protected static int reportCriticalErrorsLevel= 1;
+	protected static int reportAdmissibleErrorsLevel= 2;
+	protected static int reportWarningsLevel= 3;
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -57,14 +62,22 @@ public class AstrohnDataAcquisition extends Thread {
 		synchronized (this) {
 			serverAddress.set(address);
 			serverPort.set(port);
-			deviceOpeningAttemptDelay.set(delay);
+			deviceConnectionAttemptPeriod.set(delay);
 		}
+	}
+	//
+	public void setOutputDebugInformation(int value) {
+		outputDebugInformation.set(value);
+	}
+	public int getOutputDebugInformation() {
+		return outputDebugInformation.get();
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void activateDataTransfer() {
+	public void activateDataTransfer(int givenOutputDebugInformation) {
 		synchronized (this) {
+			outputDebugInformation.set(givenOutputDebugInformation);
 			enableDataTransfer.set(true);
 			deviceIsToBeClosed.set(false);
 			notify();
@@ -90,9 +103,9 @@ public class AstrohnDataAcquisition extends Thread {
 		return !enableDataTransfer.get();
 	}
 	//
-	public boolean isNotSuspended() {
-		return enableDataTransfer.get();
-	}
+	// public boolean isNotSuspended() {
+	//	return enableDataTransfer.get();
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -115,15 +128,19 @@ public class AstrohnDataAcquisition extends Thread {
 							deviceIsToBeClosed.set(false);
 						}
 					} catch (Throwable e) {
-						e.printStackTrace();
-						writeLater(String.format("THz data acquisition error: %s\n",e));
+						if (reportCriticalErrors()) {
+							e.printStackTrace();
+							writeLater(String.format("THz data acquisition error: %s\n",e));
+						}
 					}
 				} else {
 					try {
                 	                	tryToOpenDevice();
 					} catch (Throwable e1) {
-						e1.printStackTrace();
-						writeLater(String.format("THz camera initialization error: %s\n",e1));
+						if (reportAdmissibleErrors()) {
+							e1.printStackTrace();
+							writeLater(String.format("THz camera initialization error: %s\n",e1));
+						};
 						try {
 							closeDevice();
 						} catch (Throwable e2) {
@@ -132,7 +149,7 @@ public class AstrohnDataAcquisition extends Thread {
 					};
 					if (!deviceIsOpen.get()) {
 						synchronized (this) {
-							wait(deviceOpeningAttemptDelay.get());
+							wait(deviceConnectionAttemptPeriod.get());
 						}
 					}
 				}
@@ -147,7 +164,9 @@ public class AstrohnDataAcquisition extends Thread {
 		} catch (InterruptedException e) {
 		} catch (ThreadDeath e) {
 		} catch (Throwable e) {
-			e.printStackTrace();
+			if (reportCriticalErrors()) {
+				e.printStackTrace();
+			}
 		}
 	}
 	//
@@ -220,7 +239,9 @@ public class AstrohnDataAcquisition extends Thread {
 		int lengthP= PacketHeader.getLength(input);
 		if (lengthP > 0) {
 			long currentTime= System.currentTimeMillis();
-			TVFilterImageHeader packetBody= TVFilterImageHeader.readTVFilterImageHeader(input,lengthP);
+			boolean reportWarnings= reportWarnings();
+			TVFilterImageHeader packetBody=
+				TVFilterImageHeader.readTVFilterImageHeader(input,lengthP,reportWarnings);
 			AstrohnDataConsumerInterface consumer= dataConsumer.get();
 			if (consumer != null) {
 				consumer.setAstrohnData(packetBody,currentTime);
@@ -236,6 +257,26 @@ public class AstrohnDataAcquisition extends Thread {
 				System.err.print(text);
 			}
 		});
+	}
+	//
+	public boolean reportCriticalErrors() {
+		return outputDebugInformation.get() >= reportCriticalErrorsLevel;
+	}
+	public boolean reportAdmissibleErrors() {
+		return outputDebugInformation.get() >= reportAdmissibleErrorsLevel;
+	}
+	public boolean reportWarnings() {
+		return outputDebugInformation.get() >= reportWarningsLevel;
+	}
+	//
+	public int getReportCriticalErrorsLevel() {
+		return reportCriticalErrorsLevel;
+	}
+	public int getReportAdmissibleErrorsLevel() {
+		return reportAdmissibleErrorsLevel;
+	}
+	public int getReportWarningsLevel() {
+		return reportWarningsLevel;
 	}
 	//
 	///////////////////////////////////////////////////////////////

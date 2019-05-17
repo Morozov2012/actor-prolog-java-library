@@ -5,12 +5,14 @@ package morozov.system.kinect.converters;
 import morozov.run.*;
 import morozov.syntax.scanner.*;
 import morozov.syntax.scanner.errors.*;
+import morozov.syntax.scanner.interfaces.*;
 import morozov.system.checker.signals.*;
 import morozov.system.files.*;
 import morozov.system.files.errors.*;
 import morozov.system.kinect.converters.errors.*;
 import morozov.system.kinect.modes.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 import java.math.BigInteger;
 
@@ -29,6 +31,8 @@ public class KinectLookupTable {
 	protected static int expectedNumberOfElementsInColumn2D= 2;
 	protected static int expectedNumberOfElementsInColumn3D= 2 * 3;
 	//
+	protected static LexicalScannerMasterInterface dummyLexicalScannerMaster= new DummyLexicalScannerMaster();
+	//
 	public void loadLookupTable(ExtendedFileName fileName, int timeout, CharacterSet requestedCharacterSet, int cX, int cY, StaticContext staticContext, ChoisePoint iX) {
 		correctionX= cX;
 		correctionY= cY;
@@ -43,7 +47,7 @@ public class KinectLookupTable {
 				recentErrorText= textBuffer.toString();
 				recentErrorPosition= e.getPosition();
 				recentErrorException= e;
-				throw e;
+				throw new ActorPrologLexicalScannerError(e);
 			} catch (RuntimeException e) {
 				if (recentErrorException==null) {
 					recentErrorException= e;
@@ -56,8 +60,8 @@ public class KinectLookupTable {
 	}
 	//
 	public void loadContent(String text, ChoisePoint iX) throws LexicalScannerError {
-		LexicalScanner scanner= new LexicalScanner(false);
-		PrologToken[] tokens= scanner.analyse(text,false,true);
+		LexicalScanner scanner= new LexicalScanner(dummyLexicalScannerMaster,false);
+		PrologToken[] tokens= scanner.analyse(text,false,true,iX);
 		int numberOfTokens= tokens.length;
 		int numberOfElements= 0;
 		loop: for (int k=0; k < numberOfTokens; k++) {
@@ -103,7 +107,28 @@ public class KinectLookupTable {
 			numberOfElementsInColumn= expectedNumberOfElementsInColumn2D;
 		};
 		int numberOfColumns= numberOfElements / numberOfElementsInColumn;
-		lookupTable= new float[numberOfColumns][numberOfRows][numberOfElementsInColumn];
+		boolean createNewArray= false;
+		if (lookupTable==null) {
+			createNewArray= true;
+		} else {
+			int c1= lookupTable.length;
+			if (c1==0 || c1 != numberOfColumns) {
+				createNewArray= true;
+			} else {
+				int r1= lookupTable[0].length;
+				if (r1==0 || r1 != numberOfRows) {
+					createNewArray= true;
+				} else {
+					int e1= lookupTable[0][0].length;
+					if (e1==0 || e1 != numberOfElementsInColumn) {
+						createNewArray= true;
+					}
+				}
+			}
+		};
+		if (createNewArray) {
+			lookupTable= new float[numberOfColumns][numberOfRows][numberOfElementsInColumn];
+		};
 		int row= 0;
 		int column= 0;
 		boolean afterMinus= false;
@@ -126,30 +151,36 @@ public class KinectLookupTable {
 			case END_OF_TEXT:
 				break loop;
 			default:
-				if (type==PrologTokenType.INTEGER) {
-					TokenInteger10 integer= (TokenInteger10)token;
-					BigInteger value= integer.getIntegerValue();
-					if (afterMinus) {
-						value= value.negate();
-					};
-					lookupTable[column][row][indexOfElement]= PrologInteger.toInteger(value);
-					indexOfElement++;
-					if (indexOfElement >= numberOfElementsInColumn) {
-						indexOfElement= 0;
-						column++;
-					}
-				} else if (type==PrologTokenType.REAL) {
-					TokenReal real= (TokenReal)token;
-					double value= real.getRealValue();
-					if (afterMinus) {
-						value= - value;
-					};
-					lookupTable[column][row][indexOfElement]= (float)value;
-					indexOfElement++;
-					if (indexOfElement >= numberOfElementsInColumn) {
-						indexOfElement= 0;
-						column++;
-					}
+				try {
+///////////////////////////////////////////////////////////////////////
+if (type==PrologTokenType.INTEGER) {
+	TokenInteger10 integer= (TokenInteger10)token;
+	BigInteger value= integer.getIntegerValueOrTermIsNotAnInteger();
+	if (afterMinus) {
+		value= value.negate();
+	};
+	lookupTable[column][row][indexOfElement]= PrologInteger.toInteger(value);
+	indexOfElement++;
+	if (indexOfElement >= numberOfElementsInColumn) {
+		indexOfElement= 0;
+		column++;
+	}
+} else if (type==PrologTokenType.REAL) {
+	TokenReal10 real= (TokenReal10)token;
+	double value= real.getRealValueOrTermIsNotAReal();
+	if (afterMinus) {
+		value= - value;
+	};
+	lookupTable[column][row][indexOfElement]= (float)value;
+	indexOfElement++;
+	if (indexOfElement >= numberOfElementsInColumn) {
+		indexOfElement= 0;
+		column++;
+	}
+};
+///////////////////////////////////////////////////////////////////////
+				} catch (TermIsNotAnInteger e) {
+				} catch (TermIsNotAReal e) {
 				};
 				afterMinus= false;
 			}

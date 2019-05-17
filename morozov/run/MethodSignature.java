@@ -15,6 +15,12 @@ public class MethodSignature implements Serializable {
 	public boolean hasAsterisk;
 	public MethodArgument[] arguments;
 	//
+	private static final long serialVersionUID= 0x814194FF0C4B61AAL; // -9132854746186817110L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.run","MethodSignature");
+	// }
+	//
 	public MethodSignature(long s, String n, boolean iFC, boolean hA, MethodArgument[] list) {
 		domainSignature= s;
 		methodName= n;

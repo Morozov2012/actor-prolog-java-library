@@ -22,7 +22,7 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.Point2D;
 import java.awt.geom.Area;
 
-class MetalUtils {
+public class MetalUtils {
 	static void drawFlush3DBorder(Graphics g0, int x, int y, int w, int h) {
 		Graphics2D g2= (Graphics2D)g0;
 		g2.translate(x,y);

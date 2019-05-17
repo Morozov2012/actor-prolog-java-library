@@ -3,11 +3,14 @@
 package morozov.system.frames.converters.interfaces;
 
 import morozov.system.frames.interfaces.*;
+import morozov.system.kinect.frames.interfaces.*;
 
 public interface DataFrameConsumerInterface {
 	//
-	public boolean sendFrame(DataFrameInterface frame);
+	public boolean sendDataFrame(DataFrameInterface frame);
+	public boolean sendCompoundFrame(CompoundFrameInterface frame);
+	public boolean sendKinectFrame(KinectFrameInterface frame);
 	//
-	public void completeDataTransfer(long numberOfAcquiredFrames);
-	public void completeDataTransfer(long numberOfFrameToBeAcquired, Throwable e);
+	public void completeDataReading(long numberOfAcquiredFrames);
+	public void completeDataReading(long numberOfFrameToBeAcquired, Throwable e);
 }

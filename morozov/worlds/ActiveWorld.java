@@ -32,6 +32,12 @@ public abstract class ActiveWorld extends OwnWorld {
 	public long debugUnit= -1;
 	public int debugFileNumber= -1;
 	//
+	private static final long serialVersionUID= 0xC6F7893E4EC2F01DL; // -4109665234249912291L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.worlds","ActiveWorld");
+	// }
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	abstract public void actualize(ChoisePoint iX);

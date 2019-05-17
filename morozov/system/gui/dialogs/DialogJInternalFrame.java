@@ -12,13 +12,18 @@ import java.awt.Rectangle;
 import java.awt.Container;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.swing.event.InternalFrameListener;
+import javax.swing.event.InternalFrameEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.beans.PropertyVetoException;
 
 public class DialogJInternalFrame
 		extends JInternalFrame
-		implements DialogOperations, MouseListener {
+		implements
+			DialogOperations,
+			InternalFrameListener,
+			MouseListener {
 	//
 	protected AbstractDialog dialog;
 	protected StaticContext staticContext;
@@ -27,6 +32,7 @@ public class DialogJInternalFrame
 	public DialogJInternalFrame(AbstractDialog d) {
 		dialog= d;
 		putClientProperty("JInternalFrame.frameType","optionDialog");
+		addInternalFrameListener(this);
 		addMouseListener(this);
 	}
 	//
@@ -78,6 +84,8 @@ public class DialogJInternalFrame
 	}
 	public boolean safelyIsRestored() {
 		return DesktopUtils.safelyIsRestored(this);
+	}
+	public void safelySetAlwaysOnTop(boolean b) {
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -140,6 +148,30 @@ public class DialogJInternalFrame
 				insideDoLayout.set(false);
 			}
 		}
+	}
+	//
+	public void internalFrameActivated(InternalFrameEvent e) {
+		// Invoked when an internal frame is activated.
+	}
+	public void internalFrameClosed(InternalFrameEvent e) {
+		// Invoked when an internal frame has been closed.
+	}
+	public void internalFrameClosing(InternalFrameEvent e) {
+		// Invoked when an internal frame is in the process
+		// of being closed.
+		dialog.sendTheWindowClosingOrWindowClosedMessage();
+	}
+	public void internalFrameDeactivated(InternalFrameEvent e) {
+		// Invoked when an internal frame is de-activated.
+	}
+	public void internalFrameDeiconified(InternalFrameEvent e) {
+		// Invoked when an internal frame is de-iconified.
+	}
+	public void internalFrameIconified(InternalFrameEvent e) {
+		// Invoked when an internal frame is iconified.
+	}
+	public void internalFrameOpened(InternalFrameEvent e) {
+		// Invoked when a internal frame has been opened.
 	}
 	//
 	public void mouseClicked(MouseEvent event) {

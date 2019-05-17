@@ -11,11 +11,19 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
-class SectionIndex implements Serializable {
+public class SectionIndex implements Serializable {
 	//
 	public HashMap<String,Long> table;
 	public long counter= OpenedDataStore.maximalSystemSectionNumber;
 	public HashSet<Long> freeNumbers= new HashSet<>();
+	//
+	private static final long serialVersionUID= 0x6EC7DC9B6AF642C7L; // 7982591424610058951L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.datum","SectionIndex");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public SectionIndex(HashMap<String,Long> index, long c) {
 		table= index;

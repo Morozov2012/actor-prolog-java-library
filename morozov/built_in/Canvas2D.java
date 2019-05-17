@@ -38,6 +38,8 @@ public abstract class Canvas2D extends BufferedImageController {
 	//
 	protected AtomicReference<Canvas2DScalingFactor> actingScalingFactor= new AtomicReference<Canvas2DScalingFactor>(Canvas2DScalingFactor.INDEPENDENT);
 	//
+	public AtomicBoolean sceneAntialiasingIsEnabled= new AtomicBoolean(false);
+	//
 	public AtomicBoolean mouseClickedEventIsEnabled= new AtomicBoolean(false);
 	public AtomicBoolean mouseEnteredEventIsEnabled= new AtomicBoolean(false);
 	public AtomicBoolean mouseExitedEventIsEnabled= new AtomicBoolean(false);
@@ -122,7 +124,7 @@ public abstract class Canvas2D extends BufferedImageController {
 	}
 	//
 	public void clear1s(ChoisePoint iX, Term a1) {
-		boolean repaintImage= YesNo.termYesNo2Boolean(a1,iX);
+		boolean repaintImage= YesNoConverters.termYesNo2Boolean(a1,iX);
 		if (repaintImage) {
 			synchronized (this) {
 				actualCommands.clear();

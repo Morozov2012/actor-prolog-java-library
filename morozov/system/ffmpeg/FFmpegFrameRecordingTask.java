@@ -19,6 +19,8 @@ import org.bytedeco.javacpp.*;
 
 import morozov.system.files.*;
 import morozov.system.ffmpeg.errors.*;
+import morozov.system.ffmpeg.interfaces.*;
+import morozov.system.frames.tools.*;
 
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
@@ -34,6 +36,7 @@ public class FFmpegFrameRecordingTask extends Thread {
 	protected Object nativeLibraryGuard= new Object();
 	protected AtomicBoolean acceptFrames= new AtomicBoolean(false);
 	protected AtomicBoolean recordFrames= new AtomicBoolean(false);
+	protected AtomicInteger outputDebugInformation= new AtomicInteger(0);
 	//
 	protected ExtendedFileName extendedFileName;
 	//
@@ -62,6 +65,16 @@ public class FFmpegFrameRecordingTask extends Thread {
 	protected boolean bufferOverflow= false;
 	//
 	protected static int technicalPixelFormat= avutil.AV_PIX_FMT_ARGB;
+	protected static String metadataTagComment= "comment";
+	protected static String metadataTagCopyright= "copyright";
+	protected static String metadataTagTime= "creation_time";
+	protected static String metadataTagDate= "date";
+	//
+	protected static int reportCriticalErrorsLevel= 1;
+	protected static int reportAdmissibleErrorsLevel= 2;
+	protected static int reportWarningsLevel= 3;
+	//
+	protected static final long emergencyTimeout= 1000;
 	//
 	public FFmpegFrameRecordingTask(FFmpegInterface o) {
 		owner= o;
@@ -80,14 +93,25 @@ public class FFmpegFrameRecordingTask extends Thread {
 		writeBufferSize.set(defaultWriteBufferSize);
 	}
 	//
+	public int getOutputDebugInformation() {
+		return outputDebugInformation.get();
+	}
+	public void setOutputDebugInformation(int value) {
+		outputDebugInformation.set(value);
+	}
+	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void openWriting(ExtendedFileName fileName, String formatName, FFmpegStreamDefinition[] streams, FFmpegCodecOption[] options) {
+	public void openWriting(ExtendedFileName fileName, String formatName, FFmpegStreamDefinition[] streams, FFmpegCodecOption[] options, MetadataDescription metadataDescription) {
 		if (!acceptFrames.get()) {
 			synchronized (nativeLibraryGuard) {
-				openOutputFile(fileName,formatName,streams,options);
+				openOutputFile(fileName,formatName,streams,options,metadataDescription);
 			}
 		}
+	}
+	//
+	public boolean outputIsOpen() {
+		return acceptFrames.get();
 	}
 	//
 	public boolean eof() {
@@ -96,7 +120,7 @@ public class FFmpegFrameRecordingTask extends Thread {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected void openOutputFile(ExtendedFileName fileName, String formatName, FFmpegStreamDefinition[] streams, FFmpegCodecOption[] options) {
+	protected void openOutputFile(ExtendedFileName fileName, String formatName, FFmpegStreamDefinition[] streams, FFmpegCodecOption[] options, MetadataDescription metadataDescription) {
 		closeWriting();
 		synchronized (nativeLibraryGuard) {
 			acceptFrames.set(false);
@@ -104,7 +128,7 @@ public class FFmpegFrameRecordingTask extends Thread {
 			extendedFileName= fileName;
 			//
 			String textURL= fileName.getPathOfLocalResource().toString();
-			prepareVideoFile(textURL,formatName,streams,options);
+			prepareVideoFile(textURL,formatName,streams,options,metadataDescription);
 			videoFrameCounter.set(-1);
 			recordFrames.set(true);
 			acceptFrames.set(true);
@@ -116,18 +140,20 @@ public class FFmpegFrameRecordingTask extends Thread {
 		try {
 			while (true) {
 				synchronized (history) {
-					if (history.isEmpty()) {
+					if (history.isEmpty() || !recordFrames.get()) {
 						frameNumber= 0;
 						break;
 					} else {
-						history.wait();
+						history.wait(emergencyTimeout);
 					}
 				}
 			}
 		} catch (InterruptedException e) {
 		} catch (ThreadDeath e) {
 		} catch (Throwable e) {
-			e.printStackTrace();
+			if (reportCriticalErrors()) {
+				e.printStackTrace();
+			}
 		};
 		synchronized (nativeLibraryGuard) {
 			recordFrames.set(false);
@@ -140,7 +166,7 @@ public class FFmpegFrameRecordingTask extends Thread {
 	///////////////////////////////////////////////////////////////
 	//
 	@SuppressWarnings("deprecation")
-	protected void prepareVideoFile(String fileName, String formatName, FFmpegStreamDefinition[] streams, FFmpegCodecOption[] options) {
+	protected void prepareVideoFile(String fileName, String formatName, FFmpegStreamDefinition[] streams, FFmpegCodecOption[] options, MetadataDescription metadataDescription) {
 		// Initialize libavformat and register all the muxers,
 		// demuxers and protocols.
 		// av_register_all();
@@ -168,6 +194,34 @@ public class FFmpegFrameRecordingTask extends Thread {
 			// Couldn't open file.
 			throw new FFmpegAVFormatOpenOutputError(fileName);
 		};
+		AVDictionary metadata= new AVDictionary(null);
+		int flag5= av_dict_set(metadata,"xyz","XYZ",0);
+		int flag1= av_dict_set(metadata,metadataTagComment,metadataDescription.getDescription(),0);
+		if (flag1 < 0) {
+			throw new FFmpegCannotSetDictionaryEntry(metadataTagComment,metadataDescription.getDescription());
+		};
+		int flag2= av_dict_set(metadata,metadataTagCopyright,metadataDescription.getCopyright(),0);
+		if (flag2 < 0) {
+			throw new FFmpegCannotSetDictionaryEntry(metadataTagCopyright,metadataDescription.getCopyright());
+		};
+		// int flag3= av_dict_set(metadata,metadataTagTime,metadataDescription.getRegistrationTime(),0);
+		// int flag3= av_dict_set(metadata,"creation_time","Mon Mar 10 15:04:43 2003",0);
+		int flag3= av_dict_set(metadata,"creation_time","123456789",0);
+		if (flag3 < 0) {
+			throw new FFmpegCannotSetDictionaryEntry(metadataTagTime,metadataDescription.getRegistrationTime());
+		};
+		int flag4= av_dict_set(metadata,metadataTagDate,metadataDescription.getRegistrationDate(),0);
+		if (flag4 < 0) {
+			throw new FFmpegCannotSetDictionaryEntry(metadataTagDate,metadataDescription.getRegistrationDate());
+		};
+		// metadata:
+		// Metadata that applies to the whole file.
+		// - demuxing: set by libavformat in
+		// avformat_open_input()
+		// - muxing: may be set by the caller before
+		// avformat_write_header()
+		// Freed by libavformat in avformat_free_context().
+		pFormatCtx.metadata(metadata);
 		// oformat:
 		// The output container format. Muxing only, must be set by
 		// the caller before avformat_write_header().
@@ -1182,7 +1236,7 @@ if (writingFlag < 0) {
 		if (acceptFrames.get()) {
 			synchronized (history) {
 				history.addFirst(frame);
-				history.notify();
+				history.notifyAll();
 			}
 		}
 	}
@@ -1191,14 +1245,16 @@ if (writingFlag < 0) {
 		while (true) {
 			try {
 				synchronized (history) {
-					history.wait();
+					history.wait(emergencyTimeout);
 				};
 				recordFrames();
 			} catch (InterruptedException e) {
 			} catch (ThreadDeath e) {
 				return;
 			} catch (Throwable e) {
-				e.printStackTrace();
+				if (reportCriticalErrors()) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -1216,10 +1272,17 @@ if (writingFlag < 0) {
 					break;
 				}
 			};
-			synchronized (nativeLibraryGuard) {
-				if (recordFrames.get()) {
-					writeBufferedImage(currentFrame);
+			try {
+				synchronized (nativeLibraryGuard) {
+					if (recordFrames.get()) {
+						writeBufferedImage(currentFrame);
+					}
 				}
+			} catch (Throwable e) {
+				recordFrames.set(false);
+				closeWriting();
+				owner.completeDataWriting(frameNumber,e);
+				throw e;
 			};
 			synchronized (history) {
 				length= history.size();
@@ -1228,7 +1291,7 @@ if (writingFlag < 0) {
 						history.removeLast();
 						length= history.size();
 					} finally {
-						history.notify();
+						history.notifyAll();
 					};
 					int superfluousLength= length - writeBufferSize.get();
 					if (superfluousLength > 0) {
@@ -1254,7 +1317,7 @@ while (iteratorHistory.hasNext() && currentLength > 0) {
 }
 ///////////////////////////////////////////////////////////////////////
 						} finally {
-							history.notify();
+							history.notifyAll();
 						}
 					} else {
 						if (bufferOverflow) {
@@ -1265,5 +1328,25 @@ while (iteratorHistory.hasNext() && currentLength > 0) {
 				}
 			}
 		}
+	}
+	//
+	public boolean reportCriticalErrors() {
+		return outputDebugInformation.get() >= reportCriticalErrorsLevel;
+	}
+	public boolean reportAdmissibleErrors() {
+		return outputDebugInformation.get() >= reportAdmissibleErrorsLevel;
+	}
+	public boolean reportWarnings() {
+		return outputDebugInformation.get() >= reportWarningsLevel;
+	}
+	//
+	public int getReportCriticalErrorsLevel() {
+		return reportCriticalErrorsLevel;
+	}
+	public int getReportAdmissibleErrorsLevel() {
+		return reportAdmissibleErrorsLevel;
+	}
+	public int getReportWarningsLevel() {
+		return reportWarningsLevel;
 	}
 }

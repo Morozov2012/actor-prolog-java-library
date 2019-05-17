@@ -19,6 +19,14 @@ public class PrologSet extends UnderdeterminedSetItem {
 	//
 	private Term value;
 	//
+	private static final long serialVersionUID= 0xD287CB9E8A18C5EFL; // -3276426322106595857L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","PrologSet");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public PrologSet(long aName, Term aValue, Term aTail) {
 		name= aName;
 		value= aValue;

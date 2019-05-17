@@ -8,8 +8,18 @@ import morozov.worlds.errors.*;
 import java.util.ArrayList;
 
 public class AsyncCallTableState extends Term {
+	//
 	private ArrayList<AsyncCall> table;
 	private int currentSize;
+	//
+	private static final long serialVersionUID= 0x3B7DE7ECF790C279L; // 4286837425278337657L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.run","AsyncCallTableState");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public AsyncCallTableState(ArrayList<AsyncCall> callTable) {
 		table= callTable;
 		currentSize= callTable.size();

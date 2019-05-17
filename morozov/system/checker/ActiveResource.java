@@ -3,6 +3,7 @@
 package morozov.system.checker;
 
 import morozov.run.*;
+import morozov.system.checker.errors.*;
 import morozov.terms.*;
 import morozov.worlds.*;
 
@@ -12,15 +13,15 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.HashMap;
 
-class AnAttemptToExtractInternalWorldFromActiveResource extends RuntimeException {}
-class AnAttemptToExtractPackageCodeFromActiveResource extends RuntimeException {}
-class AnAttemptToExtractClassHierarchyFromActiveResource extends RuntimeException {}
-class AnAttemptToExtractInterfaceHierarchyFromActiveResource extends RuntimeException {}
-class AnAttemptToExtractSlotFromActiveResource extends RuntimeException {}
-
 public class ActiveResource extends ActiveWorld {
 	//
 	protected SlotVariable specialPort;
+	//
+	private static final long serialVersionUID= 0x7C208A4473091FD8L; // 8944300886550192088L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.worlds","ActiveResource");
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//

@@ -11,6 +11,12 @@ public class ClusterDomainName extends PrologDomainName {
 	protected long cluster;
 	protected String name;
 	//
+	private static final long serialVersionUID= 0x48BB75329E836F00L; // 5240911451643932416L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","ClusterDomainName");
+	// }
+	//
 	public ClusterDomainName(long c, String n) {
 		cluster= c;
 		name= n;

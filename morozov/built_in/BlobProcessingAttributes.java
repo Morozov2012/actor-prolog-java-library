@@ -3,7 +3,6 @@
 package morozov.built_in;
 
 import morozov.run.*;
-import morozov.system.*;
 import morozov.system.converters.*;
 import morozov.terms.*;
 import morozov.worlds.*;
@@ -256,12 +255,12 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// CharacteristicLengthMedianFilteringMode
 	//
 	public void setCharacteristicLengthMedianFilteringMode1s(ChoisePoint iX, Term value) {
-		setCharacteristicLengthMedianFilteringMode(YesNo.termYesNo2Boolean(value,iX),iX);
+		setCharacteristicLengthMedianFilteringMode(YesNoConverters.termYesNo2Boolean(value,iX),iX);
 	}
 	abstract public void setCharacteristicLengthMedianFilteringMode(boolean mode, ChoisePoint iX);
 	//
 	public void getCharacteristicLengthMedianFilteringMode0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getCharacteristicLengthMedianFilteringMode(iX)));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(getCharacteristicLengthMedianFilteringMode(iX)));
 	}
 	public void getCharacteristicLengthMedianFilteringMode0fs(ChoisePoint iX) {
 	}
@@ -284,12 +283,12 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// VelocityMedianFilteringMode
 	//
 	public void setVelocityMedianFilteringMode1s(ChoisePoint iX, Term value) {
-		setVelocityMedianFilteringMode(YesNo.termYesNo2Boolean(value,iX),iX);
+		setVelocityMedianFilteringMode(YesNoConverters.termYesNo2Boolean(value,iX),iX);
 	}
 	abstract public void setVelocityMedianFilteringMode(boolean mode, ChoisePoint iX);
 	//
 	public void getVelocityMedianFilteringMode0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getVelocityMedianFilteringMode(iX)));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(getVelocityMedianFilteringMode(iX)));
 	}
 	public void getVelocityMedianFilteringMode0fs(ChoisePoint iX) {
 	}
@@ -326,12 +325,12 @@ public abstract class BlobProcessingAttributes extends GenericVideoProcessor {
 	// SynthesizedImageRectangularBlobsMode
 	//
 	public void setSynthesizedImageRectangularBlobsMode1s(ChoisePoint iX, Term value) {
-		setSynthesizedImageRectangularBlobsMode(YesNo.termYesNo2Boolean(value,iX),iX);
+		setSynthesizedImageRectangularBlobsMode(YesNoConverters.termYesNo2Boolean(value,iX),iX);
 	}
 	abstract public void setSynthesizedImageRectangularBlobsMode(boolean mode, ChoisePoint iX);
 	//
 	public void getSynthesizedImageRectangularBlobsMode0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getSynthesizedImageRectangularBlobsMode(iX)));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(getSynthesizedImageRectangularBlobsMode(iX)));
 	}
 	public void getSynthesizedImageRectangularBlobsMode0fs(ChoisePoint iX) {
 	}

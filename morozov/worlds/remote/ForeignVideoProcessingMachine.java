@@ -28,7 +28,7 @@ public class ForeignVideoProcessingMachine
 		try {
 			byte[] bytes= writer.imageToBytes(nativeImage);
 			try {
-				stub.process(nativeImage,frameNumber,timeInMilliseconds,takeFrameIntoAccount,attributes);
+				stub.process(bytes,frameNumber,timeInMilliseconds,takeFrameIntoAccount,attributes);
 			} catch (OwnWorldIsNotVideoProcessingMachine e) {
 				throw new WrongArgumentIsNotVideoProcessingMachine(wrapper);
 			} catch (RemoteException e) {

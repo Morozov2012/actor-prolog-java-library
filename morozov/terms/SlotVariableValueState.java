@@ -13,6 +13,14 @@ public class SlotVariableValueState extends Term {
 	protected HashSet<ActorNumber> table;
 	protected ActorNumber insertedActor;
 	//
+	private static final long serialVersionUID= 0x55FE3E67D76B0E8BL; // 6196458753025052299L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","SlotVariableValueState");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public SlotVariableValueState(HashSet<ActorNumber> actorTable, ActorNumber actor) {
 		table= actorTable;
 		insertedActor= actor;

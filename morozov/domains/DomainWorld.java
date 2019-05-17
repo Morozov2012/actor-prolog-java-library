@@ -17,6 +17,12 @@ public class DomainWorld extends DomainAbstractWorld {
 	//
 	protected long constantCode;
 	//
+	private static final long serialVersionUID= 0xA89BCB00BE85E810L; // -6297216449890621424L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","DomainWorld");
+	// }
+	//
 	public DomainWorld(long code) {
 		constantCode= code;
 	}

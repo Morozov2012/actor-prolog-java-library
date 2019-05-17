@@ -20,6 +20,12 @@ public class DomainSet extends MonoArgumentDomainItem {
 	//
 	protected long key;
 	//
+	private static final long serialVersionUID= 0xF416C1A150A1915AL; // -858285780380839590L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","DomainSet");
+	// }
+	//
 	public DomainSet(long k, String entry) {
 		super(entry);
 		key= k;

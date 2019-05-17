@@ -437,7 +437,7 @@ public class HTML_Explorer extends HTML_BasicExplorer {
 			if (code < 0x20) {
 				segmentIsSafe= false;
 				break;
-			} if (code == '&' && enableSpecialEntitiesReplace) {
+			} else if (code == '&' && enableSpecialEntitiesReplace) {
 				segmentIsSafe= false;
 				break;
 			}

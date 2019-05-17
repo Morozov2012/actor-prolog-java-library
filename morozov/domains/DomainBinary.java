@@ -11,6 +11,12 @@ import java.util.HashSet;
 
 public class DomainBinary extends DomainAlternative {
 	//
+	private static final long serialVersionUID= 0x5B1464F051171CD4L; // 6562981540301053140L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","DomainBinary");
+	// }
+	//
 	public DomainBinary() {
 	}
 	//

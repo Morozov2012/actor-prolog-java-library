@@ -41,6 +41,12 @@ public abstract class ScalableToggleButtonIcon implements Icon, UIResource, Seri
 	protected Color failureForegroundColor;
 	protected Color failureBackgroundColor;
 	//
+	private static final long serialVersionUID= 0x161EBFBAF1465C4AL; // 1593922127768476746L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.gui.dialogs.scalable.common","ScalableToggleButtonIcon");
+	// }
+	//
 	public ScalableToggleButtonIcon() {
 		initiate();
 	}

@@ -22,6 +22,12 @@ import java.awt.geom.Rectangle2D;
 
 public class ScalableMetalCheckBoxIcon extends ScalableMetalToggleButtonIcon {
 	//
+	private static final long serialVersionUID= 0x4C3383B794208FC7L; // 5490877195182182343L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.gui.dialogs.scalable.metal","ScalableMetalCheckBoxIcon");
+	// }
+	//
 	public ScalableMetalCheckBoxIcon() {
 	}
 	//

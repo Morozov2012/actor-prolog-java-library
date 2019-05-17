@@ -6,6 +6,7 @@ import target.*;
 
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.space2d.errors.*;
 import morozov.terms.*;
 import morozov.terms.errors.*;
@@ -18,6 +19,14 @@ import java.util.Set;
 public class GenericImageEncodingAttributes implements Serializable {
 	//
 	public static GenericImageEncodingAttributes instance= new GenericImageEncodingAttributes();
+	//
+	private static final long serialVersionUID= 0x18A81D5FA4198581L; // 1776702349609895297L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.gui.space2d","GenericImageEncodingAttributes");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public GenericImageEncodingAttributes() {
 	}
@@ -55,11 +64,11 @@ public class GenericImageEncodingAttributes implements Serializable {
 					if (pairName==SymbolCodes.symbolCode_E_format) {
 						format= ImageFileFormat.argumentToImageFileFormat(pairValue,iX);
 					} else if (pairName==SymbolCodes.symbolCode_E_compressionQuality) {
-						compressionQuality= NumericalValue.argumentToNumericalValue(pairValue,iX);
+						compressionQuality= NumericalValueConverters.argumentToNumericalValue(pairValue,iX);
 					} else if (pairName==SymbolCodes.symbolCode_E_progressiveMode) {
-						progressiveMode= OnOff.termOnOff2Boolean(pairValue,iX);
+						progressiveMode= OnOffConverters.termOnOff2Boolean(pairValue,iX);
 					} else if (pairName==SymbolCodes.symbolCode_E_interlacing) {
-						interlacing= OnOff.termOnOff2Boolean(pairValue,iX);
+						interlacing= OnOffConverters.termOnOff2Boolean(pairValue,iX);
 					} else if (pairName==SymbolCodes.symbolCode_E_comment) {
 						comment= pairValue.toString(iX);
 					} else {

@@ -18,7 +18,9 @@ public class TextAttribute implements Serializable {
 	protected boolean useDefaultValue;
 	protected String value;
 	//
-	private static final long serialVersionUID= 1;
+	// private static final long serialVersionUID= 0xCE4D35BEA760D5E1L; // -3581147035721476639L;
+	// private static final long serialVersionUID= 0x1L; // 1L
+	private static final long serialVersionUID= 0xCE4D35BEA760D5E1L; // -3581147035721476639L
 	//
 	// static {
 	//	SerialVersionChecker.check(serialVersionUID,"morozov.system","TextAttribute");

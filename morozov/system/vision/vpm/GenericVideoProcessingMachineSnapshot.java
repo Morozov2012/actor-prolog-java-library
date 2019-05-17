@@ -138,7 +138,7 @@ abstract public class GenericVideoProcessingMachineSnapshot {
 		return foregroundImage;
 	}
 	//
-	protected abstract void createForegroundImageIfNecessary();
+	abstract protected void createForegroundImageIfNecessary();
 	//
 	protected void createForegroundMaskIfNecessary() {
 		if (foregroundMask==null) {
@@ -225,7 +225,7 @@ abstract public class GenericVideoProcessingMachineSnapshot {
 		prologBlobs= createPrologBlobs();
 		return prologBlobs;
 	}
-	protected abstract Term createPrologBlobs();
+	abstract protected Term createPrologBlobs();
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -331,10 +331,10 @@ abstract public class GenericVideoProcessingMachineSnapshot {
 		}
 	}
 	//
-	protected abstract boolean getRefuseSlowTracks();
-	protected abstract double getVelocityThreshold();
-	protected abstract double getDistanceThreshold();
-	protected abstract double getFuzzyThresholdBorder();
+	abstract protected boolean getRefuseSlowTracks();
+	abstract protected double getVelocityThreshold();
+	abstract protected double getDistanceThreshold();
+	abstract protected double getFuzzyThresholdBorder();
 	//
 	protected ConnectedGraph[] formConnectedGraphs() {
 		ArrayList<ConnectedGraph> graphs= new ArrayList<>();

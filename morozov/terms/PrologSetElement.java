@@ -14,6 +14,14 @@ public class PrologSetElement extends Term {
 	//
 	private Term element;
 	//
+	private static final long serialVersionUID= 0x3125341A24F90E4BL; // 3541293968890859083L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","PrologSetElement");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public PrologSetElement(Term aElement) {
 		element= aElement;
 	}

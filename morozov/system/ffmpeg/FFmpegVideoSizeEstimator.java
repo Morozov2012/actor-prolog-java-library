@@ -10,13 +10,9 @@
 
 package morozov.system.ffmpeg;
 
-import static org.bytedeco.javacpp.avformat.*;
-import static org.bytedeco.javacpp.avutil.*;
-import static org.bytedeco.javacpp.avcodec.*;
-import static org.bytedeco.javacpp.swscale.*;
-
 import morozov.run.*;
 import morozov.system.files.*;
+import morozov.system.ffmpeg.interfaces.*;
 
 public class FFmpegVideoSizeEstimator extends FFmpegFrameReadingTask {
 	//
@@ -52,6 +48,7 @@ public class FFmpegVideoSizeEstimator extends FFmpegFrameReadingTask {
 		} catch (InterruptedException e) {
 		} catch (Throwable e) {
 			e.printStackTrace();
+			owner.completeDataReading(computeCurrentFrameNumber(),e);
 		}
 	}
 }

@@ -8,5 +8,6 @@ public enum DataArrayType {
 	DOUBLE_FRAME,
 	AUDIO_FRAME,
 	THZ_FRAME,
-	IP_CAMERA_FRAME
-	}
+	IP_CAMERA_FRAME,
+	RGB_FRAME;
+}

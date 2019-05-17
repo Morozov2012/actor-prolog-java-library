@@ -20,12 +20,18 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
-class CannotCloneOptimizedSet extends RuntimeException{};
-
 public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 	//
 	private Term[] elements;
 	private long[] keys;
+	//
+	private static final long serialVersionUID= 0xEC1039F9FD1A1464L; // -1436584535275203484L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","PrologOptimizedSet");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public PrologOptimizedSet(long[] aKeys) {
 		elements= new Term[aKeys.length];

@@ -22,7 +22,7 @@ public class KinectColorMap extends DetailedColorMap {
 			YesNoDefault.NO,
 			TincturingCoefficient.instanceDefault);
 	//
-	// private static final long serialVersionUID= 1;
+	private static final long serialVersionUID= 0x969020A0B5547BA0L; // -7597536696764957792L;
 	//
 	// static {
 	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.modes","KinectColorMap");
@@ -107,12 +107,13 @@ public class KinectColorMap extends DetailedColorMap {
 				int[] red= KinectColorMapTools.getPeopleDefaultColorRed();
 				int[] green= KinectColorMapTools.getPeopleDefaultColorGreen();
 				int[] blue= KinectColorMapTools.getPeopleDefaultColorBlue();
-				int[][] array= new int[3][red.length];
+				int[][] array= new int[4][red.length];
 				int peopleIndexRatio= KinectColorMapTools.getDefaultPeopleIndexRatio();
 				for (int n=0; n < red.length; n++) {
 					array[0][n]= red[n] / peopleIndexRatio;
 					array[1][n]= green[n] / peopleIndexRatio;
 					array[2][n]= blue[n] / peopleIndexRatio;
+					array[3][n]= 0;
 				};
 				return refineColorPalette(
 					array,

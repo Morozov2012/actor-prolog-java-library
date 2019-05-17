@@ -11,6 +11,12 @@ import java.util.HashSet;
 
 public class DomainReal extends DomainAlternative {
 	//
+	private static final long serialVersionUID= 0xADDEADD59D02CFC1L; // -5918101727344406591L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","DomainReal");
+	// }
+	//
 	public DomainReal() {
 	}
 	//

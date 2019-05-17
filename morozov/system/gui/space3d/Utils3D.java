@@ -37,6 +37,7 @@ public class Utils3D extends PrincipalNode3D {
 		} catch (TermIsNotBranchGroup e) {
 			BranchGroup branchGroup= new BranchGroup();
 			argumentToListOfNodes(branchGroup,branchGroup,value,targetWorld,u,space3D,null,iX);
+			// branchGroup.compile(); // 2019-04-07
 			return branchGroup;
 			// throw new WrongArgumentIsNotBranchGroup(value);
 		}

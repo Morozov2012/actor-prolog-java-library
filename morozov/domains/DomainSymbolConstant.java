@@ -18,6 +18,12 @@ public class DomainSymbolConstant extends DomainAlternative {
 	//
 	protected long constantCode;
 	//
+	private static final long serialVersionUID= 0x7B4C68F4D321630CL; // 8884591565618635532L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","DomainSymbolConstant");
+	// }
+	//
 	public DomainSymbolConstant(long code) {
 		constantCode= code;
 	}

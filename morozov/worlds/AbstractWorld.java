@@ -24,6 +24,12 @@ public abstract class AbstractWorld extends ActorNumber {
 	//
 	final static protected MethodSignature[] emptySignatureList= new MethodSignature[0];
 	//
+	private static final long serialVersionUID= 0x957E4AD16A6078F9L; // -7674614451699418887L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.worlds","AbstractWorld");
+	// }
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public AbstractWorld() {

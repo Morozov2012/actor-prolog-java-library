@@ -7,6 +7,7 @@ import target.*;
 import morozov.domains.*;
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.files.*;
 import morozov.system.datum.*;
 import morozov.terms.*;
@@ -81,7 +82,7 @@ public abstract class Database extends DataAbstraction {
 	// get/set reuse_key_numbers
 	//
 	public void setReuseKeyNumbers1s(ChoisePoint iX, Term a1) {
-		boolean reuseKN= YesNo.termYesNo2Boolean(a1,iX);
+		boolean reuseKN= YesNoConverters.termYesNo2Boolean(a1,iX);
 		setReuseKeyNumbers(reuseKN);
 		getDatabaseTable(iX).setReuseKeyNumbers(reuseKN,currentProcess,true);
 	}
@@ -89,7 +90,7 @@ public abstract class Database extends DataAbstraction {
 		reuseKeyNumbers= value;
 	}
 	public void getReuseKeyNumbers0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getReuseKeyNumbers(iX)));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(getReuseKeyNumbers(iX)));
 	}
 	public void getReuseKeyNumbers0fs(ChoisePoint iX) {
 	}
@@ -98,7 +99,7 @@ public abstract class Database extends DataAbstraction {
 			return reuseKeyNumbers;
 		} else {
 			Term value= getBuiltInSlot_E_reuse_key_numbers();
-			return YesNo.termYesNo2Boolean(value,iX);
+			return YesNoConverters.termYesNo2Boolean(value,iX);
 		}
 	}
 	//
@@ -332,13 +333,13 @@ public abstract class Database extends DataAbstraction {
 		ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
 		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		CharacterSet requestedCharacterSet= getCharacterSet(iX);
-		getDatabaseTableContainer(iX).loadContent(fileName,timeout,requestedCharacterSet,staticContext,currentProcess,true,iX);
+		getDatabaseTableContainer(iX).loadContent(fileName,timeout,requestedCharacterSet,staticContext,currentProcess,true,dummyParserMaster,iX);
 	}
 	public void load1s(ChoisePoint iX, Term a1) {
 		ExtendedFileName fileName= retrieveRealGlobalFileName(a1,iX);
 		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		CharacterSet requestedCharacterSet= getCharacterSet(iX);
-		getDatabaseTableContainer(iX).loadContent(fileName,timeout,requestedCharacterSet,staticContext,currentProcess,true,iX);
+		getDatabaseTableContainer(iX).loadContent(fileName,timeout,requestedCharacterSet,staticContext,currentProcess,true,dummyParserMaster,iX);
 	}
 	//
 	public void recentLoadingError4s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3, PrologVariable a4) throws Backtracking {

@@ -21,6 +21,12 @@ public class OwnDomainWrapper
 	//
 	public static HashMap<ExternalDomainInterface,ForeignDomainWrapper> foreignDomainRegister= new HashMap<>();
 	//
+	private static final long serialVersionUID= 0x66889E2B6928F6EBL; // 7388329097986373355L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.worlds.remote","OwnDomainWrapper");
+	// }
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public OwnDomainWrapper(DomainAlternative d) {

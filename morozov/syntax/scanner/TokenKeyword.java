@@ -20,7 +20,7 @@ public class TokenKeyword extends TokenSymbol {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public Term toTerm() {
+	public Term toActorPrologTerm() {
 		Term[] arguments= new Term[]{new PrologSymbol(value)};
 		return new PrologStructure(SymbolCodes.symbolCode_E_keyword,arguments);
 	}

@@ -8,8 +8,18 @@ import morozov.worlds.errors.*;
 import java.util.HashSet;
 
 public class ActorTableState extends Term {
+	//
 	private HashSet<ActorNumber> table;
 	private ActorNumber insertedActor;
+	//
+	private static final long serialVersionUID= 0xDE5B381CE039F7D0L; // -2424282277736745008L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.run","ActorTableState");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public ActorTableState(HashSet<ActorNumber> actorTable, ActorNumber actor) {
 		table= actorTable;
 		insertedActor= actor;

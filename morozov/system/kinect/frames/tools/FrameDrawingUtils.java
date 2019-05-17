@@ -122,7 +122,7 @@ public class FrameDrawingUtils extends FrameDrawingBasics {
 int value= (int)(quantiles.standardize(array[counter1]) * maxColorValue);
 if (value > maxColorValue) {
 	value= maxColorValue;
-} if (value < 0) {
+} else if (value < 0) {
 	value= 0;
 };
 int redValue= value;
@@ -187,7 +187,7 @@ blue2[counter3]= byte2int(blue1[w][h]);
 						int value= (int)(quantiles.standardize(array[counter1])*maxColorValue);
 						if (value > maxColorValue) {
 							value= maxColorValue;
-						} if (value < 0) {
+						} else if (value < 0) {
 							value= 0;
 						};
 						red2[counter2]= value;

@@ -15,7 +15,7 @@ public class ColorMapSize implements Serializable {
 	//
 	public static int defaultColorMapSize= 2400;
 	//
-	// private static final long serialVersionUID= 1;
+	private static final long serialVersionUID= 0xF8783420FA5D734EL; // -542626438854118578L;
 	//
 	// static {
 	//	SerialVersionChecker.check(serialVersionUID,"morozov.system","ColorMapSize");

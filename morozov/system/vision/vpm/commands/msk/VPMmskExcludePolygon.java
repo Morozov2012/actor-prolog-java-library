@@ -4,8 +4,8 @@ package morozov.system.vision.vpm.commands.msk;
 
 public class VPMmskExcludePolygon extends VPMmskApplyPolygon {
 	//
-	public VPMmskExcludePolygon(double[] aX, double[] aY) {
-		super(aX,aY);
+	public VPMmskExcludePolygon(double[] aX, double[] aY, boolean useStandardizedCoordinates) {
+		super(aX,aY,useStandardizedCoordinates);
 	}
 	//
 	protected void applyPolygon(boolean[] foregroundMask, int[] imagePixels) {

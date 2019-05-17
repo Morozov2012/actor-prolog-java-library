@@ -13,6 +13,14 @@ public class PrologString extends Term {
 	//
 	private String value;
 	//
+	private static final long serialVersionUID= 0xB667B410A08D5CBFL; // -5303072052699374401L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","PrologString");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public PrologString(String v) {
 		value= v;
 	}

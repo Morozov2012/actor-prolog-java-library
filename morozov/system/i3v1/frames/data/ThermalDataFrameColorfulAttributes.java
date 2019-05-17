@@ -73,7 +73,7 @@ public class ThermalDataFrameColorfulAttributes extends ThermalDataFrameBaseAttr
 			givenAuxiliaryColorMap.toDataColorMap(),
 			givenIsAverageMode,
 			givenIsZoomingMode,
-			givenZoomingCoefficient.toInteger(),
+			toInteger(givenZoomingCoefficient),
 			givenReadTimeOut,
 			givenWriteTimeOut);
 		detailedMainColorMap= givenMainColorMap;

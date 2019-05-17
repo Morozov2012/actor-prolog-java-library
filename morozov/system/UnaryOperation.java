@@ -8,12 +8,6 @@ import morozov.terms.*;
 import morozov.terms.signals.*;
 
 import java.math.BigInteger;
-import java.util.Random;
-import java.security.SecureRandom;
-
-class RandomNumberGenerator {
-	static final Random generator= new SecureRandom();
-}
 
 public enum UnaryOperation {
 	MINUS {

@@ -6,8 +6,8 @@ import java.math.BigInteger;
 
 public class BigDecimalFormatException extends LexicalScannerError {
 	//
-	BigInteger mantissa;
-	BigInteger radix;
+	protected BigInteger mantissa;
+	protected BigInteger radix;
 	//
 	///////////////////////////////////////////////////////////////
 	//

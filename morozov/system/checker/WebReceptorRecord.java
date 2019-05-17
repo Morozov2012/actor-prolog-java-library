@@ -8,10 +8,20 @@ import morozov.worlds.*;
 import java.math.BigDecimal;
 
 public class WebReceptorRecord extends PredefinedClassRecord {
+	//
 	public ActorNumber actorNumber;
 	public URL_Attributes attributes;
 	public BigDecimal revisionPeriod;
 	public BigDecimal attemptPeriod;
+	//
+	private static final long serialVersionUID= 0xC28BC791A248537DL; // -4428226380281916547L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.checker","WebReceptorRecord");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public WebReceptorRecord(AbstractInternalWorld world, ActorNumber aN, URL_Attributes l, BigDecimal rP, BigDecimal aP) {
 		super(world);
 		actorNumber= aN;
@@ -19,6 +29,8 @@ public class WebReceptorRecord extends PredefinedClassRecord {
 		revisionPeriod= rP;
 		attemptPeriod= aP;
 	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public boolean equals(Object o) {
 		if (o==null) {

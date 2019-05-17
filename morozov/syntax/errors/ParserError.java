@@ -2,19 +2,14 @@
 
 package morozov.syntax.errors;
 
-public class ParserError extends RuntimeException {
-	protected int position;
+import morozov.syntax.scanner.errors.*;
+
+public class ParserError extends SyntaxError {
+	//
 	public ParserError(int p) {
-		position= p;
+		super(p);
 	}
 	public ParserError(int p, Throwable e) {
-		super(e);
-		position= p;
-	}
-	public int getPosition() {
-		return position;
-	}
-	public String toString() {
-		return this.getClass().toString() + "(position:" + Integer.toString(position) + ")";
+		super(p,e);
 	}
 }

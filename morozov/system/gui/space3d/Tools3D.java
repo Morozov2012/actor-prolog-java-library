@@ -289,7 +289,7 @@ public class Tools3D {
 						throw new WrongArgumentIsNotAnInteger(pairValue);
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_isPassive) {
-					isPassive= YesNo.termYesNo2Boolean(pairValue,iX);
+					isPassive= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				} else {
 					throw new WrongArgumentIsUnknownElapsedFramesAttribute(key);
 				}
@@ -385,25 +385,25 @@ public class Tools3D {
 			long pairName= - key;
 			Term pairValue= setPositiveMap.get(key);
 			if (pairName==SymbolCodes.symbolCode_E_enableAppearanceModify) {
-				enableAppearanceModify= YesNo.termYesNo2Boolean(pairValue,iX);
+				enableAppearanceModify= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_enableGeometryPicking) {
-				enableGeometryPicking= YesNo.termYesNo2Boolean(pairValue,iX);
+				enableGeometryPicking= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_generateNormals) {
-				generateNormals= YesNo.termYesNo2Boolean(pairValue,iX);
+				generateNormals= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_generateNormalsInward) {
-				generateNormalsInward= YesNo.termYesNo2Boolean(pairValue,iX);
+				generateNormalsInward= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_generateTextureCoords) {
-				generateTextureCoords= YesNo.termYesNo2Boolean(pairValue,iX);
+				generateTextureCoords= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_generateTextureCoordsYUp) {
-				generateTextureCoordsYUp= YesNo.termYesNo2Boolean(pairValue,iX);
+				generateTextureCoordsYUp= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				iterator.remove();
 			} else if (pairName==SymbolCodes.symbolCode_E_geometryNotShared) {
-				geometryNotShared= YesNo.termYesNo2Boolean(pairValue,iX);
+				geometryNotShared= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 				iterator.remove();
 			}
 		};

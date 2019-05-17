@@ -13,6 +13,12 @@ public abstract class UnderdeterminedSetWithTail extends UnderdeterminedSet {
 	//
 	protected Term tail;
 	//
+	private static final long serialVersionUID= 0x7ECD23233D2C2EC0L; // 9136997853261737664L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","UnderdeterminedSetWithTail");
+	// }
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public int hashCode() {

@@ -17,6 +17,12 @@ public class InterfaceDomainName extends PrologDomainName {
 	protected long unit;
 	protected String name;
 	//
+	private static final long serialVersionUID= 0x9936A908C855B00CL; // -7406546681978310644L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","InterfaceDomainName");
+	// }
+	//
 	public InterfaceDomainName(long u, String n) {
 		unit= u;
 		name= n;

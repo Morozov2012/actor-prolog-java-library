@@ -87,7 +87,7 @@ public class AnnotatedButton {
 		char c1;
 		char c2;
 		int code;
-		while(true) {
+		while (true) {
 			if (position >= textLength) {
 				break;
 			} else {
@@ -179,7 +179,7 @@ public class AnnotatedButton {
 		char c1;
 		char c2;
 		int code;
-		while(true) {
+		while (true) {
 			if (position >= textLength) {
 				break;
 			} else {
@@ -236,7 +236,7 @@ public class AnnotatedButton {
 		char c1;
 		char c2;
 		int code;
-		while(true) {
+		while (true) {
 			if (position >= textLength) {
 				break;
 			} else {

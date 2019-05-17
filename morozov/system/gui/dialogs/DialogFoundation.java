@@ -47,7 +47,9 @@ public abstract class DialogFoundation {
 	//
 	protected BigInteger insideModalDialog= BigInteger.ZERO;
 	//
-	protected AtomicReference<ExtendedCoordinates> actualCoordinates= new AtomicReference<ExtendedCoordinates>(new ExtendedCoordinates(new ExtendedCoordinate(),new ExtendedCoordinate()));
+	protected AtomicBoolean usePixelMeasurements= new AtomicBoolean(false);
+	//
+	protected AtomicReference<ExtendedCoordinates> actualCoordinates= new AtomicReference<ExtendedCoordinates>(new ExtendedCoordinates(new ExtendedCoordinate(),new ExtendedCoordinate(),false));
 	protected AtomicReference<Point> previousCoordinates= new AtomicReference<Point>(null);
 	//
 	protected AtomicReference<Dimension> previousActualSize= new AtomicReference<Dimension>(new Dimension(0,0));
@@ -86,11 +88,11 @@ public abstract class DialogFoundation {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected abstract void setGeneralFont(Font commonFont);
-	// protected abstract void setGeneralBackground(Color c);
-	protected abstract void setGeneralForeground(Color c);
-	protected abstract void setGeneralSpaceColor(Color c);
-	protected abstract void setAlarmColors(Color fc, Color bc);
+	abstract protected void setGeneralFont(Font commonFont);
+	// abstract protected void setGeneralBackground(Color c);
+	abstract protected void setGeneralForeground(Color c);
+	abstract protected void setGeneralSpaceColor(Color c);
+	abstract protected void setAlarmColors(Color fc, Color bc);
 	//
 	abstract public void assemble(ChoisePoint iX);
 	//
@@ -140,6 +142,7 @@ public abstract class DialogFoundation {
 			ExtendedCoordinate x,
 			ExtendedCoordinate y,
 			ExtendedColor backgroundColor,
+			boolean pixelMeasurements,
 			ChoisePoint iX) {
 		targetWorld= world;
 		String initialTitle= instantiateTitle(title);
@@ -152,9 +155,10 @@ public abstract class DialogFoundation {
 		String initialFontName= instantiateFontName(fontName,iX);
 		int initialFontSize= instantiateFontSize(fontSize,iX);
 		FontStyleAndUnderlineMode initialFontStyle= instantiateFontStyle(fontStyle,iX);
+		usePixelMeasurements.set(pixelMeasurements);
 		x= instantiateX(x,iX);
 		y= instantiateY(y,iX);
-		actualCoordinates.set(new ExtendedCoordinates(x,y));
+		actualCoordinates.set(new ExtendedCoordinates(x,y,pixelMeasurements));
 		if (initialFontName!=null) {
 			currentFontName.set(initialFontName);
 		};
@@ -547,13 +551,17 @@ public abstract class DialogFoundation {
 	public void changeActualX(ExtendedCoordinate actualX, ChoisePoint iX) {
 		actualX= instantiateX(actualX,iX);
 		ExtendedCoordinates currentCoordinates= actualCoordinates.get();
-		actualCoordinates.set(new ExtendedCoordinates(actualX,currentCoordinates.y));
+		actualCoordinates.set(new ExtendedCoordinates(actualX,currentCoordinates.y,currentCoordinates.usePixelMeasurements()));
 		try {
 			Rectangle bounds= safelyComputeParentLayoutSize();
 			double gridX= DefaultOptions.gridWidth;
 			Point p= safelyGetLocation();
 			Dimension size= safelyGetSize();
-			p.x= DialogUtils.calculateRealCoordinate(actualX,bounds.x,bounds.width,gridX,size.getWidth());
+			if (currentCoordinates.usePixelMeasurements()) {
+				p.x= DialogUtils.calculateAbsoluteCoordinate(actualX,bounds.x,bounds.width,size.getWidth());
+			} else {
+				p.x= DialogUtils.calculateAbsoluteCoordinate(actualX,bounds.x,bounds.width,gridX,size.getWidth());
+			};
 			safelySetLocation(p);
 		} catch (UseDefaultLocation e) {
 		}
@@ -561,29 +569,38 @@ public abstract class DialogFoundation {
 	public void changeActualY(ExtendedCoordinate actualY, ChoisePoint iX) {
 		actualY= instantiateY(actualY,iX);
 		ExtendedCoordinates currentCoordinates= actualCoordinates.get();
-		actualCoordinates.set(new ExtendedCoordinates(currentCoordinates.x,actualY));
+		actualCoordinates.set(new ExtendedCoordinates(currentCoordinates.x,actualY,currentCoordinates.usePixelMeasurements()));
 		try {
 			Rectangle bounds= safelyComputeParentLayoutSize();
 			double gridY= DefaultOptions.gridHeight;
 			Point p= safelyGetLocation();
 			Dimension size= safelyGetSize();
-			p.y= DialogUtils.calculateRealCoordinate(actualY,bounds.y,bounds.height,gridY,size.getHeight());
+			if (currentCoordinates.usePixelMeasurements()) {
+				p.y= DialogUtils.calculateAbsoluteCoordinate(actualY,bounds.y,bounds.height,size.getHeight());
+			} else {
+				p.y= DialogUtils.calculateAbsoluteCoordinate(actualY,bounds.y,bounds.height,gridY,size.getHeight());
+			};
 			safelySetLocation(p);
 		} catch (UseDefaultLocation e) {
 		}
 	}
-	public void changeActualPosition(ExtendedCoordinate actualX, ExtendedCoordinate actualY, ChoisePoint iX) {
+	public void changeActualPosition(ExtendedCoordinate actualX, ExtendedCoordinate actualY, boolean pixelMeasurements, ChoisePoint iX) {
 		actualX= instantiateX(actualX,iX);
 		actualY= instantiateY(actualY,iX);
-		actualCoordinates.set(new ExtendedCoordinates(actualX,actualY));
+		actualCoordinates.set(new ExtendedCoordinates(actualX,actualY,pixelMeasurements));
 		try {
 			Rectangle bounds= safelyComputeParentLayoutSize();
 			double gridX= DefaultOptions.gridWidth;
 			double gridY= DefaultOptions.gridHeight;
 			Point p= safelyGetLocation();
 			Dimension size= safelyGetSize();
-			p.x= DialogUtils.calculateRealCoordinate(actualX,bounds.x,bounds.width,gridX,size.getWidth());
-			p.y= DialogUtils.calculateRealCoordinate(actualY,bounds.y,bounds.height,gridY,size.getHeight());
+			if (pixelMeasurements) {
+				p.x= DialogUtils.calculateAbsoluteCoordinate(actualX,bounds.x,bounds.width,size.getWidth());
+				p.y= DialogUtils.calculateAbsoluteCoordinate(actualY,bounds.y,bounds.height,size.getHeight());
+			} else {
+				p.x= DialogUtils.calculateAbsoluteCoordinate(actualX,bounds.x,bounds.width,gridX,size.getWidth());
+				p.y= DialogUtils.calculateAbsoluteCoordinate(actualY,bounds.y,bounds.height,gridY,size.getHeight());
+			};
 			safelySetLocation(p);
 		} catch (UseDefaultLocation e) {
 		}
@@ -600,14 +617,21 @@ public abstract class DialogFoundation {
 		Point p= safelyGetLocation();
 		return (double)p.y/(((double)(bounds.height-bounds.y))/gridY);
 	}
-	public ExtendedCoordinates getActualPosition() {
+	public ExtendedCoordinates getActualPosition(boolean pixelMeasurements) {
 		Rectangle bounds= safelyComputeParentLayoutSize();
 		double gridX= DefaultOptions.gridWidth;
 		double gridY= DefaultOptions.gridHeight;
 		Point p= safelyGetLocation();
-		double x= (double)p.x/(((double)(bounds.width-bounds.x))/gridX);
-		double y= (double)p.y/(((double)(bounds.height-bounds.y))/gridY);
-		return new ExtendedCoordinates(new ExtendedCoordinate(x),new ExtendedCoordinate(y));
+		double x;
+		double y;
+		if (pixelMeasurements) {
+			x= (double)p.x;
+			y= (double)p.y;
+		} else {
+			x= (double)p.x/(((double)(bounds.width-bounds.x))/gridX);
+			y= (double)p.y/(((double)(bounds.height-bounds.y))/gridY);
+		};
+		return new ExtendedCoordinates(new ExtendedCoordinate(x),new ExtendedCoordinate(y),pixelMeasurements);
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -834,8 +858,13 @@ public abstract class DialogFoundation {
 		Rectangle parentLayoutSize= safelyComputeParentLayoutSize();
 		//
 		ExtendedCoordinates actualPoint= actualCoordinates.get();
-		x= DialogUtils.calculateRealCoordinate(actualPoint.x,parentLayoutSize.x,parentLayoutSize.width,gridX,initialWidth);
-		y= DialogUtils.calculateRealCoordinate(actualPoint.y,parentLayoutSize.y,parentLayoutSize.height,gridY,initialHeight);
+		if (actualCoordinates.get().usePixelMeasurements()) {
+			x= DialogUtils.calculateAbsoluteCoordinate(actualPoint.x,parentLayoutSize.x,parentLayoutSize.width,initialWidth);
+			y= DialogUtils.calculateAbsoluteCoordinate(actualPoint.y,parentLayoutSize.y,parentLayoutSize.height,initialHeight);
+		} else {
+			x= DialogUtils.calculateAbsoluteCoordinate(actualPoint.x,parentLayoutSize.x,parentLayoutSize.width,gridX,initialWidth);
+			y= DialogUtils.calculateAbsoluteCoordinate(actualPoint.y,parentLayoutSize.y,parentLayoutSize.height,gridY,initialHeight);
+		};
 		//
 		return new Point(x,y);
 	}
@@ -1134,6 +1163,9 @@ public abstract class DialogFoundation {
 	///////////////////////////////////////////////////////////////
 	//
 	public void safelyHide() {
+		if (safelyIsVisible()) {
+			sendTheWindowClosedMessage();
+		};
 		dialogContainer.safelySetVisible(false);
 	}
 	public void safelyDispose() {
@@ -1148,6 +1180,9 @@ public abstract class DialogFoundation {
 	public void safelyRestore() {
 		dialogContainer.safelyRestore();
 	}
+	//
+	abstract public void sendTheWindowClosedMessage();
+	abstract public void sendTheWindowClosingOrWindowClosedMessage();
 	//
 	public boolean safelyIsVisible() {
 		return dialogContainer.safelyIsVisible();

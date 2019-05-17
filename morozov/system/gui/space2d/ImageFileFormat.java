@@ -10,9 +10,8 @@ import morozov.terms.*;
 import morozov.terms.signals.*;
 
 import javax.imageio.ImageTypeSpecifier;
-import java.io.Serializable;
 
-public enum ImageFileFormat implements Serializable {
+public enum ImageFileFormat {
 	//
 	JPEG {
 		public Space2DWriter createWriter(String defaultFormatName, ImageTypeSpecifier its) {

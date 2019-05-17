@@ -9,15 +9,18 @@ import morozov.run.*;
 import java.awt.Dimension;
 import javax.swing.JInternalFrame;
 import javax.swing.WindowConstants;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class ExtendedJInternalFrame extends JInternalFrame {
+	//
 	public AtomicReference<ExtendedCoordinate> logicalX;
 	public AtomicReference<ExtendedCoordinate> logicalY;
 	public AtomicReference<ExtendedSize> logicalWidth;
 	public AtomicReference<ExtendedSize> logicalHeight;
+	public AtomicBoolean usePixelMeasurements;
 	//
-	public ExtendedJInternalFrame(InnerPage page, String title, AtomicReference<ExtendedCoordinate> x, AtomicReference<ExtendedCoordinate> y, AtomicReference<ExtendedSize> width, AtomicReference<ExtendedSize> height) {
+	public ExtendedJInternalFrame(InnerPage page, String title, AtomicReference<ExtendedCoordinate> x, AtomicReference<ExtendedCoordinate> y, AtomicReference<ExtendedSize> width, AtomicReference<ExtendedSize> height, AtomicBoolean pixelMeasurements) {
 		super(	title, // "Event Generator"
 			true, // Resizable
 			true, // Closable
@@ -29,6 +32,7 @@ public class ExtendedJInternalFrame extends JInternalFrame {
 		logicalY= y;
 		logicalWidth= width;
 		logicalHeight= height;
+		usePixelMeasurements= pixelMeasurements;
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -45,8 +49,15 @@ public class ExtendedJInternalFrame extends JInternalFrame {
 		double gridX= DefaultOptions.gridWidth;
 		double gridY= DefaultOptions.gridHeight;
 		//
-		CoordinateAndSize realXandWidth= CoordinateAndSize.calculate(logicalX.get(),logicalWidth.get(),desktopWidth,gridX);
-		CoordinateAndSize realYandHeight= CoordinateAndSize.calculate(logicalY.get(),logicalHeight.get(),desktopHeight,gridY);
+		CoordinateAndSize realXandWidth;
+		CoordinateAndSize realYandHeight;
+		if (usePixelMeasurements.get()) {
+			realXandWidth= CoordinateAndSize.calculate(logicalX.get(),logicalWidth.get(),desktopWidth);
+			realYandHeight= CoordinateAndSize.calculate(logicalY.get(),logicalHeight.get(),desktopHeight);
+		} else {
+			realXandWidth= CoordinateAndSize.calculate(logicalX.get(),logicalWidth.get(),desktopWidth,gridX);
+			realYandHeight= CoordinateAndSize.calculate(logicalY.get(),logicalHeight.get(),desktopHeight,gridY);
+		};
 		//
 		int realX= realXandWidth.coordinate;
 		int realY= realYandHeight.coordinate;

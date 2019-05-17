@@ -17,13 +17,19 @@ import morozov.worlds.remote.signals.*;
 import java.rmi.RemoteException;
 import java.util.HashMap;
 
-class AnAttemptToExtractInternalWorldFromForeignWorldWrapper extends RuntimeException {}
-
 public class ForeignWorldWrapper extends AbstractWorld {
 	//
 	public ExternalWorldInterface stub;
 	//
 	protected HashMap<Long,Long> signatureMap= new HashMap<>();
+	//
+	private static final long serialVersionUID= 0xC9F4C0E6A8A4AE0L; // 909529274552830688L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.worlds.remote","ForeignWorldWrapper");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public ForeignWorldWrapper(ExternalWorldInterface s) {
 		stub= s;

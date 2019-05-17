@@ -123,8 +123,24 @@ public class KinectListener extends J4KSDK implements KinectListenerInterface {
 			int maxNumberOfSkeletons= getMaxNumberOfSkeletons();
 			int correctionX= horizontalCorrection.get();
 			int correctionY= verticalCorrection.get();
-			frameMappingTask.initialize(new KinectFrameWritableBaseAttributes(type,focX,focY,depthFrameWidth,depthFrameHeight,colorFrameWidth,colorFrameHeight,maxNumberOfSkeletons,correctionX,correctionY));
+			KinectFrameWritableBaseAttributes attributes= createKinectFrameWritableBaseAttributes();
+			frameMappingTask.initialize(attributes);
 			frameMappingIsInitialized= true;
 		}
+	}
+	//
+	public KinectFrameWritableBaseAttributes createKinectFrameWritableBaseAttributes() {
+		byte type= getDeviceType();
+		float focX= getFocalLengthX();
+		float focY= getFocalLengthY();
+		int depthFrameWidth= getDepthWidth();
+		int depthFrameHeight= getDepthHeight();
+		int colorFrameWidth= getColorWidth();
+		int colorFrameHeight= getColorHeight();
+		int maxNumberOfSkeletons= getMaxNumberOfSkeletons();
+		int correctionX= horizontalCorrection.get();
+		int correctionY= verticalCorrection.get();
+		KinectFrameWritableBaseAttributes attributes= new KinectFrameWritableBaseAttributes(type,focX,focY,depthFrameWidth,depthFrameHeight,colorFrameWidth,colorFrameHeight,maxNumberOfSkeletons,correctionX,correctionY);
+		return attributes;
 	}
 }

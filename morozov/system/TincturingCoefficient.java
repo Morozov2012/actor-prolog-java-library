@@ -15,7 +15,9 @@ public class TincturingCoefficient implements Serializable {
 	//
 	protected static double defaultColorMapTincturingCoefficient= 0.5;
 	//
-	private static final long serialVersionUID= 1;
+	// private static final long serialVersionUID= 0xDE84F743D0CC3DC7L; // -2412531629725827641L;
+	// private static final long serialVersionUID= 0x1L; // 1L
+	private static final long serialVersionUID= 0xDE84F743D0CC3DC7L; // -2412531629725827641L
 	//
 	// static {
 	//	SerialVersionChecker.check(serialVersionUID,"morozov.system","TincturingCoefficient");

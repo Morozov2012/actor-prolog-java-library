@@ -17,7 +17,15 @@ public class HashSetTable extends DatabaseTable {
 	//
 	protected HashSet<Term> databaseHash= new HashSet<Term>();
 	//
-	protected static Term hashSetTerm= new PrologSymbol(SymbolCodes.symbolCode_E_HashSet);
+	protected static Term termHashSet= new PrologSymbol(SymbolCodes.symbolCode_E_HashSet);
+	//
+	private static final long serialVersionUID= 0x1951AEB51AB9DBE9L; // 1824431416922463209L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.datum","HashSetTable");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public HashSetTable(PrologDomain domain, boolean reuseKN) {
 		super(domain,reuseKN);
@@ -29,7 +37,7 @@ public class HashSetTable extends DatabaseTable {
 	///////////////////////////////////////////////////////////////
 	//
 	public Term getType() {
-		return hashSetTerm;
+		return termHashSet;
 	}
 	//
 	///////////////////////////////////////////////////////////////

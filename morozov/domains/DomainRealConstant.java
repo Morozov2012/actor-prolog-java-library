@@ -14,6 +14,12 @@ public class DomainRealConstant extends DomainAlternative {
 	//
 	protected double constantValue;
 	//
+	private static final long serialVersionUID= 0x9D125B93A85C64A2L; // -7128534570431126366L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","DomainRealConstant");
+	// }
+	//
 	public DomainRealConstant(double value) {
 		constantValue= value;
 	}

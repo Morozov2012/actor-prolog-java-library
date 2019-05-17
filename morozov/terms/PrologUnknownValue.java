@@ -12,6 +12,14 @@ public final class PrologUnknownValue extends Term {
 	//
 	public static final PrologUnknownValue instance= new PrologUnknownValue();
 	//
+	private static final long serialVersionUID= 0x8E4A8C0EDAC1629AL; // -8193582576619658598L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","PrologUnknownValue");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	private PrologUnknownValue() {
 	}
 	//

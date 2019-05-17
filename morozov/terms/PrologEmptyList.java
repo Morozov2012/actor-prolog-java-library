@@ -13,6 +13,14 @@ public final class PrologEmptyList extends Term {
 	//
 	public static final PrologEmptyList instance= new PrologEmptyList();
 	//
+	private static final long serialVersionUID= 0x107661AF6767A43CL; // 1186242957840720956L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","PrologEmptyList");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	private PrologEmptyList() {
 	}
 	//

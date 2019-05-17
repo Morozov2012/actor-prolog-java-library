@@ -16,10 +16,10 @@ public class I3DataAcquisition extends Thread {
 	protected I3Camera camera;
 	//
 	protected AtomicReference<I3DataConsumerInterface> dataConsumer= new AtomicReference<>();
-	protected AtomicReference<DeviceIdentifier> requestedIdentifier= new AtomicReference<>();
-	protected AtomicReference<DeviceIdentifier> currentIdentifier= new AtomicReference<>();
+	protected AtomicReference<DeviceIdentifier> requestedIdentifier= new AtomicReference<>(DeviceIdentifier.DEFAULT);
+	protected AtomicReference<DeviceIdentifier> currentIdentifier= new AtomicReference<>(DeviceIdentifier.DEFAULT);
 	protected AtomicBoolean stopThisThread= new AtomicBoolean(false);
-	protected AtomicBoolean deviceIsOpen= new AtomicBoolean(false);
+	protected AtomicBoolean deviceIsConnected= new AtomicBoolean(false);
 	//
 	protected AtomicBoolean doNotSuspendUSBDataTransfer= new AtomicBoolean(true);
 	protected AtomicBoolean enableDataTransfer= new AtomicBoolean(false);
@@ -27,14 +27,14 @@ public class I3DataAcquisition extends Thread {
 	//
 	protected byte[] m_buf;
 	//
-	protected AtomicLong deviceOpeningAttemptDelay= new AtomicLong(100);
+	protected AtomicLong deviceConnectionAttemptPeriod= new AtomicLong(100);
+	protected AtomicInteger maximalNumberOfErrors= new AtomicInteger(30);
 	protected AtomicInteger readTimeOut= new AtomicInteger(70);
 	protected AtomicInteger writeTimeOut= new AtomicInteger(70);
-	protected AtomicInteger outputDebugInformation= new AtomicInteger(0);
+	// protected AtomicInteger outputDebugInformation= new AtomicInteger(0);
 	//
 	protected AtomicInteger numberOfErrors= new AtomicInteger(0);
 	//
-	protected static int maximalNumberOfErrors= 30;
 	protected static String emptyDeviceName= "";
 	//
 	///////////////////////////////////////////////////////////////
@@ -52,45 +52,70 @@ public class I3DataAcquisition extends Thread {
 		camera.setDataConsumer(consumer);
 	}
 	//
+	public void setDoNotSuspendUSBDataTransfer(boolean value) {
+		doNotSuspendUSBDataTransfer.set(value);
+	}
 	public boolean getDoNotSuspendUSBDataTransfer() {
 		return doNotSuspendUSBDataTransfer.get();
 	}
-	public void setDoNotSuspendUSBDataTransfer(boolean value) {
-		doNotSuspendUSBDataTransfer.set(value);
+	//
+	public void setDeviceConnectionAttemptPeriod(long value) {
+		deviceConnectionAttemptPeriod.set(value);
+	}
+	public long getDeviceConnectionAttemptPeriod() {
+		return deviceConnectionAttemptPeriod.get();
+	}
+	//
+	public void setMaximalNumberOfErrors(int value) {
+		maximalNumberOfErrors.set(value);
+	}
+	public int getMaximalNumberOfErrors() {
+		return maximalNumberOfErrors.get();
 	}
 	//
 	public void setReadTimeOut(int value) {
 		camera.setReadTimeOut(value);
 	}
+	public int getReadTimeOut() {
+		return camera.getReadTimeOut();
+	}
+	//
 	public void setWriteTimeOut(int value) {
 		camera.setWriteTimeOut(value);
 	}
+	public int getWriteTimeOut() {
+		return camera.getWriteTimeOut();
+	}
+	//
 	public void setOutputDebugInformation(int value) {
 		camera.setOutputDebugInformation(value);
 	}
+	public int getOutputDebugInformation() {
+		return camera.getOutputDebugInformation();
+	}
 	//
-	public boolean openDevice(DeviceIdentifier identifier, long period) {
-		if (!deviceIsOpen.get()) {
+	public boolean connectDevice(DeviceIdentifier identifier, long period, int maximalErrorsQuantity) {
+		if (!deviceIsConnected.get()) {
 			requestedIdentifier.set(identifier);
-			deviceOpeningAttemptDelay.set(period);
+			deviceConnectionAttemptPeriod.set(period);
+			maximalNumberOfErrors.set(maximalErrorsQuantity);
 			try {
-				tryToOpenDevice();
+				tryToConnectDevice();
 			} catch (Throwable e1) {
 				if (camera.reportAdmissibleErrors()) {
 					writeLater(String.format("Camera initialization error: %s\n",e1));
 				};
-				// e1.printStackTrace();
 				try {
-					camera.closeDevice();
+					camera.disconnectDevice();
 					if (camera.reportWarnings()) {
 						writeLater("Device is closed!\n");
 					}
 				} catch (Throwable e2) {
 				};
-				deviceIsOpen.set(false);
+				deviceIsConnected.set(false);
 			}
 		};
-		return deviceIsOpen.get();
+		return deviceIsConnected.get();
 	}
 	//
 	public String getCurrentDeviceIdentifier() {
@@ -102,13 +127,14 @@ public class I3DataAcquisition extends Thread {
 		}
 	}
 	//
-	public void activateDataTransfer(DeviceIdentifier identifier, long period, int givenReadTimeOut, int givenWriteTimeOut, int givenOutputDebugInformation) {
+	public void activateDataTransfer(DeviceIdentifier identifier, long period, int maximalErrorsQuantity, int givenReadTimeOut, int givenWriteTimeOut, int givenOutputDebugInformation) {
 		synchronized (this) {
 			requestedIdentifier.set(identifier);
-			deviceOpeningAttemptDelay.set(period);
+			deviceConnectionAttemptPeriod.set(period);
+			maximalNumberOfErrors.set(maximalErrorsQuantity);
 			readTimeOut.set(givenReadTimeOut);
 			writeTimeOut.set(givenWriteTimeOut);
-			outputDebugInformation.set(givenOutputDebugInformation);
+			camera.setOutputDebugInformation(givenOutputDebugInformation);
 			enableDataTransfer.set(true);
 			deviceIsToBeClosed.set(false);
 			notify();
@@ -141,8 +167,8 @@ public class I3DataAcquisition extends Thread {
 		}
 	}
 	//
-	public boolean isOpen() {
-		return deviceIsOpen.get();
+	public boolean isConnected() {
+		return deviceIsConnected.get();
 	}
 	//
 	public boolean isSuspended() {
@@ -153,8 +179,8 @@ public class I3DataAcquisition extends Thread {
 		return enableDataTransfer.get();
 	}
 	//
-	public void closeDevice() {
-		while (deviceIsOpen.get()) {
+	public void disconnectDevice() {
+		while (deviceIsConnected.get()) {
 			if (stopThisThread.get()) {
 				return;
 			};
@@ -180,65 +206,64 @@ synchronized (this) {
 	}
 };
 if (!deviceIsToBeClosed.get()) {
-	if (deviceIsOpen.get()) {
+	if (deviceIsConnected.get()) {
 		try {
 			dataAcquisition();
 		} catch (Throwable e) {
 			if (camera.reportAdmissibleErrors()) {
+				e.printStackTrace();
 				writeLater(String.format("Data acquisition error: %s\n",e));
-				// e.printStackTrace();
 			}
 		}
 	} else {
 		try {
-			tryToOpenDevice();
+			tryToConnectDevice();
 		} catch (Throwable e1) {
 			if (camera.reportAdmissibleErrors()) {
 				writeLater(String.format("Camera initialization error: %s\n",e1));
-				// e1.printStackTrace();
 			};
 			try {
-				camera.closeDevice();
+				camera.disconnectDevice();
 				if (camera.reportWarnings()) {
 					writeLater("Device is closed!\n");
 				}
 			} catch (Throwable e2) {
 			};
-			deviceIsOpen.set(false);
+			deviceIsConnected.set(false);
 		};
-		if (!deviceIsOpen.get()) {
+		if (!deviceIsConnected.get()) {
 			synchronized (this) {
-				wait(deviceOpeningAttemptDelay.get());
+				wait(deviceConnectionAttemptPeriod.get());
 			}
 		}
 	}
 } else {
 	try {
-		camera.closeDevice();
+		camera.disconnectDevice();
 		if (camera.reportWarnings()) {
 			writeLater("Device is closed!\n");
 		};
-		deviceIsOpen.set(false);
+		deviceIsConnected.set(false);
 		deviceIsToBeClosed.set(false);
 	} catch (Throwable e) {
 		if (camera.reportAdmissibleErrors()) {
 			writeLater(String.format("Data acquisition error: %s\n",e));
-			// e.printStackTrace();
+			e.printStackTrace();
 		}
 	}
 }
 //:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 			};
 			try {
-				if (deviceIsOpen.get()) {
-					camera.closeDevice();
+				if (deviceIsConnected.get()) {
+					camera.disconnectDevice();
 					if (camera.reportWarnings()) {
 						writeLater("Device is closed!\n");
 					}
 				}
 			} finally {
 				camera.closeUSB();
-				deviceIsOpen.set(false);
+				deviceIsConnected.set(false);
 			};
 			// writeLater("Bye!\n");
 			// System.exit(0);
@@ -253,9 +278,10 @@ if (!deviceIsToBeClosed.get()) {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public boolean deviceDoesExist() {
+	public boolean deviceDoesExist(DeviceIdentifier identifier) {
+		requestedIdentifier.set(identifier);
 		synchronized (this) {
-			if (deviceIsOpen.get()) {
+			if (deviceIsConnected.get()) {
 				return true;
 			} else {
 				return camera.findDevice(requestedIdentifier.get());
@@ -263,9 +289,9 @@ if (!deviceIsToBeClosed.get()) {
 		}
 	}
 	//
-	public void tryToOpenDevice() {
+	protected void tryToConnectDevice() {
 		synchronized (this) {
-			if (!deviceIsOpen.get()) {
+			if (!deviceIsConnected.get()) {
 				DeviceIdentifier identifier= requestedIdentifier.get();
 				boolean result1= camera.findDevice(identifier);
 				if (!result1) {
@@ -273,14 +299,14 @@ if (!deviceIsToBeClosed.get()) {
 				};
 				camera.setReadTimeOut(readTimeOut.get());
 				camera.setWriteTimeOut(writeTimeOut.get());
-				camera.setOutputDebugInformation(outputDebugInformation.get());
-				camera.openDevice();
+				// camera.setOutputDebugInformation(outputDebugInformation.get());
+				camera.connectDevice();
 				camera.initCamera();
 				if (m_buf==null) {
 					m_buf= camera.createBuffer();
 				};
 				currentIdentifier.set(identifier);
-				deviceIsOpen.set(true);
+				deviceIsConnected.set(true);
 				if (camera.reportWarnings()) {
 					writeLater("Device is open!\n");
 				}
@@ -290,7 +316,7 @@ if (!deviceIsToBeClosed.get()) {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void dataAcquisition() {
+	protected void dataAcquisition() {
 		int numberOfReceivedBytes= camera.read(m_buf,m_buf.length);
 		long currentTime= System.currentTimeMillis();
 		I3DataConsumerInterface consumer= dataConsumer.get();
@@ -304,16 +330,16 @@ if (!deviceIsToBeClosed.get()) {
 				};
 				consumer.reportMissedFrame(currentTime);
 				int errorNumber= numberOfErrors.incrementAndGet();
-				if (errorNumber > maximalNumberOfErrors) {
+				if (errorNumber > maximalNumberOfErrors.get()) {
 					try {
-						camera.closeDevice();
+						camera.disconnectDevice();
 						if (camera.reportWarnings()) {
 							writeLater("Device is closed!\n");
 						}
 					} catch (Throwable e2) {
 					};
-					deviceIsOpen.set(false);
-					// tryToOpenDevice();
+					deviceIsConnected.set(false);
+					// tryToConnectDevice();
 					numberOfErrors.set(0);
 				}
 			}
@@ -322,7 +348,7 @@ if (!deviceIsToBeClosed.get()) {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static void writeLater(final String text) {
+	protected static void writeLater(final String text) {
 		SwingUtilities.invokeLater(new Runnable() {
 			public void run() {
 				System.err.print(text);

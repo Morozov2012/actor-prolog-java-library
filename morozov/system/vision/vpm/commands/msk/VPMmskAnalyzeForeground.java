@@ -57,5 +57,5 @@ abstract public class VPMmskAnalyzeForeground extends VPM_FrameCommand {
 		analyzeOperationalMatrix(foregroundMask,operationalMatrix);
 	}
 	//
-	protected abstract void analyzeOperationalMatrix(boolean[] foregroundMask, int[] operationalMatrix);
+	abstract protected void analyzeOperationalMatrix(boolean[] foregroundMask, int[] operationalMatrix);
 }

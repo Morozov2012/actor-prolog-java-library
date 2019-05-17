@@ -19,6 +19,12 @@ public class PrologVariable extends Term {
 	//
 	private Term value;
 	//
+	private static final long serialVersionUID= 0x3162151040A609FAL; // 3558429815124396538L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","PrologVariable");
+	// }
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public int hashCode() {

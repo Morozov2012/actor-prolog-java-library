@@ -20,6 +20,7 @@ import morozov.terms.*;
 
 import java.awt.Dimension;
 import java.awt.GraphicsConfiguration;
+import java.awt.Color;
 
 public class Control3D extends CustomControlComponent {
 	//
@@ -69,5 +70,8 @@ public class Control3D extends CustomControlComponent {
 			component.setMinimumSize(dimension);
 			component.setPreferredSize(dimension);
 		}
+	}
+	public void setBackground(Color c) {
+		super.setBackground(c);
 	}
 }

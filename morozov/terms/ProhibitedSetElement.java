@@ -16,6 +16,14 @@ import java.util.HashSet;
 
 public class ProhibitedSetElement extends UnderdeterminedSetItem {
 	//
+	private static final long serialVersionUID= 0xF9FD881960F3BAA5L; // -433040346575553883L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","ProhibitedSetElement");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public ProhibitedSetElement(long aName, Term aTail) {
 		name= aName;
 		tail= aTail;

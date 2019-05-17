@@ -142,7 +142,7 @@ public class DiagramContent {
 	public boolean boxContextIsOK(Map<String,ComponentState> componentSuccess) {
 		String mother= motherIdentifier;
 		int boxNumber= localNumber;
-		while(true) {
+		while (true) {
 			if (boxNumber > 0) {
 				try {
 					DiagramContent graph= DiagramTable.getDiagramContent(mother);

@@ -11,16 +11,17 @@ import java.io.InputStream;
 import java.io.IOException;
 
 public class DataStoreInputStream extends ObjectInputStream {
+	//
 	protected boolean someWorldIsDetected= false;
-	protected boolean analyseDataTables= false;
+	// protected boolean analyseDataTables= false;
 	protected DatabaseTable currentDatabaseTable= null;
 	protected boolean aWorldIsDetectedInTable= false;
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public DataStoreInputStream(InputStream out, boolean mode) throws IOException {
+	public DataStoreInputStream(InputStream out) throws IOException {
 		super(out);
-		analyseDataTables= mode;
+		// analyseDataTables= mode;
 		enableResolveObject(true);
 	}
 	//

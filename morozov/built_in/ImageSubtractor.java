@@ -48,7 +48,7 @@ public abstract class ImageSubtractor
 	// BlobExtractionMode
 	//
 	public void setBlobExtractionMode1s(ChoisePoint iX, Term value) {
-		setBlobExtractionMode(YesNo.termYesNo2Boolean(value,iX),iX);
+		setBlobExtractionMode(YesNoConverters.termYesNo2Boolean(value,iX),iX);
 	}
 	public void setBlobExtractionMode(boolean mode, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
@@ -57,7 +57,7 @@ public abstract class ImageSubtractor
 	}
 	//
 	public void getBlobExtractionMode0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getBlobExtractionMode(iX)));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(getBlobExtractionMode(iX)));
 	}
 	public void getBlobExtractionMode0fs(ChoisePoint iX) {
 	}
@@ -70,7 +70,7 @@ public abstract class ImageSubtractor
 	// BlobTracingMode
 	//
 	public void setBlobTracingMode1s(ChoisePoint iX, Term value) {
-		setBlobTracingMode(YesNo.termYesNo2Boolean(value,iX),iX);
+		setBlobTracingMode(YesNoConverters.termYesNo2Boolean(value,iX),iX);
 	}
 	public void setBlobTracingMode(boolean mode, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
@@ -79,7 +79,7 @@ public abstract class ImageSubtractor
 	}
 	//
 	public void getBlobTracingMode0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getBlobTracingMode(iX)));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(getBlobTracingMode(iX)));
 	}
 	public void getBlobTracingMode0fs(ChoisePoint iX) {
 	}
@@ -118,7 +118,7 @@ public abstract class ImageSubtractor
 	// GrayscaleMode
 	//
 	public void setGrayscaleMode1s(ChoisePoint iX, Term value) {
-		setGrayscaleMode(YesNo.termYesNo2Boolean(value,iX),iX);
+		setGrayscaleMode(YesNoConverters.termYesNo2Boolean(value,iX),iX);
 	}
 	public void setGrayscaleMode(boolean mode, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
@@ -127,7 +127,7 @@ public abstract class ImageSubtractor
 	}
 	//
 	public void getGrayscaleMode0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getGrayscaleMode(iX)));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(getGrayscaleMode(iX)));
 	}
 	public void getGrayscaleMode0fs(ChoisePoint iX) {
 	}
@@ -140,7 +140,7 @@ public abstract class ImageSubtractor
 	// BackgroundGaussianFilteringMode
 	//
 	public void setBackgroundGaussianFilteringMode1s(ChoisePoint iX, Term value) {
-		setBackgroundGaussianFilteringMode(YesNo.termYesNo2Boolean(value,iX),iX);
+		setBackgroundGaussianFilteringMode(YesNoConverters.termYesNo2Boolean(value,iX),iX);
 	}
 	public void setBackgroundGaussianFilteringMode(boolean mode, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
@@ -149,7 +149,7 @@ public abstract class ImageSubtractor
 	}
 	//
 	public void getBackgroundGaussianFilteringMode0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getBackgroundGaussianFilteringMode(iX)));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(getBackgroundGaussianFilteringMode(iX)));
 	}
 	public void getBackgroundGaussianFilteringMode0fs(ChoisePoint iX) {
 	}
@@ -184,7 +184,7 @@ public abstract class ImageSubtractor
 	// BackgroundRankFilteringMode
 	//
 	public void setBackgroundRankFilteringMode1s(ChoisePoint iX, Term value) {
-		setBackgroundRankFilteringMode(YesNo.termYesNo2Boolean(value,iX),iX);
+		setBackgroundRankFilteringMode(YesNoConverters.termYesNo2Boolean(value,iX),iX);
 	}
 	public void setBackgroundRankFilteringMode(boolean mode, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
@@ -193,7 +193,7 @@ public abstract class ImageSubtractor
 	}
 	//
 	public void getBackgroundRankFilteringMode0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getBackgroundRankFilteringMode(iX)));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(getBackgroundRankFilteringMode(iX)));
 	}
 	public void getBackgroundRankFilteringMode0fs(ChoisePoint iX) {
 	}
@@ -250,7 +250,7 @@ public abstract class ImageSubtractor
 	// ForegroundContouringMode
 	//
 	public void setForegroundContouringMode1s(ChoisePoint iX, Term value) {
-		setForegroundContouringMode(YesNo.termYesNo2Boolean(value,iX),iX);
+		setForegroundContouringMode(YesNoConverters.termYesNo2Boolean(value,iX),iX);
 	}
 	public void setForegroundContouringMode(boolean mode, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
@@ -259,7 +259,7 @@ public abstract class ImageSubtractor
 	}
 	//
 	public void getForegroundContouringMode0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getForegroundContouringMode(iX)));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(getForegroundContouringMode(iX)));
 	}
 	public void getForegroundContouringMode0fs(ChoisePoint iX) {
 	}
@@ -519,7 +519,7 @@ public abstract class ImageSubtractor
 	// SlowTracksDeletionMode
 	//
 	public void setSlowTracksDeletionMode1s(ChoisePoint iX, Term value) {
-		setSlowTracksDeletionMode(YesNo.termYesNo2Boolean(value,iX),iX);
+		setSlowTracksDeletionMode(YesNoConverters.termYesNo2Boolean(value,iX),iX);
 	}
 	public void setSlowTracksDeletionMode(boolean mode, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
@@ -528,7 +528,7 @@ public abstract class ImageSubtractor
 	}
 	//
 	public void getSlowTracksDeletionMode0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getSlowTracksDeletionMode(iX)));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(getSlowTracksDeletionMode(iX)));
 	}
 	public void getSlowTracksDeletionMode0fs(ChoisePoint iX) {
 	}
@@ -636,7 +636,7 @@ public abstract class ImageSubtractor
 		subtract(a1,a2,true,iX);
 	}
 	public void subtract3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
-		boolean takeFrameIntoAccount= YesNo.termYesNo2Boolean(a3,iX);
+		boolean takeFrameIntoAccount= YesNoConverters.termYesNo2Boolean(a3,iX);
 		subtract(a1,a2,takeFrameIntoAccount,iX);
 	}
 	//
@@ -698,17 +698,17 @@ public abstract class ImageSubtractor
 		if (imageSubtractor.get()==null) {
 			GenericImageEncodingAttributes attributes= getImageEncodingAttributes(iX);
 			setCurrentImageEncodingAttributes(attributes);
-			boolean extractBlobs= YesNo.termYesNo2Boolean(getBuiltInSlot_E_extract_blobs(),iX);
-			boolean trackBlobs= YesNo.termYesNo2Boolean(getBuiltInSlot_E_track_blobs(),iX);
+			boolean extractBlobs= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_extract_blobs(),iX);
+			boolean trackBlobs= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_track_blobs(),iX);
 			int minimalTrainingInterval= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_training_interval(),iX);
 			int maximalTrainingInterval= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_training_interval(),iX);
-			boolean useGrayscaleColors= YesNo.termYesNo2Boolean(getBuiltInSlot_E_use_grayscale_colors(),iX);
-			boolean applyGaussian_2D_Filtering= YesNo.termYesNo2Boolean(getBuiltInSlot_E_apply_gaussian_filtering_to_background(),iX);
+			boolean useGrayscaleColors= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_use_grayscale_colors(),iX);
+			boolean applyGaussian_2D_Filtering= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_apply_gaussian_filtering_to_background(),iX);
 			int gaussian_2D_FilterRadius= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_background_gaussian_filter_radius(),iX);
-			boolean applyRank_2D_Filtering= YesNo.termYesNo2Boolean(getBuiltInSlot_E_apply_rank_filtering_to_background(),iX);
+			boolean applyRank_2D_Filtering= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_apply_rank_filtering_to_background(),iX);
 			int rank_2D_FilterThreshold= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_background_rank_filter_threshold(),iX);
 			double backgroundStandardDeviationFactor= GeneralConverters.argumentToReal(getBuiltInSlot_E_background_standard_deviation_factor(),iX);
-			boolean contourForeground= YesNo.termYesNo2Boolean(getBuiltInSlot_E_contour_foreground(),iX);
+			boolean contourForeground= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_contour_foreground(),iX);
 			int horizontalBlobBorder= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_horizontal_blob_border(),iX);
 			int verticalBlobBorder= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_vertical_blob_border(),iX);
 			double horizontalExtraBorderCoefficient= GeneralConverters.argumentToReal(getBuiltInSlot_E_horizontal_extra_border_coefficient(),iX);
@@ -717,7 +717,7 @@ public abstract class ImageSubtractor
 			int minimalBlobSize= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_blob_size(),iX);
 			int minimalTrackDuration= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_track_duration(),iX);
 			int maximalTrackDuration= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_track_duration(),iX);
-			NumericalValue maximalChronicleLength= NumericalValue.argumentToNumericalValue(getBuiltInSlot_E_maximal_chronicle_length(),iX);
+			NumericalValue maximalChronicleLength= NumericalValueConverters.argumentToNumericalValue(getBuiltInSlot_E_maximal_chronicle_length(),iX);
 			int maximalBlobInvisibilityInterval= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_blob_invisibility_interval(),iX);
 			int maximalTrackRetentionInterval= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_track_retention_interval(),iX);
 			Term matrixValue= getBuiltInSlot_E_inverse_transformation_matrix();
@@ -725,16 +725,16 @@ public abstract class ImageSubtractor
 			checkMatrix(inverseMatrix,matrixValue);
 			double samplingRate= GeneralConverters.argumentToReal(getBuiltInSlot_E_sampling_rate(),iX);
 			int r2WindowHalfwidth= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_r2_window_halfwidth(),iX);
-			boolean applyCharacteristicLengthMedianFiltering= YesNo.termYesNo2Boolean(getBuiltInSlot_E_apply_median_filtering_to_characteristic_length(),iX);
+			boolean applyCharacteristicLengthMedianFiltering= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_apply_median_filtering_to_characteristic_length(),iX);
 			int characteristicLengthMedianFilterHalfwidth= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_characteristic_length_median_filter_halfwidth(),iX);
-			boolean applyVelocityMedianFiltering= YesNo.termYesNo2Boolean(getBuiltInSlot_E_apply_median_filtering_to_velocity(),iX);
+			boolean applyVelocityMedianFiltering= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_apply_median_filtering_to_velocity(),iX);
 			int velocityMedianFilterHalfwidth= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_velocity_median_filter_halfwidth(),iX);
-			boolean refuseSlowTracks= YesNo.termYesNo2Boolean(getBuiltInSlot_E_refuse_slow_tracks(),iX);
+			boolean refuseSlowTracks= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_refuse_slow_tracks(),iX);
 			double velocityThreshold= GeneralConverters.argumentToReal(getBuiltInSlot_E_fuzzy_velocity_threshold(),iX);
 			double distanceThreshold= GeneralConverters.argumentToReal(getBuiltInSlot_E_fuzzy_distance_threshold(),iX);
 			double fuzzyThresholdBorder= GeneralConverters.argumentToReal(getBuiltInSlot_E_fuzzy_threshold_border(),iX);
 			int synthesizedImageTransparency= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_synthesized_image_transparency(),iX);
-			boolean makeRectangularBlobsInSynthesizedImage= YesNo.termYesNo2Boolean(getBuiltInSlot_E_make_rectangular_blobs_in_synthesized_image(),iX);
+			boolean makeRectangularBlobsInSynthesizedImage= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_make_rectangular_blobs_in_synthesized_image(),iX);
 			imageSubtractor.set(
 				new PlainImageSubtractor(
 					extractBlobs,
@@ -807,17 +807,17 @@ public abstract class ImageSubtractor
 	//
 	protected void reset(boolean forgetSettings, boolean forgetStatistics, boolean forgetResults, ChoisePoint iX) {
 		if (!createImageSubtractorIfNecessary(iX)) {
-			boolean extractBlobs= YesNo.termYesNo2Boolean(getBuiltInSlot_E_extract_blobs(),iX);
-			boolean trackBlobs= YesNo.termYesNo2Boolean(getBuiltInSlot_E_track_blobs(),iX);
+			boolean extractBlobs= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_extract_blobs(),iX);
+			boolean trackBlobs= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_track_blobs(),iX);
 			int minimalTrainingInterval= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_training_interval(),iX);
 			int maximalTrainingInterval= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_training_interval(),iX);
-			boolean useGrayscaleColors= YesNo.termYesNo2Boolean(getBuiltInSlot_E_use_grayscale_colors(),iX);
-			boolean applyGaussian_2D_Filtering= YesNo.termYesNo2Boolean(getBuiltInSlot_E_apply_gaussian_filtering_to_background(),iX);
+			boolean useGrayscaleColors= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_use_grayscale_colors(),iX);
+			boolean applyGaussian_2D_Filtering= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_apply_gaussian_filtering_to_background(),iX);
 			int gaussian_2D_FilterRadius= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_background_gaussian_filter_radius(),iX);
-			boolean applyRank_2D_Filtering= YesNo.termYesNo2Boolean(getBuiltInSlot_E_apply_rank_filtering_to_background(),iX);
+			boolean applyRank_2D_Filtering= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_apply_rank_filtering_to_background(),iX);
 			int rank_2D_FilterThreshold= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_background_rank_filter_threshold(),iX);
 			double backgroundStandardDeviationFactor= GeneralConverters.argumentToReal(getBuiltInSlot_E_background_standard_deviation_factor(),iX);
-			boolean contourForeground= YesNo.termYesNo2Boolean(getBuiltInSlot_E_contour_foreground(),iX);
+			boolean contourForeground= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_contour_foreground(),iX);
 			int horizontalBlobBorder= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_horizontal_blob_border(),iX);
 			int verticalBlobBorder= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_vertical_blob_border(),iX);
 			double horizontalExtraBorderCoefficient= GeneralConverters.argumentToReal(getBuiltInSlot_E_horizontal_extra_border_coefficient(),iX);
@@ -826,7 +826,7 @@ public abstract class ImageSubtractor
 			int minimalBlobSize= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_blob_size(),iX);
 			int minimalTrackDuration= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_track_duration(),iX);
 			int maximalTrackDuration= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_track_duration(),iX);
-			NumericalValue maximalChronicleLength= NumericalValue.argumentToNumericalValue(getBuiltInSlot_E_maximal_chronicle_length(),iX);
+			NumericalValue maximalChronicleLength= NumericalValueConverters.argumentToNumericalValue(getBuiltInSlot_E_maximal_chronicle_length(),iX);
 			int maximalBlobInvisibilityInterval= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_blob_invisibility_interval(),iX);
 			int maximalTrackRetentionInterval= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_track_retention_interval(),iX);
 			Term matrixValue= getBuiltInSlot_E_inverse_transformation_matrix();
@@ -834,16 +834,16 @@ public abstract class ImageSubtractor
 			checkMatrix(inverseMatrix,matrixValue);
 			double samplingRate= GeneralConverters.argumentToReal(getBuiltInSlot_E_sampling_rate(),iX);
 			int r2WindowHalfwidth= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_r2_window_halfwidth(),iX);
-			boolean applyCharacteristicLengthMedianFiltering= YesNo.termYesNo2Boolean(getBuiltInSlot_E_apply_median_filtering_to_characteristic_length(),iX);
+			boolean applyCharacteristicLengthMedianFiltering= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_apply_median_filtering_to_characteristic_length(),iX);
 			int characteristicLengthMedianFilterHalfwidth= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_characteristic_length_median_filter_halfwidth(),iX);
-			boolean applyVelocityMedianFiltering= YesNo.termYesNo2Boolean(getBuiltInSlot_E_apply_median_filtering_to_velocity(),iX);
+			boolean applyVelocityMedianFiltering= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_apply_median_filtering_to_velocity(),iX);
 			int velocityMedianFilterHalfwidth= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_velocity_median_filter_halfwidth(),iX);
-			boolean refuseSlowTracks= YesNo.termYesNo2Boolean(getBuiltInSlot_E_refuse_slow_tracks(),iX);
+			boolean refuseSlowTracks= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_refuse_slow_tracks(),iX);
 			double velocityThreshold= GeneralConverters.argumentToReal(getBuiltInSlot_E_fuzzy_velocity_threshold(),iX);
 			double distanceThreshold= GeneralConverters.argumentToReal(getBuiltInSlot_E_fuzzy_distance_threshold(),iX);
 			double fuzzyThresholdBorder= GeneralConverters.argumentToReal(getBuiltInSlot_E_fuzzy_threshold_border(),iX);
 			int synthesizedImageTransparency= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_synthesized_image_transparency(),iX);
-			boolean makeRectangularBlobsInSynthesizedImage= YesNo.termYesNo2Boolean(getBuiltInSlot_E_make_rectangular_blobs_in_synthesized_image(),iX);
+			boolean makeRectangularBlobsInSynthesizedImage= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_make_rectangular_blobs_in_synthesized_image(),iX);
 			PlainImageSubtractor subtractor= imageSubtractor.get();
 			subtractor.reset(
 				forgetSettings,

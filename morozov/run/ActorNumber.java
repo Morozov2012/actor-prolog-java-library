@@ -8,6 +8,15 @@ import java.util.HashSet;
 import java.util.Iterator;
 
 public abstract class ActorNumber extends Term {
+	//
+	private static final long serialVersionUID= 0xCB0DE9322E0B250EL; // -3815136907582823154L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.run","ActorNumber");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public boolean thisIsActorNumber() {
 		return true;
 	}

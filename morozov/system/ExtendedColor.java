@@ -5,7 +5,6 @@ package morozov.system;
 import target.*;
 
 import morozov.run.*;
-import morozov.system.*;
 import morozov.system.converters.*;
 import morozov.system.errors.*;
 import morozov.system.signals.*;
@@ -178,7 +177,7 @@ public class ExtendedColor {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable()) {
 			throw Backtracking.instance;
-		} else if(value.thisIsUnknownValue()) {
+		} else if (value.thisIsUnknownValue()) {
 			return termDefault;
 		} else {
 			try {

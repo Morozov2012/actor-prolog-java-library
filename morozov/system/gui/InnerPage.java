@@ -43,6 +43,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 	public AtomicReference<ExtendedSize> logicalHeight= new AtomicReference<ExtendedSize>(new ExtendedSize());
 	public AtomicReference<ExtendedCoordinate> logicalX= new AtomicReference<ExtendedCoordinate>(new ExtendedCoordinate());
 	public AtomicReference<ExtendedCoordinate> logicalY= new AtomicReference<ExtendedCoordinate>(new ExtendedCoordinate());
+	public AtomicBoolean usePixelMeasurements= new AtomicBoolean(false);
 	//
 	protected AtomicReference<JMenuBar> currentMenuBar= new AtomicReference<JMenuBar>(null);
 	//
@@ -55,7 +56,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 	// protected long repaintingDelay= 100; // ms
 	//
 	public InnerPage(String title) {
-		internalFrame= new ExtendedJInternalFrame(this,title,logicalX,logicalY,logicalWidth,logicalHeight);
+		internalFrame= new ExtendedJInternalFrame(this,title,logicalX,logicalY,logicalWidth,logicalHeight,usePixelMeasurements);
 		// safelySetDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 		//// setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		// addPropertyChangeListener(this);
@@ -505,14 +506,19 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		double gridX= DefaultOptions.gridWidth;
 		double gridY= DefaultOptions.gridHeight;
 		//
-		CoordinateAndSize realXandWidth= CoordinateAndSize.calculate(logicalX.get(),logicalWidth.get(),desktopWidth,gridX);
-		CoordinateAndSize realYandHeight= CoordinateAndSize.calculate(logicalY.get(),logicalHeight.get(),desktopHeight,gridY);
-		//
+		CoordinateAndSize realXandWidth;
+		CoordinateAndSize realYandHeight;
+		if (usePixelMeasurements.get()) {
+			realXandWidth= CoordinateAndSize.calculate(logicalX.get(),logicalWidth.get(),desktopWidth);
+			realYandHeight= CoordinateAndSize.calculate(logicalY.get(),logicalHeight.get(),desktopHeight);
+		} else {
+			realXandWidth= CoordinateAndSize.calculate(logicalX.get(),logicalWidth.get(),desktopWidth,gridX);
+			realYandHeight= CoordinateAndSize.calculate(logicalY.get(),logicalHeight.get(),desktopHeight,gridY);
+		};
 		int realX= realXandWidth.coordinate;
 		int realY= realYandHeight.coordinate;
 		int realWidth= realXandWidth.size;
 		int realHeight= realYandHeight.size;
-		//
 		if (	realXandWidth.coordinateIsToBeCalculatedAutomatically &&
 			realYandHeight.coordinateIsToBeCalculatedAutomatically) {
 			Dimension sizeDifference= new Dimension();

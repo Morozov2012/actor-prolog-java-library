@@ -274,7 +274,7 @@ public class AList extends JScrollPane {
 	//
 	protected void implementMultipleSelection(Term tail, ChoisePoint iX, ListModel model) {
 		try {
-			while(true) {
+			while (true) {
 				Term value= tail.getNextListHead(iX);
 				try {
 					int number= value.getSmallIntegerValue(iX);

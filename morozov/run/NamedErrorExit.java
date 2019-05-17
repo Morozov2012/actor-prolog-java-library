@@ -7,6 +7,7 @@ import target.*;
 import morozov.terms.*;
 
 public class NamedErrorExit extends ErrorExit {
+	//
 	private long nameCode;
 	//
 	public NamedErrorExit(ChoisePoint cp, long code) {

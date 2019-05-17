@@ -25,6 +25,12 @@ import java.awt.geom.Line2D;
 
 public class ScalableWindowsCheckBoxIcon extends ScalableToggleButtonIcon {
 	//
+	private static final long serialVersionUID= 0x746356F4D8F29BBL; // 524165158794111419L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.gui.dialogs.scalable.windows","ScalableWindowsCheckBoxIcon");
+	// }
+	//
 	public ScalableWindowsCheckBoxIcon() {
 	}
 	//

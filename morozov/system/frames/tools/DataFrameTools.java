@@ -4,9 +4,14 @@ package morozov.system.frames.tools;
 
 import java.awt.image.WritableRaster;
 import java.awt.Graphics2D;
+import java.awt.Color;
 import java.awt.geom.AffineTransform;
 
 public class DataFrameTools {
+	//
+	protected static int defaultColorImageWidth= 704;
+	protected static int defaultColorImageHeight= 576;
+	protected static Color transparentBackground= new Color(0,0,0,0);
 	//
 	public static AttachedImage temperaturesToImage(
 			double[] targetTemperatures,
@@ -189,10 +194,13 @@ public class DataFrameTools {
 			java.awt.image.BufferedImage sourceImage,
 			boolean zoomFrame,
 			double zoomingCoefficient) {
-		int imageWidth= sourceImage.getWidth();
-		int imageHeight= sourceImage.getHeight();
-		int imageType= sourceImage.getType();
 		if (zoomFrame) {
+			int imageWidth= sourceImage.getWidth();
+			int imageHeight= sourceImage.getHeight();
+			int imageType= sourceImage.getType();
+			if (imageType==java.awt.image.BufferedImage.TYPE_CUSTOM) {
+				imageType= java.awt.image.BufferedImage.TYPE_3BYTE_BGR;
+			};
 			java.awt.image.BufferedImage zoomedImage= new java.awt.image.BufferedImage(
 				imageWidth,
 				imageHeight,
@@ -218,8 +226,32 @@ public class DataFrameTools {
 				};
 				sourceImage= zoomedImage;
 			}
+		} else {
+			sourceImage= correctImage(sourceImage);
 		};
 		return sourceImage;
+	}
+	//
+	public static java.awt.image.BufferedImage correctImage(
+			java.awt.image.BufferedImage sourceImage) {
+		int imageType= sourceImage.getType();
+		if (imageType==java.awt.image.BufferedImage.TYPE_CUSTOM) {
+			int imageWidth= sourceImage.getWidth();
+			int imageHeight= sourceImage.getHeight();
+			java.awt.image.BufferedImage correctedImage= new java.awt.image.BufferedImage(
+				imageWidth,
+				imageHeight,
+				java.awt.image.BufferedImage.TYPE_3BYTE_BGR);
+			Graphics2D g22= (Graphics2D)correctedImage.getGraphics();
+			try {
+				g22.drawImage(sourceImage,0,0,null);
+			} finally {
+				g22.dispose();
+			};
+			return correctedImage;
+		} else {
+			return sourceImage;
+		}
 	}
 	//
 	public static java.awt.image.BufferedImage rotateAndZoomImage(
@@ -229,6 +261,9 @@ public class DataFrameTools {
 		int imageWidth= sourceImage.getWidth();
 		int imageHeight= sourceImage.getHeight();
 		int imageType= sourceImage.getType();
+		if (imageType==java.awt.image.BufferedImage.TYPE_CUSTOM) {
+			imageType= java.awt.image.BufferedImage.TYPE_3BYTE_BGR;
+		};
 		AffineTransform xform= AffineTransform.getQuadrantRotateInstance(-1,imageHeight/2.0,imageWidth/2.0);
 		double shiftX= - (imageWidth/2.0 - imageHeight/2.0);
 		double shiftY= imageWidth/2.0 - imageHeight/2.0;
@@ -297,6 +332,9 @@ public class DataFrameTools {
 		int colorImageWidth= sourceImage.getWidth();
 		int colorImageHeight= sourceImage.getHeight();
 		int imageType= sourceImage.getType();
+		if (imageType==java.awt.image.BufferedImage.TYPE_CUSTOM) {
+			imageType= java.awt.image.BufferedImage.TYPE_3BYTE_BGR;
+		};
 		AffineTransform xform= AffineTransform.getQuadrantRotateInstance(-1,colorImageHeight/2.0,colorImageWidth/2.0);
 		double shiftX= - (colorImageWidth/2.0 - colorImageHeight/2.0);
 		double shiftY= colorImageWidth/2.0 - colorImageHeight/2.0;
@@ -334,6 +372,110 @@ public class DataFrameTools {
 				colorImageHeight,
 				colorImageWidth,
 				imageType);
+			int roiWidth= (int)(colorImageHeight / zoomingCoefficient);
+			int roiHeight= (int)(colorImageWidth / zoomingCoefficient);
+			int x2= (colorImageHeight - roiWidth) / 2;
+			int y2= (colorImageWidth - roiHeight) / 2;
+			Graphics2D g22= (Graphics2D)zoomedImage.getGraphics();
+			try {
+				g22.drawImage(
+					rotatedImage,
+					0,
+					0,
+					colorImageHeight,
+					colorImageWidth,
+					x2,
+					y2,
+					colorImageHeight - x2,
+					colorImageWidth - y2,
+					null);
+			} finally {
+				g22.dispose();
+			};
+			rotatedImage= zoomedImage;
+		};
+		return rotatedImage;
+	}
+	//
+	public static java.awt.image.BufferedImage borderAndZoomImage(
+			double[] targetTemperatures,
+			int matrixWidth,
+			int matrixHeight,
+			int subimageWidth,
+			int subimageHeight,
+			int offsetX,
+			int offsetY,
+			int[][] mainColorMap,
+			int[][] auxiliaryColorMap,
+			boolean temperatureAutoranging,
+			boolean useDoubleColorMap,
+			double lowerTemperatureBound,
+			double upperTemperatureBound,
+			double lowerTemperatureQuantile1,
+			double upperTemperatureQuantile1,
+			double lowerTemperatureQuantile2,
+			double upperTemperatureQuantile2,
+			boolean zoomFrame,
+			double zoomingCoefficient,
+			Color backgroundColor) {
+		int colorImageWidth= defaultColorImageWidth;
+		int colorImageHeight= defaultColorImageHeight;
+		double shiftX= - (colorImageWidth/2.0 - colorImageHeight/2.0);
+		double shiftY= colorImageWidth/2.0 - colorImageHeight/2.0;
+		AttachedImage attachedImage= temperaturesToImage(
+			targetTemperatures,
+			matrixWidth,
+			matrixHeight,
+			mainColorMap,
+			auxiliaryColorMap,
+			temperatureAutoranging,
+			useDoubleColorMap,
+			lowerTemperatureBound,
+			upperTemperatureBound,
+			lowerTemperatureQuantile1,
+			upperTemperatureQuantile1,
+			lowerTemperatureQuantile2,
+			upperTemperatureQuantile2,
+			false, // zoomFrame
+			zoomingCoefficient);
+		java.awt.image.BufferedImage terahertzImage= attachedImage.getImage();
+		java.awt.image.BufferedImage rotatedImage;
+		if (backgroundColor==null) {
+			rotatedImage= new java.awt.image.BufferedImage(
+				colorImageHeight,
+				colorImageWidth,
+				java.awt.image.BufferedImage.TYPE_4BYTE_ABGR);
+		} else {
+			rotatedImage= new java.awt.image.BufferedImage(
+				colorImageHeight,
+				colorImageWidth,
+				java.awt.image.BufferedImage.TYPE_3BYTE_BGR);
+		};
+		Graphics2D g21= (Graphics2D)rotatedImage.getGraphics();
+		try {
+			if (backgroundColor==null) {
+				g21.setBackground(transparentBackground);
+			} else {
+				g21.setBackground(backgroundColor);
+			};
+			g21.clearRect(0,0,colorImageHeight,colorImageWidth);
+			g21.drawImage(terahertzImage,offsetX,offsetY,subimageWidth,subimageHeight,null);
+		} finally {
+			g21.dispose();
+		};
+		if (zoomFrame) {
+			java.awt.image.BufferedImage zoomedImage;
+			if (backgroundColor==null) {
+				zoomedImage= new java.awt.image.BufferedImage(
+					colorImageHeight,
+					colorImageWidth,
+					java.awt.image.BufferedImage.TYPE_4BYTE_ABGR);
+			} else {
+				zoomedImage= new java.awt.image.BufferedImage(
+					colorImageHeight,
+					colorImageWidth,
+					java.awt.image.BufferedImage.TYPE_3BYTE_BGR);
+			};
 			int roiWidth= (int)(colorImageHeight / zoomingCoefficient);
 			int roiHeight= (int)(colorImageWidth / zoomingCoefficient);
 			int x2= (colorImageHeight - roiWidth) / 2;

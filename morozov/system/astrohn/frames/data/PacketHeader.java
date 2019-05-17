@@ -64,16 +64,16 @@ public class PacketHeader {
 					if (packetHeader.getDataType()==0) {
 						return packetHeader.getLength();
 					} else {
-						throw new DataType0Expected(packetHeader.getDataType());
+						throw new DataType0IsExpected(packetHeader.getDataType());
 					}
 				} else {
-					throw new MagicCodeExpected(packetHeader.getMagicCode());
+					throw new MagicCodeIsExpected(packetHeader.getMagicCode());
 				}
 			} else {
 				return packetHeader.getLength();
 			}
 		} else {
-			throw new MagicCodeExpected(packetHeader.getMagicCode());
+			throw new MagicCodeIsExpected(packetHeader.getMagicCode());
 		}
 	}
 }

@@ -60,7 +60,7 @@ public class TranslatedMenuItem {
 			return;
 		};
 		try {
-			while(true) {
+			while (true) {
 				Term value= tail.getNextListHead(iX);
 				term2TranslatedMenuItem(vector,isMenuBar,value,iX);
 				tail= tail.getNextListTail(iX);

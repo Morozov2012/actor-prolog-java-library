@@ -7,7 +7,7 @@ import target.*;
 import morozov.built_in.*;
 import morozov.domains.*;
 import morozov.run.*;
-import morozov.syntax.errors.*;
+import morozov.syntax.interfaces.*;
 import morozov.syntax.scanner.errors.*;
 import morozov.system.*;
 import morozov.system.converters.*;
@@ -35,6 +35,12 @@ public class DatabaseTableContainer extends LoadableContainer {
 	protected transient ArrayDeque<WriterAccessMode> writerAccessModesStack= new ArrayDeque<WriterAccessMode>();
 	//
 	protected transient AtomicLong numberOfWaitingWriters= new AtomicLong(0);
+	//
+	private static final long serialVersionUID= 0xE055595E1B41FF26L; // -2281819375474180314L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.datum","DatabaseTableContainer");
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -353,8 +359,8 @@ public class DatabaseTableContainer extends LoadableContainer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected void loadContent(String textBuffer, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) throws LexicalScannerError, ParserError, DatabaseRecordDoesNotBelongToDomain {
-		table.get().loadContent(textBuffer,currentProcess,checkPrivileges,iX);
+	protected void loadContent(String textBuffer, ActiveWorld currentProcess, boolean checkPrivileges, ParserMasterInterface master, ChoisePoint iX) throws SyntaxError, DatabaseRecordDoesNotBelongToDomain {
+		table.get().loadContent(textBuffer,currentProcess,checkPrivileges,master,iX);
 	}
 	//
 	///////////////////////////////////////////////////////////////

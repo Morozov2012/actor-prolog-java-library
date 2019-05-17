@@ -6,35 +6,30 @@ import morozov.run.*;
 import morozov.system.*;
 import morozov.system.converters.*;
 import morozov.system.frames.converters.*;
-import morozov.system.frames.converters.interfaces.*;
 import morozov.system.frames.data.interfaces.*;
 import morozov.system.frames.errors.*;
 import morozov.system.frames.interfaces.*;
 import morozov.system.frames.tools.*;
 import morozov.system.ip_camera.*;
 import morozov.system.ip_camera.converters.*;
-import morozov.system.ip_camera.converters.interfaces.*;
-import morozov.system.ip_camera.errors.*;
 import morozov.system.ip_camera.frames.*;
 import morozov.system.ip_camera.frames.interfaces.*;
 import morozov.system.ip_camera.interfaces.*;
-import morozov.system.modes.*;
 import morozov.terms.*;
 import morozov.worlds.*;
 
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.ListIterator;
+import java.math.BigInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-public abstract class IPCamera extends VideoBuffer implements IPCameraDataConsumerInterface, DataFrameConsumerInterface, DataFrameProviderInterface {
+public abstract class IPCamera extends ZoomDataAcquisitionBuffer implements IPCameraDataConsumerInterface {
 	//
 	protected String cameraURL;
 	//
 	protected IPCameraDataAcquisition ipCameraDataAcquisition= new IPCameraDataAcquisition();
 	//
 	protected AtomicLong counterOfAcquiredIPCameraFrames= new AtomicLong(-1);
-	protected AtomicLong numberOfRecentIPCameraFrame= new AtomicLong(-1);
+	// protected AtomicLong numberOfRecentIPCameraFrame= new AtomicLong(-1);
 	//
 	protected long numberOfRepeatedColorFrame= -1;
 	//
@@ -44,8 +39,6 @@ public abstract class IPCamera extends VideoBuffer implements IPCameraDataConsum
 	protected long committedColorFrameTime= -1;
 	protected long firstCommittedColorFrameNumber= -1;
 	protected long firstCommittedColorFrameTime= -1;
-	//
-	protected LinkedList<EnumeratedFrame> history= new LinkedList<>();
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -96,49 +89,63 @@ public abstract class IPCamera extends VideoBuffer implements IPCameraDataConsum
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public void setOutputDebugInformation(BigInteger value) {
+		super.setOutputDebugInformation(value);
+		int mode= PrologInteger.toInteger(value);
+		ipCameraDataAcquisition.setOutputDebugInformation(mode);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	protected void resetCounters() {
 		synchronized (numberOfRecentReceivedFrame) {
 			super.resetCounters();
 			counterOfAcquiredIPCameraFrames.set(-1);
-			numberOfRecentIPCameraFrame.set(-1);
+			// numberOfRecentIPCameraFrame.set(-1);
 			numberOfRepeatedColorFrame= -1;
 			committedIPCameraFrameImage= null;
-			committedColorFrameNumber= -1;
-			committedColorFrameTime= -1;
-			firstCommittedColorFrameNumber= -1;
-			firstCommittedColorFrameTime= -1;
-			synchronized (history) {
-				history.clear();
-			}
 		}
+	}
+	//
+	protected void resetFrameRate() {
+		committedColorFrameNumber= -1;
+		committedColorFrameTime= -1;
+		firstCommittedColorFrameNumber= -1;
+		firstCommittedColorFrameTime= -1;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
 	protected void activateDataAcquisition(ChoisePoint iX) {
-		ActionPeriod period= getOpeningAttemptPeriod(iX);
-		int givenOpeningAttemptDelay= period.toMillisecondsOrDefault(defaultDeviceOpeningAttemptDelay);
+		ActionPeriod period= getConnectionAttemptPeriod(iX);
+		int givenConnectionAttemptPeriod= period.toMillisecondsOrDefault(defaultDeviceConnectionAttemptPeriod);
 		ipCameraDataAcquisition.setServerAttributes(
 			getCameraURL(iX),
-			givenOpeningAttemptDelay);
-		ipCameraDataAcquisition.activateDataTransfer();
+			givenConnectionAttemptPeriod);
+		int currentOutputDebugInformation= PrologInteger.toInteger(getOutputDebugInformation(iX));
+		ipCameraDataAcquisition.activateDataTransfer(currentOutputDebugInformation);
 	}
 	//
-	protected void readGivenNumberOfTargetFrames(int number) {
-		((IPCameraFrameReadingTask)frameReadingTask).readGivenNumberOfColorFrames(number);
-	}
-	//
-	protected void suspendDataAcquisition() {
+	protected void suspendRecording(ChoisePoint iX) {
 		ipCameraDataAcquisition.suspendDataTransfer();
+		super.suspendRecording(iX);
+	}
+	protected void suspendListening(ChoisePoint iX) {
+		ipCameraDataAcquisition.suspendDataTransfer();
+		super.suspendListening(iX);
 	}
 	//
-	protected void stopDataAcquisition() {
-		super.stopDataAcquisition();
+	protected void stopRecording(ChoisePoint iX) {
 		ipCameraDataAcquisition.stopDataTransfer();
+		super.stopRecording(iX);
+	}
+	protected void stopListening(ChoisePoint iX) {
+		ipCameraDataAcquisition.stopDataTransfer();
+		super.stopListening(iX);
 	}
 	//
 	protected boolean dataAcquisitionIsActive() {
-		return ipCameraDataAcquisition.isNotSuspended();
+		return !ipCameraDataAcquisition.isSuspended();
 	}
 	//
 	protected boolean dataAcquisitionIsSuspended() {
@@ -147,34 +154,30 @@ public abstract class IPCamera extends VideoBuffer implements IPCameraDataConsum
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void commit0s(ChoisePoint iX) throws Backtracking {
-		synchronized (numberOfRecentReceivedFrame) {
-			if (recentFrame==null) {
-				throw Backtracking.instance;
-			};
-			commit();
-		}
-	}
-	//
 	protected void commit() {
 		synchronized (numberOfRecentReceivedFrame) {
 			super.commit();
 			committedFrame= recentFrame;
 			committedIPCameraFrameImage= null;
 			if (!recentFrameIsRepeated) {
-				committedColorFrameNumber= numberOfRecentIPCameraFrame.get();
+				// committedColorFrameNumber= numberOfRecentIPCameraFrame.get();
+				committedColorFrameNumber= numberOfRecentReceivedFrame.get();
 			} else {
 				committedColorFrameNumber= numberOfRepeatedColorFrame;
 			};
-			if (committedFrame != null) {
-				committedColorFrameTime= committedFrame.getTime();
-			} else {
-				committedColorFrameTime= -1;
-			};
-			if (firstCommittedColorFrameTime < 0) {
-				firstCommittedColorFrameNumber= committedColorFrameNumber;
-				firstCommittedColorFrameTime= committedColorFrameTime;
-			}
+			updateCommittedFrameTime();
+		}
+	}
+	//
+	protected void updateCommittedFrameTime() {
+		if (committedFrame != null) {
+			committedColorFrameTime= committedFrame.getTime();
+		} else {
+			committedColorFrameTime= -1;
+		};
+		if (firstCommittedColorFrameTime < 0) {
+			firstCommittedColorFrameNumber= committedColorFrameNumber;
+			firstCommittedColorFrameTime= committedColorFrameTime;
 		}
 	}
 	//
@@ -218,6 +221,7 @@ public abstract class IPCamera extends VideoBuffer implements IPCameraDataConsum
 	///////////////////////////////////////////////////////////////
 	//
 	public void getRecentImage1s(ChoisePoint iX, Term value) {
+		updateAttributesIfNecessary(iX);
 		java.awt.image.BufferedImage nativeImage;
 		DataFrameBaseAttributesInterface attributes;
 		synchronized (numberOfRecentReceivedFrame) {
@@ -241,7 +245,7 @@ public abstract class IPCamera extends VideoBuffer implements IPCameraDataConsum
 			zCoefficient= attributes.getZoomingCoefficient();
 		} else {
 			zoomIt= doZoomImage.toBoolean();
-			zCoefficient= numericalZoomingCoefficient.toDouble();
+			zCoefficient= NumericalValueConverters.toDouble(numericalZoomingCoefficient);
 		};
 		nativeImage= DataFrameTools.zoomImage(
 			nativeImage,
@@ -293,7 +297,7 @@ public abstract class IPCamera extends VideoBuffer implements IPCameraDataConsum
 			time,
 			array,
 			recentAttributes.get());
-		sendFrame(frame);
+		sendDataFrame(frame);
 	}
 	// public void setAudioData(byte[] buffer, long time) {
 	// }
@@ -305,14 +309,21 @@ public abstract class IPCamera extends VideoBuffer implements IPCameraDataConsum
 			return -1;
 		};
 		synchronized (numberOfRecentReceivedFrame) {
+			long currentFrameNumber= -1;
 			if (frame instanceof IPCameraFrameInterface) {
 				recentFrame= frame;
-				numberOfRecentIPCameraFrame.set(recentFrame.getSerialNumber());
+				committedFrameWasAssignedDirectly.set(false);
+				// numberOfRecentIPCameraFrame.set(recentFrame.getSerialNumber());
+				currentFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
+				// numberOfRecentIPCameraFrame.set(currentNumber);
 				updateHistory((IPCameraFrameInterface)frame);
+			} else {
+				return currentFrameNumber;
 			};
-			long currentFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
+			// long currentFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
 			recentFrameIsRepeated= false;
 			numberOfRepeatedColorFrame= -1;
+			numberOfRecentReceivedFrame.notifyAll();
 			return currentFrameNumber;
 		}
 	}
@@ -321,135 +332,53 @@ public abstract class IPCamera extends VideoBuffer implements IPCameraDataConsum
 		if (ipCameraFrame==null) {
 			return;
 		};
-		synchronized (history) {
-			history.addLast(new EnumeratedFrame(
-				ipCameraFrame,
-				numberOfRecentIPCameraFrame.get()));
-			if (history.size() > actingReadBufferSize.get()) {
-				history.removeFirst();
-			}
-		};
-		containsNewFrame.set(true);
+		// updateHistory(new EnumeratedDataFrame(ipCameraFrame,numberOfRecentIPCameraFrame.get()));
+		updateHistory(new EnumeratedDataFrame(ipCameraFrame,numberOfRecentReceivedFrame.get()));
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void retrieveBufferedFrame1s(ChoisePoint iX, Term a1) {
-		int number= GeneralConverters.argumentToSmallInteger(a1,iX);
-		int relativeNumber= number - 1;
-		if (relativeNumber < 0) {
-			relativeNumber= 0;
-		};
-		synchronized (numberOfRecentReceivedFrame) {
-			EnumeratedFrame enumeratedFrame;
-			synchronized (history) {
-				int bufferSize= actingReadBufferSize.get();
-				int historySize= history.size();
-				int maximalIndex= bufferSize - 1;
-				if (historySize < bufferSize) {
-					maximalIndex= historySize - 1;
-					relativeNumber= relativeNumber * historySize / bufferSize;
-				};
-				if (relativeNumber > maximalIndex) {
-					relativeNumber= maximalIndex;
-				};
-				if (relativeNumber < 0 || relativeNumber >= historySize) {
-					return;
-				};
-				enumeratedFrame= history.get(relativeNumber);
-			};
-			recentFrame= enumeratedFrame.getFrame();
-			recentFrameIsRepeated= true;
-			numberOfRepeatedColorFrame= enumeratedFrame.getNumberOfFrame();
-		};
-		sendFrameObtained();
+	protected void acceptRequestedFrame(EnumeratedFrame enumeratedFrame) {
+		EnumeratedDataFrame selectedFrame= (EnumeratedDataFrame)enumeratedFrame;
+		recentFrame= selectedFrame.getFrame();
+		committedFrameWasAssignedDirectly.set(false);
+		recentFrameIsRepeated= true;
+		numberOfRepeatedColorFrame= selectedFrame.getNumberOfFrame();
+	}
+	//
+	protected void acceptRetrievedFrame(EnumeratedFrame enumeratedFrame) {
+		EnumeratedDataFrame selectedFrame= (EnumeratedDataFrame)enumeratedFrame;
+		DataFrameInterface colorFrame= selectedFrame.getFrame();
+		committedFrame= colorFrame;
+		committedFrameWasAssignedDirectly.set(true);
+		committedIPCameraFrameImage= null;
+		committedColorFrameNumber= selectedFrame.getNumberOfFrame();
+		updateCommittedFrameTime();
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void retrieveTimedFrame1s(ChoisePoint iX, Term a1) throws Backtracking {
-		TimeInterval timeInterval= TimeInterval.argumentMillisecondsToTimeInterval(a1,iX);
-		if (!retrieveTimedFrame(timeInterval.toMillisecondsLong())) {
-			throw Backtracking.instance;
+	public void extractFrame(String key, CompoundFrameInterface container) {
+		if (committedFrame != null) {
+			EnumeratedDataFrame enumeratedFrame= new EnumeratedDataFrame(
+				committedFrame,
+				committedColorFrameNumber);
+			container.insertComponent(key,enumeratedFrame);
+		} else {
+			throw new DataFrameIsNotCommitted();
 		}
 	}
 	//
-	protected boolean retrieveTimedFrame(long targetTime) {
-		while (true) {
-			VideoBufferOperatingMode currentOperatingMode= actingVideoBufferOperatingMode.get();
-			int numberOfColorFramesToBeRead= 0;
-			synchronized (numberOfRecentReceivedFrame) {
-				synchronized (history) {
-					int bufferSize= actingReadBufferSize.get();
-					int historySize= history.size();
-					if (historySize <= 1) {
-						if (currentOperatingMode==VideoBufferOperatingMode.SPECULATIVE_READING) {
-							((IPCameraFrameReadingTaskInterface)frameReadingTask).readGivenNumberOfColorFrames(bufferSize);
-						};
-						continue;
-					};
-					EnumeratedFrame firstEnumeratedFrame= history.getFirst();
-					EnumeratedFrame lastEnumeratedFrame= history.getLast();
-					long minimalTime= firstEnumeratedFrame.getTime();
-					long maximalTime= lastEnumeratedFrame.getTime();
-					if (targetTime >= minimalTime) {
-						if(targetTime <= maximalTime) {
-///////////////////////////////////////////////////////////////////////
-ListIterator<EnumeratedFrame> iterator= history.listIterator(0);
-int relativeNumber= 0;
-EnumeratedFrame selectedFrame= firstEnumeratedFrame;
-long delay1= targetTime - minimalTime;
-if (delay1 < 0) {
-	delay1= -delay1;
-};
-while (iterator.hasNext()) {
-	EnumeratedFrame currentFrame= iterator.next();
-	long time2= currentFrame.getTime();
-	long delay2= targetTime - time2;
-	if (delay2 < 0) {
-		delay2= -delay2;
-	};
-	if (time2 >= targetTime) {
-		if (delay2 < delay1) {
-			selectedFrame= currentFrame;
-		};
-		break;
-	} else {
-		selectedFrame= currentFrame;
-		delay1= delay2;
-	}
-};
-IPCameraFrameInterface colorFrame= (IPCameraFrameInterface)selectedFrame.getFrame();
-committedFrame= colorFrame;
-committedIPCameraFrameImage= null;
-committedColorFrameNumber= numberOfRepeatedColorFrame;
-committedColorFrameTime= committedFrame.getTime();
-if (firstCommittedColorFrameTime < 0) {
-	firstCommittedColorFrameNumber= committedColorFrameNumber;
-	firstCommittedColorFrameTime= committedColorFrameTime;
-};
-if (currentOperatingMode==VideoBufferOperatingMode.SPECULATIVE_READING) {
-	((IPCameraFrameReadingTaskInterface)frameReadingTask).readGivenNumberOfColorFrames(numberOfColorFramesToBeRead);
-};
-return true;
-///////////////////////////////////////////////////////////////////////
-						} else { // Read several frames
-							if (currentOperatingMode==VideoBufferOperatingMode.SPECULATIVE_READING) {
-								((IPCameraFrameReadingTaskInterface)frameReadingTask).readFramesUntilGivenTime(targetTime,bufferSize);
-							}
-						}
-					} else { // Suspend reading of the frames
-						if (currentOperatingMode==VideoBufferOperatingMode.SPECULATIVE_READING) {
-							frameReadingTask.suspendReading();
-						};
-						return false;
-					}
-				}
-			};
-			if (currentOperatingMode != VideoBufferOperatingMode.SPECULATIVE_READING) {
-				break;
-			}
-		};
-		return false;
+	public void assignFrame(String key, CompoundFrameInterface container, ChoisePoint iX) {
+		EnumeratedDataFrame enumeratedFrame= (EnumeratedDataFrame)container.getComponent(key);
+		synchronized (numberOfRecentReceivedFrame) {
+			committedFrame= enumeratedFrame.getFrame();
+			committedFrameWasAssignedDirectly.set(true);
+			committedIPCameraFrameImage= null;
+			// committedColorFrameNumber= enumeratedFrame.getNumberOfFrame();
+			// committedColorFrameNumber= numberOfRecentIPCameraFrame.incrementAndGet();
+			committedColorFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
+			updateCommittedFrameTime();
+		}
 	}
 }

@@ -15,6 +15,12 @@ public class WorldDomainName extends PrologDomainName {
 	//
 	protected long unit;
 	//
+	private static final long serialVersionUID= 0xB14310DC8BF1C4DCL; // -5673672566129965860L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","WorldDomainName");
+	// }
+	//
 	public WorldDomainName(long u) {
 		unit= u;
 	}

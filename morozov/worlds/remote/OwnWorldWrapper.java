@@ -33,6 +33,12 @@ public class OwnWorldWrapper
 	protected transient MethodSignature[] methodSignatures= null;
 	protected transient HashMap<String,MethodSignature[]> methodHash= new HashMap<>();
 	//
+	private static final long serialVersionUID= 0x123595FC7D43A98FL; // 1312119778114251151L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.worlds.remote","OwnWorldWrapper");
+	// }
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public OwnWorldWrapper(AbstractWorld w) {

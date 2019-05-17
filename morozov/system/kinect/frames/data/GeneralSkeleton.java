@@ -2,11 +2,6 @@
 
 package morozov.system.kinect.frames.data;
 
-import edu.ufl.digitalworlds.j4k.Skeleton;
-import edu.ufl.digitalworlds.j4k.J4K1;
-import edu.ufl.digitalworlds.j4k.J4K2;
-import edu.ufl.digitalworlds.j4k.J4KSDK;
-
 import morozov.system.kinect.frames.data.interfaces.*;
 import morozov.system.kinect.frames.data.tools.*;
 

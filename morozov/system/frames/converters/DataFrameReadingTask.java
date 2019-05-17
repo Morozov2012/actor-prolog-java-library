@@ -5,10 +5,15 @@ package morozov.system.frames.converters;
 import morozov.run.*;
 import morozov.system.*;
 import morozov.system.checker.signals.*;
+import morozov.system.converters.*;
+import morozov.system.datum.*;
 import morozov.system.files.*;
 import morozov.system.files.errors.*;
 import morozov.system.frames.converters.interfaces.*;
 import morozov.system.frames.interfaces.*;
+import morozov.system.kinect.frames.interfaces.*;
+import morozov.system.kinect.modes.*;
+import morozov.system.kinect.modes.interfaces.*;
 import morozov.system.modes.*;
 
 import java.io.InputStream;
@@ -18,6 +23,7 @@ import java.io.EOFException;
 import java.io.IOException;
 
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
@@ -27,50 +33,49 @@ public class DataFrameReadingTask extends Thread {
 	//
 	protected DataFrameConsumerInterface dataConsumer;
 	//
-	protected AtomicBoolean stopThisThread= new AtomicBoolean(false);
 	protected AtomicBoolean stopAfterSingleReading= new AtomicBoolean(false);
 	protected AtomicReference<Double> slowMotionCoefficient= new AtomicReference<>(-1.0);
+	//
+	protected static long defaultMaximalFrameDelay= 1000;
+	protected AtomicLong maximalFrameDelay= new AtomicLong(defaultMaximalFrameDelay);
+	//
+	protected AtomicReference<KinectDisplayingModeInterface> displayingMode= new AtomicReference<>();
+	//
+	protected ExtendedFileName extendedFileName;
+	protected InputStream inputStream;
+	protected InputStream bufferedInputStream;
+	protected ObjectInputStream objectInputStream;
+	//
+	protected AtomicBoolean stopThisThread= new AtomicBoolean(true);
 	protected AtomicBoolean inputIsOpen= new AtomicBoolean(false);
 	//
 	protected long initialRecordTime= -1;
 	protected long initialRealTime= -1;
 	protected long totalNumberOfFrames= 0;
 	//
-	public static long defaultMaximalWaitingPeriod= 1000;
-	public AtomicLong maximalWaitingPeriod= new AtomicLong(defaultMaximalWaitingPeriod);
-	//
-	protected ExtendedFileName extendedFileName;
-	// protected Path extendedFileName;
-	protected InputStream inputStream;
-	protected InputStream bufferedInputStream;
-	protected ObjectInputStream objectInputStream;
-	//
 	protected ReentrantLock lock= new ReentrantLock();
 	protected Condition condition= lock.newCondition();
 	//
-	// protected static final FileSystem fileSystem= FileSystems.getDefault();
+	///////////////////////////////////////////////////////////////
+	//
+	protected AtomicBoolean quickReadingMode= new AtomicBoolean(false);
+	protected AtomicInteger numberOfFramesToBeRead= new AtomicInteger(0);
+	//
+	protected AtomicBoolean timeSynchronizationMode= new AtomicBoolean(false);
+	protected AtomicLong targetTime= new AtomicLong(0);
+	protected AtomicInteger numberOfExtraFramesToBeRead= new AtomicInteger(0);
 	//
 	///////////////////////////////////////////////////////////////
 	//
 	public DataFrameReadingTask() {
+		setPriority(Thread.MAX_PRIORITY);
 		setDaemon(true);
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void setDataConsumer(DataFrameConsumerInterface consumer) {
 		dataConsumer= consumer;
-	}
-	//
-	public static long getDefaultMaximalWaitingPeriod() {
-		return defaultMaximalWaitingPeriod;
-	}
-	public long getMaximalWaitingPeriod() {
-		return maximalWaitingPeriod.get();
-	}
-	public void setMaximalWaitingPeriod(long number) {
-		maximalWaitingPeriod.set(number);
-	}
-	public void setMaximalWaitingPeriod(IntegerAttribute maximalFrameDelay) {
-		maximalWaitingPeriod.set(maximalFrameDelay.getValue(getDefaultMaximalWaitingPeriod()));
 	}
 	//
 	public void setStopAfterSingleReading(boolean mode) {
@@ -79,8 +84,28 @@ public class DataFrameReadingTask extends Thread {
 	//
 	public void setSlowMotionCoefficient(NumericalValue coefficient) {
 		if (coefficient != null) {
-			slowMotionCoefficient.set(coefficient.toDouble());
+			slowMotionCoefficient.set(NumericalValueConverters.toDouble(coefficient));
 		}
+	}
+	//
+	public static long getDefaultMaximalFrameDelay() {
+		return defaultMaximalFrameDelay;
+	}
+	public long getMaximalFrameDelay() {
+		return maximalFrameDelay.get();
+	}
+	public void setMaximalFrameDelay(long number) {
+		maximalFrameDelay.set(number);
+	}
+	public void setMaximalFrameDelay(IntegerAttribute delay) {
+		maximalFrameDelay.set(delay.getValue(getDefaultMaximalFrameDelay()));
+	}
+	//
+	public KinectDisplayingModeInterface getDisplayingMode() {
+		return displayingMode.get();
+	}
+	public void setDisplayingMode(KinectDisplayingModeInterface mode) {
+		displayingMode.set(mode);
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -114,7 +139,7 @@ public class DataFrameReadingTask extends Thread {
 		if (!isAlive()) {
 			start();
 		} else {
-			notify();
+			notifyAll();
 		}
 	}
 	//
@@ -132,13 +157,15 @@ public class DataFrameReadingTask extends Thread {
 	public boolean inputIsOpen() {
 		return inputIsOpen.get();
 	}
+	public boolean stopThisThread() {
+		return stopThisThread.get();
+	}
 	public boolean eof() {
 		return !inputIsOpen.get();
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	// protected void openReading(Path inputFilePath) {
 	protected void openReading(ExtendedFileName fileName, int timeout, CharacterSet characterSet, StaticContext staticContext) {
 		closeReading();
 		synchronized (this) {
@@ -146,14 +173,11 @@ public class DataFrameReadingTask extends Thread {
 			resetCounters();
 			extendedFileName= fileName;
 			try {
-				// Path inputFilePath= fileSystem.getPath(fileName);
 				if (fileName.doesExist(false,timeout,characterSet,staticContext)) {
 					try {
 						inputStream= fileName.getInputStreamOfUniversalResource(timeout,staticContext);
-						// inputStream= Files.newInputStream(inputFilePath);
 						bufferedInputStream= new BufferedInputStream(inputStream);
-						objectInputStream= new ObjectInputStream(bufferedInputStream);
-						// displayingMode= currentDisplayingMode;
+						objectInputStream= new DataStoreInputStream(bufferedInputStream);
 						inputIsOpen.set(true);
 					} catch (CannotRetrieveContent e) {
 						throw new FileInputOutputError(fileName.toString(),e);
@@ -206,7 +230,9 @@ public class DataFrameReadingTask extends Thread {
 			long numberOfFrameToBeAcquired= totalNumberOfFrames + 1;
 			try {
 ///////////////////////////////////////////////////////////////////////
-DataFrameInterface frame;
+DataFrameInterface dataFrame= null;
+CompoundFrameInterface compoundFrame= null;
+KinectFrameInterface kinectFrame= null;
 synchronized (this) {
 	if (stopThisThread.get()) {
 		wait();
@@ -214,22 +240,66 @@ synchronized (this) {
 	};
 	if (inputIsOpen.get()) {
 		try {
-			frame= (DataFrameInterface)objectInputStream.readObject();
+			Object object= objectInputStream.readObject();
+			if (object instanceof DataFrameInterface) {
+				dataFrame= (DataFrameInterface)object;
+			} else if (object instanceof CompoundFrameInterface) {
+				compoundFrame= (CompoundFrameInterface)object;
+			} else if (object instanceof KinectFrameInterface) {
+				kinectFrame= (KinectFrameInterface)object;
+			} else {
+				System.err.printf("Unexpected object type error: %s\n",object);
+				continue;
+			}
 		} catch (EOFException e) {
 			throw e;
 		} catch (Throwable e) {
 			System.err.printf("Object reading error: %s\n",e);
 			throw e;
 		};
-		DataArrayType dataArrayType= frame.getDataArrayType();
-		if (dataArrayType==DataArrayType.CAMERA_FLASH_FRAME) {
-			if (dataConsumer != null) {
-				dataConsumer.sendFrame(frame);
+		DataArrayType dataArrayType= null;
+		CompoundArrayType compoundArrayType= null;
+		KinectDataArrayType kinectArrayType= null;
+		long currentRecordTime;
+		if (dataFrame != null) {
+			dataArrayType= dataFrame.getDataArrayType();
+			if (dataArrayType==DataArrayType.CAMERA_FLASH_FRAME) {
+				if (dataConsumer != null) {
+					dataConsumer.sendDataFrame(dataFrame);
+				};
+				continue;
 			};
+			currentRecordTime= dataFrame.getTime();
+		} else if (compoundFrame != null) {
+			compoundArrayType= compoundFrame.getCompoundArrayType();
+			if (compoundArrayType==CompoundArrayType.DESCRIPTION_FRAME) {
+				if (dataConsumer != null) {
+					dataConsumer.sendCompoundFrame(compoundFrame);
+				};
+				continue;
+			};
+			currentRecordTime= compoundFrame.getTime();
+		} else if (kinectFrame != null) {
+			kinectArrayType= kinectFrame.getDataArrayType();
+			if (kinectArrayType==KinectDataArrayType.MODE_FRAME) {
+				if (dataConsumer != null) {
+					dataConsumer.sendKinectFrame(kinectFrame);
+				};
+				continue;
+			} else {
+				KinectDisplayingModeInterface currentDisplayingMode= displayingMode.get();
+				if (currentDisplayingMode != null) {
+					if (!currentDisplayingMode.requiresFrameType(kinectArrayType)) {
+						continue;
+					}
+				}
+			};
+			currentRecordTime= kinectFrame.getActingFrameTime();
+		} else {
+			System.err.printf("Unexpected object type error\n");
 			continue;
 		};
-		long currentRecordTime= frame.getTime();
-		boolean doDelayReading= delayIsNecessary(currentRecordTime,dataArrayType);
+		boolean doDelayReading= delayIsNecessary(currentRecordTime,dataArrayType,compoundArrayType,kinectArrayType);
 		if (doDelayReading) {
 			delayReading(currentRecordTime);
 		}
@@ -242,7 +312,15 @@ if (dataConsumer != null) {
 	if (stopAfterSingleReading.get()) {
 		stopThisThread.set(true);
 	};
-	if (!dataConsumer.sendFrame(frame)) {
+	boolean frameIsAccepted= false;
+	if (dataFrame != null) {
+		frameIsAccepted= dataConsumer.sendDataFrame(dataFrame);
+	} else if (compoundFrame != null) {
+		frameIsAccepted= dataConsumer.sendCompoundFrame(compoundFrame);
+	} else if (kinectFrame != null) {
+		frameIsAccepted= dataConsumer.sendKinectFrame(kinectFrame);
+	};
+	if (!frameIsAccepted) {
 		if (stopAfterSingleReading.get()) {
 			stopThisThread.set(false);
 		}
@@ -253,42 +331,30 @@ if (dataConsumer != null) {
 				closeReading();
 				stopThisThread.set(true);
 				if (dataConsumer != null) {
-					dataConsumer.completeDataTransfer(totalNumberOfFrames);
+					dataConsumer.completeDataReading(totalNumberOfFrames);
 				};
 				continue;
 			} catch (IOException e) {
 				closeReading();
 				stopThisThread.set(true);
 				if (dataConsumer != null) {
-					dataConsumer.completeDataTransfer(numberOfFrameToBeAcquired,new FileInputOutputError(extendedFileName.toString(),e));
+					dataConsumer.completeDataReading(numberOfFrameToBeAcquired,new FileInputOutputError(extendedFileName.toString(),e));
 				}
 			} catch (ClassNotFoundException e) {
 				closeReading();
 				stopThisThread.set(true);
 				if (dataConsumer != null) {
-					dataConsumer.completeDataTransfer(numberOfFrameToBeAcquired,new FileInputOutputError(extendedFileName.toString(),e));
+					dataConsumer.completeDataReading(numberOfFrameToBeAcquired,new FileInputOutputError(extendedFileName.toString(),e));
 				}
 			} catch (InterruptedException e) {
 				closeReading();
 				stopThisThread.set(true);
 				if (dataConsumer != null) {
-					dataConsumer.completeDataTransfer(totalNumberOfFrames);
+					dataConsumer.completeDataReading(totalNumberOfFrames);
 				};
 				return;
 			}
 		}
-	}
-	//
-	public boolean delayIsNecessary(long currentRecordTime, DataArrayType dataArrayType) {
-		boolean doDelayReading= true;
-		if (currentRecordTime < 0) {
-			doDelayReading= false;
-		} else if (dataArrayType==DataArrayType.CAMERA_FLASH_FRAME) {
-			doDelayReading= false;
-		} else if (dataArrayType==DataArrayType.AUDIO_FRAME) {
-			doDelayReading= false;
-		};
-		return doDelayReading;
 	}
 	//
 	protected void delayReading(long currentRecordTime) {
@@ -305,7 +371,7 @@ if (dataConsumer != null) {
 			long recordTimeDelta= currentRecordTime - initialRecordTime;
 			long currentTimeDelta= currentRealTime - initialRealTime;
 			long waitingPeriod= recordTimeDelta - currentTimeDelta;
-			long waitingBound= maximalWaitingPeriod.get();
+			long waitingBound= maximalFrameDelay.get();
 			if (coefficient > 0.0) {
 				waitingBound= (long)(waitingBound * coefficient);
 			};
@@ -335,5 +401,79 @@ try {
 //===================================================================//
 			}
 		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void readGivenNumberOfFrames(int numberOfFrames) {
+		numberOfFramesToBeRead.set(numberOfFrames);
+		quickReadingMode.set(true);
+		targetTime.set(-1);
+		numberOfExtraFramesToBeRead.set(0);
+		timeSynchronizationMode.set(false);
+		activateReading();
+	}
+	//
+	public void readFramesUntilGivenTime(long time, int numberOfExtraFrames) {
+		targetTime.set(time);
+		numberOfExtraFramesToBeRead.set(numberOfExtraFrames);
+		timeSynchronizationMode.set(true);
+		numberOfFramesToBeRead.set(0);
+		quickReadingMode.set(false);
+		activateReading();
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public boolean delayIsNecessary(long currentRecordTime, DataArrayType dataArrayType, CompoundArrayType compoundArrayType, KinectDataArrayType kinectArrayType) {
+		boolean doDelayReading= true;
+		if (currentRecordTime < 0) {
+			doDelayReading= false;
+		} else if (isAuxiliaryArrayType(dataArrayType,compoundArrayType,kinectArrayType)) {
+			doDelayReading= false;
+		} else if (quickReadingMode.get()) {
+			doDelayReading= false;
+			if (isTargetArrayType(dataArrayType,compoundArrayType,kinectArrayType)) {
+				if (numberOfFramesToBeRead.decrementAndGet() <= 0) {
+					quickReadingMode.set(false);
+					doDelayReading= true;
+				}
+			}
+		} else if (timeSynchronizationMode.get()) {
+			doDelayReading= false;
+			if (isTargetArrayType(dataArrayType,compoundArrayType,kinectArrayType)) {
+				if (currentRecordTime >= targetTime.get()) {
+					timeSynchronizationMode.set(false);
+					targetTime.set(-1);
+					numberOfFramesToBeRead.set(numberOfExtraFramesToBeRead.get());
+					quickReadingMode.set(true);
+				}
+			}
+		};
+		return doDelayReading;
+	}
+	//
+	protected boolean isAuxiliaryArrayType(DataArrayType dataArrayType, CompoundArrayType compoundArrayType, KinectDataArrayType kinectArrayType) {
+		boolean answer= false;
+		if (dataArrayType != null) {
+			if (dataArrayType==DataArrayType.CAMERA_FLASH_FRAME) {
+				answer= true;
+			} else if (dataArrayType==DataArrayType.AUDIO_FRAME) {
+				answer= true;
+			}
+		} else if (compoundArrayType != null) {
+			if (compoundArrayType==CompoundArrayType.DESCRIPTION_FRAME) {
+				answer= true;
+			}
+		} else if (kinectArrayType != null) {
+			if (kinectArrayType==KinectDataArrayType.MODE_FRAME) {
+				answer= true;
+			}
+		};
+		return answer;
+	}
+	//
+	protected boolean isTargetArrayType(DataArrayType dataArrayType, CompoundArrayType compoundArrayType, KinectDataArrayType kinectArrayType) {
+		return true;
 	}
 }

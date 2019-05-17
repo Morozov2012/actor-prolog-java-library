@@ -106,7 +106,15 @@ public enum BinaryOperation {
 			return new PrologInteger(n1.divide(n2));
 		}
 		public Term eval(double n1, double n2) {
-			return new PrologReal(StrictMath.rint(n1 / n2));
+			// return new PrologReal(StrictMath.rint(n1 / n2));
+			double division= n1 / n2;
+			if (division > 0) {
+				division= StrictMath.floor(division);
+			} else {
+				division= StrictMath.ceil(division);
+			};
+			// return new PrologReal();
+			return new PrologInteger(GeneralConverters.doubleValueToBigInteger(division));
 		}
 	},
 	MOD {
@@ -114,7 +122,8 @@ public enum BinaryOperation {
 			return new PrologInteger(n1.remainder(n2));
 		}
 		public Term eval(double n1, double n2) {
-			return new PrologReal(StrictMath.IEEEremainder(n1,n2));
+			// return new PrologReal(StrictMath.IEEEremainder(n1,n2));
+			return new PrologReal(n1 % n2);
 		}
 	},
 	POWER {
@@ -131,6 +140,14 @@ public enum BinaryOperation {
 		}
 		public Term eval(double n1, double n2) {
 			return new PrologReal(StrictMath.hypot(n1,n2));
+		}
+	},
+	ARCTAN2 {
+		public Term eval(BigInteger n1, BigInteger n2) {
+			return new PrologReal(StrictMath.atan2(n1.doubleValue(),n2.doubleValue()));
+		}
+		public Term eval(double n1, double n2) {
+			return new PrologReal(StrictMath.atan2(n1,n2));
 		}
 	},
 	BITAND {

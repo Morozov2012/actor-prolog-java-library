@@ -40,6 +40,8 @@ public abstract class AbstractDialog
 	//
 	public boolean isModal= false;
 	public boolean isTopLevelWindow= false;
+	public boolean isAlwaysOnTopWindow= false;
+	public boolean confirmationOnWindowClose= false;
 	public boolean exitOnClose= false;
 	//
 	protected StaticContext staticContext;
@@ -60,13 +62,17 @@ public abstract class AbstractDialog
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public AbstractDialog(YesNoDefault modality, boolean topLevelWindowFlag, YesNoDefault closingMode, Window parent) {
+	public AbstractDialog(YesNoDefault modality, boolean topLevelWindowFlag, boolean alwaysOnTopWindowFlag, boolean closingConfirmationFlag, YesNoDefault closingMode, Window parent) {
 		isModal= modality.toBoolean(isToBeModal());
 		if (isModal) {
 			isTopLevelWindow= false;
+			isAlwaysOnTopWindow= false;
+			confirmationOnWindowClose= false;
 			exitOnClose= false;
 		} else {
 			isTopLevelWindow= topLevelWindowFlag;
+			isAlwaysOnTopWindow= alwaysOnTopWindowFlag;
+			confirmationOnWindowClose= closingConfirmationFlag;
 			if (isTopLevelWindow) {
 				exitOnClose= closingMode.toBoolean(isTopLevelWindow);
 			} else {
@@ -152,14 +158,19 @@ public abstract class AbstractDialog
 		dialogContainer.setResizable(true);
 		dialogContainer.setMaximizable(true);
 		dialogContainer.setIconifiable(false);
-		if (exitOnClose) {
-			try {
-				dialogContainer.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-			} catch (SecurityException e) {
-				dialogContainer.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-			}
+		if (confirmationOnWindowClose) {
+			dialogContainer.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		} else {
-			dialogContainer.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+			if (exitOnClose) {
+				try {
+					dialogContainer.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+// dialogContainer.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
+				} catch (SecurityException e) {
+					dialogContainer.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+				}
+			} else {
+					dialogContainer.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
+			}
 		};
 		dialogContainer.addComponentListener(this);
 		//
@@ -200,6 +211,9 @@ public abstract class AbstractDialog
 			if (window != null) {
 				StaticDesktopAttributes.setTopLevelWindow(window,context);
 			}
+		};
+		if (isAlwaysOnTopWindow) {
+			dialogContainer.safelySetAlwaysOnTop(true);
 		}
 	}
 	//
@@ -210,6 +224,20 @@ public abstract class AbstractDialog
 	//
 	public void receiveInitiatingMessage() {
 		specialProcess.receiveUserInterfaceMessage(null,true,DialogEventType.NONE);
+	}
+	//
+	public void sendTheWindowClosingOrWindowClosedMessage() {
+		if (confirmationOnWindowClose) {
+			sendTheWindowClosingMessage();
+		} else {
+			sendTheWindowClosedMessage();
+		}
+	}
+	public void sendTheWindowClosingMessage() {
+		specialProcess.receiveUserInterfaceMessage(null,true,DialogEventType.WINDOW_CLOSING);
+	}
+	public void sendTheWindowClosedMessage() {
+		specialProcess.receiveUserInterfaceMessage(null,true,DialogEventType.WINDOW_CLOSED);
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -673,6 +701,20 @@ public abstract class AbstractDialog
 		}
 	}
 	//
+	public void transmitTheWindowClosingMessage(ChoisePoint iX) {
+		Term[] arguments= new Term[0];
+		long domainSignature= targetWorld.entry_s_WindowClosing_0();
+		AsyncCall call= new AsyncCall(domainSignature,targetWorld,true,true,arguments,true);
+		targetWorld.transmitAsyncCall(call,iX);
+	}
+	//
+	public void transmitTheWindowClosedMessage(ChoisePoint iX) {
+		Term[] arguments= new Term[0];
+		long domainSignature= targetWorld.entry_s_WindowClosed_0();
+		AsyncCall call= new AsyncCall(domainSignature,targetWorld,true,true,arguments,true);
+		targetWorld.transmitAsyncCall(call,iX);
+	}
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public void repaintAfterDelay() {
@@ -727,6 +769,7 @@ public abstract class AbstractDialog
 		long domainSignature= -1;
 		Term[] arguments= null;
 		if (name.equals("close")) {
+			sendTheWindowClosingMessage();
 			dialogContainer.safelySetVisible(false);
 			// 2017.02.10:
 			if (exitOnClose) {

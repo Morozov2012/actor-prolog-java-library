@@ -4,18 +4,13 @@ package morozov.worlds;
 
 import morozov.run.*;
 import morozov.terms.*;
+import morozov.worlds.errors.*;
 
 import java.util.Iterator;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
-
-class AnAttemptToExtractInternalWorldFromResident extends RuntimeException {}
-class AnAttemptToExtractPackageCodeFromResident extends RuntimeException {}
-class AnAttemptToExtractClassHierarchyFromResident extends RuntimeException {}
-class AnAttemptToExtractInterfaceHierarchyFromResident extends RuntimeException {}
-class AnAttemptToExtractSlotFromResident extends RuntimeException {}
 
 public class Resident extends ActiveWorld {
 	//
@@ -27,6 +22,12 @@ public class Resident extends ActiveWorld {
 	protected HashSet<AbstractWorld> targetWorlds= new HashSet<AbstractWorld>();
 	protected HashMap<AbstractWorld,Term> resultLists= new HashMap<AbstractWorld,Term>();
 	protected AtomicBoolean hasNewResults= new AtomicBoolean(false);
+	//
+	private static final long serialVersionUID= 0x528C7BA260C4371BL; // 5948265145187972891L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.worlds","Resident");
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//

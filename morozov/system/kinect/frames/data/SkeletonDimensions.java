@@ -13,7 +13,8 @@ public class SkeletonDimensions implements SkeletonDimensionsInterface, Serializ
 	protected PlayerDimensionsInterface totalColorDimensions;
 	protected PlayerDimensionsInterface skeletonsColorDimensions;
 	//
-	private static final long serialVersionUID= 1;
+	// private static final long serialVersionUID= 1;
+	private static final long serialVersionUID= 0xB213842520E02CD9L; // -5614999015400657703L
 	//
 	// static {
 	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames.data","SkeletonDimensions");

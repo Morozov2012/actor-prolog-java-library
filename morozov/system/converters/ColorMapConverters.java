@@ -52,11 +52,11 @@ public class ColorMapConverters {
 						} else if (pairName==SymbolCodes.symbolCode_E_size) {
 							size= ColorMapSizeConverters.argumentToColorMapSize(pairValue,iX);
 						} else if (pairName==SymbolCodes.symbolCode_E_reverse_scale) {
-							reverseScale= YesNoDefault.argument2YesNoDefault(pairValue,iX);
+							reverseScale= YesNoDefaultConverters.argument2YesNoDefault(pairValue,iX);
 						} else if (pairName==SymbolCodes.symbolCode_E_reverse_minimal_value) {
-							reverseMinimalValue= YesNoDefault.argument2YesNoDefault(pairValue,iX);
+							reverseMinimalValue= YesNoDefaultConverters.argument2YesNoDefault(pairValue,iX);
 						} else if (pairName==SymbolCodes.symbolCode_E_reverse_maximal_value) {
-							reverseMaximalValue= YesNoDefault.argument2YesNoDefault(pairValue,iX);
+							reverseMaximalValue= YesNoDefaultConverters.argument2YesNoDefault(pairValue,iX);
 						} else if (pairName==SymbolCodes.symbolCode_E_tincturing_coefficient) {
 							tincturingCoefficient= TincturingCoefficientConverters.argumentToTincturingCoefficient(pairValue,iX);
 						} else if (pairName==SymbolCodes.symbolCode_E_palette) {
@@ -122,9 +122,9 @@ public class ColorMapConverters {
 			TincturingCoefficient tincturingCoefficient= colorMap.getTincturingCoefficient();
 			Term value= PrologEmptySet.instance;
 			value= new PrologSet(-SymbolCodes.symbolCode_E_tincturing_coefficient,TincturingCoefficientConverters.toTerm(tincturingCoefficient),value);
-			value= new PrologSet(-SymbolCodes.symbolCode_E_reverse_maximal_value,reverseMaximalValue.toTerm(),value);
-			value= new PrologSet(-SymbolCodes.symbolCode_E_reverse_minimal_value,reverseMinimalValue.toTerm(),value);
-			value= new PrologSet(-SymbolCodes.symbolCode_E_reverse_scale,reverseScale.toTerm(),value);
+			value= new PrologSet(-SymbolCodes.symbolCode_E_reverse_maximal_value,YesNoDefaultConverters.toTerm(reverseMaximalValue),value);
+			value= new PrologSet(-SymbolCodes.symbolCode_E_reverse_minimal_value,YesNoDefaultConverters.toTerm(reverseMinimalValue),value);
+			value= new PrologSet(-SymbolCodes.symbolCode_E_reverse_scale,YesNoDefaultConverters.toTerm(reverseScale),value);
 			value= new PrologSet(-SymbolCodes.symbolCode_E_size,ColorMapSizeConverters.toTerm(size),value);
 			value= new PrologSet(-SymbolCodes.symbolCode_E_name,ColorMapNameConverters.toTerm(name),value);
 			return value;

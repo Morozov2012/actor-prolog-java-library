@@ -17,6 +17,14 @@ public class PrologSymbol extends Term {
 	//
 	private long value;
 	//
+	private static final long serialVersionUID= 0xEC8C2A0F9BCE0D06L; // -1401699137492218618L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","PrologSymbol");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public PrologSymbol(long v) {
 		value= v;
 	}
@@ -26,6 +34,9 @@ public class PrologSymbol extends Term {
 	public long getSymbolFunctor() {
 		return value;
 	}
+	// public void setSymbolFunctor(long v) {
+	//	value= v;
+	// }
 	public int hashCode() {
 		return calculateHashCode(value);
 	}

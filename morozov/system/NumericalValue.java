@@ -2,11 +2,6 @@
 
 package morozov.system;
 
-import morozov.run.*;
-import morozov.system.errors.*;
-import morozov.terms.*;
-import morozov.terms.signals.*;
-
 import java.io.Serializable;
 import java.math.BigInteger;
 
@@ -15,6 +10,14 @@ public class NumericalValue implements Serializable {
 	protected boolean useDoubleValue= false;
 	protected BigInteger integerValue;
 	protected double doubleValue;
+	//
+	private static final long serialVersionUID= 0x34C0417223A79850L; // 3801110043980961872L;
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system","NumericalValue");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public NumericalValue(BigInteger v) {
 		useDoubleValue= false;
@@ -27,22 +30,6 @@ public class NumericalValue implements Serializable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static NumericalValue argumentToNumericalValue(Term value, ChoisePoint iX) {
-		try {
-			BigInteger integerValue= value.getIntegerValue(iX);
-			return new NumericalValue(integerValue);
-		} catch (TermIsNotAnInteger e1) {
-			try {
-				double doubleValue= value.getRealValue(iX);
-				return new NumericalValue(doubleValue);
-			} catch (TermIsNotAReal e2) {
-				throw new WrongArgumentIsNotNumerical(value);
-			}
-		}
-	}
-	//
-	///////////////////////////////////////////////////////////////
-	//
 	public boolean useDoubleValue() {
 		return useDoubleValue;
 	}
@@ -51,63 +38,5 @@ public class NumericalValue implements Serializable {
 	}
 	public double getDoubleValue() {
 		return doubleValue;
-	}
-	//
-	///////////////////////////////////////////////////////////////
-	//
-	public Term toTerm() {
-		if (useDoubleValue) {
-			return new PrologReal(doubleValue);
-		} else {
-			return new PrologInteger(integerValue);
-		}
-	}
-	//
-	public int toInteger() {
-		if (useDoubleValue) {
-			return PrologInteger.toInteger(doubleValue);
-		} else {
-			return PrologInteger.toInteger(integerValue);
-		}
-	}
-	//
-	public long toLong() {
-		if (useDoubleValue) {
-			return PrologInteger.toLong(doubleValue);
-		} else {
-			return PrologInteger.toLong(integerValue);
-		}
-	}
-	//
-	public long toLong(long coefficient) {
-		if (useDoubleValue) {
-			return PrologInteger.toLong(doubleValue * coefficient);
-		} else {
-			return PrologInteger.toLong(integerValue.multiply(BigInteger.valueOf(coefficient)));
-		}
-	}
-	//
-	public double toDouble() {
-		if (useDoubleValue) {
-			return doubleValue;
-		} else {
-			return integerValue.doubleValue();
-		}
-	}
-	//
-	public float toFloat() {
-		if (useDoubleValue) {
-			return (float)doubleValue;
-		} else {
-			return integerValue.floatValue();
-		}
-	}
-	//
-	public String toString() {
-		if (useDoubleValue) {
-			return Double.toString(doubleValue);
-		} else {
-			return integerValue.toString();
-		}
 	}
 }

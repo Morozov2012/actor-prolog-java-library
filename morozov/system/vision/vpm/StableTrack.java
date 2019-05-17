@@ -4,7 +4,7 @@ package morozov.system.vision.vpm;
 
 import target.*;
 
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.vision.vpm.converters.*;
 import morozov.terms.*;
 
@@ -544,7 +544,7 @@ public class StableTrack {
 		};
 		Term prologIdentifier= new PrologInteger(identifier);
 		Term prologType= blobType.toTerm();
-		Term prologIsMature= YesNo.boolean2TermYesNo(isStrong);
+		Term prologIsMature= YesNoConverters.boolean2TermYesNo(isStrong);
 		Term prologFrame1= new PrologInteger(getFrameNumber1());
 		Term prologTime1= new PrologInteger(getTime1());
 		Term prologX1= new PrologInteger(getX1());

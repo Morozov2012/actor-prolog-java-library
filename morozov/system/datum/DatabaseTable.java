@@ -9,9 +9,10 @@ import morozov.domains.signals.*;
 import morozov.run.*;
 import morozov.run.errors.*;
 import morozov.syntax.*;
-import morozov.syntax.errors.*;
+import morozov.syntax.interfaces.*;
 import morozov.syntax.scanner.errors.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.files.*;
 import morozov.system.files.errors.*;
 import morozov.system.datum.errors.*;
@@ -45,7 +46,14 @@ public class DatabaseTable implements Serializable, Cloneable {
 	protected transient DatabaseTableContainer container;
 	protected transient boolean tableContainsWorlds;
 	//
-	protected static Term databaseTerm= new PrologSymbol(SymbolCodes.symbolCode_E_Database);
+	protected static Term termDatabase= new PrologSymbol(SymbolCodes.symbolCode_E_Database);
+	//
+	// private static final long serialVersionUID= 0xA3722273534EB8F5L; // -6669230219468031755L
+	private static final long serialVersionUID= 0xC7BE0AE88948AA16L; // -4053790620734936554L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.datum","DatabaseTable");
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -66,8 +74,24 @@ public class DatabaseTable implements Serializable, Cloneable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void setContainer(DatabaseTableContainer c) {
-		container= c;
+	public DatabaseRecord getTableContent() {
+		return tableContent;
+	}
+	//
+	public DatabaseRecord getUltimateRecord() {
+		return ultimateRecord;
+	}
+	//
+	public PrologDomain getPrologDomain() {
+		return prologDomain;
+	}
+	//
+	public HashMap<String,PrologDomain> getLocalDomainTable() {
+		return localDomainTable;
+	}
+	//
+	public String getCurrentEntryName() {
+		return currentEntryName;
 	}
 	//
 	public void setReuseKeyNumbers(boolean reuseKN, ActiveWorld currentProcess, boolean checkPrivileges) {
@@ -75,19 +99,31 @@ public class DatabaseTable implements Serializable, Cloneable {
 		reuseKeyNumbers= reuseKN;
 	}
 	//
-	public String getEntryName() {
-		return currentEntryName;
+	public boolean reuseKeyNumbers() {
+		return reuseKeyNumbers;
 	}
 	//
-	public Term getType() {
-		return databaseTerm;
+	public void setContainer(DatabaseTableContainer c) {
+		container= c;
 	}
 	//
-	///////////////////////////////////////////////////////////////
+	public DatabaseTableContainer getContainer() {
+		return container;
+	}
 	//
 	public void declareWhetherAWorldIsDetected(boolean mode) {
 		tableContainsWorlds= mode;
 	}
+	//
+	public boolean tableContainsWorlds() {
+		return tableContainsWorlds;
+	}
+	//
+	public Term getType() {
+		return termDatabase;
+	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void checkDomain(PrologDomain domain, ChoisePoint iX) {
 		try {
@@ -370,7 +406,7 @@ public class DatabaseTable implements Serializable, Cloneable {
 		String textReuseKeyNumbers= SymbolNames.retrieveSymbolName(SymbolCodes.symbolCode_E_reuse_key_numbers).toRawString(encoder);
 		textBuffer.append(textReuseKeyNumbers);
 		textBuffer.append("(\'");
-		textBuffer.append(YesNo.boolean2StringYesNo(reuseKeyNumbers));
+		textBuffer.append(YesNoConverters.boolean2StringYesNo(reuseKeyNumbers));
 		textBuffer.append("\');\n");
 		String textTargetDomain= SymbolNames.retrieveSymbolName(SymbolCodes.symbolCode_E_target_domain).toRawString(encoder);
 		textBuffer.append(textTargetDomain);
@@ -398,10 +434,10 @@ public class DatabaseTable implements Serializable, Cloneable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void loadContent(String textBuffer, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) throws LexicalScannerError, ParserError, DatabaseRecordDoesNotBelongToDomain {
+	public void loadContent(String textBuffer, ActiveWorld currentProcess, boolean checkPrivileges, ParserMasterInterface master, ChoisePoint iX) throws SyntaxError, DatabaseRecordDoesNotBelongToDomain {
 		// String textBuffer= fileName.getTextData(timeout,requestedCharacterSet,staticContext);
-		Parser parser= new Parser(true);
-		Term[] terms= parser.stringToTerms(textBuffer);
+		GroundTermParser parser= new GroundTermParser(master,true);
+		Term[] terms= parser.stringToTerms(textBuffer,null);
 		boolean optimizeSets= DefaultOptions.underdeterminedSetsOptimizationIsEnabled;
 		for (int k=0; k < terms.length; k++) {
 			Term newItem= terms[k];

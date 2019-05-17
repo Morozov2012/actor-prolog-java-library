@@ -24,6 +24,12 @@ public class OwnResidentWrapper
 	//
 	public static HashMap<ExternalResidentInterface,ForeignResidentWrapper> foreignResidentRegister= new HashMap<>();
 	//
+	private static final long serialVersionUID= 0x14B23C67FC75932DL; // 1491320843927917357L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.worlds.remote","OwnResidentWrapper");
+	// }
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public OwnResidentWrapper(Resident w) {

@@ -4,6 +4,9 @@ package morozov.syntax.scanner;
 
 import target.*;
 
+import morozov.run.*;
+import morozov.syntax.scanner.errors.*;
+import morozov.syntax.scanner.interfaces.*;
 import morozov.terms.*;
 
 public class TokenBinary extends PrologToken {
@@ -22,13 +25,13 @@ public class TokenBinary extends PrologToken {
 	public PrologTokenType getType() {
 		return PrologTokenType.BINARY;
 	}
-	public byte[] getBinaryValue() {
+	public byte[] getBinaryValue(LexicalScannerMasterInterface master, ChoisePoint iX) throws LexicalScannerError {
 		return value;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public Term toTerm() {
+	public Term toActorPrologTerm() {
 		Term[] arguments= new Term[]{new PrologBinary(value)};
 		return new PrologStructure(SymbolCodes.symbolCode_E_binary,arguments);
 	}

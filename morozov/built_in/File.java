@@ -3,7 +3,6 @@
 package morozov.built_in;
 
 import morozov.run.*;
-import morozov.syntax.errors.*;
 import morozov.syntax.scanner.errors.*;
 import morozov.syntax.*;
 import morozov.system.*;
@@ -75,13 +74,13 @@ public abstract class File extends Text {
 	// get/set random_access
 	//
 	public void setRandomAccess1s(ChoisePoint iX, Term a1) {
-		setRandomAccess(OnOff.termOnOff2Boolean(a1,iX));
+		setRandomAccess(OnOffConverters.termOnOff2Boolean(a1,iX));
 	}
 	public void setRandomAccess(boolean value) {
 		randomAccess= value;
 	}
 	public void getRandomAccess0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(OnOff.boolean2TermOnOff(getRandomAccess(iX)));
+		result.setNonBacktrackableValue(OnOffConverters.boolean2TermOnOff(getRandomAccess(iX)));
 	}
 	public void getRandomAccess0fs(ChoisePoint iX) {
 	}
@@ -90,7 +89,7 @@ public abstract class File extends Text {
 			return randomAccess;
 		} else {
 			Term value= getBuiltInSlot_E_random_access();
-			return OnOff.termOnOff2Boolean(value,iX);
+			return OnOffConverters.termOnOff2Boolean(value,iX);
 		}
 	}
 	//
@@ -716,21 +715,15 @@ public abstract class File extends Text {
 			if (text==null) {
 				throw Backtracking.instance;
 			};
-			Parser parser= new Parser(true);
+			GroundTermParser parser= new GroundTermParser(dummyParserMaster,true);
 			try {
-				Term[] terms= parser.stringToTerms(text);
+				Term[] terms= parser.stringToTerms(text,null);
 				if (terms.length==1) {
 					return terms[0];
 				} else {
 					throw Backtracking.instance;
 				}
-			} catch (LexicalScannerError e) {
-				long errorPosition= e.getPosition();
-				recentErrorText= text;
-				recentErrorPosition= errorPosition;
-				recentErrorException= e;
-				throw Backtracking.instance;
-			} catch (ParserError e) {
+			} catch (SyntaxError e) {
 				long errorPosition= e.getPosition();
 				recentErrorText= text;
 				recentErrorPosition= errorPosition;
@@ -760,17 +753,11 @@ public abstract class File extends Text {
 			if (text==null) {
 				throw Backtracking.instance;
 			};
-			Parser parser= new Parser(true);
+			GroundTermParser parser= new GroundTermParser(dummyParserMaster,true);
 			try {
-				Term[] terms= parser.stringToTerms(text);
+				Term[] terms= parser.stringToTerms(text,null);
 				return GeneralConverters.arrayToList(terms);
-			} catch (LexicalScannerError e) {
-				long errorPosition= e.getPosition();
-				recentErrorText= text;
-				recentErrorPosition= errorPosition;
-				recentErrorException= e;
-				throw Backtracking.instance;
-			} catch (ParserError e) {
+			} catch (SyntaxError e) {
 				long errorPosition= e.getPosition();
 				recentErrorText= text;
 				recentErrorPosition= errorPosition;

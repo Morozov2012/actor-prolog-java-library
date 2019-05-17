@@ -8,12 +8,21 @@ import java.io.Serializable;
 import java.nio.charset.CharsetEncoder;
 
 public class SymbolName implements Serializable {
+	//
 	public String identifier;
 	public boolean isSafe;
+	//
+	private static final long serialVersionUID= 0xB79D129E6929A518L; // -5215992321846696680L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.run","SymbolName");
+	// }
+	//
 	public SymbolName(String name, boolean flag) {
 		identifier= name;
 		isSafe= flag;
 	}
+	//
 	public String extractClassName() {
 		if (identifier.length() < 2) {
 			return identifier;

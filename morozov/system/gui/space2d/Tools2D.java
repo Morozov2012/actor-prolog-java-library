@@ -35,15 +35,6 @@ import java.util.Set;
 import java.util.Iterator;
 import java.math.BigInteger;
 
-class FirstPointIsNotDefined extends RuntimeException {}
-class SecondPointIsNotDefined extends RuntimeException {}
-class FirstColorIsNotDefined extends RuntimeException {}
-class SecondColorIsNotDefined extends RuntimeException {}
-class ColorsAreNotDefined extends RuntimeException {}
-class FractionsAreNotDefined extends RuntimeException {}
-class CenterIsNotDefined extends RuntimeException {}
-class ImageIsNotDefined extends RuntimeException {}
-
 public class Tools2D {
 	//
 	public static int defaultTransparency= 0; // JDK uses 1, 2, 3
@@ -108,7 +99,7 @@ public class Tools2D {
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_antialiasing) {
 					try {
-						boolean mode= OnOff.termOnOffDefault2Boolean(pairValue,iX);
+						boolean mode= OnOffConverters.termOnOffDefault2Boolean(pairValue,iX);
 						if (mode) {
 							rh.put(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 						} else {
@@ -136,7 +127,7 @@ public class Tools2D {
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_fractionalMetrics) {
 					try {
-						boolean mode= OnOff.termOnOffDefault2Boolean(pairValue,iX);
+						boolean mode= OnOffConverters.termOnOffDefault2Boolean(pairValue,iX);
 						if (mode) {
 							rh.put(RenderingHints.KEY_FRACTIONALMETRICS,RenderingHints.VALUE_FRACTIONALMETRICS_ON);
 						} else {
@@ -520,7 +511,7 @@ public class Tools2D {
 					Integer underline= argumentToFontUnderline2D(pairValue,iX);
 					fontAttributes.put(TextAttribute.UNDERLINE,underline);
 				} else if (pairName==SymbolCodes.symbolCode_E_strikethrough) {
-					Boolean strikethrough= OnOff.termOnOff2Boolean(pairValue,iX);
+					Boolean strikethrough= OnOffConverters.termOnOff2Boolean(pairValue,iX);
 					fontAttributes.put(TextAttribute.STRIKETHROUGH,strikethrough);
 				} else if (pairName==SymbolCodes.symbolCode_E_runDirection) {
 					try {
@@ -541,7 +532,7 @@ public class Tools2D {
 					Integer inputMethodUnderline= argumentToInputMethodUnderline(pairValue,iX);
 					fontAttributes.put(TextAttribute.INPUT_METHOD_HIGHLIGHT,inputMethodUnderline);
 				} else if (pairName==SymbolCodes.symbolCode_E_swapColors) {
-					Boolean swapColors= YesNo.termYesNo2Boolean(pairValue,iX);
+					Boolean swapColors= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					fontAttributes.put(TextAttribute.SWAP_COLORS,swapColors);
 				} else if (pairName==SymbolCodes.symbolCode_E_kerning) {
 					Integer kerning= argumentToFontKerning2D(pairValue,iX);

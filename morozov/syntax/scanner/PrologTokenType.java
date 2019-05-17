@@ -10,27 +10,36 @@ import morozov.terms.*;
 public enum PrologTokenType {
 	//
 	END_OF_TEXT {
+		public boolean isFinalToken() {
+			return true;
+		}
 		String toText() {
 			return "";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termEndOfText;
 		}
 	},
 	REST_OF_TEXT {
+		public boolean isFinalToken() {
+			return true;
+		}
 		String toText() {
 			return "";
 		}
-		Term toTerm() throws TokenIsCompound {
+		Term toActorPrologTerm() throws TokenIsCompound {
 			return termRestOfText;
 		}
 	},
 	END_OF_LINE {
+		public boolean isFinalToken() {
+			return true;
+		}
 		String toText() {
 			return "\n";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termEndOfLine;
 		}
@@ -39,7 +48,7 @@ public enum PrologTokenType {
 		String toText() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
-		Term toTerm() throws TokenIsCompound {
+		Term toActorPrologTerm() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
 	},
@@ -47,7 +56,7 @@ public enum PrologTokenType {
 		String toText() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
-		Term toTerm() throws TokenIsCompound {
+		Term toActorPrologTerm() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
 	},
@@ -55,7 +64,7 @@ public enum PrologTokenType {
 		String toText() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
-		Term toTerm() throws TokenIsCompound {
+		Term toActorPrologTerm() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
 	},
@@ -63,7 +72,7 @@ public enum PrologTokenType {
 		String toText() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
-		Term toTerm() throws TokenIsCompound {
+		Term toActorPrologTerm() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
 	},
@@ -71,7 +80,7 @@ public enum PrologTokenType {
 		String toText() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
-		Term toTerm() throws TokenIsCompound {
+		Term toActorPrologTerm() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
 	},
@@ -79,7 +88,7 @@ public enum PrologTokenType {
 		String toText() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
-		Term toTerm() throws TokenIsCompound {
+		Term toActorPrologTerm() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
 	},
@@ -87,7 +96,7 @@ public enum PrologTokenType {
 		String toText() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
-		Term toTerm() throws TokenIsCompound {
+		Term toActorPrologTerm() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
 	},
@@ -95,7 +104,7 @@ public enum PrologTokenType {
 		String toText() {
 			return ",";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termComma;
 		}
@@ -104,7 +113,7 @@ public enum PrologTokenType {
 		String toText() {
 			return ".";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termDot;
 		}
@@ -113,7 +122,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "!";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termExclam;
 		}
@@ -122,7 +131,7 @@ public enum PrologTokenType {
 		String toText() {
 			return ":";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termColon;
 		}
@@ -131,7 +140,7 @@ public enum PrologTokenType {
 		String toText() {
 			return ";";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termSemicolon;
 		}
@@ -140,7 +149,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "?";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termQuestionMark;
 		}
@@ -149,7 +158,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "#";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termNumberSign;
 		}
@@ -158,7 +167,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "(";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termLRoundBracket;
 		}
@@ -167,7 +176,7 @@ public enum PrologTokenType {
 		String toText() {
 			return ")";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termRRoundBracket;
 		}
@@ -176,7 +185,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "|";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termBar;
 		}
@@ -185,7 +194,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "{";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termLBrace;
 		}
@@ -194,7 +203,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "}";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termRBrace;
 		}
@@ -203,7 +212,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "[";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termLSquareBracket;
 		}
@@ -212,7 +221,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "]";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termRSquareBracket;
 		}
@@ -221,7 +230,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "*";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termMyltiply;
 		}
@@ -230,7 +239,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "+";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termPlus;
 		}
@@ -239,7 +248,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "-";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termMinus;
 		}
@@ -248,7 +257,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "/";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termDivide;
 		}
@@ -257,7 +266,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "<";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termLT;
 		}
@@ -266,7 +275,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "=";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termEQ;
 		}
@@ -275,16 +284,16 @@ public enum PrologTokenType {
 		String toText() {
 			return ">";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termGT;
 		}
 	},
-	INFORMATIONAL_MESSAGE {
+	DATA_MESSAGE {
 		String toText() {
 			return "<<";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termInformationalMessage;
 		}
@@ -293,7 +302,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "<-";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termControlMessage;
 		}
@@ -302,7 +311,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "??";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termResident;
 		}
@@ -311,7 +320,7 @@ public enum PrologTokenType {
 		String toText() {
 			return ":-";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termImplication;
 		}
@@ -320,7 +329,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "==";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termEquality;
 		}
@@ -329,7 +338,7 @@ public enum PrologTokenType {
 		String toText() {
 			return ":=";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termAssignment;
 		}
@@ -338,7 +347,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "<>";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termNE;
 		}
@@ -347,7 +356,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "<=";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termLE;
 		}
@@ -356,7 +365,7 @@ public enum PrologTokenType {
 		String toText() {
 			return ">=";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termGE;
 		}
@@ -365,7 +374,7 @@ public enum PrologTokenType {
 		String toText() {
 			return "..";
 		}
-		Term toTerm() {
+		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termRange;
 		}
@@ -440,7 +449,7 @@ public enum PrologTokenType {
 				termLT= new PrologSymbol(SymbolCodes.symbolCode_E_lt);
 				termEQ= new PrologSymbol(SymbolCodes.symbolCode_E_eq);
 				termGT= new PrologSymbol(SymbolCodes.symbolCode_E_gt);
-				termInformationalMessage= new PrologSymbol(SymbolCodes.symbolCode_E_informational_message);
+				termInformationalMessage= new PrologSymbol(SymbolCodes.symbolCode_E_data_message);
 				termControlMessage= new PrologSymbol(SymbolCodes.symbolCode_E_control_message);
 				termResident= new PrologSymbol(SymbolCodes.symbolCode_E_resident);
 				termImplication= new PrologSymbol(SymbolCodes.symbolCode_E_implication);
@@ -456,6 +465,10 @@ public enum PrologTokenType {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public boolean isFinalToken() {
+		return false;
+	}
+	//
 	abstract String toText() throws TokenIsCompound;
-	abstract Term toTerm() throws TokenIsCompound;
+	abstract Term toActorPrologTerm() throws TokenIsCompound;
 }

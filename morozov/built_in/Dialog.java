@@ -6,6 +6,7 @@ import target.*;
 
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.errors.*;
@@ -24,6 +25,8 @@ public abstract class Dialog extends DataResourceConsumer {
 	protected DialogIdentifierOrAuto identifier= null;
 	protected YesNoDefault isModal= null;
 	protected YesNo isTopLevelWindow= null;
+	protected YesNo isAlwaysOnTop= null;
+	protected OnOff closingConfirmation= null;
 	protected YesNoDefault exitOnClose= null;
 	//
 	public Dialog() {
@@ -35,9 +38,13 @@ public abstract class Dialog extends DataResourceConsumer {
 	abstract public Term getBuiltInSlot_E_identifier();
 	abstract public Term getBuiltInSlot_E_is_modal();
 	abstract public Term getBuiltInSlot_E_is_top_level_window();
+	abstract public Term getBuiltInSlot_E_is_always_on_top();
+	abstract public Term getBuiltInSlot_E_closing_confirmation();
 	abstract public Term getBuiltInSlot_E_exit_on_close();
 	//
 	abstract public long entry_s_Action_1_i();
+	abstract public long entry_s_WindowClosing_0();
+	abstract public long entry_s_WindowClosed_0();
 	abstract public long entry_s_CreatedControl_1_i();
 	abstract public long entry_s_ModifiedControl_1_i();
 	abstract public long entry_s_CompleteEditing_1_i();
@@ -71,14 +78,14 @@ public abstract class Dialog extends DataResourceConsumer {
 	// get/set isModal
 	//
 	public void setIsModal1s(ChoisePoint iX, Term a1) {
-		setIsModal(YesNoDefault.argument2YesNoDefault(a1,iX));
+		setIsModal(YesNoDefaultConverters.argument2YesNoDefault(a1,iX));
 	}
 	public void setIsModal(YesNoDefault value) {
 		isModal= value;
 	}
 	public void getIsModal0ff(ChoisePoint iX, PrologVariable result) {
 		YesNoDefault value= getIsModal(iX);
-		result.setNonBacktrackableValue(value.toTerm());
+		result.setNonBacktrackableValue(YesNoDefaultConverters.toTerm(value));
 	}
 	public void getIsModal0fs(ChoisePoint iX) {
 	}
@@ -87,21 +94,21 @@ public abstract class Dialog extends DataResourceConsumer {
 			return isModal;
 		} else {
 			Term value= getBuiltInSlot_E_is_modal();
-			return YesNoDefault.argument2YesNoDefault(value,iX);
+			return YesNoDefaultConverters.argument2YesNoDefault(value,iX);
 		}
 	}
 	//
 	// get/set isTopLevelWindow
 	//
 	public void setIsTopLevelWindow1s(ChoisePoint iX, Term a1) {
-		setIsTopLevelWindow(YesNo.argument2YesNo(a1,iX));
+		setIsTopLevelWindow(YesNoConverters.argument2YesNo(a1,iX));
 	}
 	public void setIsTopLevelWindow(YesNo value) {
 		isTopLevelWindow= value;
 	}
 	public void getIsTopLevelWindow0ff(ChoisePoint iX, PrologVariable result) {
 		YesNo value= getIsTopLevelWindow(iX);
-		result.setNonBacktrackableValue(value.toTerm());
+		result.setNonBacktrackableValue(YesNoConverters.toTerm(value));
 	}
 	public void getIsTopLevelWindow0fs(ChoisePoint iX) {
 	}
@@ -110,21 +117,67 @@ public abstract class Dialog extends DataResourceConsumer {
 			return isTopLevelWindow;
 		} else {
 			Term value= getBuiltInSlot_E_is_top_level_window();
-			return YesNo.argument2YesNo(value,iX);
+			return YesNoConverters.argument2YesNo(value,iX);
+		}
+	}
+	//
+	// get/set isAlwaysOnTop
+	//
+	public void setIsAlwaysOnTop1s(ChoisePoint iX, Term a1) {
+		setIsAlwaysOnTop(YesNoConverters.argument2YesNo(a1,iX));
+	}
+	public void setIsAlwaysOnTop(YesNo value) {
+		isAlwaysOnTop= value;
+	}
+	public void getIsAlwaysOnTop0ff(ChoisePoint iX, PrologVariable result) {
+		YesNo value= getIsAlwaysOnTop(iX);
+		result.setNonBacktrackableValue(YesNoConverters.toTerm(value));
+	}
+	public void getIsAlwaysOnTop0fs(ChoisePoint iX) {
+	}
+	public YesNo getIsAlwaysOnTop(ChoisePoint iX) {
+		if (isAlwaysOnTop != null) {
+			return isAlwaysOnTop;
+		} else {
+			Term value= getBuiltInSlot_E_is_always_on_top();
+			return YesNoConverters.argument2YesNo(value,iX);
+		}
+	}
+	//
+	// get/set closingConfirmation
+	//
+	public void setClosingConfirmation1s(ChoisePoint iX, Term a1) {
+		setClosingConfirmation(OnOffConverters.argument2OnOff(a1,iX));
+	}
+	public void setClosingConfirmation(OnOff value) {
+		closingConfirmation= value;
+	}
+	public void getClosingConfirmation0ff(ChoisePoint iX, PrologVariable result) {
+		OnOff value= getClosingConfirmation(iX);
+		result.setNonBacktrackableValue(OnOffConverters.toTerm(value));
+	}
+	public void getClosingConfirmation0fs(ChoisePoint iX) {
+	}
+	public OnOff getClosingConfirmation(ChoisePoint iX) {
+		if (closingConfirmation != null) {
+			return closingConfirmation;
+		} else {
+			Term value= getBuiltInSlot_E_closing_confirmation();
+			return OnOffConverters.argument2OnOff(value,iX);
 		}
 	}
 	//
 	// get/set exitOnClose
 	//
 	public void setExitOnClose1s(ChoisePoint iX, Term a1) {
-		setExitOnClose(YesNoDefault.argument2YesNoDefault(a1,iX));
+		setExitOnClose(YesNoDefaultConverters.argument2YesNoDefault(a1,iX));
 	}
 	public void setExitOnClose(YesNoDefault value) {
 		exitOnClose= value;
 	}
 	public void getExitOnClose0ff(ChoisePoint iX, PrologVariable result) {
 		YesNoDefault value= getExitOnClose(iX);
-		result.setNonBacktrackableValue(value.toTerm());
+		result.setNonBacktrackableValue(YesNoDefaultConverters.toTerm(value));
 	}
 	public void getExitOnClose0fs(ChoisePoint iX) {
 	}
@@ -133,7 +186,7 @@ public abstract class Dialog extends DataResourceConsumer {
 			return exitOnClose;
 		} else {
 			Term value= getBuiltInSlot_E_exit_on_close();
-			return YesNoDefault.argument2YesNoDefault(value,iX);
+			return YesNoDefaultConverters.argument2YesNoDefault(value,iX);
 		}
 	}
 	//
@@ -151,16 +204,17 @@ public abstract class Dialog extends DataResourceConsumer {
 	public void setActualPosition2s(ChoisePoint iX, Term a1, Term a2) {
 		ExtendedCoordinate eX= ExtendedCoordinate.argumentToExtendedCoordinate(a1,iX);
 		ExtendedCoordinate eY= ExtendedCoordinate.argumentToExtendedCoordinate(a2,iX);
+		boolean pixelMeasurements= getUsePixelMeasurements(iX);
 		prepareDialogIfNecessary(false,iX);
 		if (targetObject != null) {
-			targetObject.changeActualPosition(eX,eY,iX);
+			targetObject.changeActualPosition(eX,eY,pixelMeasurements,iX);
 		}
 	}
 	public void getActualPosition2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
 		double x= 0.0;
 		double y= 0.0;
 		if (targetObject != null) {
-			ExtendedCoordinates coordinates= targetObject.getActualPosition();
+			ExtendedCoordinates coordinates= targetObject.getActualPosition(getUsePixelMeasurements(iX));
 			try {
 				x= coordinates.x.getDoubleValue();
 			} catch (UseDefaultLocation e) {
@@ -355,13 +409,19 @@ public abstract class Dialog extends DataResourceConsumer {
 				DialogIdentifierOrAuto value= DialogIdentifierOrAuto.argumentToDialogIdentifierOrAuto(fieldValue,iX);
 				setIdentifier(value);
 			} else if (code==SymbolCodes.symbolCode_E_is_modal) {
-				YesNoDefault value= YesNoDefault.argument2YesNoDefault(fieldValue,iX);
+				YesNoDefault value= YesNoDefaultConverters.argument2YesNoDefault(fieldValue,iX);
 				setIsModal(value);
 			} else if (code==SymbolCodes.symbolCode_E_is_top_level_window) {
-				YesNo value= YesNo.argument2YesNo(fieldValue,iX);
+				YesNo value= YesNoConverters.argument2YesNo(fieldValue,iX);
 				setIsTopLevelWindow(value);
+			} else if (code==SymbolCodes.symbolCode_E_is_always_on_top) {
+				YesNo value= YesNoConverters.argument2YesNo(fieldValue,iX);
+				setIsAlwaysOnTop(value);
+			} else if (code==SymbolCodes.symbolCode_E_closing_confirmation) {
+				OnOff value= OnOffConverters.argument2OnOff(fieldValue,iX);
+				setClosingConfirmation(value);
 			} else if (code==SymbolCodes.symbolCode_E_exit_on_close) {
-				YesNoDefault value= YesNoDefault.argument2YesNoDefault(fieldValue,iX);
+				YesNoDefault value= YesNoDefaultConverters.argument2YesNoDefault(fieldValue,iX);
 				setExitOnClose(value);
 			} else {
 				prepareDialogIfNecessary(false,iX);
@@ -386,11 +446,15 @@ public abstract class Dialog extends DataResourceConsumer {
 			if (code==SymbolCodes.symbolCode_E_identifier) {
 				return getIdentifier(iX).toTerm();
 			} else if (code==SymbolCodes.symbolCode_E_is_modal) {
-				return getIsModal(iX).toTerm();
+				return YesNoDefaultConverters.toTerm(getIsModal(iX));
 			} else if (code==SymbolCodes.symbolCode_E_is_top_level_window) {
-				return getIsTopLevelWindow(iX).toTerm();
+				return YesNoConverters.toTerm(getIsTopLevelWindow(iX));
+			} else if (code==SymbolCodes.symbolCode_E_is_always_on_top) {
+				return YesNoConverters.toTerm(getIsAlwaysOnTop(iX));
+			} else if (code==SymbolCodes.symbolCode_E_closing_confirmation) {
+				return OnOffConverters.toTerm(getClosingConfirmation(iX));
 			} else if (code==SymbolCodes.symbolCode_E_exit_on_close) {
-				return getExitOnClose(iX).toTerm();
+				return YesNoDefaultConverters.toTerm(getExitOnClose(iX));
 			} else {
 				prepareDialogIfNecessary(false,iX);
 				return targetObject.getFieldValue(DialogControlOperation.VALUE,fieldName,iX);
@@ -476,6 +540,12 @@ public abstract class Dialog extends DataResourceConsumer {
 	public void action1s(ChoisePoint iX, Term actionName) {
 	}
 	//
+	public void windowClosing0s(ChoisePoint iX) {
+	}
+	//
+	public void windowClosed0s(ChoisePoint iX) {
+	}
+	//
 	public void createdControl1s(ChoisePoint iX, Term actionName) {
 	}
 	//
@@ -503,6 +573,8 @@ public abstract class Dialog extends DataResourceConsumer {
 		if (targetObject==null) {
 			YesNoDefault isModalDialog= getIsModal(iX);
 			boolean isTopLevelDialog= getIsTopLevelWindow(iX).toBoolean();
+			boolean isAlwaysOnTopDialog= getIsAlwaysOnTop(iX).toBoolean();
+			boolean confirmationOnDialogClose= getClosingConfirmation(iX).toBoolean();
 			YesNoDefault exitProgramOnClose= getExitOnClose(iX);
 			Window mainWindow= null;
 			if (!isTopLevelDialog) {
@@ -513,7 +585,14 @@ public abstract class Dialog extends DataResourceConsumer {
 				};
 				DesktopUtils.safelySetVisible(true,mainWindow);
 			};
-			targetObject= createDialog(isModalDialog,isTopLevelDialog,exitProgramOnClose,mainWindow,iX);
+			targetObject= createDialog(
+				isModalDialog,
+				isTopLevelDialog,
+				isAlwaysOnTopDialog,
+				confirmationOnDialogClose,
+				exitProgramOnClose,
+				mainWindow,
+				iX);
 			targetObject.initiate(currentProcess,staticContext);
 			targetObject.increaseDepthCounter();
 			targetObject.prepare(
@@ -527,6 +606,7 @@ public abstract class Dialog extends DataResourceConsumer {
 				getX(iX),
 				getY(iX),
 				getBackgroundColor(iX),
+				getUsePixelMeasurements(iX),
 				iX);
 			targetObject.registerSlotVariables();
 			if (showDialog) {
@@ -544,22 +624,22 @@ public abstract class Dialog extends DataResourceConsumer {
 		}
 	}
 	//
-	protected AbstractDialog createDialog(YesNoDefault isModalDialog, boolean isTopLevelDialog, YesNoDefault exitProgramOnClose, Window window, ChoisePoint iX) {
+	protected AbstractDialog createDialog(YesNoDefault isModalDialog, boolean isTopLevelDialog, boolean isAlwaysOnTopDialog, boolean confirmationOnDialogClose, YesNoDefault exitProgramOnClose, Window window, ChoisePoint iX) {
 		DialogIdentifierOrAuto id= getIdentifier(iX);
 		if (id.isAutomatic) {
-			return createAutomaticDialog(isModalDialog,isTopLevelDialog,exitProgramOnClose,window);
+			return createAutomaticDialog(isModalDialog,isTopLevelDialog,isAlwaysOnTopDialog,confirmationOnDialogClose,exitProgramOnClose,window);
 		} else {
-			return createNamedDialog(id.name,isModalDialog,isTopLevelDialog,exitProgramOnClose,window);
+			return createNamedDialog(id.name,isModalDialog,isTopLevelDialog,isAlwaysOnTopDialog,confirmationOnDialogClose,exitProgramOnClose,window);
 		}
 	}
-	protected AbstractDialog createNamedDialog(String name, YesNoDefault isModalDialog, boolean isTopLevelDialog, YesNoDefault exitProgramOnClose, Window window) {
+	protected AbstractDialog createNamedDialog(String name, YesNoDefault isModalDialog, boolean isTopLevelDialog, boolean isAlwaysOnTopDialog, boolean confirmationOnDialogClose, YesNoDefault exitProgramOnClose, Window window) {
 		try {
-			return DialogTable.createDialog(name,isModalDialog,isTopLevelDialog,exitProgramOnClose,window);
+			return DialogTable.createDialog(name,isModalDialog,isTopLevelDialog,isAlwaysOnTopDialog,confirmationOnDialogClose,exitProgramOnClose,window);
 		} catch (UndefinedDialogTableEntry e) {
 			throw new ClassNotFound(name);
 		}
 	}
-	protected AbstractDialog createAutomaticDialog(YesNoDefault isModalDialog, boolean isTopLevelDialog, YesNoDefault exitProgramOnClose, Window window) {
+	protected AbstractDialog createAutomaticDialog(YesNoDefault isModalDialog, boolean isTopLevelDialog, boolean isAlwaysOnTopDialog, boolean confirmationOnDialogClose, YesNoDefault exitProgramOnClose, Window window) {
 		long packageNumber= getPackageCode();
 		long[] classList= getClassHierarchy();
 		for (int i= 0; i < classList.length; i++) {
@@ -568,7 +648,7 @@ public abstract class Dialog extends DataResourceConsumer {
 				packageNumber,
 				classCode);
 			try {
-				return DialogTable.createDialog(name,isModalDialog,isTopLevelDialog,exitProgramOnClose,window);
+				return DialogTable.createDialog(name,isModalDialog,isTopLevelDialog,isAlwaysOnTopDialog,confirmationOnDialogClose,exitProgramOnClose,window);
 			} catch (UndefinedDialogTableEntry e2) {
 			}
 		};

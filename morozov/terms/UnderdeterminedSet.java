@@ -14,6 +14,12 @@ public abstract class UnderdeterminedSet extends Term {
 	//
 	public static final long keyNameCode= 0;
 	//
+	private static final long serialVersionUID= 0xE1F966F762D4ADA4L; // -2163584933273752156L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","UnderdeterminedSet");
+	// }
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public boolean equals(Object o2) {

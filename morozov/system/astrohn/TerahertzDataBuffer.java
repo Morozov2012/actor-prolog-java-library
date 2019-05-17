@@ -17,6 +17,12 @@ public class TerahertzDataBuffer implements Serializable {
 	int horizontalOffset;
 	int verticalOffset;
 	//
+	private static final long serialVersionUID= 0xD9B8C62D6167EE6AL; // -2758236873554399638L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.astrohn","TerahertzDataBuffer");
+	// }
+	//
 	public TerahertzDataBuffer(double[] d, TVFilterImageHeader terahertzPacketBody) {
 		data= d;
 		matrixWidth= terahertzPacketBody.getColumns();

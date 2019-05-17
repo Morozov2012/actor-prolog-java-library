@@ -4,6 +4,7 @@ package morozov.system.kinect.converters;
 
 import morozov.built_in.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.kinect.frames.interfaces.*;
 import morozov.system.kinect.frames.tools.*;
 import morozov.system.kinect.modes.*;
@@ -17,10 +18,11 @@ import com.sun.j3d.utils.geometry.Stripifier;
 import com.sun.j3d.utils.geometry.NormalGenerator;
 import com.sun.j3d.utils.geometry.GeometryInfo;
 import javax.media.j3d.Material;
-import javax.vecmath.Color3f;
+import javax.vecmath.Color4f;
 import javax.media.j3d.PolygonAttributes;
 import javax.media.j3d.Appearance;
 import javax.vecmath.*;
+import javax.media.j3d.TransparencyAttributes;
 
 import java.util.Arrays;
 
@@ -29,6 +31,10 @@ public class Kinect2Java3D {
 	protected static float minimalDepth= 0.0f;
 	protected static float maximalColorValue= 255.0f;
 	protected static BranchGroup emptyBranchGroup= new BranchGroup();
+	//
+	static {
+		emptyBranchGroup.compile(); // 2019-04-07
+	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -57,15 +63,19 @@ public class Kinect2Java3D {
 		byte[][] red;
 		byte[][] green;
 		byte[][] blue;
+		byte[][] alpha;
+		boolean hasTransparentPixels= false;
 		if (nativeTextureImage==null) {
 			red= pointCloudsFrame.getMappedRed();
 			green= pointCloudsFrame.getMappedGreen();
 			blue= pointCloudsFrame.getMappedBlue();
+			alpha= new byte[frameWidth][frameHeight];
 		} else {
 ///////////////////////////////////////////////////////////////////////
 red= new byte[frameWidth][frameHeight];
 green= new byte[frameWidth][frameHeight];
 blue= new byte[frameWidth][frameHeight];
+alpha= new byte[frameWidth][frameHeight];
 int textureWidth= nativeTextureImage.getWidth();
 int textureHeight= nativeTextureImage.getHeight();
 int[] rgbArray= nativeTextureImage.getRGB(0,0,textureWidth,textureHeight,null,0,textureWidth);
@@ -131,18 +141,23 @@ for (int w1=0; w1 < frameWidth; w1++) {
 		int index= h2 * textureWidth + w2;
 		if (index >= 0 && index < rgbArrayLength) {
 			int rgb= rgbArray[index];
+			byte valueAlpha= (byte)(rgb >>> 24 & 0x000000FF);
 			byte valueRed= (byte)(rgb >>> 16 & 0x000000FF);
 			byte valueGreen= (byte)(rgb >>> 8 & 0x000000FF);
 			byte valueBlue= (byte)(rgb & 0x000000FF);
 			red[w1][h1]= valueRed;
 			green[w1][h1]= valueGreen;
 			blue[w1][h1]= valueBlue;
+			alpha[w1][h1]= valueAlpha;
+			if (valueAlpha > 0) {
+				hasTransparentPixels= false;
+			}
 		}
 	}
 }
 ///////////////////////////////////////////////////////////////////////
 		};
-		float maximalDepthDifference= sceneDepthThreshold.toFloat();
+		float maximalDepthDifference= NumericalValueConverters.toFloat(sceneDepthThreshold);
 		boolean createConvexSurface= true;
 		if (sceneSurfaceType==KinectSurfaceType.CONCAVE) {
 			createConvexSurface= false;
@@ -151,9 +166,9 @@ for (int w1=0; w1 < frameWidth; w1++) {
 		int arrayLength= numberOfQuads*4;
 		GeometryInfo geometryInfo= new GeometryInfo(GeometryInfo.QUAD_ARRAY);
 		Point3f[] quads= new Point3f[arrayLength];
-		Color3f[] colors= null;
+		Color4f[] colors= null;
 		if (mapColors) {
-			colors= new Color3f[arrayLength];
+			colors= new Color4f[arrayLength];
 		};
 		int quadIndex= 0;
 		for (int y=0; y < frameHeight-1; y++) {
@@ -263,7 +278,8 @@ if (mapColors) {
 	float floatRed12= (float)(red[x+1][y] & 0xFF) / maximalColorValue;
 	float floatGreen12= (float)(green[x+1][y] & 0xFF) / maximalColorValue;
 	float floatBlue12= (float)(blue[x+1][y] & 0xFF) / maximalColorValue;
-	Color3f color12= new Color3f(floatRed12,floatGreen12,floatBlue12);
+	float floatAlpha12= (float)(alpha[x+1][y] & 0xFF) / maximalColorValue;
+	Color4f color12= new Color4f(floatRed12,floatGreen12,floatBlue12,floatAlpha12);
 	colors[quadIndex]= color12;
 };
 quadIndex++;
@@ -273,7 +289,8 @@ if (mapColors) {
 	float floatRed22= (float)(red[x+1][y+1] & 0xFF) / maximalColorValue;
 	float floatGreen22= (float)(green[x+1][y+1] & 0xFF) / maximalColorValue;
 	float floatBlue22= (float)(blue[x+1][y+1] & 0xFF) / maximalColorValue;
-	Color3f color22= new Color3f(floatRed22,floatGreen22,floatBlue22);
+	float floatAlpha22= (float)(alpha[x+1][y+1] & 0xFF) / maximalColorValue;
+	Color4f color22= new Color4f(floatRed22,floatGreen22,floatBlue22,floatAlpha22);
 	colors[quadIndex]= color22;
 };
 quadIndex++;
@@ -283,7 +300,8 @@ if (mapColors) {
 	float floatRed21= (float)(red[x][y+1] & 0xFF) / maximalColorValue;
 	float floatGreen21= (float)(green[x][y+1] & 0xFF) / maximalColorValue;
 	float floatBlue21= (float)(blue[x][y+1] & 0xFF) / maximalColorValue;
-	Color3f color21= new Color3f(floatRed21,floatGreen21,floatBlue21);
+	float floatAlpha21= (float)(alpha[x][y+1] & 0xFF) / maximalColorValue;
+	Color4f color21= new Color4f(floatRed21,floatGreen21,floatBlue21,floatAlpha21);
 	colors[quadIndex]= color21;
 };
 quadIndex++;
@@ -293,7 +311,8 @@ if (mapColors) {
 	float floatRed11= (float)(red[x][y] & 0xFF) / maximalColorValue;
 	float floatGreen11= (float)(green[x][y] & 0xFF) / maximalColorValue;
 	float floatBlue11= (float)(blue[x][y] & 0xFF) / maximalColorValue;
-	Color3f color11= new Color3f(floatRed11,floatGreen11,floatBlue11);
+	float floatAlpha11= (float)(alpha[x][y] & 0xFF) / maximalColorValue;
+	Color4f color11= new Color4f(floatRed11,floatGreen11,floatBlue11,floatAlpha11);
 	colors[quadIndex]= color11;
 };
 quadIndex++;
@@ -307,7 +326,8 @@ if (mapColors) {
 	float floatRed11= (float)(red[x][y] & 0xFF) / maximalColorValue;
 	float floatGreen11= (float)(green[x][y] & 0xFF) / maximalColorValue;
 	float floatBlue11= (float)(blue[x][y] & 0xFF) / maximalColorValue;
-	Color3f color11= new Color3f(floatRed11,floatGreen11,floatBlue11);
+	float floatAlpha11= (float)(alpha[x][y] & 0xFF) / maximalColorValue;
+	Color4f color11= new Color4f(floatRed11,floatGreen11,floatBlue11,floatAlpha11);
 	colors[quadIndex]= color11;
 };
 quadIndex++;
@@ -317,7 +337,8 @@ if (mapColors) {
 	float floatRed21= (float)(red[x][y+1] & 0xFF) / maximalColorValue;
 	float floatGreen21= (float)(green[x][y+1] & 0xFF) / maximalColorValue;
 	float floatBlue21= (float)(blue[x][y+1] & 0xFF) / maximalColorValue;
-	Color3f color21= new Color3f(floatRed21,floatGreen21,floatBlue21);
+	float floatAlpha21= (float)(alpha[x][y+1] & 0xFF) / maximalColorValue;
+	Color4f color21= new Color4f(floatRed21,floatGreen21,floatBlue21,floatAlpha21);
 	colors[quadIndex]= color21;
 };
 quadIndex++;
@@ -327,7 +348,8 @@ if (mapColors) {
 	float floatRed22= (float)(red[x+1][y+1] & 0xFF) / maximalColorValue;
 	float floatGreen22= (float)(green[x+1][y+1] & 0xFF) / maximalColorValue;
 	float floatBlue22= (float)(blue[x+1][y+1] & 0xFF) / maximalColorValue;
-	Color3f color22= new Color3f(floatRed22,floatGreen22,floatBlue22);
+	float floatAlpha22= (float)(alpha[x+1][y+1] & 0xFF) / maximalColorValue;
+	Color4f color22= new Color4f(floatRed22,floatGreen22,floatBlue22,floatAlpha22);
 	colors[quadIndex]= color22;
 };
 quadIndex++;
@@ -337,7 +359,8 @@ if (mapColors) {
 	float floatRed12= (float)(red[x+1][y] & 0xFF) / maximalColorValue;
 	float floatGreen12= (float)(green[x+1][y] & 0xFF) / maximalColorValue;
 	float floatBlue12= (float)(blue[x+1][y] & 0xFF) / maximalColorValue;
-	Color3f color12= new Color3f(floatRed12,floatGreen12,floatBlue12);
+	float floatAlpha12= (float)(alpha[x+1][y] & 0xFF) / maximalColorValue;
+	Color4f color12= new Color4f(floatRed12,floatGreen12,floatBlue12,floatAlpha12);
 	colors[quadIndex]= color12;
 };
 quadIndex++;
@@ -362,20 +385,33 @@ quadIndex++;
 			GeometryArray geometryArray= geometryInfo.getGeometryArray();
 			Shape3D shape3D= new Shape3D(geometryArray);
 			if (sceneAppearance==null) {
-				sceneAppearance= createMaterialAppearance();
+				sceneAppearance= createMaterialAppearance(hasTransparentPixels);
 			};
 			shape3D.setAppearance(sceneAppearance);
 			branchGroup.addChild(shape3D);
 		};
+		branchGroup.compile();
 		return branchGroup;
 	}
-	protected static Appearance createMaterialAppearance() {
+	protected static Appearance createMaterialAppearance(boolean hasTransparentPixels) {
 		Appearance materialAppear= new Appearance();
 		PolygonAttributes polygonAttributes= new PolygonAttributes();
 		polygonAttributes.setCullFace(PolygonAttributes.CULL_NONE);
 		materialAppear.setPolygonAttributes(polygonAttributes);
 		Material material= new Material();
 		materialAppear.setMaterial(material);
+		if (hasTransparentPixels) {
+			materialAppear.setTransparencyAttributes(
+				// new TransparencyAttributes(TransparencyAttributes.BLENDED,0));
+				// new TransparencyAttributes(TransparencyAttributes.NICEST,0));
+				// new TransparencyAttributes(TransparencyAttributes.FASTEST,0.9f));
+				new TransparencyAttributes(
+					TransparencyAttributes.FASTEST,
+					// TransparencyAttributes.NICEST,
+					0.0f));
+				// new TransparencyAttributes(TransparencyAttributes.SCREEN_DOOR,0));
+				// new TransparencyAttributes(TransparencyAttributes.NONE,0));
+		};
 		return materialAppear;
 	}
 	//

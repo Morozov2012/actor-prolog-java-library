@@ -16,6 +16,14 @@ public class HashMapState extends Term {
 	protected ArrayIndices indices;
 	protected SlotVariable slotVariable;
 	//
+	private static final long serialVersionUID= 0xFE1C2DE8C6A1D5A3L; // -136183410939800157L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.run","HashMapState");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public HashMapState(Map<ArrayIndices,SlotVariable> v, ArrayIndices list, SlotVariable slot) {
 		volume= v;
 		indices= list;

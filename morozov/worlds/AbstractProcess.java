@@ -32,6 +32,12 @@ public abstract class AbstractProcess extends ActiveWorld {
 	private LinkedHashSet<ProcessStateRequest> stateRequests= new LinkedHashSet<ProcessStateRequest>();
 	private LinkedHashSet<AbstractInternalWorld> timerMessages= new LinkedHashSet<AbstractInternalWorld>();
 	//
+	private static final long serialVersionUID= 0x86028EBE7ADD70BBL; // -8790306573917523781L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.worlds","AbstractProcess");
+	// }
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	abstract public AbstractInternalWorld getMainWorld();

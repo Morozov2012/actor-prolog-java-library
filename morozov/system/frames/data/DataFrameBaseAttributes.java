@@ -2,9 +2,11 @@
 
 package morozov.system.frames.data;
 
+import morozov.system.*;
 import morozov.system.frames.data.interfaces.*;
 import morozov.system.modes.*;
 
+import java.math.BigInteger;
 import java.io.Serializable;
 
 public class DataFrameBaseAttributes implements DataFrameBaseAttributesInterface, Serializable {
@@ -113,5 +115,29 @@ public class DataFrameBaseAttributes implements DataFrameBaseAttributesInterface
 	}
 	public int getZoomingCoefficient() {
 		return zoomingCoefficient;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public static int toInteger(NumericalValue value) {
+		if (value.useDoubleValue()) {
+			double doubleValue= StrictMath.round(value.getDoubleValue());
+			if (doubleValue >= Integer.MAX_VALUE) {
+				return Integer.MAX_VALUE;
+			} else if (doubleValue <= Integer.MIN_VALUE) {
+				return Integer.MIN_VALUE;
+			} else {
+				return (int)doubleValue;
+			}
+		} else {
+			BigInteger bigInteger= value.getIntegerValue();
+			if (bigInteger.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) >= 0) {
+				return Integer.MAX_VALUE;
+			} else if (bigInteger.compareTo(BigInteger.valueOf(Integer.MIN_VALUE)) <= 0) {
+				return Integer.MIN_VALUE;
+			} else {
+				return bigInteger.intValue();
+			}
+		}
 	}
 }

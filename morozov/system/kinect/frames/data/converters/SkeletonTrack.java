@@ -4,7 +4,6 @@ package morozov.system.kinect.frames.data.converters;
 
 import target.*;
 
-import morozov.system.*;
 import morozov.system.converters.*;
 import morozov.system.kinect.frames.data.*;
 import morozov.system.kinect.frames.data.interfaces.*;
@@ -58,6 +57,12 @@ public class SkeletonTrack implements Serializable {
 	protected SkeletonDimensionsChangeInterface previousSkeletonDimensionsVelocities;
 	//
 	protected static int number12= 12;
+	//
+	private static final long serialVersionUID= 0x7B9B5A917A55A01FL; // 8906812268924477471L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.kinect.frames.data.converters","SkeletonTrack");
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -524,7 +529,7 @@ public class SkeletonTrack implements Serializable {
 		result= new PrologSet(-SymbolCodes.symbolCode_E_frame2,termRecentFrameNumber,result);
 		result= new PrologSet(-SymbolCodes.symbolCode_E_time1,termBeginningTime,result);
 		result= new PrologSet(-SymbolCodes.symbolCode_E_frame1,termFirstFrameNumber,result);
-		result= new PrologSet(-SymbolCodes.symbolCode_E_is_complete,YesNo.boolean2TermYesNo(isComplete),result);
+		result= new PrologSet(-SymbolCodes.symbolCode_E_is_complete,YesNoConverters.boolean2TermYesNo(isComplete),result);
 		result= new PrologSet(-SymbolCodes.symbolCode_E_identifier,termIdentifier,result);
 		return result;
 	}
@@ -553,7 +558,7 @@ public class SkeletonTrack implements Serializable {
 		result= new PrologSet(-SymbolCodes.symbolCode_E_frame2,termRecentFrameNumber,result);
 		result= new PrologSet(-SymbolCodes.symbolCode_E_time1,termBeginningTime,result);
 		result= new PrologSet(-SymbolCodes.symbolCode_E_frame1,termFirstFrameNumber,result);
-		result= new PrologSet(-SymbolCodes.symbolCode_E_is_complete,YesNo.boolean2TermYesNo(isComplete),result);
+		result= new PrologSet(-SymbolCodes.symbolCode_E_is_complete,YesNoConverters.boolean2TermYesNo(isComplete),result);
 		result= new PrologSet(-SymbolCodes.symbolCode_E_identifier,termIdentifier,result);
 		return result;
 	}

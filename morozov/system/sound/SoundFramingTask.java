@@ -22,11 +22,18 @@ public class SoundFramingTask extends Thread {
 	protected SoundAcquisitionTask soundAcquisitionTask= new SoundAcquisitionTask(pipedInputStream,inputStreamBufferSize);
 	//
 	protected AtomicReference<AudioDataConsumerInterface> controlPanel= new AtomicReference<>();
+	protected AtomicInteger outputDebugInformation= new AtomicInteger(0);
 	//
 	protected AtomicBoolean stopThisThread= new AtomicBoolean(false);
 	protected AtomicInteger ingoreBytes= new AtomicInteger(0);
 	//
 	protected byte[] m_buf;
+	//
+	protected static int reportCriticalErrorsLevel= 1;
+	protected static int reportAdmissibleErrorsLevel= 2;
+	protected static int reportWarningsLevel= 3;
+	//
+	protected static final long emergencyTimeout= 1000;
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -49,8 +56,15 @@ public class SoundFramingTask extends Thread {
 		bufferSize= size;
 	}
 	//
-	public void setControlPanel(AudioDataConsumerInterface panel) {
+	public void setDataConsumer(AudioDataConsumerInterface panel) {
 		controlPanel.set(panel);
+	}
+	//
+	public void setOutputDebugInformation(int value) {
+		outputDebugInformation.set(value);
+	}
+	public int getOutputDebugInformation() {
+		return outputDebugInformation.get();
 	}
 	//
 	public void startDataTransfer() {
@@ -67,10 +81,14 @@ public class SoundFramingTask extends Thread {
 			int availableBytes= pipedInputStream.available();
 			ingoreBytes.set(availableBytes);
 		} catch (IOException e) {
-			writeLater(String.format("SoundFramingTask:IOException:%s\n",e));
-			e.printStackTrace();
+			if (reportCriticalErrors()) {
+				e.printStackTrace();
+				writeLater(String.format("SoundFramingTask:IOException:%s\n",e));
+			}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			if (reportCriticalErrors()) {
+				e.printStackTrace();
+			}
 		}
 	}
 	//
@@ -84,10 +102,14 @@ public class SoundFramingTask extends Thread {
 		} catch (InterruptedException e) {
 		} catch (ThreadDeath e) {
 		} catch (IOException e) {
-			writeLater(String.format("SoundFramingTask:IOException:%s\n",e));
-			e.printStackTrace();
+			if (reportCriticalErrors()) {
+				e.printStackTrace();
+				writeLater(String.format("SoundFramingTask:IOException:%s\n",e));
+			}
 		} catch (Throwable e) {
-			e.printStackTrace();
+			if (reportCriticalErrors()) {
+				e.printStackTrace();
+			}
 		}
 	}
 	//
@@ -124,7 +146,7 @@ public class SoundFramingTask extends Thread {
 		} else {
 			if (availableBytes - bufferSize < bufferSize) {
 				synchronized (pipedInputStream) {
-					pipedInputStream.wait();
+					pipedInputStream.wait(emergencyTimeout);
 				}
 			}
 		}
@@ -138,5 +160,25 @@ public class SoundFramingTask extends Thread {
 				System.err.print(text);
 			}
 		});
+	}
+	//
+	public boolean reportCriticalErrors() {
+		return outputDebugInformation.get() >= reportCriticalErrorsLevel;
+	}
+	public boolean reportAdmissibleErrors() {
+		return outputDebugInformation.get() >= reportAdmissibleErrorsLevel;
+	}
+	public boolean reportWarnings() {
+		return outputDebugInformation.get() >= reportWarningsLevel;
+	}
+	//
+	public int getReportCriticalErrorsLevel() {
+		return reportCriticalErrorsLevel;
+	}
+	public int getReportAdmissibleErrorsLevel() {
+		return reportAdmissibleErrorsLevel;
+	}
+	public int getReportWarningsLevel() {
+		return reportWarningsLevel;
 	}
 }

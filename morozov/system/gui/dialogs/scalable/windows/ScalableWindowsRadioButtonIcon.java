@@ -28,6 +28,12 @@ import java.awt.RenderingHints;
 
 public class ScalableWindowsRadioButtonIcon extends ScalableToggleButtonIcon {
 	//
+	private static final long serialVersionUID= 0x355D9B6AAB6CA8BCL; // 3845400539289135292L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.gui.dialogs.scalable.windows","ScalableWindowsRadioButtonIcon");
+	// }
+	//
 	public ScalableWindowsRadioButtonIcon() {
 	}
 	//

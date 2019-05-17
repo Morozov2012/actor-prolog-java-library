@@ -283,12 +283,6 @@ public abstract class VideoProcessingMachine
 		VPM machine= vpm.get();
 		return machine.getInverseTransformationMatrix();
 	}
-	// public byte[] getSerializedInverseTransformationMatrix(ChoisePoint iX) {
-	//	createVideoProcessingMachineIfNecessary(iX);
-	//	VPM machine= vpm.get();
-	//	double[][] matrix= machine.getInverseTransformationMatrix();
-	//	return GeneralConverters.serializeMatrix(matrix);
-	// }
 	//
 	// SamplingRate
 	//
@@ -396,60 +390,6 @@ public abstract class VideoProcessingMachine
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	/*
-	public void processNumberedFrame1s(ChoisePoint iX, Term a1) {
-		processNumberedFrame(a1,null,true,iX);
-	}
-	public void processNumberedFrame2s(ChoisePoint iX, Term a1, Term a2) {
-		processNumberedFrame(a1,a2,true,iX);
-	}
-	public void processNumberedFrame3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
-		boolean takeFrameIntoAccount= YesNo.termYesNo2Boolean(a3,iX);
-		processNumberedFrame(a1,a2,takeFrameIntoAccount,iX);
-	}
-	//
-	public void processRealtimeFrame1s(ChoisePoint iX, Term a1) {
-		processRealtimeFrame(a1,null,true,iX);
-	}
-	public void processRealtimeFrame2s(ChoisePoint iX, Term a1, Term a2) {
-		processRealtimeFrame(a1,a2,true,iX);
-	}
-	public void processRealtimeFrame3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
-		boolean takeFrameIntoAccount= YesNo.termYesNo2Boolean(a3,iX);
-		processRealtimeFrame(a1,a2,takeFrameIntoAccount,iX);
-	}
-	*/
-	//
-	///////////////////////////////////////////////////////////////
-	//
-	/*
-	protected void processNumberedFrame(Term a1, Term a2, boolean takeFrameIntoAccount, ChoisePoint iX) {
-		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
-		long frameNumber;
-		if (a2 != null) {
-			frameNumber= PrologInteger.toLong(GeneralConverters.argumentToRoundInteger(a2,iX));
-		} else {
-			recentFrameNumber++;
-			frameNumber= recentFrameNumber;
-		};
-		GenericImageEncodingAttributes attributes= getCurrentImageEncodingAttributes();
-		process(nativeImage,frameNumber,-1,takeFrameIntoAccount,iX,attributes);
-	}
-	protected void processRealtimeFrame(Term a1, Term a2, boolean takeFrameIntoAccount, ChoisePoint iX) {
-		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
-		long timeInMilliseconds;
-		if (a2 != null) {
-			timeInMilliseconds= PrologInteger.toLong(GeneralConverters.argumentToRoundInteger(a2,iX));
-		} else {
-			Calendar calendar= Calendar.getInstance();
-			timeInMilliseconds= calendar.getTimeInMillis();
-		};
-		recentFrameNumber++;
-		GenericImageEncodingAttributes attributes= getCurrentImageEncodingAttributes();
-		process(nativeImage,recentFrameNumber,timeInMilliseconds,takeFrameIntoAccount,iX,attributes);
-	}
-	*/
-	//
 	public void process(java.awt.image.BufferedImage nativeImage, long frameNumber, long timeInMilliseconds, boolean takeFrameIntoAccount, ChoisePoint iX, GenericImageEncodingAttributes attributes) {
 		createVideoProcessingMachineIfNecessary(iX);
 		if (nativeImage != null) {
@@ -491,7 +431,7 @@ public abstract class VideoProcessingMachine
 			int minimalBlobSize= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_blob_size(),iX);
 			int minimalTrackDuration= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_track_duration(),iX);
 			int maximalTrackDuration= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_track_duration(),iX);
-			NumericalValue maximalChronicleLength= NumericalValue.argumentToNumericalValue(getBuiltInSlot_E_maximal_chronicle_length(),iX);
+			NumericalValue maximalChronicleLength= NumericalValueConverters.argumentToNumericalValue(getBuiltInSlot_E_maximal_chronicle_length(),iX);
 			int maximalBlobInvisibilityInterval= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_blob_invisibility_interval(),iX);
 			int maximalTrackRetentionInterval= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_track_retention_interval(),iX);
 			Term matrixValue= getBuiltInSlot_E_inverse_transformation_matrix();
@@ -499,12 +439,12 @@ public abstract class VideoProcessingMachine
 			checkMatrix(inverseMatrix,matrixValue);
 			double samplingRate= GeneralConverters.argumentToReal(getBuiltInSlot_E_sampling_rate(),iX);
 			int r2WindowHalfwidth= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_r2_window_halfwidth(),iX);
-			boolean applyCharacteristicLengthMedianFiltering= YesNo.termYesNo2Boolean(getBuiltInSlot_E_apply_median_filtering_to_characteristic_length(),iX);
+			boolean applyCharacteristicLengthMedianFiltering= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_apply_median_filtering_to_characteristic_length(),iX);
 			int characteristicLengthMedianFilterHalfwidth= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_characteristic_length_median_filter_halfwidth(),iX);
-			boolean applyVelocityMedianFiltering= YesNo.termYesNo2Boolean(getBuiltInSlot_E_apply_median_filtering_to_velocity(),iX);
+			boolean applyVelocityMedianFiltering= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_apply_median_filtering_to_velocity(),iX);
 			int velocityMedianFilterHalfwidth= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_velocity_median_filter_halfwidth(),iX);
 			int synthesizedImageTransparency= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_synthesized_image_transparency(),iX);
-			boolean makeRectangularBlobsInSynthesizedImage= YesNo.termYesNo2Boolean(getBuiltInSlot_E_make_rectangular_blobs_in_synthesized_image(),iX);
+			boolean makeRectangularBlobsInSynthesizedImage= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_make_rectangular_blobs_in_synthesized_image(),iX);
 			vpm.set(new VPM(
 				actualFrameCommands,
 				actualSnapshotCommands,
@@ -577,7 +517,7 @@ public abstract class VideoProcessingMachine
 			int minimalBlobSize= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_blob_size(),iX);
 			int minimalTrackDuration= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_minimal_track_duration(),iX);
 			int maximalTrackDuration= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_track_duration(),iX);
-			NumericalValue maximalChronicleLength= NumericalValue.argumentToNumericalValue(getBuiltInSlot_E_maximal_chronicle_length(),iX);
+			NumericalValue maximalChronicleLength= NumericalValueConverters.argumentToNumericalValue(getBuiltInSlot_E_maximal_chronicle_length(),iX);
 			int maximalBlobInvisibilityInterval= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_blob_invisibility_interval(),iX);
 			int maximalTrackRetentionInterval= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_maximal_track_retention_interval(),iX);
 			Term matrixValue= getBuiltInSlot_E_inverse_transformation_matrix();
@@ -585,12 +525,12 @@ public abstract class VideoProcessingMachine
 			checkMatrix(inverseMatrix,matrixValue);
 			double samplingRate= GeneralConverters.argumentToReal(getBuiltInSlot_E_sampling_rate(),iX);
 			int r2WindowHalfwidth= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_r2_window_halfwidth(),iX);
-			boolean applyCharacteristicLengthMedianFiltering= YesNo.termYesNo2Boolean(getBuiltInSlot_E_apply_median_filtering_to_characteristic_length(),iX);
+			boolean applyCharacteristicLengthMedianFiltering= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_apply_median_filtering_to_characteristic_length(),iX);
 			int characteristicLengthMedianFilterHalfwidth= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_characteristic_length_median_filter_halfwidth(),iX);
-			boolean applyVelocityMedianFiltering= YesNo.termYesNo2Boolean(getBuiltInSlot_E_apply_median_filtering_to_velocity(),iX);
+			boolean applyVelocityMedianFiltering= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_apply_median_filtering_to_velocity(),iX);
 			int velocityMedianFilterHalfwidth= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_velocity_median_filter_halfwidth(),iX);
 			int synthesizedImageTransparency= GeneralConverters.argumentToSmallRoundInteger(getBuiltInSlot_E_synthesized_image_transparency(),iX);
-			boolean makeRectangularBlobsInSynthesizedImage= YesNo.termYesNo2Boolean(getBuiltInSlot_E_make_rectangular_blobs_in_synthesized_image(),iX);
+			boolean makeRectangularBlobsInSynthesizedImage= YesNoConverters.termYesNo2Boolean(getBuiltInSlot_E_make_rectangular_blobs_in_synthesized_image(),iX);
 			VPM machine= vpm.get();
 			if (machine != null) {
 				machine.reset(
@@ -970,19 +910,39 @@ public abstract class VideoProcessingMachine
 	//
 	public void mskSelectPolygon1s(ChoisePoint iX, Term a1) {
 		Point2DArrays arrays= Point2DArrays.argumentToPoint2DArrays(a1,iX);
-		appendFrameCommand(new VPMmskSelectPolygon(arrays.xPoints,arrays.yPoints));
+		appendFrameCommand(new VPMmskSelectPolygon(arrays.xPoints,arrays.yPoints,false));
+	}
+	public void mskSelectPolygon2s(ChoisePoint iX, Term a1, Term a2) {
+		Point2DArrays arrays= Point2DArrays.argumentToPoint2DArrays(a1,iX);
+		YesNo useStandardizedCoordinates= YesNoConverters.argument2YesNo(a2,iX);
+		appendFrameCommand(new VPMmskSelectPolygon(arrays.xPoints,arrays.yPoints,useStandardizedCoordinates.toBoolean()));
 	}
 	public void mskAddPolygon1s(ChoisePoint iX, Term a1) {
 		Point2DArrays arrays= Point2DArrays.argumentToPoint2DArrays(a1,iX);
-		appendFrameCommand(new VPMmskAddPolygon(arrays.xPoints,arrays.yPoints));
+		appendFrameCommand(new VPMmskAddPolygon(arrays.xPoints,arrays.yPoints,false));
+	}
+	public void mskAddPolygon2s(ChoisePoint iX, Term a1, Term a2) {
+		Point2DArrays arrays= Point2DArrays.argumentToPoint2DArrays(a1,iX);
+		YesNo useStandardizedCoordinates= YesNoConverters.argument2YesNo(a2,iX);
+		appendFrameCommand(new VPMmskAddPolygon(arrays.xPoints,arrays.yPoints,useStandardizedCoordinates.toBoolean()));
 	}
 	public void mskExcludePolygon1s(ChoisePoint iX, Term a1) {
 		Point2DArrays arrays= Point2DArrays.argumentToPoint2DArrays(a1,iX);
-		appendFrameCommand(new VPMmskExcludePolygon(arrays.xPoints,arrays.yPoints));
+		appendFrameCommand(new VPMmskExcludePolygon(arrays.xPoints,arrays.yPoints,false));
+	}
+	public void mskExcludePolygon2s(ChoisePoint iX, Term a1, Term a2) {
+		Point2DArrays arrays= Point2DArrays.argumentToPoint2DArrays(a1,iX);
+		YesNo useStandardizedCoordinates= YesNoConverters.argument2YesNo(a2,iX);
+		appendFrameCommand(new VPMmskExcludePolygon(arrays.xPoints,arrays.yPoints,useStandardizedCoordinates.toBoolean()));
 	}
 	public void mskFlipPolygon1s(ChoisePoint iX, Term a1) {
 		Point2DArrays arrays= Point2DArrays.argumentToPoint2DArrays(a1,iX);
-		appendFrameCommand(new VPMmskFlipPolygon(arrays.xPoints,arrays.yPoints));
+		appendFrameCommand(new VPMmskFlipPolygon(arrays.xPoints,arrays.yPoints,false));
+	}
+	public void mskFlipPolygon2s(ChoisePoint iX, Term a1, Term a2) {
+		Point2DArrays arrays= Point2DArrays.argumentToPoint2DArrays(a1,iX);
+		YesNo useStandardizedCoordinates= YesNoConverters.argument2YesNo(a2,iX);
+		appendFrameCommand(new VPMmskFlipPolygon(arrays.xPoints,arrays.yPoints,useStandardizedCoordinates.toBoolean()));
 	}
 	//
 	public void mskSelectAll0s(ChoisePoint iX) {

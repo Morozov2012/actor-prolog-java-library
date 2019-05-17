@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.ArrayList;
 
-class i3EZUSBDriver {
+public class i3EZUSBDriver {
 	//
 	protected static final int MAX_BYTES_PER_PACKET= 16384;
 	protected static final int MESSAGE_DEVICE_ATTACHED= 6;
@@ -92,7 +92,7 @@ class i3EZUSBDriver {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public boolean isOpen() {
+	public boolean isConnected() {
 		return m_bOpen.get();
 	}
 	public DeviceIdentifier getIdentifier() {
@@ -134,6 +134,22 @@ class i3EZUSBDriver {
 	}
 	public boolean reportUSBTransferDelays() {
 		return m_iOutputDebugInformation.get() >= reportUSBTransferDelaysLevel;
+	}
+	//
+	public int getReportCriticalErrorsLevel() {
+		return reportCriticalErrorsLevel;
+	}
+	public int getReportAdmissibleErrorsLevel() {
+		return reportAdmissibleErrorsLevel;
+	}
+	public int getReportWarningsLevel() {
+		return reportWarningsLevel;
+	}
+	public int getReportFlashAttributesLevel() {
+		return reportFlashAttributesLevel;
+	}
+	public int getReportUSBTransferDelaysLevel() {
+		return reportUSBTransferDelaysLevel;
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -313,7 +329,7 @@ class i3EZUSBDriver {
 					throw new UnableToReadDeviceDescriptor(result);
 				};
 				if (descriptor.idVendor() == VENDOR_ID && descriptor.idProduct() == PRODUCT_ID) {
-					if (targetIdentifier.isDefault()) {
+					if (targetIdentifier==null || targetIdentifier.isDefault()) {
 						return device;
 					} else {
 						String currentIdentifier= createIdentifier(device,descriptor);
@@ -343,20 +359,20 @@ class i3EZUSBDriver {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public boolean openDevice(DeviceIdentifier identifier) {
+	public boolean connectDevice(DeviceIdentifier identifier) {
 		m_bOpen.set(false);
 		currentDeviceIdentifier= null;
-		openTheThermalExpertDevice(identifier);
+		connectTheThermalExpertDevice(identifier);
 		return m_bOpen.get();
 	}
-	public boolean openDevice() {
+	public boolean connectDevice() {
 		m_bOpen.set(false);
 		currentDeviceIdentifier= null;
-		openTheThermalExpertDevice(DeviceIdentifier.DEFAULT);
+		connectTheThermalExpertDevice(DeviceIdentifier.DEFAULT);
 		return m_bOpen.get();
 	}
 	//
-	protected void openTheThermalExpertDevice(DeviceIdentifier identifier) {
+	protected void connectTheThermalExpertDevice(DeviceIdentifier identifier) {
 		// Search for the Thermal Expert USB device and stop
 		// when not found:
 		Device device= findTheThermalExpertDevice(identifier);
@@ -638,7 +654,7 @@ class i3EZUSBDriver {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void closeDevice() {
+	public void disconnectDevice() {
 		if (m_bOpen.get()) {
 			// boolean reportDelays= reportUSBTransferDelays.get();
 			boolean reportDelays= reportUSBTransferDelays();
@@ -751,7 +767,6 @@ class i3EZUSBDriver {
 				throw new UnableToReattachKernelDriver(result2);
 			}
 		};
-		// System.out.println("Exiting");
 		// close:
 		// Close a device handle.
 		// Should be called on all open handles
@@ -864,7 +879,6 @@ class i3EZUSBDriver {
 				};
 				return -1;
 			};
-			// System.out.println(transfered + " bytes sent");
 			//
 			ByteBuffer byteBufTemp= ByteBuffer.allocateDirect(MAX_BYTES_PER_PACKET);
 			ByteBuffer auxiliaryByteBufTemp= ByteBuffer.allocateDirect(MAX_BYTES_PER_PACKET);
@@ -984,7 +998,6 @@ class i3EZUSBDriver {
 				} catch (Exception e) {
 					if (reportAdmissibleErrors()) {
 						writeLater(String.format("Exception: %s\n",e));
-						// e.printStackTrace();
 					};
 					return iOffset;
 				}
@@ -993,7 +1006,6 @@ class i3EZUSBDriver {
 		} catch (Exception e2) {
 			if (reportAdmissibleErrors()) {
 				writeLater(String.format("Exception: %s\n",e2));
-				// e2.printStackTrace();
 			};
 			return -1;
 		}
@@ -1072,13 +1084,17 @@ class i3EZUSBDriver {
 					iSize-= iWriteSize;
 					i++;
 				} catch (Exception e) {
-					e.printStackTrace();
+					if (reportCriticalErrors()) {
+						e.printStackTrace();
+					};
 					return iOffset;
 				}
 			};
 			return iOffset;
 		} catch (Exception e2) {
-			e2.printStackTrace();
+			if (reportCriticalErrors()) {
+				e2.printStackTrace();
+			};
 			return -1;
 		}
 	}
@@ -1126,7 +1142,6 @@ class i3EZUSBDriver {
 		} catch (Exception e) {
 			if (reportAdmissibleErrors()) {
 				writeLater(String.format("Exception: %s\n",e));
-				// e.printStackTrace();
 			}
 			// return;
 		}

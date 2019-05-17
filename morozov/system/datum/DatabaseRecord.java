@@ -15,9 +15,18 @@ import java.nio.charset.CharsetEncoder;
 import java.util.ArrayList;
 
 public class DatabaseRecord implements Serializable {
+	//
 	public Term content;
 	public DatabaseRecord previousRecord;
 	public DatabaseRecord nextRecord;
+	//
+	private static final long serialVersionUID= 0xB723B0BE4CC82563L; // -5250158409205406365L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.datum","DatabaseRecord");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public DatabaseRecord(Term item) {
 		content= item;

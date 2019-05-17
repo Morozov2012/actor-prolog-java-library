@@ -158,7 +158,7 @@ public class TVImageHeader implements Serializable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static TVImageHeader readTVImageHeader(DataInputStream in) throws IOException {
+	public static TVImageHeader readTVImageHeader(DataInputStream in, boolean reportWarnings) throws IOException {
 		int indicator= Integer.reverseBytes(in.readInt());
 		long relTime= Long.reverseBytes(in.readLong());
 		short apparentPPL= Short.reverseBytes(in.readShort());
@@ -175,7 +175,7 @@ public class TVImageHeader implements Serializable {
 		byte paneSet= in.readByte();
 		byte paneSets= in.readByte();
 		byte version= in.readByte();
-		if (zero != 0) {
+		if (zero != 0 && reportWarnings) {
 			System.out.printf("WARNING: TVFilterImageHeader.TVImageHeader.Zero != 0\n");
 		};
 		/*
@@ -195,7 +195,7 @@ public class TVImageHeader implements Serializable {
 		System.out.printf("TVImageHeader::Version: %x\n",version);
 		*/
 		TVPPIFRead hWIF= TVPPIFRead.readTVPPIFRead(in);
-		if (hWIF.getCookie() != expectedCookie) {
+		if (hWIF.getCookie() != expectedCookie && reportWarnings) {
 			System.out.printf("WARNING: Incorrect Cookie %x. Expected %x\n",hWIF.getCookie(),expectedCookie);
 		};
 		return new TVImageHeader(

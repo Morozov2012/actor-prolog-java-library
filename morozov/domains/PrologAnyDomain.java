@@ -10,6 +10,12 @@ import java.nio.charset.CharsetEncoder;
 
 public class PrologAnyDomain extends PrologDomain {
 	//
+	private static final long serialVersionUID= 0x3926B194C5018A12L; // 4118174161795385874L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","PrologAnyDomain");
+	// }
+	//
 	public PrologAnyDomain() {
 		super(new AnonymousDomainName(), new DomainAlternative[0]);
 	}

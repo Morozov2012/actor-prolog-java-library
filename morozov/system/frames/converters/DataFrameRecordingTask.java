@@ -2,10 +2,12 @@
 
 package morozov.system.frames.converters;
 
+import morozov.system.datum.*;
 import morozov.system.files.*;
 import morozov.system.files.errors.*;
 import morozov.system.frames.converters.interfaces.*;
 import morozov.system.frames.interfaces.*;
+import morozov.system.kinect.frames.interfaces.*;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -25,8 +27,9 @@ public class DataFrameRecordingTask extends Thread {
 	protected Object objectStreamGuard= new Object();
 	protected AtomicBoolean acceptFrames= new AtomicBoolean(false);
 	protected AtomicBoolean recordFrames= new AtomicBoolean(false);
+	protected AtomicInteger outputDebugInformation= new AtomicInteger(0);
 	//
-	protected LinkedList<DataFrameInterface> history= new LinkedList<>();
+	protected LinkedList<Object> history= new LinkedList<>();
 	protected int defaultWriteBufferSize= 100;
 	protected AtomicInteger writeBufferSize= new AtomicInteger(defaultWriteBufferSize);
 	protected boolean bufferOverflow= false;
@@ -38,6 +41,12 @@ public class DataFrameRecordingTask extends Thread {
 	protected ObjectOutputStream objectOutputStream;
 	//
 	protected long frameNumber;
+	//
+	protected static int reportCriticalErrorsLevel= 1;
+	protected static int reportAdmissibleErrorsLevel= 2;
+	protected static int reportWarningsLevel= 3;
+	//
+	protected static final long emergencyTimeout= 1000;
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -63,6 +72,13 @@ public class DataFrameRecordingTask extends Thread {
 		writeBufferSize.set(defaultWriteBufferSize);
 	}
 	//
+	public int getOutputDebugInformation() {
+		return outputDebugInformation.get();
+	}
+	public void setOutputDebugInformation(int value) {
+		outputDebugInformation.set(value);
+	}
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public void reset(ExtendedFileName fileName) {
@@ -75,7 +91,7 @@ public class DataFrameRecordingTask extends Thread {
 				outputFilePath= extendedFileName.getPathOfLocalResource();
 				outputStream= Files.newOutputStream(outputFilePath);
 				bufferedOutputStream= new BufferedOutputStream(outputStream);
-				objectOutputStream= new ObjectOutputStream(bufferedOutputStream);
+				objectOutputStream= new DataStoreOutputStream(bufferedOutputStream);
 				recordFrames.set(true);
 				acceptFrames.set(true);
 			}
@@ -88,18 +104,20 @@ public class DataFrameRecordingTask extends Thread {
 		try {
 			while (true) {
 				synchronized (history) {
-					if (history.isEmpty()) {
+					if (history.isEmpty() || !recordFrames.get()) {
 						frameNumber= 0;
 						break;
 					} else {
-						history.wait();
+						history.wait(emergencyTimeout);
 					}
 				}
 			}
 		} catch (InterruptedException e) {
 		} catch (ThreadDeath e) {
 		} catch (Throwable e) {
-			e.printStackTrace();
+			if (reportCriticalErrors()) {
+				e.printStackTrace();
+			}
 		};
 		recordFrames.set(false);
 		try {
@@ -122,13 +140,17 @@ public class DataFrameRecordingTask extends Thread {
 		}
 	}
 	//
+	public boolean outputIsOpen() {
+		return acceptFrames.get();
+	}
+	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void store(DataFrameInterface frame) {
+	public void store(Object frame) {
 		if (acceptFrames.get()) {
 			synchronized (history) {
 				history.addFirst(frame);
-				history.notify();
+				history.notifyAll();
 			}
 		}
 	}
@@ -137,25 +159,29 @@ public class DataFrameRecordingTask extends Thread {
 		while (true) {
 			try {
 				synchronized (history) {
-					if (history.isEmpty()) {
-						history.wait();
+					if (history.isEmpty() || !recordFrames.get()) {
+						history.wait(emergencyTimeout);
 					}
 				};
 				recordFrames();
 			} catch (InterruptedException e) {
+//(new RuntimeException()).printStackTrace();
 			} catch (ThreadDeath e) {
+//(new RuntimeException()).printStackTrace();
 				return;
 			} catch (Throwable e) {
-				e.printStackTrace();
+//(new RuntimeException()).printStackTrace();
+				if (reportCriticalErrors()) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
 	//
-	protected void recordFrames() {
+	protected void recordFrames() throws IOException {
 		while (recordFrames.get()) {
-			frameNumber++;
 			int length;
-			DataFrameInterface currentFrame;
+			Object currentFrame;
 			synchronized (history) {
 				length= history.size();
 				if (length > 0) {
@@ -164,13 +190,23 @@ public class DataFrameRecordingTask extends Thread {
 					break;
 				}
 			};
+			frameNumber++;
 			try {
 				synchronized (objectStreamGuard) {
 					objectOutputStream.writeObject(currentFrame);
 					objectOutputStream.reset();
 				}
-			} catch (IOException e) {
-				throw new FileInputOutputError(outputFilePath.toString(),e);
+			// } catch (IOException e) {
+			//	throw new FileInputOutputError(outputFilePath.toString(),e);
+			} catch (Throwable e) {
+//(new RuntimeException()).printStackTrace();
+				recordFrames.set(false);
+				close();
+				dataProvider.completeDataWriting(frameNumber,e);
+				throw e;
+			};
+			if (reportWarnings()) {
+				System.err.printf("RECORDED:Number:%s,Queue:%s\n",frameNumber,length);
 			};
 			synchronized (history) {
 				length= history.size();
@@ -179,7 +215,7 @@ public class DataFrameRecordingTask extends Thread {
 						history.removeLast();
 						length= history.size();
 					} finally {
-						history.notify();
+						history.notifyAll();
 					};
 					int superfluousLength= length - writeBufferSize.get();
 					if (superfluousLength > 0) {
@@ -187,7 +223,7 @@ public class DataFrameRecordingTask extends Thread {
 						if (dataProvider != null) {
 							dataProvider.reportBufferOverflow();
 						};
-						Iterator<DataFrameInterface> iteratorHistory= history.iterator();
+						Iterator<Object> iteratorHistory= history.iterator();
 						int step= length / superfluousLength;
 						int currentLength= superfluousLength;
 						int quantityOfRemovedItems= 0;
@@ -195,11 +231,15 @@ public class DataFrameRecordingTask extends Thread {
 						try {
 ///////////////////////////////////////////////////////////////////////
 while (iteratorHistory.hasNext() && currentLength > 0) {
-	DataFrameInterface previousFrame= iteratorHistory.next();
-	if (!previousFrame.isLightweightFrame()) {
+	Object previousFrame= iteratorHistory.next();
+	// if (!previousFrame.isLightweightFrame()) {
+	if (!isLightweightFrame(previousFrame)) {
 		if (auxiliaryCounter >= step) {
 			auxiliaryCounter= 0;
 			iteratorHistory.remove();
+			if (reportAdmissibleErrors()) {
+				System.err.printf("Warning: frame %s is lost.\n",previousFrame);
+			};
 			currentLength--;
 			quantityOfRemovedItems++;
 		} else {
@@ -209,7 +249,10 @@ while (iteratorHistory.hasNext() && currentLength > 0) {
 }
 ///////////////////////////////////////////////////////////////////////
 						} finally {
-							history.notify();
+							history.notifyAll();
+						}
+						if (reportAdmissibleErrors()) {
+							System.err.printf("Warning: Buffer overflow (%s); %s frames are lost.\n",length,quantityOfRemovedItems);
 						}
 					} else {
 						if (bufferOverflow) {
@@ -224,5 +267,37 @@ while (iteratorHistory.hasNext() && currentLength > 0) {
 				}
 			}
 		}
+	}
+	//
+	protected boolean isLightweightFrame(Object frame) {
+		boolean answer= false;
+		if (frame instanceof DataFrameInterface) {
+			answer= ((DataFrameInterface)frame).isLightweightFrame();
+		} else if (frame instanceof CompoundFrameInterface ) {
+			answer= ((CompoundFrameInterface)frame).isLightweightFrame();
+		} else if (frame instanceof KinectFrameInterface ) {
+			answer= ((KinectFrameInterface)frame).isLightweightFrame();
+		};
+		return answer;
+	}
+	//
+	public boolean reportCriticalErrors() {
+		return outputDebugInformation.get() >= reportCriticalErrorsLevel;
+	}
+	public boolean reportAdmissibleErrors() {
+		return outputDebugInformation.get() >= reportAdmissibleErrorsLevel;
+	}
+	public boolean reportWarnings() {
+		return outputDebugInformation.get() >= reportWarningsLevel;
+	}
+	//
+	public int getReportCriticalErrorsLevel() {
+		return reportCriticalErrorsLevel;
+	}
+	public int getReportAdmissibleErrorsLevel() {
+		return reportAdmissibleErrorsLevel;
+	}
+	public int getReportWarningsLevel() {
+		return reportWarningsLevel;
 	}
 }

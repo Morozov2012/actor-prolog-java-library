@@ -11,6 +11,14 @@ public class ArgumentNumber extends Term {
 	//
 	private long value;
 	//
+	private static final long serialVersionUID= 0x702E26F20F3506F9L; // 8083441202255693561L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","ArgumentNumber");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public ArgumentNumber(long v) {
 		value= v;
 	}

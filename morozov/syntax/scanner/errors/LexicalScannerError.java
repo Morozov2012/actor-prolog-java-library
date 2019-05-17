@@ -2,15 +2,12 @@
 
 package morozov.syntax.scanner.errors;
 
-public class LexicalScannerError extends RuntimeException {
-	protected int position;
+public class LexicalScannerError extends SyntaxError {
+	//
 	public LexicalScannerError(int p) {
-		position= p;
+		super(p);
 	}
-	public int getPosition() {
-		return position;
-	}
-	public String toString() {
-		return this.getClass().toString() + "(position:" + Integer.toString(position) + ")";
+	public LexicalScannerError(int p, Throwable e) {
+		super(p,e);
 	}
 }

@@ -22,6 +22,12 @@ public class DomainOptimizedSet extends MultiArgumentDomainItem {
 	//
 	protected long[] keys;
 	//
+	private static final long serialVersionUID= 0x5E55398845853959L; // 6797402470030326105L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","DomainOptimizedSet");
+	// }
+	//
 	public DomainOptimizedSet(long[] keyList, String[] entries) {
 		super(entries);
 		keys= keyList;

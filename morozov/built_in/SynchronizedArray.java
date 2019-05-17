@@ -3,7 +3,7 @@
 package morozov.built_in;
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.indices.*;
 import morozov.system.indices.errors.*;
 import morozov.terms.*;
@@ -44,14 +44,14 @@ public abstract class SynchronizedArray extends LambdaArray {
 	// get/set implementProtectingPorts
 	//
 	public void setImplementProtectingPorts1s(ChoisePoint iX, Term a1) {
-		setImplementProtectingPorts(YesNo.termYesNo2Boolean(a1,iX));
+		setImplementProtectingPorts(YesNoConverters.termYesNo2Boolean(a1,iX));
 	}
 	public void setImplementProtectingPorts(boolean value) {
 		implementProtectingPorts= value;
 	}
 	public void getImplementProtectingPorts0ff(ChoisePoint iX, PrologVariable result) {
 		boolean value= getImplementProtectingPorts(iX);
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(value));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(value));
 	}
 	public void getImplementProtectingPorts0fs(ChoisePoint iX) {
 	}
@@ -60,21 +60,21 @@ public abstract class SynchronizedArray extends LambdaArray {
 			return implementProtectingPorts;
 		} else {
 			Term value= getBuiltInSlot_E_implement_protecting_ports();
-			return YesNo.termYesNo2Boolean(value,iX);
+			return YesNoConverters.termYesNo2Boolean(value,iX);
 		}
 	}
 	//
 	// get/set implementSuspendingPorts
 	//
 	public void setImplementSuspendingPorts1s(ChoisePoint iX, Term a1) {
-		setImplementSuspendingPorts(YesNo.termYesNo2Boolean(a1,iX));
+		setImplementSuspendingPorts(YesNoConverters.termYesNo2Boolean(a1,iX));
 	}
 	public void setImplementSuspendingPorts(boolean value) {
 		implementSuspendingPorts= value;
 	}
 	public void getImplementSuspendingPorts0ff(ChoisePoint iX, PrologVariable result) {
 		boolean value= getImplementSuspendingPorts(iX);
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(value));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(value));
 	}
 	public void getImplementSuspendingPorts0fs(ChoisePoint iX) {
 	}
@@ -83,7 +83,7 @@ public abstract class SynchronizedArray extends LambdaArray {
 			return implementSuspendingPorts;
 		} else {
 			Term value= getBuiltInSlot_E_implement_suspending_ports();
-			return YesNo.termYesNo2Boolean(value,iX);
+			return YesNoConverters.termYesNo2Boolean(value,iX);
 		}
 	}
 	//

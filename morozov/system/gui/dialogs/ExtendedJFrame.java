@@ -15,6 +15,8 @@ import java.awt.Insets;
 import java.awt.GraphicsEnvironment;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsConfiguration;
+import java.awt.event.WindowListener;
+import java.awt.event.WindowEvent;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
@@ -23,7 +25,10 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class ExtendedJFrame
 		extends JFrame
-		implements DialogOperations, MouseListener {
+		implements
+			DialogOperations,
+			WindowListener,
+			MouseListener {
 	//
 	protected AbstractDialog dialog;
 	protected StaticContext staticContext;
@@ -34,6 +39,7 @@ public class ExtendedJFrame
 	public ExtendedJFrame(AbstractDialog d) {
 		super();
 		dialog= d;
+		addWindowListener(this);
 		addMouseListener(this);
 	}
 	//
@@ -93,6 +99,9 @@ public class ExtendedJFrame
 	public boolean safelyIsRestored() {
 		return DesktopUtils.safelyIsRestored(this);
 	}
+	public void safelySetAlwaysOnTop(boolean b) {
+		DesktopUtils.safelySetAlwaysOnTop(b,this);
+	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -133,6 +142,35 @@ public class ExtendedJFrame
 	//
 	public void doLayout() {
 		dialog.doLayout();
+	}
+	//
+	public void windowActivated(WindowEvent e) {
+		// Invoked when the Window is set to be
+		// the active Window.
+	}
+	public void windowClosed(WindowEvent e) {
+		// Invoked when a window has been closed as the
+		// result of calling dispose on the window.
+	}
+	public void windowClosing(WindowEvent e) {
+		// Invoked when the user attempts to close the
+		// window from the window's system menu.
+		dialog.sendTheWindowClosingOrWindowClosedMessage();
+	}
+	public void windowDeactivated(WindowEvent e) {
+		// Invoked when a Window is no longer the
+		// active Window.
+	}
+	public void windowDeiconified(WindowEvent e) {
+		// Invoked when a window is changed from a
+		// minimized to a normal state.
+	}
+	public void windowIconified(WindowEvent e) {
+		// Invoked when a window is changed from a normal
+		// to a minimized state.
+	}
+	public void windowOpened(WindowEvent e) {
+		// Invoked the first time a window is made visible.
 	}
 	//
 	public void mouseClicked(MouseEvent event) {

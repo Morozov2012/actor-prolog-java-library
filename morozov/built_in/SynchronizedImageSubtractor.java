@@ -3,7 +3,6 @@
 package morozov.built_in;
 
 import morozov.run.*;
-import morozov.system.*;
 import morozov.system.converters.*;
 import morozov.system.gui.space2d.*;
 import morozov.system.vision.plain.errors.*;
@@ -77,7 +76,7 @@ public abstract class SynchronizedImageSubtractor
 		subtract(a1,a2,true,iX);
 	}
 	public void subtract3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
-		boolean takeFrameIntoAccount= YesNo.termYesNo2Boolean(a3,iX);
+		boolean takeFrameIntoAccount= YesNoConverters.termYesNo2Boolean(a3,iX);
 		subtract(a1,a2,takeFrameIntoAccount,iX);
 	}
 	//

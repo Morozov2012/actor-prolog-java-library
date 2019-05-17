@@ -4,6 +4,7 @@ package morozov.system.gui.dialogs;
 
 import morozov.built_in.*;
 import morozov.run.*;
+import morozov.system.gui.dialogs.errors.*;
 import morozov.terms.*;
 import morozov.worlds.*;
 
@@ -12,17 +13,17 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.HashMap;
 
-class AnAttemptToExtractInternalWorldFromActiveUser extends RuntimeException {}
-class AnAttemptToExtractPackageCodeFromActiveUser extends RuntimeException {}
-class AnAttemptToExtractClassHierarchyFromActiveUser extends RuntimeException {}
-class AnAttemptToExtractInterfaceHierarchyFromActiveUser extends RuntimeException {}
-class AnAttemptToExtractSlotFromActiveUser extends RuntimeException {}
-
 public class ActiveUser extends ActiveWorld {
 	//
 	protected AbstractDialog targetDialog= null;
 	protected HashMap<SlotVariable,DialogEntry> slotMap= new HashMap<SlotVariable,DialogEntry>();
 	protected HashSet<DialogEvent> userInterfaceMessages= new HashSet<DialogEvent>();
+	//
+	private static final long serialVersionUID= 0x4DB5653AB96D4F75L; // 5599493014598537077L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.worlds","ActiveUser");
+	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//

@@ -51,7 +51,7 @@ public class DataFrameColorfulAttributes extends DataFrameBaseAttributes impleme
 			givenAuxiliaryColorMap.toDataColorMap(),
 			givenIsAverageMode,
 			givenIsZoomingMode,
-			givenZoomingCoefficient.toInteger());
+			toInteger(givenZoomingCoefficient));
 		detailedMainColorMap= givenMainColorMap;
 		detailedAuxiliaryColorMap= givenAuxiliaryColorMap;
 		detailedZoomingCoefficient= givenZoomingCoefficient;

@@ -19,12 +19,12 @@ public class DataFrameText {
 	///////////////////////////////////////////////////////////////
 	//
 	public static void writeRootFrameText(DataFrameInterface frame, BufferedWriter writer, Locale locale) throws IOException {
-		writer.write("; ROOT FRAME:\n");
+		writer.write("; DATA FRAME:\n");
 		DataFrameBaseAttributesInterface attributes= frame.getBaseAttributes();
 		writer.write(String.format(locale,"; serialNumber: %s\n",frame.getSerialNumber()));
 		writer.write(String.format(locale,"; time: %s\n",frame.getTime()));
 		writer.write(String.format(locale,"; isLightweight= %s\n",frame.isLightweightFrame()));
 		DataFrameBaseAttributesText.writeText(attributes,writer,locale);
-		writer.write("; End of root frame.\n");
+		writer.write("; End of data frame.\n");
 	}
 }

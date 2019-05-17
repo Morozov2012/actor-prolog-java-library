@@ -189,14 +189,14 @@ public abstract class DataAbstraction extends CustomControl {
 	// get/set watch_updates
 	//
 	public void setWatchUpdates1s(ChoisePoint iX, Term a1) {
-		boolean value= YesNo.termYesNo2Boolean(a1,iX);
+		boolean value= YesNoConverters.termYesNo2Boolean(a1,iX);
 		setWatchUpdates(value);
 	}
 	public void setWatchUpdates(boolean value) {
 		watchUpdates= value;
 	}
 	public void getWatchUpdates0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(getWatchUpdates(iX)));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(getWatchUpdates(iX)));
 	}
 	public void getWatchUpdates0fs(ChoisePoint iX) {
 	}
@@ -205,7 +205,7 @@ public abstract class DataAbstraction extends CustomControl {
 			return watchUpdates;
 		} else {
 			Term value= getBuiltInSlot_E_watch_updates();
-			return YesNo.termYesNo2Boolean(value,iX);
+			return YesNoConverters.termYesNo2Boolean(value,iX);
 		}
 	}
 	//
@@ -521,45 +521,45 @@ public abstract class DataAbstraction extends CustomControl {
 	//
 	public void setArchive1s(ChoisePoint iX, Term mode) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(iX);
-		boolean flag= OnOff.termOnOff2Boolean(mode,iX);
+		boolean flag= OnOffConverters.termOnOff2Boolean(mode,iX);
 		fileName.setArchive(flag);
 	}
 	public void setArchive2s(ChoisePoint iX, Term a1, Term mode) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(a1,iX);
-		boolean flag= OnOff.termOnOff2Boolean(mode,iX);
+		boolean flag= OnOffConverters.termOnOff2Boolean(mode,iX);
 		fileName.setArchive(flag);
 	}
 	//
 	public void setHidden1s(ChoisePoint iX, Term mode) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(iX);
-		boolean flag= OnOff.termOnOff2Boolean(mode,iX);
+		boolean flag= OnOffConverters.termOnOff2Boolean(mode,iX);
 		fileName.setHidden(flag);
 	}
 	public void setHidden2s(ChoisePoint iX, Term a1, Term mode) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(a1,iX);
-		boolean flag= OnOff.termOnOff2Boolean(mode,iX);
+		boolean flag= OnOffConverters.termOnOff2Boolean(mode,iX);
 		fileName.setHidden(flag);
 	}
 	//
 	public void setReadOnly1s(ChoisePoint iX, Term mode) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(iX);
-		boolean flag= OnOff.termOnOff2Boolean(mode,iX);
+		boolean flag= OnOffConverters.termOnOff2Boolean(mode,iX);
 		fileName.setReadOnly(flag);
 	}
 	public void setReadOnly2s(ChoisePoint iX, Term a1, Term mode) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(a1,iX);
-		boolean flag= OnOff.termOnOff2Boolean(mode,iX);
+		boolean flag= OnOffConverters.termOnOff2Boolean(mode,iX);
 		fileName.setReadOnly(flag);
 	}
 	//
 	public void setSystem1s(ChoisePoint iX, Term mode) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(iX);
-		boolean flag= OnOff.termOnOff2Boolean(mode,iX);
+		boolean flag= OnOffConverters.termOnOff2Boolean(mode,iX);
 		fileName.setSystem(flag);
 	}
 	public void setSystem2s(ChoisePoint iX, Term a1, Term mode) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(a1,iX);
-		boolean flag= OnOff.termOnOff2Boolean(mode,iX);
+		boolean flag= OnOffConverters.termOnOff2Boolean(mode,iX);
 		fileName.setSystem(flag);
 	}
 }

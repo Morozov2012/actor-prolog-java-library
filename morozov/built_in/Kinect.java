@@ -7,6 +7,7 @@ import morozov.system.converters.*;
 import morozov.system.kinect.*;
 import morozov.system.kinect.converters.interfaces.*;
 import morozov.system.kinect.errors.*;
+import morozov.system.kinect.frames.data.*;
 import morozov.system.kinect.frames.interfaces.*;
 import morozov.system.kinect.interfaces.*;
 import morozov.system.kinect.modes.*;
@@ -163,20 +164,15 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 		kinectListener.setVerticalCorrection(currentVerticalCorrection);
 	}
 	//
+	public KinectFrameWritableBaseAttributes createKinectFrameWritableBaseAttributes() {
+		return kinectListener.createKinectFrameWritableBaseAttributes();
+	}
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public void registerListener(KinectDeviceInterface device, boolean requireExclusiveAccess, ChoisePoint iX) {
 		boolean modeIsChanged;
 		synchronized (clientListeners) {
-			if (requireExclusiveAccess) {
-				if (providesExclusiveAccess) {
-					throw new KinectDeviceIsAlreadyInExclusiveAccessMode();
-				} else if (clientListeners.size() > 0) {
-					throw new KinectDeviceIsAlreadyInSharedAccessMode();
-				} else {
-					providesExclusiveAccess= true;
-				}
-			};
 			boolean deviceIsFound= false;
 			for (int n=0; n < clientListeners.size(); n++) {
 				KinectDeviceInterface element= clientListeners.get(n);
@@ -191,13 +187,54 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 				}
 			};
 			if (!deviceIsFound) {
+				if (requireExclusiveAccess) {
+					if (providesExclusiveAccess) {
+						throw new KinectDeviceIsAlreadyInExclusiveAccessMode();
+					} else if (clientListeners.size() > 0) {
+						throw new KinectDeviceIsAlreadyInSharedAccessMode();
+					} else {
+						providesExclusiveAccess= true;
+					}
+				} else {
+					providesExclusiveAccess= false;
+				};
 				device.setIsSuspended(true);
 				clientListeners.add(device);
+			} else {
+				providesExclusiveAccess= requireExclusiveAccess;
 			};
 			modeIsChanged= changeDataAcquisitionMode();
 		};
 		if (modeIsChanged) {
 			reactivateDevice(iX);
+		}
+	}
+	//
+	public boolean isRegisteredListener(KinectDeviceInterface device, ChoisePoint iX) {
+		synchronized (clientListeners) {
+			boolean deviceIsFound= false;
+			for (int n=0; n < clientListeners.size(); n++) {
+				KinectDeviceInterface element= clientListeners.get(n);
+				if (element.equals(device)) {
+					deviceIsFound= true;
+					break;
+				}
+			};
+			return (deviceIsFound && kinectListener.isConnected());
+		}
+	}
+	//
+	public boolean hasExclusiveAccess(KinectDeviceInterface device, ChoisePoint iX) {
+		synchronized (clientListeners) {
+			boolean deviceIsFound= false;
+			for (int n=0; n < clientListeners.size(); n++) {
+				KinectDeviceInterface element= clientListeners.get(n);
+				if (element.equals(device)) {
+					deviceIsFound= true;
+					break;
+				}
+			};
+			return (deviceIsFound && providesExclusiveAccess && kinectListener.isConnected());
 		}
 	}
 	//
@@ -301,7 +338,7 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 					continue;
 				};
 				if (device.requiresFrameType(KinectDataArrayType.DEPTH_FRAME)) {
-					device.sendFrame(frame);
+					device.sendKinectFrame(frame);
 				}
 			}
 		}
@@ -314,7 +351,7 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 					continue;
 				};
 				if (device.requiresFrameType(KinectDataArrayType.INFRARED_FRAME)) {
-					device.sendFrame(frame);
+					device.sendKinectFrame(frame);
 				}
 			}
 		}
@@ -327,7 +364,7 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 					continue;
 				};
 				if (device.requiresFrameType(KinectDataArrayType.LONG_EXPOSURE_INFRARED_FRAME)) {
-					device.sendFrame(frame);
+					device.sendKinectFrame(frame);
 				}
 			}
 		}
@@ -340,7 +377,7 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 					continue;
 				};
 				if (device.requiresFrameType(KinectDataArrayType.MAPPED_COLOR_FRAME)) {
-					device.sendFrame(frame);
+					device.sendKinectFrame(frame);
 				}
 			}
 		}
@@ -353,7 +390,7 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 					continue;
 				};
 				if (device.requiresFrameType(KinectDataArrayType.POINT_CLOUDS_FRAME)) {
-					device.sendFrame(frame);
+					device.sendKinectFrame(frame);
 				}
 			}
 		}
@@ -366,7 +403,7 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 					continue;
 				};
 				if (device.requiresFrameType(KinectDataArrayType.COLOR_FRAME)) {
-					device.sendFrame(frame);
+					device.sendKinectFrame(frame);
 				}
 			}
 		}

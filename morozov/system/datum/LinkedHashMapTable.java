@@ -21,7 +21,15 @@ public class LinkedHashMapTable extends HashMapTable {
 	protected HashSet<BigInteger> freeKeyNumbers= new HashSet<BigInteger>();
 	protected BigInteger recentKeyNumber= BigInteger.ZERO;
 	//
-	protected static Term linkedHashMapTerm= new PrologSymbol(SymbolCodes.symbolCode_E_LinkedHashMap);
+	protected static Term termLinkedHashMap= new PrologSymbol(SymbolCodes.symbolCode_E_LinkedHashMap);
+	//
+	private static final long serialVersionUID= 0xB4E47ABCFEC0494CL; // -5412065900046038708L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.datum","LinkedHashMapTable");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public LinkedHashMapTable(PrologDomain domain, boolean reuseKN) {
 		super(domain,reuseKN);
@@ -33,7 +41,7 @@ public class LinkedHashMapTable extends HashMapTable {
 	///////////////////////////////////////////////////////////////
 	//
 	public Term getType() {
-		return linkedHashMapTerm;
+		return termLinkedHashMap;
 	}
 	//
 	///////////////////////////////////////////////////////////////

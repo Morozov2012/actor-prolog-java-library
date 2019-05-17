@@ -4,7 +4,9 @@ package morozov.system.ffmpeg;
 
 import static org.bytedeco.javacpp.avutil.*;
 
-public class FFmpegFrame {
+import morozov.system.ffmpeg.interfaces.*;
+
+public class FFmpegFrame implements FFmpegFrameInterface {
 	//
 	protected java.awt.image.BufferedImage image;
 	protected long time;

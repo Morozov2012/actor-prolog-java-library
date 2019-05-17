@@ -7,9 +7,11 @@ import target.*;
 import morozov.domains.*;
 import morozov.domains.errors.*;
 import morozov.run.*;
-import morozov.system.errors.*;
-import morozov.system.datum.*;
 import morozov.syntax.scanner.*;
+import morozov.syntax.scanner.errors.*;
+import morozov.syntax.scanner.interfaces.*;
+import morozov.system.datum.*;
+import morozov.system.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
 import morozov.terms.errors.*;
@@ -23,7 +25,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.HashMap;
 import java.util.Set;
 import java.util.Iterator;
@@ -34,6 +38,9 @@ public class GeneralConverters {
 	protected static Term termNormal = new PrologSymbol(SymbolCodes.symbolCode_E_normal);
 	protected static Term termMinimal = new PrologSymbol(SymbolCodes.symbolCode_E_minimal);
 	protected static Term termMaximal = new PrologSymbol(SymbolCodes.symbolCode_E_maximal);
+	//
+	protected static LexicalScannerMasterInterface dummyLexicalScannerMaster= new DummyLexicalScannerMaster();
+	protected static ChoisePoint dummyChoisePoint= null;
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -110,31 +117,37 @@ public class GeneralConverters {
 		try {
 			result= new BigInteger(text);
 		} catch (NumberFormatException nfe) {
-			LexicalScanner scanner= new LexicalScanner(true);
-			PrologToken[] tokens= scanner.analyse(text);
-			if (tokens.length==2) {
-				if (tokens[0].getType()==PrologTokenType.INTEGER) {
-					result= tokens[0].getIntegerValue();
-				} else {
-					throw TermIsNotAnInteger.instance;
-				}
-			} else if (tokens.length==3) {
-				if (tokens[0].getType()==PrologTokenType.MINUS) {
-					if (tokens[1].getType()==PrologTokenType.INTEGER) {
-						result= tokens[1].getIntegerValue().negate();
-					} else {
-						throw TermIsNotAnInteger.instance;
-					}
-				} else if (tokens[0].getType()==PrologTokenType.PLUS) {
-					if (tokens[1].getType()==PrologTokenType.INTEGER) {
-						result= tokens[1].getIntegerValue();
-					} else {
-						throw TermIsNotAnInteger.instance;
-					}
-				} else {
-					throw TermIsNotAnInteger.instance;
-				}
-			} else {
+			LexicalScanner scanner= new LexicalScanner(dummyLexicalScannerMaster,true);
+			try {
+///////////////////////////////////////////////////////////////////////
+PrologToken[] tokens= scanner.analyse(text,dummyChoisePoint);
+if (tokens.length==2) {
+	if (tokens[0].getType()==PrologTokenType.INTEGER) {
+		result= tokens[0].getIntegerValueOrTermIsNotAnInteger();
+	} else {
+		throw TermIsNotAnInteger.instance;
+	}
+} else if (tokens.length==3) {
+	if (tokens[0].getType()==PrologTokenType.MINUS) {
+		if (tokens[1].getType()==PrologTokenType.INTEGER) {
+			result= tokens[1].getIntegerValueOrTermIsNotAnInteger().negate();
+		} else {
+			throw TermIsNotAnInteger.instance;
+		}
+	} else if (tokens[0].getType()==PrologTokenType.PLUS) {
+		if (tokens[1].getType()==PrologTokenType.INTEGER) {
+			result= tokens[1].getIntegerValueOrTermIsNotAnInteger();
+		} else {
+			throw TermIsNotAnInteger.instance;
+		}
+	} else {
+		throw TermIsNotAnInteger.instance;
+	}
+} else {
+	throw TermIsNotAnInteger.instance;
+}
+///////////////////////////////////////////////////////////////////////
+			} catch (LexicalScannerError e) {
 				throw TermIsNotAnInteger.instance;
 			}
 		};
@@ -154,52 +167,58 @@ public class GeneralConverters {
 		try {
 			result= new BigInteger(text);
 		} catch (NumberFormatException nfe) {
-			LexicalScanner scanner= new LexicalScanner(true);
-			PrologToken[] tokens= scanner.analyse(text);
-			if (tokens.length==2) {
-				if (tokens[0].getType()==PrologTokenType.INTEGER) {
-					result= tokens[0].getIntegerValue();
-				} else if (tokens[0].getType()==PrologTokenType.REAL) {
-					double realValue= tokens[0].getRealValue();
-					try {
-						result= doubleToBigInteger(realValue);
-					} catch (TermIsNotAReal b3) {
-						throw TermIsNotAnInteger.instance;
-					}
-				} else {
-					throw TermIsNotAnInteger.instance;
-				}
-			} else if (tokens.length==3) {
-				if (tokens[0].getType()==PrologTokenType.MINUS) {
-					if (tokens[1].getType()==PrologTokenType.INTEGER) {
-						result= tokens[1].getIntegerValue().negate();
-					} else if (tokens[1].getType()==PrologTokenType.REAL) {
-						double realValue= tokens[1].getRealValue();
-						try {
-							result= doubleToBigInteger(realValue).negate();
-						} catch (TermIsNotAReal b3) {
-							throw TermIsNotAnInteger.instance;
-						}
-					} else {
-						throw TermIsNotAnInteger.instance;
-					}
-				} else if (tokens[0].getType()==PrologTokenType.PLUS) {
-					if (tokens[1].getType()==PrologTokenType.INTEGER) {
-						result= tokens[1].getIntegerValue();
-					} else if (tokens[1].getType()==PrologTokenType.REAL) {
-						double realValue= tokens[1].getRealValue();
-						try {
-							result= doubleToBigInteger(realValue);
-						} catch (TermIsNotAReal b3) {
-							throw TermIsNotAnInteger.instance;
-						}
-					} else {
-						throw TermIsNotAnInteger.instance;
-					}
-				} else {
-					throw TermIsNotAnInteger.instance;
-				}
-			} else {
+			LexicalScanner scanner= new LexicalScanner(dummyLexicalScannerMaster,true);
+			try {
+///////////////////////////////////////////////////////////////////////
+PrologToken[] tokens= scanner.analyse(text,dummyChoisePoint);
+if (tokens.length==2) {
+	if (tokens[0].getType()==PrologTokenType.INTEGER) {
+		result= tokens[0].getIntegerValueOrTermIsNotAnInteger();
+	} else if (tokens[0].getType()==PrologTokenType.REAL) {
+		try {
+			double realValue= tokens[0].getRealValueOrTermIsNotAReal();
+			result= doubleToBigInteger(realValue);
+		} catch (TermIsNotAReal b3) {
+			throw TermIsNotAnInteger.instance;
+		}
+	} else {
+		throw TermIsNotAnInteger.instance;
+	}
+} else if (tokens.length==3) {
+	if (tokens[0].getType()==PrologTokenType.MINUS) {
+		if (tokens[1].getType()==PrologTokenType.INTEGER) {
+			result= tokens[1].getIntegerValueOrTermIsNotAnInteger().negate();
+		} else if (tokens[1].getType()==PrologTokenType.REAL) {
+			try {
+				double realValue= tokens[1].getRealValueOrTermIsNotAReal();
+				result= doubleToBigInteger(realValue).negate();
+			} catch (TermIsNotAReal b3) {
+				throw TermIsNotAnInteger.instance;
+			}
+		} else {
+			throw TermIsNotAnInteger.instance;
+		}
+	} else if (tokens[0].getType()==PrologTokenType.PLUS) {
+		if (tokens[1].getType()==PrologTokenType.INTEGER) {
+			result= tokens[1].getIntegerValueOrTermIsNotAnInteger();
+		} else if (tokens[1].getType()==PrologTokenType.REAL) {
+			try {
+				double realValue= tokens[1].getRealValueOrTermIsNotAReal();
+				result= doubleToBigInteger(realValue);
+			} catch (TermIsNotAReal b3) {
+				throw TermIsNotAnInteger.instance;
+			}
+		} else {
+			throw TermIsNotAnInteger.instance;
+		}
+	} else {
+		throw TermIsNotAnInteger.instance;
+	}
+} else {
+	throw TermIsNotAnInteger.instance;
+}
+///////////////////////////////////////////////////////////////////////
+			} catch (LexicalScannerError e) {
 				throw TermIsNotAnInteger.instance;
 			}
 		};
@@ -517,12 +536,13 @@ public class GeneralConverters {
 		}
 	}
 	//
+	/*
 	public static BigInteger doubleToBigInteger(double value) throws TermIsNotAReal {
 		value= StrictMath.round(value);
 		String text= String.format("%1f",value);
 		int indexBound= text.length() - 1;
 		int p1= 0;
-		while(true) {
+		while (true) {
 			if (p1 <= indexBound) {
 				int code= text.codePointAt(p1);
 				if (code >= '0' && code <= '9') {
@@ -541,6 +561,15 @@ public class GeneralConverters {
 		try {
 			return new BigInteger(text.substring(0,p1));
 		} catch (NumberFormatException nfe) {
+			throw TermIsNotAReal.instance;
+		}
+	}
+	*/
+	public static BigInteger doubleToBigInteger(double value) throws TermIsNotAReal {
+		// value= StrictMath.round(value);
+		try {
+			return (new BigDecimal(value,MathContext.DECIMAL128)).toBigInteger();
+		} catch (NumberFormatException e) {
 			throw TermIsNotAReal.instance;
 		}
 	}
@@ -593,37 +622,55 @@ public class GeneralConverters {
 	//
 	public static double stringToReal(String text) throws TermIsNotAReal {
 		double result;
-		LexicalScanner scanner= new LexicalScanner(true);
-		PrologToken[] tokens= scanner.analyse(text);
-		if (tokens.length==2) {
-			if (tokens[0].getType()==PrologTokenType.INTEGER) {
-				result= tokens[0].getIntegerValue().doubleValue();
-			} else if (tokens[0].getType()==PrologTokenType.REAL) {
-				result= tokens[0].getRealValue();
-			} else {
+		LexicalScanner scanner= new LexicalScanner(dummyLexicalScannerMaster,true);
+		try {
+///////////////////////////////////////////////////////////////////////
+PrologToken[] tokens= scanner.analyse(text,dummyChoisePoint);
+if (tokens.length==2) {
+	if (tokens[0].getType()==PrologTokenType.INTEGER) {
+		try {
+			result= tokens[0].getIntegerValueOrTermIsNotAnInteger().doubleValue();
+		} catch (TermIsNotAnInteger e) {
+			throw TermIsNotAReal.instance;
+		}
+	} else if (tokens[0].getType()==PrologTokenType.REAL) {
+		result= tokens[0].getRealValueOrTermIsNotAReal();
+	} else {
+		throw TermIsNotAReal.instance;
+	}
+} else if (tokens.length==3) {
+	if (tokens[0].getType()==PrologTokenType.MINUS) {
+		if (tokens[1].getType()==PrologTokenType.INTEGER) {
+			try {
+				result= tokens[1].getIntegerValueOrTermIsNotAnInteger().negate().doubleValue();
+			} catch (TermIsNotAnInteger e) {
 				throw TermIsNotAReal.instance;
 			}
-		} else if (tokens.length==3) {
-			if (tokens[0].getType()==PrologTokenType.MINUS) {
-				if (tokens[1].getType()==PrologTokenType.INTEGER) {
-					result= tokens[1].getIntegerValue().negate().doubleValue();
-				} else if (tokens[1].getType()==PrologTokenType.REAL) {
-					result= - tokens[1].getRealValue();
-				} else {
-					throw TermIsNotAReal.instance;
-				}
-			} else if (tokens[0].getType()==PrologTokenType.PLUS) {
-				if (tokens[1].getType()==PrologTokenType.INTEGER) {
-					result= tokens[1].getIntegerValue().doubleValue();
-				} else if (tokens[1].getType()==PrologTokenType.REAL) {
-					result= tokens[1].getRealValue();
-				} else {
-					throw TermIsNotAReal.instance;
-				}
-			} else {
-				throw TermIsNotAReal.instance;
-			}
+		} else if (tokens[1].getType()==PrologTokenType.REAL) {
+			result= - tokens[1].getRealValueOrTermIsNotAReal();
 		} else {
+			throw TermIsNotAReal.instance;
+		}
+	} else if (tokens[0].getType()==PrologTokenType.PLUS) {
+		if (tokens[1].getType()==PrologTokenType.INTEGER) {
+			try {
+				result= tokens[1].getIntegerValueOrTermIsNotAnInteger().doubleValue();
+			} catch (TermIsNotAnInteger e) {
+				throw TermIsNotAReal.instance;
+			}
+		} else if (tokens[1].getType()==PrologTokenType.REAL) {
+			result= tokens[1].getRealValueOrTermIsNotAReal();
+		} else {
+			throw TermIsNotAReal.instance;
+		}
+	} else {
+		throw TermIsNotAReal.instance;
+	}
+} else {
+	throw TermIsNotAReal.instance;
+};
+///////////////////////////////////////////////////////////////////////
+		} catch (LexicalScannerError e) {
 			throw TermIsNotAReal.instance;
 		};
 		return result;
@@ -661,37 +708,43 @@ public class GeneralConverters {
 		try {
 			result= new PrologInteger(new BigInteger(text));
 		} catch (NumberFormatException nfe) {
-			LexicalScanner scanner= new LexicalScanner(true);
-			PrologToken[] tokens= scanner.analyse(text);
-			if (tokens.length==2) {
-				if (tokens[0].getType()==PrologTokenType.INTEGER) {
-					result= new PrologInteger(tokens[0].getIntegerValue());
-				} else if (tokens[0].getType()==PrologTokenType.REAL) {
-					result= new PrologReal(tokens[0].getRealValue());
-				} else {
-					throw Backtracking.instance;
-				}
-			} else if (tokens.length==3) {
-				if (tokens[0].getType()==PrologTokenType.MINUS) {
-					if (tokens[1].getType()==PrologTokenType.INTEGER) {
-						result= new PrologInteger(tokens[1].getIntegerValue().negate());
-					} else if (tokens[1].getType()==PrologTokenType.REAL) {
-						result= new PrologReal(-tokens[1].getRealValue());
-					} else {
-						throw Backtracking.instance;
-					}
-				} else if (tokens[0].getType()==PrologTokenType.PLUS) {
-					if (tokens[1].getType()==PrologTokenType.INTEGER) {
-						result= new PrologInteger(tokens[1].getIntegerValue());
-					} else if (tokens[1].getType()==PrologTokenType.REAL) {
-						result= new PrologReal(tokens[1].getRealValue());
-					} else {
-						throw Backtracking.instance;
-					}
-				} else {
-					throw Backtracking.instance;
-				}
-			} else {
+			LexicalScanner scanner= new LexicalScanner(dummyLexicalScannerMaster,true);
+			try {
+///////////////////////////////////////////////////////////////////////
+PrologToken[] tokens= scanner.analyse(text,dummyChoisePoint);
+if (tokens.length==2) {
+	if (tokens[0].getType()==PrologTokenType.INTEGER) {
+		result= new PrologInteger(tokens[0].getIntegerValueOrBacktrack());
+	} else if (tokens[0].getType()==PrologTokenType.REAL) {
+		result= new PrologReal(tokens[0].getRealValueOrBacktrack());
+	} else {
+		throw Backtracking.instance;
+	}
+} else if (tokens.length==3) {
+	if (tokens[0].getType()==PrologTokenType.MINUS) {
+		if (tokens[1].getType()==PrologTokenType.INTEGER) {
+			result= new PrologInteger(tokens[1].getIntegerValueOrBacktrack().negate());
+		} else if (tokens[1].getType()==PrologTokenType.REAL) {
+			result= new PrologReal(-tokens[1].getRealValueOrBacktrack());
+		} else {
+			throw Backtracking.instance;
+		}
+	} else if (tokens[0].getType()==PrologTokenType.PLUS) {
+		if (tokens[1].getType()==PrologTokenType.INTEGER) {
+			result= new PrologInteger(tokens[1].getIntegerValueOrBacktrack());
+		} else if (tokens[1].getType()==PrologTokenType.REAL) {
+			result= new PrologReal(tokens[1].getRealValueOrBacktrack());
+		} else {
+			throw Backtracking.instance;
+		}
+	} else {
+		throw Backtracking.instance;
+	}
+} else {
+	throw Backtracking.instance;
+}
+///////////////////////////////////////////////////////////////////////
+			} catch (LexicalScannerError e) {
 				throw Backtracking.instance;
 			}
 		};
@@ -759,6 +812,35 @@ public class GeneralConverters {
 			stringList.add(string);
 		} catch (Throwable e) {
 		}
+	}
+	//
+	public static void termToSymbolCodes(HashSet<Long> symbolCodeList, Term value, ChoisePoint iX) {
+		Term nextHead;
+		Term currentTail= value;
+		try {
+			while (true) {
+				nextHead= currentTail.getNextListHead(iX);
+				termToSymbolCodes(symbolCodeList,nextHead,iX);
+				currentTail= currentTail.getNextListTail(iX);
+			}
+		} catch (EndOfList e) {
+		} catch (TermIsNotAList e) {
+			try {
+				long symbolCode= currentTail.getSymbolValue(iX);
+				symbolCodeList.add(symbolCode);
+			} catch (TermIsNotASymbol e2) {
+			}
+		} catch (Throwable e1) {
+		}
+	}
+	//
+	public static Term codeArrayToSymbolList(HashSet<Long> symbolCodeList) {
+		Long[] array= symbolCodeList.toArray(new Long[0]);
+		Term result= PrologEmptyList.instance;
+		for (int n=array.length-1; n >= 0; n--) {
+			result= new PrologList(new PrologSymbol(array[n]),result);
+		};
+		return result;
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -872,7 +954,7 @@ public class GeneralConverters {
 	public static Term[] listToArray(Term tail, ChoisePoint iX) {
 		ArrayList<Term> buffer= new ArrayList<Term>();
 		try {
-			while(true) {
+			while (true) {
 				Term value= tail.getNextListHead(iX);
 				buffer.add(value);
 				tail= tail.getNextListTail(iX);
@@ -1158,7 +1240,7 @@ public class GeneralConverters {
 		Term argument;
 		ByteArrayInputStream inputStream= new ByteArrayInputStream(argumentByteArray);
 		try {
-			DataStoreInputStream objectStream= new DataStoreInputStream(inputStream,false);
+			DataStoreInputStream objectStream= new DataStoreInputStream(inputStream/*,false*/);
 			try {
 				argument= (Term)objectStream.readObject();
 				if (objectStream.worldsAreDetected()) {
@@ -1187,7 +1269,7 @@ public class GeneralConverters {
 		Term argument;
 		ByteArrayInputStream inputStream= new ByteArrayInputStream(argumentByteArray);
 		try {
-			DataStoreInputStream objectStream= new DataStoreInputStream(inputStream,false);
+			DataStoreInputStream objectStream= new DataStoreInputStream(inputStream/*,false*/);
 			try {
 				argument= (Term)objectStream.readObject();
 				if (objectStream.worldsAreDetected()) {
@@ -1227,7 +1309,7 @@ public class GeneralConverters {
 		Term[] arguments;
 		ByteArrayInputStream inputStream= new ByteArrayInputStream(argumentByteArray);
 		try {
-			DataStoreInputStream objectStream= new DataStoreInputStream(inputStream,false);
+			DataStoreInputStream objectStream= new DataStoreInputStream(inputStream/*,false*/);
 			try {
 				arguments= (Term[])objectStream.readObject();
 				if (objectStream.worldsAreDetected()) {
@@ -1259,7 +1341,7 @@ public class GeneralConverters {
 		HashMap<String,PrologDomain> localDomainTable;
 		ByteArrayInputStream inputStream= new ByteArrayInputStream(argumentByteArray);
 		try {
-			DataStoreInputStream objectStream= new DataStoreInputStream(inputStream,false);
+			DataStoreInputStream objectStream= new DataStoreInputStream(inputStream/*,false*/);
 			try {
 				localDomainTable= (HashMap<String,PrologDomain>)objectStream.readObject();
 			} finally {

@@ -2,14 +2,14 @@
 
 package morozov.system.gui.space3d;
 
-import javax.media.j3d.Canvas3D;
+// import javax.media.j3d.Canvas3D;
 import javax.media.j3d.ImageComponent2D;
 import javax.media.j3d.ImageComponent;
 
 import java.awt.image.BufferedImage;
 import java.awt.GraphicsConfiguration;
 
-public class OffScreenCanvas3D extends Canvas3D {
+public class OffScreenCanvas3D extends javax.media.j3d.Canvas3D {
 	public OffScreenCanvas3D(GraphicsConfiguration configuration) {
 		super(configuration,true);
 	}
@@ -17,12 +17,14 @@ public class OffScreenCanvas3D extends Canvas3D {
 		if (width <= 0 || height <= 0) {
 			return null;
 		};
-		BufferedImage image= new BufferedImage(width,height,BufferedImage.TYPE_INT_ARGB);
+		// BufferedImage image= new BufferedImage(width,height,BufferedImage.TYPE_INT_ARGB);
+		BufferedImage image= new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
 		// ImageComponent2D:
 		// This class defines a 2D image component. This is
 		// used for texture images, background images and
 		// raster components of Shape3D nodes. 
-		ImageComponent2D buffer= new ImageComponent2D(ImageComponent.FORMAT_RGBA,image);
+		// ImageComponent2D buffer= new ImageComponent2D(ImageComponent.FORMAT_RGBA,image);
+		ImageComponent2D buffer= new ImageComponent2D(ImageComponent.FORMAT_RGB,image);
 		// setOffScreenBuffer:
 		// Sets the off-screen buffer for this Canvas3D. The
 		// specified image is written into by the Java 3D

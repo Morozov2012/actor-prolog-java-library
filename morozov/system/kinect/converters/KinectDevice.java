@@ -8,6 +8,7 @@ import morozov.built_in.*;
 import morozov.run.*;
 import morozov.system.kinect.converters.errors.*;
 import morozov.system.kinect.converters.interfaces.*;
+import morozov.system.kinect.frames.data.*;
 import morozov.system.kinect.frames.interfaces.*;
 import morozov.system.kinect.interfaces.*;
 import morozov.system.kinect.modes.*;
@@ -61,6 +62,10 @@ public class KinectDevice implements KinectDeviceInterface {
 		if (isRegistered.get()) {
 			registerListener(givenDisplayingMode,givenOptimizationMode,requireExclusiveAccess.get(),iX);
 		}
+	}
+	//
+	public KinectFrameWritableBaseAttributes createKinectFrameWritableBaseAttributes() {
+		return device.get().createKinectFrameWritableBaseAttributes();
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -137,6 +142,38 @@ public class KinectDevice implements KinectDeviceInterface {
 		}
 	}
 	//
+	public boolean isRegisteredListener(ChoisePoint iX) {
+		if (!useNoDevice.get()) {
+			if (isRegistered.get()) {
+				try {
+					return device.get().hasExclusiveAccess(this,iX);
+				} catch (Throwable e) {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+	//
+	public boolean hasExclusiveAccess(ChoisePoint iX) {
+		if (!useNoDevice.get()) {
+			if (isRegistered.get()) {
+				try {
+					return device.get().isRegisteredListener(this,iX);
+				} catch (Throwable e) {
+					return false;
+				}
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+	//
 	public void cancelListener(ChoisePoint iX) {
 		if (!useNoDevice.get()) {
 			if (performanceOptimization.get()==KinectPerformanceOptimization.OPERATION_SPEED) {
@@ -182,10 +219,10 @@ public class KinectDevice implements KinectDeviceInterface {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void sendFrame(KinectFrameInterface frame) {
+	public void sendKinectFrame(KinectFrameInterface frame) {
 		if (!useNoDevice.get()) {
 			if (!isSuspended.get()) {
-				buffer.get().sendFrame(frame);
+				buffer.get().sendKinectFrame(frame);
 			}
 		} else {
 			throw new InputDeviceIsNotDefined();

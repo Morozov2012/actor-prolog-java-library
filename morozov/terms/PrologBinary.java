@@ -14,6 +14,14 @@ public class PrologBinary extends Term {
 	//
 	private byte[] value;
 	//
+	private static final long serialVersionUID= 0x8F588CA49DAD4B27L; // -8117583689687413977L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.terms","PrologBinary");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public PrologBinary(byte[] v) {
 		value= v;
 	}

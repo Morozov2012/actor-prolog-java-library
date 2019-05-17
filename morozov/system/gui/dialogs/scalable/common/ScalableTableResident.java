@@ -29,6 +29,14 @@ public class ScalableTableResident extends Resident {
 	protected AtomicBoolean requestIsToBeSend= new AtomicBoolean(false);
 	protected Term previousResult= null;
 	//
+	private static final long serialVersionUID= 0x86C3D820A59BC5AAL; // -8735901217439627862L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.gui.dialogs.scalable.common","ScalableTableResident");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public ScalableTableResident(AbstractDialog dialog, ATable control) {
 		target= dialog.getTargetWorld();
 		table= control;

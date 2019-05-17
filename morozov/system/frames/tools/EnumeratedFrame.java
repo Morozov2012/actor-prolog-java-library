@@ -2,31 +2,24 @@
 
 package morozov.system.frames.tools;
 
-import morozov.system.frames.interfaces.*;
-
 import java.io.Serializable;
 
-public class EnumeratedFrame implements Serializable {
+public abstract class EnumeratedFrame implements Serializable {
 	//
-	protected DataFrameInterface frame;
-	protected long numberOfFrame;
+	// private static final long serialVersionUID= 0xFB34B21E58C97F83L; // -345455427992322173L
+	private static final long serialVersionUID= 0xFB34B21E58C97F83L; // -345455427992322173L
 	//
-	public EnumeratedFrame(
-			DataFrameInterface givenFrame,
-			long givenNumberOfFrame) {
-		frame= givenFrame;
-		numberOfFrame= givenNumberOfFrame;
-	}
+	// static {
+	//	// new SynchronizedFrames(null,0,null,0);
+	//	// new EnumeratedFFmpegFrame(null,null,0);
+	//	// new EnumeratedCompoundFrame(null,0);
+	//	// new EnumeratedDataFrame(null,0);
+	//	// new EnumeratedKinectFrame(null,0);
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.system.frames.tools","EnumeratedFrame");
+	// }
 	//
-	public DataFrameInterface getFrame() {
-		return frame;
-	}
+	///////////////////////////////////////////////////////////////
 	//
-	public long getNumberOfFrame() {
-		return numberOfFrame;
-	}
-	//
-	public long getTime() {
-		return frame.getTime();
-	}
+	// abstract public long getNumberOfFrame();
+	abstract public long getTime();
 }

@@ -272,7 +272,7 @@ public class DataStoreIO {
 		try {
 			InputStream inputStream= Files.newInputStream(indexPath);
 			try {
-				ObjectInputStream objectInputStream= new DataStoreInputStream(new BufferedInputStream(inputStream),false);
+				ObjectInputStream objectInputStream= new DataStoreInputStream(new BufferedInputStream(inputStream)/*,false*/);
 				try {
 					return (SectionIndex)objectInputStream.readObject();
 				} catch (ClassNotFoundException e) {
@@ -587,7 +587,7 @@ public class DataStoreIO {
 				Path sectionPath= subdirectoryPath.resolve(sectionFileName);
 				DatabaseTable currentTable= unsafelyReadSection(sectionPath);
 				DatabaseTableContainer currentTableContainer= new DatabaseTableContainer(currentTable,true);
-				String entryName= currentTable.getEntryName();
+				String entryName= currentTable.getCurrentEntryName();
 				FileTime time2= null;
 				try {
 					BasicFileAttributes ba= Files.readAttributes(sectionPath,BasicFileAttributes.class);
@@ -673,7 +673,7 @@ public class DataStoreIO {
 		try {
 			InputStream inputStream= Files.newInputStream(dataFilePath);
 			try {
-				ObjectInputStream objectInputStream= new DataStoreInputStream(new BufferedInputStream(inputStream),true);
+				ObjectInputStream objectInputStream= new DataStoreInputStream(new BufferedInputStream(inputStream)/*,true*/);
 				try {
 					DatabaseTable newTable= (DatabaseTable)objectInputStream.readObject();
 					newTable.acceptAttributes(entryName,actualTableContainer);
@@ -700,7 +700,7 @@ public class DataStoreIO {
 		try {
 			InputStream inputStream= Files.newInputStream(dataFilePath);
 			try {
-				ObjectInputStream objectInputStream= new DataStoreInputStream(new BufferedInputStream(inputStream),true);
+				ObjectInputStream objectInputStream= new DataStoreInputStream(new BufferedInputStream(inputStream)/*,true*/);
 				try {
 					return (DatabaseTable)objectInputStream.readObject();
 				} catch (ClassNotFoundException e) {
@@ -766,7 +766,7 @@ public class DataStoreIO {
 		try {
 			InputStream inputStream= Files.newInputStream(dataStorePath);
 			try {
-				ObjectInputStream objectInputStream= new DataStoreInputStream(new BufferedInputStream(inputStream),true);
+				ObjectInputStream objectInputStream= new DataStoreInputStream(new BufferedInputStream(inputStream)/*,true*/);
 				try {
 					return (HashMap<String,DatabaseTableContainer>)objectInputStream.readObject();
 				} catch (ClassNotFoundException e) {

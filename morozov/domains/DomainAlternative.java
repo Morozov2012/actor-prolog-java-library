@@ -20,6 +20,12 @@ import java.math.BigInteger;
 
 public abstract class DomainAlternative implements Serializable {
 	//
+	private static final long serialVersionUID= 0xEEB29AF0B5BDCF5AL; // -1246763788196262054L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","DomainAlternative");
+	// }
+	//
 	public void initiate() {
 	}
 	//

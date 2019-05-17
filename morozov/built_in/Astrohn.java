@@ -6,7 +6,6 @@ import morozov.run.*;
 import morozov.system.*;
 import morozov.system.astrohn.*;
 import morozov.system.astrohn.converters.*;
-import morozov.system.astrohn.converters.interfaces.*;
 import morozov.system.astrohn.errors.*;
 import morozov.system.astrohn.frames.*;
 import morozov.system.astrohn.frames.data.*;
@@ -14,7 +13,6 @@ import morozov.system.astrohn.frames.interfaces.*;
 import morozov.system.astrohn.interfaces.*;
 import morozov.system.converters.*;
 import morozov.system.frames.converters.*;
-import morozov.system.frames.converters.interfaces.*;
 import morozov.system.frames.data.*;
 import morozov.system.frames.data.interfaces.*;
 import morozov.system.frames.interfaces.*;
@@ -24,16 +22,20 @@ import morozov.system.ip_camera.frames.*;
 import morozov.system.ip_camera.frames.interfaces.*;
 import morozov.system.ip_camera.interfaces.*;
 import morozov.system.modes.*;
+import morozov.system.signals.*;
 import morozov.terms.*;
 import morozov.worlds.*;
 
+import java.awt.Color;
 import java.io.IOException;
-import java.util.LinkedList;
-import java.util.ListIterator;
+import java.math.BigInteger;
 import java.util.Arrays;
+import java.util.ArrayDeque;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
-public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataConsumerInterface, IPCameraDataConsumerInterface, DataFrameConsumerInterface, DataFrameProviderInterface {
+public abstract class Astrohn extends ThermalDataAcquisitionBuffer implements AstrohnDataConsumerInterface, IPCameraDataConsumerInterface {
 	//
 	protected String terahertzCameraAddress;
 	protected Integer terahertzCameraPort;
@@ -43,12 +45,17 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 	protected AstrohnDataAcquisition terahertzDataAcquisition= new AstrohnDataAcquisition();
 	protected IPCameraDataAcquisition ipCameraDataAcquisition= new IPCameraDataAcquisition();
 	//
+	protected AtomicInteger colorCameraDelayQueueSize= new AtomicInteger(6);
+	protected ArrayDeque<IPCameraFrame> ipCameraQueue= new ArrayDeque<>(colorCameraDelayQueueSize.get());
+	//
 	protected AtomicLong counterOfAcquiredTerahertzFrames= new AtomicLong(-1);
 	protected AtomicLong counterOfAcquiredIPCameraFrames= new AtomicLong(-1);
 	//
 	protected AtomicLong numberOfRecentTerahertzFrame= new AtomicLong(-1);
 	protected AtomicLong numberOfRecentIPCameraFrame= new AtomicLong(-1);
 	protected AtomicLong numberOfSynchronousIPCameraFrame= new AtomicLong(-1);
+	//
+	protected AtomicBoolean actingSynchronizeTerahertzAndColorStreams= new AtomicBoolean(false);
 	//
 	protected long numberOfRepeatedTerahertzFrame= -1;
 	protected long numberOfRepeatedColorFrame= -1;
@@ -80,8 +87,6 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 	protected long firstAcceptedColorFrameNumber= -1;
 	protected long firstAcceptedColorFrameTime= -1;
 	//
-	protected LinkedList<SynchronizedFrames> history= new LinkedList<>();
-	//
 	///////////////////////////////////////////////////////////////
 	//
 	public Astrohn() {
@@ -107,6 +112,7 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 	abstract public Term getBuiltInSlot_E_terahertz_camera_port();
 	abstract public Term getBuiltInSlot_E_color_camera_url();
 	abstract public Term getBuiltInSlot_E_synchronize_terahertz_and_color_streams();
+	abstract public Term getBuiltInSlot_E_color_camera_delay_queue_size();
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -182,14 +188,15 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 	// get/set synchronize_terahertz_and_color_streams
 	//
 	public void setSynchronizeTerahertzAndColorStreams1s(ChoisePoint iX, Term a1) {
-		setSynchronizeTerahertzAndColorStreams(YesNo.argument2YesNo(a1,iX));
+		setSynchronizeTerahertzAndColorStreams(YesNoConverters.argument2YesNo(a1,iX));
 	}
 	public void setSynchronizeTerahertzAndColorStreams(YesNo value) {
 		synchronizeTerahertzAndColorStreams= value;
+		actingSynchronizeTerahertzAndColorStreams.set(value.toBoolean());
 	}
 	public void getSynchronizeTerahertzAndColorStreams0ff(ChoisePoint iX, PrologVariable result) {
 		YesNo value= getSynchronizeTerahertzAndColorStreams(iX);
-		result.setNonBacktrackableValue(value.toTerm());
+		result.setNonBacktrackableValue(YesNoConverters.toTerm(value));
 	}
 	public void getSynchronizeTerahertzAndColorStreams0fs(ChoisePoint iX) {
 	}
@@ -198,7 +205,31 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 			return synchronizeTerahertzAndColorStreams;
 		} else {
 			Term value= getBuiltInSlot_E_synchronize_terahertz_and_color_streams();
-			return YesNo.argument2YesNo(value,iX);
+			return YesNoConverters.argument2YesNo(value,iX);
+		}
+	}
+	//
+	// get/set color_camera_delay_queue_size
+	//
+	public void setColorCameraDelayQueueSize1s(ChoisePoint iX, Term a1) {
+		int value= GeneralConverters.argumentToSmallInteger(a1,iX);
+		setColorCameraDelayQueueSize(value);
+	}
+	public void setColorCameraDelayQueueSize(int value) {
+		colorCameraDelayQueueSize.set(value);
+	}
+	public void getColorCameraDelayQueueSize0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(new PrologInteger(getColorCameraDelayQueueSize(iX)));
+	}
+	public void getColorCameraDelayQueueSize0fs(ChoisePoint iX) {
+	}
+	public int getColorCameraDelayQueueSize(ChoisePoint iX) {
+		Integer size= colorCameraDelayQueueSize.get();
+		if (size != null) {
+			return size;
+		} else {
+			Term value= getBuiltInSlot_E_color_camera_delay_queue_size();
+			return GeneralConverters.argumentToSmallInteger(value,iX);
 		}
 	}
 	//
@@ -211,7 +242,18 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public void setOutputDebugInformation(BigInteger value) {
+		super.setOutputDebugInformation(value);
+		int mode= PrologInteger.toInteger(value);
+		terahertzDataAcquisition.setOutputDebugInformation(mode);
+		ipCameraDataAcquisition.setOutputDebugInformation(mode);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	protected void updateAttributes(ChoisePoint iX) {
+		boolean mode= getSynchronizeTerahertzAndColorStreams(iX).toBoolean();
+		actingSynchronizeTerahertzAndColorStreams.set(mode);
 		boolean currentDoNotControlTemperatureRange= getUseRecordedTemperatureRangeCommands(iX).toBoolean();
 		boolean currentAveragingMode= getAveragingMode(iX).toBoolean();
 		DataFrameColorfulAttributes attributes= new DataFrameColorfulAttributes(
@@ -219,12 +261,12 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 			getAutorangingMode(iX).toBoolean(),
 			getDoubleColorMapMode(iX).toBoolean(),
 			DataRange.BOUNDS, // getSelectedDataRange(),
-			getLowerTemperatureBound(iX).toDouble(),
-			getUpperTemperatureBound(iX).toDouble(),
-			getLowerMainTemperatureQuantile(iX).toDouble(),
-			getUpperMainTemperatureQuantile(iX).toDouble(),
-			getLowerAuxiliaryTemperatureQuantile(iX).toDouble(),
-			getUpperAuxiliaryTemperatureQuantile(iX).toDouble(),
+			NumericalValueConverters.toDouble(getLowerTemperatureBound(iX)),
+			NumericalValueConverters.toDouble(getUpperTemperatureBound(iX)),
+			NumericalValueConverters.toDouble(getLowerMainTemperatureQuantile(iX)),
+			NumericalValueConverters.toDouble(getUpperMainTemperatureQuantile(iX)),
+			NumericalValueConverters.toDouble(getLowerAuxiliaryTemperatureQuantile(iX)),
+			NumericalValueConverters.toDouble(getUpperAuxiliaryTemperatureQuantile(iX)),
 			getMainColorMap(iX),
 			getAuxiliaryColorMap(iX),
 			currentAveragingMode,
@@ -240,6 +282,7 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 	protected void resetCounters() {
 		synchronized (numberOfRecentReceivedFrame) {
 			super.resetCounters();
+			actingSynchronizeTerahertzAndColorStreams.set(false);
 			counterOfAcquiredTerahertzFrames.set(-1);
 			counterOfAcquiredIPCameraFrames.set(-1);
 			numberOfRecentTerahertzFrame.set(-1);
@@ -254,9 +297,6 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 			committedIPCameraFrame= null;
 			committedIPCameraFrameImage= null;
 			committedCumulativeTemperatures= null;
-			synchronized (history) {
-				history.clear();
-			}
 		}
 	}
 	//
@@ -283,39 +323,49 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 	///////////////////////////////////////////////////////////////
 	//
 	protected void activateDataAcquisition(ChoisePoint iX) {
-		ActionPeriod period= getOpeningAttemptPeriod(iX);
-		int givenOpeningAttemptDelay= period.toMillisecondsOrDefault(defaultDeviceOpeningAttemptDelay);
+		boolean mode= getSynchronizeTerahertzAndColorStreams(iX).toBoolean();
+		actingSynchronizeTerahertzAndColorStreams.set(mode);
+		ActionPeriod period= getConnectionAttemptPeriod(iX);
+		int givenConnectionAttemptPeriod= period.toMillisecondsOrDefault(defaultDeviceConnectionAttemptPeriod);
 		ipCameraDataAcquisition.setServerAttributes(
 			getColorCameraURL(iX),
-			givenOpeningAttemptDelay);
+			givenConnectionAttemptPeriod);
 		terahertzDataAcquisition.setServerAttributes(
 			getTerahertzCameraAddress(iX),
 			getTerahertzCameraPort(iX),
-			givenOpeningAttemptDelay);
-		ipCameraDataAcquisition.activateDataTransfer();
-		terahertzDataAcquisition.activateDataTransfer();
-	}
-	//
-	protected void readGivenNumberOfTargetFrames(int number) {
-		((AstrohnDataReadingTaskInterface)frameReadingTask).readGivenNumberOfTerahertzFrames(number);
+			givenConnectionAttemptPeriod);
+		int currentOutputDebugInformation= PrologInteger.toInteger(getOutputDebugInformation(iX));
+		ipCameraDataAcquisition.activateDataTransfer(currentOutputDebugInformation);
+		terahertzDataAcquisition.activateDataTransfer(currentOutputDebugInformation);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected void suspendDataAcquisition() {
+	protected void suspendRecording(ChoisePoint iX) {
 		ipCameraDataAcquisition.suspendDataTransfer();
 		terahertzDataAcquisition.suspendDataTransfer();
+		super.suspendRecording(iX);
+	}
+	protected void suspendListening(ChoisePoint iX) {
+		ipCameraDataAcquisition.suspendDataTransfer();
+		terahertzDataAcquisition.suspendDataTransfer();
+		super.suspendListening(iX);
 	}
 	//
-	protected void stopDataAcquisition() {
-		super.stopDataAcquisition();
+	protected void stopRecording(ChoisePoint iX) {
 		ipCameraDataAcquisition.stopDataTransfer();
 		terahertzDataAcquisition.stopDataTransfer();
+		super.stopRecording(iX);
+	}
+	protected void stopListening(ChoisePoint iX) {
+		ipCameraDataAcquisition.stopDataTransfer();
+		terahertzDataAcquisition.stopDataTransfer();
+		super.stopListening(iX);
 	}
 	//
 	protected boolean dataAcquisitionIsActive() {
-		return	ipCameraDataAcquisition.isNotSuspended() ||
-			terahertzDataAcquisition.isNotSuspended();
+		return	!ipCameraDataAcquisition.isSuspended() ||
+			!terahertzDataAcquisition.isSuspended();
 	}
 	//
 	protected boolean dataAcquisitionIsSuspended() {
@@ -326,12 +376,19 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 	///////////////////////////////////////////////////////////////
 	//
 	public void commit0s(ChoisePoint iX) throws Backtracking {
-		boolean mode= getSynchronizeTerahertzAndColorStreams(iX).toBoolean();
-		synchronized (numberOfRecentReceivedFrame) {
-			if (recentFrame==null) {
+		if (committedFrameWasAssignedDirectly.get()) {
+			if (committedFrame==null) {
 				throw Backtracking.instance;
-			};
-			commit(mode);
+			}
+		} else {
+			boolean mode= getSynchronizeTerahertzAndColorStreams(iX).toBoolean();
+			actingSynchronizeTerahertzAndColorStreams.set(mode);
+			synchronized (numberOfRecentReceivedFrame) {
+				if (recentFrame==null) {
+					throw Backtracking.instance;
+				};
+				commit(mode);
+			}
 		}
 	}
 	//
@@ -357,24 +414,28 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 				committedTerahertzFrameNumber= numberOfRepeatedTerahertzFrame;
 				committedColorFrameNumber= numberOfRepeatedColorFrame;
 			};
-			if (committedTHzDataFrame != null) {
-				committedTerahertzFrameTime= committedTHzDataFrame.getTime();
-			} else {
-				committedTerahertzFrameTime= -1;
-			};
-			if (committedIPCameraFrame != null) {
-				committedColorFrameTime= committedIPCameraFrame.getTime();
-			} else {
-				committedColorFrameTime= -1;
-			};
-			if (firstCommittedTerahertzFrameTime < 0) {
-				firstCommittedTerahertzFrameNumber= committedTerahertzFrameNumber;
-				firstCommittedTerahertzFrameTime= committedTerahertzFrameTime;
-			};
-			if (firstCommittedColorFrameTime < 0) {
-				firstCommittedColorFrameNumber= committedColorFrameNumber;
-				firstCommittedColorFrameTime= committedColorFrameTime;
-			}
+			updateCommittedFrameTime();
+		}
+	}
+	//
+	protected void updateCommittedFrameTime() {
+		if (committedTHzDataFrame != null) {
+			committedTerahertzFrameTime= committedTHzDataFrame.getTime();
+		} else {
+			committedTerahertzFrameTime= -1;
+		};
+		if (committedIPCameraFrame != null) {
+			committedColorFrameTime= committedIPCameraFrame.getTime();
+		} else {
+			committedColorFrameTime= -1;
+		};
+		if (firstCommittedTerahertzFrameTime < 0) {
+			firstCommittedTerahertzFrameNumber= committedTerahertzFrameNumber;
+			firstCommittedTerahertzFrameTime= committedTerahertzFrameTime;
+		};
+		if (firstCommittedColorFrameTime < 0) {
+			firstCommittedColorFrameNumber= committedColorFrameNumber;
+			firstCommittedColorFrameTime= committedColorFrameTime;
 		}
 	}
 	//
@@ -541,6 +602,7 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 	///////////////////////////////////////////////////////////////
 	//
 	public void getRecentTerahertzImage1s(ChoisePoint iX, Term value) throws Backtracking {
+		updateAttributesIfNecessary(iX);
 		TerahertzDataBuffer terahertzDataBuffer;
 		DataFrameBaseAttributesInterface terahertzAttributes;
 		synchronized (numberOfRecentReceivedFrame) {
@@ -578,12 +640,12 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 		} else {
 			isAutorangingMode= getAutorangingMode(iX).toBoolean();
 			isDoubleColorMapMode= getDoubleColorMapMode(iX).toBoolean();
-			lowerDataBound= getLowerTemperatureBound(iX).toDouble();
-			upperDataBound= getUpperTemperatureBound(iX).toDouble();
-			lowerDataQuantile1= getLowerMainTemperatureQuantile(iX).toDouble();
-			upperDataQuantile1= getUpperMainTemperatureQuantile(iX).toDouble();
-			lowerDataQuantile2= getLowerAuxiliaryTemperatureQuantile(iX).toDouble();
-			upperDataQuantile2= getUpperAuxiliaryTemperatureQuantile(iX).toDouble();
+			lowerDataBound= NumericalValueConverters.toDouble(getLowerTemperatureBound(iX));
+			upperDataBound= NumericalValueConverters.toDouble(getUpperTemperatureBound(iX));
+			lowerDataQuantile1= NumericalValueConverters.toDouble(getLowerMainTemperatureQuantile(iX));
+			upperDataQuantile1= NumericalValueConverters.toDouble(getUpperMainTemperatureQuantile(iX));
+			lowerDataQuantile2= NumericalValueConverters.toDouble(getLowerAuxiliaryTemperatureQuantile(iX));
+			upperDataQuantile2= NumericalValueConverters.toDouble(getUpperAuxiliaryTemperatureQuantile(iX));
 		};
 		YesNo doNotControlZooming= getUseRecordedZoomingCommands(iX);
 		YesNo doZoomImage= getZoomImage(iX);
@@ -595,7 +657,7 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 			zCoefficient= terahertzAttributes.getZoomingCoefficient();
 		} else {
 			zoomIt= doZoomImage.toBoolean();
-			zCoefficient= numericalZoomingCoefficient.toDouble();
+			zCoefficient= NumericalValueConverters.toDouble(numericalZoomingCoefficient);
 		};
 		AttachedImage attachedImage= DataFrameTools.temperaturesToImage(
 			terahertzDataBuffer.getData(),
@@ -637,6 +699,7 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 	///////////////////////////////////////////////////////////////
 	//
 	public void getRecentColorImage1s(ChoisePoint iX, Term value) throws Backtracking {
+		updateAttributesIfNecessary(iX);
 		java.awt.image.BufferedImage nativeImage;
 		DataFrameBaseAttributesInterface attributes;
 		synchronized (numberOfRecentReceivedFrame) {
@@ -664,7 +727,7 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 			zCoefficient= attributes.getZoomingCoefficient();
 		} else {
 			zoomIt= doZoomImage.toBoolean();
-			zCoefficient= numericalZoomingCoefficient.toDouble();
+			zCoefficient= NumericalValueConverters.toDouble(numericalZoomingCoefficient);
 		};
 		nativeImage= DataFrameTools.rotateAndZoomImage(
 			nativeImage,
@@ -691,6 +754,7 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 	///////////////////////////////////////////////////////////////
 	//
 	public void getRecentCombinedImage1s(ChoisePoint iX, Term value) throws Backtracking {
+		updateAttributesIfNecessary(iX);
 		java.awt.image.BufferedImage nativeImage;
 		TerahertzDataBuffer terahertzDataBuffer;
 		DataFrameBaseAttributesInterface terahertzAttributes;
@@ -733,12 +797,12 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 		} else {
 			isAutorangingMode= getAutorangingMode(iX).toBoolean();
 			isDoubleColorMapMode= getDoubleColorMapMode(iX).toBoolean();
-			lowerDataBound= getLowerTemperatureBound(iX).toDouble();
-			upperDataBound= getUpperTemperatureBound(iX).toDouble();
-			lowerDataQuantile1= getLowerMainTemperatureQuantile(iX).toDouble();
-			upperDataQuantile1= getUpperMainTemperatureQuantile(iX).toDouble();
-			lowerDataQuantile2= getLowerAuxiliaryTemperatureQuantile(iX).toDouble();
-			upperDataQuantile2= getUpperAuxiliaryTemperatureQuantile(iX).toDouble();
+			lowerDataBound= NumericalValueConverters.toDouble(getLowerTemperatureBound(iX));
+			upperDataBound= NumericalValueConverters.toDouble(getUpperTemperatureBound(iX));
+			lowerDataQuantile1= NumericalValueConverters.toDouble(getLowerMainTemperatureQuantile(iX));
+			upperDataQuantile1= NumericalValueConverters.toDouble(getUpperMainTemperatureQuantile(iX));
+			lowerDataQuantile2= NumericalValueConverters.toDouble(getLowerAuxiliaryTemperatureQuantile(iX));
+			upperDataQuantile2= NumericalValueConverters.toDouble(getUpperAuxiliaryTemperatureQuantile(iX));
 		};
 		YesNo doNotControlZooming= getUseRecordedZoomingCommands(iX);
 		YesNo doZoomImage= getZoomImage(iX);
@@ -750,7 +814,7 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 			zCoefficient= terahertzAttributes.getZoomingCoefficient();
 		} else {
 			zoomIt= doZoomImage.toBoolean();
-			zCoefficient= numericalZoomingCoefficient.toDouble();
+			zCoefficient= NumericalValueConverters.toDouble(numericalZoomingCoefficient);
 		};
 		nativeImage= DataFrameTools.rotateAugmentAndZoomImage(
 			nativeImage,
@@ -774,6 +838,104 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 			zoomIt,
 			zCoefficient);
 		modifyImage(value,nativeImage,iX);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void getRecentBorderedImage2s(ChoisePoint iX, Term a1, Term a2) throws Backtracking {
+		updateAttributesIfNecessary(iX);
+		Color backgroundColor;
+		try {
+			backgroundColor= ExtendedColor.argumentToColor(a2,iX);
+		} catch (TermIsSymbolDefault e) {
+			backgroundColor= null;
+		};
+		getRecentBorderedImage(a1,backgroundColor,iX);
+	}
+	public void getRecentBorderedImage1s(ChoisePoint iX, Term a1) throws Backtracking {
+		updateAttributesIfNecessary(iX);
+		getRecentBorderedImage(a1,null,iX);
+	}
+	//
+	protected void getRecentBorderedImage(Term a1, Color backgroundColor, ChoisePoint iX) throws Backtracking {
+		TerahertzDataBuffer terahertzDataBuffer;
+		DataFrameBaseAttributesInterface terahertzAttributes;
+		synchronized (numberOfRecentReceivedFrame) {
+			if (committedFrame != null) {
+				if (committedTHzDataFrame != null) {
+					terahertzAttributes= committedTHzDataFrame.getBaseAttributes();
+					terahertzDataBuffer= getTerahertzDataBuffer(terahertzAttributes);
+				} else {
+					throw Backtracking.instance;
+				}
+			} else {
+				throw new AstrohnFrameIsNotCommitted();
+			}
+		};
+		YesNo doNotControlColorMaps= getUseRecordedColorMapCommands(iX);
+		int[][] mainColorMap= prepareMainColorMap(doNotControlColorMaps.toBoolean(),terahertzAttributes);
+		int[][] auxiliaryColorMap= prepareAuxiliaryColorMap(doNotControlColorMaps.toBoolean(),terahertzAttributes);
+		boolean isAutorangingMode;
+		boolean isDoubleColorMapMode;
+		double lowerDataBound;
+		double upperDataBound;
+		double lowerDataQuantile1;
+		double upperDataQuantile1;
+		double lowerDataQuantile2;
+		double upperDataQuantile2;
+		if (actingDoNotControlTemperatureRange.get()) {
+			isAutorangingMode= terahertzAttributes.isAutorangingMode();
+			isDoubleColorMapMode= terahertzAttributes.isDoubleColorMapMode();
+			lowerDataBound= terahertzAttributes.getLowerDataBound();
+			upperDataBound= terahertzAttributes.getUpperDataBound();
+			lowerDataQuantile1= terahertzAttributes.getLowerDataQuantile1();
+			upperDataQuantile1= terahertzAttributes.getUpperDataQuantile1();
+			lowerDataQuantile2= terahertzAttributes.getLowerDataQuantile2();
+			upperDataQuantile2= terahertzAttributes.getUpperDataQuantile2();
+		} else {
+			isAutorangingMode= getAutorangingMode(iX).toBoolean();
+			isDoubleColorMapMode= getDoubleColorMapMode(iX).toBoolean();
+			lowerDataBound= NumericalValueConverters.toDouble(getLowerTemperatureBound(iX));
+			upperDataBound= NumericalValueConverters.toDouble(getUpperTemperatureBound(iX));
+			lowerDataQuantile1= NumericalValueConverters.toDouble(getLowerMainTemperatureQuantile(iX));
+			upperDataQuantile1= NumericalValueConverters.toDouble(getUpperMainTemperatureQuantile(iX));
+			lowerDataQuantile2= NumericalValueConverters.toDouble(getLowerAuxiliaryTemperatureQuantile(iX));
+			upperDataQuantile2= NumericalValueConverters.toDouble(getUpperAuxiliaryTemperatureQuantile(iX));
+		};
+		YesNo doNotControlZooming= getUseRecordedZoomingCommands(iX);
+		YesNo doZoomImage= getZoomImage(iX);
+		NumericalValue numericalZoomingCoefficient= getZoomingCoefficient(iX);
+		boolean zoomIt;
+		double zCoefficient;
+		if (doNotControlZooming.toBoolean()) {
+			zoomIt= terahertzAttributes.isZoomingMode();
+			zCoefficient= terahertzAttributes.getZoomingCoefficient();
+		} else {
+			zoomIt= doZoomImage.toBoolean();
+			zCoefficient= NumericalValueConverters.toDouble(numericalZoomingCoefficient);
+		};
+		java.awt.image.BufferedImage nativeImage= DataFrameTools.borderAndZoomImage(
+			terahertzDataBuffer.getData(),
+			terahertzDataBuffer.getMatrixWidth(),
+			terahertzDataBuffer.getMatrixHeight(),
+			terahertzDataBuffer.getImageWidth(),
+			terahertzDataBuffer.getImageHeight(),
+			terahertzDataBuffer.getHorizontalOffset(),
+			terahertzDataBuffer.getVerticalOffset(),
+			mainColorMap,
+			auxiliaryColorMap,
+			isAutorangingMode,
+			isDoubleColorMapMode,
+			lowerDataBound,
+			upperDataBound,
+			lowerDataQuantile1,
+			upperDataQuantile1,
+			lowerDataQuantile2,
+			upperDataQuantile2,
+			zoomIt,
+			zCoefficient,
+			backgroundColor);
+		modifyImage(a1,nativeImage,iX);
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -907,20 +1069,44 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 			time,
 			packetBody,
 			recentAttributes.get());
-		sendFrame(frame);
+		sendDataFrame(frame);
 	}
 	//
 	public void setIPCameraData(byte[] array, long time) {
 		dataAcquisitionError.set(null);
-		IPCameraFrame frame= new IPCameraFrame(
+		IPCameraFrame frame1= new IPCameraFrame(
 			counterOfAcquiredIPCameraFrames.incrementAndGet(),
 			time,
 			array,
 			recentAttributes.get());
-		sendFrame(frame);
+		int givenLength= colorCameraDelayQueueSize.get();
+		IPCameraFrame frame2= null;
+		synchronized (ipCameraQueue) {
+			while (ipCameraQueue.size() >= givenLength) {
+				frame2= ipCameraQueue.remove();
+			};
+			ipCameraQueue.add(frame1);
+		};
+		// ipCameraQueueTimer.schedule(
+		//	new IPCameraTimerTask(this),
+		//	ipCameraDelayInMilliseconds.get());
+		// sendDataFrame(frame);
+		if (frame2 != null) {
+			sendDataFrame(frame2);
+		}
 	}
 	// public void setAudioData(byte[] buffer, long time) {
 	// }
+	//
+	public void sendFrameObtainedIfNecessary(DataFrameInterface frame) {
+		if (actingSynchronizeTerahertzAndColorStreams.get()) {
+			if (frame instanceof THzDataFrameInterface) {
+				sendFrameObtained();
+			}
+		} else {
+			sendFrameObtained();
+		}
+	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -929,34 +1115,14 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 			return -1;
 		};
 		synchronized (numberOfRecentReceivedFrame) {
-			recentFrame= frame;
 			if (frame instanceof THzDataFrameInterface) {
 				recentTHzDataFrame= (THzDataFrameInterface)frame;
-				numberOfRecentTerahertzFrame.set(recentTHzDataFrame.getSerialNumber());
+				// numberOfRecentTerahertzFrame.set(recentTHzDataFrame.getSerialNumber());
+				numberOfRecentTerahertzFrame.incrementAndGet();
 				synchronousIPCameraFrame= recentIPCameraFrame;
 				numberOfSynchronousIPCameraFrame.set(numberOfRecentIPCameraFrame.get());
 				updateHistory(recentTHzDataFrame,synchronousIPCameraFrame);
-				boolean isAveragingMode;
-				if (actingDoNotControlTemperatureRange.get()) {
-					DataFrameBaseAttributesInterface attributes= frame.getBaseAttributes();
-					isAveragingMode= attributes.isAverageMode();
-				} else {
-					isAveragingMode= actingAveragingMode.get();
-				};
-				if (isAveragingMode) {
-					numberOfAveragedFrames++;
-					TVFilterImageHeader terahertzPacketBody= recentTHzDataFrame.getTHzData();
-					double[] targetTemperatures= AstrohnDataAcquisition.tvFilterImageHeaderToDouble(terahertzPacketBody);
-					if (cumulativeTemperatures==null) {
-						cumulativeTemperatures= Arrays.copyOf(targetTemperatures,targetTemperatures.length);
-					} else {
-						for (int k=0; k < cumulativeTemperatures.length; k++) {
-							cumulativeTemperatures[k]+= targetTemperatures[k];
-						}
-					}
-				} else {
-					resetCumulativeTemperatures();
-				};
+				updateCumulativeTemperatures(recentTHzDataFrame);
 				acceptedTerahertzFrameNumber++;
 				acceptedTerahertzFrameTime= frame.getTime();
 				if (firstAcceptedTerahertzFrameNumber < 0) {
@@ -965,7 +1131,8 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 				}
 			} else if (frame instanceof IPCameraFrameInterface) {
 				recentIPCameraFrame= (IPCameraFrameInterface)frame;
-				numberOfRecentIPCameraFrame.set(recentIPCameraFrame.getSerialNumber());
+				// numberOfRecentIPCameraFrame.set(recentIPCameraFrame.getSerialNumber());
+				numberOfRecentIPCameraFrame.incrementAndGet();
 				if (synchronousIPCameraFrame==null) {
 					synchronousIPCameraFrame= recentIPCameraFrame;
 					numberOfSynchronousIPCameraFrame.set(numberOfRecentIPCameraFrame.get());
@@ -977,11 +1144,16 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 					firstAcceptedColorFrameNumber= acceptedColorFrameNumber;
 					firstAcceptedColorFrameTime= acceptedColorFrameTime;
 				}
+			} else {
+				return -1;
 			};
+			recentFrame= frame;
+			committedFrameWasAssignedDirectly.set(false);
 			long currentFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
 			recentFrameIsRepeated= false;
 			numberOfRepeatedTerahertzFrame= -1;
 			numberOfRepeatedColorFrame= -1;
+			numberOfRecentReceivedFrame.notifyAll();
 			return currentFrameNumber;
 		}
 	}
@@ -990,152 +1162,98 @@ public abstract class Astrohn extends ThermalVideoBuffer implements AstrohnDataC
 		if (recentTHzDataFrame==null || synchronousIPCameraFrame==null) {
 			return;
 		};
-		synchronized (history) {
-			history.addLast(new SynchronizedFrames(
+		updateHistory(new SynchronizedFrames(
 				recentTHzDataFrame,
 				numberOfRecentTerahertzFrame.get(),
 				synchronousIPCameraFrame,
 				numberOfSynchronousIPCameraFrame.get()));
-			if (history.size() > actingReadBufferSize.get()) {
-				history.removeFirst();
+	}
+	//
+	protected void updateCumulativeTemperatures(THzDataFrameInterface frame) {
+		boolean isAveragingMode;
+		if (actingDoNotControlTemperatureRange.get()) {
+			DataFrameBaseAttributesInterface attributes= frame.getBaseAttributes();
+			isAveragingMode= attributes.isAverageMode();
+		} else {
+			isAveragingMode= actingAveragingMode.get();
+		};
+		if (isAveragingMode) {
+			numberOfAveragedFrames++;
+			TVFilterImageHeader terahertzPacketBody= recentTHzDataFrame.getTHzData();
+			double[] targetTemperatures= AstrohnDataAcquisition.tvFilterImageHeaderToDouble(terahertzPacketBody);
+			if (cumulativeTemperatures==null) {
+				cumulativeTemperatures= Arrays.copyOf(targetTemperatures,targetTemperatures.length);
+			} else {
+				for (int k=0; k < cumulativeTemperatures.length; k++) {
+					cumulativeTemperatures[k]+= targetTemperatures[k];
+				}
 			}
-		};
-		containsNewFrame.set(true);
-	}
-	//
-	///////////////////////////////////////////////////////////////
-	//
-	public void retrieveBufferedFrame1s(ChoisePoint iX, Term a1) {
-		int number= GeneralConverters.argumentToSmallInteger(a1,iX);
-		int relativeNumber= number - 1;
-		if (relativeNumber < 0) {
-			relativeNumber= 0;
-		};
-		synchronized (numberOfRecentReceivedFrame) {
-			SynchronizedFrames synchronizedFrames;
-			synchronized (history) {
-				int bufferSize= actingReadBufferSize.get();
-				int historySize= history.size();
-				int maximalIndex= bufferSize - 1;
-				if (historySize < bufferSize) {
-					maximalIndex= historySize - 1;
-					relativeNumber= relativeNumber * historySize / bufferSize;
-				};
-				if (relativeNumber > maximalIndex) {
-					relativeNumber= maximalIndex;
-				};
-				if (relativeNumber < 0 || relativeNumber >= historySize) {
-					return;
-				};
-				synchronizedFrames= history.get(relativeNumber);
-			};
-			THzDataFrameInterface terahertzFrame= synchronizedFrames.getTerahertzFrame();
-			IPCameraFrameInterface colorFrame= synchronizedFrames.getColorFrame();
-			recentFrame= terahertzFrame;
-			recentTHzDataFrame= terahertzFrame;
-			recentIPCameraFrame= colorFrame;
-			synchronousIPCameraFrame= colorFrame;
-			recentFrameIsRepeated= true;
-			numberOfRepeatedTerahertzFrame= synchronizedFrames.getNumberOfTerahertzFrame();
-			numberOfRepeatedColorFrame= synchronizedFrames.getNumberOfColorFrame();
-		};
-		sendFrameObtained();
-	}
-	//
-	///////////////////////////////////////////////////////////////
-	//
-	public void retrieveTimedFrame1s(ChoisePoint iX, Term a1) throws Backtracking {
-		TimeInterval timeInterval= TimeInterval.argumentMillisecondsToTimeInterval(a1,iX);
-		if (!retrieveTimedFrame(timeInterval.toMillisecondsLong())) {
-			throw Backtracking.instance;
+		} else {
+			resetCumulativeTemperatures();
 		}
 	}
 	//
-	protected boolean retrieveTimedFrame(long targetTime) {
-		while (true) {
-			VideoBufferOperatingMode currentOperatingMode= actingVideoBufferOperatingMode.get();
-			int numberOfTerahertzFramesToBeRead= 0;
-			synchronized (numberOfRecentReceivedFrame) {
-				synchronized (history) {
-					int bufferSize= actingReadBufferSize.get();
-					int historySize= history.size();
-					if (historySize <= 1) {
-						if (currentOperatingMode==VideoBufferOperatingMode.SPECULATIVE_READING) {
-							((AstrohnDataReadingTaskInterface)frameReadingTask).readGivenNumberOfTerahertzFrames(bufferSize);
-						};
-						continue;
-					};
-					SynchronizedFrames firstSynchronizedPair= history.getFirst();
-					SynchronizedFrames lastSynchronizedPair= history.getLast();
-					long minimalTime= firstSynchronizedPair.getTime();
-					long maximalTime= lastSynchronizedPair.getTime();
-					if (targetTime >= minimalTime) {
-						if(targetTime <= maximalTime) {
-///////////////////////////////////////////////////////////////////////
-ListIterator<SynchronizedFrames> iterator= history.listIterator(0);
-int relativeNumber= 0;
-SynchronizedFrames selectedPair= firstSynchronizedPair;
-long delay1= targetTime - minimalTime;
-if (delay1 < 0) {
-	delay1= -delay1;
-};
-while (iterator.hasNext()) {
-	SynchronizedFrames currentPair= iterator.next();
-	long time2= currentPair.getTime();
-	long delay2= targetTime - time2;
-	if (delay2 < 0) {
-		delay2= -delay2;
-	};
-	if (time2 >= targetTime) {
-		if (delay2 < delay1) {
-			selectedPair= currentPair;
-		};
-		break;
-	} else {
-		selectedPair= currentPair;
-		delay1= delay2;
+	///////////////////////////////////////////////////////////////
+	//
+	protected void acceptRequestedFrame(EnumeratedFrame enumeratedFrame) {
+		SynchronizedFrames synchronizedFrames= (SynchronizedFrames)enumeratedFrame;
+		THzDataFrameInterface terahertzFrame= synchronizedFrames.getTerahertzFrame();
+		IPCameraFrameInterface colorFrame= synchronizedFrames.getColorFrame();
+		recentFrame= terahertzFrame;
+		committedFrameWasAssignedDirectly.set(false);
+		recentTHzDataFrame= terahertzFrame;
+		recentIPCameraFrame= colorFrame;
+		synchronousIPCameraFrame= colorFrame;
+		recentFrameIsRepeated= true;
+		numberOfRepeatedTerahertzFrame= synchronizedFrames.getNumberOfTerahertzFrame();
+		numberOfRepeatedColorFrame= synchronizedFrames.getNumberOfColorFrame();
 	}
-};
-THzDataFrameInterface terahertzFrame= selectedPair.getTerahertzFrame();
-IPCameraFrameInterface colorFrame= selectedPair.getColorFrame();
-committedFrame= terahertzFrame;
-committedTHzDataFrame= terahertzFrame;
-committedIPCameraFrame= colorFrame;
-committedIPCameraFrameImage= null;
-committedTerahertzFrameNumber= numberOfRepeatedTerahertzFrame;
-committedColorFrameNumber= numberOfRepeatedColorFrame;
-committedTerahertzFrameTime= committedTHzDataFrame.getTime();
-committedColorFrameTime= committedIPCameraFrame.getTime();
-if (firstCommittedTerahertzFrameTime < 0) {
-	firstCommittedTerahertzFrameNumber= committedTerahertzFrameNumber;
-	firstCommittedTerahertzFrameTime= committedTerahertzFrameTime;
-};
-if (firstCommittedColorFrameTime < 0) {
-	firstCommittedColorFrameNumber= committedColorFrameNumber;
-	firstCommittedColorFrameTime= committedColorFrameTime;
-};
-if (currentOperatingMode==VideoBufferOperatingMode.SPECULATIVE_READING) {
-	((AstrohnDataReadingTaskInterface)frameReadingTask).readGivenNumberOfTerahertzFrames(numberOfTerahertzFramesToBeRead);
-};
-return true;
-///////////////////////////////////////////////////////////////////////
-						} else { // Read several frames
-							if (currentOperatingMode==VideoBufferOperatingMode.SPECULATIVE_READING) {
-								((AstrohnDataReadingTaskInterface)frameReadingTask).readFramesUntilGivenTime(targetTime,bufferSize);
-							}
-						}
-					} else { // Suspend reading of the frames
-						if (currentOperatingMode==VideoBufferOperatingMode.SPECULATIVE_READING) {
-							frameReadingTask.suspendReading();
-						};
-						return false;
-					}
-				}
-			};
-			if (currentOperatingMode != VideoBufferOperatingMode.SPECULATIVE_READING) {
-				break;
-			}
-		};
-		return false;
+	//
+	protected void acceptRetrievedFrame(EnumeratedFrame enumeratedFrame) {
+		SynchronizedFrames selectedPair= (SynchronizedFrames)enumeratedFrame;
+		THzDataFrameInterface terahertzFrame= selectedPair.getTerahertzFrame();
+		IPCameraFrameInterface colorFrame= selectedPair.getColorFrame();
+		committedFrame= terahertzFrame;
+		committedFrameWasAssignedDirectly.set(true);
+		committedTHzDataFrame= terahertzFrame;
+		committedIPCameraFrame= colorFrame;
+		committedIPCameraFrameImage= null;
+		committedTerahertzFrameNumber= selectedPair.getNumberOfTerahertzFrame();
+		committedColorFrameNumber= selectedPair.getNumberOfColorFrame();
+		updateCommittedFrameTime();
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public void extractFrame(String key, CompoundFrameInterface container) {
+		if (committedFrame != null) {
+			SynchronizedFrames synchronizedFrames= new SynchronizedFrames(
+				committedTHzDataFrame,
+				committedTerahertzFrameNumber,
+				committedIPCameraFrame,
+				committedColorFrameNumber);
+			container.insertComponent(key,synchronizedFrames);
+		} else {
+			throw new AstrohnFrameIsNotCommitted();
+		}
+	}
+	//
+	public void assignFrame(String key, CompoundFrameInterface container, ChoisePoint iX) {
+		boolean mode= getSynchronizeTerahertzAndColorStreams(iX).toBoolean();
+		actingSynchronizeTerahertzAndColorStreams.set(mode);
+		SynchronizedFrames synchronizedFrames= (SynchronizedFrames)container.getComponent(key);
+		synchronized (numberOfRecentReceivedFrame) {
+			committedTHzDataFrame= synchronizedFrames.getTerahertzFrame();
+			committedFrame= committedTHzDataFrame;
+			committedFrameWasAssignedDirectly.set(true);
+			committedIPCameraFrame= synchronizedFrames.getColorFrame();
+			committedIPCameraFrameImage= null;
+			// committedTerahertzFrameNumber= synchronizedFrames.getNumberOfTerahertzFrame();
+			committedTerahertzFrameNumber= numberOfRecentTerahertzFrame.incrementAndGet();
+			// committedColorFrameNumber= synchronizedFrames.getNumberOfColorFrame();
+			committedColorFrameNumber= numberOfRecentIPCameraFrame.incrementAndGet();
+			updateCumulativeTemperatures(committedTHzDataFrame);
+			updateCommittedFrameTime();
+		}
 	}
 }

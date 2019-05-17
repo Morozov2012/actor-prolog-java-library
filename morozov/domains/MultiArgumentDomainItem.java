@@ -14,6 +14,12 @@ public abstract class MultiArgumentDomainItem extends DomainAlternative {
 	protected String[] domainTableEntries;
 	protected transient PrologDomain[] domainItems;
 	//
+	private static final long serialVersionUID= 0x333E591488EF3D68L; // 3692486689221983592L
+	//
+	// static {
+	//	SerialVersionChecker.check(serialVersionUID,"morozov.domains","MultiArgumentDomainItem");
+	// }
+	//
 	public MultiArgumentDomainItem(String[] entries) {
 		domainTableEntries= entries;
 	}

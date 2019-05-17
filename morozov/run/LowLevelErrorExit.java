@@ -5,6 +5,7 @@ package morozov.run;
 import morozov.terms.*;
 
 public class LowLevelErrorExit extends ErrorExit {
+	//
 	private Throwable exception;
 	//
 	public LowLevelErrorExit(ChoisePoint cp, Throwable e) {

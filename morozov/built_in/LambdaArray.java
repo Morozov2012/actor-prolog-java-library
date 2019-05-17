@@ -4,7 +4,7 @@ package morozov.built_in;
 
 import morozov.run.*;
 import morozov.run.errors.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.errors.*;
 import morozov.system.indices.*;
 import morozov.system.indices.errors.*;
@@ -60,14 +60,14 @@ public abstract class LambdaArray extends Lambda {
 	// get/set indexChecking
 	//
 	public void setIndexChecking1s(ChoisePoint iX, Term a1) {
-		setIndexChecking(OnOff.termOnOff2Boolean(a1,iX));
+		setIndexChecking(OnOffConverters.termOnOff2Boolean(a1,iX));
 	}
 	public void setIndexChecking(boolean value) {
 		indexChecking= value;
 	}
 	public void getIndexChecking0ff(ChoisePoint iX, PrologVariable result) {
 		boolean value= getIndexChecking(iX);
-		result.setNonBacktrackableValue(OnOff.boolean2TermOnOff(value));
+		result.setNonBacktrackableValue(OnOffConverters.boolean2TermOnOff(value));
 	}
 	public void getIndexChecking0fs(ChoisePoint iX) {
 	}
@@ -75,7 +75,7 @@ public abstract class LambdaArray extends Lambda {
 		if (indexChecking != null) {
 			return indexChecking;
 		} else {
-			return OnOff.termOnOff2Boolean(getBuiltInSlot_E_index_checking(),iX);
+			return OnOffConverters.termOnOff2Boolean(getBuiltInSlot_E_index_checking(),iX);
 		}
 	}
 	//
@@ -341,7 +341,7 @@ for (int n=0; n < givenIndices.length; n++) {
 	}
 };
 BigInteger radius= BigInteger.ONE.negate();
-radiusLoop: while(true) {
+radiusLoop: while (true) {
 	if (radius.compareTo(maximumRadius) >= 0) {
 		break radiusLoop;
 	};
@@ -353,7 +353,7 @@ radiusLoop: while(true) {
 			}
 		};
 		boolean[] bits= new boolean[numberOfIndicesToBeInstantiated];
-		mainLoop: while(true) {
+		mainLoop: while (true) {
 			for (int n=0; n <= numberOfIndicesToBeInstantiated; n++) {
 				if (n==numberOfIndicesToBeInstantiated) {
 					break mainLoop;
@@ -382,7 +382,7 @@ radiusLoop: while(true) {
 					indices[n]= rangesOfIndicesToBeInstantiated[n].center.subtract(radius).add(BigInteger.ONE);
 				}
 			};
-			shellCoveringLoop: while(true) {
+			shellCoveringLoop: while (true) {
 // ====================================================================
 boolean skipPass= false;
 int counter2= 0;

@@ -4,7 +4,7 @@ package morozov.built_in;
 
 import target.*;
 
-import morozov.syntax.errors.*;
+import morozov.syntax.interfaces.*;
 import morozov.syntax.scanner.errors.*;
 import morozov.syntax.*;
 import morozov.system.*;
@@ -39,6 +39,10 @@ public abstract class Alpha extends AbstractInternalWorld {
 	protected static Term termEmptyString= new PrologString("");
 	protected static Term[] noArguments= new Term[0];
 	//
+	protected static int defaultFractionPartLength= 7;
+	//
+	protected static ParserMasterInterface dummyParserMaster= new DummyParserMaster();
+	//
 	public Alpha() {
 	}
 	public Alpha(GlobalWorldIdentifier id) {
@@ -69,14 +73,14 @@ public abstract class Alpha extends AbstractInternalWorld {
 	// get/set backslashAlwaysIsSeparator
 	//
 	public void setBackslashAlwaysIsSeparator1s(ChoisePoint iX, Term a1) {
-		setBackslashAlwaysIsSeparator(YesNo.termYesNo2Boolean(a1,iX));
+		setBackslashAlwaysIsSeparator(YesNoConverters.termYesNo2Boolean(a1,iX));
 	}
 	public void setBackslashAlwaysIsSeparator(boolean value) {
 		backslashAlwaysIsSeparator= value;
 	}
 	public void getBackslashAlwaysIsSeparator0ff(ChoisePoint iX, PrologVariable result) {
 		boolean value= getBackslashAlwaysIsSeparator(iX);
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(value));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(value));
 	}
 	public void getBackslashAlwaysIsSeparator0fs(ChoisePoint iX) {
 	}
@@ -85,21 +89,21 @@ public abstract class Alpha extends AbstractInternalWorld {
 			return backslashAlwaysIsSeparator;
 		} else {
 			Term value= getBuiltInSlot_E_backslash_always_is_separator();
-			return YesNo.termYesNo2Boolean(value,iX);
+			return YesNoConverters.termYesNo2Boolean(value,iX);
 		}
 	}
 	//
 	// get/set acceptOnlyUniformResourceIdentifiers
 	//
 	public void setAcceptOnlyUniformResourceIdentifiers1s(ChoisePoint iX, Term a1) {
-		setAcceptOnlyUniformResourceIdentifiers(YesNo.termYesNo2Boolean(a1,iX));
+		setAcceptOnlyUniformResourceIdentifiers(YesNoConverters.termYesNo2Boolean(a1,iX));
 	}
 	public void setAcceptOnlyUniformResourceIdentifiers(boolean value) {
 		acceptOnlyUniformResourceIdentifiers= value;
 	}
 	public void getAcceptOnlyUniformResourceIdentifiers0ff(ChoisePoint iX, PrologVariable result) {
 		boolean value= getAcceptOnlyUniformResourceIdentifiers(iX);
-		result.setNonBacktrackableValue(YesNo.boolean2TermYesNo(value));
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(value));
 	}
 	public void getAcceptOnlyUniformResourceIdentifiers0fs(ChoisePoint iX) {
 	}
@@ -108,7 +112,7 @@ public abstract class Alpha extends AbstractInternalWorld {
 			return acceptOnlyUniformResourceIdentifiers;
 		} else {
 			Term value= getBuiltInSlot_E_accept_only_uniform_resource_identifiers();
-			return YesNo.termYesNo2Boolean(value,iX);
+			return YesNoConverters.termYesNo2Boolean(value,iX);
 		}
 	}
 	//
@@ -258,7 +262,7 @@ public abstract class Alpha extends AbstractInternalWorld {
 		//
 		public void execute(ChoisePoint iX) throws Backtracking {
 			ChoisePoint newIx= new ChoisePoint(iX);
-			while(true) {
+			while (true) {
 				try {
 					c0.execute(newIx);
 				} catch (Backtracking b) {
@@ -559,6 +563,12 @@ public abstract class Alpha extends AbstractInternalWorld {
 	public void arctan1fs(ChoisePoint iX, Term a1) {
 	}
 	//
+	public void arctan2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
+		Arithmetic.calculate_binary_arithmetic_function(iX,result,a1,a2,BinaryOperation.ARCTAN2);
+	}
+	public void arctan2fs(ChoisePoint iX, Term a1, Term a2) {
+	}
+	//
 	public void signum1ff(ChoisePoint iX, PrologVariable result, Term a1) {
 		Arithmetic.calculate_unary_function(iX,result,a1,UnaryOperation.SIGNUM);
 	}
@@ -731,19 +741,17 @@ public abstract class Alpha extends AbstractInternalWorld {
 	public void stringToTerm1ff(ChoisePoint iX, PrologVariable result, Term a1) throws Backtracking {
 		try {
 			String text= a1.getStringValue(iX);
-			Parser parser= new Parser();
+			GroundTermParser parser= new GroundTermParser(dummyParserMaster);
 			try {
-				Term[] terms= parser.stringToTerms(text);
+				Term[] terms= parser.stringToTerms(text,null);
 				if (terms.length==1) {
-					if (a1 != null) {
+					if (result != null) {
 						result.setNonBacktrackableValue(terms[0]);
 					}
 				} else {
 					throw Backtracking.instance;
 				}
-			} catch (LexicalScannerError e) {
-				throw Backtracking.instance;
-			} catch (ParserError e) {
+			} catch (SyntaxError e) {
 				throw Backtracking.instance;
 			}
 		} catch (TermIsNotAString e) {
@@ -757,15 +765,13 @@ public abstract class Alpha extends AbstractInternalWorld {
 	public void stringToTerms1ff(ChoisePoint iX, PrologVariable result, Term a1) throws Backtracking {
 		try {
 			String text= a1.getStringValue(iX);
-			Parser parser= new Parser();
+			GroundTermParser parser= new GroundTermParser(dummyParserMaster);
 			try {
-				Term[] terms= parser.stringToTerms(text);
-				if (a1 != null) {
+				Term[] terms= parser.stringToTerms(text,null);
+				if (result != null) {
 					result.setNonBacktrackableValue(GeneralConverters.arrayToList(terms));
 				}
-			} catch (LexicalScannerError e) {
-				throw Backtracking.instance;
-			} catch (ParserError e) {
+			} catch (SyntaxError e) {
 				throw Backtracking.instance;
 			}
 		} catch (TermIsNotAString e) {
@@ -775,6 +781,8 @@ public abstract class Alpha extends AbstractInternalWorld {
 	public void stringToTerms1fs(ChoisePoint iX, Term a1) throws Backtracking {
 		stringToTerms1ff(iX,null,a1);
 	}
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public void stringsToText1ff(ChoisePoint iX, PrologVariable result, Term a1) {
 		String text= GeneralConverters.concatenateStringList(a1,"",iX);
@@ -811,6 +819,38 @@ public abstract class Alpha extends AbstractInternalWorld {
 		}
 	}
 	public void codesToString1fs(ChoisePoint iX, Term a1) {
+	}
+	//
+	public void applyRadix2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
+		int radix= PrologInteger.toInteger(GeneralConverters.argumentToStrictInteger(a1,iX));
+		NumericalValue numericalValue= NumericalValueConverters.argumentToNumericalValue(a2,iX);
+		result.setNonBacktrackableValue(new PrologString(NumericalValueConverters.applyRadix(radix,defaultFractionPartLength,numericalValue)));
+	}
+	public void applyRadix2fs(ChoisePoint iX, Term a1, Term a2) {
+	}
+	//
+	public void applyRadix3ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2, Term a3) {
+		int radix= PrologInteger.toInteger(GeneralConverters.argumentToStrictInteger(a1,iX));
+		int fractionPartLength= PrologInteger.toInteger(GeneralConverters.argumentToStrictInteger(a2,iX));
+		NumericalValue numericalValue= NumericalValueConverters.argumentToNumericalValue(a3,iX);
+		result.setNonBacktrackableValue(new PrologString(NumericalValueConverters.applyRadix(radix,fractionPartLength,numericalValue)));
+	}
+	public void applyRadix3fs(ChoisePoint iX, Term a1, Term a2, Term a3) {
+	}
+	//
+	public void normalizeNumber1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		NumericalValue numericalValue= NumericalValueConverters.argumentToNumericalValue(a1,iX);
+		result.setNonBacktrackableValue(new PrologString(NumericalValueConverters.normalizeNumber(defaultFractionPartLength,numericalValue)));
+	}
+	public void normalizeNumber1fs(ChoisePoint iX, Term a1) {
+	}
+	//
+	public void normalizeNumber2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
+		int fractionPartLength= PrologInteger.toInteger(GeneralConverters.argumentToStrictInteger(a1,iX));
+		NumericalValue numericalValue= NumericalValueConverters.argumentToNumericalValue(a2,iX);
+		result.setNonBacktrackableValue(new PrologString(NumericalValueConverters.normalizeNumber(fractionPartLength,numericalValue)));
+	}
+	public void normalizeNumber2fs(ChoisePoint iX, Term a1, Term a2) {
 	}
 	//
 	public void sortList1ff(ChoisePoint iX, PrologVariable result, Term a1) {
