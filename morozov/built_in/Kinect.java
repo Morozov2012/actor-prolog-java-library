@@ -122,25 +122,25 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 	///////////////////////////////////////////////////////////////
 	//
 	public void setCorrection2s(ChoisePoint iX, Term a1, Term a2) {
-		ExtendedCorrection x= ExtendedCorrectionConverters.argumentToExtendedCorrection(a1,iX);
-		ExtendedCorrection y= ExtendedCorrectionConverters.argumentToExtendedCorrection(a2,iX);
-		horizontalCorrection= x;
-		verticalCorrection= y;
+		ExtendedCorrection currentX= ExtendedCorrectionConverters.argumentToExtendedCorrection(a1,iX);
+		ExtendedCorrection currentY= ExtendedCorrectionConverters.argumentToExtendedCorrection(a2,iX);
+		horizontalCorrection= currentX;
+		verticalCorrection= currentY;
 		kinectListener.setCorrection(horizontalCorrection,verticalCorrection);
 	}
 	//
 	public void getCorrection2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
-		Term x= ExtendedCorrectionConverters.toTerm(getHorizontalCorrection(iX));
-		Term y= ExtendedCorrectionConverters.toTerm(getVerticalCorrection(iX));
-		a1.setBacktrackableValue(x,iX);
-		a2.setBacktrackableValue(y,iX);
+		Term currentX= ExtendedCorrectionConverters.toTerm(getHorizontalCorrection(iX));
+		Term currentY= ExtendedCorrectionConverters.toTerm(getVerticalCorrection(iX));
+		a1.setBacktrackableValue(currentX,iX);
+		a2.setBacktrackableValue(currentY,iX);
 	}
 	//
 	public void getCorrectionInPixels2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
-		int x= frameMappingTask.getHorizontalCorrection();
-		int y= frameMappingTask.getVerticalCorrection();
-		a1.setBacktrackableValue(new PrologInteger(x),iX);
-		a2.setBacktrackableValue(new PrologInteger(y),iX);
+		int currentX= frameMappingTask.getHorizontalCorrection();
+		int currentY= frameMappingTask.getVerticalCorrection();
+		a1.setBacktrackableValue(new PrologInteger(currentX),iX);
+		a2.setBacktrackableValue(new PrologInteger(currentY),iX);
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -149,6 +149,7 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 		activate(iX);
 	}
 	//
+	@Override
 	public void stop0s(ChoisePoint iX) {
 		stop();
 	}
@@ -170,6 +171,7 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void registerListener(KinectDeviceInterface device, boolean requireExclusiveAccess, ChoisePoint iX) {
 		boolean modeIsChanged;
 		synchronized (clientListeners) {
@@ -177,13 +179,8 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 			for (int n=0; n < clientListeners.size(); n++) {
 				KinectDeviceInterface element= clientListeners.get(n);
 				if (element.equals(device)) {
-					// if (element.isSuspended()) {
-					//	return;
-					// } else {
-					//	element.setIsSuspended(false);
 					deviceIsFound= true;
 					break;
-					// }
 				}
 			};
 			if (!deviceIsFound) {
@@ -238,8 +235,8 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 		}
 	}
 	//
+	@Override
 	public void suspendListener(KinectDeviceInterface device, ChoisePoint iX) {
-		// boolean modeIsChanged;
 		synchronized (clientListeners) {
 			boolean deviceIsFound= false;
 			for (int n=0; n < clientListeners.size(); n++) {
@@ -249,21 +246,14 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 						return;
 					} else {
 						element.setIsSuspended(true);
-						// deviceIsFound= true;
 						break;
 					}
 				}
 			}
-			// if (!deviceIsFound) {
-			//	return;
-			// };
-			// modeIsChanged= changeDataAcquisitionMode();
 		}
-		// if (modeIsChanged) {
-		//	reactivateDevice(iX);
-		// }
 	}
 	//
+	@Override
 	public void cancelListener(KinectDeviceInterface device, ChoisePoint iX) {
 		boolean modeIsChanged;
 		synchronized (clientListeners) {
@@ -271,7 +261,6 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 			for (int n=0; n < clientListeners.size(); n++) {
 				KinectDeviceInterface element= clientListeners.get(n);
 				if (element.equals(device)) {
-					// clientListeners.remove(n);
 					element.setIsSuspended(true);
 					deviceIsFound= true;
 					break;
@@ -313,6 +302,7 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void activate(ChoisePoint iX) {
 		initiateAuxiliaryProcedures(iX);
 		synchronized (kinectListener) {
@@ -321,6 +311,7 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 			}
 		}
 	}
+	@Override
 	public void stop() {
 		synchronized (kinectListener) {
 			kinectListener.stop();
@@ -330,6 +321,7 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void sendDepthFrame(KinectDepthFrameInterface frame) {
 		synchronized (clientListeners) {
 			for (int n=0; n < clientListeners.size(); n++) {
@@ -337,12 +329,13 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 				if (device.isSuspended()) {
 					continue;
 				};
-				if (device.requiresFrameType(KinectDataArrayType.DEPTH_FRAME)) {
+				if (device.requiresDepthFrames()) {
 					device.sendKinectFrame(frame);
 				}
 			}
 		}
 	}
+	@Override
 	public void sendInfraredFrame(KinectInfraredFrameInterface frame) {
 		synchronized (clientListeners) {
 			for (int n=0; n < clientListeners.size(); n++) {
@@ -350,12 +343,13 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 				if (device.isSuspended()) {
 					continue;
 				};
-				if (device.requiresFrameType(KinectDataArrayType.INFRARED_FRAME)) {
+				if (device.requiresInfraredFrames()) {
 					device.sendKinectFrame(frame);
 				}
 			}
 		}
 	}
+	@Override
 	public void sendLongExposureInfraredFrame(KinectLongExposureInfraredFrameInterface frame) {
 		synchronized (clientListeners) {
 			for (int n=0; n < clientListeners.size(); n++) {
@@ -363,12 +357,13 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 				if (device.isSuspended()) {
 					continue;
 				};
-				if (device.requiresFrameType(KinectDataArrayType.LONG_EXPOSURE_INFRARED_FRAME)) {
+				if (device.requiresLongExposureInfraredFrames()) {
 					device.sendKinectFrame(frame);
 				}
 			}
 		}
 	}
+	@Override
 	public void sendMappedColorFrame(KinectMappedColorFrameInterface frame) {
 		synchronized (clientListeners) {
 			for (int n=0; n < clientListeners.size(); n++) {
@@ -376,25 +371,41 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 				if (device.isSuspended()) {
 					continue;
 				};
-				if (device.requiresFrameType(KinectDataArrayType.MAPPED_COLOR_FRAME)) {
+				if (device.requiresMappedColorFrames()) {
 					device.sendKinectFrame(frame);
 				}
 			}
 		}
 	}
-	public void sendPointCloudsFrame(KinectPointCloudsFrameInterface frame) {
+	@Override
+	public void sendEntirePointCloudsFrame(KinectPointCloudsFrameInterface frame) {
 		synchronized (clientListeners) {
 			for (int n=0; n < clientListeners.size(); n++) {
 				KinectDeviceInterface device= clientListeners.get(n);
 				if (device.isSuspended()) {
 					continue;
 				};
-				if (device.requiresFrameType(KinectDataArrayType.POINT_CLOUDS_FRAME)) {
+				if (device.requiresEntirePointClouds()) {
 					device.sendKinectFrame(frame);
 				}
 			}
 		}
 	}
+	@Override
+	public void sendForegroundPointCloudsFrame(KinectForegroundPointCloudsFrameInterface frame) {
+		synchronized (clientListeners) {
+			for (int n=0; n < clientListeners.size(); n++) {
+				KinectDeviceInterface device= clientListeners.get(n);
+				if (device.isSuspended()) {
+					continue;
+				};
+				if (device.requiresForegroundPointClouds()) {
+					device.sendKinectFrame(frame);
+				}
+			}
+		}
+	}
+	@Override
 	public void sendColorFrame(KinectColorFrameInterface frame) {
 		synchronized (clientListeners) {
 			for (int n=0; n < clientListeners.size(); n++) {
@@ -402,7 +413,7 @@ public abstract class Kinect extends DataAbstraction implements KinectInterface,
 				if (device.isSuspended()) {
 					continue;
 				};
-				if (device.requiresFrameType(KinectDataArrayType.COLOR_FRAME)) {
+				if (device.requiresColorFrames()) {
 					device.sendKinectFrame(frame);
 				}
 			}

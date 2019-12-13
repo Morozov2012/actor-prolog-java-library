@@ -31,9 +31,8 @@ public class DomainStructure extends MultiArgumentDomainItem {
 		functor= name;
 	}
 	//
+	@Override
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
-		// initiateDomainItemsIfNecessary();
-		// t= t.dereferenceValue(cp);
 		t= t.dereferenceValue(cp);
 		if (ignoreFreeVariables && t.thisIsFreeVariable()) {
 			return true;
@@ -60,9 +59,8 @@ public class DomainStructure extends MultiArgumentDomainItem {
 			}
 		}
 	}
+	@Override
 	public Term checkAndOptimizeTerm(Term t, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
-		// initiateDomainItemsIfNecessary();
-		// t= t.dereferenceValue(cp);
 		try {
 			long name= t.getStructureFunctor(cp);
 			if (name != functor) {
@@ -83,9 +81,8 @@ public class DomainStructure extends MultiArgumentDomainItem {
 			throw new DomainAlternativeDoesNotCoverTerm(t.getPosition());
 		}
 	}
+	@Override
 	public Term checkTerm(Term t, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
-		// initiateDomainItemsIfNecessary();
-		// t= t.dereferenceValue(cp);
 		try {
 			long name= t.getStructureFunctor(cp);
 			if (name != functor) {
@@ -107,12 +104,12 @@ public class DomainStructure extends MultiArgumentDomainItem {
 		}
 	}
 	//
+	@Override
 	public boolean isEqualTo(DomainAlternative a, HashSet<PrologDomainPair> stack) {
-		// initiateDomainItemsIfNecessary();
 		return a.isEqualToStructure(functor,domainItems,stack);
 	}
+	@Override
 	public boolean isEqualToStructure(long name, PrologDomain[] domains, HashSet<PrologDomainPair> stack) {
-		// initiateDomainItemsIfNecessary();
 		if (name==functor && domainItems.length==domains.length) {
 			try {
 				for (int n=0; n < domains.length; n++) {
@@ -126,10 +123,11 @@ public class DomainStructure extends MultiArgumentDomainItem {
 			return false;
 		}
 	}
+	@Override
 	public boolean coversAlternative(DomainAlternative a, PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) {
 		return false;
 	}
-	// Converting Term to String
+	// Converting Term to String:
 	private void writeObject(ObjectOutputStream stream) throws IOException {
 		stream.defaultWriteObject();
 		stream.writeObject(SymbolNames.retrieveSymbolName(functor));
@@ -140,13 +138,14 @@ public class DomainStructure extends MultiArgumentDomainItem {
 		functor= SymbolNames.insertSymbolName(symbolName.identifier);
 	}
 	//
+	@Override
 	protected String getMultiArgumentDomainTag() {
 		return PrologDomainName.tagDomainAlternative_Structure;
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
-		// initiateDomainItemsIfNecessary();
-		StringBuffer buffer= new StringBuffer();
+		StringBuilder buffer= new StringBuilder();
 		buffer.append(getMultiArgumentDomainTag());
 		buffer.append("(\'");
 		String functorText= SymbolNames.retrieveSymbolName(functor).toRawString(encoder);

@@ -12,9 +12,9 @@ import morozov.terms.signals.*;
 
 public class ExtendedMaximalLineNumber {
 	//
-	private boolean noLimit= true;
-	private boolean windowHeight= false;
-	private int value= 0;
+	protected boolean noLimit= true;
+	protected boolean windowHeight= false;
+	protected int value= 0;
 	//
 	protected static Term noLimitTerm= new PrologSymbol(SymbolCodes.symbolCode_E_no_limit);
 	protected static Term windowHeightTerm= new PrologSymbol(SymbolCodes.symbolCode_E_window_height);
@@ -33,8 +33,11 @@ public class ExtendedMaximalLineNumber {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void useNoLimit() {
-		noLimit= true;
+	public void setUseNoLimit(boolean mode) {
+		noLimit= mode;
+	}
+	public void setUseNoLimit() {
+		setUseNoLimit(true);
 	}
 	//
 	public boolean noLimit() {
@@ -130,6 +133,7 @@ public class ExtendedMaximalLineNumber {
 		}
 	}
 	//
+	@Override
 	public String toString() {
 		return "(" +
 			String.format("%B,",noLimit) +

@@ -38,11 +38,11 @@ public abstract class AbstractDialog
 	//
 	protected boolean isDraftMode= false;
 	//
-	public boolean isModal= false;
-	public boolean isTopLevelWindow= false;
-	public boolean isAlwaysOnTopWindow= false;
-	public boolean confirmationOnWindowClose= false;
-	public boolean exitOnClose= false;
+	protected boolean isModal= false;
+	protected boolean isTopLevelWindow= false;
+	protected boolean isAlwaysOnTopWindow= false;
+	protected boolean confirmationOnWindowClose= false;
+	protected boolean exitOnClose= false;
 	//
 	protected StaticContext staticContext;
 	protected ChoisePoint modalChoisePoint= null;
@@ -97,17 +97,19 @@ public abstract class AbstractDialog
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public boolean isModal() {
+		return isModal;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void registerPortsAndRecoverPortValues(AbstractDialog dialog, Dialog targetWorld, DialogEntry[] userDefinedSlots, DialogEntry[] systemSlots) {
 		int numberOfUserDefinedSlots= userDefinedSlots.length;
 		int numberOfSystemSlots= systemSlots.length;
 		long numberOfEntries= userDefinedSlots.length + numberOfSystemSlots;
-		controlTable= new DialogEntry[PrologInteger.toInteger(numberOfEntries)];
-		for (int n=0; n < numberOfUserDefinedSlots; n++) {
-			controlTable[n]= userDefinedSlots[n];
-		};
-		for (int n=0; n < numberOfSystemSlots; n++) {
-			controlTable[numberOfUserDefinedSlots+n]= systemSlots[n];
-		};
+		controlTable= new DialogEntry[Arithmetic.toInteger(numberOfEntries)];
+		System.arraycopy(userDefinedSlots,0,controlTable,0,numberOfUserDefinedSlots);
+		System.arraycopy(systemSlots,0,controlTable,numberOfUserDefinedSlots,numberOfSystemSlots);
 		specialProcess.registerPortsAndRecoverPortValues(dialog,targetWorld,userDefinedSlots,systemSlots);
 	}
 	//
@@ -119,6 +121,7 @@ public abstract class AbstractDialog
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklyDisplay(initialState,iX,context);
 					}
@@ -128,7 +131,7 @@ public abstract class AbstractDialog
 			}
 		}
 	}
-	private void quicklyDisplay(DialogInitialState initialState, ChoisePoint iX, StaticContext context) {
+	protected void quicklyDisplay(DialogInitialState initialState, ChoisePoint iX, StaticContext context) {
 		if (isInitiated.get()) {
 			modalChoisePoint= iX;
 			dialogContainer.safelySetVisible(true);
@@ -144,6 +147,7 @@ public abstract class AbstractDialog
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklyAddAndDisplay(initialState,iX,context);
 					}
@@ -153,7 +157,7 @@ public abstract class AbstractDialog
 			}
 		}
 	}
-	private void quicklyAddAndDisplay(DialogInitialState initialState, ChoisePoint iX, final StaticContext context) {
+	protected void quicklyAddAndDisplay(DialogInitialState initialState, ChoisePoint iX, final StaticContext context) {
 		dialogContainer.setClosable(true);
 		dialogContainer.setResizable(true);
 		dialogContainer.setMaximizable(true);
@@ -164,7 +168,6 @@ public abstract class AbstractDialog
 			if (exitOnClose) {
 				try {
 					dialogContainer.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-// dialogContainer.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 				} catch (SecurityException e) {
 					dialogContainer.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 				}
@@ -177,7 +180,6 @@ public abstract class AbstractDialog
 		dialogContainer.addToDesktopIfNecessary(context);
 		//
 		modalChoisePoint= iX;
-		// defineDefaultButton();
 		dialogContainer.pack();
 		implementPreferredSize();
 		safelyPositionMainPanel();
@@ -195,9 +197,7 @@ public abstract class AbstractDialog
 		default:
 			break;
 		};
-		// dialogContainer.toFront();
 		safelyDefineDefaultButton(); // For modeless dialogs
-		// defineDefaultButton();
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -226,6 +226,7 @@ public abstract class AbstractDialog
 		specialProcess.receiveUserInterfaceMessage(null,true,DialogEventType.NONE);
 	}
 	//
+	@Override
 	public void sendTheWindowClosingOrWindowClosedMessage() {
 		if (confirmationOnWindowClose) {
 			sendTheWindowClosingMessage();
@@ -236,6 +237,7 @@ public abstract class AbstractDialog
 	public void sendTheWindowClosingMessage() {
 		specialProcess.receiveUserInterfaceMessage(null,true,DialogEventType.WINDOW_CLOSING);
 	}
+	@Override
 	public void sendTheWindowClosedMessage() {
 		specialProcess.receiveUserInterfaceMessage(null,true,DialogEventType.WINDOW_CLOSED);
 	}
@@ -249,7 +251,6 @@ public abstract class AbstractDialog
 	public void decrementTheInsideThePutOperationCounter() {
 		int counter= insideThePutOperation.decrementAndGet();
 		if (counter <= 0) {
-			// repaintAfterDelay();
 			safelyRepaint();
 		}
 	}
@@ -358,7 +359,6 @@ public abstract class AbstractDialog
 						entry.putValue(operation,fieldValue,iX);
 						specialProcess.receiveUserInterfaceMessage(entry,true,DialogEventType.NONE);
 						slotIsFound= true;
-						// return;
 					}
 				}
 			};
@@ -371,7 +371,6 @@ public abstract class AbstractDialog
 					if (entry.name.equals(slotOrActionName)) {
 						entry.putValue(operation,fieldValue,iX);
 						slotIsFound= true;
-						// return;
 					}
 				}
 			};
@@ -388,7 +387,6 @@ public abstract class AbstractDialog
 						if (entry.code==number) {
 							entry.putValue(operation,fieldValue,iX);
 							slotIsFound= true;
-							// return;
 						}
 					}
 				};
@@ -405,7 +403,6 @@ public abstract class AbstractDialog
 							if (entry.name.equals(name)) {
 								entry.putValue(operation,fieldValue,iX);
 								slotIsFound= true;
-								// return;
 							}
 						}
 					};
@@ -489,7 +486,6 @@ public abstract class AbstractDialog
 					if (entry.name.equals(slotOrActionName)) {
 						entry.setFieldIsEnabled(mode);
 						slotIsFound= true;
-						// return;
 					}
 				}
 			};
@@ -502,7 +498,6 @@ public abstract class AbstractDialog
 					if (entry.name.equals(slotOrActionName)) {
 						entry.setFieldIsEnabled(mode);
 						slotIsFound= true;
-						// return;
 					}
 				}
 			};
@@ -519,7 +514,6 @@ public abstract class AbstractDialog
 						if (entry.code==number) {
 							entry.setFieldIsEnabled(mode);
 							slotIsFound= true;
-							// return;
 						}
 					}
 				};
@@ -536,7 +530,6 @@ public abstract class AbstractDialog
 							if (entry.name.equals(name)) {
 								entry.setFieldIsEnabled(mode);
 								slotIsFound= true;
-								// return;
 							}
 						}
 					};
@@ -621,13 +614,12 @@ public abstract class AbstractDialog
 		for (int i= 0; i < controlTable.length; i++) {
 			DialogEntry entry= controlTable[i];
 			if (entry.isSlotName) {
-				Term value= null;
 				Term slot= targetWorld.getSlotByName(entry.name);
 				slot= slot.extractSlotVariable();
 				if (slot.thisIsSlotVariable()) {
 					SlotVariable slotVariable= (SlotVariable)slot;
 					try {
-						value= entry.getExistedValue();
+						Term value= entry.getExistedValue();
 						specialProcess.prepareFlowMessage(slotVariable,value);
 					} catch (Backtracking b) {
 					}
@@ -655,7 +647,6 @@ public abstract class AbstractDialog
 				newIx.freeTrail();
 			} else {
 				AsyncCall call= new AsyncCall(domainSignature,targetWorld,true,true,arguments,true);
-				// 2018.10.30: call= new AsyncCall(domainSignature,targetWorld,true,false,arguments,true);
 				targetWorld.transmitAsyncCall(call,iX);
 			}
 		}
@@ -752,42 +743,36 @@ public abstract class AbstractDialog
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void actionPerformed(ActionEvent e) {
-		// 2013.12.07: Без этих двух комманд
-		// происходят престранные вещи. Нажимаю кнопку,
-		// открывается новый (модальный) диалог, закрываю
-		// диалог, и потом текущий диалог некорректно
-		// перерисовывается.
-		// См. пример test_117_45_enable_disable_01_jdk.a.
-		// revalidate();
-		// repaint();
-		//
 		boolean isSystemCommand= false;
 		boolean isTheResetCommand= false;
 		boolean isTheVerifyCommand= false;
 		String name= e.getActionCommand();
 		long domainSignature= -1;
-		Term[] arguments= null;
-		if (name.equals("close")) {
+		Term[] arguments;
+		switch (name) {
+		case "close":
 			sendTheWindowClosingMessage();
 			dialogContainer.safelySetVisible(false);
-			// 2017.02.10:
 			if (exitOnClose) {
 				Runtime runtime= Runtime.getRuntime();
 				runtime.exit(0);
 			};
 			return;
-		} else if (name.equals("verify")) {
+		case "verify":
 			isSystemCommand= true;
 			isTheVerifyCommand= true;
 			arguments= new Term[0];
-		} else if (name.equals("reset")) {
+			break;
+		case "reset":
 			isSystemCommand= true;
 			isTheResetCommand= true;
 			arguments= new Term[0];
-		} else {
+			break;
+		default:
 			domainSignature= targetWorld.entry_s_Action_1_i();
-			Term predicateArgument= null;
+			Term predicateArgument;
 			if (name.regionMatches(0,"name:",0,5)) {
 				predicateArgument= new PrologString(name.substring(5));
 			} else if (name.regionMatches(0,"code:",0,5)) {
@@ -796,6 +781,7 @@ public abstract class AbstractDialog
 				predicateArgument= new PrologString(name);
 			};
 			arguments= new Term[]{predicateArgument};
+			break;
 		};
 		if (isModal) {
 			if (!isSystemCommand) {
@@ -824,18 +810,22 @@ public abstract class AbstractDialog
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void componentHidden(ComponentEvent event) {
 		// Invoked when the component has been made invisible.
 	}
+	@Override
 	public void componentMoved(ComponentEvent event) {
 		dialogContainer.repaintParent();
 		safelyAcceptNewPositionOfDialog();
 	}
+	@Override
 	public void componentResized(ComponentEvent event) {
 		dialogContainer.repaintParent();
 		safelyAcceptNewPositionOfDialog();
 		specialProcess.receiveUserInterfaceMessage(findDialogEntryFontSize(),true,DialogEventType.NONE);
 	}
+	@Override
 	public void componentShown(ComponentEvent event) {
 		// Invoked when the component has been made visible.
 	}

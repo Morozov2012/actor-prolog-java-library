@@ -12,16 +12,19 @@ import morozov.terms.signals.*;
 public enum DatabaseSharingMode {
 	//
 	EXCLUSIVE_ACCESS {
+		@Override
 		public Term toTerm() {
 			return termExclusiveAccess;
 		}
 	},
 	EXCLUSIVE_WRITING {
+		@Override
 		public Term toTerm() {
 			return termExclusiveWriting;
 		}
 	},
 	SHARED_ACCESS {
+		@Override
 		public Term toTerm() {
 			return termSharedAccess;
 		}

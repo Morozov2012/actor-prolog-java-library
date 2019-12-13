@@ -39,39 +39,49 @@ public class DescriptionCompoundFrame extends CompoundFrame implements Descripti
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean isLightweightFrame() {
 		return true;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public String getDescription() {
 		return description;
 	}
+	@Override
 	public void setDescription(String value) {
 		description= value;
 	}
+	@Override
 	public String getCopyright() {
 		return copyright;
 	}
+	@Override
 	public void setCopyright(String value) {
 		copyright= value;
 	}
+	@Override
 	public String getRegistrationDate() {
 		return registrationDate;
 	}
+	@Override
 	public void setRegistrationDate(String value) {
 		registrationDate= value;
 	}
+	@Override
 	public String getRegistrationTime() {
 		return registrationTime;
 	}
+	@Override
 	public void setRegistrationTime(String value) {
 		registrationTime= value;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public String toString() {
 		return DescriptionCompoundFrameText.toString(this);
 	}

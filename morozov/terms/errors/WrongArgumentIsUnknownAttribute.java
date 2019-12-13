@@ -5,10 +5,14 @@ package morozov.terms.errors;
 import target.*;
 
 public class WrongArgumentIsUnknownAttribute extends RuntimeException {
+	//
 	protected long name;
+	//
 	public WrongArgumentIsUnknownAttribute(long code) {
 		name= code;
 	}
+	//
+	@Override
 	public String toString() {
 		return	this.getClass().toString() +
 			"(" +

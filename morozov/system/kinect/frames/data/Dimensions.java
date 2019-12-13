@@ -96,7 +96,6 @@ public class Dimensions implements DimensionsInterface, Serializable {
 			};
 			for (int n=0; n < totalDepthDimensions.length; n++) {
 				totalDepthDimensions[n].computeTotalDepthParallelepiped(attributes);
-				// totalColorDimensions[n].computeDepthParallelepiped(attributes);
 			};
 			if (u != null && v != null && colorFrameWidth > 0 && colorFrameHeight > 0) {
 				for (int n=0; n < totalDepthDimensions.length; n++) {
@@ -106,10 +105,7 @@ public class Dimensions implements DimensionsInterface, Serializable {
 		};
 		if (skeletons != null) {
 			for (int n=0; n < skeletons.length; n++) {
-				// playerSkeletonDepthDimensions[n].computeParallelepipedBounds(skeletons[n]);
-				// playerColorDimensions[n].computeParallelepipedBounds(skeletons[n]);
 				skeletonsDepthDimensions[n].computeSkeletonDepthParallelepiped(skeletons[n],attributes);
-				// playerColorDimensions[n].computeDepthParallelepiped(attributes);
 			};
 			if (u != null && v != null && colorFrameWidth > 0 && colorFrameHeight > 0) {
 				for (int n=0; n < skeletonsDepthDimensions.length; n++) {
@@ -121,12 +117,15 @@ public class Dimensions implements DimensionsInterface, Serializable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public int getSize() {
 		return numberOfSkeletons;
 	}
+	@Override
 	public PlayerDimensionsInterface[] getTotalDepthDimensions() {
 		return totalDepthDimensions;
 	}
+	@Override
 	public PlayerDimensionsInterface getTotalDepthDimensions(int n) {
 		if (totalDepthDimensions != null) {
 			return totalDepthDimensions[n];
@@ -134,9 +133,11 @@ public class Dimensions implements DimensionsInterface, Serializable {
 			return null;
 		}
 	}
+	@Override
 	public PlayerDimensionsInterface[] getSkeletonsDepthDimensions() {
 		return skeletonsDepthDimensions;
 	}
+	@Override
 	public PlayerDimensionsInterface getSkeletonDepthDimensions(int n) {
 		if (skeletonsDepthDimensions != null) {
 			return skeletonsDepthDimensions[n];
@@ -144,9 +145,11 @@ public class Dimensions implements DimensionsInterface, Serializable {
 			return null;
 		}
 	}
+	@Override
 	public PlayerDimensionsInterface[] getTotalColorDimensions() {
 		return totalColorDimensions;
 	}
+	@Override
 	public PlayerDimensionsInterface getTotalColorDimensions(int n) {
 		if (totalColorDimensions != null) {
 			return totalColorDimensions[n];
@@ -154,9 +157,11 @@ public class Dimensions implements DimensionsInterface, Serializable {
 			return null;
 		}
 	}
+	@Override
 	public PlayerDimensionsInterface[] getSkeletonsColorDimensions() {
 		return skeletonsColorDimensions;
 	}
+	@Override
 	public PlayerDimensionsInterface getSkeletonColorDimensions(int n) {
 		if (skeletonsColorDimensions != null) {
 			return skeletonsColorDimensions[n];
@@ -167,6 +172,7 @@ public class Dimensions implements DimensionsInterface, Serializable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public SkeletonDimensions getSkeletonDimensions(int n) {
 		PlayerDimensionsInterface totalDepthDimensions= getTotalDepthDimensions(n);
 		PlayerDimensionsInterface skeletonDepthDimensions= getSkeletonDepthDimensions(n);

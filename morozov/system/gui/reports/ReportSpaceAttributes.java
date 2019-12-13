@@ -15,14 +15,14 @@ public class ReportSpaceAttributes extends CanvasSpaceAttributes {
 	public static final int automaticFontSizeAdjustment= -1;
 	//
 	protected StaticContext staticContext;
-	private StyledDocument currentStyledDocument= null;
-	private Integer currentCaretPosition= null;
-	private Integer currentSelectionStart= null;
-	private Integer currentSelectionEnd= null;
-	private Color currentBackgroundColor= null;
-	private Font currentFont= null;
-	private int fontSize= automaticFontSizeAdjustment;
-	private boolean keepFontSize= false;
+	protected StyledDocument currentStyledDocument= null;
+	protected Integer currentCaretPosition= null;
+	protected Integer currentSelectionStart= null;
+	protected Integer currentSelectionEnd= null;
+	protected Color currentBackgroundColor= null;
+	protected Font currentFont= null;
+	protected int fontSize= automaticFontSizeAdjustment;
+	protected boolean keepFontSize= false;
 	//
 	synchronized public void setStaticContext(StaticContext context) {
 		staticContext= context;

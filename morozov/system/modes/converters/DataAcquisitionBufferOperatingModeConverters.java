@@ -25,8 +25,6 @@ public class DataAcquisitionBufferOperatingModeConverters {
 				return DataAcquisitionBufferOperatingMode.SPECULATIVE_READING;
 			} else if (code==SymbolCodes.symbolCode_E_LISTENING) {
 				return DataAcquisitionBufferOperatingMode.LISTENING;
-			// } else if (code==SymbolCodes.symbolCode_E_DISPLAYING) {
-			//	return DataAcquisitionBufferOperatingMode.DISPLAYING;
 			} else {
 				throw new WrongArgumentIsNotDataAcquisitionBufferOperatingMode(value);
 			}
@@ -42,7 +40,6 @@ public class DataAcquisitionBufferOperatingModeConverters {
 	protected static Term termReading= new PrologSymbol(SymbolCodes.symbolCode_E_READING);
 	protected static Term termSpeculativeReading= new PrologSymbol(SymbolCodes.symbolCode_E_SPECULATIVE_READING);
 	protected static Term termListening= new PrologSymbol(SymbolCodes.symbolCode_E_LISTENING);
-	// protected static Term termDisplaying= new PrologSymbol(SymbolCodes.symbolCode_E_DISPLAYING);
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -58,8 +55,6 @@ public class DataAcquisitionBufferOperatingModeConverters {
 			return termReading;
 		case LISTENING:
 			return termListening;
-		// case DISPLAYING:
-		//	return termDisplaying;
 		};
 		throw new UnknownDataAcquisitionBufferOperatingMode(mode);
 	}

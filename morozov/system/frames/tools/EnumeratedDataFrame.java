@@ -34,6 +34,7 @@ public class EnumeratedDataFrame extends EnumeratedFrame {
 		return numberOfFrame;
 	}
 	//
+	@Override
 	public long getTime() {
 		return frame.getTime();
 	}

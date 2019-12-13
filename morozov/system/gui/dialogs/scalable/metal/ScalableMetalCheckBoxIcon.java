@@ -31,16 +31,15 @@ public class ScalableMetalCheckBoxIcon extends ScalableMetalToggleButtonIcon {
 	public ScalableMetalCheckBoxIcon() {
 	}
 	//
+	@Override
 	protected String getGradientKey() {
 		return "CheckBox.gradient";
 	}
 	//
 	private void paintOceanEye(JToggleButton tb, Graphics2D g2, int x, int y, int controlSize) {
-		// ScalableToggleButtonModel model= (ScalableToggleButtonModel)tb.getModel();
 		ButtonModel model= tb.getModel();
 		int w= getIconWidth();
 		int h= getIconHeight();
-		// Graphics2D g2= (Graphics2D)g0;
 		g2.translate(x,y);
 		if (model.isEnabled()) {
 			if (model.isPressed() && model.isArmed()) {
@@ -70,9 +69,7 @@ public class ScalableMetalCheckBoxIcon extends ScalableMetalToggleButtonIcon {
 		g2.translate(-x,-y);
 	}
 	private void paintOrdinaryEye(JToggleButton tb, Graphics2D g2, int x, int y, int controlSize) {
-		// ScalableToggleButtonModel model= (ScalableToggleButtonModel)tb.getModel();
 		ButtonModel model= tb.getModel();
-		// Graphics2D g2= (Graphics2D)g0;
 		if (model.isEnabled()) {
 			if (model.isPressed() && model.isArmed()) {
 				g2.setColor(MetalLookAndFeel.getControlShadow());
@@ -81,13 +78,13 @@ public class ScalableMetalCheckBoxIcon extends ScalableMetalToggleButtonIcon {
 			} else {
 				MetalUtils.drawFlush3DBorder(g2,x,y,controlSize,controlSize);
 			}
-			// g2.setColor(c.getForeground());
 		} else {
 			g2.setColor(MetalLookAndFeel.getControlShadow());
 			g2.draw(new Rectangle2D.Double(x,y,controlSize-2,controlSize-2));
 		}
 	}
 	//
+	@Override
 	protected void drawEye(JToggleButton tb, Graphics2D g2, int x, int y, int controlSize) {
 		if (MetalUtils.usingOcean()) {
 			paintOceanEye(tb,g2,x,y,controlSize);
@@ -96,6 +93,7 @@ public class ScalableMetalCheckBoxIcon extends ScalableMetalToggleButtonIcon {
 		}
 	}
 	//
+	@Override
 	protected void drawMarker(JToggleButton tb, Graphics2D g2, int x, int y, int controlSize) {
 		ButtonModel model1= tb.getModel();
 		if (model1 instanceof ScalableToggleButtonModel) {

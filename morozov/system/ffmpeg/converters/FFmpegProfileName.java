@@ -14,641 +14,801 @@ import morozov.terms.signals.*;
 public enum FFmpegProfileName {
 	//
 	FF_PROFILE_UNKNOWN {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_UNKNOWN;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_UNKNOWN;
 		}
 	},
 	FF_PROFILE_RESERVED {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_RESERVED;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_RESERVED;
 		}
 	},
 	FF_PROFILE_AAC_MAIN {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_AAC_MAIN;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_AAC_MAIN;
 		}
 	},
 	FF_PROFILE_AAC_LOW {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_AAC_LOW;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_AAC_LOW;
 		}
 	},
 	FF_PROFILE_AAC_SSR {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_AAC_SSR;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_AAC_SSR;
 		}
 	},
 	FF_PROFILE_AAC_LTP {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_AAC_LTP;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_AAC_LTP;
 		}
 	},
 	FF_PROFILE_AAC_HE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_AAC_HE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_AAC_HE;
 		}
 	},
 	FF_PROFILE_AAC_HE_V2 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_AAC_HE_V2;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_AAC_HE_V2;
 		}
 	},
 	FF_PROFILE_AAC_LD {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_AAC_LD;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_AAC_LD;
 		}
 	},
 	FF_PROFILE_AAC_ELD {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_AAC_ELD;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_AAC_ELD;
 		}
 	},
 	FF_PROFILE_MPEG2_AAC_LOW {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG2_AAC_LOW;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG2_AAC_LOW;
 		}
 	},
 	FF_PROFILE_MPEG2_AAC_HE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG2_AAC_HE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG2_AAC_HE;
 		}
 	},
 	FF_PROFILE_DNXHD {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_DNXHD;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_DNXHD;
 		}
 	},
 	FF_PROFILE_DNXHR_LB {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_DNXHR_LB;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_DNXHR_LB;
 		}
 	},
 	FF_PROFILE_DNXHR_SQ {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_DNXHR_SQ;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_DNXHR_SQ;
 		}
 	},
 	FF_PROFILE_DNXHR_HQ {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_DNXHR_HQ;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_DNXHR_HQ;
 		}
 	},
 	FF_PROFILE_DNXHR_HQX {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_DNXHR_HQX;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_DNXHR_HQX;
 		}
 	},
 	FF_PROFILE_DNXHR_444 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_DNXHR_444;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_DNXHR_444;
 		}
 	},
 	FF_PROFILE_DTS {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_DTS;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_DTS;
 		}
 	},
 	FF_PROFILE_DTS_ES {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_DTS_ES;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_DTS_ES;
 		}
 	},
 	FF_PROFILE_DTS_96_24 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_DTS_96_24;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_DTS_96_24;
 		}
 	},
 	FF_PROFILE_DTS_HD_HRA {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_DTS_HD_HRA;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_DTS_HD_HRA;
 		}
 	},
 	FF_PROFILE_DTS_HD_MA {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_DTS_HD_MA;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_DTS_HD_MA;
 		}
 	},
 	FF_PROFILE_DTS_EXPRESS {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_DTS_EXPRESS;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_DTS_EXPRESS;
 		}
 	},
 	FF_PROFILE_MPEG2_422 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG2_422;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG2_422;
 		}
 	},
 	FF_PROFILE_MPEG2_HIGH {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG2_HIGH;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG2_HIGH;
 		}
 	},
 	FF_PROFILE_MPEG2_SS {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG2_SS;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG2_SS;
 		}
 	},
 	FF_PROFILE_MPEG2_SNR_SCALABLE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG2_SNR_SCALABLE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG2_SNR_SCALABLE;
 		}
 	},
 	FF_PROFILE_MPEG2_MAIN {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG2_MAIN;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG2_MAIN;
 		}
 	},
 	FF_PROFILE_MPEG2_SIMPLE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG2_SIMPLE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG2_SIMPLE;
 		}
 	},
 	FF_PROFILE_H264_CONSTRAINED {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_H264_CONSTRAINED;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_H264_CONSTRAINED;
 		}
 	},
 	FF_PROFILE_H264_INTRA {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_H264_INTRA;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_H264_INTRA;
 		}
 	},
 	FF_PROFILE_H264_BASELINE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_H264_BASELINE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_H264_BASELINE;
 		}
 	},
 	FF_PROFILE_H264_CONSTRAINED_BASELINE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_H264_CONSTRAINED_BASELINE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_H264_CONSTRAINED_BASELINE;
 		}
 	},
 	FF_PROFILE_H264_MAIN {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_H264_MAIN;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_H264_MAIN;
 		}
 	},
 	FF_PROFILE_H264_EXTENDED {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_H264_EXTENDED;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_H264_EXTENDED;
 		}
 	},
 	FF_PROFILE_H264_HIGH {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_H264_HIGH;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_H264_HIGH;
 		}
 	},
 	FF_PROFILE_H264_HIGH_10 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_H264_HIGH_10;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_H264_HIGH_10;
 		}
 	},
 	FF_PROFILE_H264_HIGH_10_INTRA {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_H264_HIGH_10_INTRA;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_H264_HIGH_10_INTRA;
 		}
 	},
 	FF_PROFILE_H264_MULTIVIEW_HIGH {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_H264_MULTIVIEW_HIGH;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_H264_MULTIVIEW_HIGH;
 		}
 	},
 	FF_PROFILE_H264_HIGH_422 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_H264_HIGH_422;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_H264_HIGH_422;
 		}
 	},
 	FF_PROFILE_H264_HIGH_422_INTRA {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_H264_HIGH_422_INTRA;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_H264_HIGH_422_INTRA;
 		}
 	},
 	FF_PROFILE_H264_STEREO_HIGH {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_H264_STEREO_HIGH;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_H264_STEREO_HIGH;
 		}
 	},
 	FF_PROFILE_H264_HIGH_444 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_H264_HIGH_444;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_H264_HIGH_444;
 		}
 	},
 	FF_PROFILE_H264_HIGH_444_PREDICTIVE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_H264_HIGH_444_PREDICTIVE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_H264_HIGH_444_PREDICTIVE;
 		}
 	},
 	FF_PROFILE_H264_HIGH_444_INTRA {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_H264_HIGH_444_INTRA;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_H264_HIGH_444_INTRA;
 		}
 	},
 	FF_PROFILE_H264_CAVLC_444 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_H264_CAVLC_444;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_H264_CAVLC_444;
 		}
 	},
 	FF_PROFILE_VC1_SIMPLE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_VC1_SIMPLE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_VC1_SIMPLE;
 		}
 	},
 	FF_PROFILE_VC1_MAIN {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_VC1_MAIN;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_VC1_MAIN;
 		}
 	},
 	FF_PROFILE_VC1_COMPLEX {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_VC1_COMPLEX;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_VC1_COMPLEX;
 		}
 	},
 	FF_PROFILE_VC1_ADVANCED {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_VC1_ADVANCED;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_VC1_ADVANCED;
 		}
 	},
 	FF_PROFILE_MPEG4_SIMPLE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG4_SIMPLE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG4_SIMPLE;
 		}
 	},
 	FF_PROFILE_MPEG4_SIMPLE_SCALABLE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG4_SIMPLE_SCALABLE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG4_SIMPLE_SCALABLE;
 		}
 	},
 	FF_PROFILE_MPEG4_CORE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG4_CORE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG4_CORE;
 		}
 	},
 	FF_PROFILE_MPEG4_MAIN {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG4_MAIN;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG4_MAIN;
 		}
 	},
 	FF_PROFILE_MPEG4_N_BIT {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG4_N_BIT;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG4_N_BIT;
 		}
 	},
 	FF_PROFILE_MPEG4_SCALABLE_TEXTURE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG4_SCALABLE_TEXTURE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG4_SCALABLE_TEXTURE;
 		}
 	},
 	FF_PROFILE_MPEG4_SIMPLE_FACE_ANIMATION {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG4_SIMPLE_FACE_ANIMATION;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG4_SIMPLE_FACE_ANIMATION;
 		}
 	},
 	FF_PROFILE_MPEG4_BASIC_ANIMATED_TEXTURE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG4_BASIC_ANIMATED_TEXTURE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG4_BASIC_ANIMATED_TEXTURE;
 		}
 	},
 	FF_PROFILE_MPEG4_HYBRID {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG4_HYBRID;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG4_HYBRID;
 		}
 	},
 	FF_PROFILE_MPEG4_ADVANCED_REAL_TIME {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG4_ADVANCED_REAL_TIME;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG4_ADVANCED_REAL_TIME;
 		}
 	},
 	FF_PROFILE_MPEG4_CORE_SCALABLE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG4_CORE_SCALABLE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG4_CORE_SCALABLE;
 		}
 	},
 	FF_PROFILE_MPEG4_ADVANCED_CODING {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG4_ADVANCED_CODING;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG4_ADVANCED_CODING;
 		}
 	},
 	FF_PROFILE_MPEG4_ADVANCED_CORE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG4_ADVANCED_CORE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG4_ADVANCED_CORE;
 		}
 	},
 	FF_PROFILE_MPEG4_ADVANCED_SCALABLE_TEXTURE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG4_ADVANCED_SCALABLE_TEXTURE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG4_ADVANCED_SCALABLE_TEXTURE;
 		}
 	},
 	FF_PROFILE_MPEG4_SIMPLE_STUDIO {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG4_SIMPLE_STUDIO;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG4_SIMPLE_STUDIO;
 		}
 	},
 	FF_PROFILE_MPEG4_ADVANCED_SIMPLE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_MPEG4_ADVANCED_SIMPLE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_MPEG4_ADVANCED_SIMPLE;
 		}
 	},
 	FF_PROFILE_JPEG2000_CSTREAM_RESTRICTION_0 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_JPEG2000_CSTREAM_RESTRICTION_0;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_JPEG2000_CSTREAM_RESTRICTION_0;
 		}
 	},
 	FF_PROFILE_JPEG2000_CSTREAM_RESTRICTION_1 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_JPEG2000_CSTREAM_RESTRICTION_1;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_JPEG2000_CSTREAM_RESTRICTION_1;
 		}
 	},
 	FF_PROFILE_JPEG2000_CSTREAM_NO_RESTRICTION {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_JPEG2000_CSTREAM_NO_RESTRICTION;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_JPEG2000_CSTREAM_NO_RESTRICTION;
 		}
 	},
 	FF_PROFILE_JPEG2000_DCINEMA_2K {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_JPEG2000_DCINEMA_2K;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_JPEG2000_DCINEMA_2K;
 		}
 	},
 	FF_PROFILE_JPEG2000_DCINEMA_4K {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_JPEG2000_DCINEMA_4K;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_JPEG2000_DCINEMA_4K;
 		}
 	},
 	FF_PROFILE_VP9_0 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_VP9_0;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_VP9_0;
 		}
 	},
 	FF_PROFILE_VP9_1 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_VP9_1;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_VP9_1;
 		}
 	},
 	FF_PROFILE_VP9_2 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_VP9_2;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_VP9_2;
 		}
 	},
 	FF_PROFILE_VP9_3 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_VP9_3;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_VP9_3;
 		}
 	},
 	FF_PROFILE_HEVC_MAIN {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_HEVC_MAIN;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_HEVC_MAIN;
 		}
 	},
 	FF_PROFILE_HEVC_MAIN_10 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_HEVC_MAIN_10;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_HEVC_MAIN_10;
 		}
 	},
 	FF_PROFILE_HEVC_MAIN_STILL_PICTURE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_HEVC_MAIN_STILL_PICTURE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_HEVC_MAIN_STILL_PICTURE;
 		}
 	},
 	FF_PROFILE_HEVC_REXT {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_PROFILE_HEVC_REXT;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_PROFILE_HEVC_REXT;
 		}

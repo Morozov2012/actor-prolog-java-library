@@ -9,11 +9,11 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class StaticWebAttributes extends StaticAttributes {
 	//
-	private CookieHandler manager;
-	private ReentrantLock webGuard= new ReentrantLock();
-	private static final String staticIdentifier= "_Web";
+	protected CookieHandler manager;
+	protected ReentrantLock webGuard= new ReentrantLock();
+	protected static final String staticIdentifier= "_Web";
 	//
-	private static StaticWebAttributes retrieveStaticWebAttributes(StaticContext context) {
+	protected static StaticWebAttributes retrieveStaticWebAttributes(StaticContext context) {
 		StaticAttributes attributes= context.retrieveAttributes(staticIdentifier);
 		if (attributes==null) {
 			synchronized (context) {
@@ -26,6 +26,7 @@ public class StaticWebAttributes extends StaticAttributes {
 		};
 		return (StaticWebAttributes)attributes;
 	}
+	//
 	public static void setCookieManager(CookieHandler manager, StaticContext context) {
 		StaticWebAttributes attributes= retrieveStaticWebAttributes(context);
 		synchronized (attributes) {

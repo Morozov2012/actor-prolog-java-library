@@ -409,9 +409,6 @@ public class TrackSegment {
 				double[] temporaryVectorX= new double[length];
 				double[] temporaryVectorY= new double[length];
 				for (int n=0; n < length; n++) {
-					// Fixed 2014-05-13:
-					// velocityVectorX[n]= VisionUtils.medianAbs(velocityVectorX,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth+1);
-					// velocityVectorY[n]= VisionUtils.medianAbs(velocityVectorY,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth+1);
 					temporaryVectorX[n]= VisionUtils.medianAbs(velocityVectorX,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth);
 					temporaryVectorY[n]= VisionUtils.medianAbs(velocityVectorY,n-velocityMedianFilterHalfwidth,n+velocityMedianFilterHalfwidth);
 				};

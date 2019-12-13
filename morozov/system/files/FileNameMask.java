@@ -17,10 +17,12 @@ import javax.swing.filechooser.FileFilter;
 import java.util.regex.Pattern;
 
 public class FileNameMask extends FileFilter {
+	//
 	protected String textDescription;
 	protected String[] fileNameMasks;
 	protected String firstExtension= "";
-	private Pattern[] patterns;
+	protected Pattern[] patterns;
+	//
 	public FileNameMask(String description, String requiredPatterns) {
 		this(description, new String[] {requiredPatterns});
 	}
@@ -37,6 +39,7 @@ public class FileNameMask extends FileFilter {
 			patterns[n]= wildcard2pattern(requiredPatterns[n]);
 		}
 	}
+	//
 	protected String extractExtension(String name) {
 		int p1= name.lastIndexOf('.');
 		if (p1 >= 0) {
@@ -61,6 +64,7 @@ public class FileNameMask extends FileFilter {
 		return name;
 	}
 	//
+	@Override
 	public boolean accept(java.io.File f) {
 		if (f==null) {
 			return false;
@@ -76,6 +80,7 @@ public class FileNameMask extends FileFilter {
 			return false;
 		}
 	}
+	@Override
 	public String getDescription() {
 		return textDescription;
 	}

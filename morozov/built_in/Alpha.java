@@ -9,7 +9,6 @@ import morozov.syntax.scanner.errors.*;
 import morozov.syntax.*;
 import morozov.system.*;
 import morozov.system.converters.*;
-import morozov.system.errors.*;
 import morozov.system.files.*;
 import morozov.system.gui.*;
 import morozov.run.*;
@@ -23,25 +22,25 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class Alpha extends AbstractInternalWorld {
 	//
-	public Boolean backslashAlwaysIsSeparator= null;
-	public Boolean acceptOnlyUniformResourceIdentifiers= null;
-	public WaitingInterval maximalWaitingTime= null;
-	public CharacterSet characterSet= null;
-	public AtomicReference<ExtendedSize> width= new AtomicReference<>();
-	public AtomicReference<ExtendedSize> height= new AtomicReference<>();
+	protected Boolean backslashAlwaysIsSeparator= null;
+	protected Boolean acceptOnlyUniformResourceIdentifiers= null;
+	protected WaitingInterval maximalWaitingTime= null;
+	protected CharacterSet characterSet= null;
+	protected AtomicReference<ExtendedSize> width= new AtomicReference<>();
+	protected AtomicReference<ExtendedSize> height= new AtomicReference<>();
 	//
-	protected static long defaultMaximalWaitingTime= 12; // [sec]
-	protected static Term termDefaultMaximalWaitingTime= new PrologInteger(defaultMaximalWaitingTime);
-	protected static Term termYes= new PrologSymbol(SymbolCodes.symbolCode_E_yes);
-	protected static Term termNo= new PrologSymbol(SymbolCodes.symbolCode_E_no);
-	protected static Term termNone= new PrologSymbol(SymbolCodes.symbolCode_E_none);
-	protected static Term termDefault= new PrologSymbol(SymbolCodes.symbolCode_E_default);
-	protected static Term termEmptyString= new PrologString("");
-	protected static Term[] noArguments= new Term[0];
+	protected static final long defaultMaximalWaitingTime= 12; // [sec]
+	protected static final Term termDefaultMaximalWaitingTime= new PrologInteger(defaultMaximalWaitingTime);
+	protected static final Term termYes= new PrologSymbol(SymbolCodes.symbolCode_E_yes);
+	protected static final Term termNo= new PrologSymbol(SymbolCodes.symbolCode_E_no);
+	protected static final Term termNone= new PrologSymbol(SymbolCodes.symbolCode_E_none);
+	protected static final Term termDefault= new PrologSymbol(SymbolCodes.symbolCode_E_default);
+	protected static final Term termEmptyString= new PrologString("");
+	protected static final Term[] noArguments= new Term[0];
 	//
-	protected static int defaultFractionPartLength= 7;
+	protected static final int defaultFractionPartLength= 7;
 	//
-	protected static ParserMasterInterface dummyParserMaster= new DummyParserMaster();
+	protected static final ParserMasterInterface dummyParserMaster= new DummyParserMaster();
 	//
 	public Alpha() {
 	}
@@ -49,22 +48,22 @@ public abstract class Alpha extends AbstractInternalWorld {
 		super(id);
 	}
 	//
-	protected Term getBuiltInSlot_E_backslash_always_is_separator() {
+	public Term getBuiltInSlot_E_backslash_always_is_separator() {
 		return termYes;
 	}
-	protected Term getBuiltInSlot_E_accept_only_uniform_resource_identifiers() {
+	public Term getBuiltInSlot_E_accept_only_uniform_resource_identifiers() {
 		return termNo;
 	}
-	protected Term getBuiltInSlot_E_maximal_waiting_time() {
+	public Term getBuiltInSlot_E_maximal_waiting_time() {
 		return termDefaultMaximalWaitingTime;
 	}
-	protected Term getBuiltInSlot_E_character_set() {
+	public Term getBuiltInSlot_E_character_set() {
 		return termNone;
 	}
-	protected Term getBuiltInSlot_E_width() {
+	public Term getBuiltInSlot_E_width() {
 		return termDefault;
 	}
-	protected Term getBuiltInSlot_E_height() {
+	public Term getBuiltInSlot_E_height() {
 		return termDefault;
 	}
 	//
@@ -119,14 +118,14 @@ public abstract class Alpha extends AbstractInternalWorld {
 	// get/set maximalWaitingTime
 	//
 	public void setMaximalWaitingTime1s(ChoisePoint iX, Term a1) {
-		setMaximalWaitingTime(WaitingInterval.argumentToWaitingInterval(a1,iX));
+		setMaximalWaitingTime(WaitingIntervalConverters.argumentToWaitingInterval(a1,iX));
 	}
 	public void setMaximalWaitingTime(WaitingInterval value) {
 		maximalWaitingTime= value;
 	}
 	public void getMaximalWaitingTime0ff(ChoisePoint iX, PrologVariable result) {
 		WaitingInterval value= getMaximalWaitingTime(iX);
-		result.setNonBacktrackableValue(value.toTerm());
+		result.setNonBacktrackableValue(WaitingIntervalConverters.toTerm(value));
 	}
 	public void getMaximalWaitingTime0fs(ChoisePoint iX) {
 	}
@@ -135,12 +134,12 @@ public abstract class Alpha extends AbstractInternalWorld {
 			return maximalWaitingTime;
 		} else {
 			Term value= getBuiltInSlot_E_maximal_waiting_time();
-			return WaitingInterval.argumentToWaitingInterval(value,iX);
+			return WaitingIntervalConverters.argumentToWaitingInterval(value,iX);
 		}
 	}
 	public int getMaximalWaitingTimeInMilliseconds(ChoisePoint iX) {
 		WaitingInterval value= getMaximalWaitingTime(iX);
-		return value.toMillisecondsIntegerOrDefault(DefaultOptions.waitingInterval,iX);
+		return WaitingIntervalConverters.toMillisecondsIntegerOrDefault(value,DefaultOptions.waitingInterval,iX);
 	}
 	//
 	// get/set characterSet
@@ -236,6 +235,7 @@ public abstract class Alpha extends AbstractInternalWorld {
 			c0= aC;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			c0.execute(iX);
 		}
@@ -249,6 +249,7 @@ public abstract class Alpha extends AbstractInternalWorld {
 		public Alarm1s(Continuation aC, Term exceptionName) {
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			throw Backtracking.instance;
 		}
@@ -260,6 +261,7 @@ public abstract class Alpha extends AbstractInternalWorld {
 			c0= aC;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			ChoisePoint newIx= new ChoisePoint(iX);
 			while (true) {
@@ -626,75 +628,30 @@ public abstract class Alpha extends AbstractInternalWorld {
 	}
 	//
 	public void concat3s(ChoisePoint iX, Term a1, Term a2, PrologVariable a3) {
-		String s1;
-		String s2;
-		try {
-			s1= a1.getStringValue(iX);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a1);
-		};
-		try {
-			s2= a2.getStringValue(iX);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a2);
-		};
+		String s1= GeneralConverters.argumentToString(a1,iX);
+		String s2= GeneralConverters.argumentToString(a2,iX);
 		a3.setBacktrackableValue(new PrologString(s1.concat(s2)),iX);
 	}
 	public void concat3s(ChoisePoint iX, Term a1, PrologVariable a2, Term a3) throws Backtracking {
-		String s1;
-		String s3;
-		try {
-			s1= a1.getStringValue(iX);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a1);
-		};
-		try {
-			s3= a3.getStringValue(iX);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a3);
-		};
+		String s1= GeneralConverters.argumentToString(a1,iX);
+		String s3= GeneralConverters.argumentToString(a3,iX);
 		if (!s3.startsWith(s1)) {
 			throw Backtracking.instance;
 		};
 		a2.setBacktrackableValue(new PrologString(s3.substring(s1.length())),iX);
 	}
 	public void concat3s(ChoisePoint iX, PrologVariable a1, Term a2, Term a3) throws Backtracking {
-		String s2;
-		String s3;
-		try {
-			s2= a2.getStringValue(iX);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a2);
-		};
-		try {
-			s3= a3.getStringValue(iX);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a3);
-		};
+		String s2= GeneralConverters.argumentToString(a2,iX);
+		String s3= GeneralConverters.argumentToString(a3,iX);
 		if (!s3.endsWith(s2)) {
 			throw Backtracking.instance;
 		};
 		a1.setBacktrackableValue(new PrologString(s3.substring(0,s3.length()-s2.length())),iX);
 	}
 	public void concat3s(ChoisePoint iX, Term a1, Term a2, Term a3) throws Backtracking {
-		String s1;
-		String s2;
-		String s3;
-		try {
-			s1= a1.getStringValue(iX);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a1);
-		};
-		try {
-			s2= a2.getStringValue(iX);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a2);
-		};
-		try {
-			s3= a3.getStringValue(iX);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a3);
-		};
+		String s1= GeneralConverters.argumentToString(a1,iX);
+		String s2= GeneralConverters.argumentToString(a2,iX);
+		String s3= GeneralConverters.argumentToString(a3,iX);
 		if (!s3.equals(s1.concat(s2))) {
 			throw Backtracking.instance;
 		}
@@ -709,7 +666,6 @@ public abstract class Alpha extends AbstractInternalWorld {
 	}
 	public void convertToInteger1fs(ChoisePoint iX, Term a1) throws Backtracking {
 		try {
-			// GeneralConverters.termToRoundInteger(a1,iX,true);
 			GeneralConverters.termToStrictInteger(a1,iX,true);
 		} catch (TermIsNotAnInteger e) {
 			throw Backtracking.instance;
@@ -739,23 +695,19 @@ public abstract class Alpha extends AbstractInternalWorld {
 	}
 	//
 	public void stringToTerm1ff(ChoisePoint iX, PrologVariable result, Term a1) throws Backtracking {
+		String text= GeneralConverters.argumentToString(a1,iX);
+		GroundTermParser parser= new GroundTermParser(dummyParserMaster);
 		try {
-			String text= a1.getStringValue(iX);
-			GroundTermParser parser= new GroundTermParser(dummyParserMaster);
-			try {
-				Term[] terms= parser.stringToTerms(text,null);
-				if (terms.length==1) {
-					if (result != null) {
-						result.setNonBacktrackableValue(terms[0]);
-					}
-				} else {
-					throw Backtracking.instance;
+			Term[] terms= parser.stringToTerms(text,null);
+			if (terms.length==1) {
+				if (result != null) {
+					result.setNonBacktrackableValue(terms[0]);
 				}
-			} catch (SyntaxError e) {
+			} else {
 				throw Backtracking.instance;
 			}
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a1);
+		} catch (SyntaxError e) {
+			throw Backtracking.instance;
 		}
 	}
 	public void stringToTerm1fs(ChoisePoint iX, Term a1) throws Backtracking {
@@ -763,19 +715,15 @@ public abstract class Alpha extends AbstractInternalWorld {
 	}
 	//
 	public void stringToTerms1ff(ChoisePoint iX, PrologVariable result, Term a1) throws Backtracking {
+		String text= GeneralConverters.argumentToString(a1,iX);
+		GroundTermParser parser= new GroundTermParser(dummyParserMaster);
 		try {
-			String text= a1.getStringValue(iX);
-			GroundTermParser parser= new GroundTermParser(dummyParserMaster);
-			try {
-				Term[] terms= parser.stringToTerms(text,null);
-				if (result != null) {
-					result.setNonBacktrackableValue(GeneralConverters.arrayToList(terms));
-				}
-			} catch (SyntaxError e) {
-				throw Backtracking.instance;
+			Term[] terms= parser.stringToTerms(text,null);
+			if (result != null) {
+				result.setNonBacktrackableValue(GeneralConverters.arrayToList(terms));
 			}
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a1);
+		} catch (SyntaxError e) {
+			throw Backtracking.instance;
 		}
 	}
 	public void stringToTerms1fs(ChoisePoint iX, Term a1) throws Backtracking {
@@ -791,13 +739,9 @@ public abstract class Alpha extends AbstractInternalWorld {
 	public void stringsToText1fs(ChoisePoint iX, Term a1) {
 	}
 	public void stringsToText2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
-		try {
-			String infix= a2.getStringValue(iX);
-			String text= GeneralConverters.concatenateStringList(a1,infix,iX);
-			result.setNonBacktrackableValue(new PrologString(text));
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a2);
-		}
+		String infix= GeneralConverters.argumentToString(a2,iX);
+		String text= GeneralConverters.concatenateStringList(a1,infix,iX);
+		result.setNonBacktrackableValue(new PrologString(text));
 	}
 	public void stringsToText2fs(ChoisePoint iX, Term a1, Term a2) {
 	}
@@ -822,7 +766,7 @@ public abstract class Alpha extends AbstractInternalWorld {
 	}
 	//
 	public void applyRadix2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
-		int radix= PrologInteger.toInteger(GeneralConverters.argumentToStrictInteger(a1,iX));
+		int radix= Arithmetic.toInteger(GeneralConverters.argumentToStrictInteger(a1,iX));
 		NumericalValue numericalValue= NumericalValueConverters.argumentToNumericalValue(a2,iX);
 		result.setNonBacktrackableValue(new PrologString(NumericalValueConverters.applyRadix(radix,defaultFractionPartLength,numericalValue)));
 	}
@@ -830,8 +774,8 @@ public abstract class Alpha extends AbstractInternalWorld {
 	}
 	//
 	public void applyRadix3ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2, Term a3) {
-		int radix= PrologInteger.toInteger(GeneralConverters.argumentToStrictInteger(a1,iX));
-		int fractionPartLength= PrologInteger.toInteger(GeneralConverters.argumentToStrictInteger(a2,iX));
+		int radix= Arithmetic.toInteger(GeneralConverters.argumentToStrictInteger(a1,iX));
+		int fractionPartLength= Arithmetic.toInteger(GeneralConverters.argumentToStrictInteger(a2,iX));
 		NumericalValue numericalValue= NumericalValueConverters.argumentToNumericalValue(a3,iX);
 		result.setNonBacktrackableValue(new PrologString(NumericalValueConverters.applyRadix(radix,fractionPartLength,numericalValue)));
 	}
@@ -846,11 +790,19 @@ public abstract class Alpha extends AbstractInternalWorld {
 	}
 	//
 	public void normalizeNumber2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
-		int fractionPartLength= PrologInteger.toInteger(GeneralConverters.argumentToStrictInteger(a1,iX));
+		int fractionPartLength= Arithmetic.toInteger(GeneralConverters.argumentToStrictInteger(a1,iX));
 		NumericalValue numericalValue= NumericalValueConverters.argumentToNumericalValue(a2,iX);
 		result.setNonBacktrackableValue(new PrologString(NumericalValueConverters.normalizeNumber(fractionPartLength,numericalValue)));
 	}
 	public void normalizeNumber2fs(ChoisePoint iX, Term a1, Term a2) {
+	}
+	//
+	public void convertToSymbol1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		String text= GeneralConverters.argumentToString(a1,iX);
+		int symbolCode= SymbolTable.insertSymbolName(text);
+		result.setNonBacktrackableValue(new PrologSymbol(symbolCode));
+	}
+	public void convertToSymbol1fs(ChoisePoint iX, Term a1) {
 	}
 	//
 	public void sortList1ff(ChoisePoint iX, PrologVariable result, Term a1) {

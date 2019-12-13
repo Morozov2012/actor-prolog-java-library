@@ -11,14 +11,10 @@ import morozov.terms.*;
 public class KinectColorMapConverters {
 	//
 	public static KinectColorMap argumentToKinectColorMap(Term attributes, ChoisePoint iX) {
-		DetailedColorMap colorMap= ColorMapConverters.argumentToColorMap(attributes,iX);
-		if (colorMap.getUseCustomMap()) {
-			return new KinectColorMap(colorMap.getColors(),colorMap.getSize(),colorMap.getReverseScale(),colorMap.getReverseMinimalValue(),colorMap.getReverseMaximalValue(),colorMap.getTincturingCoefficient());
-		} else {
-			return new KinectColorMap(colorMap.getColorMapName(),colorMap.getSize(),colorMap.getReverseScale(),colorMap.getReverseMinimalValue(),colorMap.getReverseMaximalValue(),colorMap.getTincturingCoefficient());
-		}
+		IterativeDetailedColorMap colorMap= ColorMapConverters.argumentToIterativeDetailedColorMap(attributes,iX);
+		return new KinectColorMap(colorMap);
 	}
-	public static Term toTerm(DetailedColorMap colorMap) {
-		return ColorMapConverters.toTerm(colorMap);
+	public static Term toTerm(KinectColorMap colorMap) {
+		return ColorMapConverters.toTerm(colorMap.getIterativeDetailedColorMap());
 	}
 }

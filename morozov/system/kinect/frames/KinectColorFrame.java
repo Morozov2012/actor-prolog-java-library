@@ -57,21 +57,26 @@ public class KinectColorFrame extends KinectFrame implements KinectColorFrameInt
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public long getActingFrameNumber() {
 		return colorFrameNumber;
 	}
+	@Override
 	public long getActingFrameTime() {
 		return colorFrameTime;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public byte[] getColor() {
 		return color;
 	}
+	@Override
 	public float[][] getU() {
 		return u;
 	}
+	@Override
 	public float[][] getV() {
 		return v;
 	}

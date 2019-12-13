@@ -25,10 +25,10 @@ public class OwnWorldWrapper
 	//
 	protected AbstractWorld ownWorld;
 	//
-	public static HashMap<AbstractWorld,ExternalWorldInterface> ownWorldRegister= new HashMap<>();
-	public static HashMap<ExternalWorldInterface,OwnWorldWrapper> invertedOwnWorldRegister= new HashMap<>();
+	protected static HashMap<AbstractWorld,ExternalWorldInterface> ownWorldRegister= new HashMap<>();
+	protected static HashMap<ExternalWorldInterface,OwnWorldWrapper> invertedOwnWorldRegister= new HashMap<>();
 	//
-	public static HashMap<ExternalWorldInterface,ForeignWorldWrapper> foreignWorldRegister= new HashMap<>();
+	protected static HashMap<ExternalWorldInterface,ForeignWorldWrapper> foreignWorldRegister= new HashMap<>();
 	//
 	protected transient MethodSignature[] methodSignatures= null;
 	protected transient HashMap<String,MethodSignature[]> methodHash= new HashMap<>();
@@ -94,6 +94,7 @@ public class OwnWorldWrapper
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public long selectSignature(MethodSignature foreignSignature, byte[] arrayTable) {
 		HashMap<String,PrologDomain> foreignDomainTable= GeneralConverters.deserializeDomainTable(arrayTable);
 		foreignSignature.acceptLocalDomainTable(foreignDomainTable);
@@ -101,19 +102,19 @@ public class OwnWorldWrapper
 			methodSignatures= ownWorld.getMethodSignatures();
 			for (int n=0; n < methodSignatures.length; n++) {
 				MethodSignature ownSignature= methodSignatures[n];
-				String methodName= ownSignature.methodName;
+				String methodName= ownSignature.getMethodName();
 				MethodSignature[] value= methodHash.get(methodName);
 				if (value == null) {
 					int counter= 0;
 					for (int k=0; k < methodSignatures.length; k++) {
-						if (methodName.equals(methodSignatures[k].methodName)) {
+						if (methodName.equals(methodSignatures[k].getMethodName())) {
 							counter++;
 						}
 					};
 					MethodSignature[] localList= new MethodSignature[counter];
 					counter= 0;
 					for (int k=0; k < methodSignatures.length; k++) {
-						if (methodName.equals(methodSignatures[k].methodName)) {
+						if (methodName.equals(methodSignatures[k].getMethodName())) {
 							localList[counter]= methodSignatures[k];
 							counter++;
 						}
@@ -122,12 +123,12 @@ public class OwnWorldWrapper
 				}
 			};
 		};
-		String methodName= foreignSignature.methodName;
+		String methodName= foreignSignature.getMethodName();
 		MethodSignature[] localList= methodHash.get(methodName);
 		if (localList != null) {
 			for (int k=0; k < localList.length; k ++) {
 				if (localList[k].match(foreignSignature)) {
-					return localList[k].domainSignature;
+					return localList[k].getDomainSignature();
 				}
 			}
 		};
@@ -136,30 +137,37 @@ public class OwnWorldWrapper
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void sendResidentRequest(Resident resident, long domainSignature, Term[] arguments, boolean sortAndReduceResultList) {
 		ownWorld.sendResidentRequest(resident,domainSignature,arguments,sortAndReduceResultList);
 	}
+	@Override
 	public void sendResidentRequest(ExternalResidentInterface stub, long domainSignatureNumber, byte[] argumentByteArray, boolean sortAndReduceResultList) {
 		Resident resident= OwnResidentWrapper.registerWrapper(stub);
 		Term[] arguments= GeneralConverters.deserializeArguments(argumentByteArray,domainSignatureNumber);
 		ownWorld.sendResidentRequest(resident,domainSignatureNumber,arguments,sortAndReduceResultList);
 	}
 	//
+	@Override
 	public void withdrawRequest(Resident resident) {
 		ownWorld.withdrawRequest(resident);
 	}
+	@Override
 	public void withdrawRequest(ExternalResidentInterface stub) {
 		Resident resident= OwnResidentWrapper.registerWrapper(stub);
 		ownWorld.withdrawRequest(resident);
 	}
 	//
+	@Override
 	public void transmitAsyncCall(AsyncCall item, ChoisePoint iX) {
 		ownWorld.transmitAsyncCall(item,iX);
 	}
 	//
+	@Override
 	public void receiveAsyncCall(AsyncCall item) {
 		ownWorld.receiveAsyncCall(item);
 	}
+	@Override
 	public void receiveAsyncCall(long domainSignatureNumber, boolean isControlCall, boolean useBuffer, byte[] argumentByteArray) {
 		Term[] arguments= GeneralConverters.deserializeArguments(argumentByteArray,domainSignatureNumber);
 		ChoisePoint iX= null;
@@ -168,6 +176,7 @@ public class OwnWorldWrapper
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public byte[] getImage() throws OwnWorldIsNotBufferedImage {
 		if (ownWorld instanceof BufferedImage) {
 			BufferedImage bufferedImage= (BufferedImage)ownWorld;
@@ -179,6 +188,7 @@ public class OwnWorldWrapper
 		}
 	}
 	//
+	@Override
 	public void setImage(byte[] bytes, GenericImageEncodingAttributes attributes) throws OwnWorldIsNotBufferedImage {
 		if (ownWorld instanceof BufferedImage) {
 			BufferedImage bufferedImage= (BufferedImage)ownWorld;
@@ -200,6 +210,7 @@ public class OwnWorldWrapper
 			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
+	@Override
 	public void process(byte[] bytes, long frameNumber, long timeInMilliseconds, boolean takeFrameIntoAccount, GenericImageEncodingAttributes attributes) throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
@@ -210,6 +221,7 @@ public class OwnWorldWrapper
 		}
 	}
 	//
+	@Override
 	public long getFrameNumber() throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
@@ -220,6 +232,7 @@ public class OwnWorldWrapper
 		}
 	}
 	//
+	@Override
 	public long getFrameTime() throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
@@ -230,6 +243,7 @@ public class OwnWorldWrapper
 		}
 	}
 	//
+	@Override
 	public void commit() throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
@@ -240,6 +254,7 @@ public class OwnWorldWrapper
 		}
 	}
 	//
+	@Override
 	public void resetSettings() throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
@@ -249,6 +264,7 @@ public class OwnWorldWrapper
 			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
+	@Override
 	public void resetStatistics() throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
@@ -258,6 +274,7 @@ public class OwnWorldWrapper
 			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
+	@Override
 	public void resetResults() throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
@@ -267,6 +284,7 @@ public class OwnWorldWrapper
 			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
+	@Override
 	public void resetAll() throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
@@ -277,6 +295,7 @@ public class OwnWorldWrapper
 		}
 	}
 	//
+	@Override
 	public byte[] getBlobs() throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
@@ -286,6 +305,7 @@ public class OwnWorldWrapper
 			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
+	@Override
 	public byte[] getTracks() throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
@@ -295,6 +315,7 @@ public class OwnWorldWrapper
 			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
+	@Override
 	public byte[] getConnectedGraphs() throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
@@ -304,6 +325,7 @@ public class OwnWorldWrapper
 			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
+	@Override
 	public byte[] getChronicle() throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
@@ -314,6 +336,7 @@ public class OwnWorldWrapper
 		}
 	}
 	//
+	@Override
 	public byte[] getRecentImage() throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
@@ -323,6 +346,7 @@ public class OwnWorldWrapper
 			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
+	@Override
 	public byte[] getPreprocessedImage() throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
@@ -332,6 +356,7 @@ public class OwnWorldWrapper
 			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
+	@Override
 	public byte[] getForegroundImage() throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
@@ -341,6 +366,7 @@ public class OwnWorldWrapper
 			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
+	@Override
 	public byte[] getSynthesizedImage() throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
@@ -351,6 +377,7 @@ public class OwnWorldWrapper
 		}
 	}
 	//
+	@Override
 	public byte[] getBackgroundImage(int layerNumber) throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
@@ -360,6 +387,7 @@ public class OwnWorldWrapper
 			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
+	@Override
 	public byte[] getSigmaImage(int layerNumber) throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
@@ -370,6 +398,7 @@ public class OwnWorldWrapper
 		}
 	}
 	//
+	@Override
 	public double[] physicalCoordinates(int pixelX, int pixelY) throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
@@ -379,6 +408,7 @@ public class OwnWorldWrapper
 			throw OwnWorldIsNotVideoProcessingMachine.instance;
 		}
 	}
+	@Override
 	public double characteristicLength(int x, int y) throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			ChoisePoint iX= null;
@@ -389,6 +419,7 @@ public class OwnWorldWrapper
 		}
 	}
 	//
+	@Override
 	public GenericImageEncodingAttributes getCurrentImageEncodingAttributes() throws OwnWorldIsNotVideoProcessingMachine {
 		if (ownWorld instanceof VideoProcessingMachineOperations) {
 			VideoProcessingMachineOperations vpm= (VideoProcessingMachineOperations)ownWorld;
@@ -400,49 +431,61 @@ public class OwnWorldWrapper
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void startProcesses() {
 		ownWorld.startProcesses();
 	}
+	@Override
 	public void releaseSystemResources() {
 		ownWorld.releaseSystemResources();
 	}
+	@Override
 	public void stopProcesses() {
 		ownWorld.stopProcesses();
 	}
+	@Override
 	public MethodSignature[] getMethodSignatures() {
 		return ownWorld.getMethodSignatures();
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean thisIsOwnWorld() {
 		return false;
 	}
 	//
+	@Override
 	public boolean thisIsForeignWorld() {
 		return false;
 	}
 	//
+	@Override
 	public boolean isInternalWorldOf(AbstractProcess currentProcess) {
 		return ownWorld.isInternalWorldOf(currentProcess);
 	}
 	//
+	@Override
 	public AbstractInternalWorld getInternalWorld(ChoisePoint cp) throws Backtracking, TermIsNotAWorld, TermIsDummyWorld, TermIsUnboundVariable {
 		return ownWorld.getInternalWorld(cp);
 	}
 	//
+	@Override
 	public AbstractInternalWorld internalWorld(AbstractProcess process, ChoisePoint cp) throws Backtracking {
 		return ownWorld.internalWorld(process,cp);
 	}
 	//
+	@Override
 	public AbstractInternalWorld internalWorld(ChoisePoint iX) {
 		return ownWorld.internalWorld(iX);
 	}
 	//
+	@Override
 	public AbstractInternalWorld internalWorld() {
 		return ownWorld.internalWorld();
 	}
 	//
+	@Override
 	public boolean isNumberOfTemporaryActor() {
 		return ownWorld.isNumberOfTemporaryActor();
 	}

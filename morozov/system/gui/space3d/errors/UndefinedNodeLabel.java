@@ -6,12 +6,13 @@ import morozov.system.gui.space3d.*;
 
 public class UndefinedNodeLabel extends RuntimeException {
 	//
-	public NodeLabel label;
+	protected NodeLabel label;
 	//
 	public UndefinedNodeLabel(NodeLabel l) {
 		label= l;
 	}
 	//
+	@Override
 	public String toString() {
 		return	this.getClass().toString() +
 			"(" + label.toString() + ")";

@@ -6,12 +6,12 @@ import morozov.run.*;
 import morozov.syntax.scanner.*;
 import morozov.syntax.scanner.errors.*;
 import morozov.syntax.scanner.interfaces.*;
+import morozov.system.*;
 import morozov.system.checker.signals.*;
 import morozov.system.files.*;
 import morozov.system.files.errors.*;
 import morozov.system.kinect.converters.errors.*;
 import morozov.system.kinect.modes.*;
-import morozov.terms.*;
 import morozov.terms.signals.*;
 
 import java.math.BigInteger;
@@ -60,7 +60,7 @@ public class KinectLookupTable {
 	}
 	//
 	public void loadContent(String text, ChoisePoint iX) throws LexicalScannerError {
-		LexicalScanner scanner= new LexicalScanner(dummyLexicalScannerMaster,false);
+		LexicalScanner scanner= new LexicalScanner(dummyLexicalScannerMaster,true);
 		PrologToken[] tokens= scanner.analyse(text,false,true,iX);
 		int numberOfTokens= tokens.length;
 		int numberOfElements= 0;
@@ -159,7 +159,7 @@ if (type==PrologTokenType.INTEGER) {
 	if (afterMinus) {
 		value= value.negate();
 	};
-	lookupTable[column][row][indexOfElement]= PrologInteger.toInteger(value);
+	lookupTable[column][row][indexOfElement]= Arithmetic.toInteger(value);
 	indexOfElement++;
 	if (indexOfElement >= numberOfElementsInColumn) {
 		indexOfElement= 0;

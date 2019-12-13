@@ -3,13 +3,18 @@
 package morozov.worlds;
 
 public class GlobalWorldIdentifier {
+	//
 	protected Long value;
+	//
 	public GlobalWorldIdentifier(long id) {
 		value= id;
 	}
+	//
+	@Override
 	public int hashCode() {
 		return value.hashCode();
 	}
+	@Override
 	public boolean equals(Object o2) {
 		if (o2 instanceof GlobalWorldIdentifier) {
 			GlobalWorldIdentifier i2= (GlobalWorldIdentifier)o2;

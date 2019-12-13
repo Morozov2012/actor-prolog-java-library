@@ -7,9 +7,11 @@ import morozov.syntax.scanner.errors.*;
 import morozov.syntax.scanner.interfaces.*;
 
 public class DummyLexicalScannerMaster implements LexicalScannerMasterInterface {
+	@Override
 	public void handleError(LexicalScannerError exception, ChoisePoint iX) throws LexicalScannerError {
 		throw exception;
 	}
+	@Override
 	public LexicalScannerError handleUnexpectedEndOfText(int position, ChoisePoint iX) throws LexicalScannerError {
 		return new UnexpectedEndOfText(position);
 	}

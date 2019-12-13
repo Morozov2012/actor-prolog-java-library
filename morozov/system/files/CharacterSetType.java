@@ -13,103 +13,131 @@ import java.nio.charset.StandardCharsets;
 
 public enum CharacterSetType {
 	NAMED_CHARSET {
+		@Override
 		public Charset toCharSet() {
 			throw new IsNotAStandardCharacterSet();
 		}
+		@Override
 		public Term toTerm(String name) {
 			return new PrologString(name);
 		}
+		@Override
 		public String toString(String name) {
 			return "\"" + name + "\"";
 		}
+		@Override
 		public long toLong() {
 			throw new IsNotAStandardCharacterSet();
 		}
 	},
 	NONE {
+		@Override
 		public Charset toCharSet() {
 			throw new NoCharacterSetIsDefined();
 		}
+		@Override
 		public Term toTerm(String name) {
 			return termNone;
 		}
+		@Override
 		public long toLong() {
 			return longNone;
 		}
 	},
 	DEFAULT {
+		@Override
 		public Charset toCharSet() {
 			return Charset.defaultCharset();
 		}
+		@Override
 		public Term toTerm(String name) {
 			return termDefault;
 		}
+		@Override
 		public long toLong() {
 			return longDefault;
 		}
 	},
 	ISO_8859_1 {
+		@Override
 		public Charset toCharSet() {
 			return StandardCharsets.ISO_8859_1;
 		}
+		@Override
 		public Term toTerm(String name) {
 			return term_ISO_8859_1;
 		}
+		@Override
 		public long toLong() {
 			return long_ISO_8859_1;
 		}
 	},
 	US_ASCII {
+		@Override
 		public Charset toCharSet() {
 			return StandardCharsets.US_ASCII;
 		}
+		@Override
 		public Term toTerm(String name) {
 			return term_US_ASCII;
 		}
+		@Override
 		public long toLong() {
 			return long_US_ASCII;
 		}
 	},
 	UTF_16 {
+		@Override
 		public Charset toCharSet() {
 			return StandardCharsets.UTF_16;
 		}
+		@Override
 		public Term toTerm(String name) {
 			return term_UTF_16;
 		}
+		@Override
 		public long toLong() {
 			return long_UTF_16;
 		}
 	},
 	UTF_16BE {
+		@Override
 		public Charset toCharSet() {
 			return StandardCharsets.UTF_16BE;
 		}
+		@Override
 		public Term toTerm(String name) {
 			return term_UTF_16BE;
 		}
+		@Override
 		public long toLong() {
 			return long_UTF_16BE;
 		}
 	},
 	UTF_16LE {
+		@Override
 		public Charset toCharSet() {
 			return StandardCharsets.UTF_16LE;
 		}
+		@Override
 		public Term toTerm(String name) {
 			return term_UTF_16LE;
 		}
+		@Override
 		public long toLong() {
 			return long_UTF_16LE;
 		}
 	},
 	UTF_8 {
+		@Override
 		public Charset toCharSet() {
 			return StandardCharsets.UTF_8;
 		}
+		@Override
 		public Term toTerm(String name) {
 			return term_UTF_8;
 		}
+		@Override
 		public long toLong() {
 			return long_UTF_8;
 		}

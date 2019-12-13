@@ -6,11 +6,13 @@ import java.util.Map;
 
 public enum BooleanOperation {
 	ATOM {
+		@Override
 		boolean eval(DiagramBox[] boxes, Map<String,ComponentState> componentSuccess) {
 			return true;
 		}
 	},
 	AND {
+		@Override
 		boolean eval(DiagramBox[] boxes, Map<String,ComponentState> componentSuccess) {
 			for (int n=0; n < boxes.length; n++) {
 				if (!boxes[n].isOK(componentSuccess)) {
@@ -21,6 +23,7 @@ public enum BooleanOperation {
 		}
 	},
 	OR {
+		@Override
 		boolean eval(DiagramBox[] boxes, Map<String,ComponentState> componentSuccess) {
 			for (int n=0; n < boxes.length; n++) {
 				if (boxes[n].isOK(componentSuccess)) {
@@ -31,6 +34,7 @@ public enum BooleanOperation {
 		}
 	},
 	XOR {
+		@Override
 		boolean eval(DiagramBox[] boxes, Map<String,ComponentState> componentSuccess) {
 			int numberOfGreenBlocks= 0;
 			for (int n=0; n < boxes.length; n++) {
@@ -46,6 +50,7 @@ public enum BooleanOperation {
 		}
 	},
 	ALL_NOT {
+		@Override
 		boolean eval(DiagramBox[] boxes, Map<String,ComponentState> componentSuccess) {
 			for (int n=0; n < boxes.length; n++) {
 				if (boxes[n].isOK(componentSuccess)) {
@@ -56,6 +61,7 @@ public enum BooleanOperation {
 		}
 	},
 	NOT_ALL {
+		@Override
 		boolean eval(DiagramBox[] boxes, Map<String,ComponentState> componentSuccess) {
 			for (int n=0; n < boxes.length; n++) {
 				if (!boxes[n].isOK(componentSuccess)) {

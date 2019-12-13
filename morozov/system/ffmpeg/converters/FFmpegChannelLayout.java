@@ -279,6 +279,6 @@ public class FFmpegChannelLayout {
 		if (value != 0) {
 			flags.add(new FFmpegChannelLayout(value));
 		};
-		return flags.toArray(new FFmpegChannelLayout[0]);
+		return flags.toArray(new FFmpegChannelLayout[flags.size()]);
 	}
 }

@@ -14,6 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.lang.reflect.InvocationTargetException;
 
 public class DialogEntry {
+	//
 	protected AbstractDialog dialog= null;
 	protected boolean isSlotName;
 	protected boolean isNumericalName= false;
@@ -22,15 +23,15 @@ public class DialogEntry {
 	protected ActiveComponentInterface component;
 	protected boolean isInsistent;
 	protected DialogEntryType entryType= DialogEntryType.VALUE;
-	Object currentValueGuard= new Object();
-	Object currentRangeGuard= new Object();
-	Term currentValue= null;
-	Term currentRange= null;
-	private Term intermediateValue= null;
-	private Term intermediateRange= null;
-	private boolean intermediateMode= false;
-	private AtomicBoolean isInitiated= new AtomicBoolean(false);
-	private AtomicBoolean isToBeRefreshed= new AtomicBoolean(false);
+	protected Object currentValueGuard= new Object();
+	protected Object currentRangeGuard= new Object();
+	protected Term currentValue= null;
+	protected Term currentRange= null;
+	protected Term intermediateValue= null;
+	protected Term intermediateRange= null;
+	protected boolean intermediateMode= false;
+	protected AtomicBoolean isInitiated= new AtomicBoolean(false);
+	protected AtomicBoolean isToBeRefreshed= new AtomicBoolean(false);
 	//
 	public DialogEntry(AbstractDialog td, String slotName, boolean flag2, DialogEntryType type) {
 		dialog= td;
@@ -94,6 +95,7 @@ public class DialogEntry {
 				} else {
 					try {
 						SwingUtilities.invokeAndWait(new Runnable() {
+							@Override
 							public void run() {
 								dialog.incrementTheInsideThePutOperationCounter();
 								try {
@@ -140,6 +142,7 @@ public class DialogEntry {
 					} else {
 						try {
 							SwingUtilities.invokeAndWait(new Runnable() {
+								@Override
 								public void run() {
 									dialog.incrementTheInsideThePutOperationCounter();
 									try {
@@ -189,6 +192,7 @@ public class DialogEntry {
 					} else {
 						try {
 							SwingUtilities.invokeAndWait(new Runnable() {
+								@Override
 								public void run() {
 									dialog.incrementTheInsideThePutOperationCounter();
 									try {
@@ -237,6 +241,7 @@ public class DialogEntry {
 					} else {
 						try {
 							SwingUtilities.invokeAndWait(new Runnable() {
+								@Override
 								public void run() {
 									dialog.incrementTheInsideThePutOperationCounter();
 									try {
@@ -274,6 +279,7 @@ public class DialogEntry {
 					} else {
 						try {
 							SwingUtilities.invokeAndWait(new Runnable() {
+								@Override
 								public void run() {
 									intermediateValue= component.getValue(DialogControlOperation.VALUE);
 								}
@@ -301,6 +307,7 @@ public class DialogEntry {
 					} else {
 						try {
 							SwingUtilities.invokeAndWait(new Runnable() {
+								@Override
 								public void run() {
 									intermediateRange= component.getRange();
 								}
@@ -331,6 +338,7 @@ public class DialogEntry {
 					} else {
 						try {
 							SwingUtilities.invokeAndWait(new Runnable() {
+								@Override
 								public void run() {
 									intermediateValue= entryType.getValue(dialog);
 								}
@@ -360,21 +368,19 @@ public class DialogEntry {
 				} else {
 					try {
 						SwingUtilities.invokeAndWait(new Runnable() {
+							@Override
 							public void run() {
 								intermediateValue= component.getValue(operation);
 							}
 						});
 					} catch (InterruptedException e) {
-						// intermediateValue= PrologUnknownValue.instance;
 						throw new CannotAccessDialogControl(e.getCause());
 					} catch (InvocationTargetException e) {
-						// intermediateValue= PrologUnknownValue.instance;
 						throw new CannotAccessDialogControl(e.getCause());
 					};
 					if (intermediateValue!=null) {
 						return intermediateValue;
 					} else {
-						// return PrologUnknownValue.instance;
 						throw new CannotAccessDialogControl(null);
 					}
 				}
@@ -386,6 +392,7 @@ public class DialogEntry {
 				} else {
 					try {
 						SwingUtilities.invokeAndWait(new Runnable() {
+							@Override
 							public void run() {
 								intermediateValue= component.getValue(operation);
 							}
@@ -409,6 +416,7 @@ public class DialogEntry {
 				} else {
 					try {
 						SwingUtilities.invokeAndWait(new Runnable() {
+							@Override
 							public void run() {
 								intermediateRange= component.getRange();
 							}
@@ -432,6 +440,7 @@ public class DialogEntry {
 				} else {
 					try {
 						SwingUtilities.invokeAndWait(new Runnable() {
+							@Override
 							public void run() {
 								intermediateValue= entryType.getValue(dialog);
 							}
@@ -463,6 +472,7 @@ public class DialogEntry {
 				} else {
 					try {
 						SwingUtilities.invokeAndWait(new Runnable() {
+							@Override
 							public void run() {
 								component.setIsEnabled(mode);
 							}
@@ -483,6 +493,7 @@ public class DialogEntry {
 				} else {
 					try {
 						SwingUtilities.invokeAndWait(new Runnable() {
+							@Override
 							public void run() {
 								intermediateMode= component.isEnabled(mode);
 							}
@@ -509,6 +520,7 @@ public class DialogEntry {
 			return new PrologString(name);
 		}
 	}
+	@Override
 	public String toString() {
 		return String.format("DialogEntry[%s;%s;isSlotName:%s;%s;%s;isInsistent:%s;%s]",
 			entryType,dialog,isSlotName,name,component,isInsistent,entryType);

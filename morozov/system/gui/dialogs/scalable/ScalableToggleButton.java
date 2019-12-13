@@ -58,11 +58,11 @@ public class ScalableToggleButton extends ScalableButton {
 		ScalableToggleButtonModel model= new ScalableToggleButtonModel(selected,0,text);
 		((JToggleButton)component).setModel(model);
 		((JToggleButton)component).addActionListener(this);
-		// ((JToggleButton)component).addChangeListener(this);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -73,7 +73,6 @@ public class ScalableToggleButton extends ScalableButton {
 			} else if (code==SymbolCodes.symbolCode_E_unknown) {
 				return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
 			} else {
-				// return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
 				throw RejectValue.instance;
 			}
 		} catch (TermIsNotASymbol e1) {
@@ -86,11 +85,9 @@ public class ScalableToggleButton extends ScalableButton {
 				} else if (text.equalsIgnoreCase("unknown")) {
 					return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
 				} else {
-					// return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
 					throw RejectValue.instance;
 				}
 			} catch (TermIsNotAString e2) {
-				// return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
 				throw RejectValue.instance;
 			}
 		}
@@ -98,6 +95,7 @@ public class ScalableToggleButton extends ScalableButton {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void putValue(Term value, ChoisePoint iX) {
 		if (component!=null) {
 			try {
@@ -144,12 +142,10 @@ public class ScalableToggleButton extends ScalableButton {
 				}
 			};
 			targetDialog.safelyInvalidateAndRepaint();
-			// if (targetDialog!=null) {
-			//	targetDialog.reportValueUpdate(this);
-			// }
 		}
 	}
 	//
+	@Override
 	public Term getValue() {
 		if (component!=null) {
 			if (isUncertain()) {
@@ -163,12 +159,12 @@ public class ScalableToggleButton extends ScalableButton {
 			}
 		} else {
 			return PrologUnknownValue.instance;
-			// return null;
 		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setAlarmColors(Color fc, Color bc) {
 		super.setAlarmColors(fc,bc);
 		failureForegroundColor= fc;
@@ -177,6 +173,7 @@ public class ScalableToggleButton extends ScalableButton {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setUncertain(boolean flag) {
 		boolean doCheckState= (isUncertain() != flag);
 		super.setUncertain(flag);
@@ -185,6 +182,7 @@ public class ScalableToggleButton extends ScalableButton {
 		}
 	}
 	//
+	@Override
 	public void actionPerformed(ActionEvent event) {
 		super.actionPerformed(event);
 		checkUncertainState();
@@ -205,6 +203,7 @@ public class ScalableToggleButton extends ScalableButton {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 	}

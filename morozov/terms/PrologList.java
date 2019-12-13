@@ -15,8 +15,8 @@ import java.math.BigInteger;
 
 public class PrologList extends Term {
 	//
-	private Term head;
-	public Term tail;
+	protected Term head;
+	protected Term tail;
 	//
 	private static final long serialVersionUID= 0xD42AD1CDA0DC9006L; // -3158481507549671418L
 	//
@@ -33,14 +33,15 @@ public class PrologList extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public int hashCode() {
 		int result= head.hashCode();
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				result= result + nextList.head.hashCode();
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
 				Term nextValue= nextList.getValueOfVariable();
@@ -55,6 +56,7 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public boolean equals(Object o2) {
 		if (o2 instanceof Term) {
 			return ((Term)o2).isEqualToList(head,tail);
@@ -62,6 +64,7 @@ public class PrologList extends Term {
 			return false;
 		}
 	}
+	@Override
 	public int compare(Object o2) {
 		if (o2 instanceof Term) {
 			return -((Term)o2).compareWithList(head,tail);
@@ -69,6 +72,7 @@ public class PrologList extends Term {
 			return 1;
 		}
 	}
+	@Override
 	public boolean isEqualToList(Term h2, Term t2) {
 		if (head.equals(h2)) {
 			ChoisePoint cp= null;
@@ -84,7 +88,7 @@ public class PrologList extends Term {
 							firstTerm= t1.getNextListTail(cp);
 						} catch (EndOfList eol1) {
 							try {
-								secondTerm= t2.getNextListTail(cp);
+								t2.getNextListTail(cp);
 								return false;
 							} catch (EndOfList eol2) {
 								return true;
@@ -115,6 +119,7 @@ public class PrologList extends Term {
 			return false;
 		}
 	}
+	@Override
 	public int compareWithList(Term h2, Term t2) {
 		int result1= head.compare(h2);
 		if (result1==0) {
@@ -132,7 +137,7 @@ public class PrologList extends Term {
 							firstTerm= t1.getNextListTail(cp);
 						} catch (EndOfList eol1) {
 							try {
-								secondTerm= t2.getNextListTail(cp);
+								t2.getNextListTail(cp);
 								return -1;
 							} catch (EndOfList eol2) {
 								return 0;
@@ -166,59 +171,70 @@ public class PrologList extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term getListHead(ChoisePoint cp) throws Backtracking {
 		return head;
 	}
+	@Override
 	public Term getListTail(ChoisePoint cp) throws Backtracking {
 		return tail;
 	}
+	@Override
 	public Term getNextListHead(ChoisePoint cp) throws EndOfList {
 		return head;
 	}
+	@Override
 	public Term getNextListTail(ChoisePoint cp) throws EndOfList {
 		return tail;
 	}
+	@Override
 	public Term getExistentHead() {
 		return head;
 	}
+	@Override
 	public Term getExistentTail() {
 		return tail;
 	}
+	@Override
 	public Term getOutputHead(ChoisePoint cp) {
 		return head;
 	}
+	@Override
 	public Term getOutputTail(ChoisePoint cp) {
 		return tail;
 	}
+	@Override
 	public Term getNextListHeadSafely(ChoisePoint cp) throws EndOfList {
 		return head;
 	}
+	@Override
 	public Term getNextListTailSafely(ChoisePoint cp) throws EndOfList {
 		return tail;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void unifyWithList(Term aHead, Term aTail, Term aList, ChoisePoint cp) throws Backtracking {
 		head.unifyWith(aHead,cp);
 		tail.unifyWith(aTail,cp);
 	}
+	@Override
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		t.unifyWithList(head,tail,this,cp);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void registerVariables(ActiveWorld process, boolean isSuspending, boolean isProtecting) {
-		// head.registerVariables(process,isSuspending,isProtecting);
-		// tail.registerVariables(process,isSuspending,isProtecting);
 		head.registerVariables(process,isSuspending,isProtecting);
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				nextList.head.registerVariables(process,isSuspending,isProtecting);
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
 				Term nextValue= nextList.getValueOfVariable();
@@ -233,23 +249,21 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public void registerTargetWorlds(HashSet<AbstractWorld> worlds, ChoisePoint cp) {
-		// head.registerTargetWorlds(worlds,cp);
-		// tail.registerTargetWorlds(worlds,cp);
 		head.registerTargetWorlds(worlds,cp);
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				nextList.head.registerTargetWorlds(worlds,cp);
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
 				Term nextValue= nextList.getValueOfVariable();
 				if (nextValue != null) {
 					nextItem= nextValue;
 				} else {
-					// throw new WrongArgumentIsNotConstructorArgument(nextList);
 					return;
 				}
 			} else {
@@ -258,19 +272,17 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public PrologList circumscribe() {
-		// return new PrologList(
-		//	head.circumscribe(),
-		//	tail.circumscribe());
 		PrologList result= new PrologList(head.circumscribe(),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.circumscribe(),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -288,10 +300,8 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public PrologList copyValue(ChoisePoint cp, TermCircumscribingMode mode) {
-		// return new PrologList(
-		//	head.copyValue(cp,mode),
-		//	tail.copyValue(cp,mode));
 		PrologList result= new PrologList(head.copyValue(cp,mode),null);
 		PrologList createdList= result;
 		Term nextItem= tail.dereferenceValue(cp);
@@ -308,10 +318,8 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public PrologList copyGroundValue(ChoisePoint cp) throws TermIsUnboundVariable {
-		// return new PrologList(
-		//	head.copyGroundValue(cp),
-		//	tail.copyGroundValue(cp));
 		PrologList result= new PrologList(head.copyGroundValue(cp),null);
 		PrologList createdList= result;
 		Term nextItem= tail.dereferenceValue(cp);
@@ -328,10 +336,8 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public PrologList substituteWorlds(HashMap<AbstractWorld,Term> map, ChoisePoint cp) {
-		// return new PrologList(
-		//	head.substituteWorlds(map,cp),
-		//	tail.substituteWorlds(map,cp));
 		PrologList result= new PrologList(head.substituteWorlds(map,cp),null);
 		PrologList createdList= result;
 		Term nextItem= tail.dereferenceValue(cp);
@@ -351,19 +357,19 @@ public class PrologList extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void compareWithTerm(Term a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		a.compareListWith(head,tail,iX,op);
 	}
+	@Override
 	public void compareWithBigInteger(BigInteger a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		// head.compareWithBigInteger(a,iX,op);
-		// tail.compareWithBigInteger(a,iX,op);
 		head.compareWithBigInteger(a,iX,op);
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				nextList.head.compareWithBigInteger(a,iX,op);
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
 				Term nextValue= nextList.getValueOfVariable();
@@ -378,16 +384,15 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public void compareWithLong(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		// head.compareWithLong(a,iX,op);
-		// tail.compareWithLong(a,iX,op);
 		head.compareWithLong(a,iX,op);
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				nextList.head.compareWithLong(a,iX,op);
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
 				Term nextValue= nextList.getValueOfVariable();
@@ -402,16 +407,15 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public void compareWithDouble(double a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		// head.compareWithDouble(a,iX,op);
-		// tail.compareWithDouble(a,iX,op);
 		head.compareWithDouble(a,iX,op);
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				nextList.head.compareWithDouble(a,iX,op);
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
 				Term nextValue= nextList.getValueOfVariable();
@@ -426,16 +430,15 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public void compareWithString(String a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		// head.compareWithString(a,iX,op);
-		// tail.compareWithString(a,iX,op);
 		head.compareWithString(a,iX,op);
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				nextList.head.compareWithString(a,iX,op);
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
 				Term nextValue= nextList.getValueOfVariable();
@@ -450,16 +453,15 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public void compareWithBinary(byte[] a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		// head.compareWithBinary(a,iX,op);
-		// tail.compareWithBinary(a,iX,op);
 		head.compareWithBinary(a,iX,op);
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				nextList.head.compareWithBinary(a,iX,op);
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
 				Term nextValue= nextList.getValueOfVariable();
@@ -474,16 +476,15 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public void compareWithDate(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		// head.compareWithDate(a,iX,op);
-		// tail.compareWithDate(a,iX,op);
 		head.compareWithDate(a,iX,op);
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				nextList.head.compareWithDate(a,iX,op);
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
 				Term nextValue= nextList.getValueOfVariable();
@@ -498,16 +499,15 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public void compareTermWith(Term a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		// head.compareTermWith(a,iX,op);
-		// tail.compareTermWith(a,iX,op);
 		head.compareTermWith(a,iX,op);
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				nextList.head.compareTermWith(a,iX,op);
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
 				Term nextValue= nextList.getValueOfVariable();
@@ -522,16 +522,15 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public void compareBigIntegerWith(BigInteger a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		// head.compareBigIntegerWith(a,iX,op);
-		// tail.compareBigIntegerWith(a,iX,op);
 		head.compareBigIntegerWith(a,iX,op);
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				nextList.head.compareBigIntegerWith(a,iX,op);
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
 				Term nextValue= nextList.getValueOfVariable();
@@ -546,16 +545,15 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public void compareLongWith(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		// head.compareLongWith(a,iX,op);
-		// tail.compareLongWith(a,iX,op);
 		head.compareLongWith(a,iX,op);
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				nextList.head.compareLongWith(a,iX,op);
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
 				Term nextValue= nextList.getValueOfVariable();
@@ -570,16 +568,15 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public void compareDoubleWith(double a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		// head.compareDoubleWith(a,iX,op);
-		// tail.compareDoubleWith(a,iX,op);
 		head.compareDoubleWith(a,iX,op);
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				nextList.head.compareDoubleWith(a,iX,op);
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
 				Term nextValue= nextList.getValueOfVariable();
@@ -594,16 +591,15 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public void compareStringWith(String a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		// head.compareStringWith(a,iX,op);
-		// tail.compareStringWith(a,iX,op);
 		head.compareStringWith(a,iX,op);
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				nextList.head.compareStringWith(a,iX,op);
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
 				Term nextValue= nextList.getValueOfVariable();
@@ -618,16 +614,15 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public void compareBinaryWith(byte[] a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		// head.compareBinaryWith(a,iX,op);
-		// tail.compareBinaryWith(a,iX,op);
 		head.compareBinaryWith(a,iX,op);
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				nextList.head.compareBinaryWith(a,iX,op);
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
 				Term nextValue= nextList.getValueOfVariable();
@@ -642,16 +637,15 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public void compareDateWith(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		// head.compareDateWith(a,iX,op);
-		// tail.compareDateWith(a,iX,op);
 		head.compareDateWith(a,iX,op);
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				nextList.head.compareDateWith(a,iX,op);
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
 				Term nextValue= nextList.getValueOfVariable();
@@ -666,9 +660,8 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public void compareListWith(Term aHead, Term aTail, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
-		// head.compareTermWith(aHead,iX,op);
-		// tail.compareTermWith(aTail,iX,op);
 		head.compareTermWith(aHead,iX,op);
 		Term t1= tail;
 		while (true) {
@@ -682,7 +675,7 @@ public class PrologList extends Term {
 					firstTerm= t1.getNextListTail(iX);
 				} catch (EndOfList eol1) {
 					try {
-						secondTerm= aTail.getNextListTail(iX);
+						aTail.getNextListTail(iX);
 						throw Backtracking.instance;
 					} catch (EndOfList eol2) {
 						return;
@@ -712,22 +705,21 @@ public class PrologList extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term reactWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
 		return a.reactListWith(head,tail,iX,op);
 	}
+	@Override
 	public Term reactWithBigInteger(BigInteger a, ChoisePoint iX, BinaryOperation op) {
-		// return new PrologList(
-		//	head.reactWithBigInteger(a,iX,op),
-		//	tail.reactWithBigInteger(a,iX,op));
 		PrologList result= new PrologList(head.reactWithBigInteger(a,iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.reactWithBigInteger(a,iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -744,19 +736,17 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public Term reactWithLong(long a, ChoisePoint iX, BinaryOperation op) {
-		// return new PrologList(
-		//	head.reactWithLong(a,iX,op),
-		//	tail.reactWithLong(a,iX,op));
 		PrologList result= new PrologList(head.reactWithLong(a,iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.reactWithLong(a,iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -773,19 +763,17 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public Term reactWithDouble(double a, ChoisePoint iX, BinaryOperation op) {
-		// return new PrologList(
-		//	head.reactWithDouble(a,iX,op),
-		//	tail.reactWithDouble(a,iX,op));
 		PrologList result= new PrologList(head.reactWithDouble(a,iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.reactWithDouble(a,iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -802,19 +790,17 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public Term reactWithString(String a, ChoisePoint iX, BinaryOperation op) {
-		// return new PrologList(
-		//	head.reactWithString(a,iX,op),
-		//	tail.reactWithString(a,iX,op));
 		PrologList result= new PrologList(head.reactWithString(a,iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.reactWithString(a,iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -831,19 +817,17 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public Term reactWithBinary(byte[] a, ChoisePoint iX, BinaryOperation op) {
-		// return new PrologList(
-		//	head.reactWithBinary(a,iX,op),
-		//	tail.reactWithBinary(a,iX,op));
 		PrologList result= new PrologList(head.reactWithBinary(a,iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.reactWithBinary(a,iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -860,19 +844,17 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public Term reactWithDate(long a, ChoisePoint iX, BinaryOperation op) {
-		// return new PrologList(
-		//	head.reactWithDate(a,iX,op),
-		//	tail.reactWithDate(a,iX,op));
 		PrologList result= new PrologList(head.reactWithDate(a,iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.reactWithDate(a,iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -889,19 +871,17 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public Term reactWithTime(long a, ChoisePoint iX, BinaryOperation op) {
-		// return new PrologList(
-		//	head.reactWithTime(a,iX,op),
-		//	tail.reactWithTime(a,iX,op));
 		PrologList result= new PrologList(head.reactWithTime(a,iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.reactWithTime(a,iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -918,19 +898,17 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public Term reactBigIntegerWith(BigInteger a, ChoisePoint iX, BinaryOperation op) {
-		// return new PrologList(
-		//	head.reactBigIntegerWith(a,iX,op),
-		//	tail.reactBigIntegerWith(a,iX,op));
 		PrologList result= new PrologList(head.reactBigIntegerWith(a,iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.reactBigIntegerWith(a,iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -947,19 +925,17 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public Term reactLongWith(long a, ChoisePoint iX, BinaryOperation op) {
-		// return new PrologList(
-		//	head.reactLongWith(a,iX,op),
-		//	tail.reactLongWith(a,iX,op));
 		PrologList result= new PrologList(head.reactLongWith(a,iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.reactLongWith(a,iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -976,19 +952,17 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public Term reactDoubleWith(double a, ChoisePoint iX, BinaryOperation op) {
-		// return new PrologList(
-		//	head.reactDoubleWith(a,iX,op),
-		//	tail.reactDoubleWith(a,iX,op));
 		PrologList result= new PrologList(head.reactDoubleWith(a,iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.reactDoubleWith(a,iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -1005,19 +979,17 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public Term reactStringWith(String a, ChoisePoint iX, BinaryOperation op) {
-		// return new PrologList(
-		//	head.reactStringWith(a,iX,op),
-		//	tail.reactStringWith(a,iX,op));
 		PrologList result= new PrologList(head.reactStringWith(a,iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.reactStringWith(a,iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -1034,19 +1006,17 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public Term reactBinaryWith(byte[] a, ChoisePoint iX, BinaryOperation op) {
-		// return new PrologList(
-		//	head.reactBinaryWith(a,iX,op),
-		//	tail.reactBinaryWith(a,iX,op));
 		PrologList result= new PrologList(head.reactBinaryWith(a,iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.reactBinaryWith(a,iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -1063,19 +1033,17 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public Term reactDateWith(long a, ChoisePoint iX, BinaryOperation op) {
-		// return new PrologList(
-		//	head.reactDateWith(a,iX,op),
-		//	tail.reactDateWith(a,iX,op));
 		PrologList result= new PrologList(head.reactDateWith(a,iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.reactDateWith(a,iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -1092,19 +1060,17 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public Term reactTimeWith(long a, ChoisePoint iX, BinaryOperation op) {
-		// return new PrologList(
-		//	head.reactTimeWith(a,iX,op),
-		//	tail.reactTimeWith(a,iX,op));
 		PrologList result= new PrologList(head.reactTimeWith(a,iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.reactTimeWith(a,iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -1121,6 +1087,7 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public Term reactListWith(Term aHead, Term aTail, ChoisePoint iX, BinaryOperation op) {
 		return new PrologList(
 			aHead.reactWithTerm(head,iX,op),
@@ -1129,22 +1096,21 @@ public class PrologList extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term blitWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
 		return a.blitListWith(head,tail,iX,op);
 	}
+	@Override
 	public Term blitWithBigInteger(BigInteger a, ChoisePoint iX, BinaryOperation op) {
-		// return new PrologList(
-		//	head.blitWithBigInteger(a,iX,op),
-		//	tail.blitWithBigInteger(a,iX,op));
 		PrologList result= new PrologList(head.blitWithBigInteger(a,iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.blitWithBigInteger(a,iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -1161,19 +1127,17 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public Term blitWithLong(long a, ChoisePoint iX, BinaryOperation op) {
-		// return new PrologList(
-		//	head.blitWithLong(a,iX,op),
-		//	tail.blitWithLong(a,iX,op));
 		PrologList result= new PrologList(head.blitWithLong(a,iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.blitWithLong(a,iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -1190,19 +1154,17 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public Term blitWithDouble(double a, ChoisePoint iX, BinaryOperation op) {
-		// return new PrologList(
-		//	head.blitWithDouble(a,iX,op),
-		//	tail.blitWithDouble(a,iX,op));
 		PrologList result= new PrologList(head.blitWithDouble(a,iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.blitWithDouble(a,iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -1219,19 +1181,17 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public Term blitBigIntegerWith(BigInteger a, ChoisePoint iX, BinaryOperation op) {
-		// return new PrologList(
-		//	head.blitBigIntegerWith(a,iX,op),
-		//	tail.blitBigIntegerWith(a,iX,op));
 		PrologList result= new PrologList(head.blitBigIntegerWith(a,iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.blitBigIntegerWith(a,iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -1248,19 +1208,17 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public Term blitLongWith(long a, ChoisePoint iX, BinaryOperation op) {
-		// return new PrologList(
-		//	head.blitLongWith(a,iX,op),
-		//	tail.blitLongWith(a,iX,op));
 		PrologList result= new PrologList(head.blitLongWith(a,iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.blitLongWith(a,iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -1277,19 +1235,17 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public Term blitDoubleWith(double a, ChoisePoint iX, BinaryOperation op) {
-		// return new PrologList(
-		//	head.blitDoubleWith(a,iX,op),
-		//	tail.blitDoubleWith(a,iX,op));
 		PrologList result= new PrologList(head.blitDoubleWith(a,iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.blitDoubleWith(a,iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -1306,6 +1262,7 @@ public class PrologList extends Term {
 			}
 		}
 	}
+	@Override
 	public Term blitListWith(Term aHead, Term aTail, ChoisePoint iX, BinaryOperation op) {
 		return new PrologList(
 			aHead.blitWithTerm(head,iX,op),
@@ -1314,19 +1271,17 @@ public class PrologList extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term evaluate(ChoisePoint iX, UnaryOperation op) {
-		// return new PrologList(
-		//	head.evaluate(iX,op),
-		//	tail.evaluate(iX,op));
 		PrologList result= new PrologList(head.evaluate(iX,op),null);
 		PrologList createdList= result;
-		Term nextItem= tail; // .dereferenceValue(cp);
+		Term nextItem= tail;
 		while (true) {
 			if (nextItem instanceof PrologList) {
 				PrologList nextList= (PrologList)nextItem;
 				PrologList newList= new PrologList(nextList.head.evaluate(iX,op),null);
 				createdList.tail= newList;
-				nextItem= nextList.tail; // .dereferenceValue(cp);
+				nextItem= nextList.tail;
 				createdList= newList;
 			} else if (nextItem instanceof PrologVariable) {
 				PrologVariable nextList= (PrologVariable)nextItem;
@@ -1346,6 +1301,7 @@ public class PrologList extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		StringBuilder buffer= new StringBuilder("[");
 		buffer.append(head.toString(cp,true,provideStrictSyntax,encodeWorlds,encoder));
@@ -1369,7 +1325,6 @@ public class PrologList extends Term {
 				return buffer.toString();
 			}
 		} catch (Throwable e) {
-			buffer= new StringBuilder();
 			return String.format("[%s|%s]",
 				head.toString(cp,true,provideStrictSyntax,encodeWorlds,encoder),
 				tail.toString(cp,true,provideStrictSyntax,encodeWorlds,encoder));

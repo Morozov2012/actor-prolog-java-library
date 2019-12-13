@@ -71,48 +71,63 @@ public class DataFrameBaseAttributes implements DataFrameBaseAttributesInterface
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public long getSerialNumber() {
 		return serialNumber;
 	}
+	@Override
 	public boolean isAutorangingMode() {
 		return isAutorangingMode;
 	}
+	@Override
 	public boolean isDoubleColorMapMode() {
 		return isDoubleColorMapMode;
 	}
+	@Override
 	public DataRange getSelectedDataRange() {
 		return selectedDataRange;
 	}
+	@Override
 	public double getLowerDataBound() {
 		return lowerDataBound;
 	}
+	@Override
 	public double getUpperDataBound() {
 		return upperDataBound;
 	}
+	@Override
 	public double getLowerDataQuantile1() {
 		return lowerDataQuantile1;
 	}
+	@Override
 	public double getUpperDataQuantile1() {
 		return upperDataQuantile1;
 	}
+	@Override
 	public double getLowerDataQuantile2() {
 		return lowerDataQuantile2;
 	}
+	@Override
 	public double getUpperDataQuantile2() {
 		return upperDataQuantile2;
 	}
+	@Override
 	public DataColorMap getMainColorMap() {
 		return mainColorMap;
 	}
+	@Override
 	public DataColorMap getAuxiliaryColorMap() {
 		return auxiliaryColorMap;
 	}
+	@Override
 	public boolean isAverageMode() {
 		return isAverageMode;
 	}
+	@Override
 	public boolean isZoomingMode() {
 		return isZoomingMode;
 	}
+	@Override
 	public int getZoomingCoefficient() {
 		return zoomingCoefficient;
 	}

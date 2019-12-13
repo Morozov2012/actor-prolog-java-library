@@ -6,8 +6,8 @@ import morozov.terms.*;
 
 public class ProcessedErrorExit extends ErrorExit {
 	//
-	public ErrorExit processedException;
-	public Continuation continuation;
+	protected ErrorExit processedException;
+	protected Continuation continuation;
 	//
 	public ProcessedErrorExit(ErrorExit e, Continuation c) {
 		super(e);
@@ -15,13 +15,23 @@ public class ProcessedErrorExit extends ErrorExit {
 		continuation= c;
 	}
 	//
+	public ErrorExit getProcessedException() {
+		return processedException;
+	};
+	public Continuation getContinuation() {
+		return continuation;
+	}
+	//
+	@Override
 	public boolean isNormalTerminationOfTheProgram() {
 		return processedException.isNormalTerminationOfTheProgram();
 	}
 	//
+	@Override
 	public Term createTerm() {
 		return processedException.createTerm();
 	}
+	@Override
 	public String toString() {
 		return "ProcessedErrorExit(" + processedException.toString() + ")";
 	}

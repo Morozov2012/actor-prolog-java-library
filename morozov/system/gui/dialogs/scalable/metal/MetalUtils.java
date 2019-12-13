@@ -6,7 +6,7 @@
 
 package morozov.system.gui.dialogs.scalable.metal;
 
-import morozov.terms.*;
+import morozov.system.*;
 
 import javax.swing.plaf.metal.OceanTheme;
 import javax.swing.plaf.metal.MetalLookAndFeel;
@@ -23,6 +23,7 @@ import java.awt.geom.Point2D;
 import java.awt.geom.Area;
 
 public class MetalUtils {
+	//
 	static void drawFlush3DBorder(Graphics g0, int x, int y, int w, int h) {
 		Graphics2D g2= (Graphics2D)g0;
 		g2.translate(x,y);
@@ -77,8 +78,8 @@ public class MetalUtils {
 	}
 	//
 	private static void drawVerticalRectangleGradient(Graphics2D g2, float ratio1, float ratio2, Color c1, Color c2, Color c3, int w, int h) {
-		int mid= PrologInteger.toInteger(ratio1 * h);
-		int mid2= PrologInteger.toInteger(ratio2 * h);
+		int mid= Arithmetic.toInteger(ratio1 * h);
+		int mid2= Arithmetic.toInteger(ratio2 * h);
 		if (mid > 0) {
 			g2.setPaint(getGradient(0,0,c1,0,mid,c2));
 			g2.fillRect(0,0,w,mid);
@@ -97,16 +98,12 @@ public class MetalUtils {
 		}
 	}
 	private static void drawVerticalOvalGradient(Graphics2D g2, float ratio1, float ratio2, Color c1, Color c2, Color c3, int w, int h) {
-		int mid= PrologInteger.toInteger(ratio1 * h);
-		int mid2= PrologInteger.toInteger(ratio2 * h);
+		int mid= Arithmetic.toInteger(ratio1 * h);
+		int mid2= Arithmetic.toInteger(ratio2 * h);
 		Shape shapeOne= new Ellipse2D.Double(0,0,h,w);
-		// Shape shapeOne= new Ellipse2D.Double(1,1,h-3,w-3);
-		// Shape shapeOne= new Ellipse2D.Double(0,0,h-1,w-1);
 		Area areaOne= new Area(shapeOne);
 		if (mid > 0) {
 			g2.setPaint(getGradient(0,0,c1,0,mid,c2));
-			// g2.setPaint(Color.RED);
-			// g2.fillRect(0,0,w,mid);
 			Shape shapeTwo= new Rectangle2D.Double(0,0,w,mid);
 			Area areaTwo= new Area(shapeTwo);
 			areaTwo.intersect(areaOne);
@@ -114,8 +111,6 @@ public class MetalUtils {
 		};
 		if (mid2 > 0) {
 			g2.setColor(c2);
-			// g2.setPaint(Color.RED);
-			// g2.fillRect(0,mid,w,mid2);
 			Shape shapeTwo= new Rectangle2D.Double(0,mid,w,mid2);
 			Area areaTwo= new Area(shapeTwo);
 			areaTwo.intersect(areaOne);
@@ -123,8 +118,6 @@ public class MetalUtils {
 		};
 		if (mid > 0) {
 			g2.setPaint(getGradient(0,mid+mid2,c2,0,mid*2+mid2,c1));
-			// g2.setPaint(Color.RED);
-			// g2.fillRect(0,mid+mid2,w,mid);
 			Shape shapeTwo= new Rectangle2D.Double(0,mid+mid2,w,mid);
 			Area areaTwo= new Area(shapeTwo);
 			areaTwo.intersect(areaOne);
@@ -132,8 +125,6 @@ public class MetalUtils {
 		};
 		if (h - mid * 2 - mid2 > 0) {
 			g2.setPaint(getGradient(0,mid*2+mid2,c1,0,h,c3));
-			// g2.setPaint(Color.RED);
-			// g2.fillRect(0,mid*2+mid2,w,h-mid*2-mid2);
 			Shape shapeTwo= new Rectangle2D.Double(0,mid*2+mid2,w,h-mid*2-mid2);
 			Area areaTwo= new Area(shapeTwo);
 			areaTwo.intersect(areaOne);
@@ -147,6 +138,5 @@ public class MetalUtils {
 	//
 	protected static boolean usingOcean() {
 		return (MetalLookAndFeel.getCurrentTheme() instanceof OceanTheme);
-		// return false;
 	}
 }

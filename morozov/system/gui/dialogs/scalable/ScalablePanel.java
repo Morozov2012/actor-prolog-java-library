@@ -15,7 +15,7 @@ package morozov.system.gui.dialogs.scalable;
 import target.*;
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.errors.*;
 import morozov.system.signals.*;
@@ -64,7 +64,7 @@ public class ScalablePanel extends JPanel implements ActiveComponentInterface {
 	protected int getInitialRightBorder() {return 0;}
 	//
 	protected AtomicBoolean isTransparent= new AtomicBoolean(true);
-	protected AtomicReference<Color> hatchColor= new AtomicReference<Color>();
+	protected AtomicReference<Color> hatchColor= new AtomicReference<>();
 	//
 	protected static Term termEmptyString= new PrologString("");
 	protected static Term termDefault= new PrologSymbol(SymbolCodes.symbolCode_E_default);
@@ -77,15 +77,18 @@ public class ScalablePanel extends JPanel implements ActiveComponentInterface {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		return value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 	}
+	@Override
 	public Term standardizeRange(Term value, ChoisePoint iX) throws RejectRange {
 		return value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void putValue(DialogControlOperation operation, Term value, ChoisePoint iX) {
 		switch (operation) {
 			case VALUE:
@@ -105,6 +108,7 @@ public class ScalablePanel extends JPanel implements ActiveComponentInterface {
 		}
 	}
 	//
+	@Override
 	public Term getValue(DialogControlOperation operation) {
 		switch (operation) {
 			case VALUE:
@@ -121,14 +125,17 @@ public class ScalablePanel extends JPanel implements ActiveComponentInterface {
 		throw new UnknownDialogControlOperation();
 	}
 	//
+	@Override
 	public void putRange(Term value, ChoisePoint iX) {
 	}
+	@Override
 	public Term getRange() {
 		return PrologUnknownValue.instance;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setIsEnabled(boolean mode) {
 		if (mode) {
 			setEnabled(true);
@@ -137,6 +144,7 @@ public class ScalablePanel extends JPanel implements ActiveComponentInterface {
 		}
 	}
 	//
+	@Override
 	public boolean isEnabled(boolean mode) {
 		return (isEnabled() == mode);
 	}
@@ -153,6 +161,7 @@ public class ScalablePanel extends JPanel implements ActiveComponentInterface {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setPadding(
 			GridBagLayout gBL,
 			boolean flagTop, boolean flagLeft, boolean flagBottom, boolean flagRight,
@@ -166,6 +175,7 @@ public class ScalablePanel extends JPanel implements ActiveComponentInterface {
 		verticalPadding= valueVertical;
 	}
 	//
+	@Override
 	public void setScaling(double valueHorizontal, double valueVertical) {
 		horizontalScaling= valueHorizontal;
 		verticalScaling= valueVertical;
@@ -173,6 +183,7 @@ public class ScalablePanel extends JPanel implements ActiveComponentInterface {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setGeneralFont(Font font) {
 		colourlessFont= font;
 		font= DialogUtils.refineTextAndSpaceColors(
@@ -204,15 +215,12 @@ public class ScalablePanel extends JPanel implements ActiveComponentInterface {
 			gridBagLayout.setConstraints(this,gBC);
 		};
 		setFont(font);
-		//// component.setMinimumSize(component.getPreferredSize());
-		//// Предположительно, это может помочь в борьбе
-		//// с проблемой схлопывания текстовых полей:
-		// setMinimumSize(getPreferredSize());
 		invalidate();
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setGeneralForeground(Color c) {
 		textColor= c;
 		if (individualTextColor==null) {
@@ -226,6 +234,7 @@ public class ScalablePanel extends JPanel implements ActiveComponentInterface {
 		setGeneralFont(colourlessFont);
 	}
 	//
+	@Override
 	public void setGeneralSpaceColor(Color c) {
 		spaceColor= c;
 		if (colourlessFont==null) {
@@ -234,6 +243,7 @@ public class ScalablePanel extends JPanel implements ActiveComponentInterface {
 		setGeneralFont(colourlessFont);
 	}
 	//
+	@Override
 	public void setGeneralBackground(Color c) {
 		if (individualBackgroundColor==null) {
 			setBackground(c);
@@ -242,6 +252,7 @@ public class ScalablePanel extends JPanel implements ActiveComponentInterface {
 		}
 	}
 	//
+	@Override
 	public void setAlarmColors(Color fc, Color bc) {
 	}
 	//
@@ -256,7 +267,7 @@ public class ScalablePanel extends JPanel implements ActiveComponentInterface {
 	//
 	public void setIndividualTextColor(Term value, ChoisePoint iX) {
 		try {
-			individualTextColor= ExtendedColor.argumentToColorSafe(value,iX);
+			individualTextColor= ColorAttributeConverters.argumentToColorSafe(value,iX);
 			setForeground(individualTextColor);
 		} catch (TermIsSymbolDefault e) {
 			individualTextColor= null;
@@ -268,7 +279,7 @@ public class ScalablePanel extends JPanel implements ActiveComponentInterface {
 	}
 	public void setIndividualSpaceColor(Term value, ChoisePoint iX) {
 		try {
-			individualSpaceColor= ExtendedColor.argumentToColorSafe(value,iX);
+			individualSpaceColor= ColorAttributeConverters.argumentToColorSafe(value,iX);
 		} catch (TermIsSymbolDefault e) {
 			individualSpaceColor= null;
 		};
@@ -279,7 +290,7 @@ public class ScalablePanel extends JPanel implements ActiveComponentInterface {
 	}
 	public void setIndividualBackgroundColor(Term value, ChoisePoint iX) {
 		try {
-			individualBackgroundColor= ExtendedColor.argumentToColorSafe(value,iX);
+			individualBackgroundColor= ColorAttributeConverters.argumentToColorSafe(value,iX);
 			setBackground(individualBackgroundColor);
 		} catch (TermIsSymbolDefault e) {
 			individualBackgroundColor= null;
@@ -290,21 +301,21 @@ public class ScalablePanel extends JPanel implements ActiveComponentInterface {
 	//
 	public Term getIndividualTextColor() {
 		if (individualTextColor != null) {
-			return ExtendedColor.colorToTerm(individualTextColor);
+			return ColorAttributeConverters.colorToTerm(individualTextColor);
 		} else {
 			return termDefault;
 		}
 	}
 	public Term getIndividualSpaceColor() {
 		if (individualSpaceColor != null) {
-			return ExtendedColor.colorToTerm(individualSpaceColor);
+			return ColorAttributeConverters.colorToTerm(individualSpaceColor);
 		} else {
 			return termDefault;
 		}
 	}
 	public Term getIndividualBackgroundColor() {
 		if (individualBackgroundColor != null) {
-			return ExtendedColor.colorToTerm(individualBackgroundColor);
+			return ColorAttributeConverters.colorToTerm(individualBackgroundColor);
 		} else {
 			return termDefault;
 		}
@@ -312,6 +323,7 @@ public class ScalablePanel extends JPanel implements ActiveComponentInterface {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void paint(Graphics g0) {
 		if (!isTransparent.get()) {
 			Graphics2D g2= (Graphics2D)g0;

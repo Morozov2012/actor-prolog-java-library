@@ -20,9 +20,17 @@ public abstract class ColorMap extends DataAbstraction {
 	//
 	public void stringToColorMapName1ff(ChoisePoint iX, PrologVariable result, Term a1) {
 		String text= GeneralConverters.argumentToString(a1,iX);
-		ColorMapName name= ColorMapNameConverters.stringToColorMapName(text,a1);
-		result.setNonBacktrackableValue(ColorMapNameConverters.toTerm(name));
+		ColorMapName currentName= ColorMapNameConverters.stringToColorMapName(text,a1);
+		result.setNonBacktrackableValue(ColorMapNameConverters.toTerm(currentName));
 	}
 	public void stringToColorMapName1fs(ChoisePoint iX, Term a1) {
+	}
+	//
+	public void stringToColorChannel1ff(ChoisePoint iX, PrologVariable result, Term a1) {
+		String text= GeneralConverters.argumentToString(a1,iX);
+		ColorChannelSubstitutionName currentName= ColorSubstitutionModeConverters.stringToColorChannelSubstitutionName(text,a1);
+		result.setNonBacktrackableValue(ColorSubstitutionModeConverters.toTerm(currentName));
+	}
+	public void stringToColorChannel1fs(ChoisePoint iX, Term a1) {
 	}
 }

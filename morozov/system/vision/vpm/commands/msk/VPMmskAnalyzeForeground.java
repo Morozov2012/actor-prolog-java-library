@@ -6,7 +6,7 @@ import morozov.system.vision.vpm.*;
 import morozov.system.vision.vpm.commands.*;
 import morozov.system.vision.vpm.converters.*;
 
-abstract public class VPMmskAnalyzeForeground extends VPM_FrameCommand {
+public abstract class VPMmskAnalyzeForeground extends VPM_FrameCommand {
 	//
 	protected ImageChannelName channelName;
 	protected int lowerBound;
@@ -18,6 +18,7 @@ abstract public class VPMmskAnalyzeForeground extends VPM_FrameCommand {
 		upperBound= right;
 	}
 	//
+	@Override
 	public void execute(VPM vpm) {
 		int[] operationalMatrix;
 		if (channelName==null) {

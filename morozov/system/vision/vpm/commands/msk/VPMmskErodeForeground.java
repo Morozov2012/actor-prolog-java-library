@@ -16,6 +16,7 @@ public class VPMmskErodeForeground extends VPMmskHierarchicalMorphologicalFilter
 		algorithm= a;
 	}
 	//
+	@Override
 	public void execute(VPM vpm) {
 		imageWidth= vpm.getOperationalImageWidth();
 		imageHeight= vpm.getOperationalImageHeight();

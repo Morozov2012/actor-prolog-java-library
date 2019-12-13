@@ -22,6 +22,7 @@ public class ClusterDomainName extends PrologDomainName {
 		name= n;
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
 		return tagDomainName_Cluster + "(" + Long.toString(cluster) + ",\"" + FormatOutput.encodeString(name,false,encoder) + "\")";
 	}

@@ -14,57 +14,71 @@ import morozov.terms.signals.*;
 public enum FFmpegMediaTypeName {
 	//
 	AVMEDIA_TYPE_UNKNOWN {
+		@Override
 		public int toInteger() {
 			return avutil.AVMEDIA_TYPE_UNKNOWN;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVMEDIA_TYPE_UNKNOWN;
 		}
 	},
 	AVMEDIA_TYPE_VIDEO {
+		@Override
 		public int toInteger() {
 			return avutil.AVMEDIA_TYPE_VIDEO;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVMEDIA_TYPE_VIDEO;
 		}
 	},
 	AVMEDIA_TYPE_AUDIO {
+		@Override
 		public int toInteger() {
 			return avutil.AVMEDIA_TYPE_AUDIO;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVMEDIA_TYPE_AUDIO;
 		}
 	},
 	AVMEDIA_TYPE_DATA {
+		@Override
 		public int toInteger() {
 			return avutil.AVMEDIA_TYPE_DATA;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVMEDIA_TYPE_DATA;
 		}
 	},
 	AVMEDIA_TYPE_SUBTITLE {
+		@Override
 		public int toInteger() {
 			return avutil.AVMEDIA_TYPE_SUBTITLE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVMEDIA_TYPE_SUBTITLE;
 		}
 	},
 	AVMEDIA_TYPE_ATTACHMENT {
+		@Override
 		public int toInteger() {
 			return avutil.AVMEDIA_TYPE_ATTACHMENT;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVMEDIA_TYPE_ATTACHMENT;
 		}
 	},
 	AVMEDIA_TYPE_NB {
+		@Override
 		public int toInteger() {
 			return avutil.AVMEDIA_TYPE_NB;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVMEDIA_TYPE_NB;
 		}

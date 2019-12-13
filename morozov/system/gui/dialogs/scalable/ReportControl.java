@@ -40,16 +40,17 @@ public class ReportControl extends CustomControlComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void putValue(Term value, ChoisePoint iX) {
 		if (space !=null) {
 			value= value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 			if (value instanceof Report) {
 				if (currentValue != null) {
-					currentValue.release(targetDialog.isModal,iX);
+					currentValue.release(targetDialog.isModal(),iX);
 				};
 				currentValue= (Report)value;
 				currentValue.registerCanvasSpace(space,iX);
-				currentValue.draw(targetDialog.isModal,iX);
+				currentValue.draw(targetDialog.isModal(),iX);
 				targetDialog.doLayout(true);
 				targetDialog.safelyRepaint();
 				targetDialog.repaintAfterDelay();
@@ -57,6 +58,7 @@ public class ReportControl extends CustomControlComponent {
 		}
 	}
 	//
+	@Override
 	public Term getValue() {
 		return currentValue;
 	}
@@ -69,6 +71,7 @@ public class ReportControl extends CustomControlComponent {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklyInitiateControlSize();
 					}
@@ -87,6 +90,7 @@ public class ReportControl extends CustomControlComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 		if (space != null) {
@@ -94,13 +98,9 @@ public class ReportControl extends CustomControlComponent {
 		}
 	}
 	//
+	@Override
 	public void setDimension(Dimension dimension) {
 		if (space != null) {
-			// 2013.08.29: Если устанавливать размеры
-			// space, а не component,
-			// то SWING сходит с ума.
-			// panel.setMinimumSize(dimension);
-			// panel.setPreferredSize(dimension);
 			space.getControl().setMinimumSize(dimension);
 			space.getControl().setPreferredSize(dimension);
 			targetDialog.doLayout(true);

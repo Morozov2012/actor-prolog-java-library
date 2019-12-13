@@ -11,8 +11,8 @@ import java.util.Collections;
 
 public class StaticAttributes2D extends StaticAttributes {
 	//
-	private Map<AbstractWorld,InternalFrame2D> innerWindows= Collections.synchronizedMap(new HashMap<AbstractWorld,InternalFrame2D>());
-	private static final String staticIdentifier= "Canvas2D";
+	protected Map<AbstractWorld,InternalFrame2D> innerWindows= Collections.synchronizedMap(new HashMap<AbstractWorld,InternalFrame2D>());
+	protected static final String staticIdentifier= "Canvas2D";
 	//
 	private static StaticAttributes2D retrieveStaticAttributes2D(StaticContext context) {
 		StaticAttributes attributes= context.retrieveAttributes(staticIdentifier);

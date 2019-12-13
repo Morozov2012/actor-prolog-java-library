@@ -12,6 +12,7 @@ public class IllegalNumberOfRowsInLookupTable extends RuntimeException {
 		expectedNumber= n;
 	}
 	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(" + Integer.toString(row) + ";" + Integer.toString(expectedNumber) + ")";
 	}

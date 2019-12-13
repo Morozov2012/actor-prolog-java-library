@@ -3,10 +3,14 @@
 package morozov.system.files.errors;
 
 public class FileAccessError extends RuntimeException {
-	public String fileName;
+	//
+	protected String fileName;
+	//
 	public FileAccessError(String name) {
 		fileName= name;
 	}
+	//
+	@Override
 	public String toString() {
 		if (fileName != null) {
 			return this.getClass().toString() + "(" + fileName.toString() + ")";

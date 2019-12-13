@@ -3,10 +3,14 @@
 package morozov.system.gui.dialogs.errors;
 
 public class ClassNotFound extends RuntimeException {
-	public String className;
+	//
+	protected String className;
+	//
 	public ClassNotFound(String name) {
 		className= name;
 	}
+	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(" + className + ")";
 	}

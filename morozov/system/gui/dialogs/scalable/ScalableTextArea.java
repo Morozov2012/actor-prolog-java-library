@@ -25,7 +25,7 @@ import java.awt.Font;
 
 public class ScalableTextArea extends ActiveComponent {
 	//
-	public JTextArea area= null;
+	protected JTextArea area= null;
 	protected boolean isEditable= false;
 	//
 	///////////////////////////////////////////////////////////////
@@ -42,6 +42,7 @@ public class ScalableTextArea extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
@@ -57,12 +58,14 @@ public class ScalableTextArea extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void putValue(Term value, ChoisePoint iX) {
 		if (area != null) {
 			area.setText(value.toString(iX));
 		}
 	}
 	//
+	@Override
 	public Term getValue() {
 		if (area != null) {
 			return new PrologString(area.getText());
@@ -73,6 +76,7 @@ public class ScalableTextArea extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setIsEnabled(boolean mode) {
 		if (component != null && area != null) {
 			if (mode) {
@@ -85,6 +89,7 @@ public class ScalableTextArea extends ActiveComponent {
 		}
 	}
 	//
+	@Override
 	public boolean isEnabled(boolean mode1) {
 		if (component != null && area != null) {
 			boolean mode2= component.isEnabled() && area.isEnabled();
@@ -103,11 +108,11 @@ public class ScalableTextArea extends ActiveComponent {
 		}
 	}
 	//
+	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 		if (area != null) {
 			area.setFont(font);
-			// super.setGeneralFont(font);
 			if (component != null) {
 				JScrollPane scrollPane= (JScrollPane)component;
 				scrollPane.setMinimumSize(scrollPane.getPreferredSize());
@@ -117,12 +122,14 @@ public class ScalableTextArea extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setForeground(Color c) {
 		if (area != null) {
 			area.setForeground(c);
 		}
 	}
 	//
+	@Override
 	public void setBackground(Color c) {
 		if (area != null) {
 			area.setBackground(c);

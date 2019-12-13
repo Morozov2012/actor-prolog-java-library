@@ -19,18 +19,18 @@ public abstract class AbstractProcess extends ActiveWorld {
 	//
 	protected AbstractInternalWorld[] worldArray;
 	protected AbstractInternalWorld[] specialWorldArray;
-	private boolean isProven= false;
-	public ArrayList<SuspendedCall> suspendedCallTable= new ArrayList<SuspendedCall>();
-	private ArrayList<AsyncCall> asyncCallTable= new ArrayList<AsyncCall>();
-	private ArrayList<PredefinedClassRecord> predefinedClassesState= new ArrayList<PredefinedClassRecord>();
-	public ArrayList<AsyncCall> inputControlDirectMessages= new ArrayList<AsyncCall>();
-	public ArrayList<AsyncCall> inputInformationDirectMessages= new ArrayList<AsyncCall>();
-	public LinkedHashSet<AsyncCall> inputControlDirectMessagesHash= new LinkedHashSet<AsyncCall>();
-	public LinkedHashSet<AsyncCall> inputInformationDirectMessagesHash= new LinkedHashSet<AsyncCall>();
-	public ArrayList<ResidentRequest> inputResidentRequests= new ArrayList<ResidentRequest>();
-	public ArrayList<ResidentRequest> processedResidentRequests= new ArrayList<ResidentRequest>();
-	private LinkedHashSet<ProcessStateRequest> stateRequests= new LinkedHashSet<ProcessStateRequest>();
-	private LinkedHashSet<AbstractInternalWorld> timerMessages= new LinkedHashSet<AbstractInternalWorld>();
+	protected boolean isProven= false;
+	protected ArrayList<SuspendedCall> suspendedCallTable= new ArrayList<>();
+	protected ArrayList<AsyncCall> asyncCallTable= new ArrayList<>();
+	protected ArrayList<PredefinedClassRecord> predefinedClassesState= new ArrayList<>();
+	protected ArrayList<AsyncCall> inputControlDirectMessages= new ArrayList<>();
+	protected ArrayList<AsyncCall> inputInformationDirectMessages= new ArrayList<>();
+	protected LinkedHashSet<AsyncCall> inputControlDirectMessagesHash= new LinkedHashSet<>();
+	protected LinkedHashSet<AsyncCall> inputInformationDirectMessagesHash= new LinkedHashSet<>();
+	protected ArrayList<ResidentRequest> inputResidentRequests= new ArrayList<>();
+	protected ArrayList<ResidentRequest> processedResidentRequests= new ArrayList<>();
+	protected LinkedHashSet<ProcessStateRequest> stateRequests= new LinkedHashSet<>();
+	protected LinkedHashSet<AbstractInternalWorld> timerMessages= new LinkedHashSet<>();
 	//
 	private static final long serialVersionUID= 0x86028EBE7ADD70BBL; // -8790306573917523781L
 	//
@@ -52,21 +52,26 @@ public abstract class AbstractProcess extends ActiveWorld {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void startProcesses() {
 		start();
 	}
+	@Override
 	public void releaseSystemResources() {
 	}
+	@Override
 	public void stopProcesses() {
 		stop();
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public AbstractInternalWorld getInternalWorld(ChoisePoint cp) throws Backtracking, TermIsNotAWorld, TermIsDummyWorld, TermIsUnboundVariable {
 		return getMainWorld();
 	}
 	//
+	@Override
 	public AbstractInternalWorld internalWorld(AbstractProcess process, ChoisePoint cp) throws Backtracking {
 		if (this==process) {
 			return getMainWorld();
@@ -75,20 +80,24 @@ public abstract class AbstractProcess extends ActiveWorld {
 		}
 	}
 	//
+	@Override
 	public AbstractInternalWorld internalWorld(ChoisePoint iX) {
 		return getMainWorld();
 	}
 	//
+	@Override
 	public AbstractInternalWorld internalWorld() {
 		return getMainWorld();
 	}
 	//
+	@Override
 	public boolean thisIsProcess() {
 		return true;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public MethodSignature[] getMethodSignatures() {
 		return getMainWorld().getMethodSignatures();
 	}
@@ -98,9 +107,11 @@ public abstract class AbstractProcess extends ActiveWorld {
 	public void extractWorlds(LinkedHashSet<AbstractInternalWorld> list) {
 	}
 	//
+	@Override
 	public void extractWorlds(AbstractProcess process, LinkedHashSet<AbstractInternalWorld> list) {
 	}
 	//
+	@Override
 	public Term substituteWorlds(HashMap<AbstractWorld,Term> map, ChoisePoint cp) {
 		Term value1= map.get(this);
 		if (value1 != null) {
@@ -155,6 +166,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 		predefinedClassesState.add(record);
 	}
 	//
+	@Override
 	public Continuation collectSuspendedCalls(Continuation c0, ChoisePoint iX) {
 		int length= suspendedCallTable.size();
 		Continuation c1= c0;
@@ -184,13 +196,13 @@ public abstract class AbstractProcess extends ActiveWorld {
 	}
 	//
 	public void sendAsyncCall(ChoisePoint iX, AsyncCall item1) {
-		Term target= item1.target.dereferenceValue(iX);
+		Term target= item1.getTarget().dereferenceValue(iX);
 		if (!target.thisIsFreeVariable() && !target.thisIsUnknownValue()) {
 			if (target instanceof AbstractWorld) {
 				AbstractWorld receiver= (AbstractWorld)target;
 				receiver.transmitAsyncCall(item1,iX);
 			} else {
-				AbstractWorld currentWorld= item1.reserveTarget;
+				AbstractWorld currentWorld= item1.getReserveTarget();
 				currentWorld.transmitAsyncCall(item1,iX);
 			}
 		}
@@ -199,13 +211,13 @@ public abstract class AbstractProcess extends ActiveWorld {
 	public void sendAsyncCalls(ChoisePoint iX) {
 		for(int i= 0; i < asyncCallTable.size(); i++) {
 			AsyncCall item= asyncCallTable.get(i);
-			if (item.isControlCall) {
+			if (item.isControlCall()) {
 				sendAsyncCall(iX,item);
 			}
 		};
 		for(int i= 0; i < asyncCallTable.size(); i++) {
 			AsyncCall item= asyncCallTable.get(i);
-			if (!item.isControlCall) {
+			if (!item.isControlCall()) {
 				sendAsyncCall(iX,item);
 			}
 		};
@@ -218,6 +230,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void sendResidentRequest(Resident resident, long domainSignature, Term[] arguments, boolean sortAndReduceResultList) {
 		sendResidentRequest(this,resident,domainSignature,arguments,sortAndReduceResultList);
 	}
@@ -228,13 +241,14 @@ public abstract class AbstractProcess extends ActiveWorld {
 			Iterator<ResidentRequest> inputResidentRequestIterator= inputResidentRequests.iterator();
 			while (inputResidentRequestIterator.hasNext()) {
 				ResidentRequest currentRequest= inputResidentRequestIterator.next();
-				if	(currentRequest.resident==resident &&
-					currentRequest.target==target) {
-					if	(currentRequest.domainSignature==domainSignature &&
-						currentRequest.arguments.length==arguments.length) {
+				if	(currentRequest.getResident()==resident &&
+					currentRequest.getTarget()==target) {
+					if	(currentRequest.getDomainSignature()==domainSignature &&
+						currentRequest.getArgumentsLength()==arguments.length) {
 						try {
+							Term[] currentRequestArguments= currentRequest.getArguments();
 							for (int i= 0; i < arguments.length; i++) {
-								currentRequest.arguments[i].unifyWith(arguments[i],null);
+								currentRequestArguments[i].unifyWith(arguments[i],null);
 							};
 							addNewRequest= false;
 						} catch (Backtracking b) {
@@ -249,13 +263,14 @@ public abstract class AbstractProcess extends ActiveWorld {
 			Iterator<ResidentRequest> processedResidentRequestIterator= processedResidentRequests.iterator();
 			while (processedResidentRequestIterator.hasNext()) {
 				ResidentRequest currentRequest= processedResidentRequestIterator.next();
-				if	(currentRequest.resident==resident &&
-					currentRequest.target==target) {
-					if	(currentRequest.domainSignature==domainSignature &&
-						currentRequest.arguments.length==arguments.length) {
+				if	(currentRequest.getResident()==resident &&
+					currentRequest.getTarget()==target) {
+					if	(currentRequest.getDomainSignature()==domainSignature &&
+						currentRequest.getArgumentsLength()==arguments.length) {
 						try {
+							Term[] currentRequestArguments= currentRequest.getArguments();
 							for (int i= 0; i < arguments.length; i++) {
-								currentRequest.arguments[i].unifyWith(arguments[i],null);
+								currentRequestArguments[i].unifyWith(arguments[i],null);
 							};
 							addNewRequest= false;
 						} catch (Backtracking b) {
@@ -274,6 +289,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 		wakeUp();
 	}
 	//
+	@Override
 	public void withdrawRequest(Resident resident) {
 		withdrawRequest(this,resident);
 	}
@@ -288,8 +304,8 @@ public abstract class AbstractProcess extends ActiveWorld {
 		Iterator<ResidentRequest> inputResidentRequestIterator= inputResidentRequests.iterator();
 		while (inputResidentRequestIterator.hasNext()) {
 			ResidentRequest currentRequest= inputResidentRequestIterator.next();
-			if	(currentRequest.resident==resident &&
-				currentRequest.target==target) {
+			if	(currentRequest.getResident()==resident &&
+				currentRequest.getTarget()==target) {
 				inputResidentRequestIterator.remove();
 				break;
 			}
@@ -297,13 +313,14 @@ public abstract class AbstractProcess extends ActiveWorld {
 		Iterator<ResidentRequest> processedResidentRequestIterator= processedResidentRequests.iterator();
 		while (processedResidentRequestIterator.hasNext()) {
 			ResidentRequest currentRequest= processedResidentRequestIterator.next();
-			if (currentRequest.resident==resident) {
+			if (currentRequest.getResident()==resident) {
 				processedResidentRequestIterator.remove();
 				break;
 			}
 		}
 	}
 	//
+	@Override
 	protected void resetResidentOwners() {
 		synchronized (inputResidentRequests) {
 			inputResidentRequests.addAll(processedResidentRequests);
@@ -311,7 +328,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 			Iterator<ResidentRequest> inputResidentRequestIterator= inputResidentRequests.iterator();
 			while (inputResidentRequestIterator.hasNext()) {
 				ResidentRequest currentRequest= inputResidentRequestIterator.next();
-				currentRequest.resident.cancelResultList(currentRequest.target);
+				currentRequest.getResident().cancelResultList(currentRequest.getTarget());
 			}
 		}
 	}
@@ -326,10 +343,11 @@ public abstract class AbstractProcess extends ActiveWorld {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void receiveAsyncCall(AsyncCall newItem) {
-		if (newItem.isControlCall) {
+		if (newItem.isControlCall()) {
 			synchronized (inputControlDirectMessages) {
-				if (newItem.useBuffer) {
+				if (newItem.useBuffer()) {
 					inputControlDirectMessages.add(newItem);
 				} else {
 					if (inputControlDirectMessagesHash.contains(newItem)) {
@@ -343,7 +361,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 			}
 		} else {
 			synchronized (inputInformationDirectMessages) {
-				if (newItem.useBuffer) {
+				if (newItem.useBuffer()) {
 					inputInformationDirectMessages.add(newItem);
 				} else {
 					if (inputInformationDirectMessagesHash.contains(newItem)) {
@@ -364,6 +382,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void receiveTimerMessage(AbstractInternalWorld target) {
 		synchronized (timerMessages) {
 			timerMessages.add(target);
@@ -371,6 +390,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 		wakeUp();
 	}
 	//
+	@Override
 	public void cancelTimerMessage(AbstractInternalWorld target) {
 		synchronized (timerMessages) {
 			timerMessages.remove(target);
@@ -379,6 +399,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void acceptDirectMessage() {
 		if (debugThisProcess()) {
 			System.out.printf("%s: === acceptDirectMessage() ===\n",this);
@@ -444,7 +465,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 				synchronized (inputControlDirectMessages) {
 					if (inputControlDirectMessages.contains(directMessage)) {
 						inputControlDirectMessages.remove(directMessage);
-						if (!directMessage.useBuffer) {
+						if (!directMessage.useBuffer()) {
 							inputControlDirectMessagesHash.remove(directMessage);
 						}
 					};
@@ -462,10 +483,10 @@ public abstract class AbstractProcess extends ActiveWorld {
 						};
 						processDirectMessageAndHandleBreak(
 							c1,
-							directMessage.domainSignatureNumber,
-							directMessage.target,
-							directMessage.reserveTarget,
-							directMessage.arguments,
+							directMessage.getDomainSignatureNumber(),
+							directMessage.getTarget(),
+							directMessage.getReserveTarget(),
+							directMessage.getArguments(),
 							rootCP);
 					}
 				} finally {
@@ -511,7 +532,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 					System.out.printf("%s: ============================================\n",this);
 				};
 				try {
-					Term[] arguments= residentRequest.arguments;
+					Term[] arguments= residentRequest.getArguments();
 					final PrologVariable result= new PrologVariable();
 					Term[] argumentList= new Term[arguments.length+1];
 					argumentList[0]= result;
@@ -520,51 +541,57 @@ public abstract class AbstractProcess extends ActiveWorld {
 					};
 					Continuation completion;
 					Iterator<Term> resultSetIterator;
-					if (residentRequest.sortAndReduceResultList) {
-						final TreeSet<Term> resultSet= new TreeSet<Term>(new TermComparator(true));
+					if (residentRequest.sortAndReduceResultList()) {
+						final TreeSet<Term> resultSet= new TreeSet<>(new TermComparator(true));
 						completion= new Continuation() {
+							@Override
 							public void execute(ChoisePoint iX) throws Backtracking {
 								Term newResult= result.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 								resultSet.add(newResult);
 								throw Backtracking.instance;
 							}
+							@Override
 							public boolean isPhaseTermination() {
 								return false;
 							}
+							@Override
 							public String toString() {
 								return "CollectResults;Backtrack;";
 							}
 						};
-						AbstractInternalWorld targetWorld= residentRequest.target.internalWorld();
+						AbstractInternalWorld targetWorld= residentRequest.getTarget().internalWorld();
 						Continuation c1= new NeutralizeActors(completion);
 						processDirectMessageAndHandleBreak(
 							c1,
-							residentRequest.domainSignature,
+							residentRequest.getDomainSignature(),
 							targetWorld,
 							targetWorld,
 							argumentList,
 							rootCP);
 						resultSetIterator= resultSet.descendingIterator();
 					} else {
-						final ArrayList<Term> resultArray= new ArrayList<Term>();
+						final ArrayList<Term> resultArray= new ArrayList<>();
 						completion= new Continuation() {
+							@Override
 							public void execute(ChoisePoint iX) throws Backtracking {
 								Term newResult= result.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 								resultArray.add(0,newResult);
 								throw Backtracking.instance;
 							}
+							@Override
 							public boolean isPhaseTermination() {
 								return false;
 							}
+							@Override
 							public String toString() {
 								return "CollectResults;Backtrack;";
 							}
 						};
-						AbstractInternalWorld targetWorld= residentRequest.target.internalWorld();
+						AbstractInternalWorld targetWorld= residentRequest.getTarget().internalWorld();
 						Continuation c1= new NeutralizeActors(completion);
 						processDirectMessageAndHandleBreak(
 							c1,
-							residentRequest.domainSignature,
+							residentRequest.getDomainSignature(),
 							targetWorld,
 							targetWorld,
 							argumentList,
@@ -576,7 +603,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 						Term currentResult= resultSetIterator.next();
 						resultList= new PrologList(currentResult,resultList);
 					};
-					residentRequest.resident.returnResultList(residentRequest.target,resultList);
+					residentRequest.getResident().returnResultList(residentRequest.getTarget(),resultList);
 				} finally {
 					synchronized (inputResidentRequests) {
 						if (inputResidentRequests.contains(residentRequest)) {
@@ -621,16 +648,16 @@ public abstract class AbstractProcess extends ActiveWorld {
 					c1= new NeutralizeActors(c1);
 					processDirectMessageAndHandleBreak(
 						c1,
-						directMessage.domainSignatureNumber,
-						directMessage.target,
-						directMessage.reserveTarget,
-						directMessage.arguments,
+						directMessage.getDomainSignatureNumber(),
+						directMessage.getTarget(),
+						directMessage.getReserveTarget(),
+						directMessage.getArguments(),
 						rootCP);
 				} finally {
 					synchronized (inputInformationDirectMessages) {
 						if (inputInformationDirectMessages.contains(directMessage)) {
 							inputInformationDirectMessages.remove(directMessage);
-							if (!directMessage.useBuffer) {
+							if (!directMessage.useBuffer()) {
 								inputInformationDirectMessagesHash.remove(directMessage);
 							}
 						};
@@ -648,10 +675,11 @@ public abstract class AbstractProcess extends ActiveWorld {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void acceptTimerMessage() {
-		boolean hasUpdatedPorts= false;
+		boolean hasUpdatedPorts;
 		AbstractInternalWorld targetWorld= null;
-		Iterator<AbstractInternalWorld> iterator= null;
+		Iterator<AbstractInternalWorld> iterator;
 		boolean flowMessageIsToBeProcessed= false;
 		synchronized (timerMessages) {
 			if (timerMessages.size() > 0) {
@@ -741,7 +769,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 		} catch (Backtracking b) {
 			backtrack(iX);
 		} catch (ProcessedErrorExit e1) {
-			if (c1.containsNode(e1.continuation)) {
+			if (c1.containsNode(e1.getContinuation())) {
 				throw e1;
 			} else {
 				iX.freeTrail();
@@ -751,7 +779,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 					c2.execute(iX);
 					iX.freeTrail();
 				} catch (Backtracking b) {
-					throw new ProcessedErrorExit(e1.processedException,c1);
+					throw new ProcessedErrorExit(e1.getProcessedException(),c1);
 				} catch (ErrorExit e2) {
 					throw new ProcessedErrorExit(e2,c1);
 				} catch (Throwable e2) {
@@ -789,6 +817,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 		}
 	}
 	//
+	@Override
 	public void sendStateOfProcess() {
 		if (!stateIsToBeSend.compareAndSet(true,false)) {
 			return;
@@ -797,13 +826,14 @@ public abstract class AbstractProcess extends ActiveWorld {
 			Iterator<ProcessStateRequest> iterator= stateRequests.iterator();
 			while (iterator.hasNext()) {
 				ProcessStateRequest request= iterator.next();
-				request.listener.rememberStateOfProcess(request.identifier,isProven,isSuspended);
+				request.getListener().rememberStateOfProcess(request.getIdentifier(),isProven,isSuspended);
 			}
 		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void processFlowMessages(ChoisePoint iX) {
 		AbstractInternalWorld[] neutralizedActors= neutralizeActors(iX);
 		Continuation c1= new PhaseTermination();
@@ -843,11 +873,11 @@ public abstract class AbstractProcess extends ActiveWorld {
 	}
 	//
 	private Continuation addGoals(Continuation c1, ChoisePoint iX) {
-		LinkedHashSet<AbstractInternalWorld> worlds= new LinkedHashSet<AbstractInternalWorld>();
+		LinkedHashSet<AbstractInternalWorld> worlds= new LinkedHashSet<>();
 		extractWorlds(worlds);
 		worldArray= new AbstractInternalWorld[worlds.size()];
 		worlds.toArray(worldArray);
-		LinkedHashSet<AbstractInternalWorld> specialWorlds= new LinkedHashSet<AbstractInternalWorld>();
+		LinkedHashSet<AbstractInternalWorld> specialWorlds= new LinkedHashSet<>();
 		if (worldArray != null) {
 			for (int n=0; n < worldArray.length; n++) {
 				if (worldArray[n].isSpecialWorld()) {
@@ -865,6 +895,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 		return c2;
 	}
 	//
+	@Override
 	protected boolean removeNewlyProvedOldActors(HashSet<ActorNumber> oldActors) {
 		boolean hasProvenActors= false;
 		Iterator<ActorNumber> oldActorsIterator= oldActors.iterator();
@@ -879,12 +910,14 @@ public abstract class AbstractProcess extends ActiveWorld {
 		return hasProvenActors;
 	}
 	//
+	@Override
 	public void clearActorStore() {
 		actorsToBeProved.clear();
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void registerActorToBeProved(ActorNumber actorNumber, ChoisePoint cp) {
 		if (!actorsToBeProved.contains(actorNumber)) {
 			actorsToBeProved.add(actorNumber);
@@ -901,6 +934,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 		System.out.println(actorsToBeProved);
 	}
 	//
+	@Override
 	public Continuation createActorNeutralizationNode(Continuation aC) {
 		return new NeutralizeActors(aC);
 	}
@@ -908,25 +942,29 @@ public abstract class AbstractProcess extends ActiveWorld {
 	///////////////////////////////////////////////////////////////
 	//
 	public class NeutralizeActors extends Continuation {
-		private Continuation c0;
 		public NeutralizeActors(Continuation aC) {
 			c0= aC;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			neutralizeActorsAndContinue(c0,iX);
 		}
+		@Override
 		public String toString() {
 			return "NeutrActors;" + c0.toString();
 		}
 	}
 	//
 	public class PhaseTermination extends Continuation {
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			successfullyFinishPhase(iX);
 		}
+		@Override
 		public boolean isPhaseTermination() {
 			return true;
 		}
+		@Override
 		public String toString() {
 			return "PhaseTermination;";
 		}
@@ -939,7 +977,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 			finishPhase= true;
 		};
 		HashSet<AbstractInternalWorld> neutralizedActors= convolveActualSlotValues(newIndex);
-		if (finishPhase && neutralizedActors.size() == 0) {
+		if (finishPhase && neutralizedActors.isEmpty()) {
 			convolveNonactivatedSlotValues(neutralizedActors);
 			successfullyFinishPhase(iX);
 		} else {
@@ -985,8 +1023,10 @@ public abstract class AbstractProcess extends ActiveWorld {
 			oldActorsIterator= oldActors.iterator();
 			while (oldActorsIterator.hasNext()) {
 				ActorNumber actor= oldActorsIterator.next();
-				if (neutralizedActors.contains(actor)) {
-					continue;
+				if (!actor.isNumberOfTemporaryActor()) {
+					if (neutralizedActors.contains((AbstractInternalWorld)actor)) {
+						continue;
+					}
 				};
 				if (!actorsToBeProved.contains(actor)) {
 					skipActor= false;
@@ -1028,6 +1068,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 		informInternalWorldsAboutFailure();
 	}
 	//
+	@Override
 	protected void informInternalWorldsAboutFailure() {
 		if (specialWorldArray != null) {
 			for (int n=0; n < specialWorldArray.length; n++) {
@@ -1039,7 +1080,7 @@ public abstract class AbstractProcess extends ActiveWorld {
 	public void storePredefinedClassRecords() {
 		for(int i= 0; i < predefinedClassesState.size(); i++) {
 			PredefinedClassRecord item= predefinedClassesState.get(i);
-			AbstractInternalWorld receiver= item.target;
+			AbstractInternalWorld receiver= item.getTarget();
 			receiver.storeBacktrackableRecord(item);
 		};
 		predefinedClassesState.clear();

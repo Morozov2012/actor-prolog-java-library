@@ -20,8 +20,8 @@ public class DomainReal extends DomainAlternative {
 	public DomainReal() {
 	}
 	//
+	@Override
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
-		// t= t.dereferenceValue(cp);
 		t= t.dereferenceValue(cp);
 		if (ignoreFreeVariables && t.thisIsFreeVariable()) {
 			return true;
@@ -35,19 +35,24 @@ public class DomainReal extends DomainAlternative {
 		}
 	}
 	//
+	@Override
 	public boolean isEqualTo(DomainAlternative a, HashSet<PrologDomainPair> stack) {
 		return a.isEqualToReal();
 	}
+	@Override
 	public boolean isEqualToReal() {
 		return true;
 	}
+	@Override
 	public boolean coversAlternative(DomainAlternative a, PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) {
 		return a.isCoveredByReal();
 	}
+	@Override
 	public boolean isCoveredByReal() {
 		return true;
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
 		return PrologDomainName.tagDomainAlternative_Real;
 	}

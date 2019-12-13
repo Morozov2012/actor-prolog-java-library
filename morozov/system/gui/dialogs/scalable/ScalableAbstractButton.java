@@ -84,7 +84,6 @@ public abstract class ScalableAbstractButton extends ActiveComponent {
 		if (component!=null) {
 			ScalableToggleButtonModel model= (ScalableToggleButtonModel)((JToggleButton)component).getModel();
 			model.setUncertain(flag);
-			// component.invalidate();
 			component.repaint();
 		}
 	}

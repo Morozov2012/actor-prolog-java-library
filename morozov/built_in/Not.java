@@ -44,9 +44,7 @@ public abstract class Not extends Lambda {
 		if (!subgoalIsCallOfFunction && clauseIsFunction) {
 			targetArguments= new Term[args.length+1];
 			targetArguments[0]= new PrologVariable();
-			for(int i= 0; i < args.length; i++) {
-				targetArguments[i+1]= args[i];
-			}
+			System.arraycopy(args,0,targetArguments,1,args.length);
 		} else {
 			targetArguments= args;
 		};
@@ -62,7 +60,7 @@ public abstract class Not extends Lambda {
 	}
 	//
 	public class Negation extends Continuation {
-		// private Continuation c0;
+		//
 		private long predicateSignatureNumber;
 		private boolean subgoalIsCallOfFunction;
 		private boolean clauseIsFunction;
@@ -76,6 +74,7 @@ public abstract class Not extends Lambda {
 			argumentList= (Term[])args;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			long worldDomainSignatureNumber;
 			if (clauseIsFunction) {
@@ -88,9 +87,7 @@ public abstract class Not extends Lambda {
 			if (!subgoalIsCallOfFunction && clauseIsFunction) {
 				targetArguments= new Term[argumentList.length+1];
 				targetArguments[0]= new PrologVariable();
-				for(int i= 0; i < argumentList.length; i++) {
-					targetArguments[i+1]= argumentList[i];
-				}
+				System.arraycopy(argumentList,0,targetArguments,1,argumentList.length);
 			} else {
 				targetArguments= argumentList;
 			};

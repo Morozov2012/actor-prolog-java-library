@@ -6,6 +6,7 @@ import target.*;
 
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.*;
 import morozov.system.gui.reports.*;
 import morozov.system.gui.reports.signals.*;
@@ -64,25 +65,11 @@ public abstract class Report extends Text {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	// abstract public Term getBuiltInSlot_E_title();
-	// abstract public Term getBuiltInSlot_E_text_color();
-	// abstract public Term getBuiltInSlot_E_space_color();
-	// abstract public Term getBuiltInSlot_E_font_name();
-	// abstract public Term getBuiltInSlot_E_font_size();
-	// abstract public Term getBuiltInSlot_E_font_style();
-	// abstract public Term getBuiltInSlot_E_x();
-	// abstract public Term getBuiltInSlot_E_y();
-	// abstract public Term getBuiltInSlot_E_width();
-	// abstract public Term getBuiltInSlot_E_height();
-	// abstract public Term getBuiltInSlot_E_background_color();
 	abstract public Term getBuiltInSlot_E_maximal_line_number();
 	abstract public Term getBuiltInSlot_E_area_type();
 	//
 	abstract public long entry_s_Action_1_i();
 	abstract public long entry_s_WindowClosed_0();
-	// abstract public long entry_s_Initialize_0();
-	// abstract public long entry_s_Start_0();
-	// abstract public long entry_s_Stop_0();
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -136,25 +123,28 @@ public abstract class Report extends Text {
 	///////////////////////////////////////////////////////////////
 	//
 	public void setColor1s(ChoisePoint iX, Term a1) {
-		setTextColor(ExtendedColor.argumentToExtendedColor(a1,iX));
+		setTextColor(ColorAttributeConverters.argumentToColorAttribute(a1,iX));
 	}
 	public void setColor2s(ChoisePoint iX, Term a1, Term a2) {
-		ExtendedColor tColor= ExtendedColor.argumentToExtendedColor(a1,iX);
-		ExtendedColor sColor= ExtendedColor.argumentToExtendedColor(a2,iX);
+		ColorAttribute tColor= ColorAttributeConverters.argumentToColorAttribute(a1,iX);
+		ColorAttribute sColor= ColorAttributeConverters.argumentToColorAttribute(a2,iX);
 		setTextColor(tColor);
 		setSpaceColor(sColor);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setFontName1s(ChoisePoint iX, Term a1) {
 		super.setFontName1s(iX,a1);
 		changeFont(iX);
 	}
+	@Override
 	public void setFontSize1s(ChoisePoint iX, Term a1) {
 		super.setFontSize1s(iX,a1);
 		changeFontSize(iX);
 	}
+	@Override
 	public void setFontStyle1s(ChoisePoint iX, Term a1) {
 		super.setFontStyle1s(iX,a1);
 		changeFont(iX);
@@ -179,7 +169,8 @@ public abstract class Report extends Text {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void changeBackgroundColor(ExtendedColor eColor, ChoisePoint iX) {
+	@Override
+	public void changeBackgroundColor(ColorAttribute eColor, ChoisePoint iX) {
 		Color color;
 		try {
 			color= eColor.getValue();
@@ -189,23 +180,21 @@ public abstract class Report extends Text {
 		updateRootTextStyleBackground(color);
 		synchronized (this) {
 			if (canvasSpace != null) {
-				// ReportUtils.safelySetBackground(color,canvasSpace.panel);
 				canvasSpace.safelySetBackground(color);
 			}
 		}
 	}
 	//
 	public void changeFont(ChoisePoint iX) {
-		// createGraphicWindowIfNecessary(iX,false);
-		String name;
+		String currentFontName;
 		try {
-			name= getFontName(iX).getValue();
+			currentFontName= getFontName(iX).getValue();
 		} catch (UseDefaultFontName e1) {
 			try {
 				Term nameOfFont= DefaultOptions.textFontName;
-				name= ExtendedFontName.argumentToFontName(nameOfFont,iX);
+				currentFontName= ExtendedFontName.argumentToFontName(nameOfFont,iX);
 			} catch (TermIsSymbolDefault e2) {
-				name= defaultFontName;
+				currentFontName= defaultFontName;
 			}
 		};
 		int size= computeFontSize(iX);
@@ -228,12 +217,12 @@ public abstract class Report extends Text {
 		updateRootTextStyleUnderline(isUnderlined);
 		synchronized (this) {
 			if (canvasSpace != null) {
-				((ExtendedReportSpace)canvasSpace).setPanelFont(name,style,size,true);
+				((ExtendedReportSpace)canvasSpace).setPanelFont(currentFontName,style,size,true);
 			}
 		}
 	}
+	@Override
 	public void changeFontSize(ChoisePoint iX) {
-		// createGraphicWindowIfNecessary(iX,false);
 		int size= computeFontSize(iX);
 		synchronized (this) {
 			if (canvasSpace != null) {
@@ -264,6 +253,7 @@ public abstract class Report extends Text {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void clear0s(ChoisePoint iX) {
 		createGraphicWindowIfNecessary(iX,false);
 		synchronized (this) {
@@ -274,6 +264,7 @@ public abstract class Report extends Text {
 		}
 	}
 	//
+	@Override
 	public void setString1s(ChoisePoint iX, Term text) {
 		createGraphicWindowIfNecessary(iX,false);
 		String buffer= text.toString(iX);
@@ -285,6 +276,7 @@ public abstract class Report extends Text {
 		}
 	}
 	//
+	@Override
 	public void getString0ff(ChoisePoint iX, PrologVariable result) {
 		synchronized (this) {
 			String content;
@@ -297,26 +289,31 @@ public abstract class Report extends Text {
 			result.setNonBacktrackableValue(new PrologString(content));
 		}
 	}
+	@Override
 	public void getString0fs(ChoisePoint iX) {
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void write1ms(ChoisePoint iX, Term... args) {
 		StringBuilder textBuffer= FormatOutput.termsToString(iX,(Term[])args);
 		write_text_buffer(iX,false,textBuffer);
 	}
 	//
+	@Override
 	public void writeLn1ms(ChoisePoint iX, Term... args) {
 		StringBuilder textBuffer= FormatOutput.termsToString(iX,(Term[])args);
 		write_text_buffer(iX,true,textBuffer);
 	}
 	//
+	@Override
 	public void writeF2ms(ChoisePoint iX, Term... args) {
 		StringBuilder textBuffer= FormatOutput.termsToFormattedString(iX,(Term[])args);
 		write_text_buffer(iX,false,textBuffer);
 	}
 	//
+	@Override
 	public void newLine0s(ChoisePoint iX) {
 		write_text_buffer(iX,true,new StringBuilder());
 	}
@@ -325,6 +322,7 @@ public abstract class Report extends Text {
 	// Auxiliary operations
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void initiateRegisteredCanvasSpace(CanvasSpace s, ChoisePoint iX) {
 		ReportSpaceAttributes reportAttributes= (ReportSpaceAttributes)spaceAttributes;
 		reportAttributes.implementValues((ExtendedReportSpace)s);
@@ -334,12 +332,14 @@ public abstract class Report extends Text {
 		s.safelyRevalidate(); // s.panel.revalidate();
 	}
 	//
+	@Override
 	public void saveCanvasSpaceAttributes() {
 		((ReportSpaceAttributes)spaceAttributes).collectValues((ExtendedReportSpace)canvasSpace);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected InnerPage createInternalFrameIfNecessary(ChoisePoint iX, boolean enableMovingWindowToFront) {
 		Map<AbstractWorld,InternalTextFrame> innerWindows= StaticReportAttributes.retrieveInnerWindows(staticContext);
 		boolean restoreWindow= false;
@@ -359,7 +359,7 @@ public abstract class Report extends Text {
 						} else {
 							graphicWindow= consoleWindow;
 							canvasSpace= graphicWindow.getCanvasSpace(); // scrollPane;
-							((ReportSpaceAttributes)spaceAttributes).setStyledDocument(((ExtendedReportSpace)canvasSpace).attributes.getStyledDocument());
+							((ReportSpaceAttributes)spaceAttributes).setStyledDocument(((ExtendedReportSpace)canvasSpace).getAttributes().getStyledDocument());
 							refreshAttributesOfInternalFrame(graphicWindow,iX);
 						}
 					} finally {
@@ -368,7 +368,7 @@ public abstract class Report extends Text {
 				} else {
 					graphicWindow= consoleWindow;
 					canvasSpace= graphicWindow.getCanvasSpace(); // scrollPane;
-					((ReportSpaceAttributes)spaceAttributes).setStyledDocument(((ExtendedReportSpace)canvasSpace).attributes.getStyledDocument());
+					((ReportSpaceAttributes)spaceAttributes).setStyledDocument(((ExtendedReportSpace)canvasSpace).getAttributes().getStyledDocument());
 					refreshAttributesOfInternalFrame(graphicWindow,iX);
 				}
 			} else {
@@ -393,10 +393,10 @@ public abstract class Report extends Text {
 	//
 	protected InternalTextFrame createInternalFrame(ChoisePoint iX) {
 		//
-		String title= getTitle(iX).getValueOrDefaultText("");
+		String currentTitle= getTitle(iX).getValueOrDefaultText("");
 		//
 		((ReportSpaceAttributes)spaceAttributes).setStaticContext(staticContext);
-		InternalTextFrame internalTextFrame= new InternalTextFrame(this,title,(ReportSpaceAttributes)spaceAttributes);
+		InternalTextFrame internalTextFrame= new InternalTextFrame(this,currentTitle,(ReportSpaceAttributes)spaceAttributes);
 		graphicWindow= internalTextFrame;
 		Map<AbstractWorld,InternalTextFrame> innerWindows= StaticReportAttributes.retrieveInnerWindows(staticContext);
 		innerWindows.put(this,internalTextFrame);
@@ -413,6 +413,7 @@ public abstract class Report extends Text {
 		return internalTextFrame;
 	}
 	//
+	@Override
 	protected void refreshAttributesOfCanvasSpace(ChoisePoint iX) {
 		changeBackgroundColor(iX);
 		changeFont(iX);
@@ -420,6 +421,7 @@ public abstract class Report extends Text {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void sendTheWindowClosedMessage() {
 		long domainSignature= entry_s_WindowClosed_0();
 		AsyncCall call= new AsyncCall(domainSignature,this,true,true,noArguments,true);
@@ -462,12 +464,12 @@ public abstract class Report extends Text {
 					safelyInsertString(doc,textBuffer.toString(),transparentTextAttributes);
 				};
 				try {
-					long maximalLineNumber= getMaximalLineNumber(iX).getValue();
-					safelyRemoveSuperfluousLines(maximalLineNumber,doc);
+					long currentMaximalLineNumber= getMaximalLineNumber(iX).getValue();
+					safelyRemoveSuperfluousLines(currentMaximalLineNumber,doc);
 				} catch (UseWindowHeight e) {
 					if (canvasSpace != null) {
 						synchronized (canvasSpace) {
-							Boolean isSucceded= new Boolean(false);
+							Boolean isSucceded= false;
 							((ExtendedReportSpace)canvasSpace).safelyRemoveSuperfluousLines(doc,isSucceded);
 							if (isSucceded) {
 								scrollPageToTheEndPosition= false;
@@ -478,7 +480,6 @@ public abstract class Report extends Text {
 				};
 				if (canvasSpace != null) {
 					if (scrollPageToTheEndPosition) {
-						// safelySetCaretPosition(canvasSpace.panel,doc.getLength());
 						((ExtendedReportSpace)canvasSpace).safelySetCaretPosition(doc.getLength());
 					} else {
 						((ExtendedReportSpace)canvasSpace).safelyResetCaretPosition();
@@ -499,6 +500,7 @@ public abstract class Report extends Text {
 			try {
 				EventQueue.invokeAndWait(
 					new Runnable() {
+						@Override
 						public void run() {
 							try {
 								doc.remove(0,doc.getLength());
@@ -522,10 +524,10 @@ public abstract class Report extends Text {
 			}
 		} else {
 			try {
-				// waitForIdle();
-				final AtomicReference<StringBuilder> buffer= new AtomicReference<StringBuilder>(new StringBuilder());
+				final AtomicReference<StringBuilder> buffer= new AtomicReference<>(new StringBuilder());
 				EventQueue.invokeAndWait(
 					new Runnable() {
+						@Override
 						public void run() {
 							try {
 								buffer.get().append(doc.getText(0,doc.getLength()));
@@ -550,9 +552,9 @@ public abstract class Report extends Text {
 			}
 		} else {
 			try {
-				// waitForIdle();
 				EventQueue.invokeAndWait(
 					new Runnable() {
+						@Override
 						public void run() {
 							try {
 								doc.insertString(doc.getLength(),buffer,textStyle);
@@ -574,9 +576,9 @@ public abstract class Report extends Text {
 			}
 		} else {
 			try {
-				// waitForIdle();
 				EventQueue.invokeAndWait(
 					new Runnable() {
+						@Override
 						public void run() {
 							try {
 								doc.remove(0,(int)endPosition+1);
@@ -595,9 +597,9 @@ public abstract class Report extends Text {
 			removeSuperfluousLines(maximalLineNumber,doc);
 		} else {
 			try {
-				// waitForIdle();
 				EventQueue.invokeAndWait(
 					new Runnable() {
+						@Override
 						public void run() {
 							removeSuperfluousLines(maximalLineNumber,doc);
 						}
@@ -661,6 +663,7 @@ public abstract class Report extends Text {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void isHidden0s(ChoisePoint iX) throws Backtracking {
 		isHiddenCustomControl(iX);
 	}

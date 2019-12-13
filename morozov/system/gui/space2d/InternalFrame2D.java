@@ -23,6 +23,7 @@ import java.util.concurrent.atomic.AtomicReference;
 public class InternalFrame2D
 		extends InnerPage
 		implements ActionListener, MouseListener, MouseMotionListener {
+	//
 	protected Canvas2D targetWorld;
 	protected AtomicReference<Canvas2DScalingFactor> scalingFactor;
 	//
@@ -45,18 +46,21 @@ public class InternalFrame2D
 		}
 	}
 	//
+	@Override
 	public void safelySetBackground(Color c) {
 		if (canvasSpace != null) {
 			canvasSpace.safelySetBackground(c);
 		}
 	}
 	//
+	@Override
 	public void safelyRepaint() {
 		if (canvasSpace != null) {
 			canvasSpace.safelyRepaint();
 		}
 	}
 	//
+	@Override
 	public void actionPerformed(ActionEvent event) {
 		long domainSignature= targetWorld.entry_s_Action_1_i();
 		Term predicateArgument= new PrologString(event.getActionCommand());
@@ -65,42 +69,49 @@ public class InternalFrame2D
 		targetWorld.transmitAsyncCall(call,null);
 	}
 	//
+	@Override
 	public void mouseClicked(MouseEvent ev) {
 		if (targetWorld.mouseClickedEventIsEnabled.get()) {
 			long domainSignature= targetWorld.entry_s_MouseClicked_1_i();
 			sendMouseEvent(ev,domainSignature,SymbolCodes.symbolCode_E_MOUSE_CLICKED,true);
 		}
 	}
+	@Override
 	public void mouseEntered(MouseEvent ev) {
 		if (targetWorld.mouseEnteredEventIsEnabled.get()) {
 			long domainSignature= targetWorld.entry_s_MouseEntered_1_i();
 			sendMouseEvent(ev,domainSignature,SymbolCodes.symbolCode_E_MOUSE_ENTERED,true);
 		}
 	}
+	@Override
 	public void mouseExited(MouseEvent ev) {
 		if (targetWorld.mouseExitedEventIsEnabled.get()) {
 			long domainSignature= targetWorld.entry_s_MouseExited_1_i();
 			sendMouseEvent(ev,domainSignature,SymbolCodes.symbolCode_E_MOUSE_EXITED,true);
 		}
 	}
+	@Override
 	public void mousePressed(MouseEvent ev) {
 		if (targetWorld.mousePressedEventIsEnabled.get()) {
 			long domainSignature= targetWorld.entry_s_MousePressed_1_i();
 			sendMouseEvent(ev,domainSignature,SymbolCodes.symbolCode_E_MOUSE_PRESSED,true);
 		}
 	}
+	@Override
 	public void mouseReleased(MouseEvent ev) {
 		if (targetWorld.mouseReleasedEventIsEnabled.get()) {
 			long domainSignature= targetWorld.entry_s_MouseReleased_1_i();
 			sendMouseEvent(ev,domainSignature,SymbolCodes.symbolCode_E_MOUSE_RELEASED,true);
 		}
 	}
+	@Override
 	public void mouseDragged(MouseEvent ev) {
 		if (targetWorld.mouseDraggedEventIsEnabled.get()) {
 			long domainSignature= targetWorld.entry_s_MouseDragged_1_i();
 			sendMouseEvent(ev,domainSignature,SymbolCodes.symbolCode_E_MOUSE_DRAGGED,false);
 		}
 	}
+	@Override
 	public void mouseMoved(MouseEvent ev) {
 		if (targetWorld.mouseMovedEventIsEnabled.get()) {
 			long domainSignature= targetWorld.entry_s_MouseMoved_1_i();

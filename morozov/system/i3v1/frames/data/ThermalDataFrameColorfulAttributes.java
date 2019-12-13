@@ -83,9 +83,11 @@ public class ThermalDataFrameColorfulAttributes extends ThermalDataFrameBaseAttr
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public DetailedColorMap getDetailedMainColorMap() {
 		return detailedMainColorMap;
 	}
+	@Override
 	public DetailedColorMap getDetailedAuxiliaryColorMap() {
 		return detailedAuxiliaryColorMap;
 	}

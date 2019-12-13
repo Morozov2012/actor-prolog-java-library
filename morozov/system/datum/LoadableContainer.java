@@ -49,22 +49,23 @@ public abstract class LoadableContainer implements Serializable, Cloneable {
 	//
 	protected transient HashMap<ActiveWorld,ArrayDeque<DatabaseAccessMode>> readers= new HashMap<>();
 	//
-	protected transient AtomicReference<ActiveWorld> writer= new AtomicReference<ActiveWorld>(null);
+	protected transient AtomicReference<ActiveWorld> writer= new AtomicReference<>(null);
 	//
 	protected transient long externalFileNumber= -1;
 	protected transient String sectionFileName_MainLock;
 	protected transient String sectionFileName_MainData;
 	protected transient String sectionFileName_BackupLock;
 	protected transient String sectionFileName_BackupData;
+	//
 	public transient Path sectionPath_MainLock;
 	public transient Path sectionPath_MainData;
 	public transient Path sectionPath_BackupLock;
 	public transient Path sectionPath_BackupData;
-	public transient AtomicReference<FileChannel> sectionMainLockChannel= new AtomicReference<FileChannel>();
-	public transient AtomicReference<FileChannel> sectionBackupLockChannel= new AtomicReference<FileChannel>();
+	public transient AtomicReference<FileChannel> sectionMainLockChannel= new AtomicReference<>();
+	public transient AtomicReference<FileChannel> sectionBackupLockChannel= new AtomicReference<>();
 	//
-	protected transient HashSet<DataAbstraction> informedWorlds= new HashSet<DataAbstraction>();
-	protected transient HashSet<DataAbstraction> linkedWorlds= new HashSet<DataAbstraction>();
+	protected transient HashSet<DataAbstraction> informedWorlds= new HashSet<>();
+	protected transient HashSet<DataAbstraction> linkedWorlds= new HashSet<>();
 	//
 	protected static final String messageAnObsoleteFileIsErased= "An obsolete file is erased: %s\n";
 	//
@@ -161,10 +162,10 @@ public abstract class LoadableContainer implements Serializable, Cloneable {
 				recentErrorException= e;
 				throw new ActorPrologParserError(e);
 			} catch (DatabaseRecordDoesNotBelongToDomain e) {
-				recentErrorText= e.text;
-				recentErrorPosition= e.position;
+				recentErrorText= e.getText();
+				recentErrorPosition= e.getPosition();
 				recentErrorException= e;
-				throw new WrongTermDoesNotBelongToDomain(e.item);
+				throw new WrongTermDoesNotBelongToDomain(e.getItem());
 			} catch (RuntimeException e) {
 				if (recentErrorException==null) {
 					recentErrorException= e;
@@ -283,7 +284,6 @@ public abstract class LoadableContainer implements Serializable, Cloneable {
 					}
 				}
 			}
-		// } catch (InterruptedException e) {
 		} finally {
 			lock.unlock();
 		}
@@ -297,7 +297,6 @@ public abstract class LoadableContainer implements Serializable, Cloneable {
 			if (openedDataStore != null) {
 				openedDataStore.unregisterWatcher(database,sectionPath_MainData);
 			}
-		// } catch (InterruptedException e) {
 		} finally {
 			lock.unlock();
 		}
@@ -485,8 +484,8 @@ public abstract class LoadableContainer implements Serializable, Cloneable {
 		lock= new ReentrantLock(useFairLock);
 		databaseTableIsFree= lock.newCondition();
 		externalFileIsFree= lock.newCondition();
-		readers= new HashMap<ActiveWorld,ArrayDeque<DatabaseAccessMode>>();
-		writer= new AtomicReference<ActiveWorld>(null);
+		readers= new HashMap<>();
+		writer= new AtomicReference<>(null);
 		externalFileNumber= -1;
 		sectionFileName_MainLock= null;
 		sectionFileName_MainData= null;
@@ -496,14 +495,15 @@ public abstract class LoadableContainer implements Serializable, Cloneable {
 		sectionPath_MainData= null;
 		sectionPath_BackupLock= null;
 		sectionPath_BackupData= null;
-		sectionMainLockChannel= new AtomicReference<FileChannel>();
-		sectionBackupLockChannel= new AtomicReference<FileChannel>();
-		informedWorlds= new HashSet<DataAbstraction>();
-		linkedWorlds= new HashSet<DataAbstraction>();
+		sectionMainLockChannel= new AtomicReference<>();
+		sectionBackupLockChannel= new AtomicReference<>();
+		informedWorlds= new HashSet<>();
+		linkedWorlds= new HashSet<>();
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Object clone() {
 		LoadableContainer o;
 		try {
@@ -517,8 +517,8 @@ public abstract class LoadableContainer implements Serializable, Cloneable {
 		o.lock= new ReentrantLock(useFairLock);
 		o.databaseTableIsFree= o.lock.newCondition();
 		o.externalFileIsFree= o.lock.newCondition();
-		o.readers= new HashMap<ActiveWorld,ArrayDeque<DatabaseAccessMode>>();
-		o.writer= new AtomicReference<ActiveWorld>(null);
+		o.readers= new HashMap<>();
+		o.writer= new AtomicReference<>(null);
 		o.externalFileNumber= -1;
 		o.sectionFileName_MainLock= null;
 		o.sectionFileName_MainData= null;
@@ -528,10 +528,10 @@ public abstract class LoadableContainer implements Serializable, Cloneable {
 		o.sectionPath_MainData= null;
 		o.sectionPath_BackupLock= null;
 		o.sectionPath_BackupData= null;
-		o.sectionMainLockChannel= new AtomicReference<FileChannel>();
-		o.sectionBackupLockChannel= new AtomicReference<FileChannel>();
-		o.informedWorlds= new HashSet<DataAbstraction>();
-		o.linkedWorlds= new HashSet<DataAbstraction>();
+		o.sectionMainLockChannel= new AtomicReference<>();
+		o.sectionBackupLockChannel= new AtomicReference<>();
+		o.informedWorlds= new HashSet<>();
+		o.linkedWorlds= new HashSet<>();
 		return o;
 	}
 }

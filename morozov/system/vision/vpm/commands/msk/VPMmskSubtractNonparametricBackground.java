@@ -53,6 +53,7 @@ public class VPMmskSubtractNonparametricBackground extends VPMmskBackgroundSubtr
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void execute(VPM vpm) {
 		initializeInternalMatricesIfNecessary(vpm);
 		int[] operationalMatrix= vpm.getOperationalMatrix();
@@ -158,6 +159,7 @@ public class VPMmskSubtractNonparametricBackground extends VPMmskBackgroundSubtr
 		}
 	}
 	//
+	@Override
 	public void forgetStatistics() {
 		counters= null;
 		histograms= null;
@@ -165,6 +167,7 @@ public class VPMmskSubtractNonparametricBackground extends VPMmskBackgroundSubtr
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public int[] getBackgroundImage(VPM vpm) {
 		initializeInternalMatricesIfNecessary(vpm);
 		int[] mean= new int[vectorLength];
@@ -186,6 +189,7 @@ public class VPMmskSubtractNonparametricBackground extends VPMmskBackgroundSubtr
 		return mean;
 	}
 	//
+	@Override
 	public int[] getSigmaImage(VPM vpm) {
 		initializeInternalMatricesIfNecessary(vpm);
 		int[] sigma= new int[vectorLength];

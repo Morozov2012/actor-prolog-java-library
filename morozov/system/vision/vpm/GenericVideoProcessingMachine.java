@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 import java.math.BigInteger;
 
-abstract public class GenericVideoProcessingMachine implements BlobHolder {
+public abstract class GenericVideoProcessingMachine implements BlobHolder {
 	//
 	protected int initialMinimalTrainingInterval= -1;
 	protected int initialMaximalTrainingInterval= -1;
@@ -239,6 +239,7 @@ abstract public class GenericVideoProcessingMachine implements BlobHolder {
 	synchronized public void setMinimalTrackDuration(int value) {
 		initialMinimalTrackDuration= value;
 	}
+	@Override
 	public int getMinimalTrackDuration() {
 		return activeMinimalTrackDuration;
 	}
@@ -246,6 +247,7 @@ abstract public class GenericVideoProcessingMachine implements BlobHolder {
 	synchronized public void setMaximalTrackDuration(int value) {
 		initialMaximalTrackDuration= value;
 	}
+	@Override
 	public int getMaximalTrackDuration() {
 		return activeMaximalTrackDuration;
 	}
@@ -260,6 +262,7 @@ abstract public class GenericVideoProcessingMachine implements BlobHolder {
 	synchronized public void setMaximalBlobInvisibilityInterval(int value) {
 		initialMaximalBlobInvisibilityInterval= value;
 	}
+	@Override
 	public int getMaximalBlobInvisibilityInterval() {
 		return activeMaximalBlobInvisibilityInterval;
 	}
@@ -267,6 +270,7 @@ abstract public class GenericVideoProcessingMachine implements BlobHolder {
 	synchronized public void setMaximalTrackRetentionInterval(int value) {
 		initialMaximalTrackRetentionInterval= value;
 	}
+	@Override
 	public int getMaximalTrackRetentionInterval() {
 		return activeMaximalTrackRetentionInterval;
 	}
@@ -282,6 +286,7 @@ abstract public class GenericVideoProcessingMachine implements BlobHolder {
 	synchronized public void setSamplingRate(double value) {
 		initialSamplingRate= value;
 	}
+	@Override
 	public double getSamplingRate() {
 		return activeSamplingRate;
 	}
@@ -289,6 +294,7 @@ abstract public class GenericVideoProcessingMachine implements BlobHolder {
 	synchronized public void setR2WindowHalfwidth(int value) {
 		initialR2WindowHalfwidth= value;
 	}
+	@Override
 	public int getR2WindowHalfwidth() {
 		return activeR2WindowHalfwidth;
 	}
@@ -296,6 +302,7 @@ abstract public class GenericVideoProcessingMachine implements BlobHolder {
 	synchronized public void setCharacteristicLengthMedianFilteringMode(boolean mode) {
 		initialApplyCharacteristicLengthMedianFiltering= mode;
 	}
+	@Override
 	public boolean getCharacteristicLengthMedianFilteringMode() {
 		return activeApplyCharacteristicLengthMedianFiltering;
 	}
@@ -303,6 +310,7 @@ abstract public class GenericVideoProcessingMachine implements BlobHolder {
 	synchronized public void setCharacteristicLengthMedianFilterHalfwidth(int value) {
 		initialCharacteristicLengthMedianFilterHalfwidth= value;
 	}
+	@Override
 	public int getCharacteristicLengthMedianFilterHalfwidth() {
 		return activeCharacteristicLengthMedianFilterHalfwidth;
 	}
@@ -310,6 +318,7 @@ abstract public class GenericVideoProcessingMachine implements BlobHolder {
 	synchronized public void setVelocityMedianFilteringMode(boolean mode) {
 		initialApplyVelocityMedianFiltering= mode;
 	}
+	@Override
 	public boolean getVelocityMedianFilteringMode() {
 		return activeApplyVelocityMedianFiltering;
 	}
@@ -317,6 +326,7 @@ abstract public class GenericVideoProcessingMachine implements BlobHolder {
 	synchronized public void setVelocityMedianFilterHalfwidth(int value) {
 		initialVelocityMedianFilterHalfwidth= value;
 	}
+	@Override
 	public int getVelocityMedianFilterHalfwidth() {
 		return activeVelocityMedianFilterHalfwidth;
 	}
@@ -360,6 +370,7 @@ abstract public class GenericVideoProcessingMachine implements BlobHolder {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public TransformationMatrices getTransformationMatrices() {
 		createTransformationMatricesIfNecessary();
 		return transformationMatrices;
@@ -375,10 +386,12 @@ abstract public class GenericVideoProcessingMachine implements BlobHolder {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public int getOperationalImageWidth() {
 		return operationalImageWidth;
 	}
 	//
+	@Override
 	public int getOperationalImageHeight() {
 		return operationalImageHeight;
 	}
@@ -548,10 +561,12 @@ abstract public class GenericVideoProcessingMachine implements BlobHolder {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public long getRecentFrameNumber() {
 		return recentFrameNumber;
 	}
 	//
+	@Override
 	public long getRecentTimeInMilliseconds() {
 		return recentTimeInMilliseconds;
 	}
@@ -562,10 +577,12 @@ abstract public class GenericVideoProcessingMachine implements BlobHolder {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public BlobType[] getBlobTypes() {
 		createBlobAttributesIfNecessary();
 		return currentBlobTypes;
 	}
+	@Override
 	public BlobAttributes[] getBlobAttributes() {
 		createBlobAttributesIfNecessary();
 		return currentBlobAttributes;
@@ -580,6 +597,7 @@ abstract public class GenericVideoProcessingMachine implements BlobHolder {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setTracks(HashMap<BigInteger,GrowingTrack> t) {
 		tracks= t;
 	}

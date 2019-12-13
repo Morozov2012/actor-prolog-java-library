@@ -3,11 +3,15 @@
 package morozov.system.gui.space3d.errors;
 
 public class SceneConversionError extends RuntimeException {
-	public Throwable exception;
+	//
+	protected Throwable exception;
+	//
 	public SceneConversionError(Throwable e) {
 		super(e);
 		exception= e;
 	}
+	//
+	@Override
 	public String toString() {
 		return exception.toString();
 	}

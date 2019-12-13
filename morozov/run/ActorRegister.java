@@ -5,10 +5,19 @@ package morozov.run;
 import morozov.worlds.*;
 
 public class ActorRegister {
-	public ActiveWorld currentProcess;
-	public ActorNumber currentActorNumber;
+	//
+	protected ActiveWorld currentProcess;
+	protected ActorNumber currentActorNumber;
+	//
 	public ActorRegister(ActiveWorld cP, ActorNumber rA) {
 		currentProcess= cP;
 		currentActorNumber= rA;
+	}
+	//
+	public ActiveWorld getCurrentProcess() {
+		return currentProcess;
+	}
+	public ActorNumber getCurrentActorNumber() {
+		return currentActorNumber;
 	}
 }

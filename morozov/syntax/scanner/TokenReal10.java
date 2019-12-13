@@ -26,28 +26,58 @@ public class TokenReal10 extends PrologToken {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public PrologTokenType getType() {
 		return PrologTokenType.REAL;
 	}
+	@Override
 	public double getRealValue(LexicalScannerMasterInterface master, ChoisePoint iX) throws LexicalScannerError {
 		return value;
 	}
+	@Override
 	public double getRealValueOrBacktrack() throws Backtracking {
 		return value;
 	}
+	@Override
 	public double getRealValueOrTermIsNotAReal() throws TermIsNotAReal {
 		return value;
 	}
+	@Override
 	public boolean isExtendedNumber(LexicalScannerMasterInterface master, ChoisePoint iX) {
 		return isExtendedNumber;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
+	public boolean correspondsToActorPrologTerm(Term argument, ChoisePoint iX) {
+		try {
+			long functor= argument.getStructureFunctor(iX);
+			if (functor != SymbolCodes.symbolCode_E_real_10) {
+				return false;
+			};
+			Term[] list= argument.getStructureArguments(iX);
+			if (list.length != 1) {
+				return false;
+			};
+			argument= list[0];
+			double v= argument.getRealValue(iX);
+			return Arithmetic.realsAreEqual(value,v);
+		} catch (TermIsNotAStructure e) {
+			return false;
+		} catch (TermIsNotAReal e) {
+			return false;
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	@Override
 	public Term toActorPrologTerm() {
 		Term[] arguments= new Term[]{new PrologReal(value)};
 		return new PrologStructure(SymbolCodes.symbolCode_E_real_10,arguments);
 	}
+	@Override
 	public String toString() {
 		return FormatOutput.realToString(value);
 	}

@@ -222,7 +222,7 @@ public class ExtendedFileName extends RelativeFileName {
 	public URL_Attributes getUniversalResourceAttributes(int timeout, CharacterSet characterSet, StaticContext staticContext) throws URISyntaxException, MalformedURLException, IOException {
 		URI uri= get_URI_OfResource();
 		installCookieManagerIfNecessary(staticContext);
-		boolean isLocalResource= isLocalResourceURI(uri);
+		boolean currentIsLocalResource= isLocalResourceURI(uri);
 		boolean isDirectoryName= isDirectoryURI(uri);
 		URL url= uri.toURL();
 		try {
@@ -234,7 +234,6 @@ public class ExtendedFileName extends RelativeFileName {
 				};
 				connection.setUseCaches(false);
 				InputStream stream= connection.getInputStream();
-				// boolean has_UTF_Coding= has_UTF_Coding(stream);
 				try {
 					long lastModificationTime;
 					try {
@@ -253,8 +252,7 @@ public class ExtendedFileName extends RelativeFileName {
 						url,
 						characterSet,
 						timeout,
-						isLocalResource,
-						// has_UTF_Coding,
+						currentIsLocalResource,
 						isDirectoryName,
 						lastModificationTime,
 						contentLength);
@@ -270,8 +268,7 @@ public class ExtendedFileName extends RelativeFileName {
 					exceptionName,
 					characterSet,
 					timeout,
-					isLocalResource,
-					// false,
+					currentIsLocalResource,
 					isDirectoryName);
 			}
 		} catch (Throwable e1) {
@@ -282,18 +279,17 @@ public class ExtendedFileName extends RelativeFileName {
 				channelExceptionToName(e1),
 				characterSet,
 				timeout,
-				isLocalResource,
-				// false,
+				currentIsLocalResource,
 				isDirectoryName);
 		}
 	}
 	//
 	public static URL_Attributes renewUniversalResourceAttributes(URL_Attributes oldAttributes) throws IOException {
-		URL url= oldAttributes.url;
-		boolean isDirectoryName= isDirectoryURI(oldAttributes.uri);
+		URL url= oldAttributes.getURL();
+		boolean isDirectoryName= isDirectoryURI(oldAttributes.getURI());
 		URLConnection connection= url.openConnection();
 		try {
-			int timeout= oldAttributes.maxWaitingInterval;
+			int timeout= oldAttributes.getMaxWaitingInterval();
 			if (timeout >= 0) {
 				connection.setConnectTimeout(timeout);
 				connection.setReadTimeout(timeout);
@@ -346,8 +342,8 @@ public class ExtendedFileName extends RelativeFileName {
 	public Term getTermContentOfUniversalResource(URL_Attributes attributes) throws CannotRetrieveContent, URISyntaxException, MalformedURLException, IOException {
 		try {
 			Term result;
-			if (attributes.isDirectory) {
-				List<Path> list= retrieveDirectoryList(attributes.uri);
+			if (attributes.isDirectory()) {
+				List<Path> list= retrieveDirectoryList(attributes.getURI());
 				StringBuilder buffer= new StringBuilder();
 				for (int n=0; n < list.size(); n++) {
 					buffer.append(tryToMakeRealName(list.get(n)).toString());
@@ -373,7 +369,6 @@ public class ExtendedFileName extends RelativeFileName {
 	public String getTextContentOfUniversalResource(int timeout, CharacterSet characterSet, StaticContext staticContext) throws CannotRetrieveContent {
 		URI uri= get_URI_OfResource();
 		try {
-			// installCookieManagerIfNecessary(staticContext);
 			URL_Attributes attributes= getUniversalResourceAttributes(timeout,characterSet,staticContext);
 			try {
 				String text= readStringFromUniversalResource(attributes);
@@ -387,12 +382,8 @@ public class ExtendedFileName extends RelativeFileName {
 			}
 		} catch (URISyntaxException e1) {
 			throw new WrongArgumentIsMalformedURL(uri.toString(),e1);
-		// } catch (MalformedURLException e1) {
-		//	throw e1;
 		} catch (IOException e1) {
 			throw new FileInputOutputError(uri.toString(),e1);
-		// } catch (Throwable e1) {
-		//	return channelExceptionToName(e1);
 		}
 	}
 	//
@@ -415,19 +406,13 @@ public class ExtendedFileName extends RelativeFileName {
 				}
 			} catch (Throwable e2) {
 				throw new CannotRetrieveContent(e2);
-			// } finally {
-			//	attributes.safeCloseConnection();
 			}
 		} catch (CannotRetrieveContent e) {
 			throw new FileInputOutputError(uri.toString(),e);
 		} catch (URISyntaxException e1) {
 			throw new WrongArgumentIsMalformedURL(uri.toString(),e1);
-		// } catch (MalformedURLException e1) {
-		//	throw e1;
 		} catch (IOException e1) {
 			throw new FileInputOutputError(uri.toString(),e1);
-		// } catch (Throwable e1) {
-		//	return channelExceptionToName(e1);
 		}
 	}
 	//
@@ -444,17 +429,11 @@ public class ExtendedFileName extends RelativeFileName {
 				}
 			} catch (Throwable e2) {
 				throw new CannotRetrieveContent(e2);
-			// } finally {
-			//	attributes.safeCloseConnection();
 			}
 		} catch (URISyntaxException e1) {
 			throw new WrongArgumentIsMalformedURL(uri.toString(),e1);
-		// } catch (MalformedURLException e1) {
-		//	throw e1;
 		} catch (IOException e1) {
 			throw new FileInputOutputError(uri.toString(),e1);
-		// } catch (Throwable e1) {
-		//	return channelExceptionToName(e1);
 		}
 	}
 	//
@@ -471,17 +450,11 @@ public class ExtendedFileName extends RelativeFileName {
 				}
 			} catch (Throwable e2) {
 				throw new CannotRetrieveContent(e2);
-			// } finally {
-			//	attributes.safeCloseConnection();
 			}
 		} catch (URISyntaxException e1) {
 			throw new WrongArgumentIsMalformedURL(uri.toString(),e1);
-		// } catch (MalformedURLException e1) {
-		//	throw e1;
 		} catch (IOException e1) {
 			throw new FileInputOutputError(uri.toString(),e1);
-		// } catch (Throwable e1) {
-		//	return channelExceptionToName(e1);
 		}
 	}
 	//
@@ -522,13 +495,10 @@ public class ExtendedFileName extends RelativeFileName {
 						return false;
 					}
 				} catch (MalformedURLException e) {
-					// throw new WrongArgumentIsMalformedURL(e);
 					return false;
 				} catch (URISyntaxException e) {
-					// throw new WrongArgumentIsMalformedURL(e);
 					return false;
 				} catch (IOException e) {
-					// throw new WrongArgumentIsMalformedURL(e);
 					return false;
 				}
 			}
@@ -539,6 +509,7 @@ public class ExtendedFileName extends RelativeFileName {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void isLocalResource() throws Backtracking {
 		if (!isLocalResource) {
 			throw Backtracking.instance;
@@ -616,7 +587,6 @@ public class ExtendedFileName extends RelativeFileName {
 			}
 		} else {
 			if (systemName==StandardFileName.STDIN) {
-				// throw new StandardInputStreamDoesNotSupportThisOperation();
 				try {
 					int n= System.in.available();
 					System.in.read(new byte[n]);
@@ -650,13 +620,9 @@ public class ExtendedFileName extends RelativeFileName {
 			Path path1= getPathOfLocalResource();
 			Path path2= fileName2.getPathOfLocalResource();
 			try {
-				Files.move(path1,path2); // StandardCopyOption.ATOMIC_MOVE
-			// } catch (UnsupportedOperationException e) {
-			// } catch (FileAlreadyExistsException e) {
-			// } catch (AtomicMoveNotSupportedException e) {
+				Files.move(path1,path2);
 			} catch (IOException e) {
 				throw new FileInputOutputError(toString(),fileName2.toString(),e);
-			// } catch (SecurityException e) {
 			}
 		} else {
 			throw new StandardStreamIsNotAllowedInThisOperation();
@@ -669,11 +635,8 @@ public class ExtendedFileName extends RelativeFileName {
 			Path path2= fileName2.getPathOfLocalResource();
 			try {
 				Files.copy(path1,path2,StandardCopyOption.COPY_ATTRIBUTES,StandardCopyOption.REPLACE_EXISTING);
-			// } catch (UnsupportedOperationException e) {
-			// } catch (FileAlreadyExistsException e) {
 			} catch (IOException e) {
 				throw new FileInputOutputError(toString(),fileName2.toString(),e);
-			// } catch (SecurityException e) {
 			}
 		} else {
 			throw new StandardStreamIsNotAllowedInThisOperation();
@@ -687,7 +650,7 @@ public class ExtendedFileName extends RelativeFileName {
 			Path path2= fileSystem.getPath(fileName2);
 			try {
 				Files.deleteIfExists(path2);
-				Files.move(path1,path2); // StandardCopyOption.ATOMIC_MOVE
+				Files.move(path1,path2);
 			} catch (IOException e) {
 			}
 		}
@@ -827,8 +790,6 @@ public class ExtendedFileName extends RelativeFileName {
 					Files.setAttribute(path,"dos:archive",flag);
 				}
 			} catch (UnsupportedOperationException e) {
-			// } catch (IllegalArgumentException e) {
-			// } catch (ClassCastException e) {
 			} catch (IOException e) {
 			}
 		} else {
@@ -844,8 +805,6 @@ public class ExtendedFileName extends RelativeFileName {
 					Files.setAttribute(path,"dos:hidden",flag);
 				}
 			} catch (UnsupportedOperationException e) {
-			// } catch (IllegalArgumentException e) {
-			// } catch (ClassCastException e) {
 			} catch (IOException e) {
 			}
 		} else {
@@ -861,8 +820,6 @@ public class ExtendedFileName extends RelativeFileName {
 					Files.setAttribute(path,"dos:readonly",flag);
 				}
 			} catch (UnsupportedOperationException e) {
-			// } catch (IllegalArgumentException e) {
-			// } catch (ClassCastException e) {
 			} catch (IOException e) {
 			}
 		} else {
@@ -892,8 +849,6 @@ public class ExtendedFileName extends RelativeFileName {
 					Files.setAttribute(path,"dos:system",flag);
 				}
 			} catch (UnsupportedOperationException e) {
-			// } catch (IllegalArgumentException e) {
-			// } catch (ClassCastException e) {
 			} catch (IOException e) {
 			}
 		} else {
@@ -925,7 +880,6 @@ public class ExtendedFileName extends RelativeFileName {
 	//
 	public String getTextData(int timeout, CharacterSet requestedCharacterSet, StaticContext staticContext) throws CannotRetrieveContent {
 		if (!isStandardFile) {
-			// URI uri= get_URI_OfResource();
 			return getTextContentOfUniversalResource(timeout,requestedCharacterSet,staticContext);
 		} else {
 			if (systemName==StandardFileName.STDIN) {
@@ -949,7 +903,6 @@ public class ExtendedFileName extends RelativeFileName {
 			createDirectories(path,true);
 			byte[] dst;
 			if (characterSet.isDummy()) {
-				dst= new byte[text.length()];
 				dst= text.getBytes(completeCharset);
 			} else {
 				dst= text.getBytes(characterSet.toCharSet());

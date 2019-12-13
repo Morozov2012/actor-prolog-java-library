@@ -5,7 +5,9 @@ package morozov.system.gui.sadt.signals;
 import morozov.run.*;
 
 public final class DiagramTableEntryDoesNotExist extends LightweightException {
-	public String identifier;
+	//
+	protected String identifier;
+	//
 	public DiagramTableEntryDoesNotExist(String label) {
 		identifier= label;
 	}

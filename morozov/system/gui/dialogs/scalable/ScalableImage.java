@@ -51,6 +51,7 @@ public class ScalableImage extends CustomControlComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
@@ -62,6 +63,7 @@ public class ScalableImage extends CustomControlComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void putValue(Term value, ChoisePoint iX) {
 		address= value.toString(iX);
 		if (component!=null) {
@@ -72,11 +74,6 @@ public class ScalableImage extends CustomControlComponent {
 				image= targetDialog.getTargetWorld().readImage(address,iX);
 			};
 			safelyPutValue(image);
-			// targetDialog.invalidate();
-			// Без команды repaint не меняется фотография
-			// в примере test_117_26_image_01_jdk, если
-			// диалоговое окно максимизировано.
-			// targetDialog.repaint(); // 2013.09.04
 			targetDialog.safelyInvalidateAndRepaint();
 		}
 	}
@@ -86,6 +83,7 @@ public class ScalableImage extends CustomControlComponent {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklyPutValue(image);
 					}
@@ -106,12 +104,14 @@ public class ScalableImage extends CustomControlComponent {
 		}
 	}
 	//
+	@Override
 	public Term getValue() {
 		return new PrologString(address);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setDimension(Dimension dimension) {
 		if (component!=null) {
 			scalableIcon.setSize(dimension);

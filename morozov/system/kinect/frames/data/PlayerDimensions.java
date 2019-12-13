@@ -55,6 +55,7 @@ public class PlayerDimensions implements PlayerDimensionsInterface, Serializable
 	//
 	/////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void refineRectangleBounds(int x, int y) {
 		if (XY_Tools.isLegal(x) && XY_Tools.isLegal(y)) {
 			if (areInitialized_2D_Bounds) {
@@ -82,6 +83,7 @@ public class PlayerDimensions implements PlayerDimensionsInterface, Serializable
 	//
 	/////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void computeSkeletonDepthRectangleBounds(GeneralSkeletonInterface skeleton, KinectFrameBaseAttributesInterface attributes) {
 		float focalLengthX= attributes.getFocalLengthX();
 		float focalLengthY= attributes.getFocalLengthY();
@@ -106,6 +108,7 @@ public class PlayerDimensions implements PlayerDimensionsInterface, Serializable
 			}
 		}
 	}
+	@Override
 	public void computeSkeletonColorRectangleBounds(GeneralSkeletonInterface skeleton, float[][] u, float[][] v, KinectFrameBaseAttributesInterface attributes) {
 		float focalLengthX= attributes.getFocalLengthX();
 		float focalLengthY= attributes.getFocalLengthY();
@@ -146,6 +149,7 @@ public class PlayerDimensions implements PlayerDimensionsInterface, Serializable
 	//
 	/////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void refineParallelepipedBounds(float x, float y, float z) {
 		if (areInitialized_Depth3D_Bounds) {
 			if (minimalX_3D > x) {
@@ -179,12 +183,14 @@ public class PlayerDimensions implements PlayerDimensionsInterface, Serializable
 	//
 	/////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void computeTotalDepthParallelepiped(KinectFrameBaseAttributesInterface attributes) {
 		if (identifier >= 0 && areInitialized_Depth3D_Bounds) {
 			computeParallelepiped(attributes);
 			isInitialized_DepthParallelepiped= true;
 		}
 	}
+	@Override
 	public void computeSkeletonDepthParallelepiped(GeneralSkeletonInterface skeleton, KinectFrameBaseAttributesInterface attributes) {
 		if (identifier >= 0 && skeleton.isTracked()) {
 			computeSkeletonParallelepipedBounds(skeleton);
@@ -192,6 +198,7 @@ public class PlayerDimensions implements PlayerDimensionsInterface, Serializable
 			isInitialized_DepthParallelepiped= true;
 		}
 	}
+	@Override
 	public void computeTotalColorParallelepiped(float[][] u, float[][] v, KinectFrameBaseAttributesInterface attributes) {
 		int colorFrameWidth= attributes.getColorFrameWidth();
 		int colorFrameHeight= attributes.getColorFrameHeight();
@@ -201,6 +208,7 @@ public class PlayerDimensions implements PlayerDimensionsInterface, Serializable
 			isInitialized_ColorParallelepiped= true;
 		}
 	}
+	@Override
 	public void computeSkeletonColorParallelepiped(GeneralSkeletonInterface skeleton, float[][] u, float[][] v, KinectFrameBaseAttributesInterface attributes) {
 		int colorFrameWidth= attributes.getColorFrameWidth();
 		int colorFrameHeight= attributes.getColorFrameHeight();
@@ -274,6 +282,7 @@ public class PlayerDimensions implements PlayerDimensionsInterface, Serializable
 			}
 		}
 	}
+	@Override
 	public void projectParallelepipedToColorImage(float[][] u, float[][] v, int colorFrameWidth, int colorFrameHeight) {
 		//
 		xy11= XY_Tools.projectToColorImage(xy11,u,v,colorFrameWidth,colorFrameHeight);
@@ -289,72 +298,95 @@ public class PlayerDimensions implements PlayerDimensionsInterface, Serializable
 	//
 	/////////////////////////////////////////////////////////////
 	//
+	@Override
 	public int getIdentifier() {
 		return identifier;
 	}
+	@Override
 	public boolean areInitialized_2D_Bounds() {
 		return areInitialized_2D_Bounds;
 	}
+	@Override
 	public int getMinimalX_2D() {
 		return minimalX_2D;
 	}
+	@Override
 	public int getMaximalX_2D() {
 		return maximalX_2D;
 	}
+	@Override
 	public int getMinimalY_2D() {
 		return minimalY_2D;
 	}
+	@Override
 	public int getMaximalY_2D() {
 		return maximalY_2D;
 	}
+	@Override
 	public boolean areInitialized_Depth3D_Bounds() {
 		return areInitialized_Depth3D_Bounds;
 	}
+	@Override
 	public float getMinimalX_3D() {
 		return minimalX_3D;
 	}
+	@Override
 	public float getMaximalX_3D() {
 		return maximalX_3D;
 	}
+	@Override
 	public float getMinimalY_3D() {
 		return minimalY_3D;
 	}
+	@Override
 	public float getMaximalY_3D() {
 		return maximalY_3D;
 	}
+	@Override
 	public float getMinimalZ_3D() {
 		return minimalZ_3D;
 	}
+	@Override
 	public float getMaximalZ_3D() {
 		return maximalZ_3D;
 	}
+	@Override
 	public boolean isInitialized_DepthParallelepiped() {
 		return isInitialized_DepthParallelepiped;
 	}
+	@Override
 	public boolean isInitialized_ColorParallelepiped() {
 		return isInitialized_ColorParallelepiped;
 	}
+	@Override
 	public XY_Interface getXY11() {
 		return xy11;
 	}
+	@Override
 	public XY_Interface getXY12() {
 		return xy12;
 	}
+	@Override
 	public XY_Interface getXY13() {
 		return xy13;
 	}
+	@Override
 	public XY_Interface getXY14() {
 		return xy14;
 	}
+	@Override
 	public XY_Interface getXY21() {
 		return xy21;
 	}
+	@Override
 	public XY_Interface getXY22() {
 		return xy22;
 	}
+	@Override
 	public XY_Interface getXY23() {
 		return xy23;
 	}
+	@Override
 	public XY_Interface getXY24() {
 		return xy24;
 	}

@@ -40,17 +40,13 @@ public class ScalableTableResident extends Resident {
 	public ScalableTableResident(AbstractDialog dialog, ATable control) {
 		target= dialog.getTargetWorld();
 		table= control;
-		// tableModel= model;
 	}
 	//
 	public void initiate(Term aTarget, long signature, Term... args) {
-		// staticContext= context;
-		// output= aOutput;
 		synchronized (this) {
 			previousResult= null;
 			target= aTarget;
 			domainSignature= signature;
-			// functor= aFunctor;
 			arguments= (Term[])args;
 			requestIsToBeSend.set(true);
 			wakeUp();
@@ -83,6 +79,7 @@ public class ScalableTableResident extends Resident {
 		}
 	}
 	//
+	@Override
 	public void acceptFlowMessages() {
 		if (!requestIsToBeSend.compareAndSet(true,false)) {
 			return;
@@ -90,20 +87,12 @@ public class ScalableTableResident extends Resident {
 		get_target().sendResidentRequest(this,get_domain_signature(),get_arguments(),false);
 	}
 	//
+	@Override
 	public void acceptDirectMessage() {
 		if (!hasNewResults.compareAndSet(true,false)) {
 			return;
 		};
-		// boolean processWasSuspended= isSuspended;
-		// if (isToBeSuspended()) {
-		//	if (!processWasSuspended) {
-		//		finishPhaseBySuspension();
-		//	};
-		//	return;
-		// };
 		phaseInitiation();
-		// boolean hasUpdatedPorts= acceptPortValues();
-		// Term resultValue= target.substituteWorlds(resultLists,rootCP);
 		Term resultValue= resultLists.get(get_target());
 		Term previousValue= get_previous_result();
 		if (previousValue!=null) {
@@ -130,6 +119,7 @@ public class ScalableTableResident extends Resident {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						table.putRange(resultValue,true,iX);
 					}
@@ -139,8 +129,4 @@ public class ScalableTableResident extends Resident {
 			}
 		}
 	}
-	// public void wakeUp() {
-	//	requestIsToBeSend.set(true);
-	//	super.wakeUp();
-	// }
 }

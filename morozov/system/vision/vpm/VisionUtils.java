@@ -95,10 +95,6 @@ public class VisionUtils {
 	public static double medianWnd(double[] vector, int from, int to) {
 		int initialLength= vector.length;
 		int windowLength= to - from + 1;
-		// Fixed:2017-11-02
-		// if (initialLength < windowLength) {
-		//	return 0;
-		// } else
 		if (initialLength <= 0 || windowLength <= 0) {
 			return 0;
 		} else {
@@ -114,7 +110,6 @@ public class VisionUtils {
 				from= 0;
 				to= vector.length-1;
 			};
-			// Fixed:2014-05-13: double[] array= Arrays.copyOfRange(vector,from,to);
 			double[] array= Arrays.copyOfRange(vector,from,to+1);
 			int actualLength= array.length;
 			Arrays.sort(array);
@@ -133,10 +128,6 @@ public class VisionUtils {
 	public static double medianAbs(double[] vector, int from, int to) {
 		int initialLength= vector.length;
 		int windowLength= to - from + 1;
-		// Fixed:2017-11-02
-		// if (initialLength < windowLength) {
-		//	return 0;
-		// } else
 		if (initialLength <= 0 || windowLength <= 0) {
 			return 0;
 		} else {
@@ -152,7 +143,6 @@ public class VisionUtils {
 				from= 0;
 				to= vector.length-1;
 			};
-			// Fixed:2014-05-13: double[] array= Arrays.copyOfRange(vector,from,to);
 			double[] array= Arrays.copyOfRange(vector,from,to+1);
 			int actualLength= array.length;
 			for (int n=0; n < actualLength; n++) {
@@ -172,7 +162,7 @@ public class VisionUtils {
 			return result;
 		}
 	}
-	// Order-statistic filtering
+	// Order-statistic filtering:
 	public static int[] rankFilter2D(int noDifferenceMarker, int[] pixels, int width, int height, int userDefinedThreshold, boolean contourForeground) {
 		int counterThreshold= 8 - userDefinedThreshold;
 		int[] result= Arrays.copyOf(pixels,pixels.length);
@@ -397,9 +387,7 @@ public class VisionUtils {
 		int[][] pixelsHSB= new int[numberOfBands][vectorLength];
 		if (numberOfBands > 3) {
 			for (int b=0; b < numberOfBands; b++) {
-				for (int n=0; n < vectorLength; n++) {
-					pixelsHSB[b][n]= pixelsRGB[b][n];
-				}
+				System.arraycopy(pixelsRGB[b],0,pixelsHSB[b],0,vectorLength);
 			}
 		};
 		for (int k=0; k < vectorLength; k++) {
@@ -446,5 +434,69 @@ public class VisionUtils {
 			pixelsHSB[2][k]= brightness;
 		};
 		return pixelsHSB;
+	}
+	//
+	public static int[] hsb2rgb(int hue256, int saturation256, int brightness256) {
+		float hue= (float)hue256 / maximalColor;
+		float saturation= (float)saturation256 / maximalColor;
+		float brightness= (float)brightness256 / maximalColor;
+		hue= 6 * hue;
+		int k= (int)hue;
+		float p= hue - k;
+		float t= 1 - saturation;
+		float n= 1 - saturation * p;
+		p= 1 - (saturation * (1 - p));
+		float r= 0;
+		float g= 0;
+		float b= 0;
+		switch (k) {
+		case 0:
+		case 6:
+			r= 1;
+			g= p;
+			b= t;
+			break;
+		case 1:
+			r= r + n;
+			g= g + 1;
+			b= b + t;
+			break;
+		case 2:
+			r= r + t;
+			g= g + 1;
+			b= b + p;
+			break;
+		case 3:
+			r= r + t;
+			g= g + n;
+			b= b + 1;
+			break;
+		case 4:
+			r= r + p;
+			g= g + t;
+			b= b + 1;
+			break;
+		case 5:
+			r= r + 1;
+			g= g + t;
+			b= b + n;
+			break;
+		};
+		float max= r;
+		if (max < g) {
+			max= g;
+		};
+		if (max < b) {
+			max= b;
+		};
+		float f= brightness / max;
+		float rout= f * r;
+		g= f * g;
+		b= f * b;
+		int[] rgb= new int[3];
+		rgb[0]= (int)(rout*maximalColor);
+		rgb[1]= (int)(g*maximalColor);
+		rgb[2]= (int)(b*maximalColor);
+		return rgb;
 	}
 }

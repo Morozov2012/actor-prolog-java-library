@@ -8,14 +8,14 @@ import java.io.Serializable;
 
 public class TerahertzDataBuffer implements Serializable {
 	//
-	double[] data;
+	protected double[] data;
 	//
-	int matrixWidth;
-	int matrixHeight;
-	int imageWidth;
-	int imageHeight;
-	int horizontalOffset;
-	int verticalOffset;
+	protected int matrixWidth;
+	protected int matrixHeight;
+	protected int imageWidth;
+	protected int imageHeight;
+	protected int horizontalOffset;
+	protected int verticalOffset;
 	//
 	private static final long serialVersionUID= 0xD9B8C62D6167EE6AL; // -2758236873554399638L
 	//

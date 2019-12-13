@@ -29,17 +29,22 @@ public class HashMapState extends Term {
 		indices= list;
 		slotVariable= slot;
 	}
+	//
+	@Override
 	public void clear() {
 		volume.remove(indices);
 	}
+	@Override
 	public void registerNewSlotVariable(HashSet<SlotVariable> slotVariables) {
 		slotVariables.add(slotVariable);
 	}
-	// General "Unify With" function
+	// General "Unify With" function:
+	@Override
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		throw new SpecialTermCannotBeUnified();
 	}
-	// Converting Term to String
+	// Converting Term to String:
+	@Override
 	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		return "HashMapState:" + indices.toString();
 	}

@@ -17,6 +17,7 @@ public class BigIntegerFormatException extends LexicalScannerError {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(" + mantissa + "," + Integer.toString(radix) + ")";
 	}

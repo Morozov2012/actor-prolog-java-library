@@ -24,7 +24,7 @@ public class WorldDomainName extends PrologDomainName {
 	public WorldDomainName(long u) {
 		unit= u;
 	}
-	// Converting Term to String
+	// Converting Term to String:
 	private void writeObject(ObjectOutputStream stream) throws IOException {
 		stream.defaultWriteObject();
 		stream.writeObject(SymbolNames.retrieveSymbolName(unit));
@@ -35,6 +35,7 @@ public class WorldDomainName extends PrologDomainName {
 		unit= SymbolNames.insertSymbolName(symbolName.identifier);
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
 		String text= SymbolNames.retrieveSymbolName(unit).toRawString(encoder);
 		return tagDomainName_World + "(\'" + text + "\')";

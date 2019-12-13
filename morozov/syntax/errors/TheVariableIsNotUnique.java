@@ -11,6 +11,7 @@ public class TheVariableIsNotUnique extends ParserError {
 		secondPosition= p2;
 	}
 	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(" + Integer.toString(position) + "," + Integer.toString(secondPosition) + ")";
 	}

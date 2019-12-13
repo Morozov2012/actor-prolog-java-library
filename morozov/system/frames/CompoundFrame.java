@@ -32,43 +32,54 @@ public class CompoundFrame implements CompoundFrameInterface, Serializable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setCompoundArrayType(CompoundArrayType type) {
 		arrayType= type;
 	}
+	@Override
 	public CompoundArrayType getCompoundArrayType() {
 		return arrayType;
 	}
 	//
+	@Override
 	public void setSerialNumber(long number) {
 		serialNumber= number;
 	}
+	@Override
 	public long getSerialNumber() {
 		return serialNumber;
 	}
 	//
+	@Override
 	public void setTime(long t) {
 		time= t;
 	}
+	@Override
 	public long getTime() {
 		return time;
 	}
 	//
+	@Override
 	public boolean isLightweightFrame() {
 		return false;
 	}
 	//
+	@Override
 	public void insertComponent(String key, Object frame) {
 		localMemory.put(key,frame);
 	}
 	//
+	@Override
 	public Object getComponent(String key) {
 		return localMemory.get(key);
 	}
 	//
+	@Override
 	public void deleteComponent(String key) {
 		localMemory.remove(key);
 	}
 	//
+	@Override
 	public boolean hasComponent(String key) {
 		return localMemory.containsKey(key);
 	}

@@ -12,6 +12,7 @@ public class UnknownDataAcquisitionBufferOperatingMode extends RuntimeException 
 		mode= m;
 	}
 	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(" + mode.toString() + ")";
 	}

@@ -13,6 +13,7 @@ package morozov.system.gui.dialogs.scalable.common;
 */
 
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.*;
 import morozov.terms.*;
@@ -30,7 +31,7 @@ import java.util.List;
 
 public class AList extends JScrollPane {
 	//
-	public JList<String> list= null;
+	protected JList<String> list= null;
 	protected AbstractDialog targetDialog= null;
 	protected ActiveComponent targetComponent= null;
 	protected int length;
@@ -42,17 +43,16 @@ public class AList extends JScrollPane {
 	public AList(AbstractDialog tD, ActiveComponent tC, String[] stringList, double visibleRowCount, double visibleColumnCount, boolean mode1, boolean mode2) {
 		targetDialog= tD;
 		targetComponent= tC;
-		length= PrologInteger.toInteger(visibleColumnCount);
+		length= Arithmetic.toInteger(visibleColumnCount);
 		enableSorting= mode1;
 		useTabStops= mode2;
 		if (enableSorting) {
-			// Arrays.sort(stringList,new AlphabeticComparator());
 			sortedStrings= new SortedStrings(stringList);
 			stringList= sortedStrings.sortedArray;
 		};
-		list= new JList<String>(stringList);
+		list= new JList<>(stringList);
 		setFixedWidth(list.getFont());
-		list.setVisibleRowCount(PrologInteger.toInteger(visibleRowCount));
+		list.setVisibleRowCount(Arithmetic.toInteger(visibleRowCount));
 		list.setLayoutOrientation(JList.VERTICAL);
 		setViewportView(list);
 		if (useTabStops) {
@@ -61,7 +61,6 @@ public class AList extends JScrollPane {
 		};
 		list.addKeyListener(new ListSearcher(list));
 		list.addListSelectionListener(targetComponent);
-		// list.getModel().addListDataListener(targetComponent);
 	}
 	//
 	public void setLayoutOrientation(int layoutOrientation) {
@@ -98,6 +97,7 @@ public class AList extends JScrollPane {
 		}
 	}
 	//
+	@Override
 	public void setFont(Font font) {
 		if (list!=null) {
 			list.setFont(font);
@@ -112,7 +112,7 @@ public class AList extends JScrollPane {
 	public void setFixedWidth(Font font) {
 		FontMetrics metrics= list.getFontMetrics(font);
 		int charWidth= metrics.charWidth('M');
-		int currentWidth= PrologInteger.toInteger(length*charWidth);
+		int currentWidth= Arithmetic.toInteger(length*charWidth);
 		list.setFixedCellWidth(currentWidth);
 	}
 	//
@@ -134,7 +134,6 @@ public class AList extends JScrollPane {
 					try {
 						int number= value.getSmallIntegerValue(iX);
 						if (number > 0 && number <= model.getSize()) {
-							// list.clearSelection(); 2012.08.29
 							int index= number-1;
 							if (enableSorting) {
 								index= sortedStrings.resolveIndex(index);
@@ -180,9 +179,8 @@ public class AList extends JScrollPane {
 	public void putRange(Term value, ChoisePoint iX) {
 		if (list!=null) {
 			ArrayList<String> stringVector= DialogUtils.listToStringVector(value,iX);
-			String[] stringList= stringVector.toArray(new String[0]);
+			String[] stringList= stringVector.toArray(new String[stringVector.size()]);
 			if (enableSorting) {
-				// Arrays.sort(stringList,new AlphabeticComparator());
 				sortedStrings= new SortedStrings(stringList);
 				stringList= sortedStrings.sortedArray;
 			};
@@ -246,10 +244,10 @@ public class AList extends JScrollPane {
 			}
 		} else {
 			return PrologEmptyList.instance;
-			// return PrologUnknownValue.instance;
 		}
 	}
 	//
+	@Override
 	public void setEnabled(boolean mode) {
 		if (list != null) {
 			if (mode) {
@@ -262,6 +260,7 @@ public class AList extends JScrollPane {
 		}
 	}
 	//
+	@Override
 	public boolean isEnabled() {
 		if (list != null) {
 			return super.isEnabled() && list.isEnabled();

@@ -2,13 +2,14 @@
 
 package morozov.system.gui.space2d;
 
-import morozov.terms.*;
+import morozov.system.*;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Color;
 
 public class Java2DPickOutAndDrawImage extends Java2DCommand {
+	//
 	protected Image image;
 	protected Color color= null;
 	protected double destinationX1= 0;
@@ -43,17 +44,19 @@ public class Java2DPickOutAndDrawImage extends Java2DCommand {
 		sourceX2= sX2;
 		sourceX2= sY2;
 	}
+	//
+	@Override
 	public void execute(Graphics2D g2, DrawingMode drawingMode) {
 		double factorX= drawingMode.getFactorX();
 		double factorY= drawingMode.getFactorY();
-		int integerDestinationX1= PrologInteger.toInteger(destinationX1*factorX);
-		int integerDestinationY1= PrologInteger.toInteger(destinationY1*factorX);
-		int integerDestinationX2= PrologInteger.toInteger(destinationX2*factorX);
-		int integerDestinationY2= PrologInteger.toInteger(destinationY2*factorX);
-		int integerSourceX1= PrologInteger.toInteger(sourceX1*factorX);
-		int integerSourceY1= PrologInteger.toInteger(sourceY1*factorX);
-		int integerSourceX2= PrologInteger.toInteger(sourceX2*factorX);
-		int integerSourceY2= PrologInteger.toInteger(sourceY2*factorX);
+		int integerDestinationX1= Arithmetic.toInteger(destinationX1*factorX);
+		int integerDestinationY1= Arithmetic.toInteger(destinationY1*factorX);
+		int integerDestinationX2= Arithmetic.toInteger(destinationX2*factorX);
+		int integerDestinationY2= Arithmetic.toInteger(destinationY2*factorX);
+		int integerSourceX1= Arithmetic.toInteger(sourceX1*factorX);
+		int integerSourceY1= Arithmetic.toInteger(sourceY1*factorX);
+		int integerSourceX2= Arithmetic.toInteger(sourceX2*factorX);
+		int integerSourceY2= Arithmetic.toInteger(sourceY2*factorX);
 		if (color==null) {
 			g2.drawImage(
 				image,

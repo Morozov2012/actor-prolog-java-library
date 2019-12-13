@@ -20,28 +20,25 @@ public class DomainItem extends MonoArgumentDomainItem {
 		super(entry);
 	}
 	//
+	@Override
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
-		// initiateDomainItemIfNecessary();
-		// t= t.dereferenceValue(cp);
 		return t.isCoveredByDomain(domainItem,cp,ignoreFreeVariables);
 	}
+	@Override
 	public Term checkAndOptimizeTerm(Term t, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
-		// initiateDomainItemIfNecessary();
-		// t= t.dereferenceValue(cp);
 		return domainItem.checkAndOptimizeTerm(t,cp);
 	}
+	@Override
 	public Term checkTerm(Term t, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
-		// initiateDomainItemIfNecessary();
-		// t= t.dereferenceValue(cp);
 		return domainItem.checkTerm(t,cp);
 	}
 	//
+	@Override
 	public boolean isEqualTo(DomainAlternative a, HashSet<PrologDomainPair> stack) {
-		// initiateDomainItemIfNecessary();
 		return a.isEqualToItem(domainItem,stack);
 	}
+	@Override
 	public boolean isEqualToItem(PrologDomain domain, HashSet<PrologDomainPair> stack) {
-		// initiateDomainItemIfNecessary();
 		try {
 			domainItem.isEqualTo(domain,stack);
 			return true;
@@ -49,8 +46,8 @@ public class DomainItem extends MonoArgumentDomainItem {
 			return false;
 		}
 	}
+	@Override
 	public boolean coversAlternative(DomainAlternative a, PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) {
-		// initiateDomainItemIfNecessary();
 		try {
 			domainItem.coversAlternative(a,ownerDomain,stack);
 			return true;
@@ -59,6 +56,7 @@ public class DomainItem extends MonoArgumentDomainItem {
 		}
 	}
 	//
+	@Override
 	protected String getMonoArgumentDomainTag() {
 		return PrologDomainName.tagDomainAlternative_DomainItem;
 	}

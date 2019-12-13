@@ -5,7 +5,6 @@ package morozov.system.gui.space2d;
 import target.*;
 
 import morozov.run.*;
-import morozov.system.*;
 import morozov.system.converters.*;
 import morozov.system.gui.space2d.errors.*;
 import morozov.system.signals.*;
@@ -20,7 +19,7 @@ import java.util.Iterator;
 
 public class StrokeAndColor extends BasicStroke {
 	//
-	public Color color= null;
+	protected Color color= null;
 	//
 	public StrokeAndColor(Color c, float width, int cap, int join, float miterlimit) {
 		super(width,cap,join,miterlimit);
@@ -41,7 +40,7 @@ public class StrokeAndColor extends BasicStroke {
 		float miterLimit= 10.0f;
 		float[] dashArray= null;
 		float dashPhase= 0.0f;
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		HashMap<Long,Term> setPositiveMap= new HashMap<>();
 		Term setEnd= value.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
 		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -53,7 +52,7 @@ public class StrokeAndColor extends BasicStroke {
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_color) {
 					try {
-						color= ExtendedColor.argumentToColor(pairValue,iX);
+						color= ColorAttributeConverters.argumentToColor(pairValue,iX);
 					} catch (TermIsSymbolDefault e1) {
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_lineWidth) {
@@ -81,7 +80,7 @@ public class StrokeAndColor extends BasicStroke {
 			return node;
 		} else {
 			try {
-				color= ExtendedColor.argumentToColor(value,iX);
+				color= ColorAttributeConverters.argumentToColor(value,iX);
 				StrokeAndColor node= new StrokeAndColor(color,lineWidth,endCap,lineJoin,miterLimit);
 				return node;
 			} catch (TermIsSymbolDefault e1) {

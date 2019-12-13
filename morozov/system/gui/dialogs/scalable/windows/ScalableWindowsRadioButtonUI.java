@@ -15,10 +15,14 @@ import javax.swing.AbstractButton;
 import com.sun.java.swing.plaf.windows.WindowsRadioButtonUI;
 
 public class ScalableWindowsRadioButtonUI extends WindowsRadioButtonUI {
-	private boolean icon_is_copied= false;
+	//
+	protected boolean icon_is_copied= false;
+	//
 	public static ComponentUI createUI(JComponent c) {
 		return new ScalableWindowsRadioButtonUI();
 	}
+	//
+	@Override
 	public void installDefaults(AbstractButton b) {
 		super.installDefaults(b);
 		if(!icon_is_copied) {
@@ -28,6 +32,7 @@ public class ScalableWindowsRadioButtonUI extends WindowsRadioButtonUI {
 			icon_is_copied= true;
 		}
 	}
+	@Override
 	public void uninstallDefaults(AbstractButton b) {
 		super.uninstallDefaults(b);
 		icon_is_copied= false;

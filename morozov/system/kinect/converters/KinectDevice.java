@@ -51,6 +51,7 @@ public class KinectDevice implements KinectDeviceInterface {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void update(KinectDeviceInterface newAttributes, KinectDisplayingModeInterface givenDisplayingMode, KinectPerformanceOptimization givenOptimizationMode, ChoisePoint iX) {
 		useNoDevice.set(newAttributes.getUseNoDevice());
 		Kinect newDevice= newAttributes.getDevice();
@@ -64,60 +65,75 @@ public class KinectDevice implements KinectDeviceInterface {
 		}
 	}
 	//
+	@Override
 	public KinectFrameWritableBaseAttributes createKinectFrameWritableBaseAttributes() {
 		return device.get().createKinectFrameWritableBaseAttributes();
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean getUseNoDevice() {
 		return useNoDevice.get();
 	}
+	@Override
 	public Kinect getDevice() {
 		return device.get();
 	}
+	@Override
 	public KinectFrameType[] getDataAcquisitionMode() {
 		return dataAcquisitionMode.get();
 	}
+	@Override
 	public KinectBufferInterface getBuffer() {
 		return buffer.get();
 	}
+	@Override
 	public boolean getRequireExclusiveAccess() {
 		return requireExclusiveAccess.get();
 	}
+	@Override
 	public KinectDisplayingModeInterface getDisplayingMode() {
 		return displayingMode.get();
 	}
+	@Override
 	public KinectPerformanceOptimization getPerformanceOptimization() {
 		return performanceOptimization.get();
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setIsRegistered(boolean mode) {
 		isRegistered.set(mode);
 	}
 	//
+	@Override
 	public boolean isRegistered() {
 		return isRegistered.get();
 	}
+	@Override
 	public boolean isNotRegistered() {
 		return !isRegistered.get();
 	}
 	//
+	@Override
 	public void setIsSuspended(boolean mode) {
 		isSuspended.set(mode);
 	}
 	//
+	@Override
 	public boolean isSuspended() {
 		return isSuspended.get();
 	}
+	@Override
 	public boolean isNotSuspended() {
 		return !isSuspended.get();
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void registerListener(KinectDisplayingModeInterface givenDisplayingMode, KinectPerformanceOptimization givenOptimizationMode, boolean accessMode, ChoisePoint iX) {
 		if (!useNoDevice.get()) {
 			displayingMode.set(givenDisplayingMode);
@@ -133,6 +149,7 @@ public class KinectDevice implements KinectDeviceInterface {
 			throw new InputDeviceIsNotDefined();
 		}
 	}
+	@Override
 	public void activate(ChoisePoint iX) {
 		if (!useNoDevice.get()) {
 			isSuspended.set(false);
@@ -142,6 +159,7 @@ public class KinectDevice implements KinectDeviceInterface {
 		}
 	}
 	//
+	@Override
 	public boolean isRegisteredListener(ChoisePoint iX) {
 		if (!useNoDevice.get()) {
 			if (isRegistered.get()) {
@@ -158,6 +176,7 @@ public class KinectDevice implements KinectDeviceInterface {
 		}
 	}
 	//
+	@Override
 	public boolean hasExclusiveAccess(ChoisePoint iX) {
 		if (!useNoDevice.get()) {
 			if (isRegistered.get()) {
@@ -174,6 +193,7 @@ public class KinectDevice implements KinectDeviceInterface {
 		}
 	}
 	//
+	@Override
 	public void cancelListener(ChoisePoint iX) {
 		if (!useNoDevice.get()) {
 			if (performanceOptimization.get()==KinectPerformanceOptimization.OPERATION_SPEED) {
@@ -191,6 +211,7 @@ public class KinectDevice implements KinectDeviceInterface {
 		}
 	}
 	//
+	@Override
 	public void suspendListener(ChoisePoint iX) {
 		if (!useNoDevice.get()) {
 			device.get().suspendListener(this,iX);
@@ -201,6 +222,7 @@ public class KinectDevice implements KinectDeviceInterface {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode) {
 		if (dataAcquisitionMode.get() != null) {
 			KinectDataAcquisitionModeTools.refineDataAcquisitionMode(dataAcquisitionMode.get(),consolidatedMode,displayingMode.get());
@@ -208,6 +230,7 @@ public class KinectDevice implements KinectDeviceInterface {
 			throw new InputDeviceIsNotDefined();
 		}
 	}
+	@Override
 	public boolean requiresFrameType(KinectDataArrayType proposedFrameType) {
 		if (dataAcquisitionMode.get() != null) {
 			KinectFrameType actingFrameType= displayingMode.get().getActingFrameType();
@@ -219,6 +242,54 @@ public class KinectDevice implements KinectDeviceInterface {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
+	public boolean requiresDepthFrames() {
+		return requiresFrameType(KinectDataArrayType.DEPTH_FRAME);
+	}
+	@Override
+	public boolean requiresInfraredFrames() {
+		return requiresFrameType(KinectDataArrayType.INFRARED_FRAME);
+	}
+	@Override
+	public boolean requiresLongExposureInfraredFrames() {
+		return requiresFrameType(KinectDataArrayType.LONG_EXPOSURE_INFRARED_FRAME);
+	}
+	@Override
+	public boolean requiresMappedColorFrames() {
+		return requiresFrameType(KinectDataArrayType.MAPPED_COLOR_FRAME);
+	}
+	@Override
+	public boolean requiresEntirePointClouds() {
+		if (dataAcquisitionMode.get() != null) {
+			KinectDisplayingModeInterface mode= displayingMode.get();
+			KinectPeopleIndexMode actignPeopleIndexMode= mode.getActingPeopleIndexMode();
+			if (!actignPeopleIndexMode.peopleAreToBeExtracted()) {
+				KinectFrameType actingFrameType= mode.getActingFrameType();
+				return KinectDataAcquisitionModeTools.requiresFrameType(dataAcquisitionMode.get(),KinectDataArrayType.POINT_CLOUDS_FRAME,actingFrameType);
+			}
+		};
+		return false;
+	}
+	@Override
+	public boolean requiresForegroundPointClouds() {
+		if (dataAcquisitionMode.get() != null) {
+			KinectDisplayingModeInterface mode= displayingMode.get();
+			KinectPeopleIndexMode actignPeopleIndexMode= mode.getActingPeopleIndexMode();
+			if (actignPeopleIndexMode.peopleAreToBeExtracted()) {
+				KinectFrameType actingFrameType= mode.getActingFrameType();
+				return KinectDataAcquisitionModeTools.requiresFrameType(dataAcquisitionMode.get(),KinectDataArrayType.POINT_CLOUDS_FRAME,actingFrameType);
+			}
+		};
+		return false;
+	}
+	@Override
+	public boolean requiresColorFrames() {
+		return requiresFrameType(KinectDataArrayType.COLOR_FRAME);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	@Override
 	public void sendKinectFrame(KinectFrameInterface frame) {
 		if (!useNoDevice.get()) {
 			if (!isSuspended.get()) {
@@ -287,6 +358,7 @@ public class KinectDevice implements KinectDeviceInterface {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term toTerm() {
 		if (useNoDevice.get()) {
 			return termNone;

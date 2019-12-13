@@ -35,6 +35,7 @@ public class BlobIntersection {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public String toString() {
 		return	String.format("%d",commonAreaSize) + ": " +
 			String.format("%d",index1) +

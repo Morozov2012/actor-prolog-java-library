@@ -14,7 +14,7 @@ import java.util.ArrayList;
 
 public abstract class DynamicWorlds extends LambdaArray {
 	//
-	protected HashMap<ArrayIndices,AbstractWorld> createdWorlds= new HashMap<ArrayIndices,AbstractWorld>();
+	protected HashMap<ArrayIndices,AbstractWorld> createdWorlds= new HashMap<>();
 	protected ArrayList<AbstractInternalWorld> specialWorlds= null;
 	//
 	public DynamicWorlds() {
@@ -25,42 +25,44 @@ public abstract class DynamicWorlds extends LambdaArray {
 	//
 	abstract public Term getBuiltInSlot_E_prototype();
 	//
+	@Override
 	protected Term accessArrayElement(ArrayIndices arrayIndices, ChoisePoint cp) throws Backtracking {
 		AbstractWorld staticValue= createdWorlds.get(arrayIndices);
 		SlotVariable dynamicValue;
 		if (staticValue==null) {
-			// Create and initialize new world
+			// Create and initialize new world:
 			PrologArray array= (PrologArray)getBuiltInSlot_E_prototype();
 			staticValue= array.createWorld();
 			array.initiateWorld(staticValue);
 			if (staticValue.isSpecialWorld()) {
 				if (specialWorlds==null) {
-					specialWorlds= new ArrayList<AbstractInternalWorld>();
+					specialWorlds= new ArrayList<>();
 				};
 				AbstractInternalWorld internalWorld= (AbstractInternalWorld)staticValue;
 				specialWorlds.add(internalWorld);
 			};
 			staticValue.startProcesses();
-			// Remember new world
+			// Remember new world:
 			createdWorlds.put(arrayIndices,staticValue);
-			// Create new backtrackable array item
+			// Create new backtrackable array item:
 			dynamicValue= new SlotVariable();
 			volume.put(arrayIndices,dynamicValue);
 			cp.pushTrail(new HashMapState(volume,arrayIndices,dynamicValue));
 		} else {
 			dynamicValue= volume.get(arrayIndices);
 			if (dynamicValue==null) {
-				// Create new backtrackable array item
+				// Create new backtrackable array item:
 				dynamicValue= new SlotVariable();
 				volume.put(arrayIndices,dynamicValue);
 				cp.pushTrail(new HashMapState(volume,arrayIndices,dynamicValue));
 			}
 		};
-		// Unify array item
+		// Unify array item:
 		dynamicValue.unifyWith(staticValue,cp);
 		return staticValue;
 	}
 	//
+	@Override
 	public void startProcesses() {
 		Collection<AbstractWorld> allWorlds= createdWorlds.values();
 		Iterator<AbstractWorld> allWorldsIterator= allWorlds.iterator();
@@ -70,6 +72,7 @@ public abstract class DynamicWorlds extends LambdaArray {
 		}
 	}
 	//
+	@Override
 	public void releaseSystemResources() {
 		Collection<AbstractWorld> allWorlds= createdWorlds.values();
 		Iterator<AbstractWorld> allWorldsIterator= allWorlds.iterator();
@@ -80,6 +83,7 @@ public abstract class DynamicWorlds extends LambdaArray {
 		super.releaseSystemResources();
 	}
 	//
+	@Override
 	public void stopProcesses() {
 		Collection<AbstractWorld> allWorlds= createdWorlds.values();
 		Iterator<AbstractWorld> allWorldsIterator= allWorlds.iterator();
@@ -89,10 +93,12 @@ public abstract class DynamicWorlds extends LambdaArray {
 		}
 	}
 	//
+	@Override
 	public boolean isSpecialWorld() {
 		return true;
 	}
 	//
+	@Override
 	public void finishPhaseSuccessfully() {
 		if (specialWorlds != null) {
 			Iterator<AbstractInternalWorld> iterator= specialWorlds.iterator();
@@ -103,6 +109,7 @@ public abstract class DynamicWorlds extends LambdaArray {
 		}
 	}
 	//
+	@Override
 	public void finishPhaseUnsuccessfully() {
 		if (specialWorlds != null) {
 			Iterator<AbstractInternalWorld> iterator= specialWorlds.iterator();

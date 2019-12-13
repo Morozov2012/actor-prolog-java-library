@@ -12,26 +12,31 @@ import morozov.terms.signals.*;
 public enum PopOperationMode {
 	//
 	AND {
+		@Override
 		public Term toTerm() {
 			return term_AND;
 		}
 	},
 	OR {
+		@Override
 		public Term toTerm() {
 			return term_OR;
 		}
 	},
 	XOR {
+		@Override
 		public Term toTerm() {
 			return term_XOR;
 		}
 	},
 	ASSIGN_FOREGROUND {
+		@Override
 		public Term toTerm() {
 			return term_ASSIGN_FOREGROUND;
 		}
 	},
 	FORGET_FOREGROUND {
+		@Override
 		public Term toTerm() {
 			return term_FORGET_FOREGROUND;
 		}

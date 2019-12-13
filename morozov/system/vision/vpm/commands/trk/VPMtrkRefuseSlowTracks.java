@@ -17,6 +17,7 @@ public class VPMtrkRefuseSlowTracks extends VPM_SnapshotCommand {
 		fuzzyThresholdBorder= givenFuzzyThresholdBorder;
 	}
 	//
+	@Override
 	public void execute(VPM_Snapshot snapshot) {
 		snapshot.setSlowTrackDeletionAttributes(velocityThreshold,distanceThreshold,fuzzyThresholdBorder);
 	}

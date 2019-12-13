@@ -2,13 +2,14 @@
 
 package morozov.system.gui.space2d;
 
-import morozov.terms.*;
+import morozov.system.*;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Color;
 
 public class Java2DScaleAndDrawImage extends Java2DCommand {
+	//
 	protected Image image;
 	protected Color color= null;
 	protected double x1= 0;
@@ -31,16 +32,18 @@ public class Java2DScaleAndDrawImage extends Java2DCommand {
 		width= aWidth;
 		height= aHeight;
 	}
+	//
+	@Override
 	public void execute(Graphics2D g2, DrawingMode drawingMode) {
 		double factorX= drawingMode.getFactorX();
 		double factorY= drawingMode.getFactorY();
-		int integerX= PrologInteger.toInteger(x1*factorX);
-		int integerY= PrologInteger.toInteger(y1*factorY);
+		int integerX= Arithmetic.toInteger(x1*factorX);
+		int integerY= Arithmetic.toInteger(y1*factorY);
 		int integerWidth;
 		int integerHeight;
 		if (width > 0 && height > 0) {
-			integerWidth= PrologInteger.toInteger(width*factorX);
-			integerHeight= PrologInteger.toInteger(height*factorY);
+			integerWidth= Arithmetic.toInteger(width*factorX);
+			integerHeight= Arithmetic.toInteger(height*factorY);
 		} else if (width <= 0 && height <= 0) {
 			int imageWidth= image.getWidth(null);
 			int imageHeight= image.getHeight(null);
@@ -51,11 +54,11 @@ public class Java2DScaleAndDrawImage extends Java2DCommand {
 			double actualWindowHeight= windowHeight*(1.0-y1);
 			double windowRatio= actualWindowWidth / actualWindowHeight;
 			if (windowRatio > imageRatio) {
-				integerHeight= PrologInteger.toInteger(actualWindowHeight);
-				integerWidth= PrologInteger.toInteger(actualWindowHeight*imageRatio);
+				integerHeight= Arithmetic.toInteger(actualWindowHeight);
+				integerWidth= Arithmetic.toInteger(actualWindowHeight*imageRatio);
 			} else {
-				integerWidth= PrologInteger.toInteger(actualWindowWidth);
-				integerHeight= PrologInteger.toInteger(actualWindowWidth/imageRatio);
+				integerWidth= Arithmetic.toInteger(actualWindowWidth);
+				integerHeight= Arithmetic.toInteger(actualWindowWidth/imageRatio);
 			}
 		} else {
 			int imageWidth= image.getWidth(null);
@@ -64,13 +67,13 @@ public class Java2DScaleAndDrawImage extends Java2DCommand {
 			if (width <= 0) {
 				int windowHeight= drawingMode.getWindowHeight();
 				double actualWindowHeight= height*windowHeight;
-				integerHeight= PrologInteger.toInteger(actualWindowHeight);
-				integerWidth= PrologInteger.toInteger(actualWindowHeight*imageRatio);
+				integerHeight= Arithmetic.toInteger(actualWindowHeight);
+				integerWidth= Arithmetic.toInteger(actualWindowHeight*imageRatio);
 			} else {
 				int windowWidth= drawingMode.getWindowWidth();
 				double actualWindowWidth= width*windowWidth;
-				integerWidth= PrologInteger.toInteger(actualWindowWidth);
-				integerHeight= PrologInteger.toInteger(actualWindowWidth/imageRatio);
+				integerWidth= Arithmetic.toInteger(actualWindowWidth);
+				integerHeight= Arithmetic.toInteger(actualWindowWidth/imageRatio);
 			}
 		};
 		if (color==null) {

@@ -13,10 +13,11 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 
 public class ArrayUtils {
+	//
 	protected static Term termNone= new PrologSymbol(SymbolCodes.symbolCode_E_none);
 	//
 	public static IndexRange[] termsToIndexRanges(Term value, ChoisePoint iX) {
-		ArrayList<IndexRange> list= new ArrayList<IndexRange>();
+		ArrayList<IndexRange> list= new ArrayList<>();
 		Term nextHead= null;
 		Term currentTail= value;
 		try {
@@ -30,8 +31,7 @@ public class ArrayUtils {
 					Term internalListTail= nextHead.getNextListTail(iX);
 					Term rightBound= internalListTail.getNextListHead(iX);
 					right= argumentToIndexBound(iX,rightBound,true);
-					internalListTail= internalListTail.getNextListTail(iX);
-					// String description= nextHead.getStringValue(iX);
+					internalListTail.getNextListTail(iX);
 				} catch (EndOfList e) {
 					if (left==null || right==null) {
 						throw new WrongArgumentIsNotIndexRange(nextHead);
@@ -46,7 +46,7 @@ public class ArrayUtils {
 		} catch (TermIsNotAList e) {
 			throw new WrongArgumentIsNotIndexRangeList(currentTail);
 		};
-		return list.toArray(new IndexRange[0]);
+		return list.toArray(new IndexRange[list.size()]);
 	}
 	public static BigInteger argumentToIndexBound(ChoisePoint iX, Term value, boolean isRightBound) {
 		value= value.dereferenceValue(iX);

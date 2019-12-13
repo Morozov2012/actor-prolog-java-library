@@ -27,9 +27,11 @@ public abstract class Term implements Cloneable, Serializable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public int hashCode() {
 		return System.identityHashCode(this);
 	}
+	@Override
 	public boolean equals(Object o2) {
 		if (o2 instanceof Term) {
 			return ((Term)o2).compareWithClass(this.getClass())==0;
@@ -325,9 +327,6 @@ public abstract class Term implements Cloneable, Serializable {
 	public Term getNamedElement(long aName, ChoisePoint cp) throws Backtracking {
 		throw Backtracking.instance;
 	}
-	// public Term checkSetAndGetNamedElement(long aName, ChoisePoint cp) throws Backtracking, TermIsNotASet {
-	//	throw TermIsNotASet.instance;
-	// }
 	public void checkIfTermIsASet(ChoisePoint cp) throws TermIsNotASet {
 		throw TermIsNotASet.instance;
 	}
@@ -609,6 +608,7 @@ public abstract class Term implements Cloneable, Serializable {
 	public String toString(ChoisePoint cp) {
 		return toString(cp,false,false,true,null);
 	}
+	@Override
 	public String toString() {
 		return toString(null,true,false,false,null);
 	}

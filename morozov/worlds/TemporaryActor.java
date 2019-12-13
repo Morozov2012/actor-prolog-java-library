@@ -15,9 +15,11 @@ public class TemporaryActor extends ActorNumber {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean isNumberOfTemporaryActor() {
 		return true;
 	}
+	@Override
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		if (t != this)
 			throw Backtracking.instance;

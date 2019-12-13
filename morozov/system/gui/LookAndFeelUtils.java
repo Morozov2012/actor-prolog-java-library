@@ -15,10 +15,10 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 
 public class LookAndFeelUtils {
+	//
 	public static synchronized void assignLookAndFeel() {
 		boolean useMetalLookAndFeel= false;
 		String osName= System.getProperty("os.name");
-		// if (false && (osName != null) && (osName.indexOf("Windows") != -1)) {
 		if ((osName != null) && (osName.indexOf("Windows") != -1)) {
 			try {
 				UIManager.setLookAndFeel(new ActorPrologWindowsLookAndFeel());
@@ -28,7 +28,6 @@ public class LookAndFeelUtils {
 		} else {
 			useMetalLookAndFeel= true;
 		};
-		// useMetalLookAndFeel= true; // DEBUG: 2011.01.21
 		if (useMetalLookAndFeel) {
 			try {
 				UIManager.setLookAndFeel(new ActorPrologMetalLookAndFeel());

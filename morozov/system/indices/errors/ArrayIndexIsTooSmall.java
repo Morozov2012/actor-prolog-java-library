@@ -5,14 +5,16 @@ package morozov.system.indices.errors;
 import java.math.BigInteger;
 
 public class ArrayIndexIsTooSmall extends RuntimeException {
-	public BigInteger indexValue;
-	public BigInteger indexBound;
+	//
+	protected BigInteger indexValue;
+	protected BigInteger indexBound;
 	//
 	public ArrayIndexIsTooSmall(BigInteger value, BigInteger bound) {
 		indexValue= value;
 		indexBound= bound;
 	}
 	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(" + indexValue.toString() + "<" + indexBound.toString() + ")";
 	}

@@ -10,12 +10,13 @@ import java.util.Arrays;
 
 public class VPMmskPushForeground extends VPM_FrameCommand {
 	//
-	PushOperationMode mode;
+	protected PushOperationMode mode;
 	//
 	public VPMmskPushForeground(PushOperationMode m) {
 		mode= m;
 	}
 	//
+	@Override
 	public void execute(VPM vpm) {
 		boolean[] previousMask= vpm.pushForegroundMask();
 		int length= previousMask.length;

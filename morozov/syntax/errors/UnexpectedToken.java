@@ -1,4 +1,4 @@
-// (c) 2010 IRE RAS Alexei A. Morozov
+// (c) 2019 IRE RAS Alexei A. Morozov
 
 package morozov.syntax.errors;
 
@@ -17,6 +17,7 @@ public class UnexpectedToken extends ParserError {
 		return token;
 	}
 	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(token: " + token.toActorPrologTerm().toString() + "; position:" + Integer.toString(position) + ")";
 	}

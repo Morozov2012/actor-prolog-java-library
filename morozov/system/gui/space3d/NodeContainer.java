@@ -83,13 +83,9 @@ public class NodeContainer {
 		if (type==ContentType.Node) {
 			if (node instanceof Shape3D) {
 				((Shape3D)node).setAppearance(appearance);
-			// } else {
-			//	throw new LabeledObjectIsNotAShape3D(label);
 			} else if (node instanceof Primitive) {
 				((Primitive)node).setAppearance(appearance);
 			}
-		// } else {
-		//	throw new OperationIsNotDefinedForThisTypeOfNode(type);
 		}
 	}
 	public void setColoringAttributes(ColoringAttributes coloringAttributes) {
@@ -98,15 +94,11 @@ public class NodeContainer {
 				Shape3D shape= (Shape3D)node;
 				Appearance appearance= shape.getAppearance();
 				appearance.setColoringAttributes(coloringAttributes);
-			// } else {
-			//	throw new LabeledObjectIsNotAShape3D(label);
 			} else if (node instanceof Primitive) {
 				Primitive shape= (Primitive)node;
 				Appearance appearance= shape.getAppearance();
 				appearance.setColoringAttributes(coloringAttributes);
 			}
-		// } else {
-		//	throw new OperationIsNotDefinedForThisTypeOfNode(type);
 		}
 	}
 	public void setFont3D(Font3D font) {
@@ -115,14 +107,8 @@ public class NodeContainer {
 				Geometry geometry= ((Shape3D)node).getGeometry();
 				if (geometry instanceof Text3D) {
 					((Text3D)geometry).setFont3D(font);
-				// } else {
-				//	throw new LabeledObjectIsNotAText3D(label);
 				}
-			// } else {
-			//	throw new LabeledObjectIsNotAShape3D(label);
 			}
-		// } else {
-		//	throw new OperationIsNotDefinedForThisTypeOfNode(type);
 		}
 	}
 	public void setString(String text) {
@@ -131,14 +117,8 @@ public class NodeContainer {
 				Geometry geometry= ((Shape3D)node).getGeometry();
 				if (geometry instanceof Text3D) {
 					((Text3D)geometry).setString(text);
-				// } else {
-				//	throw new LabeledObjectIsNotAText3D(label);
 				}
-			// } else {
-			//	throw new LabeledObjectIsNotAShape3D(label);
 			}
-		// } else {
-		//	throw new OperationIsNotDefinedForThisTypeOfNode(type);
 		}
 	}
 	//
@@ -165,19 +145,4 @@ public class NodeContainer {
 			throw new LabeledObjectIsNotPointLight(label);
 		}
 	}
-	//
-	// public Point3f retrievePointLightPosition(NodeLabel label) {
-	//	if (type==ContentType.Node) {
-	//		if (node instanceof PointLight) {
-	//			PointLight pl= (PointLight)node;
-	//			Point3f position= new Point3f();
-	//			pl.getPosition(position);
-	//			return position;
-	//		} else {
-	//			throw new LabeledObjectIsNotPointLight(label);
-	//		}
-	//	} else {
-	//		throw new LabeledObjectIsNotPointLight(label);
-	//	}
-	// }
 }

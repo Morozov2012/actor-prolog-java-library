@@ -27,7 +27,7 @@ public class Control3D extends CustomControlComponent {
 	protected ExtendedSpace3D space;
 	protected morozov.built_in.Canvas3D currentValue= null;
 	//
-	protected int minimalSafeSize= 35; // Wintel7: > 31, <= 32
+	protected int minimalSafeSize= 35;
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -42,35 +42,37 @@ public class Control3D extends CustomControlComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void putValue(Term value, ChoisePoint iX) {
 		if (component!=null) {
 			value= value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 			if (value instanceof morozov.built_in.Canvas3D) {
 				if (currentValue != null) {
-					currentValue.release(targetDialog.isModal,iX);
+					currentValue.release(targetDialog.isModal(),iX);
 				};
 				currentValue= (morozov.built_in.Canvas3D)value;
 				currentValue.registerCanvasSpace(space,iX);
-				currentValue.draw(targetDialog.isModal,iX);
-				// targetDialog.invalidate();
-				// targetDialog.repaint();
+				currentValue.draw(targetDialog.isModal(),iX);
 				targetDialog.safelyInvalidateAndRepaint();
 			}
 		}
 	}
 	//
+	@Override
 	public Term getValue() {
 		return currentValue;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setDimension(Dimension dimension) {
 		if (component!=null) {
 			component.setMinimumSize(dimension);
 			component.setPreferredSize(dimension);
 		}
 	}
+	@Override
 	public void setBackground(Color c) {
 		super.setBackground(c);
 	}

@@ -5,6 +5,7 @@ package morozov.domains.signals;
 import morozov.run.*;
 
 public final class UnknownPairName extends LightweightException {
+	//
 	public static final UnknownPairName instance= new UnknownPairName();
 	//
 	private UnknownPairName() {

@@ -13,7 +13,7 @@ import java.util.HashMap;
 
 public class HashMapTable extends DatabaseTable {
 	//
-	protected HashMap<Term,DatabaseRecord> databaseHash= new HashMap<Term,DatabaseRecord>();
+	protected HashMap<Term,DatabaseRecord> databaseHash= new HashMap<>();
 	//
 	protected static Term termHashMap= new PrologSymbol(SymbolCodes.symbolCode_E_HashMap);
 	//
@@ -34,12 +34,14 @@ public class HashMapTable extends DatabaseTable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term getType() {
 		return termHashMap;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public DatabaseRecord insertRecord(Term copy, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX, boolean isInnerOperation) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
 		Term key= DatabaseUtils.extractMapKey(copy,iX);
@@ -59,6 +61,7 @@ public class HashMapTable extends DatabaseTable {
 		}
 	}
 	//
+	@Override
 	public DatabaseRecord appendRecord(Term copy, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX, boolean isInnerOperation) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
 		Term key= DatabaseUtils.extractMapKey(copy,iX);
@@ -131,6 +134,7 @@ public class HashMapTable extends DatabaseTable {
 		}
 	}
 	//
+	@Override
 	public void retractAll(ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
 		databaseHash.clear();
@@ -139,6 +143,7 @@ public class HashMapTable extends DatabaseTable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void retractCurrentRecord(DatabaseRecord currentRecord, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
 		Term key= DatabaseUtils.extractMapKey(currentRecord.content,iX);
@@ -148,9 +153,10 @@ public class HashMapTable extends DatabaseTable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Object clone() {
 		HashMapTable o= (HashMapTable)super.clone();
-		o.databaseHash= new HashMap<Term,DatabaseRecord>();
+		o.databaseHash= new HashMap<>();
 		return o;
 	}
 }

@@ -58,8 +58,6 @@ public class GeneralSkeletonTools {
 				System.arraycopy(positions,4+id*J4K2.JointType_Count*3,data,0,J4K2.JointType_Count*3);
 				skeleton.setJointPositions(data);
 				break;
-			// otherwise:
-			//	throw new UnknownDeviceType();
 			}
 		} else {
 			return skeleton;
@@ -240,11 +238,6 @@ public class GeneralSkeletonTools {
 		if (Skeleton.THUMB_LEFT < arrayLength) {
 			state= minimalState(skeleton,Skeleton.THUMB_LEFT,Skeleton.HAND_LEFT);
 			if (state != Skeleton.NOT_TRACKED) {
-				// int thumbLeftX= fX[Skeleton.THUMB_LEFT];
-				// int thumbLeftY= fY[Skeleton.THUMB_LEFT];
-				// int handLeftX= fX[Skeleton.HAND_LEFT];
-				// int handLeftY= fY[Skeleton.HAND_LEFT];
-				// drawLine(g2,state,x0,y0,thumbLeftX,thumbLeftY,handLeftX,handLeftY,imageWidth,imageHeight,scaledImageWidth,scaledImageHeight,thinLineStroke,heavyLineStroke);
 				int thumbLeftX= fX[Skeleton.THUMB_LEFT];
 				int thumbLeftY= fY[Skeleton.THUMB_LEFT];
 				int wristLeftX= fX[Skeleton.WRIST_LEFT];
@@ -309,11 +302,6 @@ public class GeneralSkeletonTools {
 		if (Skeleton.THUMB_RIGHT < arrayLength) {
 			state= minimalState(skeleton,Skeleton.THUMB_RIGHT,Skeleton.HAND_RIGHT);
 			if (state != Skeleton.NOT_TRACKED) {
-				// int thumbRightX= fX[Skeleton.THUMB_RIGHT];
-				// int thumbRightY= fY[Skeleton.THUMB_RIGHT];
-				// int handRightX= fX[Skeleton.HAND_RIGHT];
-				// int handRightY= fY[Skeleton.HAND_RIGHT];
-				// drawLine(g2,state,x0,y0,thumbRightX,thumbRightY,handRightX,handRightY,imageWidth,imageHeight,scaledImageWidth,scaledImageHeight,thinLineStroke,heavyLineStroke);
 				int thumbRightX= fX[Skeleton.THUMB_RIGHT];
 				int thumbRightY= fY[Skeleton.THUMB_RIGHT];
 				int wristRightX= fX[Skeleton.WRIST_RIGHT];

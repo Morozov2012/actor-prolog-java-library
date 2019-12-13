@@ -3,6 +3,7 @@
 package morozov.system;
 
 import morozov.run.*;
+import morozov.system.converters.errors.*;
 import morozov.system.errors.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
@@ -13,13 +14,14 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class FormatOutput {
+	//
 	static {
 		try {
 			Locale.setDefault(Locale.ENGLISH);
 		} catch (SecurityException e) {
 		}
 	};
-	// Output operations
+	// Output operations:
 	public static StringBuilder termsToString(ChoisePoint cp, Term... args) {
 		StringBuilder textBuffer= new StringBuilder();
 		for(int i= 0; i < args.length; i++) {
@@ -45,7 +47,7 @@ public class FormatOutput {
 		StringBuilder textBuffer= new StringBuilder();
 		String formatString= new String();
 		boolean formatStringIsAccepted= false;
-		ArrayList<Term> argumentTable= new ArrayList<Term>();
+		ArrayList<Term> argumentTable= new ArrayList<>();
 		for(int i= 0; i < args.length; i++) {
 			Term item= args[i];
 			if (item.thisIsArgumentNumber()) {
@@ -112,7 +114,7 @@ public class FormatOutput {
 		return textBuffer;
 	}
 	//
-	private static int format_length(String commands) {
+	protected static int format_length(String commands) {
 		boolean flag= false;
 		int counter= 0;
 		for (int n=0; n < commands.length(); n++) {
@@ -139,7 +141,7 @@ public class FormatOutput {
 		return counter;
 	}
 	//
-	private static int front_length(String commands) {
+	protected static int front_length(String commands) {
 		int counter= 0;
 		for (int n=0; n < commands.length(); n++) {
 			if (counter < commands.length()) {
@@ -160,7 +162,7 @@ public class FormatOutput {
 		return counter;
 	}
 	//
-	private static StringBuilder output_item(StringBuilder textBuffer, String formatString, ChoisePoint cp, Term v) {
+	protected static StringBuilder output_item(StringBuilder textBuffer, String formatString, ChoisePoint cp, Term v) {
 		v= v.dereferenceValue(cp);
 		if (v.thisIsFreeVariable()) {
 			textBuffer.append("_");
@@ -185,7 +187,7 @@ public class FormatOutput {
 		return textBuffer;
 	}
 	//
-	private static boolean is_format_c(String format) {
+	protected static boolean is_format_c(String format) {
 		boolean isFormatString= false;
 		int counter= 0;
 		for (int i= 0; i < format.length(); i++) {
@@ -265,9 +267,6 @@ public class FormatOutput {
 				} else if (c=='\\') {
 					containsSpecialCharacters= true;
 					break;
-				// } else if (c >= 0xFE) {
-				//	containsSpecialCharacters= true;
-				//	break;
 				} else if (c=='\'') {
 					if (isSymbol) {
 						containsSpecialCharacters= true;

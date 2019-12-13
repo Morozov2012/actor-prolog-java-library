@@ -5,13 +5,12 @@ package morozov.system.gui.space3d;
 import target.*;
 
 import morozov.run.*;
-import morozov.system.*;
 import morozov.system.converters.*;
+import morozov.system.converters.errors.*;
 import morozov.system.errors.*;
 import morozov.system.gui.space3d.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
-import morozov.terms.errors.*;
 import morozov.terms.signals.*;
 
 import java.awt.Color;
@@ -145,7 +144,7 @@ public class Tools3D {
 				float a= (float)GeneralConverters.argumentToReal(arguments[3],iX);
 				return new Color3f(new Color(r,g,b,a));
 			} catch (Backtracking b2) {
-				Color color= ExtendedColor.argumentToColor(value,iX);
+				Color color= ColorAttributeConverters.argumentToColor(value,iX);
 				return new Color3f(color);
 			}
 		}
@@ -270,7 +269,7 @@ public class Tools3D {
 	///////////////////////////////////////////////////////////////
 	//
 	public static WakeupOnElapsedFrames attributesToWakeupOnElapsedFrames(Term attributes, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		HashMap<Long,Term> setPositiveMap= new HashMap<>();
 		Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
 		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -304,7 +303,7 @@ public class Tools3D {
 	///////////////////////////////////////////////////////////////
 	//
 	public static WakeupOnElapsedTime attributesToWakeupOnElapsedTime(Term attributes, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		HashMap<Long,Term> setPositiveMap= new HashMap<>();
 		Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
 		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -316,9 +315,7 @@ public class Tools3D {
 				long pairName= - key;
 				Term pairValue= setPositiveMap.get(key);
 				if (pairName==SymbolCodes.symbolCode_E_frameCount) {
-					// Milliseconds expected
-					// elapsedTime= pairValue.getLongIntegerValue(iX);
-					elapsedTime= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+					elapsedTime= TimeIntervalConverters.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 				} else {
 					throw new WrongArgumentIsUnknownElapsedTimeAttribute(key);
 				}

@@ -5,5 +5,9 @@ package morozov.system.datum.signals;
 import morozov.run.*;
 
 public class SectionNumberDoesNotExist extends LightweightException {
+	//
 	public static final SectionNumberDoesNotExist instance= new SectionNumberDoesNotExist();
+	//
+	private SectionNumberDoesNotExist() {
+	}
 }

@@ -6,8 +6,8 @@ import morozov.built_in.*;
 
 public class UpdatesWatchTarget {
 	//
-	public DataAbstraction world;
-	public LoadableContainer container;
+	protected DataAbstraction world;
+	protected LoadableContainer container;
 	//
 	public UpdatesWatchTarget(DataAbstraction w, LoadableContainer c) {
 		world= w;

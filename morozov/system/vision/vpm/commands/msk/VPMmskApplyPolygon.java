@@ -10,7 +10,7 @@ import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.geom.Path2D;
 
-abstract public class VPMmskApplyPolygon extends VPM_FrameCommand {
+public abstract class VPMmskApplyPolygon extends VPM_FrameCommand {
 	//
 	protected double[] xPoints;
 	protected double[] yPoints;
@@ -26,6 +26,7 @@ abstract public class VPMmskApplyPolygon extends VPM_FrameCommand {
 		useStandardizedCoordinates= standardizedCoordinates;
 	}
 	//
+	@Override
 	public void execute(VPM vpm) {
 		if (polygonPixels==null) {
 			int width= vpm.getOperationalImageWidth();

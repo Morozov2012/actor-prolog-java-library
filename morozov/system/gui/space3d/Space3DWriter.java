@@ -15,7 +15,7 @@ import java.io.IOException;
 
 public class Space3DWriter {
 	//
-	public Space3DWriter() {
+	private Space3DWriter() {
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -26,7 +26,6 @@ public class Space3DWriter {
 			SceneGraphStreamWriter writer= new SceneGraphStreamWriter(outputStream);
 			try {
 				writer.writeBranchGraph(branchGroup,null);
-				// outputStream.flush();
 				return outputStream.toByteArray();
 			} catch (NamedObjectException e) {
 				throw new SceneConversionError(e);

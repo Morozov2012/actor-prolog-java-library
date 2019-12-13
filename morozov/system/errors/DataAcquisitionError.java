@@ -15,6 +15,7 @@ public class DataAcquisitionError extends RuntimeException {
 		return exception;
 	}
 	//
+	@Override
 	public String toString() {
 		return exception.toString();
 	}

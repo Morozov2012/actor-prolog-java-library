@@ -6,6 +6,7 @@ import morozov.system.frames.data.interfaces.*;
 import morozov.system.modes.*;
 
 public interface DataFrameInterface {
+	//
 	public DataArrayType getDataArrayType();
 	public long getSerialNumber();
 	public long getTime();

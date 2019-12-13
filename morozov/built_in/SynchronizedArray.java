@@ -89,6 +89,7 @@ public abstract class SynchronizedArray extends LambdaArray {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected Term accessArrayElement(ArrayIndices arrayIndices, ChoisePoint iX) throws Backtracking {
 		boolean isProtectingPort= getImplementProtectingPorts(iX);
 		boolean isSuspendingPort= getImplementSuspendingPorts(iX);

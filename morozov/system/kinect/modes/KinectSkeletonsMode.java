@@ -9,6 +9,7 @@ import morozov.system.kinect.modes.interfaces.*;
 public enum KinectSkeletonsMode {
 	//
 	DETECT_SKELETONS {
+		@Override
 		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode, KinectFrameType frameType) {
 			consolidatedMode.setSkeletonsAreRequested(true);
 			consolidatedMode.refineKinectDataAcquisitionMode(J4KSDK.SKELETON);
@@ -18,11 +19,13 @@ public enum KinectSkeletonsMode {
 		}
 	},
 	DETECT_AND_TRACK_SKELETONS {
+		@Override
 		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode, KinectFrameType frameType) {
 			DETECT_SKELETONS.refineDataAcquisitionMode(consolidatedMode,frameType);
 		}
 	},
 	NONE {
+		@Override
 		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode, KinectFrameType frameType) {
 		}
 	};

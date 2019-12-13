@@ -12,11 +12,10 @@ import java.util.HashSet;
 public class SlotVariableValue implements Cloneable, Serializable {
 	//
 	public ActiveWorld slotValueOwner;
-	// public Term visibleValue; // oldValue
-	public Term actualValue; // newValue
-	public Term recentValue; // oldValue
-	public HashSet<ActorNumber> oldActors= new HashSet<ActorNumber>();
-	public HashSet<ActorNumber> newActors= new HashSet<ActorNumber>();
+	public Term actualValue;
+	public Term recentValue;
+	public HashSet<ActorNumber> oldActors= new HashSet<>();
+	public HashSet<ActorNumber> newActors= new HashSet<>();
 	public boolean isSuspendingPort= false;
 	public boolean isProtectingPort= false;
 	public boolean portIsUpdated= false;
@@ -43,9 +42,11 @@ public class SlotVariableValue implements Cloneable, Serializable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public int hashCode() {
 		if (actualValue==null) {
-			// The hash code for the null reference is zero.
+			// The hash code for the null
+			// reference is zero:
 			return 0;
 		} else {
 			return actualValue.hashCode();
@@ -80,6 +81,7 @@ public class SlotVariableValue implements Cloneable, Serializable {
 			}
 		}
 	}
+	@Override
 	public String toString() {
 		return	"\n{\n" +
 			"slotValueOwner:" + slotValueOwnerText() + ";\n" +
@@ -94,35 +96,35 @@ public class SlotVariableValue implements Cloneable, Serializable {
 			"portValueIsProtected:" + portValueIsProtected + ";\n" +
 			"portValueOwner:" + portValueOwnerText() + "\n}\n";
 	}
-	private String slotValueOwnerText() {
+	protected String slotValueOwnerText() {
 		if (slotValueOwner==null) {
 			return "null";
 		} else {
 			return slotValueOwner.toString();
 		}
 	}
-	private String actualValueText() {
+	protected String actualValueText() {
 		if (actualValue==null) {
 			return "null";
 		} else {
 			return actualValue.toString();
 		}
 	}
-	private String recentValueText() {
+	protected String recentValueText() {
 		if (recentValue==null) {
 			return "null";
 		} else {
 			return recentValue.toString();
 		}
 	}
-	private String portValueText() {
+	protected String portValueText() {
 		if (portValue==null) {
 			return "null";
 		} else {
 			return portValue.toString();
 		}
 	}
-	private String portValueOwnerText() {
+	protected String portValueOwnerText() {
 		if (portValueOwner==null) {
 			return "null";
 		} else {

@@ -15,22 +15,28 @@ public class BlueRedColorMap extends CubicSplineColorMapRGBA {
 	public BlueRedColorMap() {
 	}
 	//
+	@Override
 	public double[][] getRedChannelDefinition() {
 		return redChannelDefinition;
 	}
+	@Override
 	public double[][] getGreenChannelDefinition() {
 		return greenChannelDefinition;
 	}
+	@Override
 	public double[][] getBlueChannelDefinition() {
 		return blueChannelDefinition;
 	}
 	//
+	@Override
 	public int[][] getRedChannelConstraints() {
 		return redChannelConstraints;
 	}
+	@Override
 	public int[][] getGreenChannelConstraints() {
 		return greenChannelConstraints;
 	}
+	@Override
 	public int[][] getBlueChannelConstraints() {
 		return blueChannelConstraints;
 	}

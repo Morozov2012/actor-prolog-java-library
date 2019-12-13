@@ -33,8 +33,6 @@ public class IPCameraDataAcquisition extends Thread {
 	protected AtomicBoolean enableDataTransfer= new AtomicBoolean(false);
 	protected AtomicBoolean deviceIsToBeClosed= new AtomicBoolean(false);
 	//
-	// protected String mjpgURL= "http://192.168.10.230/mjpg/video.mjpg";
-	// protected String mjpgURL= "http://localhost:8081";;
 	protected AtomicReference<String> mjpgURL= new AtomicReference<>();
 	//
 	protected URL url;
@@ -59,7 +57,6 @@ public class IPCameraDataAcquisition extends Thread {
 	//
 	public IPCameraDataAcquisition() {
 		setDaemon(true);
-		start();
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -96,14 +93,23 @@ public class IPCameraDataAcquisition extends Thread {
 			outputDebugInformation.set(givenOutputDebugInformation);
 			enableDataTransfer.set(true);
 			deviceIsToBeClosed.set(false);
-			notify();
+			startProcessIfNecessary();
+		}
+	}
+	//
+	protected void startProcessIfNecessary() {
+		synchronized (this) {
+			if (!isAlive()) {
+				start();
+			};
+			notifyAll();
 		}
 	}
 	//
 	public void suspendDataTransfer() {
 		synchronized (this) {
 			enableDataTransfer.set(false);
-			notify();
+			notifyAll();
 		}
 	}
 	//
@@ -111,7 +117,7 @@ public class IPCameraDataAcquisition extends Thread {
 		synchronized (this) {
 			enableDataTransfer.set(false);
 			deviceIsToBeClosed.set(true);
-			notify();
+			notifyAll();
 		}
 	}
 	//
@@ -119,12 +125,10 @@ public class IPCameraDataAcquisition extends Thread {
 		return !enableDataTransfer.get();
 	}
 	//
-	// public boolean isNotSuspended() {
-	//	return enableDataTransfer.get();
-	// }
-	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
+	@SuppressWarnings("CallToThreadDumpStack")
 	public void run() {
 		try {
 			while (!stopThisThread.get()) {
@@ -202,6 +206,7 @@ public class IPCameraDataAcquisition extends Thread {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@SuppressWarnings("CallToThreadDumpStack")
 	public boolean deviceDoesExist() {
 		synchronized (this) {
 			if (deviceIsOpen.get()) {
@@ -378,6 +383,7 @@ public class IPCameraDataAcquisition extends Thread {
 	//
 	public static void writeLater(final String text) {
 		SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				System.err.print(text);
 			}

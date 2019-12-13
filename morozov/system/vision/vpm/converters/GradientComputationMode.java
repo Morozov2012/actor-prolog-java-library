@@ -12,17 +12,21 @@ import morozov.terms.signals.*;
 public enum GradientComputationMode {
 	//
 	MODULUS {
+		@Override
 		public boolean isModulusMode() {
 			return true;
 		}
+		@Override
 		public Term toTerm() {
 			return term_MODULUS;
 		}
 	},
 	DIRECTION {
+		@Override
 		public boolean isModulusMode() {
 			return false;
 		}
+		@Override
 		public Term toTerm() {
 			return term_DIRECTION;
 		}

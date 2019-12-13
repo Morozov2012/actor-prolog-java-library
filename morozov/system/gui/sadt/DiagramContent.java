@@ -4,8 +4,7 @@ package morozov.system.gui.sadt;
 
 import target.*;
 
-import morozov.terms.*;
-
+import morozov.system.*;
 import morozov.system.gui.sadt.signals.*;
 
 import java.awt.Graphics2D;
@@ -19,11 +18,11 @@ import java.util.Map;
 
 public class DiagramContent {
 	//
-	public String boxIdentifier;
-	public String motherIdentifier;
-	public int localNumber;
-	public DiagramBox[] boxes;
-	public DiagramPath[] paths;
+	protected String boxIdentifier;
+	protected String motherIdentifier;
+	protected int localNumber;
+	protected DiagramBox[] boxes;
+	protected DiagramPath[] paths;
 	//
 	public DiagramContent(String identifier, String mother, int self, DiagramBox[] boxList, DiagramPath[] pathList) {
 		boxIdentifier= identifier;
@@ -32,9 +31,8 @@ public class DiagramContent {
 		boxes= boxList;
 		paths= pathList;
 	}
+	//
 	public void draw(Graphics2D g2, Dimension size, DiagramColors diagramColors, Map<String,ComponentState> componentSuccess) {
-		// Graphics2D g2= (Graphics2D)g0;
-		// DesktopUtils.setRenderingHints(g2);
 		//
 		int fontSize= adjustFont(g2,size,diagramColors);
 		//
@@ -105,7 +103,7 @@ public class DiagramContent {
 								break;
 							};
 							if (upperFontSize > lowerFontSize + 1) {
-								int newFontSize= PrologInteger.toInteger((upperFontSize + lowerFontSize) / 2);
+								int newFontSize= Arithmetic.toInteger((upperFontSize + lowerFontSize) / 2);
 								Font newFont= DiagramUtils.computeFont(diagramColors,newFontSize);
 								if (currentBox.fontSizeIsSuitable(newFont,g2,size)) {
 									lowerFont= newFont;

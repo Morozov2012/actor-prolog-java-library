@@ -21,6 +21,7 @@ import morozov.terms.*;
 import morozov.terms.signals.*;
 
 public class RealField extends ActiveTextField {
+	//
 	public RealField(AbstractDialog target, int columns) {
 		this(target,"",columns);
 	}
@@ -29,6 +30,7 @@ public class RealField extends ActiveTextField {
 		component= new ARealField(target,this,text,columns);
 	}
 	//
+	@Override
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		try {
 			double number= GeneralConverters.termToReal(value,iX);

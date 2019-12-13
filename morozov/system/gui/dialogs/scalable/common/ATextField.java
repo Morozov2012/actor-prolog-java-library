@@ -28,15 +28,14 @@ import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
 
 public class ATextField
-	extends JTextField
-	implements ActiveDocumentReportListener, FocusListener {
+		extends JTextField
+		implements ActiveDocumentReportListener, FocusListener {
 	//
-	// CompoundBorder compoundBorder= null;
-	ActiveFieldErrorBorder outerBorder= null;
-	Border nativeBorder= null;
+	protected ActiveFieldErrorBorder outerBorder= null;
+	protected Border nativeBorder= null;
 	//
-	AbstractDialog targetDialog= null;
-	ActiveComponent targetComponent= null;
+	protected AbstractDialog targetDialog= null;
+	protected ActiveComponent targetComponent= null;
 	//
 	public ATextField(AbstractDialog tD, ActiveComponent tC, int columns) {
 		this(tD,tC,"",columns);
@@ -46,8 +45,6 @@ public class ATextField
 		targetDialog= tD;
 		targetComponent= tC;
 		initiateActiveTextField();
-		// setAlignmentX(JTextField.RIGHT_ALIGNMENT);
-		// setHorizontalAlignment(JTextField.RIGHT);
 		addFocusListener(this);
 	}
 	//
@@ -55,10 +52,10 @@ public class ATextField
 		ActivePlainDocument activeDocument= (ActivePlainDocument)getDocument();
 		activeDocument.addReportListener(this);
 		nativeBorder= getBorder();
-		// outerBorder= new ActiveFieldErrorBorder(this,2,2,2,2);
 		outerBorder= new ActiveFieldErrorBorder(this,nativeBorder.getBorderInsets(this));
 	}
-	// Method to create default model
+	// Method to create default model:
+	@Override
 	protected Document createDefaultModel() {
 		return new ActivePlainDocument();
 	}
@@ -69,47 +66,23 @@ public class ATextField
 			activeDocument.setFormat(format);
 		}
 	}
-	// public ActiveDocumentFormat getFormat() {
-	//	return ((ActivePlainDocument)getDocument()).getFormat();
-	// }
 	//
-	// public void setValue(Number number) {
-	//	setText(getFormat().format(number));
-	// }
-	//
-	// Override to handle insertion error
-	// public void reportSuccess() {
-	// }
+	@Override
 	public void reportSuccess() {
-		// By default, just beep
-		// Toolkit.getDefaultToolkit().beep();
-		// outerBorder.setActiveFieldValueIsValid(true);
 		setBorder(nativeBorder);
-		// repaint();
 		if (targetDialog!=null) {
 			targetDialog.reportValueUpdate(targetComponent);
-			// targetDialog.repaint();
-			// targetDialog.validate();
-			// targetDialog.invalidate(); // 2012.03.05
 		}
 	}
-	// public void reportFailure() {
-	// }
+	@Override
 	public void reportFailure() {
-		// By default, just beep
-		// Toolkit.getDefaultToolkit().beep();
-		// outerBorder.setActiveFieldValueIsValid(false);
-		// setBorder(compoundBorder);
 		setBorder(outerBorder);
-		// repaint();
 		if (targetDialog!=null) {
 			targetDialog.reportValueUpdate(targetComponent);
-			// targetDialog.repaint();
-			// targetDialog.validate();
-			// targetDialog.invalidate(); // 2012.03.05
 		}
 	}
 	//
+	@Override
 	public void processComponentKeyEvent(KeyEvent evt) {
 		switch (evt.getID()) {
 		case KeyEvent.KEY_PRESSED:
@@ -129,12 +102,15 @@ public class ATextField
 		super.processComponentKeyEvent(evt);
 	}
 	//
+	@Override
 	public void focusGained(FocusEvent e) {
 	}
+	@Override
 	public void focusLost(FocusEvent e) {
 		targetDialog.reportCompleteEditing(targetComponent);
 	}
 	//
+	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 		setMinimumSize(getPreferredSize());

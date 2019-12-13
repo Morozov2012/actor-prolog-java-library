@@ -37,7 +37,6 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 	//
 	protected DeviceIdentifier defaultIdentifier;
 	protected TemperatureScale temperatureScale;
-	protected YesNo useRecordedCalibrationCommands;
 	protected YesNo eliminateAnomalousPixels;
 	protected YesNo applyAnomalousVoltagePixelDetector;
 	protected NumericalValue anomalousVoltageThreshold;
@@ -50,7 +49,6 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 	protected I3Camera camera= new I3Camera();
 	protected I3DataAcquisition thermalDataAcquisition= new I3DataAcquisition(camera);
 	protected AtomicLong counterOfAcquiredFrames= new AtomicLong(-1);
-	// protected AtomicLong numberOfRecentAcceptedFrame= new AtomicLong(-1);
 	protected long numberOfRepeatedFrame= -1;
 	//
 	protected long committedFrameNumber= -1;
@@ -90,7 +88,6 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 	//
 	abstract public Term getBuiltInSlot_E_default_identifier();
 	abstract public Term getBuiltInSlot_E_temperature_scale();
-	abstract public Term getBuiltInSlot_E_use_recorded_calibration_commands();
 	abstract public Term getBuiltInSlot_E_eliminate_anomalous_pixels();
 	abstract public Term getBuiltInSlot_E_apply_anomalous_voltage_pixel_detector();
 	abstract public Term getBuiltInSlot_E_anomalous_voltage_threshold();
@@ -131,7 +128,7 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 	// get/set temperature_scale
 	//
 	public void setTemperatureScale1s(ChoisePoint iX, Term a1) {
-		TemperatureScale value= TemperatureScale.argumentToTemperatureScale(a1,iX);
+		TemperatureScale value= TemperatureScaleConverters.argumentToTemperatureScale(a1,iX);
 		setTemperatureScale(value);
 		updateAttributes(iX);
 	}
@@ -140,7 +137,7 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 		camera.setIsCelsius(temperatureScale.isCelsius());
 	}
 	public void getTemperatureScale0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(getTemperatureScale(iX).toTerm());
+		result.setNonBacktrackableValue(TemperatureScaleConverters.toTerm(getTemperatureScale(iX)));
 	}
 	public void getTemperatureScale0fs(ChoisePoint iX) {
 	}
@@ -149,30 +146,7 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 			return temperatureScale;
 		} else {
 			Term value= getBuiltInSlot_E_temperature_scale();
-			return TemperatureScale.argumentToTemperatureScale(value,iX);
-		}
-	}
-	//
-	// get/set use_recorded_calibration_commands
-	//
-	public void setUseRecordedCalibrationCommands1s(ChoisePoint iX, Term a1) {
-		setUseRecordedCalibrationCommands(YesNoConverters.argument2YesNo(a1,iX));
-	}
-	public void setUseRecordedCalibrationCommands(YesNo value) {
-		useRecordedCalibrationCommands= value;
-	}
-	public void getUseRecordedCalibrationCommands0ff(ChoisePoint iX, PrologVariable result) {
-		YesNo value= getUseRecordedCalibrationCommands(iX);
-		result.setNonBacktrackableValue(YesNoConverters.toTerm(value));
-	}
-	public void getUseRecordedCalibrationCommands0fs(ChoisePoint iX) {
-	}
-	public YesNo getUseRecordedCalibrationCommands(ChoisePoint iX) {
-		if (useRecordedCalibrationCommands != null) {
-			return useRecordedCalibrationCommands;
-		} else {
-			Term value= getBuiltInSlot_E_use_recorded_calibration_commands();
-			return YesNoConverters.argument2YesNo(value,iX);
+			return TemperatureScaleConverters.argumentToTemperatureScale(value,iX);
 		}
 	}
 	//
@@ -331,7 +305,7 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 	}
 	public void setReadTimeOut(BigInteger value) {
 		readTimeOut= value;
-		thermalDataAcquisition.setReadTimeOut(PrologInteger.toInteger(value));
+		thermalDataAcquisition.setReadTimeOut(Arithmetic.toInteger(value));
 	}
 	public void getReadTimeOut0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(new PrologInteger(getReadTimeOut(iX)));
@@ -355,7 +329,7 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 	}
 	public void setWriteTimeOut(BigInteger value) {
 		writeTimeOut= value;
-		thermalDataAcquisition.setWriteTimeOut(PrologInteger.toInteger(value));
+		thermalDataAcquisition.setWriteTimeOut(Arithmetic.toInteger(value));
 	}
 	public void getWriteTimeOut0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(new PrologInteger(getWriteTimeOut(iX)));
@@ -373,13 +347,15 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setOutputDebugInformation(BigInteger value) {
 		super.setOutputDebugInformation(value);
-		thermalDataAcquisition.setOutputDebugInformation(PrologInteger.toInteger(value));
+		thermalDataAcquisition.setOutputDebugInformation(Arithmetic.toInteger(value));
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void releaseSystemResources() {
 		camera.disconnectDevice();
 		camera.closeUSB();
@@ -387,6 +363,7 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void updateAttributes(ChoisePoint iX) {
 		boolean currentDoNotControlTemperatureRange= getUseRecordedTemperatureRangeCommands(iX).toBoolean();
 		boolean currentAveragingMode= getAveragingMode(iX).toBoolean();
@@ -403,7 +380,7 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 			getTemperatureScale(iX).isCelsius(),
 			getAutorangingMode(iX).toBoolean(),
 			getDoubleColorMapMode(iX).toBoolean(),
-			DataRange.BOUNDS, // getSelectedDataRange(),
+			DataRange.BOUNDS,
 			NumericalValueConverters.toDouble(getLowerTemperatureBound(iX)),
 			NumericalValueConverters.toDouble(getUpperTemperatureBound(iX)),
 			NumericalValueConverters.toDouble(getLowerMainTemperatureQuantile(iX)),
@@ -415,8 +392,8 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 			currentAveragingMode,
 			getZoomImage(iX).toBoolean(),
 			getZoomingCoefficient(iX),
-			PrologInteger.toInteger(getReadTimeOut(iX)),
-			PrologInteger.toInteger(getWriteTimeOut(iX)));
+			Arithmetic.toInteger(getReadTimeOut(iX)),
+			Arithmetic.toInteger(getWriteTimeOut(iX)));
 		actingDoNotControlTemperatureRange.set(currentDoNotControlTemperatureRange);
 		actingAveragingMode.set(currentAveragingMode);
 		recentAttributes.set(attributes);
@@ -424,15 +401,16 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void resetCounters() {
 		synchronized (numberOfRecentReceivedFrame) {
 			super.resetCounters();
 			counterOfAcquiredFrames.set(-1);
-			// numberOfRecentAcceptedFrame.set(-1);
 			numberOfRepeatedFrame= -1;
 		}
 	}
 	//
+	@Override
 	protected void resetFrameRate() {
 		committedFrameNumber= -1;
 		committedFrameTime= -1;
@@ -484,7 +462,7 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 		thermalDataAcquisition.stopDataTransfer();
 		frameRecordingTask.close();
 		frameReadingTask.closeReading();
-		actingDataAcquisitionBufferOperatingMode.set(null);
+		resetActingMode();
 		thermalDataAcquisition.disconnectDevice();
 	}
 	//
@@ -496,13 +474,15 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected void activateDataAcquisition(ChoisePoint iX) {
+	@Override
+	protected void activateDataAcquisition(boolean flushBuffers, ChoisePoint iX) {
 		DeviceIdentifier identifier= getDefaultIdentifier(iX);
 		ActionPeriod period= getConnectionAttemptPeriod(iX);
 		int currentMaximalErrorsQuantity= getMaximalErrorsQuantity(iX);
-		int currentReadTimeOut= PrologInteger.toInteger(getReadTimeOut(iX));
-		int currentWriteTimeOut= PrologInteger.toInteger(getWriteTimeOut(iX));
-		int currentOutputDebugInformation= PrologInteger.toInteger(getOutputDebugInformation(iX));
+		int currentReadTimeOut= Arithmetic.toInteger(getReadTimeOut(iX));
+		int currentWriteTimeOut= Arithmetic.toInteger(getWriteTimeOut(iX));
+		int currentOutputDebugInformation= Arithmetic.toInteger(getOutputDebugInformation(iX));
+		super.activateDataAcquisition(flushBuffers,iX);
 		thermalDataAcquisition.activateDataTransfer(
 			identifier,
 			period.toMillisecondsOrDefault(defaultDeviceConnectionAttemptPeriod),
@@ -512,28 +492,34 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 			currentOutputDebugInformation);
 	}
 	//
+	@Override
 	protected void suspendRecording(ChoisePoint iX) {
 		thermalDataAcquisition.suspendDataTransfer();
 		super.suspendRecording(iX);
 	}
+	@Override
 	protected void suspendListening(ChoisePoint iX) {
 		thermalDataAcquisition.suspendDataTransfer();
 		super.suspendListening(iX);
 	}
 	//
+	@Override
 	protected void stopRecording(ChoisePoint iX) {
 		thermalDataAcquisition.stopDataTransfer();
 		super.stopRecording(iX);
 	}
+	@Override
 	protected void stopListening(ChoisePoint iX) {
 		thermalDataAcquisition.stopDataTransfer();
 		super.stopListening(iX);
 	}
 	//
+	@Override
 	protected boolean dataAcquisitionIsActive() {
 		return thermalDataAcquisition.isNotSuspended();
 	}
 	//
+	@Override
 	protected boolean dataAcquisitionIsSuspended() {
 		return thermalDataAcquisition.isSuspended();
 	}
@@ -544,6 +530,7 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 		camera.calibrateDevice();
 	}
 	//
+	@Override
 	public void completeCalibration() {
 		completeCalibration(camera.collectFlashData());
 	}
@@ -599,7 +586,6 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 				dataStream.close();
 			}
 		} catch (IOException e) {
-			// e.printStackTrace();
 			throw new FileInputOutputError(fileName.toString(),e);
 		}
 	}
@@ -618,7 +604,6 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 					dataStream.close();
 				}
 			} catch (IOException e) {
-				// e.printStackTrace();
 				throw new FileInputOutputError(fileName.toString(),e);
 			}
 		} catch (CannotRetrieveContent e) {
@@ -628,12 +613,12 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void commit() {
 		synchronized (numberOfRecentReceivedFrame) {
 			super.commit();
 			committedFrame= recentFrame;
 			if (!recentFrameIsRepeated) {
-				// committedFrameNumber= numberOfRecentAcceptedFrame.get();
 				committedFrameNumber= numberOfRecentReceivedFrame.get();
 			} else {
 				committedFrameNumber= numberOfRepeatedFrame;
@@ -762,25 +747,13 @@ public abstract class TEV1 extends ThermalDataAcquisitionBuffer implements I3Dat
 			if (committedFrame != null) {
 				attributes= committedFrame.getBaseAttributes();
 				thermalDataBuffer= getThermalDataBuffer(attributes);
-/*
-double min= thermalDataBuffer[0];
-double max= thermalDataBuffer[0];
-for (int k=0; k < thermalDataBuffer.length; k++) {
-	if (min > thermalDataBuffer[k]) {
-		min= thermalDataBuffer[k];
-	};
-	if (max < thermalDataBuffer[k]) {
-		max= thermalDataBuffer[k];
-	}
-}
-*/
 			} else {
 				throw new I3FrameIsNotCommitted();
 			}
 		};
 		YesNo doNotControlColorMaps= getUseRecordedColorMapCommands(iX);
-		int[][] mainColorMap= prepareMainColorMap(doNotControlColorMaps.toBoolean(),attributes);
-		int[][] auxiliaryColorMap= prepareAuxiliaryColorMap(doNotControlColorMaps.toBoolean(),attributes);
+		int[][] currentMainColorMap= prepareMainColorMap(doNotControlColorMaps.toBoolean(),attributes);
+		int[][] currentAuxiliaryColorMap= prepareAuxiliaryColorMap(doNotControlColorMaps.toBoolean(),attributes);
 		boolean isAutorangingMode;
 		boolean isDoubleColorMapMode;
 		double lowerDataBound;
@@ -822,8 +795,8 @@ for (int k=0; k < thermalDataBuffer.length; k++) {
 			thermalDataBuffer,
 			camera.getWindowingWidth(),
 			camera.getWindowingHeight(),
-			mainColorMap,
-			auxiliaryColorMap,
+			currentMainColorMap,
+			currentAuxiliaryColorMap,
 			isAutorangingMode,
 			isDoubleColorMapMode,
 			lowerDataBound,
@@ -855,8 +828,8 @@ for (int k=0; k < thermalDataBuffer.length; k++) {
 	///////////////////////////////////////////////////////////////
 	//
 	public void getTemperature2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
-		int x= GeneralConverters.argumentToSmallInteger(a1,iX);
-		int y= GeneralConverters.argumentToSmallInteger(a2,iX);
+		int currentX= GeneralConverters.argumentToSmallInteger(a1,iX);
+		int currentY= GeneralConverters.argumentToSmallInteger(a2,iX);
 		double[] thermalDataBuffer;
 		synchronized (numberOfRecentReceivedFrame) {
 			if (committedFrame != null) {
@@ -867,7 +840,7 @@ for (int k=0; k < thermalDataBuffer.length; k++) {
 			}
 		};
 		int columns= camera.getWindowingWidth();
-		int pos0= y * columns + x;
+		int pos0= currentY * columns + currentX;
 		double targetTemperature= thermalDataBuffer[pos0];
 		result.setNonBacktrackableValue(new PrologReal(targetTemperature));
 	}
@@ -929,11 +902,10 @@ for (int k=0; k < thermalDataBuffer.length; k++) {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setByteThermalData(byte[] buffer, long time) {
 		byte[] byteThermalDataBuffer= camera.createBuffer();
-		for (int k=0; k < byteThermalDataBuffer.length; k++) {
-			byteThermalDataBuffer[k]= buffer[k];
-		};
+		System.arraycopy(buffer,0,byteThermalDataBuffer,0,byteThermalDataBuffer.length);
 		camera.setRecvData(byteThermalDataBuffer);
 		camera.compute_FPA_Temperature();
 		camera.computeTemperatureMap();
@@ -945,12 +917,11 @@ for (int k=0; k < thermalDataBuffer.length; k++) {
 			time,
 			targetTemperatures,
 			recentAttributes.get());
+		flushAudioSystemIfNecessary();
 		sendDataFrame(frame);
 	}
 	//
-	// public void setAudioData(byte[] buffer, long time) {
-	// }
-	//
+	@Override
 	public void reportMissedFrame(long currentTime) {
 		synchronized (numberOfRecentReceivedFrame) {
 			corruptedFrameNumber++;
@@ -963,7 +934,6 @@ for (int k=0; k < thermalDataBuffer.length; k++) {
 		long domainSignature= entry_s_MissedFrame_1_i();
 		Term[] arguments= new Term[1];
 		arguments[0]= new PrologInteger(currentTime);
-		// 2018.10.30: AsyncCall call= new AsyncCall(domainSignature,this,true,false,arguments,true);
 		AsyncCall call= new AsyncCall(domainSignature,this,true,true,arguments,true);
 		transmitAsyncCall(call,null);
 	}
@@ -973,45 +943,25 @@ for (int k=0; k < thermalDataBuffer.length; k++) {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected long updateRecentFrame(DataFrameInterface frame) {
-		if (frame.isLightweightFrame()) {
-			return -1;
+	@Override
+	protected long acceptFrame(DataFrameInterface frame, long currentFrameNumber) {
+		if (frame instanceof DoubleDataFrameInterface) {
+			DoubleDataFrameInterface doubleDataFrame= (DoubleDataFrameInterface)frame;
+			currentFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
+			updateHistory(doubleDataFrame);
+			updateCumulativeTemperatures(doubleDataFrame);
+			validFrameNumber++;
+			validFrameTime= frame.getTime();
+			if (firstValidFrameNumber < 0) {
+				firstValidFrameNumber= validFrameNumber;
+				firstValidFrameTime= validFrameTime;
+			}
 		};
-		synchronized (numberOfRecentReceivedFrame) {
-			long currentFrameNumber= -1;
-			if (frame instanceof DoubleDataFrameInterface) {
-				recentFrame= frame;
-				committedFrameWasAssignedDirectly.set(false);
-				// numberOfRecentAcceptedFrame.set(recentFrame.getSerialNumber());
-				// long currentNumber=
-				currentFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
-				// numberOfRecentAcceptedFrame.set(currentNumber);
-				DoubleDataFrameInterface doubleDataFrame= (DoubleDataFrameInterface)frame;
-				updateHistory(doubleDataFrame);
-				updateCumulativeTemperatures(doubleDataFrame);
-				validFrameNumber++;
-				validFrameTime= frame.getTime();
-				if (firstValidFrameNumber < 0) {
-					firstValidFrameNumber= validFrameNumber;
-					firstValidFrameTime= validFrameTime;
-				}
-			} else {
-				return currentFrameNumber;
-			};
-			// long currentFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
-			recentFrameIsRepeated= false;
+		currentFrameNumber= super.acceptFrame(frame,currentFrameNumber);
+		if (currentFrameNumber >= 0) {
 			numberOfRepeatedFrame= -1;
-			numberOfRecentReceivedFrame.notifyAll();
-			return currentFrameNumber;
-		}
-	}
-	//
-	protected void updateHistory(DoubleDataFrameInterface recentDataFrame) {
-		if (recentDataFrame==null) {
-			return;
 		};
-		// updateHistory(new EnumeratedDataFrame(recentDataFrame,numberOfRecentAcceptedFrame.get()));
-		updateHistory(new EnumeratedDataFrame(recentDataFrame,numberOfRecentReceivedFrame.get()));
+		return currentFrameNumber;
 	}
 	//
 	protected void updateCumulativeTemperatures(DoubleDataFrameInterface frame) {
@@ -1039,6 +989,7 @@ for (int k=0; k < thermalDataBuffer.length; k++) {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void acceptRequestedFrame(EnumeratedFrame enumeratedFrame) {
 		EnumeratedDataFrame selectedFrame= (EnumeratedDataFrame)enumeratedFrame;
 		recentFrame= selectedFrame.getFrame();
@@ -1047,6 +998,7 @@ for (int k=0; k < thermalDataBuffer.length; k++) {
 		numberOfRepeatedFrame= selectedFrame.getNumberOfFrame();
 	}
 	//
+	@Override
 	protected void acceptRetrievedFrame(EnumeratedFrame enumeratedFrame) {
 		EnumeratedDataFrame selectedFrame= (EnumeratedDataFrame)enumeratedFrame;
 		DoubleDataFrameInterface thermalFrame= (DoubleDataFrameInterface)selectedFrame.getFrame();
@@ -1058,6 +1010,7 @@ for (int k=0; k < thermalDataBuffer.length; k++) {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void extractFrame(String key, CompoundFrameInterface container) {
 		if (committedFrame != null) {
 			EnumeratedDataFrame enumeratedFrame= new EnumeratedDataFrame(
@@ -1069,13 +1022,12 @@ for (int k=0; k < thermalDataBuffer.length; k++) {
 		}
 	}
 	//
+	@Override
 	public void assignFrame(String key, CompoundFrameInterface container, ChoisePoint iX) {
 		EnumeratedDataFrame enumeratedFrame= (EnumeratedDataFrame)container.getComponent(key);
 		synchronized (numberOfRecentReceivedFrame) {
 			committedFrame= enumeratedFrame.getFrame();
 			committedFrameWasAssignedDirectly.set(true);
-			// committedFrameNumber= enumeratedFrame.getNumberOfFrame();
-			// committedFrameNumber= numberOfRecentAcceptedFrame.incrementAndGet();
 			committedFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
 			DoubleDataFrameInterface doubleDataFrame= (DoubleDataFrameInterface)committedFrame;
 			updateCumulativeTemperatures(doubleDataFrame);

@@ -30,7 +30,7 @@ public class FFmpegTools {
 	protected static long STREAM_DURATION= 10;
 	protected static int SCALE_FLAGS= SWS_BICUBIC;
 	//
-	public static Object codecOpeningGuard= new Object();
+	protected static Object codecOpeningGuard= new Object();
 	//
 	protected static int maximumAllowedNumeratorAndDenominator= (1 << 16) - 1;
 	//
@@ -42,7 +42,7 @@ public class FFmpegTools {
 				if (!theFFmpegLibraryIsInitialized.get()) {
 					synchronized (codecOpeningGuard) {
 						// Initialize libavformat and register all the muxers,
-						// demuxers and protocols.
+						// demuxers and protocols:
 						av_register_all();
 					}
 				}
@@ -64,7 +64,7 @@ public class FFmpegTools {
 				break;
 			}
 		};
-		AVInputFormat[] formatArray= formats.toArray(new AVInputFormat[0]);
+		AVInputFormat[] formatArray= formats.toArray(new AVInputFormat[formats.size()]);
 		Term result1= PrologEmptyList.instance;
 		for (int n=formatArray.length-1; n >= 0; n--) {
 			AVInputFormat format2= formatArray[n];
@@ -104,7 +104,7 @@ public class FFmpegTools {
 				break;
 			}
 		};
-		AVOutputFormat[] formatArray= formats.toArray(new AVOutputFormat[0]);
+		AVOutputFormat[] formatArray= formats.toArray(new AVOutputFormat[formats.size()]);
 		Term result1= PrologEmptyList.instance;
 		for (int n=formatArray.length-1; n >= 0; n--) {
 			AVOutputFormat format2= formatArray[n];
@@ -374,12 +374,12 @@ return result;
 				// Convert a double precision floating point
 				// number to a rational.
 				// In case of infinity, the returned value
-				// is expressed as {@code {1, 0}} or
-				// {@code {-1, 0}} depending on the sign.
-				// @param d {@code double} to convert
-				// @param max Maximum allowed numerator and
-				// denominator
-				// @return {@code d} in AVRational form
+				// is expressed as {1, 0} or
+				// {-1, 0} depending on the sign.
+				// d - double to convert.
+				// max - maximum allowed numerator and
+				// denominator.
+				// return - d in AVRational form.
 				AVRational rational= av_d2q(doubleValue,maximumAllowedNumeratorAndDenominator);
 				return rational;
 			} catch (TermIsNotAReal e2) {
@@ -440,7 +440,7 @@ return result;
 			FFmpegWorkAroundBug option= FFmpegWorkAroundBug.argumentToFFmpegWorkAroundBug(currentTail,iX);
 			optionArray.add(option);
 		};
-		return optionArray.toArray(new FFmpegWorkAroundBug[0]);
+		return optionArray.toArray(new FFmpegWorkAroundBug[optionArray.size()]);
 	}
 	//
 	public static int convertFFmpegWorkAroundBugsToInteger(FFmpegWorkAroundBug[] flags) {
@@ -491,7 +491,7 @@ return result;
 			FFmpegDebugOption option= FFmpegDebugOption.argumentToFFmpegDebugOption(currentTail,iX);
 			optionArray.add(option);
 		};
-		return optionArray.toArray(new FFmpegDebugOption[0]);
+		return optionArray.toArray(new FFmpegDebugOption[optionArray.size()]);
 	}
 	//
 	public static int convertFFmpegDebugOptionsToInteger(FFmpegDebugOption[] flags) {
@@ -520,19 +520,19 @@ return result;
 				// dictionary invalidates all existing
 				// entries previously returned with
 				// av_dict_get.
-				// @param pm pointer to a pointer to a
+				// pm - pointer to a pointer to a
 				// dictionary struct. If *pm is NULL a
 				// dictionary struct is allocated and
 				// put in *pm.
-				// @param key entry key to add to *pm
+				// key - entry key to add to *pm
 				// (will either be av_strduped or added
-				// as a new key depending on flags)
-				// @param value entry value to add to
+				// as a new key depending on flags).
+				// value - entry value to add to.
 				// *pm (will be av_strduped or added as
 				// a new key depending on flags).
 				// Passing a NULL value will cause an
 				// existing entry to be deleted.
-				// @return >= 0 on success otherwise an
+				// return >= 0 on success otherwise an
 				// error code < 0.
 				int flag= av_dict_set(dictionary,option.getName(),option.getValue(),0);
 				if (flag < 0) {
@@ -550,11 +550,11 @@ return result;
 		// Fill the provided buffer with a string containing
 		// an error string corresponding to the AVERROR code
 		// errnum.
-		// @param errbuf - a buffer
-		// @param errbuf_size - size in bytes of errbuf
-		// @param errnum - error code to describe
-		// @return the buffer in input, filled with the error
-		// description
+		// errbuf - a buffer.
+		// errbuf_size - size in bytes of errbuf.
+		// errnum - error code to describe.
+		// return - the buffer in input, filled with the error
+		// description.
 		return new String(av_make_error_string(new byte[AV_ERROR_MAX_STRING_SIZE],AV_ERROR_MAX_STRING_SIZE,errnum));
 	}
 	//
@@ -562,10 +562,10 @@ return result;
 		// av_ts_make_string:
 		// Fill the provided buffer with a string containing
 		// a timestamp representation.
-		// @param buf a buffer with size in bytes of at
-		// least AV_TS_MAX_STRING_SIZE
-		// @param ts the timestamp to represent
-		// @return the buffer in input
+		// buf - a buffer with size in bytes of at
+		// least AV_TS_MAX_STRING_SIZE.
+		// ts - the timestamp to represent.
+		// return - the buffer in input.
 		return av_ts_make_string(ts);
 	}
 	public static String av_ts_make_string(long ts) {
@@ -583,11 +583,11 @@ return result;
 		// av_ts_make_time_string:
 		// Fill the provided buffer with a string containing
 		// a timestamp time representation.
-		// @param buf a buffer with size in bytes of at least
-		// AV_TS_MAX_STRING_SIZE
-		// @param ts the timestamp to represent
-		// @param tb the timebase of the timestamp
-		// @return the buffer in input
+		// buf - a buffer with size in bytes of at least
+		// AV_TS_MAX_STRING_SIZE.
+		// ts - the timestamp to represent.
+		// tb - the timebase of the timestamp.
+		// return - the buffer in input.
 		return av_ts_make_time_string(ts,tb);
 	}
 	public static String av_ts_make_time_string(long ts, AVRational tb) {
@@ -595,9 +595,9 @@ return result;
 			return "NOPTS";
 		} else {
 			// av_q2d:
-			// Convert an AVRational to a {@code double}.
-			// @param a AVRational to convert
-			// @return {@code a} in floating-point form
+			// Convert an AVRational to a double.
+			// a - AVRational to convert.
+			// return - a in floating-point form.
 			return String.format("%1.6g",av_q2d(tb)*ts);
 		}
 	}
@@ -714,19 +714,73 @@ return result;
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	protected static AVFrame allocAudioFrame(int sampleFormat, long channelLayout, int sampleRate, int nbSamples) {
+		// av_frame_alloc:
+		// Allocate an AVFrame and set its fields to default
+		// values. The resulting struct must be freed using
+		// av_frame_free().
+		// return - an AVFrame filled with default values or
+		// NULL on failure.
+		// Note: this only allocates the AVFrame itself, not
+		// the data buffers. Those must be allocated through
+		// other means, e.g. with av_frame_get_buffer() or
+		// manually.
+		AVFrame frame= av_frame_alloc();
+		if (frame==null) {
+			throw new FFmpegCannotAllocateAVFrame();
+		};
+		frame.format(sampleFormat);
+		frame.channel_layout(channelLayout);
+		frame.sample_rate(sampleRate);
+		frame.nb_samples(nbSamples);
+		if (nbSamples != 0) {
+			// av_frame_get_buffer:
+			// Allocate new buffer(s) for audio or video
+			// data. The following fields must be set on
+			// frame before calling this function:
+			// - format (pixel format for video, sample
+			// format for audio);
+			// - width and height for video;
+			// - nb_samples and channel_layout for audio.
+			// This function will fill AVFrame.data and
+			// AVFrame.buf arrays and, if necessary,
+			// allocate and fill AVFrame.extended_data
+			// and AVFrame.extended_buf.
+			// For planar formats, one buffer will be
+			// allocated for each plane.
+			// Warning: if frame already has been
+			// allocated, calling this function will leak
+			// memory. In addition, undefined behavior
+			// can occur in certain cases.
+			// frame - frame in which to store the
+			// new buffers.
+			// align - required buffer size alignment.
+			// return - 0 on success, a negative AVERROR
+			// on error.
+			int flag= av_frame_get_buffer(frame,0);
+			// int flag= av_frame_get_buffer(frame,64);
+			if (flag < 0) {
+				throw new FFmpegCannotAllocateFrameDataBuffers();
+			}
+		};
+		return frame;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public static AVFrame getVideoFrame(FFmpegOutputStreamState ost) {
 		AVCodecContext c= ost.enc;
 		// Check if we want to generate more frames:
 		AVRational avRational= av_make_q(1,1);
 		// av_compare_ts:
 		// Compare two timestamps each in its own time base.
-		// @return One of the following values:
-		// - -1 if {@code ts_a} is before {@code ts_b}
-		// - 1 if {@code ts_a} is after {@code ts_b}
-		// - 0 if they represent the same position
+		// return - one of the following values:
+		// (a) -1 if ts_a is before ts_b;
+		// (b) 1 if ts_a is after ts_b;
+		// (c) 0 if they represent the same position.
 		// Warning: The result of the function is undefined
 		// if one of the timestamps is outside
-		// the {@code int64_t} range when represented
+		// the int64_t range when represented
 		// in the other's timebase.
 		if (av_compare_ts(ost.next_pts,c.time_base(),STREAM_DURATION,avRational) >= 0) {
 			return null;
@@ -736,7 +790,7 @@ return result;
 		// data copy if possible.
 		// Do nothing if the frame is writable, allocate new
 		// buffers and copy the data if it is not.
-		// @return 0 on success, a negative AVERROR on error.
+		// return - 0 on success, a negative AVERROR on error.
 		// When we pass a frame to the encoder, it may keep
 		// a reference to it internally; make sure we do not
 		// overwrite it here.
@@ -753,23 +807,23 @@ return result;
 				// You need it to perform
 				// scaling/conversion operations
 				// using sws_scale().
-				// @param srcW the width of the source
-				// image
-				// @param srcH the height of the source
-				// image
-				// @param srcFormat the source image
-				// format
-				// @param dstW the width of the
-				// destination image
-				// @param dstH the height of the
-				// destination image
-				// @param dstFormat the destination
-				// image format
-				// @param flags specify which
+				// srcW - the width of the source
+				// image.
+				// srcH - the height of the source
+				// image.
+				// srcFormat - the source image
+				// format.
+				// dstW - the width of the
+				// destination image.
+				// dstH - the height of the
+				// destination image.
+				// dstFormat - the destination
+				// image format.
+				// flags - specify which
 				// algorithm and options to use for
-				// rescaling
-				// @param param extra parameters to
-				// tune the used scaler
+				// rescaling.
+				// param - extra parameters to
+				// tune the used scaler.
 				// For SWS_BICUBIC param[0] and [1]
 				// tune the shape of the basis
 				// function, param[0] tunes f(1) and
@@ -778,8 +832,8 @@ return result;
 				// exponent and thus cutoff frequency
 				// For SWS_LANCZOS param[0] tunes the
 				// width of the window function
-				// @return a pointer to an allocated
-				// context, or NULL in case of error
+				// return - a pointer to an allocated
+				// context, or NULL in case of error.
 				// Note: this function is to be
 				// removed after a saner alternative
 				// is written.
@@ -805,25 +859,26 @@ return result;
 			// order. If slices are provided in
 			// non-sequential order the behavior of the
 			// function is undefined.
-			// @param c - the scaling context previously
-			// created with sws_getContext()
-			// @param srcSlice - the array containing
+			// c - the scaling context previously
+			// created with sws_getContext().
+			// srcSlice - the array containing
 			// the pointers to the planes of the source
-			// slice
-			// @param srcStride the array containing the
-			// strides for each plane of the source image
-			// @param srcSliceY the position in the source
+			// slice.
+			// srcStride - the array containing the
+			// strides for each plane of the source image.
+			// srcSliceY - the position in the source
 			// image of the slice to process, that is the
 			// number (counted starting from zero) in the
-			// image of the first row of the slice @param
-			// srcSliceH the height of the source slice,
-			// that is the number of rows in the slice
-			// @param dst - the array containing the
+			// image of the first row of the slice.
+			// srcSliceH - the height of the source slice,
+			// that is the number of rows in the slice.
+			// dst - the array containing the
 			// pointers to the planes of the destination
-			// image @param dstStride - the array
+			// image.
+			// dstStride - the array
 			// containing the strides for each plane of
-			// the destination image
-			// @return - the height of the output slice
+			// the destination image.
+			// return - the height of the output slice.
 			sws_scale(
 				ost.sws_ctx,
 				ost.tmp_frame.data(),

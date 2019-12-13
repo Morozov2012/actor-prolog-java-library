@@ -8,7 +8,7 @@ import java.util.HashMap;
 
 public abstract class MethodTable {
 	//
-	public static MethodSignature[] initialContent;
+	protected static MethodSignature[] initialContent;
 	//
 	protected static HashMap<Long,MethodSignature> table= new HashMap<>();
 	//

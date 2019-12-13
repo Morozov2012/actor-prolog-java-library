@@ -45,14 +45,8 @@ public class ExtendedSpace2D
 	public ExtendedSpace2D(CustomControlComponent customControl, boolean keepProportions) {
 		super(customControl);
 		Canvas2DScalingFactor scaling;
-		// if (keepProportions) {
-		//	scaling= Canvas2DScalingFactor.MIN;
-		// } else {
-		//	scaling= Canvas2DScalingFactor.INDEPENDENT;
-		// };
-		// 2016.08.04 !!!
 		scaling= Canvas2DScalingFactor.INDEPENDENT;
-		scalingFactor= new AtomicReference<Canvas2DScalingFactor>(scaling);
+		scalingFactor= new AtomicReference<>(scaling);
 		sceneAntialiasingIsEnabled= new AtomicBoolean(false);
 		control= new ExtendedJPanel(owner,currentCommands,oldCommands,scalingFactor,sceneAntialiasingIsEnabled,redrawingIsSuspended);
 	}
@@ -105,6 +99,7 @@ public class ExtendedSpace2D
 			} else {
 				try {
 					SwingUtilities.invokeAndWait(new Runnable() {
+						@Override
 						public void run() {
 							o.addMouseListener(ExtendedSpace2D.this);
 						}
@@ -123,6 +118,7 @@ public class ExtendedSpace2D
 			} else {
 				try {
 					SwingUtilities.invokeAndWait(new Runnable() {
+						@Override
 						public void run() {
 							o.removeMouseListener(ExtendedSpace2D.this);
 						}
@@ -141,6 +137,7 @@ public class ExtendedSpace2D
 			} else {
 				try {
 					SwingUtilities.invokeAndWait(new Runnable() {
+						@Override
 						public void run() {
 							o.addMouseMotionListener(ExtendedSpace2D.this);
 						}
@@ -159,6 +156,7 @@ public class ExtendedSpace2D
 			} else {
 				try {
 					SwingUtilities.invokeAndWait(new Runnable() {
+						@Override
 						public void run() {
 							o.removeMouseMotionListener(ExtendedSpace2D.this);
 						}
@@ -211,6 +209,7 @@ public class ExtendedSpace2D
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void actionPerformed(ActionEvent event) {
 		if (targetWorld != null) {
 			long domainSignature= ((Canvas2D)targetWorld).entry_s_Action_1_i();
@@ -223,6 +222,7 @@ public class ExtendedSpace2D
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void mouseClicked(MouseEvent ev) {
 		if (targetWorld != null) {
 			if (((Canvas2D)targetWorld).mouseClickedEventIsEnabled.get()) {
@@ -231,6 +231,7 @@ public class ExtendedSpace2D
 			}
 		}
 	}
+	@Override
 	public void mouseEntered(MouseEvent ev) {
 		if (targetWorld != null) {
 			if (((Canvas2D)targetWorld).mouseEnteredEventIsEnabled.get()) {
@@ -239,6 +240,7 @@ public class ExtendedSpace2D
 			}
 		}
 	}
+	@Override
 	public void mouseExited(MouseEvent ev) {
 		if (targetWorld != null) {
 			if (((Canvas2D)targetWorld).mouseExitedEventIsEnabled.get()) {
@@ -247,6 +249,7 @@ public class ExtendedSpace2D
 			}
 		}
 	}
+	@Override
 	public void mousePressed(MouseEvent ev) {
 		if (targetWorld != null) {
 			if (((Canvas2D)targetWorld).mousePressedEventIsEnabled.get()) {
@@ -255,6 +258,7 @@ public class ExtendedSpace2D
 			}
 		}
 	}
+	@Override
 	public void mouseReleased(MouseEvent ev) {
 		if (targetWorld != null) {
 			if (((Canvas2D)targetWorld).mouseReleasedEventIsEnabled.get()) {
@@ -263,6 +267,7 @@ public class ExtendedSpace2D
 			}
 		}
 	}
+	@Override
 	public void mouseDragged(MouseEvent ev) {
 		if (targetWorld != null) {
 			if (((Canvas2D)targetWorld).mouseDraggedEventIsEnabled.get()) {
@@ -271,6 +276,7 @@ public class ExtendedSpace2D
 			}
 		}
 	}
+	@Override
 	public void mouseMoved(MouseEvent ev) {
 		if (targetWorld != null) {
 			if (((Canvas2D)targetWorld).mouseMovedEventIsEnabled.get()) {
@@ -296,11 +302,13 @@ public class ExtendedSpace2D
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void repaintAfterDelay() {
 		if (dialog != null) {
 			dialog.repaintAfterDelay();
 		}
 	}
+	@Override
 	public void skipDelayedRepainting() {
 		if (dialog != null) {
 			dialog.skipDelayedRepainting();
@@ -316,6 +324,7 @@ public class ExtendedSpace2D
 			try {
 				final AtomicReference<java.awt.image.BufferedImage> result= new AtomicReference<>();
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						result.set(quicklyGetBufferedImage(selectRegion,integerX,integerY,integerWidth,integerHeight));
 					}

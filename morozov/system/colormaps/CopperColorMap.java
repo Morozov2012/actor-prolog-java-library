@@ -7,23 +7,26 @@ public class CopperColorMap extends ColorMapRGBA {
 	public CopperColorMap() {
 	}
 	//
-	public int[][] createColorMap(int size, int alpha) {
-		int[][] cm= new int[4][size];
-		if (size <= 0) {
-			return cm;
-		};
+	@Override
+	public void createColorMap(int[][] cm, int shift, int bandWidth, int totalSize, int alpha) {
 		double k1= 1.2500 * maximalIndex;
 		double k2= 0.7812 * maximalIndex;
 		double k3= 0.4975 * maximalIndex;
-		int p1= size-1;
+		int p1= bandWidth-1;
 		if (p1 <= 0) {
-			cm[0][0]= maximalIndex;
-			cm[1][0]= (int)k2;
-			cm[2][0]= (int)k3;
-			cm[3][0]= alpha;
-			return cm;
+			if (shift+0 >= totalSize) {
+				return;
+			};
+			cm[0][shift+0]= maximalIndex;
+			cm[1][shift+0]= (int)k2;
+			cm[2][shift+0]= (int)k3;
+			cm[3][shift+0]= alpha;
+			return;
 		};
 		for (int n=0; n<=p1; n++) {
+			if (shift+n >= totalSize) {
+				break;
+			};
 			int red= (int)(k1 * n / p1);
 			if (red > maximalIndex) {
 				red= maximalIndex;
@@ -36,11 +39,10 @@ public class CopperColorMap extends ColorMapRGBA {
 			if (blue > maximalIndex) {
 				blue= maximalIndex;
 			};
-			cm[0][n]= red;
-			cm[1][n]= green;
-			cm[2][n]= blue;
-			cm[3][n]= alpha;
-		};
-		return cm;
+			cm[0][shift+n]= red;
+			cm[1][shift+n]= green;
+			cm[2][shift+n]= blue;
+			cm[3][shift+n]= alpha;
+		}
 	}
 }

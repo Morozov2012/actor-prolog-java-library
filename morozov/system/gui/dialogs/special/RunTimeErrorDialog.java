@@ -36,46 +36,48 @@ import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 public class RunTimeErrorDialog extends JDialog implements ActionListener {
-	ThreadHolder processHolder;
-	Throwable error;
-	String errorName;
-	long textPosition;
-	String position;
-	long unitCode;
-	String unitName;
-	int sourceFileNumber;
-	String sourceFileName;
-	String stackTrace;
-	JPanel mainPanel;
-	GridBagLayout mainPanelLayout;
-	JButton control_5_3_0;
-	JButton control_5_2_0;
-	JButton control_5_1_0;
-	JPanel panel5;
-	JTextArea area_3_2_5;
-	JScrollPane control_3_2_5;
-	JLabel control_3_1_5;
-	JTextArea area_3_2_4;
-	JScrollPane control_3_2_4;
-	JLabel control_3_1_4;
-	JButton control_4_2_3;
-	JTextField control_4_1_3;
-	JPanel panel4;
-	JLabel control_3_1_3;
-	JTextField control_3_2_2;
-	JLabel control_3_1_2;
-	JTextArea area_3_2_1;
-	JScrollPane control_3_2_1;
-	JLabel control_3_1_1;
-	JPanel panel3;
-	JPanel panel2;	// Titled
-	JPanel panel1;
-	GridBagLayout gBL3;
-	GridBagConstraints gBC3;
-	boolean hasCompactMode= true;
-	int horizontalInset= 12; // 10;
-	int verticalInset= 17; // 15;
-	int textAreaWidth= 55; // 32; // 45; // 32
+	//
+	protected ThreadHolder processHolder;
+	protected Throwable error;
+	protected String errorName;
+	protected long textPosition;
+	protected String position;
+	protected long unitCode;
+	protected String unitName;
+	protected int sourceFileNumber;
+	protected String sourceFileName;
+	protected String stackTrace;
+	protected JPanel mainPanel;
+	protected GridBagLayout mainPanelLayout;
+	protected JButton control_5_3_0;
+	protected JButton control_5_2_0;
+	protected JButton control_5_1_0;
+	protected JPanel panel5;
+	protected JTextArea area_3_2_5;
+	protected JScrollPane control_3_2_5;
+	protected JLabel control_3_1_5;
+	protected JTextArea area_3_2_4;
+	protected JScrollPane control_3_2_4;
+	protected JLabel control_3_1_4;
+	protected JButton control_4_2_3;
+	protected JTextField control_4_1_3;
+	protected JPanel panel4;
+	protected JLabel control_3_1_3;
+	protected JTextField control_3_2_2;
+	protected JLabel control_3_1_2;
+	protected JTextArea area_3_2_1;
+	protected JScrollPane control_3_2_1;
+	protected JLabel control_3_1_1;
+	protected JPanel panel3;
+	protected JPanel panel2;
+	protected JPanel panel1;
+	protected GridBagLayout gBL3;
+	protected GridBagConstraints gBC3;
+	protected boolean hasCompactMode= true;
+	protected int horizontalInset= 12;
+	protected int verticalInset= 17;
+	protected int textAreaWidth= 55;
+	//
 	public RunTimeErrorDialog(ThreadHolder listener, Window w, Throwable e, long p, long u, int s) {
 		super(w);
 		processHolder= listener;
@@ -106,6 +108,7 @@ public class RunTimeErrorDialog extends JDialog implements ActionListener {
 		writer.flush();
 		stackTrace= byteArray.toString();
 	}
+	//
 	public void activate() {
 		assemble();
 		pack();
@@ -113,7 +116,6 @@ public class RunTimeErrorDialog extends JDialog implements ActionListener {
 		setModalityType(ModalityType.DOCUMENT_MODAL);
 		pack();
 		SpecialUtils.centre(this);
-		// setVisible(true);
 		DesktopUtils.safelySetVisible(true,this);
 	}
 	//
@@ -161,10 +163,8 @@ public class RunTimeErrorDialog extends JDialog implements ActionListener {
 		gBL1.setConstraints(panel2,gBC1);
 		panel1.add(panel2);
 		panel3= new JPanel();
-		// GridBagLayout gBL3= new GridBagLayout();
 		gBL3= new GridBagLayout();
 		panel3.setLayout(gBL3);
-		// GridBagConstraints gBC3= new GridBagConstraints();
 		gBC3= new GridBagConstraints();
 		gBC3.ipadx= 0;
 		gBC3.ipady= 0;
@@ -319,12 +319,9 @@ public class RunTimeErrorDialog extends JDialog implements ActionListener {
 		gBC3.weighty= 1;
 		gBC3.ipadx= 0;
 		gBC3.ipady= 0;
-		// control_3_2_5= new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 		control_3_2_5= new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-		// area_3_2_5= new JTextArea(stackTrace,7,textAreaWidth);
 		area_3_2_5= new JTextArea(stackTrace,10,textAreaWidth);
 		area_3_2_5.setEditable(false);
-		// area_3_2_5.setLineWrap(true);
 		area_3_2_5.setLineWrap(false);
 		control_3_2_5.setViewportView(area_3_2_5);
 		gBC3.insets= new Insets(0,0,0,0);
@@ -409,7 +406,6 @@ public class RunTimeErrorDialog extends JDialog implements ActionListener {
 		gBC3.weighty= 1;
 		gBC3.ipadx= 0;
 		gBC3.ipady= 0;
-		// control_3_1_4= new JLabel("Source file");
 		if (hasCompactMode) {
 			gBC3.insets= new Insets(0,0,0,horizontalInset);
 		} else {
@@ -425,11 +421,6 @@ public class RunTimeErrorDialog extends JDialog implements ActionListener {
 		gBC3.weighty= 1;
 		gBC3.ipadx= 0;
 		gBC3.ipady= 0;
-		// control_3_2_4= new JScrollPane(ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
-		// area_3_2_4= new JTextArea(sourceFileName,5,textAreaWidth);
-		// area_3_2_4.setEditable(false);
-		// area_3_2_4.setLineWrap(true);
-		// control_3_2_4.setViewportView(area_3_2_4);
 		if (hasCompactMode) {
 			gBC3.insets= new Insets(0,0,0,0);
 		} else {
@@ -440,14 +431,10 @@ public class RunTimeErrorDialog extends JDialog implements ActionListener {
 	//
 	protected void tuneStackTraceAreaVisibility() {
 		if (hasCompactMode) {
-			// control_3_2_5.setVisible(false);
 			DesktopUtils.safelySetVisible(false,control_3_2_5);
-			// control_3_1_5.setVisible(false);
 			DesktopUtils.safelySetVisible(false,control_3_1_5);
 		} else {
-			// control_3_2_5.setVisible(true);
 			DesktopUtils.safelySetVisible(true,control_3_2_5);
-			// control_3_1_5.setVisible(true);
 			DesktopUtils.safelySetVisible(true,control_3_1_5);
 		}
 	}
@@ -464,6 +451,7 @@ public class RunTimeErrorDialog extends JDialog implements ActionListener {
 		setFont(font);
 	}
 	//
+	@Override
 	public void setFont(Font font) {
 		mainPanel.setFont(font);
 		panel1.setFont(font);
@@ -490,8 +478,10 @@ public class RunTimeErrorDialog extends JDialog implements ActionListener {
 		control_5_3_0.setFont(font);
 	}
 	//
+	@Override
 	public void actionPerformed(ActionEvent e) {
-		if ("switch_mode".equals(e.getActionCommand())) {
+		switch (e.getActionCommand()) {
+		case "switch_mode":
 			if (hasCompactMode) {
 				hasCompactMode= false;
 			} else {
@@ -502,15 +492,17 @@ public class RunTimeErrorDialog extends JDialog implements ActionListener {
 			tuneDialogModeButton();
 			pack();
 			SpecialUtils.centre(this);
-		} else if ("goto".equals(e.getActionCommand())) {
+			break;
+		case "goto":
 			processHolder.reportErrorPosition(error,textPosition,unitCode,sourceFileNumber);
-		} else if ("stop".equals(e.getActionCommand())) {
-			// setVisible(false);
+			break;
+		case "stop":
 			DesktopUtils.safelySetVisible(false,this);
 			processHolder.stopProgram(error,textPosition,unitCode,sourceFileNumber);
-		} else if ("continue".equals(e.getActionCommand())) {
-			// setVisible(false);
+			break;
+		case "continue":
 			DesktopUtils.safelySetVisible(false,this);
+			break;
 		}
 	}
 }

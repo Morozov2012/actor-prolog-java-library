@@ -16,12 +16,16 @@ import java.awt.Color;
 import java.awt.Component;
 
 public class ColoredTableCellRenderer extends DefaultTableCellRenderer {
-	TextAlignment horizontalAlignment;
+	//
+	protected TextAlignment horizontalAlignment;
+	//
 	public ColoredTableCellRenderer(TextAlignment hAlignment, Color foreground, Color background) {
 		horizontalAlignment= hAlignment;
 		setForeground(foreground);
 		setBackground(background);
 	}
+	//
+	@Override
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
 		ColoredTableCellRenderer c= (ColoredTableCellRenderer)super.getTableCellRendererComponent(table,value,isSelected,hasFocus,row,column);
 		Font font= table.getFont();

@@ -5,6 +5,7 @@ package morozov.system.signals;
 import morozov.run.*;
 
 public final class UseDefaultColor extends LightweightException {
+	//
 	public static final UseDefaultColor instance= new UseDefaultColor();
 	//
 	private UseDefaultColor() {

@@ -54,6 +54,7 @@ public class KinectDepthFrame extends KinectFrame implements KinectDepthFrameInt
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public short[] getDepth() {
 		return depth;
 	}

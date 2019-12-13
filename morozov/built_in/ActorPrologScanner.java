@@ -14,7 +14,6 @@ import morozov.terms.*;
 import morozov.worlds.*;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class ActorPrologScanner
@@ -23,6 +22,7 @@ public abstract class ActorPrologScanner
 	//
 	protected String[] keywords;
 	protected Boolean keepTextPositions;
+	protected Boolean acceptErroneousText;
 	//
 	protected YesNo stopTranslationAfterFirstError;
 	protected YesNo raiseRuntimeExceptions;
@@ -34,7 +34,6 @@ public abstract class ActorPrologScanner
 	protected AtomicBoolean actingThereAreTranslationErrors= new AtomicBoolean(false);
 	//
 	protected static Term termLexicalScannerError= new PrologSymbol(SymbolCodes.symbolCode_E_LexicalScannerError);
-	// protected static Term termEmptyString= new PrologString("");
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -48,6 +47,7 @@ public abstract class ActorPrologScanner
 	//
 	abstract public Term getBuiltInSlot_E_keywords();
 	abstract public Term getBuiltInSlot_E_keep_text_positions();
+	abstract public Term getBuiltInSlot_E_accept_erroneous_text();
 	abstract public Term getBuiltInSlot_E_stop_translation_after_first_error();
 	abstract public Term getBuiltInSlot_E_raise_runtime_exceptions();
 	abstract public Term getBuiltInSlot_E_send_error_messages();
@@ -98,6 +98,29 @@ public abstract class ActorPrologScanner
 			return keepTextPositions;
 		} else {
 			Term value= getBuiltInSlot_E_keep_text_positions();
+			return YesNoConverters.termYesNo2Boolean(value,iX);
+		}
+	}
+	//
+	// get/set acceptErroneousText
+	//
+	public void setAcceptErroneousText1s(ChoisePoint iX, Term a1) {
+		setAcceptErroneousText(YesNoConverters.termYesNo2Boolean(a1,iX));
+	}
+	public void setAcceptErroneousText(boolean value) {
+		acceptErroneousText= value;
+	}
+	public void getAcceptErroneousText0ff(ChoisePoint iX, PrologVariable result) {
+		boolean value= getAcceptErroneousText(iX);
+		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(value));
+	}
+	public void getAcceptErroneousText0fs(ChoisePoint iX) {
+	}
+	public boolean getAcceptErroneousText(ChoisePoint iX) {
+		if (acceptErroneousText != null) {
+			return acceptErroneousText;
+		} else {
+			Term value= getBuiltInSlot_E_accept_erroneous_text();
 			return YesNoConverters.termYesNo2Boolean(value,iX);
 		}
 	}
@@ -180,8 +203,9 @@ public abstract class ActorPrologScanner
 		String text= GeneralConverters.argumentToString(a1,iX);
 		String[] keywordArray= getKeywords(iX);
 		boolean includeTextPositions= getKeepTextPositions(iX);
+		boolean useRobustMode= getAcceptErroneousText(iX);
 		updateGeneralAttributes(iX);
-		PrologToken[] tokens= convertTextToTokens(text,keywordArray,includeTextPositions,iX);
+		PrologToken[] tokens= convertTextToTokens(text,keywordArray,includeTextPositions,useRobustMode,iX);
 		ArrayList<Term> tokenTermArray= new ArrayList<>();
 		int counter= 0;
 		while (counter < tokens.length) {
@@ -204,15 +228,22 @@ public abstract class ActorPrologScanner
 	public void convertToTokens1fs(ChoisePoint iX, Term a1) throws Backtracking {
 	}
 	//
-	protected PrologToken[] convertTextToTokens(String text, String[] keywordArray, boolean includeTextPositions, ChoisePoint iX) throws Backtracking {
-		HashSet<String> keywordHash= new HashSet<>();
-		HashSet<String> reservedNameHash= new HashSet<>();
-		for (int k=0; k < keywordArray.length; k++) {
-			String keyword= keywordArray[k];
-			keywordHash.add(keyword);
-			reservedNameHash.add(keyword.toLowerCase());
+	public void isPredefinedClassName1ff(ChoisePoint iX, PrologVariable result, Term a1) throws Backtracking {
+		int nameCode= GeneralConverters.argumentToSmallInteger(a1,iX);
+		if (!SymbolNames.isPredefinedClassName(nameCode)) {
+			throw Backtracking.instance;
 		};
-		LexicalScanner scanner= new LexicalScanner(this,false,keywordHash,reservedNameHash);
+		result.setNonBacktrackableValue(new PrologSymbol(SymbolNames.getPredefinedClassAncestorName(nameCode)));
+	}
+	public void isPredefinedClassName1fs(ChoisePoint iX, Term a1) throws Backtracking {
+		long nameCode= GeneralConverters.argumentToSymbol(a1,iX);
+		if (!SymbolNames.isPredefinedClassName(nameCode)) {
+			throw Backtracking.instance;
+		}
+	}
+	//
+	protected PrologToken[] convertTextToTokens(String text, String[] keywordArray, boolean includeTextPositions, boolean useRobustMode, ChoisePoint iX) throws Backtracking {
+		LexicalScanner scanner= new LexicalScanner(this,useRobustMode,keywordArray);
 		try {
 			PrologToken[] tokens= scanner.analyse(text,iX);
 			if (actingThereAreTranslationErrors.get()) {
@@ -241,6 +272,7 @@ public abstract class ActorPrologScanner
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void handleError(LexicalScannerError exception, ChoisePoint iX) throws LexicalScannerError {
 		actingThereAreTranslationErrors.set(true);
 		if (actingSendErrorMessages.get()) {
@@ -253,6 +285,7 @@ public abstract class ActorPrologScanner
 		}
 	}
 	//
+	@Override
 	public LexicalScannerError handleUnexpectedEndOfText(int position, ChoisePoint iX) throws LexicalScannerError {
 		LexicalScannerError exception= new UnexpectedEndOfText(position);
 		handleError(exception,iX);

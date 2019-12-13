@@ -31,15 +31,14 @@ public class DomainIntegerRange extends DomainAlternative {
 		rightBound= BigInteger.valueOf(right);
 	}
 	//
+	@Override
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
-		// t= t.dereferenceValue(cp);
 		t= t.dereferenceValue(cp);
 		if (ignoreFreeVariables && t.thisIsFreeVariable()) {
 			return true;
 		} else {
 			try {
 				BigInteger value= t.getIntegerValue(cp);
-				// if (leftBound <= value && value <= rightBound) {
 				if (leftBound.compareTo(value) <= 0 && value.compareTo(rightBound) <= 0) {
 					return true;
 				} else {
@@ -51,22 +50,28 @@ public class DomainIntegerRange extends DomainAlternative {
 		}
 	}
 	//
+	@Override
 	public boolean isEqualTo(DomainAlternative a, HashSet<PrologDomainPair> stack) {
 		return a.isEqualToIntegerRange(leftBound,rightBound);
 	}
+	@Override
 	public boolean isEqualToIntegerRange(BigInteger value1, BigInteger value2) {
 		return (leftBound.compareTo(value1)==0) && (rightBound.compareTo(value2)==0);
 	}
+	@Override
 	public boolean isCoveredByInteger() {
 		return true;
 	}
+	@Override
 	public boolean coversAlternative(DomainAlternative a, PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) {
 		return a.isCoveredByIntegerRange(leftBound,rightBound);
 	}
+	@Override
 	public boolean isCoveredByIntegerRange(BigInteger value1, BigInteger value2) {
 		return (value1.compareTo(leftBound)<=0) && (value2.compareTo(rightBound)>=0);
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
 		return PrologDomainName.tagDomainAlternative_IntegerRange + "(" + FormatOutput.integerToString(leftBound) + "," + FormatOutput.integerToString(rightBound) + ")";
 	}

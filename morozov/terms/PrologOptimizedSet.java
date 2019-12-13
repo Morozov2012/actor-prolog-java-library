@@ -22,8 +22,8 @@ import java.util.Iterator;
 
 public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 	//
-	private Term[] elements;
-	private long[] keys;
+	protected Term[] elements;
+	protected long[] keys;
 	//
 	private static final long serialVersionUID= 0xEC1039F9FD1A1464L; // -1436584535275203484L
 	//
@@ -147,6 +147,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public int hashCode() {
 		int sum= 0;
 		for (int i= 0; i < elements.length; i++) {
@@ -157,6 +158,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected Object clone() {
 		try {
 			PrologOptimizedSet o= (PrologOptimizedSet)super.clone();
@@ -169,6 +171,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 			throw new CannotCloneOptimizedSet();
 		}
 	}
+	@Override
 	public void isEmptySet(ChoisePoint cp) throws Backtracking {
 		for (int i= 0; i < elements.length; i++) {
 			Term e1= elements[i];
@@ -176,6 +179,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 		};
 		tail.isEmptySet(cp);
 	}
+	@Override
 	public void inheritSetElements(PrologOptimizedSet set, ChoisePoint cp) throws Backtracking {
 		for (int i= 0; i < elements.length; i++) {
 			Term e1= elements[i];
@@ -205,7 +209,6 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 				if (e2==null) {
 					elements[i]= e1;
 				} else {
-					// e1.isNoValue(cp);
 					throw Backtracking.instance;
 				};
 				tail.inheritSetElements(this,cp);
@@ -226,6 +229,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 		};
 		tail.inheritSetElements(this,cp);
 	}
+	@Override
 	public Term getNamedElement(long aName, ChoisePoint cp) throws Backtracking {
 		for (int i= 0; i < elements.length; i++) {
 			if (keys[i]==aName) {
@@ -239,22 +243,11 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 		};
 		return tail.getNamedElement(aName,cp);
 	}
-	// public Term checkSetAndGetNamedElement(long aName, ChoisePoint cp) throws Backtracking, TermIsNotASet {
-	//	for (int i= 0; i < elements.length; i++) {
-	//		if (keys[i]==aName) {
-	//			Term element= elements[i];
-	//			try {
-	//				return element.retrieveSetElementValue(cp);
-	//			} catch (TermIsNotSetElement e) {
-	//				throw new WrongArgumentIsNotSetElement(element);
-	//			}
-	//		}
-	//	};
-	//	return tail.checkSetAndGetNamedElement(aName,cp);
-	// }
+	@Override
 	public void checkIfTermIsASet(ChoisePoint cp) throws TermIsNotASet {
 		tail.checkIfTermIsASet(cp);
 	}
+	@Override
 	public Term excludeNamedElements(long[] aNames, ChoisePoint cp) throws Backtracking {
 		PrologOptimizedSet clone= (PrologOptimizedSet)this.clone();
 		Term noValue= PrologNoValue.instance;
@@ -270,7 +263,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 			};
 			if (!elementIsFound) {
 				if (extraElementsToBeExcluded==null) {
-					extraElementsToBeExcluded= new HashSet<Long>();
+					extraElementsToBeExcluded= new HashSet<>();
 				};
 				extraElementsToBeExcluded.add(aNames[i]);
 			}
@@ -287,6 +280,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 		};
 		return clone;
 	}
+	@Override
 	public void hasNoMoreElements(long[] aNames, ChoisePoint cp) throws Backtracking {
 		for (int i= 0; i < elements.length; i++) {
 			boolean isUnexpectedElement= true;
@@ -302,6 +296,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 		};
 		tail.hasNoMoreElements(aNames,cp);
 	}
+	@Override
 	public void verifySet(long[] aNames, ChoisePoint cp) throws Backtracking {
 		for (int i= 0; i < aNames.length; i++) {
 			for (int j= 0; j < elements.length; j++) {
@@ -312,10 +307,12 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 		};
 		tail.verifySet(aNames,cp);
 	}
+	@Override
 	public Term exploreSetPositiveElements(HashMap<Long,Term> positiveMap, ChoisePoint cp) {
 		exploreOptimizedPositiveElements(positiveMap,cp);
 		return tail.exploreSetPositiveElements(positiveMap,cp);
 	}
+	@Override
 	public Term exploreSet(HashMap<Long,Term> positiveMap, HashSet<Long> negativeMap, ChoisePoint cp) {
 		exploreOptimizedElements(positiveMap,negativeMap,cp);
 		return tail.exploreSet(positiveMap,negativeMap,cp);
@@ -345,6 +342,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 			}
 		}
 	}
+	@Override
 	public void unifyWithOptimizedSet(PrologOptimizedSet set, ChoisePoint cp) throws Backtracking {
 		if (keys==set.keys) {
 			for (int i= 0; i < elements.length; i++) {
@@ -354,13 +352,11 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 			};
 			tail.unifyWith(set.tail,cp);
 		} else {
-			HashMap<Long,Term> leftSetPositiveMap= new HashMap<Long,Term>();
-			HashSet<Long> leftSetNegativeMap= new HashSet<Long>();
-			HashMap<Long,Term> rightSetPositiveMap= new HashMap<Long,Term>();
-			HashSet<Long> rightSetNegativeMap= new HashSet<Long>();
-			// leftSetPositiveMap.put(name,value.dereferenceValue(cp));
+			HashMap<Long,Term> leftSetPositiveMap= new HashMap<>();
+			HashSet<Long> leftSetNegativeMap= new HashSet<>();
+			HashMap<Long,Term> rightSetPositiveMap= new HashMap<>();
+			HashSet<Long> rightSetNegativeMap= new HashSet<>();
 			exploreOptimizedElements(leftSetPositiveMap,leftSetNegativeMap,cp);
-			// rightSetPositiveMap.put(aName,aValue.dereferenceValue(cp));
 			set.exploreOptimizedElements(rightSetPositiveMap,rightSetNegativeMap,cp);
 			unify_with_set(
 				set.tail,cp,
@@ -370,12 +366,12 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 				rightSetNegativeMap);
 		}
 	}
+	@Override
 	public void unifyWithSet(long aName, Term aValue, Term aTail, Term aSet, ChoisePoint cp) throws Backtracking {
-		HashMap<Long,Term> leftSetPositiveMap= new HashMap<Long,Term>();
-		HashSet<Long> leftSetNegativeMap= new HashSet<Long>();
-		HashMap<Long,Term> rightSetPositiveMap= new HashMap<Long,Term>();
-		HashSet<Long> rightSetNegativeMap= new HashSet<Long>();
-		// leftSetPositiveMap.put(name,value.dereferenceValue(cp));
+		HashMap<Long,Term> leftSetPositiveMap= new HashMap<>();
+		HashSet<Long> leftSetNegativeMap= new HashSet<>();
+		HashMap<Long,Term> rightSetPositiveMap= new HashMap<>();
+		HashSet<Long> rightSetNegativeMap= new HashSet<>();
 		exploreOptimizedElements(leftSetPositiveMap,leftSetNegativeMap,cp);
 		rightSetPositiveMap.put(aName,aValue.dereferenceValue(cp));
 		unify_with_set(
@@ -385,12 +381,12 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 			rightSetPositiveMap,
 			rightSetNegativeMap);
 	}
+	@Override
 	public void unifyWithProhibitedElement(long aName, Term aTail, Term aSet, ChoisePoint cp) throws Backtracking {
-		HashMap<Long,Term> leftSetPositiveMap= new HashMap<Long,Term>();
-		HashSet<Long> leftSetNegativeMap= new HashSet<Long>();
-		HashMap<Long,Term> rightSetPositiveMap= new HashMap<Long,Term>();
-		HashSet<Long> rightSetNegativeMap= new HashSet<Long>();
-		// leftSetPositiveMap.put(name,value.dereferenceValue(cp));
+		HashMap<Long,Term> leftSetPositiveMap= new HashMap<>();
+		HashSet<Long> leftSetNegativeMap= new HashSet<>();
+		HashMap<Long,Term> rightSetPositiveMap= new HashMap<>();
+		HashSet<Long> rightSetNegativeMap= new HashSet<>();
 		exploreOptimizedElements(leftSetPositiveMap,leftSetNegativeMap,cp);
 		rightSetNegativeMap.add(aName);
 		unify_with_set(
@@ -400,24 +396,28 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 			rightSetPositiveMap,
 			rightSetNegativeMap);
 	}
+	@Override
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		t.unifyWithOptimizedSet(this,cp);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void registerVariables(ActiveWorld process, boolean isSuspending, boolean isProtecting) {
 		for (int i= 0; i < elements.length; i++) {
 			elements[i].registerVariables(process,isSuspending,isProtecting);
 		};
 		tail.registerVariables(process,isSuspending,isProtecting);
 	}
+	@Override
 	public void registerTargetWorlds(HashSet<AbstractWorld> worlds, ChoisePoint cp) {
 		for (int i= 0; i < elements.length; i++) {
 			elements[i].registerTargetWorlds(worlds,cp);
 		};
 		tail.registerTargetWorlds(worlds,cp);
 	}
+	@Override
 	public PrologOptimizedSet circumscribe() {
 		PrologOptimizedSet clone= (PrologOptimizedSet)this.clone();
 		for (int i= 0; i < elements.length; i++) {
@@ -426,6 +426,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 		clone.tail= tail.circumscribe();
 		return clone;
 	}
+	@Override
 	public PrologOptimizedSet copyValue(ChoisePoint cp, TermCircumscribingMode mode) {
 		PrologOptimizedSet clone= (PrologOptimizedSet)this.clone();
 		for (int i= 0; i < elements.length; i++) {
@@ -433,6 +434,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 		};
 		return clone;
 	}
+	@Override
 	public PrologOptimizedSet copyGroundValue(ChoisePoint cp) throws TermIsUnboundVariable {
 		PrologOptimizedSet clone= (PrologOptimizedSet)this.clone();
 		for (int i= 0; i < elements.length; i++) {
@@ -440,6 +442,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 		};
 		return clone;
 	}
+	@Override
 	public PrologOptimizedSet substituteWorlds(HashMap<AbstractWorld,Term> map, ChoisePoint cp) {
 		PrologOptimizedSet clone= (PrologOptimizedSet)this.clone();
 		for (int i= 0; i < elements.length; i++) {
@@ -451,6 +454,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean isCoveredByDomain(PrologDomain baseDomain, ChoisePoint cp, boolean ignoreFreeVariables) {
 		for (int i= 0; i < elements.length; i++) {
 			Term element= elements[i].dereferenceValue(cp);
@@ -479,9 +483,11 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 		};
 		return tail.isCoveredByDomain(baseDomain,cp,ignoreFreeVariables);
 	}
+	@Override
 	public boolean isCoveredBySetDomain(long functor, PrologDomain headDomain, PrologDomain baseDomain, ChoisePoint cp, boolean ignoreFreeVariables) {
 		return baseDomain.coversOptimizedSet(keys,elements,tail,baseDomain,cp,ignoreFreeVariables);
 	}
+	@Override
 	public boolean isCoveredByEmptySetDomain(PrologDomain baseDomain, ChoisePoint cp, boolean ignoreFreeVariables) {
 		for (int i= 0; i < elements.length; i++) {
 			Term element= elements[i].dereferenceValue(cp);
@@ -503,6 +509,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 		};
 		return tail.isCoveredByEmptySetDomain(baseDomain,cp,ignoreFreeVariables);
 	}
+	@Override
 	public Term checkSetTerm(long functor, PrologDomain headDomain, Term initialValue, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
 		return baseDomain.checkOptimizedSet(keys,elements,tail,initialValue,cp,baseDomain);
 	}
@@ -528,6 +535,7 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 			}
 		}
 	}
+	@Override
 	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		StringBuilder buffer= new StringBuilder("{");
 		boolean writeComma= false;
@@ -542,10 +550,10 @@ public class PrologOptimizedSet extends UnderdeterminedSetWithTail {
 				};
 				long name= keys[i];
 				buffer.append(
-					(name < 0 ?
-						SymbolNames.retrieveSymbolName(-name).toSafeString(encoder) :
-						String.format("%d",name) ) +
-					":");
+					name < 0 ?
+					SymbolNames.retrieveSymbolName(-name).toSafeString(encoder) :
+					String.format("%d",name))
+					.append(":");
 				if (value != null) {
 					buffer.append(value.toString(cp,true,provideStrictSyntax,encodeWorlds,encoder));
 				} else {

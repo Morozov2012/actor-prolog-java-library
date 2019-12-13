@@ -27,7 +27,7 @@ public class InterfaceDomainName extends PrologDomainName {
 		unit= u;
 		name= n;
 	}
-	// Converting Term to String
+	// Converting Term to String:
 	private void writeObject(ObjectOutputStream stream) throws IOException {
 		stream.defaultWriteObject();
 		stream.writeObject(SymbolNames.retrieveSymbolName(unit));
@@ -38,6 +38,7 @@ public class InterfaceDomainName extends PrologDomainName {
 		unit= SymbolNames.insertSymbolName(symbolName.identifier);
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
 		String uN= SymbolNames.retrieveSymbolName(unit).toRawString(encoder);
 		return tagDomainName_Interface + "(\'" + uN + "\',\"" + FormatOutput.encodeString(name,false,encoder) + "\")";

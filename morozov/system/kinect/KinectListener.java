@@ -28,16 +28,19 @@ public class KinectListener extends J4KSDK implements KinectListenerInterface {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setHorizontalCorrection(ExtendedCorrectionInterface x) {
 		int valueX= x.getHorizontalCorrection();
 		horizontalCorrection.set(valueX);
 		frameMappingTask.setCorrection(valueX,verticalCorrection.get());
 	}
+	@Override
 	public void setVerticalCorrection(ExtendedCorrectionInterface y) {
 		int valueY= y.getVerticalCorrection();
 		verticalCorrection.set(valueY);
 		frameMappingTask.setCorrection(horizontalCorrection.get(),valueY);
 	}
+	@Override
 	public void setCorrection(ExtendedCorrectionInterface x, ExtendedCorrectionInterface y) {
 		int valueX= x.getHorizontalCorrection();
 		int valueY= y.getVerticalCorrection();
@@ -45,6 +48,7 @@ public class KinectListener extends J4KSDK implements KinectListenerInterface {
 		verticalCorrection.set(valueY);
 		frameMappingTask.setCorrection(valueX,valueY);
 	}
+	@Override
 	public void setCorrection(int valueX, int valueY) {
 		horizontalCorrection.set(valueX);
 		verticalCorrection.set(valueY);
@@ -53,6 +57,7 @@ public class KinectListener extends J4KSDK implements KinectListenerInterface {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean initializeDevice(ConsolidatedDataAcquisitionModeInterface acquisitionMode) {
 		if (isConnected) {
 			return isConnected;
@@ -73,9 +78,11 @@ public class KinectListener extends J4KSDK implements KinectListenerInterface {
 		super.stop();
 		isConnected= false;
 	}
+	@Override
 	public boolean isConnected() {
 		return isConnected;
 	}
+	@Override
 	public boolean frameMappingIsInitialized() {
 		return frameMappingIsInitialized;
 	}
@@ -129,6 +136,7 @@ public class KinectListener extends J4KSDK implements KinectListenerInterface {
 		}
 	}
 	//
+	@Override
 	public KinectFrameWritableBaseAttributes createKinectFrameWritableBaseAttributes() {
 		byte type= getDeviceType();
 		float focX= getFocalLengthX();

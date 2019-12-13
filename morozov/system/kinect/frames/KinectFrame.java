@@ -72,119 +72,149 @@ public abstract class KinectFrame implements KinectFrameInterface, Serializable 
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public KinectDataArrayType getDataArrayType() {
 		return dataArrayType;
 	}
+	@Override
 	public long getSerialNumber() {
 		return serialNumber;
 	}
+	@Override
 	public long getTargetFrameNumber() {
 		return targetFrameNumber;
 	}
+	@Override
 	public long getColorFrameNumber() {
 		return colorFrameNumber;
 	}
+	@Override
 	public long getSkeletonsFrameNumber() {
 		return skeletonsFrameNumber;
 	}
+	@Override
 	public long getActingFrameNumber() {
 		return targetFrameNumber;
 	}
+	@Override
 	public boolean isProcessed() {
 		return isProcessed;
 	}
+	@Override
 	public void setIsProcessed(boolean value) {
 		isProcessed= value;
 	}
+	@Override
 	public long getTargetFrameTime() {
 		return targetFrameTime;
 	}
+	@Override
 	public long getColorFrameTime() {
 		return colorFrameTime;
 	}
+	@Override
 	public long getSkeletonsFrameTime() {
 		return skeletonsFrameTime;
 	}
+	@Override
 	public long getActingFrameTime() {
 		return targetFrameTime;
 	}
+	@Override
 	public GeneralSkeletonInterface[] getSkeletons() {
-		// if (skeletons != null) {
 		return skeletons;
-		// } else {
-		//	return emptySkeletonArray;
-		// }
 	}
+	@Override
 	public boolean hasTrackedSkeletons() {
 		return KinectSkeletonsFrameText.hasTrackedSkeletons(skeletons);
 	}
+	@Override
 	public DimensionsInterface getDimensions() {
 		return dimensions;
 	}
+	@Override
 	public byte[] getPlayerIndex() {
 		return playerIndex;
 	}
+	@Override
 	public byte[][] getMappedRed() {
 		return mappedRed;
 	}
+	@Override
 	public byte[][] getMappedGreen() {
 		return mappedGreen;
 	}
+	@Override
 	public byte[][] getMappedBlue() {
 		return mappedBlue;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public KinectFrameBaseAttributesInterface getBaseAttributes() {
 		return baseAttributes;
 	}
+	@Override
 	public byte getDeviceType() {
 		return baseAttributes.getDeviceType();
 	}
+	@Override
 	public float getFocalLengthX() {
 		return baseAttributes.getFocalLengthX();
 	}
+	@Override
 	public float getFocalLengthY() {
 		return baseAttributes.getFocalLengthY();
 	}
+	@Override
 	public int getDepthFrameWidth() {
 		return baseAttributes.getDepthFrameWidth();
 	}
+	@Override
 	public int getDepthFrameHeight() {
 		return baseAttributes.getDepthFrameHeight();
 	}
+	@Override
 	public int getColorFrameWidth() {
 		return baseAttributes.getColorFrameWidth();
 	}
+	@Override
 	public int getColorFrameHeight() {
 		return baseAttributes.getColorFrameHeight();
 	}
+	@Override
 	public int getNumberOfSkeletons() {
 		return baseAttributes.getNumberOfSkeletons();
 	}
+	@Override
 	public int getCorrectionX() {
 		return baseAttributes.getCorrectionX();
 	}
+	@Override
 	public int getCorrectionY() {
 		return baseAttributes.getCorrectionY();
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean isLightweightFrame() {
 		return false;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public long getReceivedFrameNumber() {
 		return receivedFrameNumber;
 	}
+	@Override
 	public void putReceivedFrameNumber(long number) {
 		receivedFrameNumber= number;
 	}
 	//
+	@Override
 	public KinectSkeletonsFrame extractSkeletonsFrame(long receivedFrameNumber) {
 		return new KinectSkeletonsFrame(
 			receivedFrameNumber,

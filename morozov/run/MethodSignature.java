@@ -9,11 +9,11 @@ import java.util.HashMap;
 
 public class MethodSignature implements Serializable {
 	//
-	public long domainSignature;
-	public String methodName;
-	public boolean isFunctionCall;
-	public boolean hasAsterisk;
-	public MethodArgument[] arguments;
+	protected long domainSignature;
+	protected String methodName;
+	protected boolean isFunctionCall;
+	protected boolean hasAsterisk;
+	protected MethodArgument[] arguments;
 	//
 	private static final long serialVersionUID= 0x814194FF0C4B61AAL; // -9132854746186817110L
 	//
@@ -27,6 +27,22 @@ public class MethodSignature implements Serializable {
 		isFunctionCall= iFC;
 		hasAsterisk= hA;
 		arguments= list;
+	}
+	//
+	public long getDomainSignature() {
+		return domainSignature;
+	}
+	public String getMethodName() {
+		return methodName;
+	}
+	public boolean isFunctionCall() {
+		return isFunctionCall;
+	}
+	public boolean hasAsterisk() {
+		return hasAsterisk;
+	}
+	public MethodArgument[] getArguments() {
+		return arguments;
 	}
 	//
 	public void collectLocalDomainTable(HashMap<String,PrologDomain> localDomainTable) {

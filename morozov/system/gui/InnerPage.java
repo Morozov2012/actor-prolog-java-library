@@ -37,29 +37,23 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 	//
 	protected ExtendedJInternalFrame internalFrame;
 	//
-	public CanvasSpace canvasSpace;
+	protected CanvasSpace canvasSpace;
 	//
-	public AtomicReference<ExtendedSize> logicalWidth= new AtomicReference<ExtendedSize>(new ExtendedSize());
-	public AtomicReference<ExtendedSize> logicalHeight= new AtomicReference<ExtendedSize>(new ExtendedSize());
-	public AtomicReference<ExtendedCoordinate> logicalX= new AtomicReference<ExtendedCoordinate>(new ExtendedCoordinate());
-	public AtomicReference<ExtendedCoordinate> logicalY= new AtomicReference<ExtendedCoordinate>(new ExtendedCoordinate());
-	public AtomicBoolean usePixelMeasurements= new AtomicBoolean(false);
+	protected AtomicReference<ExtendedSize> logicalWidth= new AtomicReference<>(new ExtendedSize());
+	protected AtomicReference<ExtendedSize> logicalHeight= new AtomicReference<>(new ExtendedSize());
+	protected AtomicReference<ExtendedCoordinate> logicalX= new AtomicReference<>(new ExtendedCoordinate());
+	protected AtomicReference<ExtendedCoordinate> logicalY= new AtomicReference<>(new ExtendedCoordinate());
+	protected AtomicBoolean usePixelMeasurements= new AtomicBoolean(false);
 	//
-	protected AtomicReference<JMenuBar> currentMenuBar= new AtomicReference<JMenuBar>(null);
+	protected AtomicReference<JMenuBar> currentMenuBar= new AtomicReference<>(null);
 	//
 	protected java.util.Timer scheduler;
 	protected LocalInnerPageTask currentTask;
 	//
 	protected long repaintingDelay= 10; // ms
-	// protected long repaintingDelay= 10000; // ms
-	// protected long repaintingDelay= 1; // ms
-	// protected long repaintingDelay= 100; // ms
 	//
 	public InnerPage(String title) {
 		internalFrame= new ExtendedJInternalFrame(this,title,logicalX,logicalY,logicalWidth,logicalHeight,usePixelMeasurements);
-		// safelySetDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
-		//// setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		// addPropertyChangeListener(this);
 		scheduler= new java.util.Timer(true);
 	}
 	//
@@ -72,6 +66,22 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		return canvasSpace;
 	}
 	//
+	public void setLogicalWidth(ExtendedSize value) {
+		logicalWidth.set(value);
+	}
+	public void setLogicalHeight(ExtendedSize value) {
+		logicalHeight.set(value);
+	}
+	public void setLogicalX(ExtendedCoordinate value) {
+		logicalX.set(value);
+	}
+	public void setLogicalY(ExtendedCoordinate value) {
+		logicalY.set(value);
+	}
+	public void setUsePixelMeasurements(boolean value) {
+		usePixelMeasurements.set(value);;
+	}
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public void safelyAdd(final CanvasSpace space) {
@@ -80,6 +90,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						internalFrame.add(space.getControl());
 					}
@@ -95,6 +106,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						internalFrame.add(c,index);
 					}
@@ -110,6 +122,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						internalFrame.setTitle(title);
 					}
@@ -128,6 +141,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						internalFrame.setBackground(color);
 						if (canvasSpace != null) {
@@ -140,23 +154,6 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 			}
 		}
 	}
-/*
-	public void safelySetDefaultCloseOperation(final int operation) {
-		if (SwingUtilities.isEventDispatchThread()) {
-			internalFrame.setDefaultCloseOperation(operation);
-		} else {
-			try {
-				SwingUtilities.invokeAndWait(new Runnable() {
-					public void run() {
-						internalFrame.setDefaultCloseOperation(operation);
-					}
-				});
-			} catch (InterruptedException e) {
-			} catch (InvocationTargetException e) {
-			}
-		}
-	}
-*/
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -166,6 +163,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						internalFrame.addComponentListener(l);
 					}
@@ -184,6 +182,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						internalFrame.getLocation(location);
 					}
@@ -200,6 +199,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						internalFrame.getLocation(location);
 						internalFrame.getSize(size);
@@ -216,6 +216,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						internalFrame.getSize(size);
 					}
@@ -231,6 +232,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklyGetSizeDifference(sizeDifference);
 					}
@@ -255,6 +257,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						internalFrame.setVisible(mode);
 					}
@@ -270,6 +273,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						internalFrame.moveToFront();
 					}
@@ -285,6 +289,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						internalFrame.revalidate();
 					}
@@ -300,6 +305,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						internalFrame.repaint();
 					}
@@ -315,6 +321,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						internalFrame.dispose();
 					}
@@ -333,6 +340,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklyMaximize();
 					}
@@ -360,6 +368,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklyMinimize();
 					}
@@ -387,6 +396,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklyRestore();
 					}
@@ -420,6 +430,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 			try {
 				final AtomicBoolean result= new AtomicBoolean(false);
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						result.set(internalFrame.isMaximum());
 					}
@@ -438,6 +449,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 			try {
 				final AtomicBoolean result= new AtomicBoolean(false);
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						result.set(internalFrame.isIcon());
 					}
@@ -456,6 +468,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 			try {
 				final AtomicBoolean result= new AtomicBoolean(false);
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						result.set(quicklyIsRestored());
 					}
@@ -477,6 +490,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 			try {
 				final AtomicBoolean result= new AtomicBoolean(false);
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						result.set(internalFrame.isVisible());
 					}
@@ -561,6 +575,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklyRestoreSize(x,y,width,height);
 					}
@@ -597,10 +612,6 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		}
 	}
 	//
-	// public void repaint() {
-	//	super.repaint();
-	// }
-	//
 	///////////////////////////////////////////////////////////////
 	//
 	public java.awt.image.BufferedImage safelyGetBufferedImage(final boolean selectRegion, final int integerX, final int integerY, final int integerWidth, final int integerHeight) {
@@ -610,6 +621,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 			try {
 				final AtomicReference<java.awt.image.BufferedImage> result= new AtomicReference<>();
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						result.set(quicklyGetBufferedImage(selectRegion,integerX,integerY,integerWidth,integerHeight));
 					}
@@ -637,7 +649,6 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		GraphicsConfiguration gc= internalFrame.getGraphicsConfiguration();
 		if (gc != null) {
 			java.awt.image.BufferedImage bufferedImage= gc.createCompatibleImage(integerWidth,integerHeight);
-			// Graphics g= bufferedImage.getGraphics();
 			Graphics g= DesktopUtils.safelyGetGraphics2D(bufferedImage);
 			try {
 				g.translate(x0,y0);
@@ -653,9 +664,6 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	//public void safelySetMenu(final JMenuBar menuBar) {
-	//	((JDesktopPane)internalFrame.getParent()).getRootPane().setJMenuBar(menuBar);
-	//}
 	public void safelySetMenu(final JMenuBar menuBar) {
 		currentMenuBar.set(menuBar);
 		if (SwingUtilities.isEventDispatchThread()) {
@@ -663,6 +671,7 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklySetMenu(menuBar);
 					}
@@ -673,7 +682,6 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 		}
 	}
 	protected void quicklySetMenu(final JMenuBar menuBar) {
-		// internalFrame.setJMenuBar(menuBar);
 		JDesktopPane desktop= (JDesktopPane)internalFrame.getParent();
 		desktop.getRootPane().setJMenuBar(menuBar);
 		desktop.revalidate();
@@ -704,33 +712,43 @@ public class InnerPage implements ActionListener, MouseListener, MouseMotionList
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void actionPerformed(ActionEvent event) {
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void mouseClicked(MouseEvent ev) {
 	}
+	@Override
 	public void mouseEntered(MouseEvent ev) {
 	}
+	@Override
 	public void mouseExited(MouseEvent ev) {
 	}
+	@Override
 	public void mousePressed(MouseEvent ev) {
 	}
+	@Override
 	public void mouseReleased(MouseEvent ev) {
 	}
+	@Override
 	public void mouseDragged(MouseEvent ev) {
 	}
+	@Override
 	public void mouseMoved(MouseEvent ev) {
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void focusGained(FocusEvent e) {
 		// Invoked when a component gains the keyboard focus.
 		JMenuBar menuBar= currentMenuBar.get();
 		quicklySetMenu(menuBar);
 	}
+	@Override
 	public void focusLost(FocusEvent e) {
 		// Invoked when a component loses the keyboard focus.
 	}

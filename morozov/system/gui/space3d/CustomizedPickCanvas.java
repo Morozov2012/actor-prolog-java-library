@@ -46,7 +46,7 @@ public class CustomizedPickCanvas
 	protected java.util.Timer scheduler;
 	protected LocalCustomizedPickCanvasTask currentTask;
 	//
-	protected HashSet<NodeLabel> currentlyIndicatedLabels= new HashSet<NodeLabel>();
+	protected HashSet<NodeLabel> currentlyIndicatedLabels= new HashSet<>();
 	//
 	public CustomizedPickCanvas(BranchGroup b, Canvas3D world, javax.media.j3d.Canvas3D c) {
 		super(c,b);
@@ -123,6 +123,7 @@ public class CustomizedPickCanvas
 		}
 	}
 	//
+	@Override
 	public void mouseClicked(MouseEvent mouseEvent) {
 		// Invoked when the mouse button has been clicked (pressed and released) on a component.
 		if (handleMouseClicked) {
@@ -134,6 +135,7 @@ public class CustomizedPickCanvas
 			}
 		}
 	}
+	@Override
 	public void mouseEntered(MouseEvent mouseEvent) {
 		// Invoked when the mouse enters a component.
 		activateTimer();
@@ -142,6 +144,7 @@ public class CustomizedPickCanvas
 			sendMessage(domainSignature,PrologEmptyList.instance);
 		}
 	}
+	@Override
 	public void mouseExited(MouseEvent mouseEvent) {
 		// Invoked when the mouse exits a component.
 		suspendTimer();
@@ -150,6 +153,7 @@ public class CustomizedPickCanvas
 			sendMessage(domainSignature,PrologEmptyList.instance);
 		}
 	}
+	@Override
 	public void mousePressed(MouseEvent mouseEvent) {
 		// Invoked when a mouse button has been pressed on a component.
 		if (handleMousePressed) {
@@ -161,6 +165,7 @@ public class CustomizedPickCanvas
 			}
 		}
 	}
+	@Override
 	public void mouseReleased(MouseEvent mouseEvent) {
 		// Invoked when a mouse button has been released on a component.
 		if (handleMousePressed) {
@@ -173,6 +178,7 @@ public class CustomizedPickCanvas
 		}
 	}
 	//
+	@Override
 	public void mouseDragged(MouseEvent mouseEvent) {
 		// Invoked when a mouse button is pressed on a component and then dragged.
 		if (handleMouseDragged) {
@@ -184,6 +190,7 @@ public class CustomizedPickCanvas
 			}
 		}
 	}
+	@Override
 	public void mouseMoved(MouseEvent mouseEvent) {
 		// Invoked when the mouse cursor has been moved onto a component but no buttons have been pushed.
 		if (handleMouseMoved) {
@@ -215,7 +222,7 @@ public class CustomizedPickCanvas
 	protected void updateNodeLabels(NodeLabel[] labels) {
 		int numberOfLabels= labels.length;
 		NodeLabel[] newLabels= new NodeLabel[numberOfLabels];
-		ArrayList<NodeLabel> removedLabels= new ArrayList<NodeLabel>();
+		ArrayList<NodeLabel> removedLabels= new ArrayList<>();
 		int numberOfNewLabels= 0;
 		int numberOfRemovedLabels= 0;
 		Iterator<NodeLabel> iterator= currentlyIndicatedLabels.iterator();

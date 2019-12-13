@@ -38,7 +38,7 @@ public class DatabaseTable implements Serializable, Cloneable {
 	protected DatabaseRecord ultimateRecord;
 	//
 	protected PrologDomain prologDomain;
-	protected HashMap<String,PrologDomain> localDomainTable= new HashMap<String,PrologDomain>();
+	protected HashMap<String,PrologDomain> localDomainTable= new HashMap<>();
 	//
 	protected String currentEntryName;
 	protected boolean reuseKeyNumbers= true;
@@ -60,13 +60,11 @@ public class DatabaseTable implements Serializable, Cloneable {
 	public DatabaseTable(PrologDomain domain, boolean reuseKN) {
 		prologDomain= domain;
 		reuseKeyNumbers= reuseKN;
-		// isShared= shared;
 		prologDomain.collectLocalDomainTable(localDomainTable);
 	}
 	public DatabaseTable(PrologDomain domain, boolean reuseKN, HashMap<String,PrologDomain> domainTable) {
 		prologDomain= domain;
 		reuseKeyNumbers= reuseKN;
-		// isShared= shared;
 		localDomainTable.clear();
 		localDomainTable.putAll(domainTable);
 		prologDomain.acceptLocalDomainTable(localDomainTable);
@@ -176,8 +174,7 @@ public class DatabaseTable implements Serializable, Cloneable {
 			if (currentRecord != null) {
 				if (hasOutputArgument) {
 					outputResult.setBacktrackableValue(currentRecord.content,newIx);
-					//newIx.pushTrail(outputResult);
-				} else {
+					} else {
 					try {
 						inputResult.unifyWith(currentRecord.content,newIx);
 					} catch (Backtracking b) {
@@ -191,7 +188,6 @@ public class DatabaseTable implements Serializable, Cloneable {
 				} catch (Backtracking b) {
 					if (hasOutputArgument) {
 						outputResult.clear();
-						//newIx.pushTrail(outputResult);
 					};
 					if (newIx.isEnabled()) {
 						newIx.freeTrail();
@@ -225,7 +221,6 @@ public class DatabaseTable implements Serializable, Cloneable {
 			if (currentRecord != null) {
 				if (isFunctionCall) {
 					result.setNonBacktrackableValue(currentRecord.content);
-					// newIx.pushTrail(result);
 				};
 				try {
 					c0.execute(newIx);
@@ -265,7 +260,6 @@ public class DatabaseTable implements Serializable, Cloneable {
 			if (currentRecord != null) {
 				if (hasOutputArgument) {
 					outputResult.setBacktrackableValue(currentRecord.content,newIx);
-					//newIx.pushTrail(outputResult);
 				} else {
 					try {
 						inputResult.unifyWith(currentRecord.content,newIx);
@@ -346,8 +340,8 @@ public class DatabaseTable implements Serializable, Cloneable {
 	public void sortBy(Term targetKey, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
 		long key= DatabaseUtils.argumentToSortingKey(targetKey,iX);
-		ArrayList<ComparablePair> pairs= new ArrayList<ComparablePair>();
-		ArrayList<Term> rest= new ArrayList<Term>();
+		ArrayList<ComparablePair> pairs= new ArrayList<>();
+		ArrayList<Term> rest= new ArrayList<>();
 		tableContent.retrieveComparablePairs(key,pairs,rest,iX);
 		Collections.sort(pairs);
 		if (tableContent != null) {
@@ -435,7 +429,6 @@ public class DatabaseTable implements Serializable, Cloneable {
 	///////////////////////////////////////////////////////////////
 	//
 	public void loadContent(String textBuffer, ActiveWorld currentProcess, boolean checkPrivileges, ParserMasterInterface master, ChoisePoint iX) throws SyntaxError, DatabaseRecordDoesNotBelongToDomain {
-		// String textBuffer= fileName.getTextData(timeout,requestedCharacterSet,staticContext);
 		GroundTermParser parser= new GroundTermParser(master,true);
 		Term[] terms= parser.stringToTerms(textBuffer,null);
 		boolean optimizeSets= DefaultOptions.underdeterminedSetsOptimizationIsEnabled;
@@ -486,7 +479,6 @@ public class DatabaseTable implements Serializable, Cloneable {
 			} else if (currentRecord.content != null) {
 				try {
 					currentRecord.content.unifyWith(pattern,iX);
-					// iX.freeTrail();
 					return currentRecord;
 				} catch (Backtracking b) {
 					iX.freeTrail();
@@ -528,9 +520,6 @@ public class DatabaseTable implements Serializable, Cloneable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	// private void writeObject(ObjectOutputStream stream) throws IOException {
-	//	stream.defaultWriteObject();
-	// }
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		if (stream instanceof DataStoreInputStream) {
 			DataStoreInputStream dataStream= (DataStoreInputStream)stream;
@@ -553,6 +542,7 @@ public class DatabaseTable implements Serializable, Cloneable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Object clone() {
 		DatabaseTable o;
 		try {

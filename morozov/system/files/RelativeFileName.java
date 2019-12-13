@@ -7,6 +7,7 @@ import morozov.system.files.errors.*;
 import morozov.terms.*;
 
 public class RelativeFileName extends SimpleFileName {
+	//
 	public RelativeFileName(String name, boolean backslashIsSeparator, boolean acceptOnlyURI) {
 		super(name,backslashIsSeparator,acceptOnlyURI);
 	}
@@ -107,7 +108,6 @@ public class RelativeFileName extends SimpleFileName {
 				return fullName;
 			}
 		} else {
-			// return toString();
 			throw new StandardStreamIsNotAllowedInThisOperation();
 		}
 	}
@@ -137,7 +137,6 @@ public class RelativeFileName extends SimpleFileName {
 				return "";
 			}
 		} else {
-			// return "";
 			throw new StandardStreamIsNotAllowedInThisOperation();
 		}
 	}
@@ -146,7 +145,6 @@ public class RelativeFileName extends SimpleFileName {
 		if (!isStandardFile) {
 			return new PrologString(modifyFileExtension(newExtension));
 		} else {
-			// return toTerm();
 			throw new StandardStreamIsNotAllowedInThisOperation();
 		}
 	}

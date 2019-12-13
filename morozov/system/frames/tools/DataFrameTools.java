@@ -1,3 +1,4 @@
+
 // (c) 2018 Alexei A. Morozov
 
 package morozov.system.frames.tools;
@@ -84,7 +85,6 @@ public class DataFrameTools {
 		int[] red= new int[imageSize];
 		int[] green= new int[imageSize];
 		int[] blue= new int[imageSize];
-		int[] alpha= new int[imageSize];
 		int mainColorMapSize= 256;
 		int auxiliaryColorMapSize= 256;
 		if (mainColorMap != null && mainColorMap.length > 0) {
@@ -110,12 +110,10 @@ public class DataFrameTools {
 							red[pos1]= mainColorMap[0][mainIndex];
 							green[pos1]= mainColorMap[1][mainIndex];
 							blue[pos1]= mainColorMap[2][mainIndex];
-							alpha[pos1]= mainColorMap[3][mainIndex];
 						} else {
 							red[pos1]= 255 - (int)(255.0 * (t - lowerTemperatureQuantile2) / (upperTemperatureQuantile2 - lowerTemperatureQuantile2));
 							green[pos1]= (int)(255.0 * (t - lowerTemperatureQuantile2) / (upperTemperatureQuantile2 - lowerTemperatureQuantile2));
 							blue[pos1]= 255 - (int)(255.0 * (t - lowerTemperatureQuantile2) / (upperTemperatureQuantile2 - lowerTemperatureQuantile2));
-							alpha[pos1]= 255;
 						}
 					} else {
 						if (t > upperTemperatureQuantile1) {
@@ -133,20 +131,11 @@ public class DataFrameTools {
 							red[pos1]= auxiliaryColorMap[0][auxiliaryIndex];
 							green[pos1]= auxiliaryColorMap[1][auxiliaryIndex];
 							blue[pos1]= auxiliaryColorMap[2][auxiliaryIndex];
-							alpha[pos1]= auxiliaryColorMap[3][auxiliaryIndex];
 						} else {
 							red[pos1]= 255 - (int)(255.0 * (t - lowerTemperatureQuantile1) / (upperTemperatureQuantile1 - lowerTemperatureQuantile1));
 							green[pos1]= (int)(255.0 * (t - lowerTemperatureQuantile1) / (upperTemperatureQuantile1 - lowerTemperatureQuantile1));
 							blue[pos1]= 255 - (int)(255.0 * (t - lowerTemperatureQuantile1) / (upperTemperatureQuantile1 - lowerTemperatureQuantile1));
-							alpha[pos1]= 255;
 						}
-						/*
-						int grey= (int)(255.0 * (t - lowerTemperatureQuantile1) / (upperTemperatureQuantile1 - lowerTemperatureQuantile1));
-						red[pos1]= grey;
-						green[pos1]= grey;
-						blue[pos1]= grey;
-						alpha[pos1]= 255;
-						*/
 					}
 				}
 			}
@@ -171,12 +160,10 @@ public class DataFrameTools {
 						red[pos1]= mainColorMap[0][index];
 						green[pos1]= mainColorMap[1][index];
 						blue[pos1]= mainColorMap[2][index];
-						alpha[pos1]= mainColorMap[3][index];
 					} else {
 						red[pos1]= 255 - (int)(255.0 * (t - lowerTemperatureQuantile2) / (upperTemperatureQuantile2 - lowerTemperatureQuantile2));
 						green[pos1]= (int)(255.0 * (t - lowerTemperatureQuantile2) / (upperTemperatureQuantile2 - lowerTemperatureQuantile2));
 						blue[pos1]= 255 - (int)(255.0 * (t - lowerTemperatureQuantile2) / (upperTemperatureQuantile2 - lowerTemperatureQuantile2));
-						alpha[pos1]= 255;
 					}
 				}
 			}
@@ -186,7 +173,6 @@ public class DataFrameTools {
 		imageRaster.setSamples(0,0,imageWidth,imageHeight,0,red);
 		imageRaster.setSamples(0,0,imageWidth,imageHeight,1,green);
 		imageRaster.setSamples(0,0,imageWidth,imageHeight,2,blue);
-		// imageRaster.setSamples(0,0,imageWidth,imageHeight,3,alpha);
 		return new AttachedImage(image,imageX0,imageY0);
 	}
 	//

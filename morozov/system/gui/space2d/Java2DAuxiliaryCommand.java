@@ -3,6 +3,7 @@
 package morozov.system.gui.space2d;
 
 public abstract class Java2DAuxiliaryCommand extends Java2DCommand {
+	@Override
 	public boolean isAuxiliaryCommand() {
 		return true;
 	}

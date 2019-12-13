@@ -53,7 +53,6 @@ public class DataFrameRecordingTask extends Thread {
 	public DataFrameRecordingTask() {
 		setDaemon(true);
 		setPriority(Thread.MAX_PRIORITY);
-		start();
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -83,6 +82,7 @@ public class DataFrameRecordingTask extends Thread {
 	//
 	public void reset(ExtendedFileName fileName) {
 		close();
+		startProcessIfNecessary();
 		try {
 			synchronized (objectStreamGuard) {
 				acceptFrames.set(false);
@@ -99,6 +99,17 @@ public class DataFrameRecordingTask extends Thread {
 			throw new FileInputOutputError(outputFilePath.toString(),e);
 		}
 	}
+	//
+	protected void startProcessIfNecessary() {
+		synchronized (this) {
+			if (!isAlive()) {
+				start();
+			};
+			notifyAll();
+		}
+	}
+	//
+	@SuppressWarnings("CallToThreadDumpStack")
 	public void close() {
 		acceptFrames.set(false);
 		try {
@@ -155,6 +166,8 @@ public class DataFrameRecordingTask extends Thread {
 		}
 	}
 	//
+	@Override
+	@SuppressWarnings("CallToThreadDumpStack")
 	public void run() {
 		while (true) {
 			try {
@@ -165,12 +178,9 @@ public class DataFrameRecordingTask extends Thread {
 				};
 				recordFrames();
 			} catch (InterruptedException e) {
-//(new RuntimeException()).printStackTrace();
 			} catch (ThreadDeath e) {
-//(new RuntimeException()).printStackTrace();
 				return;
 			} catch (Throwable e) {
-//(new RuntimeException()).printStackTrace();
 				if (reportCriticalErrors()) {
 					e.printStackTrace();
 				}
@@ -196,10 +206,7 @@ public class DataFrameRecordingTask extends Thread {
 					objectOutputStream.writeObject(currentFrame);
 					objectOutputStream.reset();
 				}
-			// } catch (IOException e) {
-			//	throw new FileInputOutputError(outputFilePath.toString(),e);
 			} catch (Throwable e) {
-//(new RuntimeException()).printStackTrace();
 				recordFrames.set(false);
 				close();
 				dataProvider.completeDataWriting(frameNumber,e);
@@ -232,7 +239,6 @@ public class DataFrameRecordingTask extends Thread {
 ///////////////////////////////////////////////////////////////////////
 while (iteratorHistory.hasNext() && currentLength > 0) {
 	Object previousFrame= iteratorHistory.next();
-	// if (!previousFrame.isLightweightFrame()) {
 	if (!isLightweightFrame(previousFrame)) {
 		if (auxiliaryCounter >= step) {
 			auxiliaryCounter= 0;

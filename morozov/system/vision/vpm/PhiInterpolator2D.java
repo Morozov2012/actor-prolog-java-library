@@ -4,26 +4,28 @@ package morozov.system.vision.vpm;
 
 public class PhiInterpolator2D extends Interpolator2D {
 	//
-	protected double targetMeshEpsilon= 0.1;
+	protected double targetPhiInterpolatorMeshEpsilon= 0.1;
 	protected double physicalDistanceEpsilon= 0.01;
 	protected int maxPhysicalDistanceIterations= 30;
 	//
 	///////////////////////////////////////////////////////////////
 	//
 	public PhiInterpolator2D() {
-		meshEpsilon= targetMeshEpsilon;
+		meshEpsilon= targetPhiInterpolatorMeshEpsilon;
 	}
 	public PhiInterpolator2D(double epsilon, int iterations) {
 		super();
 		physicalDistanceEpsilon= epsilon;
-		int maxPhysicalDistanceIterations= iterations;
+		maxPhysicalDistanceIterations= iterations;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public double computeMatrixItem(int pX, int pY, double[][] inverseMatrix, double[][] dummyArgument) {
 		return computePhi(pX,pY,inverseMatrix);
 	}
+	@Override
 	public double computeDefaultValue() {
 		return StrictMath.PI / 2;
 	}

@@ -12,8 +12,8 @@ package morozov.system.gui.dialogs.scalable.common;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.system.*;
 import morozov.system.gui.space2d.*;
-import morozov.terms.*;
 
 import java.awt.GridBagConstraints;
 import javax.swing.Icon;
@@ -44,12 +44,15 @@ public class Icon2D implements Icon {
 		currentHeight= d.height;
 	}
 	//
+	@Override
 	public int getIconHeight() {
 		return currentHeight;
 	}
+	@Override
 	public int getIconWidth() {
 		return currentWidth;
 	}
+	@Override
 	public void paintIcon(Component c, Graphics g0, int x, int y) {
 		if (space2D != null) {
 			if (keepProportions) {
@@ -62,7 +65,7 @@ public class Icon2D implements Icon {
 					double ratio0= (double)iconHeight / iconWidth;
 					double ratio1= (double)imageHeight / imageWidth;
 					if (ratio0 < ratio1) {
-						int w2= PrologInteger.toInteger(iconHeight / ratio1);
+						int w2= Arithmetic.toInteger(iconHeight / ratio1);
 						if (	anchor==GridBagConstraints.WEST ||
 							anchor==GridBagConstraints.NORTHWEST ||
 							anchor==GridBagConstraints.SOUTHWEST ) {
@@ -75,12 +78,12 @@ public class Icon2D implements Icon {
 							gg.translate(x3,0);
 							space2D.quicklyPaintComponent(gg);
 						} else {
-							int deltaW= PrologInteger.toInteger((iconWidth - w2) / 2);
+							int deltaW= Arithmetic.toInteger((iconWidth - w2) / 2);
 							gg.translate(deltaW,0);
 							space2D.quicklyPaintComponent(gg);
 						}
 					} else {
-						int h2= PrologInteger.toInteger(iconWidth * ratio1);
+						int h2= Arithmetic.toInteger(iconWidth * ratio1);
 						if (	anchor==GridBagConstraints.NORTH ||
 							anchor==GridBagConstraints.NORTHWEST ||
 							anchor==GridBagConstraints.NORTHEAST ) {
@@ -93,7 +96,7 @@ public class Icon2D implements Icon {
 							gg.translate(0,y3);
 							space2D.quicklyPaintComponent(gg);
 						} else {
-							int deltaH= PrologInteger.toInteger((iconHeight - h2) / 2);
+							int deltaH= Arithmetic.toInteger((iconHeight - h2) / 2);
 							gg.translate(0,deltaH);
 							space2D.quicklyPaintComponent(gg);
 						}

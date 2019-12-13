@@ -13,7 +13,6 @@ public class KinectMappedColorFrameText {
 	//
 	public static void writeText(KinectMappedColorFrameInterface frame, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {
 		if (exportMode==ExportMode.SKELETONS) {
-			// super.writeText(writer,exportMode,locale);
 			KinectFrameText.writeRootFrameText(frame,writer,exportMode,locale);
 		} else {
 			writeMappedColorFrameText(frame,writer,exportMode,locale);
@@ -22,7 +21,6 @@ public class KinectMappedColorFrameText {
 	//
 	public static void writeMappedColorFrameText(KinectMappedColorFrameInterface frame, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {
 		writer.write("; MAPPED COLOR FRAME.\n");
-		// super.writeText(writer,exportMode,locale);
 		KinectFrameText.writeRootFrameText(frame,writer,exportMode,locale);
 		writer.write("; End of mapped color frame.\n");
 	}

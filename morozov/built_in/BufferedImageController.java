@@ -3,7 +3,7 @@
 package morozov.built_in;
 
 import morozov.run.*;
-import morozov.system.errors.*;
+import morozov.system.converters.errors.*;
 import morozov.system.files.*;
 import morozov.system.files.errors.*;
 import morozov.system.gui.space2d.*;
@@ -120,10 +120,6 @@ public abstract class BufferedImageController extends DataResourceConsumer {
 					outputStream= new BufferedOutputStream(System.err);
 				}
 			};
-			// if (writer==null) {
-			//	ImageIO.setUseCache(false);
-			//	ImageIO.write(nativeImage,formatName,outputStream);
-			// } else {
 			ImageOutputStream output= new MemoryCacheImageOutputStream(outputStream);
 			try {
 				writer.setOutput(output);
@@ -136,7 +132,6 @@ public abstract class BufferedImageController extends DataResourceConsumer {
 					outputStream.close();
 				}
 			}
-			// }
 		} catch (IOException e) {
 			throw new FileInputOutputError(fileName.toString(),e);
 		}
@@ -175,6 +170,7 @@ public abstract class BufferedImageController extends DataResourceConsumer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void isHidden0s(ChoisePoint iX) throws Backtracking {
 		isHiddenCustomControl(iX);
 	}

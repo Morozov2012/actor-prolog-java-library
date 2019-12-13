@@ -34,9 +34,6 @@ public abstract class BufferedScene extends DataResourceConsumer {
 	//
 	protected AtomicReference<BranchGroup> bufferedScene= new AtomicReference<>(null);
 	//
-	//protected static final Term symbolDefault= new PrologSymbol(SymbolCodes.symbolCode_E_default);
-	//protected static final Term noValue= new PrologInteger(-1);
-	//
 	protected static final String format_LWS= "lws";	// Lightwave Scene Format
 	protected static final String format_OBJ= "obj";	// Wavefront
 	protected static final String format_J3D= "j3d";	// Java3D
@@ -79,8 +76,6 @@ public abstract class BufferedScene extends DataResourceConsumer {
 		} else {
 			byte[] byteArray= fileName.getByteContentOfUniversalResource(CharacterSet.NONE,timeout,staticContext);
 			if (format.equals(format_J3D)) {
-				// Java3D
-				// return Space3DWriter.bytesToScene(byteArray);
 				try {
 					Path path= Files.createTempFile(temporaryJ3DFilePrefix,null);
 					Files.write(path,byteArray);
@@ -184,12 +179,6 @@ public abstract class BufferedScene extends DataResourceConsumer {
 	public void setBranchGroup(BranchGroup group) {
 		bufferedScene.set(group);
 	}
-	//
-	// public void getSceneGroup0ff(ChoisePoint iX, Term result) {
-	//	result.setNonBacktrackableValue(bufferedScene.get().toTerm());
-	// }
-	// public void getSceneGroup0fs(ChoisePoint iX) {
-	// }
 	//
 	public BranchGroup getBranchGroup() {
 		return bufferedScene.get();

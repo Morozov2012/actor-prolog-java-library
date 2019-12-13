@@ -11,9 +11,12 @@ import javax.swing.JComponent;
 import javax.swing.plaf.ComponentUI;
 
 public class ActorPrologWindowsDesktopPaneUI extends WindowsDesktopPaneUI {
+	//
 	public static ComponentUI createUI(JComponent c) {
 		return new ActorPrologWindowsDesktopPaneUI();
 	}
+	//
+	@Override
 	protected void installDesktopManager() {
 		desktopManager= desktop.getDesktopManager();
 		if(desktopManager == null) {
@@ -21,6 +24,7 @@ public class ActorPrologWindowsDesktopPaneUI extends WindowsDesktopPaneUI {
 			desktop.setDesktopManager(desktopManager);
 		}
 	}
+	@Override
 	protected void installDefaults() {
 		super.installDefaults();
 	}

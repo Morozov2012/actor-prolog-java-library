@@ -5,6 +5,7 @@ package morozov.system.gui.sadt;
 import target.*;
 
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.gui.*;
 import morozov.system.gui.sadt.signals.*;
 import morozov.terms.*;
@@ -32,6 +33,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.beans.PropertyVetoException;
 
 public class DiagramUtils {
+	//
 	public static String computeFullIdentifier(String motherIdentifier, long innerBlockNumber) {
 		if (motherIdentifier.isEmpty()) {
 			return String.format("%d",innerBlockNumber);
@@ -82,6 +84,7 @@ public class DiagramUtils {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						createInternalFrame(identifier,graph,context,diagramColors,components,componentSuccess);
 					}
@@ -102,8 +105,6 @@ public class DiagramUtils {
 		};
 		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(context);
 		desktop.safelyAdd(diagramWindow.getInternalFrame());
-		// diagramWindow.setVisible(true);
-		// DesktopUtils.safelySetVisible(true,diagramWindow);
 		diagramWindow.safelySetVisible(true);
 		diagramWindow.safelyRestoreSize(context);
 	}
@@ -114,7 +115,7 @@ public class DiagramUtils {
 			name= DiagramTable.getDiagramName(identifier);
 		} catch (DiagramTableEntryDoesNotExist e) {
 		};
-		String title= "";
+		String title;
 		if (identifier.isEmpty()) {
 			title= "a-0";
 		} else {
@@ -129,6 +130,7 @@ public class DiagramUtils {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						makeInternalFrameVisible(diagramWindow);
 					}
@@ -144,8 +146,6 @@ public class DiagramUtils {
 		} catch (PropertyVetoException e) {
 		};
 		if (!diagramWindow.getInternalFrame().isShowing()) {
-			// diagramWindow.setVisible(true);
-			// DesktopUtils.safelySetVisible(true,diagramWindow);
 			diagramWindow.safelySetVisible(true);
 		};
 		diagramWindow.getInternalFrame().toFront();
@@ -158,7 +158,7 @@ public class DiagramUtils {
 		return computeFont(colors.fontName,size,colors.fontStyle,foreground,background);
 	}
 	public static Font computeFont(String fontName, int fontSize, int fontStyle, Color foreground, Color background) {
-		Map<TextAttribute,Object> map= new HashMap<TextAttribute,Object>();
+		Map<TextAttribute,Object> map= new HashMap<>();
 		map.put(TextAttribute.FAMILY,fontName);
 		boolean isBold= (fontStyle & Font.BOLD) != 0;
 		boolean isItalic= (fontStyle & Font.ITALIC) != 0;
@@ -233,7 +233,6 @@ public class DiagramUtils {
 			Font font= g2.getFont();
 			FontMetrics metrics= g2.getFontMetrics();
 			FontRenderContext frc= metrics.getFontRenderContext();
-			double textX= 0;
 			float descent= metrics.getDescent();
 			double textY;
 			if (boxHeight >= 1) {
@@ -246,18 +245,20 @@ public class DiagramUtils {
 					int lineWidth= metrics.stringWidth(boxText[n]);
 					Rectangle2D rectangle2D= font.getMaxCharBounds(frc);
 					double lineHeight= rectangle2D.getHeight();
+					double textX;
 					if (boxWidth >= 1) {
 						textX= x + (boxWidth - lineWidth) / 2;
 					} else {
 						textX= x;
 					};
 					if (boxText[n].length() > 0) {
-						g2.drawString(boxText[n],PrologInteger.toInteger(textX),PrologInteger.toInteger(textY));
+						g2.drawString(boxText[n],Arithmetic.toInteger(textX),Arithmetic.toInteger(textY));
 					};
 					textY= textY + lineHeight + extraLeading;
 				}
 			} else {
 				int lineWidth= metrics.stringWidth(boxText[0]);
+				double textX;
 				if (boxWidth >= 1) {
 					textX= x + (boxWidth - lineWidth) / 2;
 				} else {
@@ -269,7 +270,7 @@ public class DiagramUtils {
 					textY= y + firstLineHeight - descent;
 				};
 				if (boxText[0].length() > 0) {
-					g2.drawString(boxText[0],PrologInteger.toInteger(textX),PrologInteger.toInteger(textY));
+					g2.drawString(boxText[0],Arithmetic.toInteger(textX),Arithmetic.toInteger(textY));
 				}
 			}
 		}
@@ -293,19 +294,19 @@ public class DiagramUtils {
 		JDialog dialog= panel.createDialog(parent,title);
 		dialog.setModal(true);
 		dialog.setModalityType(Dialog.ModalityType.DOCUMENT_MODAL);
-		// dialog.setVisible(true);
 		DesktopUtils.safelySetVisible(true,dialog);
 	}
 	//
 	public static void safelyRepaintAllDiagrams(StaticContext context) {
 		Map<String,InternalDiagramFrame> innerWindows= StaticDiagramAttributes.retrieveInnerWindows(context);
 		Collection<InternalDiagramFrame> values= innerWindows.values();
-		final InternalDiagramFrame[] frames= values.toArray(new InternalDiagramFrame[0]);
+		final InternalDiagramFrame[] frames= values.toArray(new InternalDiagramFrame[values.size()]);
 		if (SwingUtilities.isEventDispatchThread()) {
 			repaintDiagrams(frames);
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						repaintDiagrams(frames);
 					}
@@ -324,12 +325,13 @@ public class DiagramUtils {
 	public static void safelyDisposeAllDiagrams(StaticContext context) {
 		Map<String,InternalDiagramFrame> innerWindows= StaticDiagramAttributes.retrieveInnerWindows(context);
 		Collection<InternalDiagramFrame> values= innerWindows.values();
-		final InternalDiagramFrame[] frames= values.toArray(new InternalDiagramFrame[0]);
+		final InternalDiagramFrame[] frames= values.toArray(new InternalDiagramFrame[values.size()]);
 		if (SwingUtilities.isEventDispatchThread()) {
 			disposeDiagrams(frames);
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						disposeDiagrams(frames);
 					}

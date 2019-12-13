@@ -49,7 +49,6 @@ public class AstrohnDataAcquisition extends Thread {
 	//
 	public AstrohnDataAcquisition() {
 		setDaemon(true);
-		start();
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -80,14 +79,23 @@ public class AstrohnDataAcquisition extends Thread {
 			outputDebugInformation.set(givenOutputDebugInformation);
 			enableDataTransfer.set(true);
 			deviceIsToBeClosed.set(false);
-			notify();
+			startProcessIfNecessary();
+		}
+	}
+	//
+	protected void startProcessIfNecessary() {
+		synchronized (this) {
+			if (!isAlive()) {
+				start();
+			};
+			notifyAll();
 		}
 	}
 	//
 	public void suspendDataTransfer() {
 		synchronized (this) {
 			enableDataTransfer.set(false);
-			notify();
+			notifyAll();
 		}
 	}
 	//
@@ -95,7 +103,7 @@ public class AstrohnDataAcquisition extends Thread {
 		synchronized (this) {
 			enableDataTransfer.set(false);
 			deviceIsToBeClosed.set(true);
-			notify();
+			notifyAll();
 		}
 	}
 	//
@@ -103,12 +111,9 @@ public class AstrohnDataAcquisition extends Thread {
 		return !enableDataTransfer.get();
 	}
 	//
-	// public boolean isNotSuspended() {
-	//	return enableDataTransfer.get();
-	// }
-	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void run() {
 		try {
 			while (!stopThisThread.get()) {
@@ -179,8 +184,8 @@ public class AstrohnDataAcquisition extends Thread {
 			} else {
 				try {
 					InetAddress ipAddress= InetAddress.getByName(serverAddress.get());
-					Socket socket= new Socket(ipAddress,serverPort.get());
-					socket.close();
+					Socket currentSocket= new Socket(ipAddress,serverPort.get());
+					currentSocket.close();
 					return true;
 				} catch (Throwable e) {
 				};
@@ -253,6 +258,7 @@ public class AstrohnDataAcquisition extends Thread {
 	//
 	public static void writeLater(final String text) {
 		SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				System.err.print(text);
 			}

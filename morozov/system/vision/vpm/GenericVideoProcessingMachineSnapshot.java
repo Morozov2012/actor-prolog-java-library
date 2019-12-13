@@ -17,7 +17,7 @@ import java.util.Set;
 import java.util.Iterator;
 import java.math.BigInteger;
 
-abstract public class GenericVideoProcessingMachineSnapshot {
+public abstract class GenericVideoProcessingMachineSnapshot {
 	//
 	protected int synthesizedImageTransparency;
 	protected boolean makeRectangularBlobsInSynthesizedImage;
@@ -32,7 +32,7 @@ abstract public class GenericVideoProcessingMachineSnapshot {
 	protected boolean[] foregroundMask;
 	//
 	protected VPM_FrameNumberAndTime[] arrayOfTime;
-	protected HashMap<BigInteger,StableTrack> tracks= new HashMap<BigInteger,StableTrack>();
+	protected HashMap<BigInteger,StableTrack> tracks= new HashMap<>();
 	protected ConnectedGraph[] graphs;
 	//
 	protected java.awt.image.BufferedImage foregroundImage;
@@ -71,7 +71,7 @@ abstract public class GenericVideoProcessingMachineSnapshot {
 		recentImage= rImage;
 		preprocessedImage= pImage;
 		foregroundMask= mask;
-		arrayOfTime= timeArray.toArray(new VPM_FrameNumberAndTime[0]);
+		arrayOfTime= timeArray.toArray(new VPM_FrameNumberAndTime[timeArray.size()]);
 		Set<BigInteger> trackIdentifiers= currentTracks.keySet();
 		Iterator<BigInteger> trackIdentifiersIterator= trackIdentifiers.iterator();
 		while (trackIdentifiersIterator.hasNext()) {
@@ -172,7 +172,6 @@ abstract public class GenericVideoProcessingMachineSnapshot {
 	protected void createSynthesizedImageIfNecessary() {
 		if (synthesizedImage==null) {
 			createForegroundMaskIfNecessary();
-			// createForegroundImageIfNecessary();
 			int[] alphaPixels= new int[operationalVectorLength];
 			if (makeRectangularBlobsInSynthesizedImage) {
 				formAndGetConnectedGraphs();
@@ -298,10 +297,10 @@ abstract public class GenericVideoProcessingMachineSnapshot {
 		if (prologConnectedGraphs != null) {
 			return prologConnectedGraphs;
 		};
-		ConnectedGraph[] graphs= formAndGetConnectedGraphs();
+		ConnectedGraph[] currentGraphs= formAndGetConnectedGraphs();
 		prologConnectedGraphs= PrologEmptyList.instance;
-		for (int n=graphs.length-1; n >= 0; n--) {
-			ConnectedGraph graph= graphs[n];
+		for (int n=currentGraphs.length-1; n >= 0; n--) {
+			ConnectedGraph graph= currentGraphs[n];
 			ArrayList<ConnectedSegment> connectedSegments= graph.getConnectedSegments();
 			int numberOfSegments= connectedSegments.size();
 			if (numberOfSegments <= 0) {
@@ -337,23 +336,23 @@ abstract public class GenericVideoProcessingMachineSnapshot {
 	abstract protected double getFuzzyThresholdBorder();
 	//
 	protected ConnectedGraph[] formConnectedGraphs() {
-		ArrayList<ConnectedGraph> graphs= new ArrayList<>();
+		ArrayList<ConnectedGraph> currentGraphs= new ArrayList<>();
 		Set<BigInteger> trackIdentifiers= tracks.keySet();
 		Iterator<BigInteger> trackIdentifiersIterator= trackIdentifiers.iterator();
 		Loop1: while (trackIdentifiersIterator.hasNext()) {
 			BigInteger trackIdentifier= trackIdentifiersIterator.next();
-			for (int k=0; k < graphs.size(); k++) {
-				if (graphs.get(k).containsTrack(trackIdentifier)) {
+			for (int k=0; k < currentGraphs.size(); k++) {
+				if (currentGraphs.get(k).containsTrack(trackIdentifier)) {
 					continue Loop1;
 				}
 			};
 			StableTrack track= tracks.get(trackIdentifier);
 			if (track != null) {
-				track.assembleConnectedGraph(graphs,tracks);
+				track.assembleConnectedGraph(currentGraphs,tracks);
 			}
 		};
-		ConnectedGraph[] array= new ConnectedGraph[graphs.size()];
-		graphs.toArray(array);
+		ConnectedGraph[] array= new ConnectedGraph[currentGraphs.size()];
+		currentGraphs.toArray(array);
 		return array;
 	}
 	//

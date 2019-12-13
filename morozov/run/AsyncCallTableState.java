@@ -9,8 +9,8 @@ import java.util.ArrayList;
 
 public class AsyncCallTableState extends Term {
 	//
-	private ArrayList<AsyncCall> table;
-	private int currentSize;
+	protected ArrayList<AsyncCall> table;
+	protected int currentSize;
 	//
 	private static final long serialVersionUID= 0x3B7DE7ECF790C279L; // 4286837425278337657L
 	//
@@ -24,15 +24,18 @@ public class AsyncCallTableState extends Term {
 		table= callTable;
 		currentSize= callTable.size();
 	}
+	@Override
 	public void clear() {
 		for(int i=table.size(); i > currentSize; i--) {
 			table.remove(i-1);
 		}
 	}
-	// General "Unify With" function
+	// General "Unify With" function:
+	@Override
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		throw new SpecialTermCannotBeUnified();
 	}
+	@Override
 	public String toString() {
 		return "AsyncCallTableState=" + currentSize;
 	}

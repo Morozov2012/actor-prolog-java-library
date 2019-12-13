@@ -5,6 +5,7 @@ package morozov.system.gui;
 import target.*;
 
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.gui.errors.*;
 import morozov.system.gui.signals.*;
 import morozov.system.signals.*;
@@ -15,8 +16,8 @@ import java.math.BigInteger;
 
 public class ExtendedFontSize {
 	//
-	private boolean useDefaultFontSize= true;
-	private int value= 18;
+	protected boolean useDefaultFontSize= true;
+	protected int value= 18;
 	//
 	protected static Term termDefault= new PrologSymbol(SymbolCodes.symbolCode_E_default);
 	//
@@ -29,8 +30,11 @@ public class ExtendedFontSize {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void useDefaultFontSize() {
-		useDefaultFontSize= true;
+	public void setUseDefaultFontSize(boolean mode) {
+		useDefaultFontSize= mode;
+	}
+	public void setUseDefaultFontSize() {
+		setUseDefaultFontSize(true);
 	}
 	//
 	public boolean isDefault() {
@@ -108,7 +112,7 @@ public class ExtendedFontSize {
 			return value.getIntegerValue(iX).intValue();
 		} catch (TermIsNotAnInteger e1) {
 			try {
-				return PrologInteger.toInteger(value.getRealValue(iX));
+				return Arithmetic.toInteger(value.getRealValue(iX));
 			} catch (TermIsNotAReal e2) {
 				try {
 					long code= value.getSymbolValue(iX);
@@ -137,8 +141,6 @@ public class ExtendedFontSize {
 			} catch (TermIsNotAnInteger e1) {
 				try {
 					double number= value.getRealValue(iX);
-					// BigInteger bigInteger= GeneralConverters.doubleToBigInteger(number);
-					// return new PrologReal(number);
 					return new PrologInteger((long)StrictMath.round(number));
 				} catch (TermIsNotAReal e2) {
 					try {
@@ -166,6 +168,7 @@ public class ExtendedFontSize {
 		}
 	}
 	//
+	@Override
 	public String toString() {
 		return "(" +
 			String.format("%B,",useDefaultFontSize) +

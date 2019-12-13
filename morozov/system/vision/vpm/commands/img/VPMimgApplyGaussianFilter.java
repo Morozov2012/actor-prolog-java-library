@@ -2,9 +2,9 @@
 
 package morozov.system.vision.vpm.commands.img;
 
+import morozov.system.*;
 import morozov.system.vision.vpm.*;
 import morozov.system.vision.vpm.commands.*;
-import morozov.terms.*;
 
 import java.awt.Graphics2D;
 import java.awt.image.ConvolveOp;
@@ -21,19 +21,17 @@ public class VPMimgApplyGaussianFilter extends VPM_FrameCommand {
 		radius= r;
 	}
 	//
+	@Override
 	public void execute(VPM vpm) {
 		if (convolveOperation==null) {
 			float[] gaussianMatrix= VisionUtils.gaussianMatrix(radius);
-			int length= PrologInteger.toInteger(StrictMath.sqrt(gaussianMatrix.length));
+			int length= Arithmetic.toInteger(StrictMath.sqrt(gaussianMatrix.length));
 			convolveOperation= new ConvolveOp(
 				new Kernel(length,length,gaussianMatrix),
 				// ConvolveOp.EDGE_NO_OP,
 				ConvolveOp.EDGE_ZERO_FILL,
 				null);
 		};
-		// if (vpm.imageIsAnalyzed()) {
-		//	throw new ImageFilteringIsToBeDoneBeforeImageAnalysis();
-		// };
 		int sourceWidth= vpm.getOperationalImageWidth();
 		int sourceHeight= vpm.getOperationalImageHeight();
 		java.awt.image.BufferedImage previousImage= vpm.getPreprocessedImage();

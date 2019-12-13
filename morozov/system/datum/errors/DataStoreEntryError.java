@@ -3,10 +3,14 @@
 package morozov.system.datum.errors;
 
 public class DataStoreEntryError extends RuntimeException {
-	public String entryName;
+	//
+	protected String entryName;
+	//
 	public DataStoreEntryError(String name) {
 		entryName= name;
 	}
+	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(" + entryName.toString() + ")";
 	}

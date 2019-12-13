@@ -19,7 +19,7 @@ import java.util.Locale;
 
 public abstract class SymbolicInformation extends DataAbstraction {
 	//
-	public Boolean caseSensitivity= null;
+	protected Boolean caseSensitivity= null;
 	//
 	protected static LexicalScannerMasterInterface dummyLexicalScannerMaster= new DummyLexicalScannerMaster();
 	//
@@ -217,12 +217,14 @@ public abstract class SymbolicInformation extends DataAbstraction {
 		}
 	}
 	public class Search extends Continuation {
+		//
 		protected PrologVariable outputResult;
 		protected boolean hasOutput;
 		protected boolean retrieveTextString;
 		protected Term inputText;
 		protected Term inputTarget;
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			if (retrieveTextString) {
 				inputText= retrieveTextString(iX);
@@ -239,7 +241,6 @@ public abstract class SymbolicInformation extends DataAbstraction {
 					if (p1 >= 0) {
 						if (hasOutput) {
 							outputResult.setNonBacktrackableValue(new PrologInteger(p1+1));
-							// newIx.pushTrail(outputResult);
 						};
 						try {
 							c0.execute(newIx);
@@ -419,7 +420,7 @@ public abstract class SymbolicInformation extends DataAbstraction {
 	public void extractTokens0fs(ChoisePoint iX) {
 	}
 	protected Term extractTokens(String text, ChoisePoint iX) {
-		ArrayList<Term> tokens= new ArrayList<Term>(0);
+		ArrayList<Term> tokens= new ArrayList<>(0);
 		while (true) {
 			try {
 				String[] textSegments= extractFrontToken(text,iX);
@@ -499,7 +500,6 @@ public abstract class SymbolicInformation extends DataAbstraction {
 	}
 	//
 	public void extractLine4s(ChoisePoint iX, Term a1, PrologVariable a2, PrologVariable a3, PrologVariable a4) throws Backtracking {
-		int textPosition= GeneralConverters.argumentToSmallInteger(a1,iX);
 		Term inputText= retrieveTextString(iX);
 		extractLine5s(iX,a1,inputText,a2,a3,a4);
 	}
@@ -515,7 +515,6 @@ public abstract class SymbolicInformation extends DataAbstraction {
 		char[] characters= text.toCharArray();
 		int textLength= characters.length;
 		int position= 0;
-		boolean processSupplementaryCharacter= false;
 		char c1;
 		char c2;
 		int code;
@@ -538,13 +537,14 @@ public abstract class SymbolicInformation extends DataAbstraction {
 				throw Backtracking.instance;
 			};
 			c1= characters[position];
+			boolean processSupplementaryCharacter;
 			if (	(position + 1 <= textLength - 1) &&
 				Character.isSurrogatePair(c1,characters[position+1])) {
 				c2= characters[position+1];
 				code= Character.toCodePoint(c1,c2);
 				processSupplementaryCharacter= true;
 			} else {
-				c2= 0;
+				// c2= 0;
 				code= c1;
 				processSupplementaryCharacter= false;
 			};
@@ -657,8 +657,8 @@ public abstract class SymbolicInformation extends DataAbstraction {
 		String text= GeneralConverters.argumentToString(a1,iX);
 		String target= GeneralConverters.argumentToString(a2,iX);
 		String replacement= GeneralConverters.argumentToString(a3,iX);
-		boolean caseSensitivity= getCaseSensitivity(iX);
-		int index= SystemUtils.indexOf(text,target,0,caseSensitivity);
+		boolean currentCaseSensitivity= getCaseSensitivity(iX);
+		int index= SystemUtils.indexOf(text,target,0,currentCaseSensitivity);
 		if (index == -1) {
 			throw Backtracking.instance;
 		} else {
@@ -671,9 +671,8 @@ public abstract class SymbolicInformation extends DataAbstraction {
 	public void replace3fs(ChoisePoint iX, Term a1, Term a2, Term a3) throws Backtracking {
 		String text= GeneralConverters.argumentToString(a1,iX);
 		String target= GeneralConverters.argumentToString(a2,iX);
-		String replacement= GeneralConverters.argumentToString(a3,iX);
-		boolean caseSensitivity= getCaseSensitivity(iX);
-		int index= SystemUtils.indexOf(text,target,0,caseSensitivity);
+		boolean currentCaseSensitivity= getCaseSensitivity(iX);
+		int index= SystemUtils.indexOf(text,target,0,currentCaseSensitivity);
 		if (index == -1) {
 			throw Backtracking.instance;
 		}
@@ -691,15 +690,15 @@ public abstract class SymbolicInformation extends DataAbstraction {
 		String text= GeneralConverters.argumentToString(a1,iX);
 		String target= GeneralConverters.argumentToString(a2,iX);
 		String replacement= GeneralConverters.argumentToString(a3,iX);
-		boolean caseSensitivity= getCaseSensitivity(iX);
+		boolean currentCaseSensitivity= getCaseSensitivity(iX);
 		String modifiedText;
-		if (!caseSensitivity && target.length() > 0) {
-			ArrayList<String> table= new ArrayList<String>();
+		if (!currentCaseSensitivity && target.length() > 0) {
+			ArrayList<String> table= new ArrayList<>();
 			String rest;
 			int currentPosition= 0;
 			while (true) {
 				if (currentPosition < text.length()) {
-					int index= SystemUtils.indexOf(text,target,currentPosition,caseSensitivity);
+					int index= SystemUtils.indexOf(text,target,currentPosition,currentCaseSensitivity);
 					if (index == -1) {
 						rest= text.substring(currentPosition);
 						break;

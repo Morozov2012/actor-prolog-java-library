@@ -15,6 +15,8 @@ public class WebcamName {
 	protected boolean isDefault= true;
 	protected String name= "";
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	public WebcamName() {
 	}
 	public WebcamName(String text) {
@@ -67,6 +69,7 @@ public class WebcamName {
 		}
 	}
 	//
+	@Override
 	public String toString() {
 		if (isDefault) {
 			return stringDefault;

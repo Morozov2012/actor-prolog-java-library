@@ -37,13 +37,24 @@ public class ColorMapSize implements Serializable {
 		return useDefaultSize;
 	}
 	public int getValue() throws UseDefaultSize {
-		return value;
+		if (useDefaultSize || value <= 0) {
+			throw UseDefaultSize.instance;
+		} else {
+			return value;
+		}
 	}
 	public int getValue(int defaultSize) {
 		if (useDefaultSize || value <= 0) {
 			return defaultSize;
 		} else {
 			return value;
+		}
+	}
+	public ColorMapSize getValue(ColorMapSize defaultValue) {
+		if (useDefaultSize) {
+			return defaultValue;
+		} else {
+			return this;
 		}
 	}
 	//

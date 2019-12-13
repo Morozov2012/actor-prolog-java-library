@@ -15,6 +15,7 @@ public class VPMblbSetMinimalBlobIntersectionArea extends VPM_FrameCommand {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void execute(VPM vpm) {
 		vpm.blbSetMinimalBlobIntersectionArea(area);
 	}

@@ -12,18 +12,22 @@ import morozov.terms.signals.*;
 public enum DatabaseAccessMode {
 	//
 	READING {
+		@Override
 		public void checkAuthority(DatabaseAccessMode mode) {
 		}
+		@Override
 		public Term toTerm() {
 			return termReading;
 		}
 	},
 	MODIFYING {
+		@Override
 		public void checkAuthority(DatabaseAccessMode mode) {
 			if (mode==DatabaseAccessMode.READING) {
 				throw new ModifyingTransactionCannotBeInsideReadingTransaction();
 			}
 		}
+		@Override
 		public Term toTerm() {
 			return termModifying;
 		}

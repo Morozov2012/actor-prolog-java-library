@@ -3,7 +3,8 @@
 package morozov.system.gui;
 
 public class CanvasSpaceAttributes {
-	private boolean controlIsInitialized= false;
+	//
+	protected boolean controlIsInitialized= false;
 	//
 	synchronized public boolean initializeControlIfNecessary() {
 		if (!controlIsInitialized) {

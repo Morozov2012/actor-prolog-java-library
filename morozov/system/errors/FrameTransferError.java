@@ -20,6 +20,7 @@ public class FrameTransferError extends RuntimeException {
 		return exception;
 	}
 	//
+	@Override
 	public String toString() {
 		return exception.toString();
 	}

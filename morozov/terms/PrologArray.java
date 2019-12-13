@@ -15,6 +15,7 @@ public abstract class PrologArray extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		if (t != this)
 			throw Backtracking.instance;

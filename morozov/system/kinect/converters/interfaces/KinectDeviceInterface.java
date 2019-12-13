@@ -43,6 +43,14 @@ public interface KinectDeviceInterface {
 	public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode);
 	public boolean requiresFrameType(KinectDataArrayType proposedFrameType);
 	//
+	public boolean requiresDepthFrames();
+	public boolean requiresInfraredFrames();
+	public boolean requiresLongExposureInfraredFrames();
+	public boolean requiresMappedColorFrames();
+	public boolean requiresEntirePointClouds();
+	public boolean requiresForegroundPointClouds();
+	public boolean requiresColorFrames();
+	//
 	public void sendKinectFrame(KinectFrameInterface frame);
 	//
 	public Term toTerm();

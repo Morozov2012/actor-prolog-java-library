@@ -3,12 +3,15 @@
 package morozov.system.checker.errors;
 
 public class WrongArgumentIsMalformedURL extends RuntimeException {
-	public String fileName;
+	//
+	protected String fileName;
 	//
 	public WrongArgumentIsMalformedURL(String name, Throwable e) {
 		super(e);
 		fileName= name;
 	}
+	//
+	@Override
 	public String toString() {
 		if (fileName != null) {
 			return this.getClass().toString() + "(" + fileName.toString() + ")";

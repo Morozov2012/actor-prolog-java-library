@@ -4,9 +4,10 @@ package morozov.system.gui.dialogs;
 
 import target.*;
 
+import morozov.system.*;
 import morozov.system.gui.*;
 import morozov.system.gui.signals.*;
-import morozov.terms.*;
+
 import javax.swing.SwingUtilities;
 import java.awt.Font;
 import java.awt.Dimension;
@@ -51,6 +52,7 @@ public abstract class DialogKernel extends DialogFoundation {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						do_layout(forceCheck);
 					}
@@ -81,8 +83,6 @@ public abstract class DialogKernel extends DialogFoundation {
 			forceCheck= true;
 		};
 		if (givenWidth!=previousActualWidthAndHeight.width || givenHeight!=previousActualWidthAndHeight.height || forceCheck) {
-			int netPreferredWidth= 0;
-			int netPreferredHeight= 0;
 			double maximalRefusedSize= 0;
 			for (int i= 1; i <= maximalNumberOfIterations; i++) {
 				int minimumWidth= minimumSize.width;
@@ -93,10 +93,10 @@ public abstract class DialogKernel extends DialogFoundation {
 				};
 				int requestedPreferredWidth= prefLS.width;
 				int requestedPreferredHeight= prefLS.height;
-				netPreferredWidth= StrictMath.max(0,requestedPreferredWidth-minimumWidth);
-				netPreferredHeight= StrictMath.max(0,requestedPreferredHeight-minimumHeight);
+				int netPreferredWidth= StrictMath.max(0,requestedPreferredWidth-minimumWidth);
+				int netPreferredHeight= StrictMath.max(0,requestedPreferredHeight-minimumHeight);
 				double widthIncrease1= 1;
-				double heightIncrease1= 1;
+				double heightIncrease1;
 				double increaseCoefficient1= 1;
 				if (netPreferredWidth > 0) {
 					widthIncrease1= ((double)correctedGivenWidth) / netPreferredWidth;
@@ -118,9 +118,9 @@ public abstract class DialogKernel extends DialogFoundation {
 					} else {
 						maximalRefusedSize= prospectiveFontSize;
 					};
-					prospectiveFontSize= PrologInteger.toInteger(prospectiveFontSize * increaseCoefficient1);
+					prospectiveFontSize= Arithmetic.toInteger(prospectiveFontSize * increaseCoefficient1);
 				} else {
-					prospectiveFontSize= PrologInteger.toInteger(prospectiveFontSize * increaseCoefficient1);
+					prospectiveFontSize= Arithmetic.toInteger(prospectiveFontSize * increaseCoefficient1);
 					if (maximalRefusedSize > 0) {
 						prospectiveFontSize= (int)StrictMath.min(prospectiveFontSize,maximalRefusedSize-1);
 					}
@@ -232,6 +232,7 @@ public abstract class DialogKernel extends DialogFoundation {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Point safelyComputePosition(AtomicReference<ExtendedCoordinates> actualCoordinates) throws UseDefaultLocation {
 		//
 		Dimension initialSize= safelyGetSize();
@@ -239,8 +240,8 @@ public abstract class DialogKernel extends DialogFoundation {
 		int initialWidth= initialSize.width;
 		int initialHeight= initialSize.height;
 		//
-		int x= 0;
-		int y= 0;
+		int x;
+		int y;
 		//
 		double gridX= DefaultOptions.gridWidth;
 		double gridY= DefaultOptions.gridHeight;
@@ -249,11 +250,11 @@ public abstract class DialogKernel extends DialogFoundation {
 		//
 		ExtendedCoordinates actualPoint= actualCoordinates.get();
 		if (actualCoordinates.get().usePixelMeasurements()) {
-			x= DialogUtils.calculateAbsoluteCoordinate(actualPoint.x,parentLayoutSize.x,parentLayoutSize.width,initialWidth);
-			y= DialogUtils.calculateAbsoluteCoordinate(actualPoint.y,parentLayoutSize.y,parentLayoutSize.height,initialHeight);
+			x= DialogUtils.calculateAbsoluteCoordinate(actualPoint.getX(),parentLayoutSize.x,parentLayoutSize.width,initialWidth);
+			y= DialogUtils.calculateAbsoluteCoordinate(actualPoint.getY(),parentLayoutSize.y,parentLayoutSize.height,initialHeight);
 		} else {
-			x= DialogUtils.calculateAbsoluteCoordinate(actualPoint.x,parentLayoutSize.x,parentLayoutSize.width,gridX,initialWidth);
-			y= DialogUtils.calculateAbsoluteCoordinate(actualPoint.y,parentLayoutSize.y,parentLayoutSize.height,gridY,initialHeight);
+			x= DialogUtils.calculateAbsoluteCoordinate(actualPoint.getX(),parentLayoutSize.x,parentLayoutSize.width,gridX,initialWidth);
+			y= DialogUtils.calculateAbsoluteCoordinate(actualPoint.getY(),parentLayoutSize.y,parentLayoutSize.height,gridY,initialHeight);
 		};
 		//
 		return new Point(x,y);

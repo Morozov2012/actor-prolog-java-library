@@ -23,6 +23,7 @@ public class VPMtrkSelectFrontTracks extends VPM_SnapshotCommand {
 		sortingMode= givenSortingMode;
 	}
 	//
+	@Override
 	public void execute(VPM_Snapshot snapshot) {
 		HashMap<BigInteger,StableTrack> tracks= snapshot.getTracks();
 		if (tracks==null) {
@@ -32,11 +33,11 @@ public class VPMtrkSelectFrontTracks extends VPM_SnapshotCommand {
 			return;
 		};
 		Collection<StableTrack> collectionOfValues= tracks.values();
-		StableTrack[] trackArray= collectionOfValues.toArray(new StableTrack[0]);
+		StableTrack[] trackArray= collectionOfValues.toArray(new StableTrack[collectionOfValues.size()]);
 		TrackComparator trackComparator= new TrackComparator(sortingCriterion,sortingMode);
 		Arrays.sort(trackArray,trackComparator);
 		trackArray= Arrays.copyOfRange(trackArray,0,numberOfTracks);
-		tracks= new HashMap<BigInteger,StableTrack>();
+		tracks= new HashMap<>();
 		for (int k=0; k < trackArray.length; k++) {
 			StableTrack track= trackArray[k];
 			tracks.put(track.getIdentifier(),track);

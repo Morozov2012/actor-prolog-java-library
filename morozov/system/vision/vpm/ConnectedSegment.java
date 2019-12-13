@@ -107,9 +107,6 @@ public class ConnectedSegment {
 	//
 	public void resolveLinks(HashMap<BigInteger,StableTrack> tracks, HashSet<BigInteger> refusedTracks, HashMap<BigInteger,HashMap<Integer,ConnectedSegment>> hash1) {
 		BigInteger owner= trackSegment.getOwner();
-		// if (refusedTracks.contains(owner)) {
-		//	return;
-		// };
 		int number= trackSegment.getNumber();
 		if (!isFirst) {
 			HashMap<Integer,ConnectedSegment> hash2= hash1.get(owner);
@@ -122,15 +119,12 @@ public class ConnectedSegment {
 			nextSegment= connectedSegment;
 		};
 		HashSet<BigInteger> inspectedTracks= new HashSet<>();
-		BigInteger[] entries= trackSegment.getEntries();
-		resolveLinks(entries,tracks,refusedTracks,hash1,inspectedTracks);
+		BigInteger[] currentEntries= trackSegment.getEntries();
+		resolveLinks(currentEntries,tracks,refusedTracks,hash1,inspectedTracks);
 	}
 	public void resolveLinks(BigInteger[] links, HashMap<BigInteger,StableTrack> tracks, HashSet<BigInteger> refusedTracks, HashMap<BigInteger,HashMap<Integer,ConnectedSegment>> hash1, HashSet<BigInteger> inspectedTracks) {
 		for (int n=0; n < links.length; n++) {
 			BigInteger neighbour= links[n];
-			// if (refusedTracks.contains(neighbour)) {
-			//	continue;
-			// };
 			if (inspectedTracks.add(neighbour)) {
 				StableTrack track= tracks.get(neighbour);
 				if (track != null) {
@@ -153,7 +147,7 @@ public class ConnectedSegment {
 		if (trackSegment.getLength() >= minimalSegmentLength) {
 			if (previousSegment != null) {
 				long beginningTime= trackSegment.getSegmentBeginning();
-				HashSet<ConnectedSegment> emptySegments= new HashSet<ConnectedSegment>();
+				HashSet<ConnectedSegment> emptySegments= new HashSet<>();
 				previousSegment.registerOriginsAndBranches(origins,this,beginningTime,emptySegments);
 			}
 		}
@@ -206,19 +200,19 @@ public class ConnectedSegment {
 	///////////////////////////////////////////////////////////////
 	//
 	public void excludeSegment() {
-		HashSet<ConnectedSegment> origins= getOrigins();
-		Iterator<ConnectedSegment> originsIterator= origins.iterator();
+		HashSet<ConnectedSegment> currentBranches= getBranches();
+		HashSet<ConnectedSegment> currentOrigins= getOrigins();
+		Iterator<ConnectedSegment> originsIterator= currentOrigins.iterator();
 		while (originsIterator.hasNext()) {
 			ConnectedSegment origin= originsIterator.next();
 			origin.deleteBranch(this);
-			origin.addBranches(branches);
+			origin.addBranches(currentBranches);
 		};
-		HashSet<ConnectedSegment> branches= getBranches();
-		Iterator<ConnectedSegment> branchesIterator= branches.iterator();
+		Iterator<ConnectedSegment> branchesIterator= currentBranches.iterator();
 		while (branchesIterator.hasNext()) {
 			ConnectedSegment branch= branchesIterator.next();
 			branch.deleteOrigin(this);
-			branch.addOrigins(origins);
+			branch.addOrigins(currentOrigins);
 		}
 	}
 	public void deleteOrigin(ConnectedSegment segment) {
@@ -274,9 +268,9 @@ public class ConnectedSegment {
 	}
 	//
 	protected Term collectOriginEdges(int connectedSegmentNumber, ArrayList<ConnectedSegment> connectedSegments) {
-		HashSet<ConnectedSegment> origins= getOrigins();
+		HashSet<ConnectedSegment> currentOrigins= getOrigins();
 		Term result= PrologEmptyList.instance;
-		Iterator<ConnectedSegment> iterator= origins.iterator();
+		Iterator<ConnectedSegment> iterator= currentOrigins.iterator();
 		while (iterator.hasNext()) {
 			ConnectedSegment entry= iterator.next();
 			BigInteger owner= entry.getOwner();
@@ -293,9 +287,9 @@ public class ConnectedSegment {
 	}
 	//
 	protected Term collectBranchEdges(int connectedSegmentNumber, ArrayList<ConnectedSegment> connectedSegments) {
-		HashSet<ConnectedSegment> branches= getBranches();
+		HashSet<ConnectedSegment> currentBranches= getBranches();
 		Term result= PrologEmptyList.instance;
-		Iterator<ConnectedSegment> iterator= branches.iterator();
+		Iterator<ConnectedSegment> iterator= currentBranches.iterator();
 		while (iterator.hasNext()) {
 			ConnectedSegment entry= iterator.next();
 			BigInteger owner= entry.getOwner();

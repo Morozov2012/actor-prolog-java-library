@@ -8,18 +8,36 @@ import morozov.terms.*;
 
 public class NamedErrorExit extends ErrorExit {
 	//
-	private long nameCode;
+	protected boolean useTextName;
+	protected String nameText;
+	protected long nameCode;
 	//
+	public NamedErrorExit(ChoisePoint cp, String text) {
+		choisePoint= cp;
+		nameText= text;
+		useTextName= true;
+	}
 	public NamedErrorExit(ChoisePoint cp, long code) {
 		choisePoint= cp;
 		nameCode= code;
+		useTextName= false;
 	}
 	//
+	@Override
 	public Term createTerm() {
-		return new PrologSymbol(nameCode);
+		if (useTextName) {
+			return new PrologString(nameText);
+		} else {
+			return new PrologSymbol(nameCode);
+		}
 	}
+	@Override
 	public String toString() {
-		SymbolName name= SymbolNames.retrieveSymbolName(nameCode);
-		return "'" + name.toRawString(null) + "'";
+		if (useTextName) {
+			return "\"" + nameText + "\"";
+		} else {
+			SymbolName name= SymbolNames.retrieveSymbolName(nameCode);
+			return "'" + name.toRawString(null) + "'";
+		}
 	}
 }

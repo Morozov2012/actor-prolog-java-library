@@ -56,12 +56,12 @@ public class ScalableCheckBox extends ScalableAbstractButton {
 		component= new JCheckBox(text,icon,selected);
 		ScalableToggleButtonModel model= new ScalableToggleButtonModel(selected,0,text);
 		((JCheckBox)component).setModel(model);
-		// ((JCheckBox)component).addChangeListener(this);
 		((JCheckBox)component).addActionListener(this);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		try {
 			long code= value.getSymbolValue(iX);
@@ -72,7 +72,6 @@ public class ScalableCheckBox extends ScalableAbstractButton {
 			} else if (code==SymbolCodes.symbolCode_E_unknown) {
 				return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
 			} else {
-				// return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
 				throw RejectValue.instance;
 			}
 		} catch (TermIsNotASymbol e1) {
@@ -85,11 +84,9 @@ public class ScalableCheckBox extends ScalableAbstractButton {
 				} else if (text.equalsIgnoreCase("unknown")) {
 					return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
 				} else {
-					// return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
 					throw RejectValue.instance;
 				}
 			} catch (TermIsNotAString e2) {
-				// return new PrologSymbol(SymbolCodes.symbolCode_E_unknown);
 				throw RejectValue.instance;
 			}
 		}
@@ -97,6 +94,7 @@ public class ScalableCheckBox extends ScalableAbstractButton {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void putValue(Term value, ChoisePoint iX) {
 		if (component!=null) {
 			try {
@@ -145,6 +143,7 @@ public class ScalableCheckBox extends ScalableAbstractButton {
 		}
 	}
 	//
+	@Override
 	public Term getValue() {
 		if (component!=null) {
 			if (isUncertain()) {
@@ -158,12 +157,12 @@ public class ScalableCheckBox extends ScalableAbstractButton {
 			}
 		} else {
 			return PrologUnknownValue.instance;
-			// return null;
 		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setAlarmColors(Color fc, Color bc) {
 		BasicRadioButtonUI ui= (BasicRadioButtonUI)((JCheckBox)component).getUI();
 		Icon defaultIcon= ui.getDefaultIcon();
@@ -177,11 +176,13 @@ public class ScalableCheckBox extends ScalableAbstractButton {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setIndividualText(Term value, ChoisePoint iX) {
 		AnnotatedButton.safelyUpdateAbstractButton((AbstractButton)component,value,iX);
 		targetDialog.safelyRevalidateAndRepaint();
 	}
 	//
+	@Override
 	public Term getIndividualText() {
 		if (component!=null) {
 			String text= AnnotatedButton.safelyRestoreText((AbstractButton)component);
@@ -193,10 +194,10 @@ public class ScalableCheckBox extends ScalableAbstractButton {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 		if (component!=null) {
-			// ((JCheckBox)component).setFont(font);
 			BasicRadioButtonUI ui= (BasicRadioButtonUI)((JCheckBox)component).getUI();
 			Icon defaultIcon= ui.getDefaultIcon();
 			if (defaultIcon!=null) {

@@ -13,15 +13,19 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 public class ListSearcher extends KeyAdapter {
+	//
 	protected JList<String> m_list;
 	protected ListModel<String> m_model;
 	protected String m_key= "";
 	protected long m_time= 0;
 	public static int CHAR_DELTA= 1000;
+	//
 	public ListSearcher(JList<String> list) {
 		m_list= list;
 		m_model= m_list.getModel();
 	}
+	//
+	@Override
 	public void keyTyped(KeyEvent e) {
 		char ch= e.getKeyChar();
 		if (Character.isLetterOrDigit(ch)) {

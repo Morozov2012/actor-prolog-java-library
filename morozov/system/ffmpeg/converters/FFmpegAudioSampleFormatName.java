@@ -14,105 +14,131 @@ import morozov.terms.signals.*;
 public enum FFmpegAudioSampleFormatName {
 	//
 	AV_SAMPLE_FMT_NONE {
+		@Override
 		public int toInteger() {
 			return avutil.AV_SAMPLE_FMT_NONE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_SAMPLE_FMT_NONE;
 		}
 	},
 	AV_SAMPLE_FMT_U8 {
+		@Override
 		public int toInteger() {
 			return avutil.AV_SAMPLE_FMT_U8;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_SAMPLE_FMT_U8;
 		}
 	},
 	AV_SAMPLE_FMT_S16 {
+		@Override
 		public int toInteger() {
 			return avutil.AV_SAMPLE_FMT_S16;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_SAMPLE_FMT_S16;
 		}
 	},
 	AV_SAMPLE_FMT_S32 {
+		@Override
 		public int toInteger() {
 			return avutil.AV_SAMPLE_FMT_S32;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_SAMPLE_FMT_S32;
 		}
 	},
 	AV_SAMPLE_FMT_FLT {
+		@Override
 		public int toInteger() {
 			return avutil.AV_SAMPLE_FMT_FLT;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_SAMPLE_FMT_FLT;
 		}
 	},
 	AV_SAMPLE_FMT_DBL {
+		@Override
 		public int toInteger() {
 			return avutil.AV_SAMPLE_FMT_DBL;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_SAMPLE_FMT_DBL;
 		}
 	},
 	AV_SAMPLE_FMT_U8P {
+		@Override
 		public int toInteger() {
 			return avutil.AV_SAMPLE_FMT_U8P;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_SAMPLE_FMT_U8P;
 		}
 	},
 	AV_SAMPLE_FMT_S16P {
+		@Override
 		public int toInteger() {
 			return avutil.AV_SAMPLE_FMT_S16P;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_SAMPLE_FMT_S16P;
 		}
 	},
 	AV_SAMPLE_FMT_S32P {
+		@Override
 		public int toInteger() {
 			return avutil.AV_SAMPLE_FMT_S32P;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_SAMPLE_FMT_S32P;
 		}
 	},
 	AV_SAMPLE_FMT_FLTP {
+		@Override
 		public int toInteger() {
 			return avutil.AV_SAMPLE_FMT_FLTP;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_SAMPLE_FMT_FLTP;
 		}
 	},
 	AV_SAMPLE_FMT_DBLP {
+		@Override
 		public int toInteger() {
 			return avutil.AV_SAMPLE_FMT_DBLP;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_SAMPLE_FMT_DBLP;
 		}
 	},
 	AV_SAMPLE_FMT_S64 {
+		@Override
 		public int toInteger() {
 			return avutil.AV_SAMPLE_FMT_S64;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_SAMPLE_FMT_S64;
 		}
 	},
 	AV_SAMPLE_FMT_S64P {
+		@Override
 		public int toInteger() {
 			return avutil.AV_SAMPLE_FMT_S64P;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_SAMPLE_FMT_S64P;
 		}

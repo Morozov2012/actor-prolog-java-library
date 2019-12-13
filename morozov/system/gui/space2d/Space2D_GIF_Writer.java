@@ -13,6 +13,7 @@ public class Space2D_GIF_Writer extends Space2DWriter {
 	public Space2D_GIF_Writer(ImageTypeSpecifier its) {
 		super("gif",its);
 	}
+	@Override
 	public void setInterlacing(boolean interlacing) {
 		String[] names= metadata.getMetadataFormatNames();
 		int length= names.length;
@@ -38,6 +39,7 @@ public class Space2D_GIF_Writer extends Space2DWriter {
 			}
 		}
 	}
+	@Override
 	public void setComment(String comment) {
 		String[] names= metadata.getMetadataFormatNames();
 		int length= names.length;

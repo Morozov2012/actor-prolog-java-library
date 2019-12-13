@@ -177,6 +177,7 @@ public abstract class DataStore extends DataAbstraction {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setWatchUpdates1s(ChoisePoint iX, Term a1) {
 		super.setWatchUpdates1s(iX,a1);
 		if (!getWatchUpdates(iX)) {
@@ -311,11 +312,7 @@ public abstract class DataStore extends DataAbstraction {
 				OpenedDataStore dataStore= openedDataStore.get();
 				tableContainer.rollbackTransactionTree(this,currentProcess,dataStore,watchTable);
 				readLock.unlock();
-			// } else {
-			//	throw new NotInsideTransaction();
 			}
-		// } else {
-		//	throw new NotInsideTransaction();
 		}
 	}
 	//
@@ -401,7 +398,6 @@ public abstract class DataStore extends DataAbstraction {
 	public void unsafelyDownloadExternalFile(String currentEntryName, DatabaseTableContainer actualTableContainer) {
 		OpenedDataStore dataStore= openedDataStore.get();
 		if (dataStore != null) {
-			DatabaseTable newTable;
 			synchronized (dataStore) {
 				auxiliaryLock.lock();
 				try {
@@ -427,6 +423,7 @@ public abstract class DataStore extends DataAbstraction {
 			resultType= a2;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			claimReadingAccess();
 			Set<String> setOfKeys;
@@ -435,7 +432,7 @@ public abstract class DataStore extends DataAbstraction {
 			HashMap<String,DatabaseTableContainer> hash= tableHash.get();
 			synchronized (hash) {
 				setOfKeys= hash.keySet();
-				arrayOfKeys= setOfKeys.toArray(new String[0]);
+				arrayOfKeys= setOfKeys.toArray(new String[setOfKeys.size()]);
 				Arrays.sort(arrayOfKeys);
 				arrayOfTypes= new Term[arrayOfKeys.length];
 				for (int n=0; n < arrayOfKeys.length; n++) {
@@ -627,7 +624,7 @@ public abstract class DataStore extends DataAbstraction {
 	//
 	protected void saveToTextBuffer(HashMap<String,DatabaseTableContainer> hash, StringBuilder textBuffer, ChoisePoint iX, CharsetEncoder encoder) {
 		Set<String> setOfKeys= hash.keySet();
-		String[] arrayOfKeys= setOfKeys.toArray(new String[0]);
+		String[] arrayOfKeys= setOfKeys.toArray(new String[setOfKeys.size()]);
 		Arrays.sort(arrayOfKeys);
 		for (int n=0; n < arrayOfKeys.length; n++) {
 			String tableName= FormatOutput.encodeString(arrayOfKeys[n],false,encoder);
@@ -652,7 +649,7 @@ public abstract class DataStore extends DataAbstraction {
 		try {
 			String textBuffer= fileName.getTextData(timeout,requestedCharacterSet,staticContext);
 			try {
-				HashMap<String,DatabaseTableContainer> hash= new HashMap<String,DatabaseTableContainer>();
+				HashMap<String,DatabaseTableContainer> hash= new HashMap<>();
 				loadContent(textBuffer,hash,iX);
 				tableHash.set(hash);
 			} catch (SyntaxError e) {
@@ -661,10 +658,10 @@ public abstract class DataStore extends DataAbstraction {
 				recentErrorException= e;
 				throw new ActorPrologParserError(e);
 			} catch (DatabaseRecordDoesNotBelongToDomain e) {
-				recentErrorText= e.text;
-				recentErrorPosition= e.position;
+				recentErrorText= e.getText();
+				recentErrorPosition= e.getPosition();
 				recentErrorException= e;
-				throw new WrongTermDoesNotBelongToDomain(e.item);
+				throw new WrongTermDoesNotBelongToDomain(e.getItem());
 			} catch (RuntimeException e) {
 				if (recentErrorException==null) {
 					recentErrorException= e;
@@ -684,7 +681,7 @@ public abstract class DataStore extends DataAbstraction {
 		DatabaseType currentDatabaseType= DatabaseType.PLAIN;
 		Boolean currentReuseKeyNumbers= true;
 		PrologDomain currentTargetDomain= null;
-		HashMap<String,PrologDomain> currentLocalDomainTable= new HashMap<String,PrologDomain>();
+		HashMap<String,PrologDomain> currentLocalDomainTable= new HashMap<>();
 		DatabaseTable currentTable= null;
 		DatabaseTableContainer currentContainer= null;
 		for (int k=0; k < terms.length; k++) {
@@ -914,7 +911,7 @@ public abstract class DataStore extends DataAbstraction {
 						openedDataStoreList.remove(auxiliaryDataStore);
 					};
 					auxiliaryDataStore.destroy();
-					auxiliaryDataStore= null;
+					// auxiliaryDataStore= null;
 				} finally {
 					auxiliaryLock.unlock();
 				}
@@ -925,7 +922,7 @@ public abstract class DataStore extends DataAbstraction {
 					openedDataStoreList.remove(auxiliaryDataStore);
 				};
 				auxiliaryDataStore.destroy();
-				auxiliaryDataStore= null;
+				// auxiliaryDataStore= null;
 			}
 		}
 	}
@@ -950,10 +947,8 @@ public abstract class DataStore extends DataAbstraction {
 	}
 	//
 	protected void openDataStore(ExtendedFileName fileName, DatabaseAccessMode access, DatabaseSharingMode sharing, DataStoreUnpackMode unpackDataStore, ChoisePoint iX) {
-		Path dataStorePath= fileName.getPathOfLocalResource();
 		String subdirectoryName= fileName.discardFileExtension();
 		Path subdirectoryPath= fileSystem.getPath(subdirectoryName);
-		dataStorePath= dataStorePath.toAbsolutePath();
 		subdirectoryPath= subdirectoryPath.toAbsolutePath();
 		OpenedDataStore dataStore= openedDataStore.get();
 		if (dataStore==null) {
@@ -1002,7 +997,7 @@ public abstract class DataStore extends DataAbstraction {
 				auxiliaryLock.lock();
 				try {
 					newDataStore.initiate(unpackDataStore,externalFileIsFree);
-					if (!newDataStore.isValid) {
+					if (!newDataStore.isValid()) {
 						throw new CannotAccessSharedDataStore(fileName.toString());
 					}
 				} finally {
@@ -1067,7 +1062,7 @@ public abstract class DataStore extends DataAbstraction {
 				HashMap<String,DatabaseTableContainer> hash= tableHash.get();
 				synchronized (hash) {
 					int totalNumberOfEntries= hash.size();
-					HashMap<String,DatabaseTableContainer> tableHashCopy= new HashMap<String,DatabaseTableContainer>();
+					HashMap<String,DatabaseTableContainer> tableHashCopy= new HashMap<>();
 					BigInteger numberOfUnsuccessfulAttempts= BigInteger.ZERO;
 					while (true) {
 						Set<String> setOfKeysOfTableHashCopy= tableHashCopy.keySet();
@@ -1363,10 +1358,12 @@ public abstract class DataStore extends DataAbstraction {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void delete0s(ChoisePoint iX) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(iX);
 		deleteDataStore(fileName);
 	}
+	@Override
 	public void delete1s(ChoisePoint iX, Term a1) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(a1,iX);
 		deleteDataStore(fileName);
@@ -1409,11 +1406,13 @@ public abstract class DataStore extends DataAbstraction {
 		}
 	}
 	//
+	@Override
 	public void rename1s(ChoisePoint iX, Term destination) {
 		ExtendedFileName fileName2= retrieveRealLocalFileName(destination,iX);
 		ExtendedFileName fileName1= retrieveRealLocalFileName(iX);
 		renameDataStore(fileName1,fileName2);
 	}
+	@Override
 	public void rename2s(ChoisePoint iX, Term source, Term destination) {
 		ExtendedFileName fileName1= retrieveRealLocalFileName(source,iX);
 		ExtendedFileName fileName2= retrieveRealLocalFileName(destination,iX);
@@ -1443,12 +1442,8 @@ public abstract class DataStore extends DataAbstraction {
 		if (Files.exists(path1)) {
 			try {
 				Files.move(path1,path2); // StandardCopyOption.ATOMIC_MOVE
-			// } catch (UnsupportedOperationException e) {
-			// } catch (FileAlreadyExistsException e) {
-			// } catch (AtomicMoveNotSupportedException e) {
 			} catch (IOException e) {
 				throw new FileInputOutputError(path1.toString(),path2.toString(),e);
-			// } catch (SecurityException e) {
 			}
 		}
 	}
@@ -1497,6 +1492,7 @@ public abstract class DataStore extends DataAbstraction {
 			c0= aC;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			c0.execute(iX);
 		}

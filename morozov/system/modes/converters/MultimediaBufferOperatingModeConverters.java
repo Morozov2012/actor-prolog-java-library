@@ -23,8 +23,6 @@ public class MultimediaBufferOperatingModeConverters {
 				return MultimediaBufferOperatingMode.READING;
 			} else if (code==SymbolCodes.symbolCode_E_SPECULATIVE_READING) {
 				return MultimediaBufferOperatingMode.SPECULATIVE_READING;
-			// } else if (code==SymbolCodes.symbolCode_E_DISPLAYING) {
-			//	return MultimediaBufferOperatingMode.DISPLAYING;
 			} else {
 				throw new WrongArgumentIsNotMultimediaBufferOperatingMode(value);
 			}
@@ -39,7 +37,6 @@ public class MultimediaBufferOperatingModeConverters {
 	protected static Term termPlaying= new PrologSymbol(SymbolCodes.symbolCode_E_PLAYING);
 	protected static Term termReading= new PrologSymbol(SymbolCodes.symbolCode_E_READING);
 	protected static Term termSpeculativeReading= new PrologSymbol(SymbolCodes.symbolCode_E_SPECULATIVE_READING);
-	// protected static Term termDisplaying= new PrologSymbol(SymbolCodes.symbolCode_E_DISPLAYING);
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -53,8 +50,6 @@ public class MultimediaBufferOperatingModeConverters {
 			return termSpeculativeReading;
 		case READING:
 			return termReading;
-		// case DISPLAYING:
-		//	return termDisplaying;
 		};
 		throw new UnknownMultimediaBufferOperatingMode(mode);
 	}

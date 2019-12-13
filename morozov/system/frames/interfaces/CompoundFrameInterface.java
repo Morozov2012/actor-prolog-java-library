@@ -5,6 +5,7 @@ package morozov.system.frames.interfaces;
 import morozov.system.modes.*;
 
 public interface CompoundFrameInterface {
+	//
 	public void setCompoundArrayType(CompoundArrayType type);
 	public CompoundArrayType getCompoundArrayType();
 	public void setSerialNumber(long number);

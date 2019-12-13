@@ -192,6 +192,7 @@ public abstract class Dialog extends DataResourceConsumer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void releaseSystemResources() {
 		if (targetObject != null) {
 			targetObject.safelyDispose();
@@ -201,6 +202,7 @@ public abstract class Dialog extends DataResourceConsumer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setActualPosition2s(ChoisePoint iX, Term a1, Term a2) {
 		ExtendedCoordinate eX= ExtendedCoordinate.argumentToExtendedCoordinate(a1,iX);
 		ExtendedCoordinate eY= ExtendedCoordinate.argumentToExtendedCoordinate(a2,iX);
@@ -210,70 +212,77 @@ public abstract class Dialog extends DataResourceConsumer {
 			targetObject.changeActualPosition(eX,eY,pixelMeasurements,iX);
 		}
 	}
+	@Override
 	public void getActualPosition2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
-		double x= 0.0;
-		double y= 0.0;
+		double givenX= 0.0;
+		double givenY= 0.0;
 		if (targetObject != null) {
 			ExtendedCoordinates coordinates= targetObject.getActualPosition(getUsePixelMeasurements(iX));
 			try {
-				x= coordinates.x.getDoubleValue();
+				givenX= coordinates.getX().getDoubleValue();
 			} catch (UseDefaultLocation e) {
 			} catch (CentreFigure e) {
 			};
 			try {
-				y= coordinates.y.getDoubleValue();
+				givenY= coordinates.getY().getDoubleValue();
 			} catch (UseDefaultLocation e) {
 			} catch (CentreFigure e) {
 			};
 		};
-		a1.setBacktrackableValue(new PrologReal(x),iX);
-		a2.setBacktrackableValue(new PrologReal(y),iX);
+		a1.setBacktrackableValue(new PrologReal(givenX),iX);
+		a2.setBacktrackableValue(new PrologReal(givenY),iX);
 	}
 	//
+	@Override
 	public void getPositionInPixels2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
-		int x= 0;
-		int y= 0;
+		int givenX= 0;
+		int givenY= 0;
 		if (targetObject != null) {
 			Point position= targetObject.safelyGetLocation();
-			x= position.x;
-			y= position.y;
+			givenX= position.x;
+			givenY= position.y;
 		};
-		a1.setBacktrackableValue(new PrologInteger(x),iX);
-		a2.setBacktrackableValue(new PrologInteger(y),iX);
+		a1.setBacktrackableValue(new PrologInteger(givenX),iX);
+		a2.setBacktrackableValue(new PrologInteger(givenY),iX);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void changeTitle(ExtendedTitle title, ChoisePoint iX) {
 		if (targetObject != null) {
 			targetObject.changeTitle(title);
 		}
 	}
 	//
+	@Override
 	protected void changeTextColor(ChoisePoint iX) {
 		changeTextColor(getTextColor(iX),iX);
 	}
-	protected void changeTextColor(ExtendedColor color, ChoisePoint iX) {
+	protected void changeTextColor(ColorAttribute color, ChoisePoint iX) {
 		if (targetObject != null) {
 			targetObject.changeTextColor(color,true,iX);
 		}
 	}
 	//
+	@Override
 	protected void changeSpaceColor(ChoisePoint iX) {
 		changeSpaceColor(getSpaceColor(iX),iX);
 	}
-	protected void changeSpaceColor(ExtendedColor color, ChoisePoint iX) {
+	protected void changeSpaceColor(ColorAttribute color, ChoisePoint iX) {
 		if (targetObject != null) {
 			targetObject.changeSpaceColor(color,true,iX);
 		}
 	}
 	//
-	protected void changeBackgroundColor(ExtendedColor color, ChoisePoint iX) {
+	@Override
+	protected void changeBackgroundColor(ColorAttribute color, ChoisePoint iX) {
 		if (targetObject != null) {
 			targetObject.changeBackgroundColor(color,true,iX);
 		}
 	}
 	//
+	@Override
 	protected void changeFontName(ChoisePoint iX) {
 		changeFontName(getFontName(iX),iX);
 	}
@@ -283,6 +292,7 @@ public abstract class Dialog extends DataResourceConsumer {
 		}
 	}
 	//
+	@Override
 	protected void changeFontSize(ChoisePoint iX) {
 		changeFontSize(getFontSize(iX),iX);
 	}
@@ -292,6 +302,7 @@ public abstract class Dialog extends DataResourceConsumer {
 		}
 	}
 	//
+	@Override
 	protected void changeFontStyle(ChoisePoint iX) {
 		changeFontStyle(getFontStyle(iX),iX);
 	}
@@ -303,12 +314,15 @@ public abstract class Dialog extends DataResourceConsumer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void show2s(ChoisePoint iX, Term a1, Term a2) {
 		prepareDialogIfNecessary(true,DialogInitialState.RESTORED,iX);
 	}
+	@Override
 	public void show0s(ChoisePoint iX) {
 		prepareDialogIfNecessary(true,DialogInitialState.RESTORED,iX);
 	}
+	@Override
 	public void show1ms(ChoisePoint iX, Term... args) {
 		prepareDialogIfNecessary(true,DialogInitialState.RESTORED,iX);
 	}
@@ -317,18 +331,21 @@ public abstract class Dialog extends DataResourceConsumer {
 		prepareDialogIfNecessary(false,iX);
 	}
 	//
+	@Override
 	public void redraw0s(ChoisePoint iX) {
 		if (targetObject != null) {
 			targetObject.safelyValidate();
 		}
 	}
 	//
+	@Override
 	public void hide0s(ChoisePoint iX) {
 		if (targetObject != null) {
 			targetObject.safelyHide();
 		}
 	}
 	//
+	@Override
 	public void maximize0s(ChoisePoint iX) {
 		prepareDialogIfNecessary(true,DialogInitialState.MAXIMIZED,iX);
 		if (targetObject != null) {
@@ -336,6 +353,7 @@ public abstract class Dialog extends DataResourceConsumer {
 		}
 	}
 	//
+	@Override
 	public void minimize0s(ChoisePoint iX) {
 		prepareDialogIfNecessary(true,DialogInitialState.MINIMIZED,iX);
 		if (targetObject != null) {
@@ -343,6 +361,7 @@ public abstract class Dialog extends DataResourceConsumer {
 		}
 	}
 	//
+	@Override
 	public void restore0s(ChoisePoint iX) {
 		prepareDialogIfNecessary(true,DialogInitialState.RESTORED,iX);
 		if (targetObject != null) {
@@ -350,6 +369,7 @@ public abstract class Dialog extends DataResourceConsumer {
 		}
 	}
 	//
+	@Override
 	public void isVisible0s(ChoisePoint iX) throws Backtracking {
 		if (targetObject != null) {
 			if (!targetObject.safelyIsVisible()) {
@@ -360,6 +380,7 @@ public abstract class Dialog extends DataResourceConsumer {
 		}
 	}
 	//
+	@Override
 	public void isHidden0s(ChoisePoint iX) throws Backtracking {
 		if (targetObject != null) {
 			if (!targetObject.safelyIsHidden()) {
@@ -368,6 +389,7 @@ public abstract class Dialog extends DataResourceConsumer {
 		}
 	}
 	//
+	@Override
 	public void isMaximized0s(ChoisePoint iX) throws Backtracking {
 		if (targetObject != null) {
 			if (!targetObject.safelyIsMaximized()) {
@@ -378,6 +400,7 @@ public abstract class Dialog extends DataResourceConsumer {
 		}
 	}
 	//
+	@Override
 	public void isMinimized0s(ChoisePoint iX) throws Backtracking {
 		if (targetObject != null) {
 			if (!targetObject.safelyIsMinimized()) {
@@ -388,6 +411,7 @@ public abstract class Dialog extends DataResourceConsumer {
 		}
 	}
 	//
+	@Override
 	public void isRestored0s(ChoisePoint iX) throws Backtracking {
 		if (targetObject != null) {
 			if (!targetObject.safelyIsRestored()) {
@@ -537,12 +561,15 @@ public abstract class Dialog extends DataResourceConsumer {
 		prepareDialogIfNecessary(false,iX);
 	}
 	//
+	@Override
 	public void action1s(ChoisePoint iX, Term actionName) {
 	}
 	//
+	@Override
 	public void windowClosing0s(ChoisePoint iX) {
 	}
 	//
+	@Override
 	public void windowClosed0s(ChoisePoint iX) {
 	}
 	//
@@ -561,6 +588,7 @@ public abstract class Dialog extends DataResourceConsumer {
 			c0= aC;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			c0.execute(iX);
 		}
@@ -626,10 +654,10 @@ public abstract class Dialog extends DataResourceConsumer {
 	//
 	protected AbstractDialog createDialog(YesNoDefault isModalDialog, boolean isTopLevelDialog, boolean isAlwaysOnTopDialog, boolean confirmationOnDialogClose, YesNoDefault exitProgramOnClose, Window window, ChoisePoint iX) {
 		DialogIdentifierOrAuto id= getIdentifier(iX);
-		if (id.isAutomatic) {
+		if (id.isAutomatic()) {
 			return createAutomaticDialog(isModalDialog,isTopLevelDialog,isAlwaysOnTopDialog,confirmationOnDialogClose,exitProgramOnClose,window);
 		} else {
-			return createNamedDialog(id.name,isModalDialog,isTopLevelDialog,isAlwaysOnTopDialog,confirmationOnDialogClose,exitProgramOnClose,window);
+			return createNamedDialog(id.getName(),isModalDialog,isTopLevelDialog,isAlwaysOnTopDialog,confirmationOnDialogClose,exitProgramOnClose,window);
 		}
 	}
 	protected AbstractDialog createNamedDialog(String name, YesNoDefault isModalDialog, boolean isTopLevelDialog, boolean isAlwaysOnTopDialog, boolean confirmationOnDialogClose, YesNoDefault exitProgramOnClose, Window window) {
@@ -644,11 +672,11 @@ public abstract class Dialog extends DataResourceConsumer {
 		long[] classList= getClassHierarchy();
 		for (int i= 0; i < classList.length; i++) {
 			long classCode= classList[i];
-			String name= String.format("d%02d_%04d",
+			String givenName= String.format("d%02d_%04d",
 				packageNumber,
 				classCode);
 			try {
-				return DialogTable.createDialog(name,isModalDialog,isTopLevelDialog,isAlwaysOnTopDialog,confirmationOnDialogClose,exitProgramOnClose,window);
+				return DialogTable.createDialog(givenName,isModalDialog,isTopLevelDialog,isAlwaysOnTopDialog,confirmationOnDialogClose,exitProgramOnClose,window);
 			} catch (UndefinedDialogTableEntry e2) {
 			}
 		};
@@ -678,6 +706,7 @@ public abstract class Dialog extends DataResourceConsumer {
 			tableName= aP;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			throw Backtracking.instance;
 		}

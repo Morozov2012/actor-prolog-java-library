@@ -27,8 +27,8 @@ public abstract class CubicSplineColorMapRGBA extends ColorMapRGBA {
 		return emptyChannelStraightSegments;
 	}
 	//
-	public int[][] createColorMap(int size, int alpha) {
-		int[][] map= new int[4][size];
+	@Override
+	public void createColorMap(int[][] map, int shift, int bandWidth, int totalSize, int alpha) {
 		double[][] dRed= getRedChannelDefinition();
 		double[][] dGreen= getGreenChannelDefinition();
 		double[][] dBlue= getBlueChannelDefinition();
@@ -38,20 +38,19 @@ public abstract class CubicSplineColorMapRGBA extends ColorMapRGBA {
 		int[][] sRed= getRedChannelStraightSegments();
 		int[][] sGreen= getGreenChannelStraightSegments();
 		int[][] sBlue= getBlueChannelStraightSegments();
-		computeCubicSplineColorMapChannel(map,0,dRed,cRed,sRed);
-		computeCubicSplineColorMapChannel(map,1,dGreen,cGreen,sGreen);
-		computeCubicSplineColorMapChannel(map,2,dBlue,cBlue,sBlue);
-		for (int k=0; k < size; k++) {
-			map[3][k]= alpha;
+		computeCubicSplineColorMapChannel(map,0,shift,bandWidth,totalSize,dRed,cRed,sRed);
+		computeCubicSplineColorMapChannel(map,1,shift,bandWidth,totalSize,dGreen,cGreen,sGreen);
+		computeCubicSplineColorMapChannel(map,2,shift,bandWidth,totalSize,dBlue,cBlue,sBlue);
+		for (int k=0; k < bandWidth; k++) {
+			if (shift+k >= totalSize) {
+				break;
+			};
+			map[3][shift+k]= alpha;
 		};
-		return map;
+		return;
 	}
 	//
-	public void computeCubicSplineColorMapChannel(int[][] map, int channelNumber, double[][] channelDefinition, int[][] channelConstraints, int[][] channelStraightSegments) {
-		int mapLength= 0;
-		if (map.length > 0) {
-			mapLength= map[0].length;
-		};
+	public void computeCubicSplineColorMapChannel(int[][] map, int channelNumber, int shift, int bandWidth, int totalSize, double[][] channelDefinition, int[][] channelConstraints, int[][] channelStraightSegments) {
 		int channelDefinitionLength= channelDefinition.length;
 		int channelConstraintsNumber= channelConstraints.length;
 		int channelStraightSegmentsNumber= channelStraightSegments.length;
@@ -59,8 +58,11 @@ public abstract class CubicSplineColorMapRGBA extends ColorMapRGBA {
 		double[] c= new double[channelDefinitionLength];
 		double[] d= new double[channelDefinitionLength];
 		computeCubicSpline(channelDefinition,b,c,d);
-		for (int k=0; k < mapLength; k++) {
-			double u= (double)k * maximalIndex / (mapLength-1);
+		for (int k=0; k < bandWidth; k++) {
+			if (shift+k >= totalSize) {
+				break;
+			};
+			double u= (double)k * maximalIndex / (bandWidth-1);
 			int value= 0;
 			boolean isConstrainedSegment= false;
 			int integerU= (int)StrictMath.round(u);
@@ -96,7 +98,7 @@ public abstract class CubicSplineColorMapRGBA extends ColorMapRGBA {
 			} else if (value > maximalIndex) {
 				value= maximalIndex;
 			};
-			map[channelNumber][k]= value;
+			map[channelNumber][shift+k]= value;
 		}
 	}
 	//

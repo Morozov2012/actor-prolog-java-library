@@ -6,7 +6,7 @@
 
 package morozov.system.gui.dialogs.scalable.windows;
 
-import morozov.terms.*;
+import morozov.system.*;
 
 import javax.swing.plaf.basic.BasicArrowButton;
 
@@ -21,20 +21,19 @@ import java.awt.Color;
 */
 
 public class ScalableComboBoxArrowButton extends BasicArrowButton {
+	//
 	public ScalableComboBoxArrowButton(int direction, Color background, Color shadow, Color darkShadow, Color highlight) {
 		super(direction,background,shadow,darkShadow,highlight);
 	}
 	//
+	@Override
 	public Dimension getPreferredSize() {
-		// return new Dimension(16,16);
-		return new Dimension(PrologInteger.toInteger(16*(2.0/5)),16);
-		// return new Dimension(PrologInteger.toInteger(8*(2.0/5)),8);
-		// return new Dimension(PrologInteger.toInteger(32*(2.0/5)),32);
-		// return new Dimension(PrologInteger.toInteger(64*(2.0/5)),64);
+		return new Dimension(Arithmetic.toInteger(16*(2.0/5)),16);
 	}
+	@Override
 	public Insets getInsets() {
 		Insets insets= super.getInsets();
-		insets.set(insets.bottom,PrologInteger.toInteger(insets.left*(2.0/5)),insets.top,PrologInteger.toInteger(insets.right*(2.0/5)));
+		insets.set(insets.bottom,Arithmetic.toInteger(insets.left*(2.0/5)),insets.top,Arithmetic.toInteger(insets.right*(2.0/5)));
 		return insets;
 	}
 }

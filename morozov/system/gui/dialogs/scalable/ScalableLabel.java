@@ -65,6 +65,7 @@ public class ScalableLabel extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
@@ -76,16 +77,16 @@ public class ScalableLabel extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void putValue(Term value, ChoisePoint iX) {
 		text= value.toString(iX);
 		if (component!=null) {
 			((JLabel)component).setText(alignText(text));
-			// targetDialog.invalidate(); // 2012.03.05
-			// targetDialog.repaint(); // 2013.09.04
 			targetDialog.safelyInvalidateAndRepaint();
 		}
 	}
 	//
+	@Override
 	public Term getValue() {
 		return new PrologString(text);
 	}

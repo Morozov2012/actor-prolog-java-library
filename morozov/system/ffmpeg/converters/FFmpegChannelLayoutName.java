@@ -14,225 +14,281 @@ import morozov.terms.signals.*;
 public enum FFmpegChannelLayoutName {
 	//
 	AV_CH_LAYOUT_MONO {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_MONO;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_MONO;
 		}
 	},
 	AV_CH_LAYOUT_STEREO {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_STEREO;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_STEREO;
 		}
 	},
 	AV_CH_LAYOUT_2POINT1 {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_2POINT1;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_2POINT1;
 		}
 	},
 	AV_CH_LAYOUT_2_1 {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_2_1;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_2_1;
 		}
 	},
 	AV_CH_LAYOUT_SURROUND {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_SURROUND;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_SURROUND;
 		}
 	},
 	AV_CH_LAYOUT_3POINT1 {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_3POINT1;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_3POINT1;
 		}
 	},
 	AV_CH_LAYOUT_4POINT0 {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_4POINT0;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_4POINT0;
 		}
 	},
 	AV_CH_LAYOUT_4POINT1 {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_4POINT1;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_4POINT1;
 		}
 	},
 	AV_CH_LAYOUT_2_2 {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_2_2;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_2_2;
 		}
 	},
 	AV_CH_LAYOUT_QUAD {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_QUAD;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_QUAD;
 		}
 	},
 	AV_CH_LAYOUT_5POINT0 {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_5POINT0;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_5POINT0;
 		}
 	},
 	AV_CH_LAYOUT_5POINT1 {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_5POINT1;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_5POINT1;
 		}
 	},
 	AV_CH_LAYOUT_5POINT0_BACK {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_5POINT0_BACK;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_5POINT0_BACK;
 		}
 	},
 	AV_CH_LAYOUT_5POINT1_BACK {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_5POINT1_BACK;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_5POINT1_BACK;
 		}
 	},
 	AV_CH_LAYOUT_6POINT0 {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_6POINT0;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_6POINT0;
 		}
 	},
 	AV_CH_LAYOUT_6POINT0_FRONT {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_6POINT0_FRONT;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_6POINT0_FRONT;
 		}
 	},
 	AV_CH_LAYOUT_HEXAGONAL {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_HEXAGONAL;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_HEXAGONAL;
 		}
 	},
 	AV_CH_LAYOUT_6POINT1 {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_6POINT1;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_6POINT1;
 		}
 	},
 	AV_CH_LAYOUT_6POINT1_BACK {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_6POINT1_BACK;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_6POINT1_BACK;
 		}
 	},
 	AV_CH_LAYOUT_6POINT1_FRONT {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_6POINT1_FRONT;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_6POINT1_FRONT;
 		}
 	},
 	AV_CH_LAYOUT_7POINT0 {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_7POINT0;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_7POINT0;
 		}
 	},
 	AV_CH_LAYOUT_7POINT0_FRONT {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_7POINT0_FRONT;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_7POINT0_FRONT;
 		}
 	},
 	AV_CH_LAYOUT_7POINT1 {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_7POINT1;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_7POINT1;
 		}
 	},
 	AV_CH_LAYOUT_7POINT1_WIDE {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_7POINT1_WIDE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_7POINT1_WIDE;
 		}
 	},
 	AV_CH_LAYOUT_7POINT1_WIDE_BACK {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_7POINT1_WIDE_BACK;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_7POINT1_WIDE_BACK;
 		}
 	},
 	AV_CH_LAYOUT_OCTAGONAL {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_OCTAGONAL;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_OCTAGONAL;
 		}
 	},
 	AV_CH_LAYOUT_HEXADECAGONAL {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_HEXADECAGONAL;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_HEXADECAGONAL;
 		}
 	},
 	AV_CH_LAYOUT_STEREO_DOWNMIX {
+		@Override
 		public long toLong() {
 			return avutil.AV_CH_LAYOUT_STEREO_DOWNMIX;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AV_CH_LAYOUT_STEREO_DOWNMIX;
 		}

@@ -17,11 +17,9 @@ public interface I3CameraFlashAttributesInterface {
 	public double getDriftTempCoeffi3();
 	public double getDriftTempCoeffi4();
 	public double[] getAmbientTempCoeffi();
-	// public calcAmbientCoeffi();
 	public double[] getAmbientConstA();
 	public double[] getAmbientConstB();
 	public double getCheckcamberTemp();
-	// public calcAmbientTempOffset();
 	public double[] getAmbientOffsetConstA();
 	public double[] getAmbientOffsetConstB();
 	public float[] getSLGain();

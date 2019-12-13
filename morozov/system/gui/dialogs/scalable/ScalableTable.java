@@ -38,6 +38,7 @@ public class ScalableTable extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
@@ -56,6 +57,7 @@ public class ScalableTable extends ActiveComponent {
 		}
 	}
 	//
+	@Override
 	public Term standardizeRange(Term value, ChoisePoint iX) {
 		try {
 			String text= value.getStringValue(iX);
@@ -68,21 +70,21 @@ public class ScalableTable extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void putValue(Term value, ChoisePoint iX) {
 		if (component!=null) {
 			((ATable)component).putValue(value,iX);
-			// if (targetDialog!=null) {
-			//	targetDialog.reportValueUpdate(this);
-			// }
 		}
 	}
 	//
+	@Override
 	public void putRange(Term value, ChoisePoint iX) {
 		if (component!=null) {
 			((ATable)component).putRange(value,iX);
 		}
 	}
 	//
+	@Override
 	public Term getValue() {
 		if (component!=null) {
 			return ((ATable)component).getValue();
@@ -91,11 +93,11 @@ public class ScalableTable extends ActiveComponent {
 		}
 	}
 	//
+	@Override
 	public Term getRange() {
 		if (component!=null) {
 			return ((ATable)component).getRange();
 		} else {
-			// return PrologEmptyList.instance;
 			return PrologUnknownValue.instance;
 		}
 	}

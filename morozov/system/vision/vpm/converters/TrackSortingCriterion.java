@@ -12,36 +12,43 @@ import morozov.terms.signals.*;
 public enum TrackSortingCriterion {
 	//
 	NUMBER_OF_FRAMES {
+		@Override
 		public Term toTerm() {
 			return term_NUMBER_OF_FRAMES;
 		}
 	},
 	MEAN_BLOB_AREA {
+		@Override
 		public Term toTerm() {
 			return term_MEAN_BLOB_AREA;
 		}
 	},
 	MEAN_FOREGROUND_AREA {
+		@Override
 		public Term toTerm() {
 			return term_MEAN_FOREGROUND_AREA;
 		}
 	},
 	MEAN_CONTOUR_LENGTH {
+		@Override
 		public Term toTerm() {
 			return term_MEAN_CONTOUR_LENGTH;
 		}
 	},
 	TOTAL_DISTANCE {
+		@Override
 		public Term toTerm() {
 			return term_TOTAL_DISTANCE;
 		}
 	},
 	TOTAL_SHIFT {
+		@Override
 		public Term toTerm() {
 			return term_TOTAL_SHIFT;
 		}
 	},
 	MEAN_VELOCITY {
+		@Override
 		public Term toTerm() {
 			return term_MEAN_VELOCITY;
 		}

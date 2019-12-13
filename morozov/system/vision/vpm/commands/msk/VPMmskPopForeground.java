@@ -8,12 +8,13 @@ import morozov.system.vision.vpm.converters.*;
 
 public class VPMmskPopForeground extends VPM_FrameCommand {
 	//
-	PopOperationMode mode;
+	protected PopOperationMode mode;
 	//
 	public VPMmskPopForeground(PopOperationMode m) {
 		mode= m;
 	}
 	//
+	@Override
 	public void execute(VPM vpm) {
 		boolean[] currentMask= vpm.getForegroundMask();
 		boolean[] previousMask= vpm.popForegroundMask();

@@ -12,13 +12,13 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class StaticDesktopAttributes extends StaticAttributes {
 	//
-	private MainDesktopPane desktop;
-	private ReentrantLock desktopGuard= new ReentrantLock();
-	private int previousDefaultPosition= -1;
-	private Window mainWindow;
-	private Window topLevelWindow;
-	private static final String staticIdentifier= "_Desktop";
-	private boolean exitOnClose= true;
+	protected MainDesktopPane desktop;
+	protected ReentrantLock desktopGuard= new ReentrantLock();
+	protected int previousDefaultPosition= -1;
+	protected Window mainWindow;
+	protected Window topLevelWindow;
+	protected static final String staticIdentifier= "_Desktop";
+	protected boolean exitOnClose= true;
 	//
 	private static StaticDesktopAttributes retrieveStaticDesktopAttributes(StaticContext context) {
 		StaticAttributes attributes= context.retrieveAttributes(staticIdentifier);
@@ -151,11 +151,9 @@ public class StaticDesktopAttributes extends StaticAttributes {
 						if (mode) {
 							frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 						} else {
-							// frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 							frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 						}
 					} catch (SecurityException e) {
-						// frame.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 						frame.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 					}
 				}

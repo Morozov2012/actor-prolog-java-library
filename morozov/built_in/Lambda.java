@@ -18,12 +18,12 @@ public abstract class Lambda extends AbstractInternalWorld {
 	}
 	//
 	public class Goal0s extends Continuation {
-		// private Continuation c0;
 		//
 		public Goal0s(Continuation aC) {
 			c0= aC;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			c0.execute(iX);
 		}
@@ -37,6 +37,7 @@ public abstract class Lambda extends AbstractInternalWorld {
 		public Alarm1s(Continuation aC, Term exceptionName) {
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			throw Backtracking.instance;
 		}

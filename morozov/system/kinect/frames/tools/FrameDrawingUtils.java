@@ -2,6 +2,7 @@
 
 package morozov.system.kinect.frames.tools;
 
+import morozov.system.*;
 import morozov.system.kinect.frames.data.tools.*;
 import morozov.system.kinect.frames.interfaces.*;
 import morozov.system.kinect.frames.tools.errors.*;
@@ -16,7 +17,7 @@ import java.awt.Graphics2D;
 
 public class FrameDrawingUtils extends FrameDrawingBasics {
 	//
-	public static final int coincedenceThreshold= 100;
+	protected static final int coincedenceThreshold= 100;
 	//
 /////////////////////////////////////////////////////////////////////
 // Kinect Frame -> Image                                           //
@@ -26,34 +27,127 @@ public class FrameDrawingUtils extends FrameDrawingBasics {
 		int maximalNumberOfSkeletons= frame.getNumberOfSkeletons();
 		if (frame instanceof KinectColorFrameInterface) {
 			KinectColorFrameInterface colorFrame= (KinectColorFrameInterface)frame;
-			return colorFrameToBufferedImage(colorFrame.getColor(),colorFrame.getU(),colorFrame.getV(),peopleIndexMode,colorFrame.getPlayerIndex(),true,colorMap,peopleColors,maximalNumberOfSkeletons);
+			return colorFrameToBufferedImage(
+				colorFrame.getColor(),
+				colorFrame.getU(),
+				colorFrame.getV(),
+				peopleIndexMode,
+				colorFrame.getPlayerIndex(),
+				Color.WHITE,
+				colorMap,
+				peopleColors,
+				maximalNumberOfSkeletons);
 		} else if (frame instanceof KinectDepthFrameInterface) {
 			KinectDepthFrameInterface depthFrame= (KinectDepthFrameInterface)frame;
 			if (displayingMode.getActingFrameType() == KinectFrameType.DEPTH_MAPS) {
-				return shortArrayToGrayBufferedImage(depthFrame.getDepth(),true,peopleIndexMode,depthFrame.getPlayerIndex(),true,depthFrame.getMappedRed(),depthFrame.getMappedGreen(),depthFrame.getMappedBlue(),colorMap,peopleColors,maximalNumberOfSkeletons);
+				return shortArrayToGrayBufferedImage(
+					depthFrame.getDepth(),
+					true,	// computeQuantiles
+					peopleIndexMode,
+					depthFrame.getPlayerIndex(),
+					Color.WHITE,
+					depthFrame.getMappedRed(),
+					depthFrame.getMappedGreen(),
+					depthFrame.getMappedBlue(),
+					colorMap,
+					peopleColors,
+					maximalNumberOfSkeletons);
 			} else if (displayingMode.getActingFrameType() == KinectFrameType.COLORED_DEPTH_MAPS) {
-				return shortArrayToColouredBufferedImage(depthFrame.getDepth(),true,peopleIndexMode,depthFrame.getPlayerIndex(),true,depthFrame.getMappedRed(),depthFrame.getMappedGreen(),depthFrame.getMappedBlue(),colorMap,peopleColors,maximalNumberOfSkeletons);
+				return shortArrayToColouredBufferedImage(
+					depthFrame.getDepth(),
+					true,	// computeQuantiles
+					peopleIndexMode,
+					depthFrame.getPlayerIndex(),
+					Color.WHITE,
+					depthFrame.getMappedRed(),
+					depthFrame.getMappedGreen(),
+					depthFrame.getMappedBlue(),
+					colorMap,
+					peopleColors,
+					maximalNumberOfSkeletons);
 			} else {
-				return shortArrayToEmptyBufferedImage(depthFrame.getDepth(),peopleIndexMode,depthFrame.getPlayerIndex(),false,depthFrame.getMappedRed(),depthFrame.getMappedGreen(),depthFrame.getMappedBlue(),peopleColors,maximalNumberOfSkeletons);
+				return shortArrayToEmptyBufferedImage(
+					depthFrame.getDepth(),
+					peopleIndexMode,
+					depthFrame.getPlayerIndex(),
+					Color.BLACK,
+					depthFrame.getMappedRed(),
+					depthFrame.getMappedGreen(),
+					depthFrame.getMappedBlue(),
+					colorMap,
+					peopleColors,
+					maximalNumberOfSkeletons);
 			}
-		// } else if (frame instanceof KinectForegroundPointCloudsFrameInterface) {
-		// } else if (frame instanceof KinectFrameInterface) {
 		} else if (frame instanceof KinectInfraredFrameInterface) {
 			KinectInfraredFrameInterface infraredFrame= (KinectInfraredFrameInterface)frame;
-			return shortArrayToGrayBufferedImage(infraredFrame.getInfrared(),true,peopleIndexMode,infraredFrame.getPlayerIndex(),false,infraredFrame.getMappedRed(),infraredFrame.getMappedGreen(),infraredFrame.getMappedBlue(),colorMap,peopleColors,maximalNumberOfSkeletons);
+			return shortArrayToGrayBufferedImage(
+				infraredFrame.getInfrared(),
+				true,	// computeQuantiles
+				peopleIndexMode,
+				infraredFrame.getPlayerIndex(),
+				Color.BLACK,
+				infraredFrame.getMappedRed(),
+				infraredFrame.getMappedGreen(),
+				infraredFrame.getMappedBlue(),
+				colorMap,
+				peopleColors,
+				maximalNumberOfSkeletons);
 		} else if (frame instanceof KinectLongExposureInfraredFrameInterface) {
 			KinectLongExposureInfraredFrameInterface longExposureInfraredFrame= (KinectLongExposureInfraredFrameInterface)frame;
-			return shortArrayToGrayBufferedImage(longExposureInfraredFrame.getLongExposureInfrared(),true,peopleIndexMode,longExposureInfraredFrame.getPlayerIndex(),false,longExposureInfraredFrame.getMappedRed(),longExposureInfraredFrame.getMappedGreen(),longExposureInfraredFrame.getMappedBlue(),colorMap,peopleColors,maximalNumberOfSkeletons);
+			return shortArrayToGrayBufferedImage(
+				longExposureInfraredFrame.getLongExposureInfrared(),
+				true,	// computeQuantiles
+				peopleIndexMode,
+				longExposureInfraredFrame.getPlayerIndex(),
+				Color.BLACK,
+				longExposureInfraredFrame.getMappedRed(),
+				longExposureInfraredFrame.getMappedGreen(),
+				longExposureInfraredFrame.getMappedBlue(),
+				colorMap,
+				peopleColors,
+				maximalNumberOfSkeletons);
 		} else if (frame instanceof KinectMappedColorFrameInterface) {
 			KinectMappedColorFrameInterface mappedColorFrame= (KinectMappedColorFrameInterface)frame;
-			return colorFrameToMappedImage(mappedColorFrame.getMappedRed(),mappedColorFrame.getMappedGreen(),mappedColorFrame.getMappedBlue(),peopleIndexMode,mappedColorFrame.getPlayerIndex(),false,colorMap,peopleColors,maximalNumberOfSkeletons);
-		// } else if (frame instanceof KinectModeFrameInterface) {
+			return colorFrameToMappedImage(
+				mappedColorFrame.getMappedRed(),
+				mappedColorFrame.getMappedGreen(),
+				mappedColorFrame.getMappedBlue(),
+				peopleIndexMode,
+				mappedColorFrame.getPlayerIndex(),
+				Color.BLACK,
+				colorMap,
+				peopleColors,
+				maximalNumberOfSkeletons);
 		} else if (frame instanceof KinectPointCloudsFrameInterface) {
 			KinectPointCloudsFrameInterface pointCloudsFrame= (KinectPointCloudsFrameInterface)frame;
 			if (displayingMode.getActingFrameType() == KinectFrameType.DEVICE_TUNING) {
-				return tuneProgramAndCreateMappedBufferedImage(pointCloudsFrame.getXYZ(),pointCloudsFrame.getMappedRed(),pointCloudsFrame.getMappedGreen(),pointCloudsFrame.getMappedBlue(),peopleIndexMode,pointCloudsFrame.getPlayerIndex(),false,pointCloudsFrame.getFocalLengthX(),pointCloudsFrame.getFocalLengthY(),pointCloudsFrame.getCorrectionX(),pointCloudsFrame.getCorrectionY()).getImage();
+				return tuneProgramAndCreateMappedBufferedImage(
+					pointCloudsFrame.getXYZ(),
+					pointCloudsFrame.getMappedRed(),
+					pointCloudsFrame.getMappedGreen(),
+					pointCloudsFrame.getMappedBlue(),
+					peopleIndexMode,
+					pointCloudsFrame.getPlayerIndex(),
+					pointCloudsFrame.getFocalLengthX(),
+					pointCloudsFrame.getFocalLengthY(),
+					pointCloudsFrame.getCorrectionX(),
+					pointCloudsFrame.getCorrectionY()).getImage();
 			} else {
-				return pointCloudToMappedBufferedImage(pointCloudsFrame.getXYZ(),pointCloudsFrame.getMappedRed(),pointCloudsFrame.getMappedGreen(),pointCloudsFrame.getMappedBlue(),peopleIndexMode,pointCloudsFrame.getPlayerIndex(),false,pointCloudsFrame.getFocalLengthX(),pointCloudsFrame.getFocalLengthY(),pointCloudsFrame.getCorrectionX(),pointCloudsFrame.getCorrectionY(),colorMap,peopleColors,maximalNumberOfSkeletons);
+				return pointCloudToMappedBufferedImage(
+					pointCloudsFrame.getXYZ(),
+					pointCloudsFrame.getMappedRed(),
+					pointCloudsFrame.getMappedGreen(),
+					pointCloudsFrame.getMappedBlue(),
+					peopleIndexMode,
+					pointCloudsFrame.getPlayerIndex(),
+					Color.BLACK,
+					pointCloudsFrame.getFocalLengthX(),
+					pointCloudsFrame.getFocalLengthY(),
+					pointCloudsFrame.getCorrectionX(),
+					pointCloudsFrame.getCorrectionY(),
+					colorMap,
+					peopleColors,
+					maximalNumberOfSkeletons);
 			}
 		} else {
 			throw new FrameHasNoVisualRepresentation(frame);
@@ -63,7 +157,18 @@ public class FrameDrawingUtils extends FrameDrawingBasics {
 // Short Array to Gray Buffered Image                              //
 // (tinctureRatio4)                                                //
 /////////////////////////////////////////////////////////////////////
-	public static BufferedImage shortArrayToGrayBufferedImage(short[] array, boolean computeQuantiles, KinectPeopleIndexMode currentPeopleIndexMode, byte[] playerIndex, boolean useWhiteBackground, byte[][] red1, byte[][] green1, byte[][] blue1, KinectColorMap colorMap, KinectColorMap peopleColors, int maximalNumberOfSkeletons) {
+	public static BufferedImage shortArrayToGrayBufferedImage(
+			short[] array,
+			boolean computeQuantiles,
+			KinectPeopleIndexMode currentPeopleIndexMode,
+			byte[] playerIndex,
+			Color defaultBackgroundColor,
+			byte[][] red1,
+			byte[][] green1,
+			byte[][] blue1,
+			KinectColorMap colorMap,
+			KinectColorMap peopleColors,
+			int maximalNumberOfSkeletons) {
 		if (playerIndex==null) {
 			currentPeopleIndexMode= KinectPeopleIndexMode.NONE;
 		};
@@ -81,15 +186,23 @@ public class FrameDrawingUtils extends FrameDrawingBasics {
 			int[] peopleIndexBlue= peopleColorMatrix[2];
 			double colormapTincturingCoefficient= colorMap.getColorMapTincturingCoefficient();
 			double peopleColorsTincturingCoefficient= peopleColors.getPeopleColorsTincturingCoefficient();
-			Quantiles quantiles;
+			long numberOfColorMapBands= colorMap.toNumberOfBands();
+			boolean colorMapIsIterative= (numberOfColorMapBands > 1);
+			IntegerQuantiles quantiles= new IntegerQuantiles(
+				colorMap.getLowerQuantile(),
+				colorMap.getUpperQuantile(),
+				colorMap.getLowerBoundIsZero(),
+				colorMap.getUpperBoundIsZero(),
+				colorMapIsIterative);
 			if (computeQuantiles) {
 				if (currentPeopleIndexMode==KinectPeopleIndexMode.ADAPTIVELY_EXTRACT_PEOPLE) {
-					quantiles= Quantiles.computeQuantiles(array,playerIndex);
+					quantiles.computeQuantiles(array,playerIndex);
 				} else {
-					quantiles= Quantiles.computeQuantiles(array,true);
+					quantiles.setLowerBoundIsZero(colorMap.getLowerBoundIsZero().getValue(YesNoDefault.YES));
+					quantiles.computeQuantiles(array); // ,true);
 				}
 			} else {
-				quantiles= Quantiles.computeBounds(array);
+				quantiles.computeBounds(array);
 			};
 			if (currentPeopleIndexMode==KinectPeopleIndexMode.PROJECT_PEOPLE) {
 				if (red1==null || green1==null || blue1==null) {
@@ -201,19 +314,28 @@ blue2[counter3]= byte2int(blue1[w][h]);
 			imageRaster.setSamples(0,0,imageWidth,imageHeight,1,green2);
 			imageRaster.setSamples(0,0,imageWidth,imageHeight,2,blue2);
 		} else {
+			int backgroundColorBrightness= brightness(colorMap.getBackgroundColor().getValue(defaultBackgroundColor));
 			image= shortArrayToBlankGrayBufferedImage(array);
 			if (image==null) {
 				return null;
 			};
-			Quantiles quantiles;
+			long numberOfColorMapBands= colorMap.toNumberOfBands();
+			boolean colorMapIsIterative= (numberOfColorMapBands > 1);
+			IntegerQuantiles quantiles= new IntegerQuantiles(
+				colorMap.getLowerQuantile(),
+				colorMap.getUpperQuantile(),
+				colorMap.getLowerBoundIsZero(),
+				colorMap.getUpperBoundIsZero(),
+				colorMapIsIterative);
 			if (computeQuantiles) {
 				if (currentPeopleIndexMode==KinectPeopleIndexMode.ADAPTIVELY_EXTRACT_PEOPLE) {
-					quantiles= Quantiles.computeQuantiles(array,playerIndex);
+					quantiles.computeQuantiles(array,playerIndex);
 				} else {
-					quantiles= Quantiles.computeQuantiles(array,true);
+					quantiles.setLowerBoundIsZero(colorMap.getLowerBoundIsZero().getValue(YesNoDefault.YES));
+					quantiles.computeQuantiles(array); // ,true);
 				}
 			} else {
-				quantiles= Quantiles.computeBounds(array);
+				quantiles.computeBounds(array);
 			};
 			int frameLength= array.length;
 			int imageWidth= image.getWidth();
@@ -242,8 +364,8 @@ blue2[counter3]= byte2int(blue1[w][h]);
 								value= 0;
 							};
 							doubleNumberArray[counter2]= value;
-						} else if (useWhiteBackground) {
-							doubleNumberArray[counter2]= maxColorValue;
+						} else { // if (useWhiteBackground) {
+							doubleNumberArray[counter2]= backgroundColorBrightness; // maxColorValue;
 						}
 					}
 				}
@@ -257,7 +379,18 @@ blue2[counter3]= byte2int(blue1[w][h]);
 // Short Array to Coloured Buffered Image                          //
 // (tinctureRatio2)                                                //
 /////////////////////////////////////////////////////////////////////
-	public static BufferedImage shortArrayToColouredBufferedImage(short[] array, boolean computeQuantiles, KinectPeopleIndexMode currentPeopleIndexMode, byte[] playerIndex, boolean useWhiteBackground, byte[][] red1, byte[][] green1, byte[][] blue1, KinectColorMap colorMap, KinectColorMap peopleColors, int maximalNumberOfSkeletons) {
+	public static BufferedImage shortArrayToColouredBufferedImage(
+			short[] array,
+			boolean computeQuantiles,
+			KinectPeopleIndexMode currentPeopleIndexMode,
+			byte[] playerIndex,
+			Color defaultBackgroundColor,
+			byte[][] red1,
+			byte[][] green1,
+			byte[][] blue1,
+			KinectColorMap colorMap,
+			KinectColorMap peopleColors,
+			int maximalNumberOfSkeletons) {
 		if (playerIndex==null) {
 			currentPeopleIndexMode= KinectPeopleIndexMode.NONE;
 		};
@@ -266,6 +399,8 @@ blue2[counter3]= byte2int(blue1[w][h]);
 			return null;
 		};
 		int[][] colors= colorMap.toColors();
+		long numberOfColorMapBands= colorMap.toNumberOfBands();
+		boolean colorMapIsIterative= (numberOfColorMapBands > 1);
 		int[] jetRed= colors[0];
 		int[] jetGreen= colors[1];
 		int[] jetBlue= colors[2];
@@ -276,21 +411,31 @@ blue2[counter3]= byte2int(blue1[w][h]);
 		int[] peopleIndexBlue= peopleColorMatrix[2];
 		double colormapTincturingCoefficient= colorMap.getColorMapTincturingCoefficient();
 		double peopleColorsTincturingCoefficient= peopleColors.getPeopleColorsTincturingCoefficient();
-		Quantiles quantiles;
+		IntegerQuantiles quantiles= new IntegerQuantiles(
+			colorMap.getLowerQuantile(),
+			colorMap.getUpperQuantile(),
+			colorMap.getLowerBoundIsZero(),
+			colorMap.getUpperBoundIsZero(),
+			colorMapIsIterative);
 		if (computeQuantiles) {
 			if (currentPeopleIndexMode==KinectPeopleIndexMode.ADAPTIVELY_EXTRACT_PEOPLE) {
-				quantiles= Quantiles.computeQuantiles(array,playerIndex);
+				quantiles.computeQuantiles(array,playerIndex);
 			} else {
-				quantiles= Quantiles.computeQuantiles(array,true);
+				quantiles.setLowerBoundIsZero(colorMap.getLowerBoundIsZero().getValue(YesNoDefault.YES));
+				quantiles.computeQuantiles(array); // ,true);
 			}
 		} else {
-			quantiles= Quantiles.computeBounds(array);
+			quantiles.computeBounds(array);
 		};
 		if (currentPeopleIndexMode==KinectPeopleIndexMode.PROJECT_PEOPLE) {
 			if (red1==null || green1==null || blue1==null) {
 				currentPeopleIndexMode= KinectPeopleIndexMode.PAINT_PEOPLE;
 			}
 		};
+		Color backgroundColor= colorMap.getBackgroundColor().getValue(defaultBackgroundColor);
+		int backgroundColorRed= backgroundColor.getRed();
+		int backgroundColorGreen= backgroundColor.getGreen();
+		int backgroundColorBlue= backgroundColor.getBlue();
 		int frameLength= array.length;
 		int imageWidth= image.getWidth();
 		int imageHeight= image.getHeight();
@@ -305,7 +450,6 @@ blue2[counter3]= byte2int(blue1[w][h]);
 				int counter2= h*imageWidth + (imageWidth-w-1);
 				int value= array[counter1];
 				int i= (int)(quantiles.standardize(value)*(jetLength-1));
-				// i= jetLength - 1 - i;
 				if (i >= jetLength) {
 					i= jetLength-1;
 				} else if (i < 0) {
@@ -400,10 +544,10 @@ if (index >= 0) {
 	red2[counter2]= jetRed[i];
 	green2[counter2]= jetGreen[i];
 	blue2[counter2]= jetBlue[i];
-} else if (useWhiteBackground) {
-	red2[counter2]= maxColorValue;
-	green2[counter2]= maxColorValue;
-	blue2[counter2]= maxColorValue;
+} else { // if (useWhiteBackground) {
+	red2[counter2]= backgroundColorRed;
+	green2[counter2]= backgroundColorGreen;
+	blue2[counter2]= backgroundColorBlue;
 }
 //
 //-----------------------------------------------------------------//
@@ -419,10 +563,10 @@ if (index >= 0) {
 	red2[counter2]= jetRed[i];
 	green2[counter2]= jetGreen[i];
 	blue2[counter2]= jetBlue[i];
-} else if (useWhiteBackground) {
-	red2[counter2]= maxColorValue;
-	green2[counter2]= maxColorValue;
-	blue2[counter2]= maxColorValue;
+} else { // if (useWhiteBackground) {
+	red2[counter2]= backgroundColorRed;
+	green2[counter2]= backgroundColorGreen;
+	blue2[counter2]= backgroundColorBlue;
 }
 //
 //-----------------------------------------------------------------//
@@ -464,13 +608,26 @@ if (index >= 0) {
 // Color Frame to Mapped Image                                     //
 // (tinctureRatio2)                                                //
 /////////////////////////////////////////////////////////////////////
-	public static BufferedImage colorFrameToMappedImage(byte[][] red1, byte[][] green1, byte[][] blue1, KinectPeopleIndexMode currentPeopleIndexMode, byte[] playerIndex, boolean useWhiteBackground, KinectColorMap colorMap, KinectColorMap peopleColors, int maximalNumberOfSkeletons) {
+	public static BufferedImage colorFrameToMappedImage(
+			byte[][] red1,
+			byte[][] green1,
+			byte[][] blue1,
+			KinectPeopleIndexMode currentPeopleIndexMode,
+			byte[] playerIndex,
+			Color defaultBackgroundColor,
+			KinectColorMap colorMap,
+			KinectColorMap peopleColors,
+			int maximalNumberOfSkeletons) {
 		if (red1==null || green1==null || blue1==null) {
 			return null;
 		};
 		if (playerIndex==null) {
 			currentPeopleIndexMode= KinectPeopleIndexMode.NONE;
 		};
+		Color backgroundColor= colorMap.getBackgroundColor().getValue(defaultBackgroundColor);
+		int backgroundColorRed= backgroundColor.getRed();
+		int backgroundColorGreen= backgroundColor.getGreen();
+		int backgroundColorBlue= backgroundColor.getBlue();
 		int uvWidth= red1.length;
 		if (uvWidth <= 0) {
 			return null;
@@ -547,7 +704,7 @@ if (index >= 0) {
 //
 //-----------------------------------------------------------------//
 					//
-				} else if(currentPeopleIndexMode==KinectPeopleIndexMode.PAINT_PEOPLE) {
+				} else if (currentPeopleIndexMode==KinectPeopleIndexMode.PAINT_PEOPLE) {
 					//
 //-----------------------------------------------------------------//
 // Paint People                                                    //
@@ -580,10 +737,10 @@ if (index >= 0) {
 	red2[counter2]= byte2int(red1[w][h]);
 	green2[counter2]= byte2int(green1[w][h]);
 	blue2[counter2]= byte2int(blue1[w][h]);
-} else if (useWhiteBackground) {
-	red2[counter2]= maxColorValue;
-	green2[counter2]= maxColorValue;
-	blue2[counter2]= maxColorValue;
+} else { // if (useWhiteBackground) {
+	red2[counter2]= backgroundColorRed;
+	green2[counter2]= backgroundColorGreen;
+	blue2[counter2]= backgroundColorBlue;
 }
 //
 //-----------------------------------------------------------------//
@@ -599,10 +756,10 @@ if (index >= 0) {
 	red2[counter2]= byte2int(red1[w][h]);
 	green2[counter2]= byte2int(green1[w][h]);
 	blue2[counter2]= byte2int(blue1[w][h]);
-} else if (useWhiteBackground) {
-	red2[counter2]= maxColorValue;
-	green2[counter2]= maxColorValue;
-	blue2[counter2]= maxColorValue;
+} else { // if (useWhiteBackground) {
+	red2[counter2]= backgroundColorRed;
+	green2[counter2]= backgroundColorGreen;
+	blue2[counter2]= backgroundColorBlue;
 }
 //
 //-----------------------------------------------------------------//
@@ -625,13 +782,31 @@ if (index >= 0) {
 // Point Cloud to Mapped Buffered Image                            //
 // (tinctureRatio2)                                                //
 /////////////////////////////////////////////////////////////////////
-	public static BufferedImage pointCloudToMappedBufferedImage(float[] xyz, byte[][] red1, byte[][] green1, byte[][] blue1, KinectPeopleIndexMode currentPeopleIndexMode, byte[] playerIndex, boolean useWhiteBackground, float focalLengthX, float focalLengthY, int correctionX, int correctionY, KinectColorMap colorMap, KinectColorMap peopleColors, int maximalNumberOfSkeletons) {
+	public static BufferedImage pointCloudToMappedBufferedImage(
+			float[] xyz,
+			byte[][] red1,
+			byte[][] green1,
+			byte[][] blue1,
+			KinectPeopleIndexMode currentPeopleIndexMode,
+			byte[] playerIndex,
+			Color defaultBackgroundColor,
+			float focalLengthX,
+			float focalLengthY,
+			int correctionX,
+			int correctionY,
+			KinectColorMap colorMap,
+			KinectColorMap peopleColors,
+			int maximalNumberOfSkeletons) {
 		if (red1==null || green1==null || blue1==null) {
 			return null;
 		};
 		if (playerIndex==null) {
 			currentPeopleIndexMode= KinectPeopleIndexMode.NONE;
 		};
+		Color backgroundColor= colorMap.getBackgroundColor().getValue(defaultBackgroundColor);
+		int backgroundColorRed= backgroundColor.getRed();
+		int backgroundColorGreen= backgroundColor.getGreen();
+		int backgroundColorBlue= backgroundColor.getBlue();
 		BufferedImage image= pointCloudToBlankColouredBufferedImage(xyz);
 		if (image==null) {
 			return null;
@@ -751,10 +926,10 @@ if (index >= 0) {
 	red2[counter2]= byte2int(red1[x2][y2]);
 	green2[counter2]= byte2int(green1[x2][y2]);
 	blue2[counter2]= byte2int(blue1[x2][y2]);
-} else if (useWhiteBackground) {
-	red2[counter2]= maxColorValue;
-	green2[counter2]= maxColorValue;
-	blue2[counter2]= maxColorValue;
+} else { // if (useWhiteBackground) {
+	red2[counter2]= backgroundColorRed;
+	green2[counter2]= backgroundColorGreen;
+	blue2[counter2]= backgroundColorBlue;
 }
 //
 //-----------------------------------------------------------------//
@@ -770,10 +945,10 @@ if (index >= 0) {
 	red2[counter2]= byte2int(red1[x2][y2]);
 	green2[counter2]= byte2int(green1[x2][y2]);
 	blue2[counter2]= byte2int(blue1[x2][y2]);
-} else if (useWhiteBackground) {
-	red2[counter2]= maxColorValue;
-	green2[counter2]= maxColorValue;
-	blue2[counter2]= maxColorValue;
+} else { // if (useWhiteBackground) {
+	red2[counter2]= backgroundColorRed;
+	green2[counter2]= backgroundColorGreen;
+	blue2[counter2]= backgroundColorBlue;
 }
 //
 //-----------------------------------------------------------------//
@@ -794,13 +969,26 @@ if (index >= 0) {
 // Color Frame to Buffered Image                                   //
 // (tinctureRatio4)                                                //
 /////////////////////////////////////////////////////////////////////
-	public static BufferedImage colorFrameToBufferedImage(byte[] data, float[][] u, float v[][], KinectPeopleIndexMode currentPeopleIndexMode, byte[] playerIndex, boolean useWhiteBackground, KinectColorMap colorMap, KinectColorMap peopleColors, int maximalNumberOfSkeletons) {
+	public static BufferedImage colorFrameToBufferedImage(
+			byte[] data,
+			float[][] u,
+			float v[][],
+			KinectPeopleIndexMode currentPeopleIndexMode,
+			byte[] playerIndex,
+			Color defaultBackgroundColor,
+			KinectColorMap colorMap,
+			KinectColorMap peopleColors,
+			int maximalNumberOfSkeletons) {
 		FrameSize colorFrameSize= FrameSize.computeColorFrameSize(data);
 		int colorFrameWidth= colorFrameSize.width;
 		int colorFrameHeight= colorFrameSize.height;
 		if (colorFrameWidth <= 0 || colorFrameHeight <= 0) {
 			return null;
 		};
+		Color backgroundColor= colorMap.getBackgroundColor().getValue(defaultBackgroundColor);
+		int backgroundColorRed= backgroundColor.getRed();
+		int backgroundColorGreen= backgroundColor.getGreen();
+		int backgroundColorBlue= backgroundColor.getBlue();
 		BufferedImage image= new BufferedImage(colorFrameWidth,colorFrameHeight,BufferedImage.TYPE_3BYTE_BGR);
 		int bandLength= colorFrameWidth * colorFrameHeight;
 		int[] red2= new int[bandLength];
@@ -959,15 +1147,9 @@ for (int h=0; h < uvHeight; h++) {
 			}
 		} else {
 			if (clearBackground) {
-				if (useWhiteBackground) {
-					valueRed= maxColorValue;
-					valueGreen= maxColorValue;
-					valueBlue= maxColorValue;
-				} else {
-					valueRed= 0;
-					valueGreen= 0;
-					valueBlue= 0;
-				}
+				valueRed= backgroundColorRed;
+				valueGreen= backgroundColorGreen;
+				valueBlue= backgroundColorBlue;
 			} else {
 				continue;
 			}
@@ -991,7 +1173,6 @@ for (int h=0; h < uvHeight; h++) {
 				} else if (y3 >= colorFrameHeight) {
 					continue;
 				};
-				// int counter3= y3*colorFrameWidth + x3;
 				int counter3= y3*colorFrameWidth + (colorFrameWidth - x3 - 1);
 				red2[counter3]= valueRed;
 				green2[counter3]= valueGreen;
@@ -1016,7 +1197,17 @@ for (int h=0; h < uvHeight; h++) {
 /////////////////////////////////////////////////////////////////////
 // Tune Program and Create Mapped Buffered Image                   //
 /////////////////////////////////////////////////////////////////////
-	public static TunedBufferedImage tuneProgramAndCreateMappedBufferedImage(float[] xyz, byte[][] red1, byte[][] green1, byte[][] blue1, KinectPeopleIndexMode currentPeopleIndexMode, byte[] playerIndex, boolean useWhiteBackground, float focalLengthX, float focalLengthY, int correctionX, int correctionY) {
+	public static TunedBufferedImage tuneProgramAndCreateMappedBufferedImage(
+			float[] xyz,
+			byte[][] red1,
+			byte[][] green1,
+			byte[][] blue1,
+			KinectPeopleIndexMode currentPeopleIndexMode,
+			byte[] playerIndex,
+			float focalLengthX,
+			float focalLengthY,
+			int correctionX,
+			int correctionY) {
 		if (red1==null || green1==null || blue1==null) {
 			return null;
 		};
@@ -1027,11 +1218,6 @@ for (int h=0; h < uvHeight; h++) {
 		if (image==null) {
 			return null;
 		};
-		// int colorFrameWidth= red1.length;
-		// if (colorFrameWidth <= 0) {
-		//	return null;
-		// };
-		// int colorFrameHeight= red1[0].length;
 		int uvWidth= red1.length;
 		if (uvWidth <= 0) {
 			return null;
@@ -1118,8 +1304,6 @@ for (int h=0; h < uvHeight; h++) {
 		String results;
 		if (maxCoincidence >= coincedenceThreshold) {
 			results= String.format("Correction: dX = %s; dY = %s",maxCoincidenceDX,maxCoincidenceDY);
-			// FrameDrawingBasics.setCorrectionX(maxCoincidenceDX);
-			// FrameDrawingBasics.setCorrectionY(maxCoincidenceDY);
 		} else {
 			results= "No people found!";
 		};
@@ -1136,7 +1320,17 @@ for (int h=0; h < uvHeight; h++) {
 /////////////////////////////////////////////////////////////////////
 // Short Array to Empty Buffered Image                             //
 /////////////////////////////////////////////////////////////////////
-	public static BufferedImage shortArrayToEmptyBufferedImage(short[] array, KinectPeopleIndexMode currentPeopleIndexMode, byte[] playerIndex, boolean useWhiteBackground, byte[][] red1, byte[][] green1, byte[][] blue1, KinectColorMap peopleColors, int maximalNumberOfSkeletons) {
+	public static BufferedImage shortArrayToEmptyBufferedImage(
+			short[] array,
+			KinectPeopleIndexMode currentPeopleIndexMode,
+			byte[] playerIndex,
+			Color defaultBackgroundColor,
+			byte[][] red1,
+			byte[][] green1,
+			byte[][] blue1,
+			KinectColorMap colorMap,
+			KinectColorMap peopleColors,
+			int maximalNumberOfSkeletons) {
 		if (playerIndex==null) {
 			currentPeopleIndexMode= KinectPeopleIndexMode.NONE;
 		};
@@ -1153,6 +1347,10 @@ for (int h=0; h < uvHeight; h++) {
 					currentPeopleIndexMode= KinectPeopleIndexMode.PAINT_PEOPLE;
 				}
 			};
+			Color backgroundColor= colorMap.getBackgroundColor().getValue(defaultBackgroundColor);
+			int backgroundColorRed= backgroundColor.getRed();
+			int backgroundColorGreen= backgroundColor.getGreen();
+			int backgroundColorBlue= backgroundColor.getBlue();
 			int frameLength= array.length;
 			int imageWidth= image.getWidth();
 			int imageHeight= image.getHeight();
@@ -1192,10 +1390,10 @@ blue2[counter3]= byte2int(blue1[w][h]);
 							green2[counter2]= peopleIndexGreen[index];
 							blue2[counter2]= peopleIndexBlue[index];
 						}
-					} else if (useWhiteBackground) {
-						red2[counter2]= maxColorValue;
-						green2[counter2]= maxColorValue;
-						blue2[counter2]= maxColorValue;
+					} else { // if (useWhiteBackground) {
+						red2[counter2]= backgroundColorRed;
+						green2[counter2]= backgroundColorGreen;
+						blue2[counter2]= backgroundColorBlue;
 					}
 				}
 			};
@@ -1208,6 +1406,7 @@ blue2[counter3]= byte2int(blue1[w][h]);
 			if (image==null) {
 				return null;
 			};
+			int backgroundColorBrightness= brightness(colorMap.getBackgroundColor().getValue(defaultBackgroundColor));
 			int frameLength= array.length;
 			int imageWidth= image.getWidth();
 			int imageHeight= image.getHeight();
@@ -1215,14 +1414,23 @@ blue2[counter3]= byte2int(blue1[w][h]);
 			for (int h=0; h < imageHeight; h++) {
 				for (int w=0; w < imageWidth; w++) {
 					int counter2= h*imageWidth + (imageWidth-w-1);
-					if (useWhiteBackground) {
-						doubleNumberArray[counter2]= maxColorValue;
-					}
+					doubleNumberArray[counter2]= backgroundColorBrightness;
 				}
 			};
 			WritableRaster imageRaster= image.getRaster();
 			imageRaster.setSamples(0,0,imageWidth,imageHeight,0,doubleNumberArray);
 		};
 		return image;
+	}
+/////////////////////////////////////////////////////////////////////
+// Auxiliary procedures                                            //
+/////////////////////////////////////////////////////////////////////
+	protected static int brightness(Color color) {
+		int colorRed= color.getRed();
+		int colorGreen= color.getGreen();
+		int colorBlue= color.getBlue();
+		int brightness= (colorRed > colorGreen) ? colorRed : colorGreen;
+		brightness= (colorBlue > brightness) ? colorBlue : brightness;
+		return brightness;
 	}
 }

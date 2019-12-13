@@ -2,7 +2,6 @@
 
 package morozov.system.gui.space3d;
 
-// import javax.media.j3d.Canvas3D;
 import javax.media.j3d.ImageComponent2D;
 import javax.media.j3d.ImageComponent;
 
@@ -10,14 +9,15 @@ import java.awt.image.BufferedImage;
 import java.awt.GraphicsConfiguration;
 
 public class OffScreenCanvas3D extends javax.media.j3d.Canvas3D {
+	//
 	public OffScreenCanvas3D(GraphicsConfiguration configuration) {
 		super(configuration,true);
 	}
+	//
 	public BufferedImage renderImage(int width, int height) {
 		if (width <= 0 || height <= 0) {
 			return null;
 		};
-		// BufferedImage image= new BufferedImage(width,height,BufferedImage.TYPE_INT_ARGB);
 		BufferedImage image= new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
 		// ImageComponent2D:
 		// This class defines a 2D image component. This is
@@ -74,6 +74,7 @@ public class OffScreenCanvas3D extends javax.media.j3d.Canvas3D {
 		image= getOffScreenBuffer().getImage();
 		return image;
 	}
+	@Override
 	public void postSwap() {
 	}
 }

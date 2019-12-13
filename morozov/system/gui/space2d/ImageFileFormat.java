@@ -14,46 +14,57 @@ import javax.imageio.ImageTypeSpecifier;
 public enum ImageFileFormat {
 	//
 	JPEG {
+		@Override
 		public Space2DWriter createWriter(String defaultFormatName, ImageTypeSpecifier its) {
 			return new Space2D_JPEG_Writer(its);
 		}
+		@Override
 		public Term toTerm() {
 			return termJPEG;
 		}
 	},
 	PNG {
+		@Override
 		public Space2DWriter createWriter(String defaultFormatName, ImageTypeSpecifier its) {
 			return new Space2D_PNG_Writer(its);
 		}
+		@Override
 		public Term toTerm() {
 			return termPNG;
 		}
 	},
 	GIF {
+		@Override
 		public Space2DWriter createWriter(String defaultFormatName, ImageTypeSpecifier its) {
 			return new Space2D_GIF_Writer(its);
 		}
+		@Override
 		public Term toTerm() {
 			return termGIF;
 		}
 	},
 	BMP {
+		@Override
 		public Space2DWriter createWriter(String defaultFormatName, ImageTypeSpecifier its) {
 			return new Space2D_BMP_Writer(its);
 		}
+		@Override
 		public Term toTerm() {
 			return termBMP;
 		}
 	},
 	WBMP {
+		@Override
 		public Space2DWriter createWriter(String defaultFormatName, ImageTypeSpecifier its) {
 			return new Space2D_WBMP_Writer(its);
 		}
+		@Override
 		public Term toTerm() {
 			return termWBMP;
 		}
 	},
 	UNIVERSAL {
+		@Override
 		public Space2DWriter createWriter(String defaultFormatName, ImageTypeSpecifier its) {
 			ImageFileFormat format= recognizeFormat(defaultFormatName);
 			if (format==UNIVERSAL) {
@@ -62,6 +73,7 @@ public enum ImageFileFormat {
 				return format.createWriter(defaultFormatName,its);
 			}
 		}
+		@Override
 		public Term toTerm() {
 			return termDefault;
 		}
@@ -87,7 +99,6 @@ public enum ImageFileFormat {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_default) {
-				// throw TermIsSymbolDefault.instance;
 				return ImageFileFormat.UNIVERSAL;
 			} else if (code==SymbolCodes.symbolCode_E_JPEG) {
 				return ImageFileFormat.JPEG;

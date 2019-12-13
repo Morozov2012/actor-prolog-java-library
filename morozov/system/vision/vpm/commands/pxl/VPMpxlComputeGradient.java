@@ -16,6 +16,7 @@ public class VPMpxlComputeGradient extends VPM_FrameCommand {
 		mode= m;
 	}
 	//
+	@Override
 	public void execute(VPM vpm) {
 		int imageWidth= vpm.getOperationalImageWidth();
 		int imageHeight= vpm.getOperationalImageHeight();

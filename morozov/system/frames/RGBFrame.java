@@ -22,14 +22,12 @@ public class RGBFrame extends DataFrame implements RGBFrameInterface {
 	///////////////////////////////////////////////////////////////
 	//
 	public RGBFrame(java.awt.image.BufferedImage givenImage,
-			// BufferedImageController targetClass,
 			byte[] givenByteArray,
 			long givenNumber,
 			long givenTime,
 			DataFrameBaseAttributesInterface givenAttributes) {
 		super(givenNumber,givenTime,givenAttributes);
 		nativeImage= givenImage;
-		// byteArray= targetClass.convertImageToBytes(givenImage);
 		byteArray= givenByteArray;
 		width= givenImage.getWidth();
 		height= givenImage.getHeight();
@@ -37,41 +35,39 @@ public class RGBFrame extends DataFrame implements RGBFrameInterface {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public DataArrayType getDataArrayType() {
 		return DataArrayType.RGB_FRAME;
 	}
 	//
+	@Override
 	public int getDataSize() {
 		return byteArray.length;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	/*
-	public java.awt.image.BufferedImage getImage() {
-		if (nativeImage==null) {
-			nativeImage= Space2DWriter.bytesToImage(byteArray);
-		};
-		return nativeImage;
-	}
-	*/
-	//
+	@Override
 	public void setNativeImage(java.awt.image.BufferedImage image) {
 		nativeImage= image;
 	}
 	//
+	@Override
 	public java.awt.image.BufferedImage getNativeImage() {
 		return nativeImage;
 	}
 	//
+	@Override
 	public byte[] getByteArray() {
 		return byteArray;
 	}
 	//
+	@Override
 	public int getWidth() {
 		return width;
 	}
 	//
+	@Override
 	public int getHeight() {
 		return height;
 	}

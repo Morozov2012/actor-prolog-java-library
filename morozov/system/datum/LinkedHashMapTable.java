@@ -18,7 +18,7 @@ import java.math.BigInteger;
 
 public class LinkedHashMapTable extends HashMapTable {
 	//
-	protected HashSet<BigInteger> freeKeyNumbers= new HashSet<BigInteger>();
+	protected HashSet<BigInteger> freeKeyNumbers= new HashSet<>();
 	protected BigInteger recentKeyNumber= BigInteger.ZERO;
 	//
 	protected static Term termLinkedHashMap= new PrologSymbol(SymbolCodes.symbolCode_E_LinkedHashMap);
@@ -40,12 +40,14 @@ public class LinkedHashMapTable extends HashMapTable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term getType() {
 		return termLinkedHashMap;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void retractAll(ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
 		freeKeyNumbers.clear();
@@ -63,6 +65,7 @@ public class LinkedHashMapTable extends HashMapTable {
 		argumentKey.setBacktrackableValue(keyTerm,iX);
 	}
 	//
+	@Override
 	public DatabaseRecord insertRecord(Term copy, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX, boolean isInnerOperation) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
 		if (isInnerOperation) {
@@ -89,6 +92,7 @@ public class LinkedHashMapTable extends HashMapTable {
 		argumentKey.setBacktrackableValue(keyTerm,iX);
 	}
 	//
+	@Override
 	public DatabaseRecord appendRecord(Term copy, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX, boolean isInnerOperation) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
 		Term keyTerm= DatabaseUtils.extractMapKey(copy,iX);
@@ -247,6 +251,7 @@ public class LinkedHashMapTable extends HashMapTable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void retractCurrentRecord(DatabaseRecord currentRecord, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
 		if (reuseKeyNumbers) {
@@ -293,9 +298,10 @@ public class LinkedHashMapTable extends HashMapTable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Object clone() {
 		LinkedHashMapTable o= (LinkedHashMapTable)super.clone();
-		o.freeKeyNumbers= new HashSet<BigInteger>();
+		o.freeKeyNumbers= new HashSet<>();
 		o.recentKeyNumber= BigInteger.ZERO;
 		return o;
 	}

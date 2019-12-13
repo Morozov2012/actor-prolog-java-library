@@ -13,8 +13,8 @@ import java.nio.charset.Charset;
 
 public class CharacterSet {
 	//
-	private CharacterSetType type;
-	private String name;
+	protected CharacterSetType type;
+	protected String name;
 	//
 	public static CharacterSet NONE= new CharacterSet(CharacterSetType.NONE);
 	public static CharacterSet DEFAULT= new CharacterSet(CharacterSetType.DEFAULT);
@@ -89,6 +89,7 @@ public class CharacterSet {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public String toString() {
 		return type.toString(name);
 	}

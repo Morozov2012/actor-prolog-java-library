@@ -4,6 +4,7 @@ package morozov.syntax.data;
 
 import target.*;
 
+import morozov.syntax.data.subgoals.*;
 import morozov.system.converters.*;
 import morozov.terms.*;
 

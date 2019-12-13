@@ -6,7 +6,7 @@ import target.*;
 
 import morozov.run.*;
 import morozov.system.*;
-import morozov.system.errors.*;
+import morozov.system.converters.errors.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 

@@ -3,6 +3,7 @@
 package morozov.built_in;
 
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.converters.*;
 import morozov.system.gui.space2d.*;
 import morozov.system.vision.vpm.*;
@@ -53,7 +54,7 @@ public abstract class GenericVideoProcessor extends BufferedImageController {
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		long frameNumber;
 		if (a2 != null) {
-			frameNumber= PrologInteger.toLong(GeneralConverters.argumentToRoundInteger(a2,iX));
+			frameNumber= Arithmetic.toLong(GeneralConverters.argumentToRoundInteger(a2,iX));
 		} else {
 			recentFrameNumber++;
 			frameNumber= recentFrameNumber;
@@ -65,7 +66,7 @@ public abstract class GenericVideoProcessor extends BufferedImageController {
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(a1,iX);
 		long timeInMilliseconds;
 		if (a2 != null) {
-			timeInMilliseconds= PrologInteger.toLong(GeneralConverters.argumentToRoundInteger(a2,iX));
+			timeInMilliseconds= Arithmetic.toLong(GeneralConverters.argumentToRoundInteger(a2,iX));
 		} else {
 			Calendar calendar= Calendar.getInstance();
 			timeInMilliseconds= calendar.getTimeInMillis();
@@ -198,9 +199,9 @@ public abstract class GenericVideoProcessor extends BufferedImageController {
 	abstract public double[] physicalCoordinates(int pixelX, int pixelY, ChoisePoint iX);
 	//
 	public void characteristicLength2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
-		int x= GeneralConverters.argumentToSmallRoundInteger(a1,iX);
-		int y= GeneralConverters.argumentToSmallRoundInteger(a2,iX);
-		result.setNonBacktrackableValue(new PrologReal(characteristicLength(x,y,iX)));
+		int currentX= GeneralConverters.argumentToSmallRoundInteger(a1,iX);
+		int currentY= GeneralConverters.argumentToSmallRoundInteger(a2,iX);
+		result.setNonBacktrackableValue(new PrologReal(characteristicLength(currentX,currentY,iX)));
 	}
 	public void characteristicLength2fs(ChoisePoint iX, Term a1, Term a2) {
 	}

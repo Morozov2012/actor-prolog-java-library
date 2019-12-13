@@ -14,9 +14,11 @@ import morozov.terms.signals.*;
 public enum FFmpegLevelName {
 	//
 	FF_LEVEL_UNKNOWN {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_LEVEL_UNKNOWN;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_LEVEL_UNKNOWN;
 		}

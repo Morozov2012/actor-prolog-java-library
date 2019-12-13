@@ -12,7 +12,7 @@ import java.util.Arrays;
 
 public class PrologBinary extends Term {
 	//
-	private byte[] value;
+	protected byte[] value;
 	//
 	private static final long serialVersionUID= 0x8F588CA49DAD4B27L; // -8117583689687413977L
 	//
@@ -32,10 +32,12 @@ public class PrologBinary extends Term {
 		return value;
 	}
 	//
+	@Override
 	public int hashCode() {
 		return Arrays.hashCode(value);
 	}
 	//
+	@Override
 	public boolean equals(Object o2) {
 		if (o2 instanceof Term) {
 			return ((Term)o2).isEqualToBinary(value);
@@ -43,6 +45,7 @@ public class PrologBinary extends Term {
 			return false;
 		}
 	}
+	@Override
 	public boolean isEqualToBinary(byte[] v2) {
 		return twoBinariesAreEqual(value,v2);
 	}
@@ -60,6 +63,7 @@ public class PrologBinary extends Term {
 		}
 	}
 	//
+	@Override
 	public int compare(Object o2) {
 		if (o2 instanceof Term) {
 			return -((Term)o2).compareWithBinary(value);
@@ -67,6 +71,7 @@ public class PrologBinary extends Term {
 			return 1;
 		}
 	}
+	@Override
 	public int compareWithBinary(byte[] v2) {
 		return compareTwoBinaries(value,v2);
 	}
@@ -82,42 +87,50 @@ public class PrologBinary extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void isBinary(PrologBinary v, ChoisePoint cp) throws Backtracking {
 		if ( !twoBinariesAreEqual(value,v.getByteArray()) ) {
 			throw Backtracking.instance;
 		}
 	}
+	@Override
 	public void isBinary(byte[] v, ChoisePoint cp) throws Backtracking {
 		if ( !twoBinariesAreEqual(value,v) ) {
 			throw Backtracking.instance;
 		}
 	}
 	//
+	@Override
 	public byte[] getBinaryValue(ChoisePoint cp) throws TermIsNotABinary {
 		return value;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		t.isBinary(value,cp);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void compareWithTerm(Term a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		a.compareBinaryWith(value,iX,op);
 	}
+	@Override
 	public void compareWithBinary(byte[] a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		if ( !op.eval(value,a) ) {
 			throw Backtracking.instance;
 		}
 	}
+	@Override
 	public void compareBinaryWith(byte[] a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		if ( !op.eval(a,value) ) {
 			throw Backtracking.instance;
 		}
 	}
+	@Override
 	public void compareListWith(Term aHead, Term aTail, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		aHead.compareWithBinary(value,iX,op);
 		aTail.compareWithBinary(value,iX,op);
@@ -125,21 +138,27 @@ public class PrologBinary extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term reactWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
 		return a.reactBinaryWith(value,iX,op);
 	}
+	@Override
 	public Term reactWithBigInteger(BigInteger a, ChoisePoint iX, BinaryOperation op) {
 		return op.eval(value,a);
 	}
+	@Override
 	public Term reactWithBinary(byte[] a, ChoisePoint iX, BinaryOperation op) {
 		return op.eval(value,a);
 	}
+	@Override
 	public Term reactBigIntegerWith(BigInteger a, ChoisePoint iX, BinaryOperation op) {
 		return op.eval(a,value);
 	}
+	@Override
 	public Term reactBinaryWith(byte[] a, ChoisePoint iX, BinaryOperation op) {
 		return op.eval(a,value);
 	}
+	@Override
 	public Term reactListWith(Term aHead, Term aTail, ChoisePoint iX, BinaryOperation op) {
 		return new PrologList(
 			aHead.reactWithBinary(value,iX,op),
@@ -156,6 +175,7 @@ public class PrologBinary extends Term {
 		return buffer.toString();
 	}
 	//
+	@Override
 	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		String text= binaryToString(value);
 		if (isInner || provideStrictSyntax) {

@@ -11,11 +11,11 @@ import java.util.Collections;
 
 public class StaticReportAttributes extends StaticAttributes {
 	//
-	private Map<AbstractWorld,InternalTextFrame> innerWindows= Collections.synchronizedMap(new HashMap<AbstractWorld,InternalTextFrame>());
-	private InternalTextFrame consoleWindow;
-	private static final String staticIdentifier= "Report";
+	protected Map<AbstractWorld,InternalTextFrame> innerWindows= Collections.synchronizedMap(new HashMap<AbstractWorld,InternalTextFrame>());
+	protected InternalTextFrame consoleWindow;
+	protected static final String staticIdentifier= "Report";
 	//
-	private static StaticReportAttributes retrieveStaticReportAttributes(StaticContext context) {
+	protected static StaticReportAttributes retrieveStaticReportAttributes(StaticContext context) {
 		StaticAttributes attributes= context.retrieveAttributes(staticIdentifier);
 		if (attributes==null) {
 			synchronized (context) {
@@ -50,18 +50,4 @@ public class StaticReportAttributes extends StaticAttributes {
 		};
 		return consoleWindow;
 	}
-	// public static void setFileChooser(ExtendedFileChooser chooser, StaticContext context) {
-	//	StaticReportAttributes attributes= retrieveStaticReportAttributes(context);
-	//	synchronized (attributes) {
-	//		attributes.fileChooser= chooser;
-	//	}
-	// }
-	// public static ExtendedFileChooser retrieveFileChooser(StaticContext context) {
-	//	StaticReportAttributes attributes= retrieveStaticReportAttributes(context);
-	//	ExtendedFileChooser chooser;
-	//	synchronized (attributes) {
-	//		chooser= attributes.fileChooser;
-	//	};
-	//	return chooser;
-	// }
 }

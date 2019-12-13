@@ -17,6 +17,7 @@ public class VPMblbSetExtraBorderCoefficients extends VPM_FrameCommand {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void execute(VPM vpm) {
 		vpm.blbSetExtraBorderCoefficients(horizontalExtraBorderCoefficient,verticalExtraBorderCoefficient);
 	}

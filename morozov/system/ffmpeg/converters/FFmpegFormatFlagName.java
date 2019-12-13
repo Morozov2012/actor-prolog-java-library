@@ -14,145 +14,181 @@ import morozov.terms.signals.*;
 public enum FFmpegFormatFlagName {
 	//
 	AVFMT_NOFILE {
+		@Override
 		public int toInteger() {
 			return avformat.AVFMT_NOFILE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVFMT_NOFILE;
 		}
 	},
 	AVFMT_NEEDNUMBER {
+		@Override
 		public int toInteger() {
 			return avformat.AVFMT_NEEDNUMBER;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVFMT_NEEDNUMBER;
 		}
 	},
 	AVFMT_SHOW_IDS {
+		@Override
 		public int toInteger() {
 			return avformat.AVFMT_SHOW_IDS;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVFMT_SHOW_IDS;
 		}
 	},
 	AVFMT_RAWPICTURE {
+		@Override
 		public int toInteger() {
 			return avformat.AVFMT_RAWPICTURE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVFMT_RAWPICTURE;
 		}
 	},
 	AVFMT_GLOBALHEADER {
+		@Override
 		public int toInteger() {
 			return avformat.AVFMT_GLOBALHEADER;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVFMT_GLOBALHEADER;
 		}
 	},
 	AVFMT_NOTIMESTAMPS {
+		@Override
 		public int toInteger() {
 			return avformat.AVFMT_NOTIMESTAMPS;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVFMT_NOTIMESTAMPS;
 		}
 	},
 	AVFMT_GENERIC_INDEX {
+		@Override
 		public int toInteger() {
 			return avformat.AVFMT_GENERIC_INDEX;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVFMT_GENERIC_INDEX;
 		}
 	},
 	AVFMT_TS_DISCONT {
+		@Override
 		public int toInteger() {
 			return avformat.AVFMT_TS_DISCONT;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVFMT_TS_DISCONT;
 		}
 	},
 	AVFMT_VARIABLE_FPS {
+		@Override
 		public int toInteger() {
 			return avformat.AVFMT_VARIABLE_FPS;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVFMT_VARIABLE_FPS;
 		}
 	},
 	AVFMT_NODIMENSIONS {
+		@Override
 		public int toInteger() {
 			return avformat.AVFMT_NODIMENSIONS;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVFMT_NODIMENSIONS;
 		}
 	},
 	AVFMT_NOSTREAMS {
+		@Override
 		public int toInteger() {
 			return avformat.AVFMT_NOSTREAMS;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVFMT_NOSTREAMS;
 		}
 	},
 	AVFMT_NOBINSEARCH {
+		@Override
 		public int toInteger() {
 			return avformat.AVFMT_NOBINSEARCH;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVFMT_NOBINSEARCH;
 		}
 	},
 	AVFMT_NOGENSEARCH {
+		@Override
 		public int toInteger() {
 			return avformat.AVFMT_NOGENSEARCH;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVFMT_NOGENSEARCH;
 		}
 	},
 	AVFMT_NO_BYTE_SEEK {
+		@Override
 		public int toInteger() {
 			return avformat.AVFMT_NO_BYTE_SEEK;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVFMT_NO_BYTE_SEEK;
 		}
 	},
 	AVFMT_ALLOW_FLUSH {
+		@Override
 		public int toInteger() {
 			return avformat.AVFMT_ALLOW_FLUSH;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVFMT_ALLOW_FLUSH;
 		}
 	},
 	AVFMT_TS_NONSTRICT {
+		@Override
 		public int toInteger() {
 			return avformat.AVFMT_TS_NONSTRICT;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVFMT_TS_NONSTRICT;
 		}
 	},
 	AVFMT_TS_NEGATIVE {
+		@Override
 		public int toInteger() {
 			return avformat.AVFMT_TS_NEGATIVE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVFMT_TS_NEGATIVE;
 		}
 	},
 	AVFMT_SEEK_TO_PTS {
+		@Override
 		public int toInteger() {
 			return avformat.AVFMT_SEEK_TO_PTS;
 		}
+		@Override
 		public Term toTerm() {
 			return term_AVFMT_SEEK_TO_PTS;
 		}

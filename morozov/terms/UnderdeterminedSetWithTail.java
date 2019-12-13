@@ -21,12 +21,14 @@ public abstract class UnderdeterminedSetWithTail extends UnderdeterminedSet {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public int hashCode() {
 		return tail.hashCode();
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void unify_with_set(
 			Term aTail,
 			ChoisePoint cp,
@@ -76,13 +78,11 @@ public abstract class UnderdeterminedSetWithTail extends UnderdeterminedSet {
 			long rightSetPositiveKey= rightSetPositiveIterator.next();
 			Term rightSetPositiveValue= rightSetPositiveMap.get(rightSetPositiveKey);
 			tail.appendNamedElement(rightSetPositiveKey,rightSetPositiveValue,cp);
-			// rightSetPositiveIterator.remove();
 		};
 		Iterator<Long> rightSetNegativeIterator= rightSetNegativeMap.iterator();
 		while (rightSetNegativeIterator.hasNext()) {
 			long rightSetNegativeKey= rightSetNegativeIterator.next();
 			tail.appendNamedElementProhibition(rightSetNegativeKey,cp);
-			// rightSetNegativeIterator.remove();
 		};
 		leftSetEnd= leftSetEnd.exploreSet(cp);
 		rightSetEnd= rightSetEnd.exploreSet(cp);

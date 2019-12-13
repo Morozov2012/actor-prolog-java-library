@@ -2,8 +2,8 @@
 
 package morozov.system;
 
+import morozov.system.converters.*;
 import morozov.worlds.*;
-import morozov.terms.*;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -32,20 +32,20 @@ public class SystemUtils {
 	}
 	public static void sleep(BigDecimal nanos, ActiveWorld currentProcess) {
 		try {
-			BigDecimal milliseconds= nanos.divideToIntegralValue(TimeUnits.oneMillionBig,MathContext.DECIMAL128);
-			BigDecimal remainder= nanos.subtract(milliseconds.multiply(TimeUnits.oneMillionBig));
-			int delayInMilliseconds= PrologInteger.toInteger(milliseconds);
-			int delayInNanos= PrologInteger.toInteger(remainder);
+			BigDecimal milliseconds= nanos.divideToIntegralValue(TimeUnitsConverters.oneMillionBig,MathContext.DECIMAL128);
+			BigDecimal remainder= nanos.subtract(milliseconds.multiply(TimeUnitsConverters.oneMillionBig));
+			int delayInMilliseconds= Arithmetic.toInteger(milliseconds);
+			int delayInNanos= Arithmetic.toInteger(remainder);
 			if (delayInMilliseconds >= 0) {
 				if (delayInNanos > 0) {
 					if (delayInNanos <= 999999) {
-						currentProcess.thread.sleep(delayInMilliseconds,delayInNanos);
+						ThreadHolder.sleep(delayInMilliseconds,delayInNanos);
 					} else {
 						delayInMilliseconds++;
-						currentProcess.thread.sleep(delayInMilliseconds);
+						ThreadHolder.sleep(delayInMilliseconds);
 					}
 				} else {
-					currentProcess.thread.sleep(delayInMilliseconds);
+					ThreadHolder.sleep(delayInMilliseconds);
 				}
 			}
 		} catch (InterruptedException e) {

@@ -16,6 +16,7 @@ public class IncorrectForegroundMaskSize extends RuntimeException {
 		operationalImageHeight= oH;
 	}
 	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(" +
 			Integer.toString(foregroundMaskWidth) + "x" +

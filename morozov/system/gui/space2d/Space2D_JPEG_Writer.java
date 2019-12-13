@@ -14,15 +14,16 @@ public class Space2D_JPEG_Writer extends Space2DWriter {
 	public Space2D_JPEG_Writer(ImageTypeSpecifier its) {
 		super("jpeg",its);
 	}
+	@Override
 	public void setCompressionQuality(double compressionQuality) {
 		if (iwp.canWriteCompressed()) {
 			float quality= StrictMath.max(0,(float)compressionQuality);
 			quality= StrictMath.min(1,quality);
 			iwp.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-			// iwp.setCompressionType(types[0]);
 			iwp.setCompressionQuality(quality);
 		}
 	}
+	@Override
 	public void setComment(String comment) {
 		String[] names= metadata.getMetadataFormatNames();
 		int length= names.length;

@@ -20,8 +20,8 @@ public class DomainInteger extends DomainAlternative {
 	public DomainInteger() {
 	}
 	//
+	@Override
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
-		// t= t.dereferenceValue(cp);
 		t= t.dereferenceValue(cp);
 		if (ignoreFreeVariables && t.thisIsFreeVariable()) {
 			return true;
@@ -35,19 +35,24 @@ public class DomainInteger extends DomainAlternative {
 		}
 	}
 	//
+	@Override
 	public boolean isEqualTo(DomainAlternative a, HashSet<PrologDomainPair> stack) {
 		return a.isEqualToInteger();
 	}
+	@Override
 	public boolean isEqualToInteger() {
 		return true;
 	}
+	@Override
 	public boolean coversAlternative(DomainAlternative a, PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) {
 		return a.isCoveredByInteger();
 	}
+	@Override
 	public boolean isCoveredByInteger() {
 		return true;
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
 		return PrologDomainName.tagDomainAlternative_Integer;
 	}

@@ -23,14 +23,17 @@ public class THzDataFrame extends DataFrame implements THzDataFrameInterface {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public DataArrayType getDataArrayType() {
 		return DataArrayType.THZ_FRAME;
 	}
 	//
+	@Override
 	public TVFilterImageHeader getTHzData() {
 		return packetBody;
 	}
 	//
+	@Override
 	public int getDataSize() {
 		return packetBody.getLength();
 	}

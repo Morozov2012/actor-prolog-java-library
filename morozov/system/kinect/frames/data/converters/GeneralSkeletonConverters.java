@@ -163,7 +163,6 @@ public class GeneralSkeletonConverters {
 		Term termPoint= new PrologStructure(SymbolCodes.symbolCode_E_p,new Term[]{termPointX,termPointY,termPointZ});
 		int[] x_Depth= skeleton.getDepthX();
 		int[] y_Depth= skeleton.getDepthY();
-		// int frameWidth= skeleton.getDepthFrameWidth();
 		int mapping1X= x_Depth[jointCode];
 		int mapping1Y= y_Depth[jointCode];
 		Term termMapping1X= new PrologInteger(mapping1X);
@@ -173,7 +172,6 @@ public class GeneralSkeletonConverters {
 		int[] x_Color= skeleton.getColorX();
 		int[] y_Color= skeleton.getColorY();
 		if (x_Color != null && y_Color != null) {
-			// int colorFrameWidth= skeleton.getColorFrameWidth();
 			int mapping2X= x_Color[jointCode];
 			int mapping2Y= y_Color[jointCode];
 			Term termMapping2X= new PrologInteger(mapping2X);

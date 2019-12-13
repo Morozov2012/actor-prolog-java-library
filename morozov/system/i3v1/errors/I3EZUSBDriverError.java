@@ -3,10 +3,14 @@
 package morozov.system.i3v1.errors;
 
 public class I3EZUSBDriverError extends RuntimeException {
-	public int errorCode;
+	//
+	protected int errorCode;
+	//
 	public I3EZUSBDriverError(int code) {
 		errorCode= code;
 	}
+	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(" + Integer.toString(errorCode) + ")";
 	}

@@ -36,6 +36,7 @@ public class EnumeratedKinectFrame extends EnumeratedFrame {
 		return numberOfFrame;
 	}
 	//
+	@Override
 	public long getTime() {
 		return frame.getActingFrameTime();
 	}

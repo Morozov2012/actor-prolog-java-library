@@ -348,46 +348,6 @@ public class TVPPIFRead implements Serializable {
 		short preampGain= Short.reverseBytes(in.readShort());
 		short temperature= Short.reverseBytes(in.readShort());
 		short zero= Short.reverseBytes(in.readShort());
-		/*
-		System.out.printf("TVPPIFRead::cookie: %x\n",cookie);
-		System.out.printf("TVPPIFRead::hdrLength: %s\n",hdrLength);
-		System.out.printf("TVPPIFRead::line: %s\n",line);
-		System.out.printf("TVPPIFRead::position: %s\n",position);
-		System.out.printf("TVPPIFRead::rows: %s\n",rows);
-		System.out.printf("TVPPIFRead::productID: %s (%x)\n",productID,productID);
-		System.out.printf("TVPPIFRead::channels: %s\n",channels);
-		System.out.printf("TVPPIFRead::positionOffset: %s\n",positionOffset);
-		System.out.printf("TVPPIFRead::lines: %s\n",lines);
-		System.out.printf("TVPPIFRead::gap: %s\n",gap);
-		System.out.printf("TVPPIFRead::points: %s\n",points);
-		System.out.printf("TVPPIFRead::lineOffset: %s\n",lineOffset);
-		System.out.printf("TVPPIFRead::frameSyncOffset: %s\n",frameSyncOffset);
-		System.out.printf("TVPPIFRead::lineSyncOffset: %s\n",lineSyncOffset);
-		System.out.printf("TVPPIFRead::onTime: %s\n",onTime);
-		System.out.printf("TVPPIFRead::TVPPIFRead::fMotorSpeed: %s\n",fMotorSpeed);
-		System.out.printf("TVPPIFRead::frameSpeed: %s\n",frameSpeed);
-		System.out.printf("TVPPIFRead::boardTemp: %s\n",boardTemp);
-		System.out.printf("TVPPIFRead::minorVersion: %s\n",minorVersion);
-		System.out.printf("TVPPIFRead::majorVersion: %s\n",majorVersion);
-		System.out.printf("TVPPIFRead::accOnTime: %s\n",accOnTime);
-		System.out.printf("TVPPIFRead::status: %s (%x)\n",status,status);
-		System.out.printf("TVPPIFRead::hornOffset: %s\n",hornOffset);
-		System.out.printf("TVPPIFRead::dropCount: %s\n",dropCount);
-		System.out.printf("TVPPIFRead::qBuf: %s\n",qBuf);
-		System.out.printf("TVPPIFRead::orientation: %s\n",orientation);
-		System.out.printf("TVPPIFRead::boardRevision: %s\n",boardRevision);
-		System.out.printf("TVPPIFRead::multiIOStatus: %s\n",multiIOStatus);
-		System.out.printf("TVPPIFRead::limit: %s\n",limit);
-		System.out.printf("TVPPIFRead::battery: %s (%x)\n",battery,battery);
-		System.out.printf("TVPPIFRead::slowADC1: %s\n",slowADC1);
-		System.out.printf("TVPPIFRead::slowADC2: %s\n",slowADC2);
-		System.out.printf("TVPPIFRead::slowADC3: %s\n",slowADC3);
-		System.out.printf("TVPPIFRead::slowADC4: %s\n",slowADC4);
-		System.out.printf("TVPPIFRead::preampOffset: %s\n",preampOffset);
-		System.out.printf("TVPPIFRead::preampGain: %s\n",preampGain);
-		System.out.printf("TVPPIFRead::temperature: %s\n",temperature);
-		System.out.printf("TVPPIFRead::zero: %s\n",zero);
-		*/
 		return new TVPPIFRead(
 			cookie,
 			hdrLength,

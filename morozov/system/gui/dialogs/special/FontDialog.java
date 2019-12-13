@@ -52,6 +52,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FontDialog extends JDialog {
+	//
 	protected int m_option= JOptionPane.CLOSED_OPTION;
 	protected OpenList m_lstFontName;
 	protected OpenList m_lstFontSize;
@@ -59,11 +60,8 @@ public class FontDialog extends JDialog {
 	protected JCheckBox m_chkBold;
 	protected JCheckBox m_chkItalic;
 	protected JCheckBox m_chkUnderline;
-	// protected JCheckBox m_chkStrikethrough;
-	// protected JCheckBox m_chkSubscript;
-	// protected JCheckBox m_chkSuperscript;
-	// protected JComboBox m_cbColor;
 	protected JLabel m_preview;
+	//
 	public FontDialog(Frame parent, String[] names, String[] sizes) {
 		super(parent,"Font",true);
 		getContentPane().setLayout(new BoxLayout(getContentPane(),BoxLayout.Y_AXIS));
@@ -74,7 +72,6 @@ public class FontDialog extends JDialog {
 		m_lstFontSize= new OpenList(sizes,"Size:");
 		p.add(m_lstFontSize);
 		getContentPane().add(p);
-		// p= new JPanel(new GridLayout(2,3,10,5));
 		p= new JPanel(new GridLayout(1,3,10,5));
 		p.setBorder(new TitledBorder(new EtchedBorder(),"Effects"));
 		m_chkBold= new JCheckBox("Bold");
@@ -83,34 +80,9 @@ public class FontDialog extends JDialog {
 		p.add(m_chkItalic);
 		m_chkUnderline= new JCheckBox("Underline");
 		p.add(m_chkUnderline);
-		// m_chkStrikethrough= new JCheckBox("Strikeout");
-		// p.add(m_chkStrikethrough);
-		// m_chkSubscript= new JCheckBox("Subscript");
-		// p.add(m_chkSubscript);
-		// m_chkSuperscript= new JCheckBox("Superscript");
-		// p.add(m_chkSuperscript);
 		getContentPane().add(p);
 		getContentPane().add(Box.createVerticalStrut(5));
 		//
-		// p= new JPanel();
-		// p.setLayout(new BoxLayout(p,BoxLayout.X_AXIS));
-		// p.add(Box.createHorizontalStrut(10));
-		// p.add(new JLabel("Color:"));
-		// p.add(Box.createHorizontalStrut(20));
-		// m_cbColor= new JComboBox();
-		// int[] values= new int[] {0,128,192,255};
-		//
-		// for (int r=0; r<values.length; r++) {
-		//	for (int g=0; g<values.length; g++) {
-		//		for (int b=0; b<values.length; b++) {
-		//			Color c= new Color(values[r],values[g],values[b]);
-		//			m_cbColor.addItem(c);
-		//		}
-		//	}
-		// };
-		// m_cbColor.setRenderer(new ColorComboRenderer());
-		// p.add(m_cbColor);
-		// p.add(Box.createHorizontalStrut(10));
 		getContentPane().add(p);
 		//
 		p= new JPanel(new BorderLayout());
@@ -127,6 +99,7 @@ public class FontDialog extends JDialog {
 		JPanel p1= new JPanel(new GridLayout(1,2,10,2));
 		JButton btOK= new JButton("OK");
 		ActionListener lst= new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				m_option= JOptionPane.OK_OPTION;
 				setVisible(false);
@@ -137,14 +110,17 @@ public class FontDialog extends JDialog {
 		JButton btCancel= new JButton("Cancel");
 		btCancel.setActionCommand("cancel");
 		lst= new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				m_option= JOptionPane.CANCEL_OPTION;
 				setVisible(false);
 			}
 		};
 		btCancel.addActionListener(lst);
-		// The following few lines are used to register esc to close the dialog
+		// The following few lines are used to register ESC
+		// to close the dialog:
 		Action cancelKeyAction= new AbstractAction() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				m_option= JOptionPane.CANCEL_OPTION;
 				setVisible(false);
@@ -157,7 +133,7 @@ public class FontDialog extends JDialog {
 			inputMap.put(cancelKeyStroke,"cancel");
 			actionMap.put("cancel",cancelKeyAction);
 		};
-		// end esc handling
+		//
 		p1.add(btCancel);
 		p.add(p1);
 		getContentPane().add(p);
@@ -165,6 +141,7 @@ public class FontDialog extends JDialog {
 		setResizable(false);
 		SpecialUtils.centre(this);
 		ListSelectionListener lsel= new ListSelectionListener() {
+			@Override
 			public void valueChanged(ListSelectionEvent e) {
 				updatePreview();
 			}
@@ -172,6 +149,7 @@ public class FontDialog extends JDialog {
 		m_lstFontName.addListSelectionListener(lsel);
 		m_lstFontSize.addListSelectionListener(lsel);
 		lst= new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				updatePreview();
 			}
@@ -179,8 +157,8 @@ public class FontDialog extends JDialog {
 		m_chkBold.addActionListener(lst);
 		m_chkItalic.addActionListener(lst);
 		m_chkUnderline.addActionListener(lst);
-		// m_cbColor.addActionListener(lst);
 	}
+	//
 	public void setAttributes(AttributeSet a) {
 		m_attributes= new SimpleAttributeSet(a);
 		String name= StyleConstants.getFontFamily(a);
@@ -190,11 +168,6 @@ public class FontDialog extends JDialog {
 		m_chkBold.setSelected(StyleConstants.isBold(a));
 		m_chkItalic.setSelected(StyleConstants.isItalic(a));
 		m_chkUnderline.setSelected(StyleConstants.isUnderline(a));
-		// m_chkStrikethrough.setSelected(
-		//	StyleConstants.isStrikeThrough(a));
-		// m_chkSubscript.setSelected(StyleConstants.isSubscript(a));
-		// m_chkSuperscript.setSelected(StyleConstants.isSuperscript(a));
-		// m_cbColor.setSelectedItem(StyleConstants.getForeground(a));
 		updatePreview();
 	}
 	public AttributeSet getAttributes() {
@@ -216,23 +189,13 @@ public class FontDialog extends JDialog {
 		StyleConstants.setUnderline(
 			m_attributes,
 			m_chkUnderline.isSelected());
-		// StyleConstants.setStrikeThrough(
-		//	m_attributes,
-		//	m_chkStrikethrough.isSelected());
-		// StyleConstants.setSubscript(
-		//	m_attributes,
-		//	m_chkSubscript.isSelected());
-		// StyleConstants.setSuperscript(
-		//	m_attributes,
-		//	m_chkSuperscript.isSelected());
-		// StyleConstants.setForeground(
-		//	m_attributes,
-		//	(Color)m_cbColor.getSelectedItem());
 		return m_attributes;
 	}
-	public int getOption() { return m_option; }
+	public int getOption() {
+		return m_option;
+	}
 	protected void updatePreview() {
-		Map<TextAttribute,Object> map= new HashMap<TextAttribute,Object>();
+		Map<TextAttribute,Object> map= new HashMap<>();
 		String name= m_lstFontName.getSelected();
 		map.put(TextAttribute.FAMILY,name);
 		int size= m_lstFontSize.getSelectedInt();
@@ -241,13 +204,10 @@ public class FontDialog extends JDialog {
 		};
 		int realFontSize= DefaultOptions.fontSystemSimulationMode.simulate(size);
 		map.put(TextAttribute.SIZE,realFontSize);
-		// int style= Font.PLAIN;
 		if (m_chkBold.isSelected()) {
-			// style |= Font.BOLD;
 			map.put(TextAttribute.WEIGHT,TextAttribute.WEIGHT_BOLD);
 		};
 		if (m_chkItalic.isSelected()) {
-			// style |= Font.ITALIC;
 			map.put(TextAttribute.POSTURE,TextAttribute.POSTURE_OBLIQUE);
 		};
 		if (m_chkUnderline.isSelected()) {

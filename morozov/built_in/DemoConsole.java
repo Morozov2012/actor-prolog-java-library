@@ -15,6 +15,7 @@ public abstract class DemoConsole extends Console {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void goal0s(ChoisePoint iX) throws Backtracking {
 		throw Backtracking.instance;
 	}
@@ -25,6 +26,7 @@ public abstract class DemoConsole extends Console {
 			c0= aC;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			throw Backtracking.instance;
 		}

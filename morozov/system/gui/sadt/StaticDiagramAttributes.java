@@ -10,8 +10,8 @@ import java.util.Map;
 
 public class StaticDiagramAttributes extends StaticAttributes {
 	//
-	private Map<String,InternalDiagramFrame> innerWindows= Collections.synchronizedMap(new HashMap<String,InternalDiagramFrame>());
-	private static final String staticIdentifier= "_SADT";
+	protected Map<String,InternalDiagramFrame> innerWindows= Collections.synchronizedMap(new HashMap<String,InternalDiagramFrame>());
+	protected static final String staticIdentifier= "_SADT";
 	//
 	private static StaticDiagramAttributes retrieveStaticDiagramAttributes(StaticContext context) {
 		StaticAttributes attributes= context.retrieveAttributes(staticIdentifier);

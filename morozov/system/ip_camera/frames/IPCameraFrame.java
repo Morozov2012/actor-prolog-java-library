@@ -2,7 +2,6 @@
 
 package morozov.system.ip_camera.frames;
 
-// import morozov.system.ip_camera.frames.data.*;
 import morozov.system.ip_camera.frames.interfaces.*;
 import morozov.system.frames.*;
 import morozov.system.frames.data.interfaces.*;
@@ -23,14 +22,17 @@ public class IPCameraFrame extends DataFrame implements IPCameraFrameInterface {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public DataArrayType getDataArrayType() {
 		return DataArrayType.IP_CAMERA_FRAME;
 	}
 	//
+	@Override
 	public byte[] getByteArray() {
 		return byteArray;
 	}
 	//
+	@Override
 	public int getDataSize() {
 		return byteArray.length;
 	}

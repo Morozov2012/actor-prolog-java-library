@@ -14,129 +14,161 @@ import morozov.terms.signals.*;
 public enum FFmpegWorkAroundBugName {
 	//
 	FF_BUG_AUTODETECT {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_BUG_AUTODETECT;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_BUG_AUTODETECT;
 		}
 	},
 	FF_BUG_OLD_MSMPEG4 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_BUG_OLD_MSMPEG4;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_BUG_OLD_MSMPEG4;
 		}
 	},
 	FF_BUG_XVID_ILACE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_BUG_XVID_ILACE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_BUG_XVID_ILACE;
 		}
 	},
 	FF_BUG_UMP4 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_BUG_UMP4;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_BUG_UMP4;
 		}
 	},
 	FF_BUG_NO_PADDING {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_BUG_NO_PADDING;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_BUG_NO_PADDING;
 		}
 	},
 	FF_BUG_AMV {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_BUG_AMV;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_BUG_AMV;
 		}
 	},
 	FF_BUG_QPEL_CHROMA {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_BUG_QPEL_CHROMA;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_BUG_QPEL_CHROMA;
 		}
 	},
 	FF_BUG_STD_QPEL {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_BUG_STD_QPEL;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_BUG_STD_QPEL;
 		}
 	},
 	FF_BUG_QPEL_CHROMA2 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_BUG_QPEL_CHROMA2;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_BUG_QPEL_CHROMA2;
 		}
 	},
 	FF_BUG_DIRECT_BLOCKSIZE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_BUG_DIRECT_BLOCKSIZE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_BUG_DIRECT_BLOCKSIZE;
 		}
 	},
 	FF_BUG_EDGE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_BUG_EDGE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_BUG_EDGE;
 		}
 	},
 	FF_BUG_HPEL_CHROMA {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_BUG_HPEL_CHROMA;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_BUG_HPEL_CHROMA;
 		}
 	},
 	FF_BUG_DC_CLIP {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_BUG_DC_CLIP;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_BUG_DC_CLIP;
 		}
 	},
 	FF_BUG_MS {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_BUG_MS;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_BUG_MS;
 		}
 	},
 	FF_BUG_TRUNCATED {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_BUG_TRUNCATED;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_BUG_TRUNCATED;
 		}
 	},
 	FF_BUG_IEDGE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_BUG_IEDGE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_BUG_IEDGE;
 		}

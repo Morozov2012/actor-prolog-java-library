@@ -13,6 +13,7 @@ public class VPMpxlAdjustLevels extends VPM_FrameCommand {
 		histogramTailCoefficient= c;
 	}
 	//
+	@Override
 	public void execute(VPM vpm) {
 		int[] red= vpm.getMatrixRed();
 		int[] green= vpm.getMatrixGreen();

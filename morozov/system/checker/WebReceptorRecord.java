@@ -9,10 +9,10 @@ import java.math.BigDecimal;
 
 public class WebReceptorRecord extends PredefinedClassRecord {
 	//
-	public ActorNumber actorNumber;
-	public URL_Attributes attributes;
-	public BigDecimal revisionPeriod;
-	public BigDecimal attemptPeriod;
+	protected ActorNumber actorNumber;
+	protected URL_Attributes attributes;
+	protected BigDecimal revisionPeriod;
+	protected BigDecimal attemptPeriod;
 	//
 	private static final long serialVersionUID= 0xC28BC791A248537DL; // -4428226380281916547L
 	//
@@ -32,6 +32,22 @@ public class WebReceptorRecord extends PredefinedClassRecord {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public ActorNumber getActorNumber() {
+		return actorNumber;
+	}
+	public URL_Attributes getAttributes() {
+		return attributes;
+	}
+	public BigDecimal getRevisionPeriod() {
+		return revisionPeriod;
+	}
+	public BigDecimal getAttemptPeriod() {
+		return attemptPeriod;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	@Override
 	public boolean equals(Object o) {
 		if (o==null) {
 			return false;
@@ -43,8 +59,6 @@ public class WebReceptorRecord extends PredefinedClassRecord {
 				if (r.attributes.uri.equals(attributes.uri)) {
 					boolean ok= attributes.connectionWasSuccessful();
 					if (r.attributes.connectionWasSuccessful()==ok) {
-						// if (	( ok && r.revisionPeriod.equals(revisionPeriod) ) ||
-						//	( !ok && r.attemptPeriod.equals(attemptPeriod) ) ) {
 						if (ok) {
 							if (r.revisionPeriod.compareTo(revisionPeriod)==0) {
 								return true;
@@ -68,12 +82,8 @@ public class WebReceptorRecord extends PredefinedClassRecord {
 		}
 	}
 	//
+	@Override
 	public int hashCode() {
-		// if (attributes.connectionWasSuccessful()) {
-		//	return attributes.uri.hashCode(); + revisionPeriod.hashCode();
-		// } else {
-		//	return attributes.uri.hashCode(); + attemptPeriod.hashCode();
-		// }
 		return attributes.uri.hashCode();
 	}
 	//

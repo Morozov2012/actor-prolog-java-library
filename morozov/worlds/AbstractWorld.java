@@ -4,8 +4,8 @@ package morozov.worlds;
 
 import morozov.run.*;
 import morozov.system.converters.*;
+import morozov.system.converters.errors.*;
 import morozov.system.datum.*;
-import morozov.system.errors.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 
@@ -22,7 +22,7 @@ public abstract class AbstractWorld extends ActorNumber {
 	protected static AtomicLong globalWorldCounter= new AtomicLong(0);
 	protected transient GlobalWorldIdentifier globalWorldIdentifier= null;
 	//
-	final static protected MethodSignature[] emptySignatureList= new MethodSignature[0];
+	protected static final MethodSignature[] emptySignatureList= new MethodSignature[0];
 	//
 	private static final long serialVersionUID= 0x957E4AD16A6078F9L; // -7674614451699418887L
 	//
@@ -59,10 +59,12 @@ public abstract class AbstractWorld extends ActorNumber {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void registerTargetWorlds(HashSet<AbstractWorld> worlds, ChoisePoint cp) {
 		worlds.add(this);
 	}
 	//
+	@Override
 	public Term substituteWorlds(HashMap<AbstractWorld,Term> map, ChoisePoint cp) {
 		Term value= map.get(this);
 		if (value != null) {
@@ -85,9 +87,11 @@ public abstract class AbstractWorld extends ActorNumber {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public int hashCode() {
 		return globalWorldIdentifier.hashCode();
 	}
+	@Override
 	public boolean equals(Object o2) {
 		if (o2 instanceof Term) {
 			return ((Term)o2).isEqualToWorld(globalWorldIdentifier);
@@ -95,6 +99,7 @@ public abstract class AbstractWorld extends ActorNumber {
 			return false;
 		}
 	}
+	@Override
 	public int compare(Object o2) {
 		if (o2 instanceof Term) {
 			return -((Term)o2).compareWithWorld(globalWorldIdentifier);
@@ -102,9 +107,11 @@ public abstract class AbstractWorld extends ActorNumber {
 			return 1;
 		}
 	}
+	@Override
 	public boolean isEqualToWorld(GlobalWorldIdentifier id2) {
 		return globalWorldIdentifier.equals(id2);
 	}
+	@Override
 	public int compareWithWorld(GlobalWorldIdentifier id2) {
 		return globalWorldIdentifier.compare(id2);
 	}
@@ -117,23 +124,27 @@ public abstract class AbstractWorld extends ActorNumber {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void isWorld(Term v, ChoisePoint cp) throws Backtracking {
 		if (this != v) {
 			throw Backtracking.instance;
 		}
 	}
+	@Override
 	public boolean thisIsOwnWorld() {
 		return true;
 	}
 	public boolean isSpecialWorld() {
 		return false;
 	}
+	@Override
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		t.isWorld(this,cp);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		if (encodeWorlds) {
 			ByteArrayOutputStream outputStream= new ByteArrayOutputStream();

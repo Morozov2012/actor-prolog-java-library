@@ -14,22 +14,22 @@ import java.util.Date;
 import java.util.Calendar;
 
 public class URL_Attributes {
-	public URI uri;
-	public URL url;
-	private Throwable exception;
-	private Term exceptionName;
-	public CharacterSet characterSet;
-	public int maxWaitingInterval;
-	public boolean isLocalResource;
-	public LocalFileAttributes localFileAttributes;
-	// public boolean has_UTF_Coding;
-	public boolean isDirectory;
-	public long lastModificationTime;
-	public long size;
+	//
+	protected URI uri;
+	protected URL url;
+	protected Throwable exception;
+	protected Term exceptionName;
+	protected CharacterSet characterSet;
+	protected int maxWaitingInterval;
+	protected boolean isLocalResource;
+	protected LocalFileAttributes localFileAttributes;
+	protected boolean isDirectory;
+	protected long lastModificationTime;
+	protected long size;
+	//
 	public URL_Attributes(URI i, URL l, Throwable e, Term eN, CharacterSet cS, int mWI, boolean iLR, boolean iD) {
 		uri= i;
 		url= l;
-		// connection= null;
 		exception= e;
 		exceptionName= eN;
 		characterSet= cS;
@@ -38,7 +38,6 @@ public class URL_Attributes {
 		if (isLocalResource) {
 			localFileAttributes= new LocalFileAttributes(uri);
 		};
-		// has_UTF_Coding= h_UFT_C;
 		isDirectory= iD;
 		lastModificationTime= -1;
 		size= -1;
@@ -46,7 +45,6 @@ public class URL_Attributes {
 	public URL_Attributes(URI i, URL l, CharacterSet cS, int mWI, boolean iLR, boolean iD, long lMT, long s) {
 		uri= i;
 		url= l;
-		// connection= c;
 		exception= null;
 		exceptionName= null;
 		characterSet= cS;
@@ -55,7 +53,6 @@ public class URL_Attributes {
 		if (isLocalResource) {
 			localFileAttributes= new LocalFileAttributes(uri);
 		};
-		// has_UTF_Coding= h_UFT_C;
 		isDirectory= iD;
 		lastModificationTime= lMT;
 		size= s;
@@ -71,8 +68,7 @@ public class URL_Attributes {
 		if (isLocalResource) {
 			localFileAttributes= new LocalFileAttributes(uri);
 		};
-		// has_UTF_Coding= oldAttributes.has_UTF_Coding;
-		isDirectory= iD; // oldAttributes.isDirectory;
+		isDirectory= iD;
 		lastModificationTime= lMT;
 		size= s;
 	}
@@ -87,14 +83,42 @@ public class URL_Attributes {
 		if (isLocalResource) {
 			localFileAttributes= new LocalFileAttributes(uri);
 		};
-		// has_UTF_Coding= oldAttributes.has_UTF_Coding;
-		isDirectory= iD; // oldAttributes.isDirectory;
+		isDirectory= iD;
 		lastModificationTime= -1;
 		size= -1;
 	}
+	//
+	public URI getURI() {
+		return uri;
+	}
+	public URL getURL() {
+		return url;
+	}
+	public CharacterSet getCharacterSet() {
+		return characterSet;
+	}
+	public int getMaxWaitingInterval() {
+		return maxWaitingInterval;
+	}
+	public boolean isLocalResource() {
+		return isLocalResource;
+	}
+	public LocalFileAttributes getLocalFileAttributes() {
+		return localFileAttributes;
+	}
+	public boolean isDirectory() {
+		return isDirectory;
+	}
+	public long getLastModificationTime() {
+		return lastModificationTime;
+	}
+	public long getSize() {
+		return size;
+	}
+	//
 	public boolean wereChanged(URL_Attributes recentAttributes) {
 		if (recentAttributes.connectionThrowsException(exception)) {
-			// Do not report repeated error
+			// Do not report repeated error:
 			return false;
 		} else {
 			if (	lastModificationTime <= 0 ||
@@ -149,16 +173,8 @@ public class URL_Attributes {
 	}
 	public Term toTerm() {
 		if (connectionWasSuccessful()) {
-			Term address= null;
-			Term date= null;
-			Term time= null;
-			// Term attribute= null;
-			Term resourceSize= null;
-			address= new PrologString(url.toExternalForm());
-			// address= new PrologString(url.toString());
-			// Calendar calendar= new GregorianCalendar();
+			Term address= new PrologString(url.toExternalForm());
 			Calendar calendar= Calendar.getInstance();
-			// calendar.setTime(new Date(connection.getDate()));
 			calendar.setTime(new Date(lastModificationTime));
 			Term year= new PrologInteger(calendar.get(Calendar.YEAR));
 			Term month= new PrologInteger(calendar.get(Calendar.MONTH) + 1);
@@ -167,10 +183,9 @@ public class URL_Attributes {
 			Term minute= new PrologInteger(calendar.get(Calendar.MINUTE));
 			Term second= new PrologInteger(calendar.get(Calendar.SECOND));
 			Term millisecond= new PrologInteger(calendar.get(Calendar.MILLISECOND));
-			date= new PrologStructure(SymbolCodes.symbolCode_E_date,new Term[]{year,month,day});
-			time= new PrologStructure(SymbolCodes.symbolCode_E_time,new Term[]{hour,minute,second,millisecond});
-			// attribute= new PrologInteger(0);
-			resourceSize= new PrologInteger(size);
+			Term date= new PrologStructure(SymbolCodes.symbolCode_E_date,new Term[]{year,month,day});
+			Term time= new PrologStructure(SymbolCodes.symbolCode_E_time,new Term[]{hour,minute,second,millisecond});
+			Term resourceSize= new PrologInteger(size);
 			long functorCode;
 			if (isDirectory) {
 				functorCode= SymbolCodes.symbolCode_E_catalog;
@@ -183,10 +198,10 @@ public class URL_Attributes {
 		}
 	}
 	//
+	@Override
 	public String toString() {
 		return	uri.toString() + ";" +
 			url.toExternalForm() + ";" +
-			// connection.toString() + ";" +
 			String.format("%d",maxWaitingInterval) + ";" +
 			String.format("%s",isDirectory) + ";" +
 			String.format("%d",lastModificationTime) + ";" +

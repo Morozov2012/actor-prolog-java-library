@@ -49,10 +49,10 @@ public abstract class ScreenCapture extends BufferedImageController {
 	public void getImage5s(ChoisePoint iX, Term a1, Term a2, Term a3, Term a4, Term a5) {
 		int x1= GeneralConverters.argumentToSmallInteger(a2,iX);
 		int y1= GeneralConverters.argumentToSmallInteger(a3,iX);
-		int width= GeneralConverters.argumentToSmallInteger(a4,iX);
-		int height= GeneralConverters.argumentToSmallInteger(a5,iX);
+		int currentWidth= GeneralConverters.argumentToSmallInteger(a4,iX);
+		int currentHeight= GeneralConverters.argumentToSmallInteger(a5,iX);
 		initializeRobotIfNecessary();
-		Rectangle screenbounds= new Rectangle(x1,y1,width,height);
+		Rectangle screenbounds= new Rectangle(x1,y1,currentWidth,currentHeight);
 		java.awt.image.BufferedImage bufferedImage= getBufferedImage(screenbounds);
 		modifyImage(a1,bufferedImage,iX);
 	}

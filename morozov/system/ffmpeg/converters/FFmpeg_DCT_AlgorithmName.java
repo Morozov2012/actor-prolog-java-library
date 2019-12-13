@@ -14,49 +14,61 @@ import morozov.terms.signals.*;
 public enum FFmpeg_DCT_AlgorithmName {
 	//
 	FF_DCT_AUTO {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DCT_AUTO;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DCT_AUTO;
 		}
 	},
 	FF_DCT_FASTINT {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DCT_FASTINT;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DCT_FASTINT;
 		}
 	},
 	FF_DCT_INT {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DCT_INT;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DCT_INT;
 		}
 	},
 	FF_DCT_MMX {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DCT_MMX;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DCT_MMX;
 		}
 	},
 	FF_DCT_ALTIVEC {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DCT_ALTIVEC;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DCT_ALTIVEC;
 		}
 	},
 	FF_DCT_FAAN {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DCT_FAAN;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DCT_FAAN;
 		}

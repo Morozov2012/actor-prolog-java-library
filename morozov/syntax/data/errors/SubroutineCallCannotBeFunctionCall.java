@@ -6,12 +6,14 @@ import morozov.syntax.errors.*;
 
 public class SubroutineCallCannotBeFunctionCall extends ParserError {
 	//
-	public int proposedNumber;
+	protected int proposedNumber;
 	//
 	public SubroutineCallCannotBeFunctionCall(int n, int position) {
 		super(position);
 		proposedNumber= n;
 	}
+	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(" + Integer.toString(proposedNumber) + ")";
 	}

@@ -9,6 +9,7 @@ import morozov.worlds.*;
 import java.util.Map;
 
 public class InternalDiagramFrame extends InnerPage {
+	//
 	protected DiagramPaneNoWrap panel;
 	//
 	public InternalDiagramFrame(String title, String identifier, DiagramContent graph, DiagramColors diagramColors, StaticContext context, Map<String,AbstractProcess> components, Map<String,ComponentState> componentSuccess) {

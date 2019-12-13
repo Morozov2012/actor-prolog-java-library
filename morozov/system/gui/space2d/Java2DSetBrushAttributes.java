@@ -7,10 +7,14 @@ import java.awt.Paint;
 import java.awt.Color;
 
 public class Java2DSetBrushAttributes extends Java2DAuxiliaryCommand {
+	//
 	protected BrushAttributes attributes;
+	//
 	public Java2DSetBrushAttributes(BrushAttributes argument) {
 		attributes= argument;
 	}
+	//
+	@Override
 	public void execute(Graphics2D g2, DrawingMode drawingMode) {
 		Paint paint= attributes.paint;
 		if (paint != null) {

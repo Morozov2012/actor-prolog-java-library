@@ -14,17 +14,21 @@ import morozov.terms.signals.*;
 public enum FFmpegSubtitleTextFormatName {
 	//
 	FF_SUB_TEXT_FMT_ASS {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_SUB_TEXT_FMT_ASS;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_SUB_TEXT_FMT_ASS;
 		}
 	},
 	FF_SUB_TEXT_FMT_ASS_WITH_TIMINGS {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_SUB_TEXT_FMT_ASS_WITH_TIMINGS;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_SUB_TEXT_FMT_ASS_WITH_TIMINGS;
 		}

@@ -31,8 +31,8 @@ import java.lang.reflect.InvocationTargetException;
 
 public class ExtendedReportSpace extends CanvasSpace implements MouseListener, ActionListener {
 	//
-	public TextPaneNoWrap panel;
-	public ReportSpaceAttributes attributes;
+	protected TextPaneNoWrap panel;
+	protected ReportSpaceAttributes attributes;
 	//
 	protected JPopupMenu popup;
 	protected JMenuItem item_copy;
@@ -54,13 +54,18 @@ public class ExtendedReportSpace extends CanvasSpace implements MouseListener, A
 	public void setAttributes(ReportSpaceAttributes a) {
 		attributes= a;
 	}
+	public ReportSpaceAttributes getAttributes() {
+		return attributes;
+	}
 	//
+	@Override
 	public void safelySetBackground(final Color color) {
 		if (SwingUtilities.isEventDispatchThread()) {
 			panel.setBackground(color);
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						panel.setBackground(color);
 					}
@@ -138,23 +143,23 @@ public class ExtendedReportSpace extends CanvasSpace implements MouseListener, A
 	///////////////////////////////////////////////////////////////
 	//
 	public JPopupMenu installTextPanePopupMenu(ActionListener listener) {
-		JPopupMenu popup= new JPopupMenu();
+		JPopupMenu newPopup= new JPopupMenu();
 		//
 		JMenuItem item1= new JMenuItem("Cancel");
 		item1.setMnemonic('C');
 		item1.setDisplayedMnemonicIndex(0);
 		item1.setActionCommand("Cancel");
 		item1.addActionListener(listener);
-		popup.add(item1);
+		newPopup.add(item1);
 		//
-		popup.addSeparator();
+		newPopup.addSeparator();
 		//
 		JMenuItem item2= new JMenuItem("Copy");
 		item2.setMnemonic('O');
 		item2.setDisplayedMnemonicIndex(1);
 		item2.setActionCommand("Copy");
 		item2.addActionListener(listener);
-		popup.add(item2);
+		newPopup.add(item2);
 		item_copy= item2;
 		//
 		JMenuItem item3= new JMenuItem("Select All");
@@ -162,28 +167,28 @@ public class ExtendedReportSpace extends CanvasSpace implements MouseListener, A
 		item3.setDisplayedMnemonicIndex(1);
 		item3.setActionCommand("SelectAll");
 		item3.addActionListener(listener);
-		popup.add(item3);
+		newPopup.add(item3);
 		//
 		JMenuItem item4= new JMenuItem("Select All & Copy");
 		item4.setMnemonic('A');
 		item4.setDisplayedMnemonicIndex(7);
 		item4.setActionCommand("SelectAllAndCopy");
 		item4.addActionListener(listener);
-		popup.add(item4);
+		newPopup.add(item4);
 		//
-		popup.addSeparator();
+		newPopup.addSeparator();
 		//
 		JMenuItem item5= new JMenuItem("Clear");
 		item5.setMnemonic('L');
 		item5.setDisplayedMnemonicIndex(1);
 		item5.setActionCommand("Clear");
 		item5.addActionListener(listener);
-		popup.add(item5);
+		newPopup.add(item5);
 		//
-		popup.addSeparator();
+		newPopup.addSeparator();
 		//
-		popup= DesktopUtils.installStandardPopupMenu(listener,popup);
-		return popup;
+		newPopup= DesktopUtils.installStandardPopupMenu(listener,newPopup);
+		return newPopup;
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -195,6 +200,7 @@ public class ExtendedReportSpace extends CanvasSpace implements MouseListener, A
 			try {
 				EventQueue.invokeAndWait(
 					new Runnable() {
+						@Override
 						public void run() {
 							quicklySetCaretPosition(textLength);
 						}
@@ -245,6 +251,7 @@ public class ExtendedReportSpace extends CanvasSpace implements MouseListener, A
 			try {
 				EventQueue.invokeAndWait(
 					new Runnable() {
+						@Override
 						public void run() {
 							resetCaretPosition();
 						}
@@ -269,6 +276,7 @@ public class ExtendedReportSpace extends CanvasSpace implements MouseListener, A
 			try {
 				EventQueue.invokeAndWait(
 					new Runnable() {
+						@Override
 						public void run() {
 							removeSuperfluousLines(doc,isSucceeded);
 						}
@@ -309,15 +317,20 @@ public class ExtendedReportSpace extends CanvasSpace implements MouseListener, A
 		popup= installTextPanePopupMenu(this);
 	}
 	//
+	@Override
 	public void mouseClicked(MouseEvent event) {
 	}
+	@Override
 	public void mouseEntered(MouseEvent event) {
 	}
+	@Override
 	public void mouseExited(MouseEvent event) {
 	}
+	@Override
 	public void mousePressed(MouseEvent event) {
 		mousePressedOrReleased(event);
 	}
+	@Override
 	public void mouseReleased(MouseEvent event) {
 		mousePressedOrReleased(event);
 	}
@@ -343,33 +356,41 @@ public class ExtendedReportSpace extends CanvasSpace implements MouseListener, A
 		}
 	}
 	//
+	@Override
 	public void actionPerformed(ActionEvent event) {
 		String name= event.getActionCommand();
-		if (name.equals("Cancel")) {
-		} else if (name.equals("Copy")) {
+		switch (name) {
+		case "Cancel":
+			break;
+		case "Copy":
 			if (panel != null) {
 				panel.copy();
-			}
-		} else if (name.equals("SelectAll")) {
+			};
+			break;
+		case "SelectAll":
 			if (panel != null) {
 				panel.selectAll();
-			}
-		} else if (name.equals("SelectAllAndCopy")) {
+			};
+			break;
+		case "SelectAllAndCopy":
 			if (panel != null) {
 				panel.selectAll();
 				panel.copy();
-			}
-		} else if (name.equals("Clear")) {
+			};
+			break;
+		case "Clear":
 			if (panel != null) {
 				panel.setText("");
-			}
-		} else {
+			};
+			break;
+		default:
 			if (attributes != null) {
 				StaticContext context= attributes.staticContext;
 				if (context != null) {
 					DesktopUtils.actionPerformed(event,context);
 				}
-			}
+			};
+			break;
 		}
 	}
 }

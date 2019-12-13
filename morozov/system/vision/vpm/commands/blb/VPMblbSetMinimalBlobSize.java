@@ -15,6 +15,7 @@ public class VPMblbSetMinimalBlobSize extends VPM_FrameCommand {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void execute(VPM vpm) {
 		vpm.blbSetMinimalBlobSize(size);
 	}

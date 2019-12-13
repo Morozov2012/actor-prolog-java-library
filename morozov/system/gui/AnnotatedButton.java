@@ -13,9 +13,9 @@ import java.lang.reflect.InvocationTargetException;
 
 public class AnnotatedButton {
 	//
-	String name;
-	int mnemonicCode;
-	int mnemonicIndex;
+	protected String name;
+	protected int mnemonicCode;
+	protected int mnemonicIndex;
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -50,6 +50,7 @@ public class AnnotatedButton {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklyUpdateAbstractButton(jButton,aButton);
 					}
@@ -82,7 +83,7 @@ public class AnnotatedButton {
 		char[] characters= text.toCharArray();
 		int textLength= characters.length;
 		StringBuilder buffer= new StringBuilder();
-		boolean processSupplementaryCharacter= false;
+		boolean processSupplementaryCharacter;
 		int position= 0;
 		char c1;
 		char c2;
@@ -111,7 +112,7 @@ public class AnnotatedButton {
 						continue;
 					} else {
 						if (mnemonicIndex==-1) {
-							mnemonicCode= characters[position+1];
+							mnemonicCode= KeyEvent.getExtendedKeyCodeForChar(characters[position+1]);
 							mnemonicIndex= position;
 						};
 						position++;
@@ -144,6 +145,7 @@ public class AnnotatedButton {
 			try {
 				final AtomicReference<String> result= new AtomicReference<>();
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						result.set(quicklyRestoreText(jButton));
 					}
@@ -174,7 +176,7 @@ public class AnnotatedButton {
 		char[] characters= text.toCharArray();
 		int textLength= characters.length;
 		StringBuilder buffer= new StringBuilder();
-		boolean processSupplementaryCharacter= false;
+		boolean processSupplementaryCharacter;
 		int position= 0;
 		char c1;
 		char c2;
@@ -231,7 +233,7 @@ public class AnnotatedButton {
 		char[] characters= text.toCharArray();
 		int textLength= characters.length;
 		StringBuilder buffer= new StringBuilder();
-		boolean processSupplementaryCharacter= false;
+		boolean processSupplementaryCharacter;
 		int position= 0;
 		char c1;
 		char c2;
@@ -273,6 +275,7 @@ public class AnnotatedButton {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public String toString() {
 		return "(" +
 			name + "," +

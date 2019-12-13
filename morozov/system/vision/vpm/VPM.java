@@ -81,21 +81,21 @@ public class VPM extends GenericVideoProcessingMachine {
 			velocityFilterHalfwidth,
 			synthesizedImageTransparencyValue,
 			makeRectangularBlobsInSynthesizedImageValue);
-		actualFrameCommands= frameCommands.toArray(new VPM_FrameCommand[0]);
-		actualSnapshotCommands= snapshotCommands.toArray(new VPM_SnapshotCommand[0]);
+		actualFrameCommands= frameCommands.toArray(new VPM_FrameCommand[frameCommands.size()]);
+		actualSnapshotCommands= snapshotCommands.toArray(new VPM_SnapshotCommand[snapshotCommands.size()]);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
 	synchronized public void updateActualFrameCommands(List<VPM_FrameCommand> commands) {
-		actualFrameCommands= commands.toArray(new VPM_FrameCommand[0]);
+		actualFrameCommands= commands.toArray(new VPM_FrameCommand[commands.size()]);
 	}
 	synchronized public void updateActualSnapshotCommands(List<VPM_SnapshotCommand> commands) {
-		actualSnapshotCommands= commands.toArray(new VPM_SnapshotCommand[0]);
+		actualSnapshotCommands= commands.toArray(new VPM_SnapshotCommand[commands.size()]);
 	}
 	synchronized public void updateActualCommands(List<VPM_FrameCommand> frameCommands, List<VPM_SnapshotCommand> snapshotCommands) {
-		actualFrameCommands= frameCommands.toArray(new VPM_FrameCommand[0]);
-		actualSnapshotCommands= snapshotCommands.toArray(new VPM_SnapshotCommand[0]);
+		actualFrameCommands= frameCommands.toArray(new VPM_FrameCommand[frameCommands.size()]);
+		actualSnapshotCommands= snapshotCommands.toArray(new VPM_SnapshotCommand[snapshotCommands.size()]);
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -229,6 +229,7 @@ public class VPM extends GenericVideoProcessingMachine {
 		}
 	}
 	//
+	@Override
 	protected void clearForegroundMask() {
 		super.clearForegroundMask();
 		foregroundStack.clear();
@@ -437,9 +438,6 @@ public class VPM extends GenericVideoProcessingMachine {
 	///////////////////////////////////////////////////////////////
 	//
 	synchronized public void commit() {
-		// if (operationalMatrix==null) {
-		//	return;
-		// };
 		if (frameNumberIsIllegal(recentFrameNumber)){
 			return;
 		};
@@ -468,6 +466,7 @@ public class VPM extends GenericVideoProcessingMachine {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void forgetStatistics() {
 		super.forgetStatistics();
 		clearOperationalMatrix();
@@ -496,6 +495,7 @@ public class VPM extends GenericVideoProcessingMachine {
 		blobGroups= groups;
 	}
 	//
+	@Override
 	protected void createBlobAttributesIfNecessary() {
 		if (currentBlobTypes==null) {
 			ArrayList<BlobType> arrayOfBlobTypes= new ArrayList<>();
@@ -511,11 +511,12 @@ public class VPM extends GenericVideoProcessingMachine {
 					arrayOfBlobAttributes.add(attributeArray[k]);
 				}
 			};
-			currentBlobTypes= arrayOfBlobTypes.toArray(new BlobType[0]);
-			currentBlobAttributes= arrayOfBlobAttributes.toArray(new BlobAttributes[0]);
+			currentBlobTypes= arrayOfBlobTypes.toArray(new BlobType[arrayOfBlobTypes.size()]);
+			currentBlobAttributes= arrayOfBlobAttributes.toArray(new BlobAttributes[arrayOfBlobAttributes.size()]);
 		}
 	}
 	//
+	@Override
 	protected void clearBlobStore() {
 		super.clearBlobStore();
 		blobGroups.clear();

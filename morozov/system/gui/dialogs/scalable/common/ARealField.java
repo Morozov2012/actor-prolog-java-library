@@ -20,22 +20,16 @@ import morozov.terms.*;
 import morozov.terms.signals.*;
 
 public class ARealField extends ATextField {
+	//
 	public ARealField(AbstractDialog tD, ActiveComponent tC, String text, int columns) {
 		super(tD,tC,text,columns);
-		// DecimalFormatSymbols dFS= new DecimalFormatSymbols();
-		// dFS.setGroupingSeparator(' ');
-		// dFS.setDecimalSeparator('.');
-		// DecimalFormat format= new DecimalFormat("# ###.##################",dFS);
-		// format.setGroupingUsed(true);
-		// format.setGroupingSize(3);
-		// format.setParseIntegerOnly(false);
-		// setFormat(format);
 		setFormat(ActiveDocumentFormat.REAL);
 	}
+	//
+	@Override
 	public Term getValue() {
 		ActivePlainDocument activeDocument= (ActivePlainDocument)getDocument();
 		try {
-			// return new PrologReal(new Double(activeDocument.getTextOrBacktrack()));
 			String text= activeDocument.getTextOrBacktrack();
 			double number= GeneralConverters.stringToReal(text);
 			return new PrologReal(number);

@@ -4,14 +4,14 @@ package morozov.system.vision.vpm;
 
 public class SizeInterpolator2D extends PhiInterpolator2D {
 	//
-	protected double targetMeshEpsilon= 4;
+	protected double targetSizeInterpolatorMeshEpsilon= 4;
 	protected double physicalSizeEpsilon= 0.001;
 	protected int maxPixelDistanceIterations= 100;
 	//
 	///////////////////////////////////////////////////////////////
 	//
 	public SizeInterpolator2D() {
-		meshEpsilon= targetMeshEpsilon;
+		meshEpsilon= targetSizeInterpolatorMeshEpsilon;
 	}
 	public SizeInterpolator2D(double epsilon, int iterations) {
 		super();
@@ -21,6 +21,7 @@ public class SizeInterpolator2D extends PhiInterpolator2D {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public double computeMatrixItem(int pX, int pY, double[][] inverseMatrix, double[][] phiMatrix) {
 		double phi0;
 		int phiMatrixHeight= phiMatrix.length;
@@ -41,6 +42,7 @@ public class SizeInterpolator2D extends PhiInterpolator2D {
 		double value= r1 + r2;
 		return value;
 	}
+	@Override
 	public double computeDefaultValue() {
 		return 1.0;
 	}

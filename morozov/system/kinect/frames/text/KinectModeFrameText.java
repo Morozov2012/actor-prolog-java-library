@@ -36,7 +36,6 @@ public class KinectModeFrameText {
 			String.format("%s",skeletonsMode) + ";" +
 			String.format("%s",peopleIndexMode) + ";" +
 			KinectCircumscriptionModesTools.toString(circumscriptionModes) + ";" +
-			// String.format("%s",dataAcquisitionMode) + ";" +
 			KinectDataAcquisitionModeTools.toString(dataAcquisitionMode) + ";" +
 			String.format("%s",depthIsSelected) + ";" +
 			String.format("%s",peopleIndexIsSelected) + ";" +
@@ -56,7 +55,6 @@ public class KinectModeFrameText {
 	//
 	public static void writeText(KinectModeFrameInterface frame, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {
 		if (exportMode==ExportMode.SKELETONS) {
-			// super.writeText(writer,exportMode,locale);
 			KinectFrameText.writeRootFrameText(frame,writer,exportMode,locale);
 		} else {
 			writeModeFrameText(frame,writer,exportMode,locale);
@@ -65,7 +63,6 @@ public class KinectModeFrameText {
 	//
 	public static void writeModeFrameText(KinectModeFrameInterface frame, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {
 		writer.write("; MODE FRAME:\n");
-		// super.writeText(writer,exportMode,locale);
 		KinectFrameText.writeRootFrameText(frame,writer,exportMode,locale);
 		KinectFrameType kinectFrameType= frame.getKinectFrameType();
 		KinectSkeletonsMode skeletonsMode= frame.getSkeletonsMode();
@@ -87,11 +84,8 @@ public class KinectModeFrameText {
 		writer.write(String.format(locale,"; kinectFrameType: %s\n",kinectFrameType));
 		writer.write(String.format(locale,"; skeletonsMode: %s\n",skeletonsMode));
 		writer.write(String.format(locale,"; peopleIndexMode: %s\n",peopleIndexMode));
-		// writer.write(String.format(locale,"; circumscriptionMode: %s\n",circumscriptionModes));
 		KinectCircumscriptionModesTools.writeText(circumscriptionModes,writer,exportMode,locale);
-		// writer.write("dataAcquisitionMode: ");
 		KinectDataAcquisitionModeTools.writeText(dataAcquisitionMode,writer,exportMode,locale);
-		// writer.write("\n");
 		writer.write(String.format(locale,"; depthIsSelected= %s\n",depthIsSelected));
 		writer.write(String.format(locale,"; peopleIndexIsSelected= %s\n",peopleIndexIsSelected));
 		writer.write(String.format(locale,"; xyzIsSelected= %s\n",xyzIsSelected));

@@ -28,7 +28,6 @@ public class Space2DWriter {
 	protected IIOMetadata metadata;
 	//
 	protected static String defaultImageTransferFormat= "png";
-	// protected static String defaultImageTransferFormat= "jpg";
 	//
 	static {
 		try {
@@ -119,6 +118,9 @@ public class Space2DWriter {
 	public void dispose() {
 		writer.reset(); // 2017-03-04
 		writer.dispose();
+		writer= null;
+		iwp= null;
+		metadata= null;
 	}
 	//
 	static Node getChildNode(Node node, String givenName) {
@@ -152,10 +154,8 @@ public class Space2DWriter {
 		} finally {
 			try {
 				imageStream.close();
-				// outputStream.close();
 			} catch (IOException e) {
 			}
-			// writer.dispose();
 		}
 	}
 	//

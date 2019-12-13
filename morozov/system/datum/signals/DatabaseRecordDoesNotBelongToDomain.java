@@ -7,9 +7,9 @@ import morozov.terms.*;
 
 public class DatabaseRecordDoesNotBelongToDomain extends LightweightException {
 	//
-	public Term item;
-	public String text;
-	public long position;
+	protected Term item;
+	protected String text;
+	protected long position;
 	//
 	public DatabaseRecordDoesNotBelongToDomain(Term i, String t, long p, Throwable e) {
 		super(e);
@@ -21,5 +21,15 @@ public class DatabaseRecordDoesNotBelongToDomain extends LightweightException {
 		item= i;
 		text= t;
 		position= p;
+	}
+	//
+	public Term getItem() {
+		return item;
+	}
+	public String getText() {
+		return text;
+	}
+	public long getPosition() {
+		return position;
 	}
 }

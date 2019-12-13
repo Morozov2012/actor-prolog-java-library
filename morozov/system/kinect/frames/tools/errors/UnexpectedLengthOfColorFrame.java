@@ -3,10 +3,14 @@
 package morozov.system.kinect.frames.tools.errors;
 
 public class UnexpectedLengthOfColorFrame extends RuntimeException {
+	//
 	protected int length;
+	//
 	public UnexpectedLengthOfColorFrame(int n) {
 		length= n;
 	}
+	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(" + Integer.toString(length) + ")";
 	}

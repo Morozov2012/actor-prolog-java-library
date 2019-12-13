@@ -16,21 +16,21 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public abstract class ActiveWorld extends OwnWorld {
 	//
 	protected boolean isSuspended= false;
-	public ArrayList<Term> trail= new ArrayList<Term>();
-	public long recentChoisePointNumber= 0;
-	public HashSet<SlotVariable> slotVariables= new HashSet<SlotVariable>();
-	public AtomicBoolean hasUpdatedPort= new AtomicBoolean(false);
-	public ThreadHolder thread;
-	private ActorNumber rootActorNumber= new TemporaryActor();
-	private ActorRegister rootActor= new ActorRegister(this,rootActorNumber);
+	protected ArrayList<Term> trail= new ArrayList<>();
+	protected long recentChoisePointNumber= 0;
+	protected HashSet<SlotVariable> slotVariables= new HashSet<>();
+	protected AtomicBoolean hasUpdatedPort= new AtomicBoolean(false);
+	protected ThreadHolder thread;
+	protected ActorNumber rootActorNumber= new TemporaryActor();
+	protected ActorRegister rootActor= new ActorRegister(this,rootActorNumber);
 	protected ChoisePoint rootCP= new ChoisePoint(null,rootActor);
-	private boolean processIsFormed= false;
+	protected boolean processIsFormed= false;
 	protected boolean processWasProvedOneTimeAtLeast= false;
-	protected HashSet<ActorNumber> actorsToBeProved= new HashSet<ActorNumber>();
+	protected HashSet<ActorNumber> actorsToBeProved= new HashSet<>();
 	protected AtomicBoolean stateIsToBeSend= new AtomicBoolean(false);
-	public long debugPosition= -1;
-	public long debugUnit= -1;
-	public int debugFileNumber= -1;
+	protected long debugPosition= -1;
+	protected long debugUnit= -1;
+	protected int debugFileNumber= -1;
 	//
 	private static final long serialVersionUID= 0xC6F7893E4EC2F01DL; // -4109665234249912291L
 	//
@@ -85,6 +85,24 @@ public abstract class ActiveWorld extends OwnWorld {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public ArrayList<Term> getTrail() {
+		return trail;
+	}
+	public int getTrailSize() {
+		return trail.size();
+	}
+	public long getRecentChoisePointNumber() {
+		return recentChoisePointNumber;
+	}
+	public long incrementAndGetRecentChoisePointNumber() {
+		return ++recentChoisePointNumber;
+	}
+	public ThreadHolder getThread() {
+		return thread;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	// CONTROL LOCAL TRAIL AND BACKTRACKING OF PROCESS
 	//
 	public void registerBinding(Term v) {
@@ -119,10 +137,12 @@ public abstract class ActiveWorld extends OwnWorld {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean isInternalWorldOf(AbstractProcess process) {
 		return false;
 	}
 	//
+	@Override
 	public boolean isNumberOfTemporaryActor() {
 		return false;
 	}
@@ -693,8 +713,8 @@ public abstract class ActiveWorld extends OwnWorld {
 	//
 	protected void actualizeValues(ChoisePoint iX, Term... args) throws Backtracking {
 		ChoisePoint newIndex= new ChoisePoint(iX);
-		HashSet<AbstractInternalWorld> actorsToBeProved= convolveActualSlotValues(newIndex);
-		if (actorsToBeProved.isEmpty()) {
+		HashSet<AbstractInternalWorld> currentActorsToBeProved= convolveActualSlotValues(newIndex);
+		if (currentActorsToBeProved.isEmpty()) {
 			Term[] copies= new Term[args.length];
 			for (int i= 0; i < args.length; i++) {
 				copies[i]= args[i].copyValue(newIndex,TermCircumscribingMode.CLONE_FREE_VARIABLES);
@@ -714,7 +734,7 @@ public abstract class ActiveWorld extends OwnWorld {
 		SlotVariableValue slotValue;
 		HashSet<ActorNumber> newActors;
 		HashSet<ActorNumber> oldActors;
-		HashSet<AbstractInternalWorld> neutralizedActors= new HashSet<AbstractInternalWorld>();
+		HashSet<AbstractInternalWorld> neutralizedActors= new HashSet<>();
 		Term newValue;
 		Term oldValue;
 		ChoisePoint baseIx= new ChoisePoint(iX);
@@ -748,11 +768,13 @@ public abstract class ActiveWorld extends OwnWorld {
 			oldActorsIterator= oldActors.iterator();
 			while (oldActorsIterator.hasNext()) {
 				ActorNumber actor= oldActorsIterator.next();
-				if (neutralizedActors.contains(actor)) {
-					if (debugActorsOfThisProcess()) {
-						System.out.printf("%s: NEUTR(3).; neutralizedActors.contains(%s);\n",this,actor);
-					};
-					continue;
+				if (!actor.isNumberOfTemporaryActor()) {
+					if (neutralizedActors.contains((AbstractInternalWorld)actor)) {
+						if (debugActorsOfThisProcess()) {
+							System.out.printf("%s: NEUTR(3).; neutralizedActors.contains(%s);\n",this,actor);
+						};
+						continue;
+					}
 				};
 				if (!actorsToBeProved.contains(actor)) {
 					if (debugActorsOfThisProcess()) {
@@ -840,6 +862,7 @@ public abstract class ActiveWorld extends OwnWorld {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public String toString() {
 		return "(" + super.toString() + ")";
 	}

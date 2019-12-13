@@ -7,6 +7,7 @@ import target.*;
 import morozov.built_in.*;
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.*;
 import morozov.system.gui.dialogs.errors.*;
 import morozov.system.gui.dialogs.scalable.*;
@@ -40,28 +41,28 @@ public abstract class DialogFoundation {
 	//
 	protected DialogOperations dialogContainer;
 	//
-	private AtomicBoolean dialogIsProven= new AtomicBoolean(false);
-	private AtomicBoolean dialogIsSuspended= new AtomicBoolean(false);
+	protected AtomicBoolean dialogIsProven= new AtomicBoolean(false);
+	protected AtomicBoolean dialogIsSuspended= new AtomicBoolean(false);
 	//
-	private AtomicBoolean isDisposed= new AtomicBoolean(false);
+	protected AtomicBoolean isDisposed= new AtomicBoolean(false);
 	//
 	protected BigInteger insideModalDialog= BigInteger.ZERO;
 	//
 	protected AtomicBoolean usePixelMeasurements= new AtomicBoolean(false);
 	//
-	protected AtomicReference<ExtendedCoordinates> actualCoordinates= new AtomicReference<ExtendedCoordinates>(new ExtendedCoordinates(new ExtendedCoordinate(),new ExtendedCoordinate(),false));
-	protected AtomicReference<Point> previousCoordinates= new AtomicReference<Point>(null);
+	protected AtomicReference<ExtendedCoordinates> actualCoordinates= new AtomicReference<>(new ExtendedCoordinates(new ExtendedCoordinate(),new ExtendedCoordinate(),false));
+	protected AtomicReference<Point> previousCoordinates= new AtomicReference<>(null);
 	//
-	protected AtomicReference<Dimension> previousActualSize= new AtomicReference<Dimension>(new Dimension(0,0));
+	protected AtomicReference<Dimension> previousActualSize= new AtomicReference<>(new Dimension(0,0));
 	//
-	protected AtomicReference<Color> currentSuccessBackgroundColor= new AtomicReference<Color>();
-	protected AtomicReference<Color> currentFailureForegroundColor= new AtomicReference<Color>();
-	protected AtomicReference<Color> currentFailureBackgroundColor= new AtomicReference<Color>();
+	protected AtomicReference<Color> currentSuccessBackgroundColor= new AtomicReference<>();
+	protected AtomicReference<Color> currentFailureForegroundColor= new AtomicReference<>();
+	protected AtomicReference<Color> currentFailureBackgroundColor= new AtomicReference<>();
 	//
-	private AtomicReference<String> currentFontName= new AtomicReference<String>(defaultDialogFontName);
-	private AtomicInteger currentFontSize= new AtomicInteger(defaultDialogFontSize);
-	private AtomicInteger currentFontStyle= new AtomicInteger(defaultDialogFontStyle);
-	private AtomicBoolean currentFontUnderline= new AtomicBoolean(defaultDialogFontUnderline);
+	protected AtomicReference<String> currentFontName= new AtomicReference<>(defaultDialogFontName);
+	protected AtomicInteger currentFontSize= new AtomicInteger(defaultDialogFontSize);
+	protected AtomicInteger currentFontStyle= new AtomicInteger(defaultDialogFontStyle);
+	protected AtomicBoolean currentFontUnderline= new AtomicBoolean(defaultDialogFontUnderline);
 	//
 	protected Map<Integer,Font> approvedFonts= Collections.synchronizedMap(new HashMap<Integer,Font>());
 	//
@@ -89,7 +90,6 @@ public abstract class DialogFoundation {
 	///////////////////////////////////////////////////////////////
 	//
 	abstract protected void setGeneralFont(Font commonFont);
-	// abstract protected void setGeneralBackground(Color c);
 	abstract protected void setGeneralForeground(Color c);
 	abstract protected void setGeneralSpaceColor(Color c);
 	abstract protected void setAlarmColors(Color fc, Color bc);
@@ -134,14 +134,14 @@ public abstract class DialogFoundation {
 	public void prepare(
 			Dialog world,
 			ExtendedTitle title,
-			ExtendedColor textColor,
-			ExtendedColor spaceColor,
+			ColorAttribute textColor,
+			ColorAttribute spaceColor,
 			ExtendedFontName fontName,
 			ExtendedFontSize fontSize,
 			ExtendedFontStyle fontStyle,
 			ExtendedCoordinate x,
 			ExtendedCoordinate y,
-			ExtendedColor backgroundColor,
+			ColorAttribute backgroundColor,
 			boolean pixelMeasurements,
 			ChoisePoint iX) {
 		targetWorld= world;
@@ -196,6 +196,7 @@ public abstract class DialogFoundation {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						dialogContainer.setTitle(title);
 					}
@@ -210,8 +211,9 @@ public abstract class DialogFoundation {
 			return dialogContainer.getTitle();
 		} else {
 			try {
-				final AtomicReference<String> value= new AtomicReference<String>();
+				final AtomicReference<String> value= new AtomicReference<>();
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						value.set(dialogContainer.getTitle());
 					}
@@ -227,20 +229,20 @@ public abstract class DialogFoundation {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected Color instantiateTextColor(ExtendedColor textColor, ChoisePoint iX) {
+	protected Color instantiateTextColor(ColorAttribute textColor, ChoisePoint iX) {
 		Color value;
 		try {
 			value= textColor.getValue();
 		} catch (UseDefaultColor e1) {
 			try {
-				value= ExtendedColor.argumentToColorSafe(getPredefinedTextColor(),iX);
+				value= ColorAttributeConverters.argumentToColorSafe(getPredefinedTextColor(),iX);
 			} catch (TermIsSymbolDefault e2) {
 				value= defaultDialogTextColor;
 			}
 		};
 		return value;
 	}
-	public void changeTextColor(ExtendedColor textColor, boolean repaintContainer, ChoisePoint iX) {
+	public void changeTextColor(ColorAttribute textColor, boolean repaintContainer, ChoisePoint iX) {
 		Color value= instantiateTextColor(textColor,iX);
 		safelySetTextColor(value,repaintContainer);
 	}
@@ -250,6 +252,7 @@ public abstract class DialogFoundation {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklySetTextColor(color,repaintContainer);
 					}
@@ -270,8 +273,9 @@ public abstract class DialogFoundation {
 			return dialogContainer.getForeground();
 		} else {
 			try {
-				final AtomicReference<Color> value= new AtomicReference<Color>();
+				final AtomicReference<Color> value= new AtomicReference<>();
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						value.set(dialogContainer.getForeground());
 					}
@@ -287,20 +291,20 @@ public abstract class DialogFoundation {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected Color instantiateSpaceColor(ExtendedColor spaceColor, ChoisePoint iX) {
+	protected Color instantiateSpaceColor(ColorAttribute spaceColor, ChoisePoint iX) {
 		Color value;
 		try {
 			value= spaceColor.getValue();
 		} catch (UseDefaultColor e1) {
 			try {
-				value= ExtendedColor.argumentToColorSafe(getPredefinedSpaceColor(),iX);
+				value= ColorAttributeConverters.argumentToColorSafe(getPredefinedSpaceColor(),iX);
 			} catch (TermIsSymbolDefault e2) {
 				value= defaultDialogSpaceColor;
 			}
 		};
 		return value;
 	}
-	public void changeSpaceColor(ExtendedColor spaceColor, boolean repaintContainer, ChoisePoint iX) {
+	public void changeSpaceColor(ColorAttribute spaceColor, boolean repaintContainer, ChoisePoint iX) {
 		Color value= instantiateSpaceColor(spaceColor,iX);
 		safelySetSpaceColor(value,repaintContainer);
 	}
@@ -310,6 +314,7 @@ public abstract class DialogFoundation {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklySetSpaceColor(color,repaintContainer);
 					}
@@ -328,20 +333,20 @@ public abstract class DialogFoundation {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected Color instantiateSuccessBackgroundColor(ExtendedColor backgroundColor, ChoisePoint iX) {
+	protected Color instantiateSuccessBackgroundColor(ColorAttribute backgroundColor, ChoisePoint iX) {
 		Color value;
 		try {
 			value= backgroundColor.getValue();
 		} catch (UseDefaultColor e1) {
 			try {
-				value= ExtendedColor.argumentToColorSafe(getPredefinedBackgroundColor(),iX);
+				value= ColorAttributeConverters.argumentToColorSafe(getPredefinedBackgroundColor(),iX);
 			} catch (TermIsSymbolDefault e2) {
 				value= defaultDialogSuccessBackgroundColor;
 			}
 		};
 		return value;
 	}
-	public void changeBackgroundColor(ExtendedColor backgroundColor, boolean repaintContainer, ChoisePoint iX) {
+	public void changeBackgroundColor(ColorAttribute backgroundColor, boolean repaintContainer, ChoisePoint iX) {
 		Color successColor= instantiateSuccessBackgroundColor(backgroundColor,iX);
 		currentSuccessBackgroundColor.set(successColor);
 		Color refinedColor= refineBackgroundColor(successColor);
@@ -353,6 +358,7 @@ public abstract class DialogFoundation {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklySetBackgroundColor(color,repaintContainer);
 					}
@@ -376,8 +382,9 @@ public abstract class DialogFoundation {
 			return dialogContainer.getBackground();
 		} else {
 			try {
-				final AtomicReference<Color> value= new AtomicReference<Color>();
+				final AtomicReference<Color> value= new AtomicReference<>();
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						value.set(dialogContainer.getBackground());
 					}
@@ -396,7 +403,7 @@ public abstract class DialogFoundation {
 	protected Color instantiateFailureForegroundColor(ChoisePoint iX) {
 		Color value;
 		try {
-			value= ExtendedColor.argumentToColorSafe(DefaultOptions.failureDrawingForegroundColor,iX);
+			value= ColorAttributeConverters.argumentToColorSafe(DefaultOptions.failureDrawingForegroundColor,iX);
 		} catch (TermIsSymbolDefault e1) {
 			value= defaultDialogFailureForegroundColor;
 		};
@@ -408,7 +415,7 @@ public abstract class DialogFoundation {
 	protected Color instantiateFailureBackgroundColor(ChoisePoint iX) {
 		Color value;
 		try {
-			value= ExtendedColor.argumentToColorSafe(DefaultOptions.failureDrawingBackgroundColor,iX);
+			value= ColorAttributeConverters.argumentToColorSafe(DefaultOptions.failureDrawingBackgroundColor,iX);
 		} catch (TermIsSymbolDefault e1) {
 			value= defaultDialogFailureBackgroundColor;
 		};
@@ -551,7 +558,7 @@ public abstract class DialogFoundation {
 	public void changeActualX(ExtendedCoordinate actualX, ChoisePoint iX) {
 		actualX= instantiateX(actualX,iX);
 		ExtendedCoordinates currentCoordinates= actualCoordinates.get();
-		actualCoordinates.set(new ExtendedCoordinates(actualX,currentCoordinates.y,currentCoordinates.usePixelMeasurements()));
+		actualCoordinates.set(new ExtendedCoordinates(actualX,currentCoordinates.getY(),currentCoordinates.usePixelMeasurements()));
 		try {
 			Rectangle bounds= safelyComputeParentLayoutSize();
 			double gridX= DefaultOptions.gridWidth;
@@ -569,7 +576,7 @@ public abstract class DialogFoundation {
 	public void changeActualY(ExtendedCoordinate actualY, ChoisePoint iX) {
 		actualY= instantiateY(actualY,iX);
 		ExtendedCoordinates currentCoordinates= actualCoordinates.get();
-		actualCoordinates.set(new ExtendedCoordinates(currentCoordinates.x,actualY,currentCoordinates.usePixelMeasurements()));
+		actualCoordinates.set(new ExtendedCoordinates(currentCoordinates.getX(),actualY,currentCoordinates.usePixelMeasurements()));
 		try {
 			Rectangle bounds= safelyComputeParentLayoutSize();
 			double gridY= DefaultOptions.gridHeight;
@@ -714,7 +721,7 @@ public abstract class DialogFoundation {
 		return create_new_font(currentFontName.get(),currentFontStyle.get(),currentFontUnderline.get(),currentFontSize.get());
 	}
 	protected Font create_new_font(String fontName, int fontStyle, boolean fontUnderline, int fontSize) {
-		Map<TextAttribute,Object> map= new HashMap<TextAttribute,Object>();
+		Map<TextAttribute,Object> map= new HashMap<>();
 		map.put(TextAttribute.FAMILY,fontName);
 		boolean isBold= (fontStyle & Font.BOLD) != 0;
 		boolean isItalic= (fontStyle & Font.ITALIC) != 0;
@@ -758,6 +765,7 @@ public abstract class DialogFoundation {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklyAssembleAndAdd(initialTitle,initialFailureForegroundColor,initialFailureBackgroundColor,refinedBackgroundColor,iX);
 					}
@@ -807,6 +815,7 @@ public abstract class DialogFoundation {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklySetSizeAndCentreMainPanel(size);
 					}
@@ -849,8 +858,8 @@ public abstract class DialogFoundation {
 		int initialWidth= initialSize.width;
 		int initialHeight= initialSize.height;
 		//
-		int x= 0;
-		int y= 0;
+		int x;
+		int y;
 		//
 		double gridX= DefaultOptions.gridWidth;
 		double gridY= DefaultOptions.gridHeight;
@@ -859,11 +868,11 @@ public abstract class DialogFoundation {
 		//
 		ExtendedCoordinates actualPoint= actualCoordinates.get();
 		if (actualCoordinates.get().usePixelMeasurements()) {
-			x= DialogUtils.calculateAbsoluteCoordinate(actualPoint.x,parentLayoutSize.x,parentLayoutSize.width,initialWidth);
-			y= DialogUtils.calculateAbsoluteCoordinate(actualPoint.y,parentLayoutSize.y,parentLayoutSize.height,initialHeight);
+			x= DialogUtils.calculateAbsoluteCoordinate(actualPoint.getX(),parentLayoutSize.x,parentLayoutSize.width,initialWidth);
+			y= DialogUtils.calculateAbsoluteCoordinate(actualPoint.getY(),parentLayoutSize.y,parentLayoutSize.height,initialHeight);
 		} else {
-			x= DialogUtils.calculateAbsoluteCoordinate(actualPoint.x,parentLayoutSize.x,parentLayoutSize.width,gridX,initialWidth);
-			y= DialogUtils.calculateAbsoluteCoordinate(actualPoint.y,parentLayoutSize.y,parentLayoutSize.height,gridY,initialHeight);
+			x= DialogUtils.calculateAbsoluteCoordinate(actualPoint.getX(),parentLayoutSize.x,parentLayoutSize.width,gridX,initialWidth);
+			y= DialogUtils.calculateAbsoluteCoordinate(actualPoint.getY(),parentLayoutSize.y,parentLayoutSize.height,gridY,initialHeight);
 		};
 		//
 		return new Point(x,y);
@@ -877,6 +886,7 @@ public abstract class DialogFoundation {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklyGetPreferredAndMinimumSize(preferredSize,minimumSize);
 					}
@@ -896,8 +906,9 @@ public abstract class DialogFoundation {
 			return dialogContainer.computeParentLayoutSize();
 		} else {
 			try {
-				final AtomicReference<Rectangle> value= new AtomicReference<Rectangle>();
+				final AtomicReference<Rectangle> value= new AtomicReference<>();
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						value.set(dialogContainer.computeParentLayoutSize());
 					}
@@ -917,6 +928,7 @@ public abstract class DialogFoundation {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklySetSize(size);
 					}
@@ -935,8 +947,9 @@ public abstract class DialogFoundation {
 			return dialogContainer.getSize();
 		} else {
 			try {
-				final AtomicReference<Dimension> value= new AtomicReference<Dimension>();
+				final AtomicReference<Dimension> value= new AtomicReference<>();
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						value.set(dialogContainer.getSize());
 					}
@@ -956,6 +969,7 @@ public abstract class DialogFoundation {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						setGeneralFont(font);
 					}
@@ -980,6 +994,7 @@ public abstract class DialogFoundation {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklyRevalidateAndRepaint();
 					}
@@ -991,9 +1006,6 @@ public abstract class DialogFoundation {
 	}
 	private void quicklyRevalidateAndRepaint() {
 		dialogContainer.revalidate();
-		// dialogContainer.invalidate();
-		// dialogContainer.revalidate();
-		// dialogContainer.validateTree();
 		dialogContainer.repaint();
 	}
 	//
@@ -1003,6 +1015,7 @@ public abstract class DialogFoundation {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklyInvalidateAndRepaint();
 					}
@@ -1023,6 +1036,7 @@ public abstract class DialogFoundation {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						dialogContainer.validate();
 					}
@@ -1039,6 +1053,7 @@ public abstract class DialogFoundation {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						dialogContainer.invalidate();
 					}
@@ -1055,6 +1070,7 @@ public abstract class DialogFoundation {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						dialogContainer.repaint();
 					}
@@ -1073,6 +1089,7 @@ public abstract class DialogFoundation {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						setLocationByPlatform();
 					}
@@ -1093,6 +1110,7 @@ public abstract class DialogFoundation {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						setLocation(p);
 					}
@@ -1116,8 +1134,9 @@ public abstract class DialogFoundation {
 			return dialogContainer.getLocation();
 		} else {
 			try {
-				final AtomicReference<Point> value= new AtomicReference<Point>();
+				final AtomicReference<Point> value= new AtomicReference<>();
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						value.set(dialogContainer.getLocation());
 					}
@@ -1138,8 +1157,9 @@ public abstract class DialogFoundation {
 			return quicklyGetGraphicsConfiguration();
 		} else {
 			try {
-				final AtomicReference<GraphicsConfiguration> value= new AtomicReference<GraphicsConfiguration>();
+				final AtomicReference<GraphicsConfiguration> value= new AtomicReference<>();
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						value.set(quicklyGetGraphicsConfiguration());
 					}
@@ -1207,6 +1227,7 @@ public abstract class DialogFoundation {
 			final AtomicBoolean value= new AtomicBoolean(false);
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						value.set(isShowing());
 					}
@@ -1227,6 +1248,7 @@ public abstract class DialogFoundation {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						defineDefaultButton();
 					}

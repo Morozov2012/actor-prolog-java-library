@@ -26,11 +26,11 @@ public class ScalableListButton extends ScalableComboBox {
 	//
 	public ScalableListButton(AbstractDialog tD, String[] items, double visibleRowCount, double visibleColumnCount, boolean enableSorting) {
 		super(tD,items,visibleRowCount,visibleColumnCount,false,enableSorting);
-		// ((JComboBox)component).addActionListener(this);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
@@ -47,15 +47,16 @@ public class ScalableListButton extends ScalableComboBox {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setGeneralForeground(Color c) {
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void actionPerformed(ActionEvent event) {
 		if (targetDialog!=null) {
 			targetDialog.reportValueUpdate(this);
-			// int modifiers= event.getModifiers();
 			if (component!=null && targetDialog.safelyIsShowing() && ((JComboBox)component).isPopupVisible()) {
 				synchronized (component) {
 					Object selectedValue= ((JComboBox)component).getSelectedItem();

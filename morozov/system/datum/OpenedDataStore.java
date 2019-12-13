@@ -27,8 +27,8 @@ import java.math.BigInteger;
 
 public class OpenedDataStore extends DataStoreIO {
 	//
-	public boolean isValid= false;
-	protected AtomicReference<UpdatesWatchHolder> watcher= new AtomicReference<UpdatesWatchHolder>(null);
+	protected boolean isValid= false;
+	protected AtomicReference<UpdatesWatchHolder> watcher= new AtomicReference<>(null);
 	//
 	protected AtomicBoolean isUpdated= new AtomicBoolean(false);
 	//
@@ -40,6 +40,12 @@ public class OpenedDataStore extends DataStoreIO {
 	//
 	public OpenedDataStore(ExtendedFileName storeName, Path storePath, Path subdirectory, ActiveWorld process, DatabaseAccessMode access, DatabaseSharingMode sharing, TimeInterval waiting, TimeInterval sleep, BigInteger maxRetry) {
 		super(storeName,storePath,subdirectory,process,access,sharing,waiting,sleep,maxRetry);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public boolean isValid() {
+		return isValid;
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -207,7 +213,7 @@ public class OpenedDataStore extends DataStoreIO {
 		if (Files.exists(dataStorePath)) {
 			tableHash= unsafelyReadDataStore();
 		} else {
-			tableHash= new HashMap<String,DatabaseTableContainer>();
+			tableHash= new HashMap<>();
 			unsafelyWriteDataStore(tableHash);
 		};
 		HashMap<String,Long> tableIndex= new HashMap<>();

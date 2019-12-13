@@ -10,12 +10,16 @@ import java.util.Set;
 import java.util.Iterator;
 
 public class TermComparator implements Comparator<Term> {
-	boolean ascendingSorting= true;
+	//
+	protected boolean ascendingSorting= true;
+	//
 	public TermComparator() {
 	}
 	public TermComparator(boolean mode) {
 		ascendingSorting= mode;
 	}
+	//
+	@Override
 	public int compare(Term o1, Term o2) {
 		if (!ascendingSorting) {
 			Term o3= o1;

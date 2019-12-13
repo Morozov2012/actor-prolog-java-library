@@ -15,11 +15,13 @@ package morozov.system.gui.dialogs.scalable.common;
 import morozov.terms.*;
 
 public class ScalableTableColumnDescription {
-	public String name;
-	public double width;
-	public TextAlignment horizontalAlignment;
-	public Term foregroundColor;
-	public Term backgroundColor;
+	//
+	protected String name;
+	protected double width;
+	protected TextAlignment horizontalAlignment;
+	protected Term foregroundColor;
+	protected Term backgroundColor;
+	//
 	public ScalableTableColumnDescription(String text, int size, TextAlignment hAlign, Term foreground, Term background) {
 		name= text;
 		width= size;

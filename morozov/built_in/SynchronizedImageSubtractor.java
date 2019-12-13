@@ -3,6 +3,7 @@
 package morozov.built_in;
 
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.converters.*;
 import morozov.system.gui.space2d.*;
 import morozov.system.vision.plain.errors.*;
@@ -82,17 +83,18 @@ public abstract class SynchronizedImageSubtractor
 	//
 	protected void subtract(Term frame, Term image, boolean takeFrameIntoAccount, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
-		long frameNumber= PrologInteger.toLong(GeneralConverters.argumentToRoundInteger(frame,iX));
+		long frameNumber= Arithmetic.toLong(GeneralConverters.argumentToRoundInteger(frame,iX));
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(image,iX);
 		GenericImageEncodingAttributes attributes= getCurrentImageEncodingAttributes();
 		process(nativeImage,frameNumber,-1,takeFrameIntoAccount,iX,attributes);
 	}
-	// abstract public void subtract(long frameNumber, java.awt.image.BufferedImage nativeImage, boolean takeFrameIntoAccount, ChoisePoint iX, GenericImageEncodingAttributes attributes);
 	//
+	@Override
 	public void process(java.awt.image.BufferedImage nativeImage, long frameNumber, long timeInMilliseconds, boolean takeFrameIntoAccount, ChoisePoint iX, GenericImageEncodingAttributes attributes) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		subtractor.process(nativeImage,frameNumber,timeInMilliseconds,takeFrameIntoAccount,iX,attributes);
 	}
+	@Override
 	public void process(byte[] image, long frameNumber, long timeInMilliseconds, boolean takeFrameIntoAccount, ChoisePoint iX, GenericImageEncodingAttributes attributes) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		subtractor.process(image,frameNumber,timeInMilliseconds,takeFrameIntoAccount,iX,attributes);
@@ -106,6 +108,7 @@ public abstract class SynchronizedImageSubtractor
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void commit(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		subtractor.commit(iX);
@@ -113,21 +116,25 @@ public abstract class SynchronizedImageSubtractor
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void resetSettings(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		subtractor.resetSettings(iX);
 	}
 	//
+	@Override
 	public void resetStatistics(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		subtractor.resetStatistics(iX);
 	}
 	//
+	@Override
 	public void resetResults(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		subtractor.resetResults(iX);
 	}
 	//
+	@Override
 	public void resetAll(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		subtractor.resetAll(iX);
@@ -135,19 +142,23 @@ public abstract class SynchronizedImageSubtractor
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public long getFrameNumber(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.getFrameNumber(iX);
 	}
+	@Override
 	public Term getFrameNumberOrSpacer(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.getFrameNumberOrSpacer(iX);
 	}
 	//
+	@Override
 	public long getFrameTime(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.getFrameTime(iX);
 	}
+	@Override
 	public Term getFrameTimeOrSpacer(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.getFrameTimeOrSpacer(iX);
@@ -155,37 +166,45 @@ public abstract class SynchronizedImageSubtractor
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void getRecentImage(Term image, ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		subtractor.getRecentImage(image,iX);
 	}
+	@Override
 	public byte[] getSerializedRecentImage(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.getSerializedRecentImage(iX);
 	}
 	//
+	@Override
 	public void getPreprocessedImage(Term image, ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		subtractor.getPreprocessedImage(image,iX);
 	}
+	@Override
 	public byte[] getSerializedPreprocessedImage(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.getSerializedPreprocessedImage(iX);
 	}
 	//
+	@Override
 	public void getForegroundImage(Term image, ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		subtractor.getForegroundImage(image,iX);
 	}
+	@Override
 	public byte[] getSerializedForegroundImage(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.getSerializedForegroundImage(iX);
 	}
 	//
+	@Override
 	public void getSynthesizedImage(Term image, ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		subtractor.getSynthesizedImage(image,iX);
 	}
+	@Override
 	public byte[] getSerializedSynthesizedImage(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.getSerializedSynthesizedImage(iX);
@@ -193,19 +212,23 @@ public abstract class SynchronizedImageSubtractor
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void getBackgroundImage(Term image, int layerNumber, ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		subtractor.getBackgroundImage(image,layerNumber,iX);
 	}
+	@Override
 	public byte[] getSerializedBackgroundImage(int layerNumber, ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.getSerializedBackgroundImage(layerNumber,iX);
 	}
 	//
+	@Override
 	public void getSigmaImage(Term image, int layerNumber, ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		subtractor.getSigmaImage(image,layerNumber,iX);
 	}
+	@Override
 	public byte[] getSerializedSigmaImage(int layerNumber, ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.getSerializedSigmaImage(layerNumber,iX);
@@ -213,37 +236,45 @@ public abstract class SynchronizedImageSubtractor
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term getBlobs(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.getBlobs(iX);
 	}
+	@Override
 	public byte[] getSerializedBlobs(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.getSerializedBlobs(iX);
 	}
 	//
+	@Override
 	public Term getTracks(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.getTracks(iX);
 	}
+	@Override
 	public byte[] getSerializedTracks(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.getSerializedTracks(iX);
 	}
 	//
+	@Override
 	public Term getChronicle(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.getChronicle(iX);
 	}
+	@Override
 	public byte[] getSerializedChronicle(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.getSerializedChronicle(iX);
 	}
 	//
+	@Override
 	public Term getConnectedGraphs(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.getConnectedGraphs(iX);
 	}
+	@Override
 	public byte[] getSerializedConnectedGraphs(ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.getSerializedConnectedGraphs(iX);
@@ -251,11 +282,13 @@ public abstract class SynchronizedImageSubtractor
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public double[] physicalCoordinates(int pixelX, int pixelY, ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.physicalCoordinates(pixelX,pixelY,iX);
 	}
 	//
+	@Override
 	public double characteristicLength(int x, int y, ChoisePoint iX) {
 		VideoProcessingMachineOperations subtractor= getImageSubtractor(iX);
 		return subtractor.characteristicLength(x,y,iX);

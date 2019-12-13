@@ -54,6 +54,7 @@ public class KinectPointCloudsFrame extends KinectFrame implements KinectPointCl
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public float[] getXYZ() {
 		return xyz;
 	}

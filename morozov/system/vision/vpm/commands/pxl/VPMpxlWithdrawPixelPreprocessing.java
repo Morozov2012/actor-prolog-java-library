@@ -10,6 +10,7 @@ public class VPMpxlWithdrawPixelPreprocessing extends VPM_FrameCommand {
 	public VPMpxlWithdrawPixelPreprocessing() {
 	}
 	//
+	@Override
 	public void execute(VPM vpm) {
 		vpm.clearOperationalMatrix();
 	}

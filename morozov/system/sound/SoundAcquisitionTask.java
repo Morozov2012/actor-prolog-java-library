@@ -2,12 +2,15 @@
 
 package morozov.system.sound;
 
+import morozov.system.sound.frames.data.*;
 import morozov.system.sound.interfaces.*;
 
 import javax.swing.SwingUtilities;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.TargetDataLine;
 import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.Mixer;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.io.IOException;
@@ -18,6 +21,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class SoundAcquisitionTask extends Thread {
 	//
+	protected AtomicReference<Mixer.Info> requestedMixerInfo= new AtomicReference<>();
+	protected AtomicReference<AudioFormat> requestedAudioFormat= new AtomicReference<>();
+	//
 	protected TargetDataLine microphone;
 	protected PipedInputStream pipedInputStream;
 	protected PipedOutputStream pipedOutputStream;
@@ -26,9 +32,9 @@ public class SoundAcquisitionTask extends Thread {
 	protected AtomicReference<AudioDataConsumerInterface> controlPanel= new AtomicReference<>();
 	protected AtomicInteger outputDebugInformation= new AtomicInteger(0);
 	//
-	protected AtomicBoolean stopThisThread= new AtomicBoolean(false);
 	protected AtomicBoolean deviceIsOpen= new AtomicBoolean(false);
 	protected AtomicBoolean enableDataTransfer= new AtomicBoolean(false);
+	protected AtomicBoolean suspendDataAcquisition= new AtomicBoolean(false);
 	//
 	protected byte[] m_buf;
 	protected int numberOfErrors= 0;
@@ -57,6 +63,83 @@ public class SoundAcquisitionTask extends Thread {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public void setRequestedMixerInfoAndAudioFormat(Mixer.Info mixerInfo, AudioFormat format) {
+		suspendDataAcquisition.set(true);
+		try {
+			synchronized (this) {
+				requestedMixerInfo.set(mixerInfo);
+				requestedAudioFormat.set(format);
+			}
+		} finally {
+			suspendDataAcquisition.set(false);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public AudioFormatBaseAttributes getAudioFormat() {
+		suspendDataAcquisition.set(true);
+		try {
+			synchronized (this) {
+				if (microphone==null) {
+					if (!deviceDoesExist()) {
+						return null;
+					}
+				};
+				if (microphone != null) {
+					AudioFormat format= microphone.getFormat();
+					return new AudioFormatBaseAttributes(
+						format.getChannels(),
+						format.getEncoding().toString(),
+						format.getFrameRate(),
+						format.getFrameSize(),
+						format.getSampleRate(),
+						format.getSampleSizeInBits(),
+						format.isBigEndian());
+				} else {
+					return null;
+				}
+			}
+		} finally {
+			suspendDataAcquisition.set(false);
+		}
+	}
+	//
+	public boolean microphoneIsAvailable() {
+		suspendDataAcquisition.set(true);
+		try {
+			synchronized (this) {
+				if (microphone==null) {
+					if (!deviceDoesExist()) {
+						return false;
+					}
+				};
+				return (microphone != null);
+			}
+		} finally {
+			suspendDataAcquisition.set(false);
+		}
+	}
+	//
+	public boolean microphoneIsActive() {
+		suspendDataAcquisition.set(true);
+		try {
+			synchronized (this) {
+				if (microphone==null) {
+					return false;
+				};
+				if (!isAlive()) {
+					return false;
+				};
+				return enableDataTransfer.get();
+			}
+		} finally {
+			suspendDataAcquisition.set(false);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public void setDataConsumer(AudioDataConsumerInterface panel) {
 		controlPanel.set(panel);
 	}
@@ -76,24 +159,46 @@ public class SoundAcquisitionTask extends Thread {
 	}
 	//
 	public void startDataTransfer() {
-		synchronized (this) {
-			enableDataTransfer.set(true);
-			notifyAll();
+		suspendDataAcquisition.set(true);
+		try {
+			synchronized (this) {
+				enableDataTransfer.set(true);
+				if (!isAlive()) {
+					start();
+				};
+				notifyAll();
+			}
+		} finally {
+			suspendDataAcquisition.set(false);
 		}
 	}
 	//
 	public void stopDataTransfer() {
-		synchronized (this) {
-			if (microphone != null) {
-				closeMicrophone();
-				enableDataTransfer.set(false);
-				notifyAll();
+		suspendDataAcquisition.set(true);
+		try {
+			synchronized (this) {
+				if (microphone != null) {
+					closeMicrophone();
+					enableDataTransfer.set(false);
+					notifyAll();
+				}
 			}
+		} finally {
+			suspendDataAcquisition.set(false);
 		}
 	}
 	//
 	protected void closeMicrophone() {
-		microphone.close();
+		suspendDataAcquisition.set(true);
+		try {
+			synchronized (this) {
+				if (microphone != null) {
+					microphone.close();
+				}
+			}
+		} finally {
+			suspendDataAcquisition.set(false);
+		};
 		try {
 			pipedOutputStream.flush();
 		} catch (IOException e) {
@@ -104,7 +209,16 @@ public class SoundAcquisitionTask extends Thread {
 	}
 	//
 	public void flush() {
-		microphone.flush();
+		suspendDataAcquisition.set(true);
+		try {
+			synchronized (this) {
+				if (microphone != null) {
+					microphone.flush();
+				}
+			}
+		} finally {
+			suspendDataAcquisition.set(false);
+		};
 		try {
 			pipedOutputStream.flush();
 		} catch (IOException e) {
@@ -116,9 +230,11 @@ public class SoundAcquisitionTask extends Thread {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
+	@SuppressWarnings("CallToThreadDumpStack")
 	public void run() {
 		try {
-			while (!stopThisThread.get()) {
+			while (true) {
 				synchronized (this) {
 					if (!enableDataTransfer.get()) {
 						wait();
@@ -178,8 +294,19 @@ public class SoundAcquisitionTask extends Thread {
 	//
 	public boolean deviceDoesExist() {
 		try {
-			synchronized (this) {
-				AudioSystem.getTargetDataLine(null);
+			suspendDataAcquisition.set(true);
+			try {
+				synchronized (this) {
+					Mixer.Info mixerInfo= requestedMixerInfo.get();
+					AudioFormat audioFormat= requestedAudioFormat.get();
+					if (mixerInfo != null && audioFormat != null) {
+						microphone= AudioSystem.getTargetDataLine(audioFormat,mixerInfo);
+					} else {
+						microphone= AudioSystem.getTargetDataLine(null);
+					}
+				}
+			} finally {
+				suspendDataAcquisition.set(false);
 			};
 			return true;
 		} catch (LineUnavailableException e) {
@@ -192,7 +319,13 @@ public class SoundAcquisitionTask extends Thread {
 	public void tryToOpenDevice() throws LineUnavailableException {
 		synchronized (this) {
 			if (!deviceIsOpen.get()) {
-				microphone= AudioSystem.getTargetDataLine(null);
+				Mixer.Info mixerInfo= requestedMixerInfo.get();
+				AudioFormat audioFormat= requestedAudioFormat.get();
+				if (mixerInfo != null && audioFormat != null) {
+					microphone= AudioSystem.getTargetDataLine(audioFormat,mixerInfo);
+				} else {
+					microphone= AudioSystem.getTargetDataLine(null);
+				};
 				int dataGroupSize= microphone.getBufferSize() / 5;
 				if (dataGroupSize > inputStreamBufferSize) {
 					dataGroupSize= inputStreamBufferSize;
@@ -201,7 +334,11 @@ public class SoundAcquisitionTask extends Thread {
 					m_buf.length != dataGroupSize) {
 					m_buf= new byte[dataGroupSize];
 				};
-				microphone.open();
+				if (audioFormat != null) {
+					microphone.open(audioFormat);
+				} else {
+					microphone.open();
+				};
 				microphone.start();
 				deviceIsOpen.set(true);
 				numberOfErrors= 0;
@@ -213,7 +350,10 @@ public class SoundAcquisitionTask extends Thread {
 	///////////////////////////////////////////////////////////////
 	//
 	public void dataAcquisition() throws IOException {
-		int numberOfReceivedBytes= microphone.read(m_buf,0,m_buf.length);
+		int numberOfReceivedBytes;
+		synchronized (this) {
+			numberOfReceivedBytes= microphone.read(m_buf,0,m_buf.length);
+		};
 		if (numberOfReceivedBytes == m_buf.length) {
 			pipedOutputStream.write(m_buf,0,numberOfReceivedBytes);
 			synchronized (pipedInputStream) {
@@ -223,7 +363,6 @@ public class SoundAcquisitionTask extends Thread {
 		if (numberOfReceivedBytes > 0) {
 			numberOfErrors= 0;
 		} else {
-			reportMicrophoneAvailability(false);
 			if (numberOfErrors > maximalNumberOfErrors) {
 				closeMicrophone();
 				deviceIsOpen.set(false);
@@ -238,6 +377,7 @@ public class SoundAcquisitionTask extends Thread {
 	//
 	public static void writeLater(final String text) {
 		SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				System.err.print(text);
 			}

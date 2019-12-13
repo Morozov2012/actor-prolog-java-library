@@ -4,6 +4,7 @@ package morozov.syntax.scanner;
 
 import target.*;
 
+import morozov.run.*;
 import morozov.syntax.scanner.signals.*;
 import morozov.terms.*;
 
@@ -20,12 +21,21 @@ public class TokenPlain extends PrologToken {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public PrologTokenType getType() {
 		return type;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
+	public boolean correspondsToActorPrologTerm(Term argument, ChoisePoint iX) {
+		return type.correspondsToActorPrologTerm(argument,iX);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	@Override
 	public Term toActorPrologTerm() {
 		try {
 			return type.toActorPrologTerm();
@@ -34,6 +44,7 @@ public class TokenPlain extends PrologToken {
 			return new PrologStructure(SymbolCodes.symbolCode_E_string,arguments);
 		}
 	}
+	@Override
 	public String toString() {
 		try {
 			return type.toText();

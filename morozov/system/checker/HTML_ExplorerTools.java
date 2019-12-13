@@ -11,7 +11,7 @@ import java.util.Stack;
 
 public class HTML_ExplorerTools {
 	//
-	protected Stack<Integer> stack= new Stack<Integer>();
+	protected Stack<Integer> stack= new Stack<>();
 	protected String text;
 	//
 	protected void shiftTextPosition(int increment) {

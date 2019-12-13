@@ -22,22 +22,16 @@ import morozov.terms.signals.*;
 import java.math.BigInteger;
 
 public class AIntegerField extends ATextField {
+	//
 	public AIntegerField(AbstractDialog tD, ActiveComponent tC, String text, int columns) {
 		super(tD,tC,text,columns);
-		// DecimalFormatSymbols dFS= new DecimalFormatSymbols();
-		// dFS.setGroupingSeparator(' ');
-		// dFS.setDecimalSeparator('.');
-		// DecimalFormat format= new DecimalFormat("#",dFS);
-		// format.setGroupingUsed(true);
-		// format.setGroupingSize(3);
-		// format.setParseIntegerOnly(true);
-		// setFormat(format);
 		setFormat(ActiveDocumentFormat.INTEGER);
 	}
+	//
+	@Override
 	public Term getValue() {
 		ActivePlainDocument activeDocument= (ActivePlainDocument)getDocument();
 		try {
-			// return new PrologReal(new Double(activeDocument.getTextOrBacktrack()));
 			String text= activeDocument.getTextOrBacktrack();
 			BigInteger number= GeneralConverters.stringToStrictInteger(text);
 			return new PrologInteger(number);

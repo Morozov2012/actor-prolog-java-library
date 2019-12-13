@@ -4,12 +4,13 @@ package morozov.system.gui.sadt;
 
 public class ComponentState {
 	//
-	private boolean isProven= false;
-	private boolean isSuspended= false;
+	protected boolean isProven= false;
+	protected boolean isSuspended= false;
 	//
 	public ComponentState(boolean p, boolean s) {
 		set(p,s);
 	}
+	//
 	public void set(boolean p, boolean s) {
 		synchronized (this) {
 			isProven= p;

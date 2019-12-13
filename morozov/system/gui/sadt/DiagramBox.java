@@ -17,16 +17,17 @@ import java.awt.BasicStroke;
 import java.util.Map;
 
 public class DiagramBox {
-	public String mother;
-	public int number;
-	public long boxCode;
-	public String[] boxText;
-	public double x1;
-	public double y1;
-	public double x2;
-	public double y2;
+	//
+	protected String mother;
+	protected int number;
+	protected long boxCode;
+	protected String[] boxText;
+	protected double x1;
+	protected double y1;
+	protected double x2;
+	protected double y2;
 	protected int border= 3;
-	public BooleanOperation operation= BooleanOperation.AND;
+	protected BooleanOperation operation= BooleanOperation.AND;
 	//
 	public DiagramBox(String motherIdentifier, int localNumber, long nameCode, String[] text, double xx1, double yy1, double xx2, double yy2) {
 		mother= motherIdentifier;
@@ -60,9 +61,9 @@ public class DiagramBox {
 			}
 		}
 	}
+	//
 	public void draw(Graphics2D g2, Dimension size, Map<String,ComponentState> componentSuccess, DiagramColors diagramColors, int fontSize) {
-		// Graphics2D g2= (Graphics2D)g0;
-		// DesktopUtils.setRenderingHints(g2);
+		//
 		double x= StrictMath.round(size.width * x1);
 		double y= StrictMath.round(size.height * y2);
 		double boxWidth= StrictMath.round(size.width * (x2-x1));
@@ -146,7 +147,6 @@ public class DiagramBox {
 	}
 	//
 	public boolean fontSizeIsSuitable(Font font, Graphics2D g2, Dimension size) {
-		// Graphics2D g2= (Graphics2D)g0;
 		//
 		double boxWidth= StrictMath.round(size.width * (x2-x1));
 		double boxHeight= StrictMath.round(size.height * (y1-y2));

@@ -23,14 +23,15 @@ import java.beans.PropertyVetoException;
 import java.util.Map;
 
 public class DiagramPaneNoWrap extends JPanel implements MouseListener, ActionListener {
-	private JInternalFrame owner;
-	private String identifier;
-	private DiagramContent graph;
-	private DiagramColors diagramColors;
-	private StaticContext staticContext;
-	Map<String,AbstractProcess> diagramComponents;
-	Map<String,ComponentState> componentSuccess;
-	private JPopupMenu popup;
+	//
+	protected JInternalFrame owner;
+	protected String identifier;
+	protected DiagramContent graph;
+	protected DiagramColors diagramColors;
+	protected StaticContext staticContext;
+	protected Map<String,AbstractProcess> diagramComponents;
+	protected Map<String,ComponentState> componentSuccess;
+	protected JPopupMenu popup;
 	//
 	public DiagramPaneNoWrap(JInternalFrame frame, String diagramIdentifier, DiagramContent diagramGraph, DiagramColors colors, StaticContext context, Map<String,AbstractProcess> components, Map<String,ComponentState> componentState) {
 		owner= frame;
@@ -44,6 +45,7 @@ public class DiagramPaneNoWrap extends JPanel implements MouseListener, ActionLi
 		addMouseListener(this);
 	}
 	//
+	@Override
 	public void paint(Graphics g0) {
 		Dimension size= getSize();
 		super.paint(g0);
@@ -52,15 +54,20 @@ public class DiagramPaneNoWrap extends JPanel implements MouseListener, ActionLi
 		graph.draw(g2,size,diagramColors,componentSuccess);
 	}
 	//
+	@Override
 	public void mouseClicked(MouseEvent event) {
 	}
+	@Override
 	public void mouseEntered(MouseEvent event) {
 	}
+	@Override
 	public void mouseExited(MouseEvent event) {
 	}
+	@Override
 	public void mousePressed(MouseEvent event) {
 		mousePressedOrReleased(event);
 	}
+	@Override
 	public void mouseReleased(MouseEvent event) {
 		mousePressedOrReleased(event);
 	}
@@ -75,7 +82,6 @@ public class DiagramPaneNoWrap extends JPanel implements MouseListener, ActionLi
 				if (event.getClickCount() >= 2) {
 					if (!identifier.isEmpty()) {
 						owner.setVisible(false);
-						// DesktopUtils.safelySetVisible(false,owner);
 					} else {
 						try {
 							owner.setIcon(true);
@@ -104,6 +110,7 @@ public class DiagramPaneNoWrap extends JPanel implements MouseListener, ActionLi
 		}
 	}
 	//
+	@Override
 	public void actionPerformed(ActionEvent event) {
 		DesktopUtils.actionPerformed(event,staticContext);
 	}

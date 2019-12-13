@@ -5,14 +5,15 @@ package morozov.system.indices;
 import java.math.BigInteger;
 
 public class ArrayIndices {
-	public BigInteger[] vector;
+	//
+	protected BigInteger[] vector;
+	//
 	public ArrayIndices(BigInteger[] list) {
 		vector= new BigInteger[list.length];
-		for (int n=0; n < list.length; n++) {
-			vector[n]= list[n];
-		};
+		System.arraycopy(list,0,vector,0,list.length);
 	}
 	//
+	@Override
 	public boolean equals(Object o) {
 		if (o==null) {
 			return false;
@@ -35,6 +36,7 @@ public class ArrayIndices {
 		}
 	}
 	//
+	@Override
 	public int hashCode() {
 		int sum= 0;
 		for (int n=0; n < vector.length; n++) {
@@ -43,6 +45,7 @@ public class ArrayIndices {
 		return sum;
 	}
 	//
+	@Override
 	public String toString() {
 		StringBuilder buffer= new StringBuilder();
 		for (int n=0; n < vector.length; n++) {

@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Properties;
 
 public class SimpleFileName {
+	//
 	protected boolean isStandardFile= false;
 	protected StandardFileName systemName= StandardFileName.STDOUT;
 	protected String textName= "";
@@ -249,7 +250,6 @@ public class SimpleFileName {
 			if (endsWithSlash) {
 				return path;
 			} else {
-				String fileName= path.getFileName().toString();
 				return path.getParent();
 			}
 		} else {
@@ -327,7 +327,7 @@ public class SimpleFileName {
 				mask= mask.substring(p1+1);
 			}
 		};
-		List<Path> result= new ArrayList<Path>();
+		List<Path> result= new ArrayList<>();
 		try {
 			DirectoryStream<Path> stream;
 			if (mask==null) {
@@ -405,7 +405,7 @@ public class SimpleFileName {
 	//
 	protected static String readStringFromStdIn(Charset characterSet) {
 		try {
-			ArrayList<Byte> byteList= new ArrayList<Byte>();
+			ArrayList<Byte> byteList= new ArrayList<>();
 			BufferedInputStream stream= new BufferedInputStream(System.in);
 			int bufferSize= 10000;
 			byte[] readingBuffer= new byte[bufferSize];
@@ -433,13 +433,13 @@ public class SimpleFileName {
 	///////////////////////////////////////////////////////////////
 	//
 	public static String readStringFromUniversalResource(URL_Attributes attributes) throws Throwable {
-		CharacterSet requestedCharacterSet= attributes.characterSet;
-		if (attributes.isLocalResource) {
-			Path filePath= ExtendedFileName.urlToPath(attributes.url);
+		CharacterSet requestedCharacterSet= attributes.getCharacterSet();
+		if (attributes.isLocalResource()) {
+			Path filePath= ExtendedFileName.urlToPath(attributes.getURL());
 			return readStringFromLocalFile(filePath,requestedCharacterSet);
 		} else {
-			URLConnection connection= attributes.url.openConnection();
-			int timeout= attributes.maxWaitingInterval;
+			URLConnection connection= attributes.getURL().openConnection();
+			int timeout= attributes.getMaxWaitingInterval();
 			if (timeout >= 0) {
 				connection.setConnectTimeout(timeout);
 				connection.setReadTimeout(timeout);
@@ -448,7 +448,7 @@ public class SimpleFileName {
 			try {
 				int length= StrictMath.max(stream.available(),0xFFFF);
 				byte[] readingBuffer= new byte[length];
-				ArrayList<Byte> textBuffer= new ArrayList<Byte>();
+				ArrayList<Byte> textBuffer= new ArrayList<>();
 				while (true) {
 					int k= stream.read(readingBuffer,0,length);
 					if (k < 0) {
@@ -458,7 +458,7 @@ public class SimpleFileName {
 						textBuffer.add(readingBuffer[n]);
 					}
 				};
-				Byte[] objectSequence= textBuffer.toArray(new Byte[0]);
+				Byte[] objectSequence= textBuffer.toArray(new Byte[textBuffer.size()]);
 				byte[] byteSequence= new byte[objectSequence.length];
 				for (int n=0; n < objectSequence.length; n++) {
 					byteSequence[n]= objectSequence[n];
@@ -479,12 +479,12 @@ public class SimpleFileName {
 	///////////////////////////////////////////////////////////////
 	//
 	protected static byte[] readBytesFromUniversalResource(URL_Attributes attributes) throws Throwable {
-		if (attributes.isLocalResource) {
-			Path filePath= ExtendedFileName.urlToPath(attributes.url);
+		if (attributes.isLocalResource()) {
+			Path filePath= ExtendedFileName.urlToPath(attributes.getURL());
 			return SimpleFileName.readBytesFromLocalFile(filePath);
 		} else {
-			URLConnection connection= attributes.url.openConnection();
-			int timeout= attributes.maxWaitingInterval;
+			URLConnection connection= attributes.getURL().openConnection();
+			int timeout= attributes.getMaxWaitingInterval();
 			if (timeout >= 0) {
 				connection.setConnectTimeout(timeout);
 				connection.setReadTimeout(timeout);
@@ -493,7 +493,7 @@ public class SimpleFileName {
 			try {
 				int length= StrictMath.max(stream.available(),0xFFFF);
 				byte[] readingBuffer= new byte[length];
-				ArrayList<Byte> totalBuffer= new ArrayList<Byte>();
+				ArrayList<Byte> totalBuffer= new ArrayList<>();
 				while (true) {
 					int k= stream.read(readingBuffer,0,length);
 					if (k < 0) {
@@ -503,7 +503,7 @@ public class SimpleFileName {
 						totalBuffer.add(readingBuffer[n]);
 					}
 				};
-				Byte[] totalArray= totalBuffer.toArray(new Byte[0]);
+				Byte[] totalArray= totalBuffer.toArray(new Byte[totalBuffer.size()]);
 				byte[] result= new byte[totalArray.length];
 				for (int n=0; n < totalArray.length; n++) {
 					result[n]= totalArray[n];
@@ -516,8 +516,8 @@ public class SimpleFileName {
 	}
 	//
 	protected static Object readObjectFromUniversalResource(URL_Attributes attributes) throws Throwable {
-		if (attributes.isLocalResource) {
-			Path path= ExtendedFileName.urlToPath(attributes.url);
+		if (attributes.isLocalResource()) {
+			Path path= ExtendedFileName.urlToPath(attributes.getURL());
 			InputStream inputStream= Files.newInputStream(path);
 			ObjectInputStream objectStream= new DataStoreInputStream(new BufferedInputStream(inputStream)/*,true*/);
 			try {
@@ -526,8 +526,8 @@ public class SimpleFileName {
 				objectStream.close();
 			}
 		} else {
-			URLConnection connection= attributes.url.openConnection();
-			int timeout= attributes.maxWaitingInterval;
+			URLConnection connection= attributes.getURL().openConnection();
+			int timeout= attributes.getMaxWaitingInterval();
 			if (timeout >= 0) {
 				connection.setConnectTimeout(timeout);
 				connection.setReadTimeout(timeout);
@@ -543,13 +543,13 @@ public class SimpleFileName {
 	}
 	//
 	protected static InputStream getInputStreamFromUniversalResource(URL_Attributes attributes) throws Throwable {
-		if (attributes.isLocalResource) {
-			Path path= ExtendedFileName.urlToPath(attributes.url);
+		if (attributes.isLocalResource()) {
+			Path path= ExtendedFileName.urlToPath(attributes.getURL());
 			InputStream inputStream= Files.newInputStream(path);
 			return inputStream;
 		} else {
-			URLConnection connection= attributes.url.openConnection();
-			int timeout= attributes.maxWaitingInterval;
+			URLConnection connection= attributes.getURL().openConnection();
+			int timeout= attributes.getMaxWaitingInterval();
 			if (timeout >= 0) {
 				connection.setConnectTimeout(timeout);
 				connection.setReadTimeout(timeout);
@@ -777,6 +777,7 @@ public class SimpleFileName {
 			return new PrologSymbol(name);
 		}
 	}
+	@Override
 	public String toString() {
 		if (!isStandardFile) {
 			return textName;

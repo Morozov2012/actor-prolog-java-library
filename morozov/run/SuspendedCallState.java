@@ -7,7 +7,7 @@ import morozov.worlds.errors.*;
 
 public class SuspendedCallState extends Term {
 	//
-	private SuspendedCall call;
+	protected SuspendedCall call;
 	//
 	private static final long serialVersionUID= 0x6D84C2E767342917L; // 7891646746184657175L
 	//
@@ -21,13 +21,16 @@ public class SuspendedCallState extends Term {
 		call= value;
 	}
 	//
+	@Override
 	public void clear() {
 		call.isReleased= false;
 	}
-	// General "Unify With" function
+	// General "Unify With" function:
+	@Override
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		throw new SpecialTermCannotBeUnified();
 	}
+	@Override
 	public String toString() {
 		return "SuspendedCallState";
 	}

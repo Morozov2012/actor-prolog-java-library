@@ -22,6 +22,7 @@ public class VPMblbExtractBlobs extends VPM_FrameCommand {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void execute(VPM vpm) {
 		extractBlobs(vpm);
 		if (numberOfProcessedFrames < Long.MAX_VALUE) {
@@ -77,6 +78,7 @@ public class VPMblbExtractBlobs extends VPM_FrameCommand {
 		BlobAttributes[] blobAttributeArray= createBlobAttributeArray(blobType,frameNumber,timeInMilliseconds,width,height,foregroundMask,blobRectangles);
 		vpm.storeBlobGroup(new BlobGroup(blobType,blobAttributeArray));
 	}
+	@Override
 	public void forgetStatistics() {
 		numberOfProcessedFrames= 0;
 	}
@@ -141,10 +143,6 @@ public class VPMblbExtractBlobs extends VPM_FrameCommand {
 			double verticalExtraBorderCoefficient,
 			int minimalBlobIntersectionArea,
 			int minimalBlobSize) {
-		int maxRadius= imageWidth;
-		if (maxRadius < imageHeight) {
-			maxRadius= imageHeight;
-		};
 		int vectorLength= imageWidth * imageHeight;
 		int blobCounter= 0;
 		boolean[] blobFlag= new boolean[vectorLength];
@@ -320,7 +318,6 @@ InnerLoop: while (repeatSearch) {
 };
 //---------------------------------------------------------------------
 		int index= 0;
-		int imageSize= (imageWidth - 2) * (imageHeight - 2);
 		for (int k=0; k < blobCounter; k++) {
 			if (blobFlag[k]) {
 				int x1= blobRectangles[k][0];
@@ -350,8 +347,6 @@ InnerLoop: while (repeatSearch) {
 				int size= (x2 - x1 + 1) * (y2 - y1 + 1);
 				if (size < minimalBlobSize) {
 					blobFlag[k]= false;
-				// } else if (size >= imageSize) {
-				//	blobFlag[k]= false;
 				} else {
 					index++;
 				};
@@ -366,9 +361,7 @@ InnerLoop: while (repeatSearch) {
 		index= 0;
 		for (int k=0; k < blobCounter; k++) {
 			if (blobFlag[k]) {
-				for (int m=0; m < 4; m++) {
-					activeBlobRectangles[index][m]= blobRectangles[k][m];
-				};
+				System.arraycopy(blobRectangles[k],0,activeBlobRectangles[index],0,4);
 				index++;
 			}
 		};
@@ -389,7 +382,8 @@ InnerLoop: while (repeatSearch) {
 			int minimalBlobSize) {
 		int vectorLength= imageWidth * imageHeight;
 		int lineCounter= -1;
-		boolean[] lineFlags= new boolean[vectorLength];
+		boolean[] lineFlags;
+		lineFlags= new boolean[vectorLength];
 		int[] lineLeftX= new int[vectorLength];
 		int[] lineRightX= new int[vectorLength];
 		int[] lineY= new int[vectorLength];
@@ -414,7 +408,6 @@ InnerLoop: while (repeatSearch) {
 			};
 			if (lineIsDetected) {
 				lineRightX[lineCounter]= imageWidth;
-				lineIsDetected= false;
 			}
 		};
 		lineCounter= lineCounter + 1;
@@ -557,9 +550,7 @@ if (cluster1 != cluster2) {
 		int index2= 0;
 		for (int k=0; k < lineCounter; k++) {
 			if (clusterFlags[k]) {
-				for (int m=0; m < 4; m++) {
-					activeBlobRectangles[index2][m]= clusterRectangles[k][m];
-				};
+				System.arraycopy(clusterRectangles[k],0,activeBlobRectangles[index2],0,4);
 				index2= index2 + 1;
 			}
 		};

@@ -24,8 +24,8 @@ public class DomainRealConstant extends DomainAlternative {
 		constantValue= value;
 	}
 	//
+	@Override
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
-		// t= t.dereferenceValue(cp);
 		t= t.dereferenceValue(cp);
 		if (ignoreFreeVariables && t.thisIsFreeVariable()) {
 			return true;
@@ -43,22 +43,28 @@ public class DomainRealConstant extends DomainAlternative {
 		}
 	}
 	//
+	@Override
 	public boolean isEqualTo(DomainAlternative a, HashSet<PrologDomainPair> stack) {
 		return a.isEqualToRealConstant(constantValue);
 	}
+	@Override
 	public boolean isEqualToRealConstant(double value) {
 		return Arithmetic.realsAreEqual(constantValue,value);
 	}
+	@Override
 	public boolean coversAlternative(DomainAlternative a, PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) {
 		return false;
 	}
+	@Override
 	public boolean isCoveredByReal() {
 		return true;
 	}
+	@Override
 	public boolean isCoveredByRealRange(double value1, double value2) {
 		return (value1 <= constantValue) && (value2 >= constantValue);
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
 		return PrologDomainName.tagDomainAlternative_RealConstant + "(" + FormatOutput.realToString(constantValue) + ")";
 	}

@@ -12,6 +12,7 @@ public class IllegalNumberOfColumnsInLookupTable extends RuntimeException {
 		expectedNumber= n;
 	}
 	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(" + Integer.toString(column) + ";" + Integer.toString(expectedNumber) + ")";
 	}

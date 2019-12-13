@@ -3,10 +3,14 @@
 package morozov.system.astrohn.frames.data.errors;
 
 public class AstrohnCameraError extends RuntimeException {
-	public int errorCode;
+	//
+	protected int errorCode;
+	//
 	public AstrohnCameraError(int code) {
 		errorCode= code;
 	}
+	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(" + Integer.toString(errorCode) + ")";
 	}

@@ -35,15 +35,19 @@ public class SkeletonDimensions implements SkeletonDimensionsInterface, Serializ
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public PlayerDimensionsInterface getTotalDepthDimensions() {
 		return totalDepthDimensions;
 	}
+	@Override
 	public PlayerDimensionsInterface getSkeletonDepthDimensions() {
 		return skeletonsDepthDimensions;
 	}
+	@Override
 	public PlayerDimensionsInterface getTotalColorDimensions() {
 		return totalColorDimensions;
 	}
+	@Override
 	public PlayerDimensionsInterface getSkeletonColorDimensions() {
 		return skeletonsColorDimensions;
 	}

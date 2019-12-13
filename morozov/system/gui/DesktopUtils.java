@@ -42,8 +42,8 @@ public class DesktopUtils {
 	public static final int DIALOG_LAYER_CODE= 10;
 	public static final Integer DIALOG_LAYER= new Integer(DIALOG_LAYER_CODE);
 	//
-	protected static final int borderSize= 3;
-	protected static final int viewerTitleHeight= 39;
+	public static final int borderSize= 3;
+	public static final int viewerTitleHeight= 39;
 	//
 	public static MainDesktopPane createPaneIfNecessary(StaticContext context) {
 		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(context);
@@ -53,13 +53,11 @@ public class DesktopUtils {
 			try {
 				desktop= StaticDesktopAttributes.retrieveMainDesktopPane(context);
 				if (desktop==null) {
-					// LookAndFeelUtils.assignLookAndFeel();
 					JApplet applet= StaticContext.retrieveApplet(context);
 					if (applet==null) {
 						Frame mainWindow= new MainWindow(context);
 						StaticDesktopAttributes.setMainWindow(mainWindow,context);
 						mainWindow.setExtendedState(Frame.MAXIMIZED_BOTH);
-						// mainWindow.setVisible(true);
 						safelySetVisible(true,mainWindow);
 					} else {
 						Window mainWindow= StaticContext.retrieveSystemWindow(context);
@@ -67,7 +65,6 @@ public class DesktopUtils {
 						Rectangle appletBounds= applet.getBounds();
 						if (appletBounds.width<=0 || appletBounds.height <= 0) {
 							GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
-							// Rectangle bounds= env.getMaximumWindowBounds();
 							GraphicsDevice device= env.getDefaultScreenDevice();
 							GraphicsConfiguration gc= device.getDefaultConfiguration();
 							Rectangle bounds= gc.getBounds();
@@ -76,7 +73,6 @@ public class DesktopUtils {
 						desktop= new MainDesktopPane(context);
 						StaticDesktopAttributes.setMainDesktopPane(desktop,context);
 						applet.getContentPane().add(desktop,BorderLayout.CENTER);
-						// desktop.setVisible(true);
 						safelySetVisible(true,desktop);
 					}
 				}
@@ -85,9 +81,7 @@ public class DesktopUtils {
 			}
 		} else {
 			Window mainWindow= StaticDesktopAttributes.retrieveMainWindow(context);
-			// mainWindow.setVisible(true);
 			safelySetVisible(true,mainWindow);
-			// desktop.setVisible(true);
 			safelySetVisible(true,desktop);
 		};
 		return desktop;
@@ -96,7 +90,6 @@ public class DesktopUtils {
 	public static void makeExistedMainWindowVisible(StaticContext context) {
 		Window mainWindow= StaticDesktopAttributes.retrieveMainWindow(context);
 		if (mainWindow != null) {
-			// mainWindow.setVisible(true);
 			safelySetVisible(true,mainWindow);
 		}
 	}
@@ -116,7 +109,11 @@ public class DesktopUtils {
 			}
 		}
 	}
+	//
+	///////////////////////////////////////////////////////////////
 	// Auxiliary operations
+	///////////////////////////////////////////////////////////////
+	//
 	public static Rectangle getCurrentDeviceBounds(StaticContext context) {
 		ReentrantLock lock= StaticDesktopAttributes.retrieveDesktopGuard(context);
 		lock.lock();
@@ -124,7 +121,6 @@ public class DesktopUtils {
 			JApplet applet= StaticContext.retrieveApplet(context);
 			if (applet==null) {
 				GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
-				// return env.getMaximumWindowBounds();
 				GraphicsDevice device= env.getDefaultScreenDevice();
 				GraphicsConfiguration gc= device.getDefaultConfiguration();
 				return gc.getBounds();
@@ -132,7 +128,6 @@ public class DesktopUtils {
 				Rectangle appletBounds= applet.getBounds();
 				if (appletBounds.width<=0 || appletBounds.height <= 0) {
 					GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
-					// Rectangle bounds= env.getMaximumWindowBounds();
 					GraphicsDevice device= env.getDefaultScreenDevice();
 					GraphicsConfiguration gc= device.getDefaultConfiguration();
 					Rectangle bounds= gc.getBounds();
@@ -151,7 +146,6 @@ public class DesktopUtils {
 		return installStandardPopupMenu(panel,popup);
 	}
 	public static JPopupMenu installStandardPopupMenu(ActionListener panel, JPopupMenu popup) {
-		// JPopupMenu popup= new JPopupMenu();
 		JMenuItem item1= new JMenuItem("Cascade Windows");
 		item1.setMnemonic('A');
 		item1.setDisplayedMnemonicIndex(1);
@@ -182,22 +176,27 @@ public class DesktopUtils {
 	public static void actionPerformed(ActionEvent e, StaticContext context) {
 		String name= e.getActionCommand();
 		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(context);
-		if (name.equals("Cascade")) {
+		switch (name) {
+		case "Cascade":
 			if (desktop!=null) {
 				cascade(desktop,JLayeredPane.DEFAULT_LAYER);
-			}
-		} else if (name.equals("HorizontalTile")) {
+			};
+		break;
+		case "HorizontalTile":
 			if (desktop!=null) {
 				horizontalTile(desktop,JLayeredPane.DEFAULT_LAYER);
-			}
-		} else if (name.equals("VerticalTile")) {
+			};
+			break;
+		case "VerticalTile":
 			if (desktop!=null) {
 				verticalTile(desktop,JLayeredPane.DEFAULT_LAYER);
-			}
-		} else if (name.equals("Restore")) {
+			};
+			break;
+		case "Restore":
 			if (desktop!=null) {
 				restoreFrames(context,JLayeredPane.DEFAULT_LAYER);
-			}
+			};
+			break;
 		}
 	}
 	//
@@ -293,7 +292,6 @@ public class DesktopUtils {
 	public static void verticalTile(JDesktopPane desktopPane, int layer) {
 		JInternalFrame[] frames= desktopPane.getAllFramesInLayer(layer);
 		frames= deleteHiddenFrames(frames);
-		// JInternalFrame[] frames= desktopPane.getAllFrames();
 		if (frames.length == 0) {
 			return;
 		} else {
@@ -370,9 +368,7 @@ public class DesktopUtils {
 	public static void selectNextInternalFrame(StaticContext context) {
 		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(context);
 		JInternalFrame[] frames= desktop.getAllFramesInLayer(JLayeredPane.DEFAULT_LAYER);
-		// Arrays.sort(frames,new ZOrderComparator(desktop));
 		Arrays.sort(frames,new InverseZOrderComparator(desktop));
-		// frames= deleteHiddenFrames(frames);
 		for (int i= 0; i < frames.length; i++) {
 			JInternalFrame frame= frames[i];
 			if (frame.isShowing()) {
@@ -412,9 +408,11 @@ public class DesktopUtils {
 		public ZOrderComparator(JLayeredPane pane) {
 			desktop= pane;
 		}
+		@Override
 		public int compare(JInternalFrame f1, JInternalFrame f2) {
 			return desktop.getPosition(f2) - desktop.getPosition(f1);
 		}
+		@Override
 		public boolean equals(Object o) {
 			if (o==null) {
 				return false;
@@ -432,6 +430,7 @@ public class DesktopUtils {
 		public InverseZOrderComparator(JLayeredPane pane) {
 			super(pane);
 		}
+		@Override
 		public int compare(JInternalFrame f1, JInternalFrame f2) {
 			return desktop.getPosition(f1) - desktop.getPosition(f2);
 		}
@@ -444,6 +443,7 @@ public class DesktopUtils {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						Point point= component.getLocation();
 						location.setLocation(point);
@@ -462,6 +462,7 @@ public class DesktopUtils {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						Point point= component.getLocation();
 						location.setLocation(point);
@@ -481,6 +482,7 @@ public class DesktopUtils {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						Point point= component.getLocationOnScreen();
 						location.setLocation(point);
@@ -499,6 +501,7 @@ public class DesktopUtils {
 			final Dimension size= new Dimension();
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						component.getSize(size);
 					}
@@ -515,6 +518,7 @@ public class DesktopUtils {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						getSizeDifference(frame,sizeDifference);
 					}
@@ -537,6 +541,7 @@ public class DesktopUtils {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						component.getSize(size);
 					}
@@ -554,29 +559,13 @@ public class DesktopUtils {
 		}
 	}
 	//
-/*
-	public static void safelySetTitle(final String title, final InnerPage window) {
-		if (SwingUtilities.isEventDispatchThread()) {
-			window.setTitle(title);
-		} else {
-			try {
-				SwingUtilities.invokeAndWait(new Runnable() {
-					public void run() {
-						window.setTitle(title);
-					}
-				});
-			} catch (InterruptedException e) {
-			} catch (InvocationTargetException e) {
-			}
-		}
-	}
-*/
 	public static void safelyRepaint(final Component window) {
 		if (SwingUtilities.isEventDispatchThread()) {
 			window.repaint();
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						window.repaint();
 					}
@@ -594,6 +583,7 @@ public class DesktopUtils {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						if (window.isVisible() != value) {
 							window.setVisible(value);
@@ -611,6 +601,7 @@ public class DesktopUtils {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						window.dispose();
 					}
@@ -626,6 +617,7 @@ public class DesktopUtils {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						window.dispose();
 					}
@@ -635,27 +627,13 @@ public class DesktopUtils {
 			}
 		}
 	}
-	// public static void safelyDispose(final ImageWriter writer) {
-	//	if (SwingUtilities.isEventDispatchThread()) {
-	//		writer.dispose();
-	//	} else {
-	//		try {
-	//			SwingUtilities.invokeAndWait(new Runnable() {
-	//				public void run() {
-	//					writer.dispose();
-	//				}
-	//			});
-	//		} catch (InterruptedException e) {
-	//		} catch (InvocationTargetException e) {
-	//		}
-	//	}
-	// }
 	public static void safelyMaximize(final JInternalFrame window) {
 		if (SwingUtilities.isEventDispatchThread()) {
 			maximize(window);
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						maximize(window);
 					}
@@ -671,6 +649,7 @@ public class DesktopUtils {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						maximize(window);
 					}
@@ -690,7 +669,6 @@ public class DesktopUtils {
 		try {
 			window.setMaximum(true);
 		} catch (PropertyVetoException e) {
-		// } catch (Throwable e) {
 		}
 	}
 	protected static void maximize(Frame window) {
@@ -702,6 +680,7 @@ public class DesktopUtils {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						minimize(window);
 					}
@@ -717,6 +696,7 @@ public class DesktopUtils {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						minimize(window);
 					}
@@ -747,6 +727,7 @@ public class DesktopUtils {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						restore(window);
 					}
@@ -762,6 +743,7 @@ public class DesktopUtils {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						restore(window);
 					}
@@ -795,6 +777,7 @@ public class DesktopUtils {
 			final AtomicBoolean state= new AtomicBoolean(false);
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						state.set(isVisible(window));
 					}
@@ -812,6 +795,7 @@ public class DesktopUtils {
 			final AtomicBoolean state= new AtomicBoolean(false);
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						state.set(isVisible(window));
 					}
@@ -835,6 +819,7 @@ public class DesktopUtils {
 			final AtomicBoolean state= new AtomicBoolean(false);
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						state.set(isHidden(window));
 					}
@@ -852,6 +837,7 @@ public class DesktopUtils {
 			final AtomicBoolean state= new AtomicBoolean(false);
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						state.set(isHidden(window));
 					}
@@ -875,6 +861,7 @@ public class DesktopUtils {
 			final AtomicBoolean state= new AtomicBoolean(false);
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						state.set(window.isMaximum());
 					}
@@ -892,6 +879,7 @@ public class DesktopUtils {
 			final AtomicBoolean state= new AtomicBoolean(false);
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						state.set(isMaximized(window));
 					}
@@ -917,6 +905,7 @@ public class DesktopUtils {
 			final AtomicBoolean state= new AtomicBoolean(false);
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						state.set(window.isIcon());
 					}
@@ -934,6 +923,7 @@ public class DesktopUtils {
 			final AtomicBoolean state= new AtomicBoolean(false);
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						state.set(isMinimized(window));
 					}
@@ -959,6 +949,7 @@ public class DesktopUtils {
 			final AtomicBoolean state= new AtomicBoolean(false);
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						state.set(!window.isMaximum() && !window.isIcon());
 					}
@@ -976,6 +967,7 @@ public class DesktopUtils {
 			final AtomicBoolean state= new AtomicBoolean(false);
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						state.set(isRestored(window));
 					}
@@ -1002,6 +994,7 @@ public class DesktopUtils {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						if (window.isAlwaysOnTopSupported() && window.isAlwaysOnTop() != value) {
 							window.setAlwaysOnTop(value);
@@ -1014,31 +1007,15 @@ public class DesktopUtils {
 			}
 		}
 	}
-/*
-	public static void safelyMoveToFront(final InnerPage window) {
-		if (SwingUtilities.isEventDispatchThread()) {
-			window.moveToFront();
-		} else {
-			try {
-				SwingUtilities.invokeAndWait(new Runnable() {
-					public void run() {
-						window.moveToFront();
-					}
-				});
-			} catch (InterruptedException e) {
-			} catch (InvocationTargetException e) {
-			}
-		}
-	}
-*/
 	//
 	public static Graphics2D safelyGetGraphics2D(final java.awt.image.BufferedImage image) {
 		if (SwingUtilities.isEventDispatchThread()) {
 			return image.createGraphics();
 		} else {
 			try {
-				final AtomicReference<Graphics2D> state= new AtomicReference<Graphics2D>(null);
+				final AtomicReference<Graphics2D> state= new AtomicReference<>(null);
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						state.set(image.createGraphics());
 					}
@@ -1056,8 +1033,9 @@ public class DesktopUtils {
 			return (Graphics2D)component.getGraphics();
 		} else {
 			try {
-				final AtomicReference<Graphics2D> state= new AtomicReference<Graphics2D>(null);
+				final AtomicReference<Graphics2D> state= new AtomicReference<>(null);
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						state.set((Graphics2D)component.getGraphics());
 					}

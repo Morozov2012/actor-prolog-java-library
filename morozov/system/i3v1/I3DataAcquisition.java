@@ -31,7 +31,6 @@ public class I3DataAcquisition extends Thread {
 	protected AtomicInteger maximalNumberOfErrors= new AtomicInteger(30);
 	protected AtomicInteger readTimeOut= new AtomicInteger(70);
 	protected AtomicInteger writeTimeOut= new AtomicInteger(70);
-	// protected AtomicInteger outputDebugInformation= new AtomicInteger(0);
 	//
 	protected AtomicInteger numberOfErrors= new AtomicInteger(0);
 	//
@@ -42,7 +41,6 @@ public class I3DataAcquisition extends Thread {
 	public I3DataAcquisition(I3Camera c) {
 		camera= c;
 		setDaemon(true);
-		start();
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -137,14 +135,23 @@ public class I3DataAcquisition extends Thread {
 			camera.setOutputDebugInformation(givenOutputDebugInformation);
 			enableDataTransfer.set(true);
 			deviceIsToBeClosed.set(false);
-			notify();
+			startProcessIfNecessary();
+		}
+	}
+	//
+	protected void startProcessIfNecessary() {
+		synchronized (this) {
+			if (!isAlive()) {
+				start();
+			};
+			notifyAll();
 		}
 	}
 	//
 	public void suspendDataTransfer() {
 		synchronized (this) {
 			enableDataTransfer.set(false);
-			notify();
+			notifyAll();
 		}
 	}
 	//
@@ -154,7 +161,7 @@ public class I3DataAcquisition extends Thread {
 			if (!doNotSuspendUSBDataTransfer.get()) {
 				deviceIsToBeClosed.set(true);
 			};
-			notify();
+			notifyAll();
 		}
 	}
 	//
@@ -163,7 +170,7 @@ public class I3DataAcquisition extends Thread {
 			stopThisThread.set(true);
 			enableDataTransfer.set(false);
 			deviceIsToBeClosed.set(true);
-			notify();
+			notifyAll();
 		}
 	}
 	//
@@ -187,13 +194,15 @@ public class I3DataAcquisition extends Thread {
 			synchronized (this) {
 				enableDataTransfer.set(false);
 				deviceIsToBeClosed.set(true);
-				notify();
+				notifyAll();
 			}
 		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
+	@SuppressWarnings("CallToThreadDumpStack")
 	public void run() {
 		try {
 			while (!stopThisThread.get()) {
@@ -264,9 +273,7 @@ if (!deviceIsToBeClosed.get()) {
 			} finally {
 				camera.closeUSB();
 				deviceIsConnected.set(false);
-			};
-			// writeLater("Bye!\n");
-			// System.exit(0);
+			}
 		} catch (InterruptedException e) {
 		} catch (ThreadDeath e) {
 		} catch (Throwable e) {
@@ -299,7 +306,6 @@ if (!deviceIsToBeClosed.get()) {
 				};
 				camera.setReadTimeOut(readTimeOut.get());
 				camera.setWriteTimeOut(writeTimeOut.get());
-				// camera.setOutputDebugInformation(outputDebugInformation.get());
 				camera.connectDevice();
 				camera.initCamera();
 				if (m_buf==null) {
@@ -339,7 +345,6 @@ if (!deviceIsToBeClosed.get()) {
 					} catch (Throwable e2) {
 					};
 					deviceIsConnected.set(false);
-					// tryToConnectDevice();
 					numberOfErrors.set(0);
 				}
 			}
@@ -350,6 +355,7 @@ if (!deviceIsToBeClosed.get()) {
 	//
 	protected static void writeLater(final String text) {
 		SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				System.err.print(text);
 			}

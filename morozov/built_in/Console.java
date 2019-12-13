@@ -3,9 +3,8 @@
 package morozov.built_in;
 
 import morozov.run.*;
-import morozov.system.*;
 import morozov.system.converters.*;
-import morozov.system.errors.*;
+import morozov.system.converters.errors.*;
 import morozov.system.files.*;
 import morozov.system.gui.*;
 import morozov.system.gui.dialogs.special.*;
@@ -30,6 +29,7 @@ import java.math.BigInteger;
 public abstract class Console extends Report {
 	//
 	protected java.io.File selectedFile= null;
+	protected java.io.File selectedDirectory= null;
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -49,14 +49,6 @@ public abstract class Console extends Report {
 		String[] buttons= GeneralConverters.termToStrings(list,iX);
 		askUser(question.toString(iX),title.toString(iX),buttons);
 	}
-	// public void ask2ff(ChoisePoint iX, PrologVariable result, Term question, Term list) throws Backtracking {
-	//	String[] buttons= GeneralConverters.termToStrings(list,iX);
-	//	result.setNonBacktrackableValue(askUser(question.toString(iX),"",buttons));
-	// }
-	// public void ask2fs(ChoisePoint iX, Term question, Term list) throws Backtracking {
-	//	String[] buttons= GeneralConverters.termToStrings(list,iX);
-	//	askUser(question.toString(iX),"",buttons);
-	// }
 	public void ask2s(ChoisePoint iX, Term title, Term question) throws Backtracking {
 		String[] buttons;
 		try {
@@ -348,9 +340,6 @@ public abstract class Console extends Report {
 				boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
 				SimpleFileName simpleFile= new SimpleFileName(startDirectory,backslashIsSeparator,acceptOnlyURI);
 				ExtendedFileName extendedFile= simpleFile.formRealFileNameBasedOnPath(true,false,"",null,staticContext);
-				// boolean backslashIsSeparator= FileUtils.checkIfBackslashIsSeparatorInLocalFileNames();
-				// startPath= FileUtils.replaceBackslashes(startPath,backslashIsSeparator);
-				// java.io.File file= new java.io.File(startPath);
 				chooser.setSelectedFile(extendedFile.getPathOfLocalResource().toFile());
 			} finally {
 			}
@@ -458,29 +447,24 @@ public abstract class Console extends Report {
 		JFileChooser chooser= new ExtendedFileChooser();
 		chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
 		chooser.setDialogTitle(dialogTitle);
-		try {
-			boolean backslashIsSeparator= getBackslashAlwaysIsSeparator(iX);
-			boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
-			SimpleFileName simpleFile= new SimpleFileName(initialDirectory,backslashIsSeparator,acceptOnlyURI);
-			ExtendedFileName extendedFile= simpleFile.formRealFileNameBasedOnPath(true,false,"",null,staticContext);
-			chooser.setCurrentDirectory(extendedFile.getPathOfLocalResource().toFile());
-		} finally {
+		if (initialDirectory.isEmpty() && selectedDirectory != null) {
+			chooser.setCurrentDirectory(selectedDirectory);
+		} else {
+			try {
+				boolean backslashIsSeparator= getBackslashAlwaysIsSeparator(iX);
+				boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
+				SimpleFileName simpleFile= new SimpleFileName(initialDirectory,backslashIsSeparator,acceptOnlyURI);
+				ExtendedFileName extendedFile= simpleFile.formRealFileNameBasedOnPath(true,false,"",null,staticContext);
+				chooser.setCurrentDirectory(extendedFile.getPathOfLocalResource().toFile());
+			} finally {
+			}
 		};
-		// if (initialDirectory.isEmpty()) {
-		//	initialDirectory= FileUtils.getUserDirectory();
-		// };
-		// try {
-		//	java.io.File initialDirectoryF= new java.io.File(initialDirectory);
-		//	chooser.setCurrentDirectory(initialDirectoryF);
-		// } finally {
-		// };
 		int returnVal= chooser.showOpenDialog(null);
 		if(returnVal == JFileChooser.APPROVE_OPTION) {
-			selectedFile= chooser.getSelectedFile();
-			// String name= FileUtils.tryToMakeRealName(selectedFile.toPath()).toString();
-			String name= selectedFile.toString();
+			selectedDirectory= chooser.getSelectedFile();
+			String currentName= selectedDirectory.toString();
 			if (result != null) {
-				result.setNonBacktrackableValue(new PrologString(name));
+				result.setNonBacktrackableValue(new PrologString(currentName));
 			}
 		} else {
 			throw Backtracking.instance;
@@ -488,9 +472,9 @@ public abstract class Console extends Report {
 	}
 	//
 	public void inputColor1ff(ChoisePoint iX, PrologVariable result, Term initialValue) throws Backtracking {
-		Color initialColor= null;
+		Color initialColor;
 		try {
-			initialColor= ExtendedColor.argumentToColor(initialValue,iX);
+			initialColor= ColorAttributeConverters.argumentToColor(initialValue,iX);
 		} catch (TermIsSymbolDefault e) {
 			initialColor= Color.WHITE;
 		};
@@ -518,10 +502,10 @@ public abstract class Console extends Report {
 			if (a2==null) {
 				throw Backtracking.instance;
 			} else {
-				String fontName= StyleConstants.getFontFamily(a2);
-				int fontSize= StyleConstants.getFontSize(a2);
-				outputVariable1.setBacktrackableValue(new PrologString(fontName),iX);
-				outputVariable2.setBacktrackableValue(new PrologInteger(fontSize),iX);
+				String currentFontName= StyleConstants.getFontFamily(a2);
+				int currentFontSize= StyleConstants.getFontSize(a2);
+				outputVariable1.setBacktrackableValue(new PrologString(currentFontName),iX);
+				outputVariable2.setBacktrackableValue(new PrologInteger(currentFontSize),iX);
 				if (outputVariable3 != null) {
 					boolean isBold= StyleConstants.isBold(a2);
 					boolean isItalic= StyleConstants.isItalic(a2);

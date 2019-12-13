@@ -12,6 +12,7 @@ public class PrologDomainPair {
 		secondDomain= d2;
 	}
 	//
+	@Override
 	public boolean equals(Object o) {
 		if (o==null) {
 			return false;
@@ -34,10 +35,12 @@ public class PrologDomainPair {
 		}
 	}
 	//
+	@Override
 	public int hashCode() {
 		return firstDomain.hashCode() + secondDomain.hashCode();
 	}
 	//
+	@Override
 	public String toString() {
 		return "<" + firstDomain.toString() + ";" + secondDomain.toString() + ">";
 	}

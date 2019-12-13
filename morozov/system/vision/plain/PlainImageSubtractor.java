@@ -9,7 +9,6 @@ import morozov.system.gui.*;
 import morozov.system.vision.vpm.*;
 import morozov.system.vision.vpm.commands.blb.*;
 import morozov.system.vision.vpm.converters.*;
-import morozov.terms.*;
 
 import java.awt.image.Raster;
 import java.awt.image.ConvolveOp;
@@ -277,9 +276,6 @@ public class PlainImageSubtractor extends GenericVideoProcessingMachine implemen
 			synthesizedImageTransparencyValue,
 			makeRectangularBlobsInSynthesizedImageValue);
 		if (forgetSettings) {
-			forgetStatistics= true;
-		};
-		if (forgetSettings) {
 			extractBlobs= extractBlobsFlag;
 			trackBlobs= trackBlobsFlag;
 			useGrayscaleColors= useGrayscaleColorsFlag;
@@ -296,6 +292,7 @@ public class PlainImageSubtractor extends GenericVideoProcessingMachine implemen
 			gaussianMatrix= null;
 		}
 	}
+	@Override
 	protected void forgetStatistics() {
 		blobTracker.forgetStatistics();
 		recentImage= null;
@@ -451,6 +448,7 @@ public class PlainImageSubtractor extends GenericVideoProcessingMachine implemen
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void createBlobAttributesIfNecessary() {
 		if (currentBlobTypes==null) {
 			if (currentBlobAttributes!=null) {
@@ -517,7 +515,6 @@ public class PlainImageSubtractor extends GenericVideoProcessingMachine implemen
 				int value= imagePixels[k][n];
 				int delta1= value - mean;
 				int delta2= delta1 * delta1;
-				// if (delta2 < dispersion) {	// BUG#2
 				if (delta2 <= dispersion * backgroundVarianceFactor) {
 					if (numberOfBands > 1) {
 						extraForegroundMasks[k][n]= false;
@@ -588,7 +585,7 @@ public class PlainImageSubtractor extends GenericVideoProcessingMachine implemen
 				if (gaussianMatrix==null) {
 					gaussianMatrix= VisionUtils.gaussianMatrix(gaussianFilterRadius);
 				};
-				int length= PrologInteger.toInteger(StrictMath.sqrt(gaussianMatrix.length));
+				int length= Arithmetic.toInteger(StrictMath.sqrt(gaussianMatrix.length));
 				ConvolveOp cop= new ConvolveOp(
 					new Kernel(length,length,gaussianMatrix),
 					ConvolveOp.EDGE_ZERO_FILL,
@@ -610,7 +607,7 @@ public class PlainImageSubtractor extends GenericVideoProcessingMachine implemen
 				if (gaussianMatrix==null) {
 					gaussianMatrix= VisionUtils.gaussianMatrix(gaussianFilterRadius);
 				};
-				int length= PrologInteger.toInteger(StrictMath.sqrt(gaussianMatrix.length));
+				int length= Arithmetic.toInteger(StrictMath.sqrt(gaussianMatrix.length));
 				ConvolveOp cop= new ConvolveOp(
 					new Kernel(length,length,gaussianMatrix),
 					ConvolveOp.EDGE_ZERO_FILL,

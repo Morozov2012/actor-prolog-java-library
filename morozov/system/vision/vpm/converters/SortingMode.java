@@ -12,16 +12,19 @@ import morozov.terms.signals.*;
 public enum SortingMode {
 	//
 	DESCENDING_ORDER {
+		@Override
 		public Term toTerm() {
 			return term_DESCENDING_ORDER;
 		}
 	},
 	ASCENDING_ORDER {
+		@Override
 		public Term toTerm() {
 			return term_ASCENDING_ORDER;
 		}
 	},
 	DEFAULT {
+		@Override
 		public Term toTerm() {
 			return term_default;
 		}

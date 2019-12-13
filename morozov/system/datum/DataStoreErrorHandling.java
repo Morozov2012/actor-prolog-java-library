@@ -2,4 +2,8 @@
 
 package morozov.system.datum;
 
-public enum DataStoreErrorHandling { NONE, IGNORE_DAMAGED_TABLES, REASSEMBLE_INDEX }
+public enum DataStoreErrorHandling {
+	NONE,
+	IGNORE_DAMAGED_TABLES,
+	REASSEMBLE_INDEX
+}

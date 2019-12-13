@@ -15,8 +15,8 @@ import java.awt.Font;
 
 public class ExtendedFontName {
 	//
-	private boolean useDefaultFontName= true;
-	private String value= Font.MONOSPACED;
+	protected boolean useDefaultFontName= true;
+	protected String value= Font.MONOSPACED;
 	//
 	protected static Term termDefault= new PrologSymbol(SymbolCodes.symbolCode_E_default);
 	//
@@ -29,8 +29,11 @@ public class ExtendedFontName {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void useDefaultFontName() {
-		useDefaultFontName= true;
+	public void setUseDefaultFontName(boolean mode) {
+		useDefaultFontName= mode;
+	}
+	public void setUseDefaultFontName() {
+		setUseDefaultFontName(true);
 	}
 	//
 	public boolean isDefault() {
@@ -171,16 +174,22 @@ public class ExtendedFontName {
 	protected static Term fontNameToTerm(String value) {
 		int code= 0;
 		boolean isStandardFontName= true;
-		if (value.equals(Font.DIALOG)) {
+		switch (value) {
+		case Font.DIALOG:
 			code= SymbolCodes.symbolCode_E_system;
-		} else if (value.equals(Font.MONOSPACED)) {
+			break;
+		case Font.MONOSPACED:
 			code= SymbolCodes.symbolCode_E_fixed;
-		} else if (value.equals(Font.SERIF)) {
+			break;
+		case Font.SERIF:
 			code= SymbolCodes.symbolCode_E_times;
-		} else if (value.equals(Font.SANS_SERIF)) {
+			break;
+		case Font.SANS_SERIF:
 			code= SymbolCodes.symbolCode_E_helvetica;
-		} else {
+			break;
+		default:
 			isStandardFontName= false;
+			break;
 		};
 		if (isStandardFontName) {
 			return new PrologSymbol(code);
@@ -199,6 +208,7 @@ public class ExtendedFontName {
 		}
 	}
 	//
+	@Override
 	public String toString() {
 		return "(" +
 			String.format("%B,",useDefaultFontName) +

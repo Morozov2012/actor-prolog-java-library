@@ -16,23 +16,25 @@ import javax.swing.text.ViewFactory;
 import javax.swing.text.StyleConstants;
 
 public class NoWrapEditorKit extends StyledEditorKit {
+	@Override
 	public ViewFactory getViewFactory() {
 		return new NoWrapViewFactory();
 	}
 	static class NoWrapViewFactory implements ViewFactory {
+		@Override
 		public View create(Element elem) {
 			String kind= elem.getName();
 			if (kind != null) {
-				if (kind.equals(AbstractDocument.ContentElementName)) {
+				switch (kind) {
+				case AbstractDocument.ContentElementName:
 					return new LabelView(elem);
-				} else if (kind.equals(AbstractDocument.ParagraphElementName)) {
+				case AbstractDocument.ParagraphElementName:
 					return new NoWrapParagraphView(elem);
-					// return new ParagraphView(elem);
-				} else if (kind.equals(AbstractDocument.SectionElementName)) {
+				case AbstractDocument.SectionElementName:
 					return new BoxView(elem,View.Y_AXIS);
-				} else if (kind.equals(StyleConstants.ComponentElementName)) {
+				case StyleConstants.ComponentElementName:
 					return new ComponentView(elem);
-				} else if (kind.equals(StyleConstants.IconElementName)) {
+				case StyleConstants.IconElementName:
 					return new IconView(elem);
 				}
 			};
@@ -43,9 +45,11 @@ public class NoWrapEditorKit extends StyledEditorKit {
 		public NoWrapParagraphView(Element elem) {
 			super(elem);
 		}
+		@Override
 		public void layout(int width, int height) {
 			super.layout(Short.MAX_VALUE,height);
 		}
+		@Override
 		public float getMinimumSpan(int axis) {
 			return super.getPreferredSpan(axis);
 		}

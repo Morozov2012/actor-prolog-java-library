@@ -10,13 +10,12 @@ public class VPMpxlNormalizePixels extends VPM_FrameCommand {
 	protected int minimalValue;
 	protected int maximalValue;
 	//
-	// protected static final int maximalColor= 255;
-	//
 	public VPMpxlNormalizePixels(int min, int max) {
 		minimalValue= min;
 		maximalValue= max;
 	}
 	//
+	@Override
 	public void execute(VPM vpm) {
 		int imageWidth= vpm.getOperationalImageWidth();
 		int imageHeight= vpm.getOperationalImageHeight();

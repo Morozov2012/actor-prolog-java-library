@@ -15,10 +15,9 @@ public abstract class PrologLinkedHashMap extends PrologHashMap {
 		super(id);
 	}
 	//
-	// abstract public Term getBuiltInSlot_E_reuse_key_numbers();
-	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public DatabaseType getDatabaseType() {
 		return DatabaseType.LINKED_HASH_MAP;
 	}

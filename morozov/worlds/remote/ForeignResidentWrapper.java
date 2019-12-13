@@ -13,7 +13,7 @@ import java.rmi.RemoteException;
 
 public class ForeignResidentWrapper extends Resident {
 	//
-	public ExternalResidentInterface stub;
+	protected ExternalResidentInterface stub;
 	//
 	private static final long serialVersionUID= 0x2E0FA9FBBF37F4D6L; // 3319058349105345750L
 	//
@@ -29,20 +29,22 @@ public class ForeignResidentWrapper extends Resident {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void returnResultList(AbstractWorld world, Term list) {
                 try {
-			ExternalWorldInterface target= OwnWorldWrapper.registerWorld(world);
+			ExternalWorldInterface currentTarget= OwnWorldWrapper.registerWorld(world);
 			byte[] byteArray= GeneralConverters.serializeArgument(list);
-			stub.returnResultList(target,byteArray);
+			stub.returnResultList(currentTarget,byteArray);
 		} catch (RemoteException e) {
 			world.withdrawRequest(this);
 		}
 	}
 	//
+	@Override
 	public void cancelResultList(AbstractWorld world) {
                 try {
-			ExternalWorldInterface target= OwnWorldWrapper.registerWorld(world);
-			stub.cancelResultList(target);
+			ExternalWorldInterface currentTarget= OwnWorldWrapper.registerWorld(world);
+			stub.cancelResultList(currentTarget);
 		} catch (RemoteException e) {
 			world.withdrawRequest(this);
 		}
@@ -50,50 +52,63 @@ public class ForeignResidentWrapper extends Resident {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void sendResidentRequest(Resident resident, long domainSignatureNumber, Term[] arguments, boolean sortAndReduceResultList) {
 	}
 	//
+	@Override
 	public void withdrawRequest(Resident resident) {
 	}
 	//
+	@Override
 	public void receiveAsyncCall(AsyncCall item) {
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void startProcesses() {
 	}
+	@Override
 	public void releaseSystemResources() {
 	}
+	@Override
 	public void stopProcesses() {
 	}
 	//
+	@Override
 	public MethodSignature[] getMethodSignatures() {
 		return emptySignatureList;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean isInternalWorldOf(AbstractProcess currentProcess) {
 		return false;
 	}
 	//
+	@Override
 	public AbstractInternalWorld getInternalWorld(ChoisePoint cp) throws Backtracking, TermIsNotAWorld, TermIsDummyWorld, TermIsUnboundVariable {
 		throw Backtracking.instance;
 	}
 	//
+	@Override
 	public AbstractInternalWorld internalWorld(AbstractProcess process, ChoisePoint cp) throws Backtracking {
 		throw Backtracking.instance;
 	}
 	//
+	@Override
 	public AbstractInternalWorld internalWorld(ChoisePoint iX) {
 		throw new AnAttemptToExtractInternalWorldFromForeignResidentWrapper();
 	}
 	//
+	@Override
 	public AbstractInternalWorld internalWorld() {
 		throw new AnAttemptToExtractInternalWorldFromForeignResidentWrapper();
 	}
 	//
+	@Override
 	public boolean isNumberOfTemporaryActor() {
 		return false;
 	}

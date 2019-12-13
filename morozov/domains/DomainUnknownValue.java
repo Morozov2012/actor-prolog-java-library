@@ -19,6 +19,7 @@ public class DomainUnknownValue extends DomainAlternative {
 	public DomainUnknownValue() {
 	}
 	//
+	@Override
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
 		t= t.dereferenceValue(cp);
 		if (ignoreFreeVariables && t.thisIsFreeVariable()) {
@@ -32,16 +33,20 @@ public class DomainUnknownValue extends DomainAlternative {
 		}
 	}
 	//
+	@Override
 	public boolean isEqualTo(DomainAlternative a, HashSet<PrologDomainPair> stack) {
 		return a.isEqualToUnknownValue();
 	}
+	@Override
 	public boolean isEqualToUnknownValue() {
 		return true;
 	}
+	@Override
 	public boolean coversAlternative(DomainAlternative a, PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) {
 		return false;
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
 		return PrologDomainName.tagDomainAlternative_UnknownValue;
 	}

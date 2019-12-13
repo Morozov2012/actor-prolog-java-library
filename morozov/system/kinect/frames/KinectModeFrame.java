@@ -99,80 +99,103 @@ public class KinectModeFrame extends KinectFrame implements KinectModeFrameInter
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean isLightweightFrame() {
 		return true;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public KinectFrameType getKinectFrameType() {
 		return kinectFrameType;
 	}
+	@Override
 	public KinectSkeletonsMode getSkeletonsMode() {
 		return skeletonsMode;
 	}
+	@Override
 	public KinectPeopleIndexMode getPeopleIndexMode() {
 		return peopleIndexMode;
 	}
+	@Override
 	public KinectCircumscriptionMode[] getCircumscriptionModes() {
 		return circumscriptionModes;
 	}
+	@Override
 	public KinectFrameType[] getDataAcquisitionMode() {
 		return dataAcquisitionMode;
 	}
 	//
+	@Override
 	public boolean depthIsSelected() {
 		return depthIsSelected;
 	}
+	@Override
 	public boolean peopleIndexIsSelected() {
 		return peopleIndexIsSelected;
 	}
+	@Override
 	public boolean xyzIsSelected() {
 		return xyzIsSelected;
 	}
+	@Override
 	public boolean uvIsSelected() {
 		return uvIsSelected;
 	}
+	@Override
 	public boolean infraredIsSelected() {
 		return infraredIsSelected;
 	}
+	@Override
 	public boolean longExposureInfraredIsSelected() {
 		return longExposureInfraredIsSelected;
 	}
+	@Override
 	public boolean colorIsSelected() {
 		return colorIsSelected;
 	}
+	@Override
 	public boolean skeletonsAreSelected() {
 		return skeletonsAreSelected;
 	}
 	//
+	@Override
 	public String getDescription() {
 		return description;
 	}
+	@Override
 	public void setDescription(String value) {
 		description= value;
 	}
+	@Override
 	public String getCopyright() {
 		return copyright;
 	}
+	@Override
 	public void setCopyright(String value) {
 		copyright= value;
 	}
+	@Override
 	public String getRegistrationDate() {
 		return registrationDate;
 	}
+	@Override
 	public void setRegistrationDate(String value) {
 		registrationDate= value;
 	}
+	@Override
 	public String getRegistrationTime() {
 		return registrationTime;
 	}
+	@Override
 	public void setRegistrationTime(String value) {
 		registrationTime= value;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public String toString() {
 		return KinectModeFrameText.toString(this);
 	}

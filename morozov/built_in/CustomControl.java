@@ -28,26 +28,14 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	public AtomicReference<ExtendedTitle> title= new AtomicReference<>();
 	public AtomicReference<ExtendedCoordinate> x= new AtomicReference<>();
 	public AtomicReference<ExtendedCoordinate> y= new AtomicReference<>();
-	public AtomicReference<ExtendedColor> backgroundColor= new AtomicReference<>();
+	public AtomicReference<ColorAttribute> backgroundColor= new AtomicReference<>();
 	public Boolean usePixelMeasurements= null;
-	// public AtomicReference<ExtendedSize> width= new AtomicReference<>();
-	// public AtomicReference<ExtendedSize> height= new AtomicReference<>();
-	public AtomicReference<ExtendedColor> textColor= new AtomicReference<>();
-	public AtomicReference<ExtendedColor> spaceColor= new AtomicReference<>();
+	public AtomicReference<ColorAttribute> textColor= new AtomicReference<>();
+	public AtomicReference<ColorAttribute> spaceColor= new AtomicReference<>();
 	//
 	public AtomicReference<ExtendedFontName> fontName= new AtomicReference<>();
 	public AtomicReference<ExtendedFontSize> fontSize= new AtomicReference<>();
 	public AtomicReference<ExtendedFontStyle> fontStyle= new AtomicReference<>();
-	//
-	// public AtomicBoolean sceneAntialiasingIsEnabled= new AtomicBoolean(false);
-	//
-	// public AtomicBoolean mouseClickedEventIsEnabled= new AtomicBoolean(false);
-	// public AtomicBoolean mouseEnteredEventIsEnabled= new AtomicBoolean(false);
-	// public AtomicBoolean mouseExitedEventIsEnabled= new AtomicBoolean(false);
-	// public AtomicBoolean mousePressedEventIsEnabled= new AtomicBoolean(false);
-	// public AtomicBoolean mouseReleasedEventIsEnabled= new AtomicBoolean(false);
-	// public AtomicBoolean mouseDraggedEventIsEnabled= new AtomicBoolean(false);
-	// public AtomicBoolean mouseMovedEventIsEnabled= new AtomicBoolean(false);
 	//
 	protected InnerPage graphicWindow= null;
 	protected CanvasSpace canvasSpace= null;
@@ -62,42 +50,42 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected Term getBuiltInSlot_E_title() {
+	public Term getBuiltInSlot_E_title() {
 		return termDefault;
 	}
-	protected Term getBuiltInSlot_E_x() {
+	public Term getBuiltInSlot_E_x() {
 		return termDefault;
 	}
-	protected Term getBuiltInSlot_E_y() {
+	public Term getBuiltInSlot_E_y() {
 		return termDefault;
 	}
-	protected Term getBuiltInSlot_E_background_color() {
+	public Term getBuiltInSlot_E_background_color() {
 		return termDefault;
 	}
-	protected Term getBuiltInSlot_E_use_pixel_measurements() {
+	public Term getBuiltInSlot_E_use_pixel_measurements() {
 		return termNo;
 	}
-	protected Term getBuiltInSlot_E_text_color() {
+	public Term getBuiltInSlot_E_text_color() {
 		return termDefault;
 	}
-	protected Term getBuiltInSlot_E_space_color() {
+	public Term getBuiltInSlot_E_space_color() {
 		return termDefault;
 	}
 	//
-	protected Term getBuiltInSlot_E_font_name() {
+	public Term getBuiltInSlot_E_font_name() {
 		return termDefault;
 	}
-	protected Term getBuiltInSlot_E_font_size() {
+	public Term getBuiltInSlot_E_font_size() {
 		return termDefault;
 	}
-	protected Term getBuiltInSlot_E_font_style() {
+	public Term getBuiltInSlot_E_font_style() {
 		return termDefault;
 	}
 	//
-	protected Term getBuiltInSlot_E_enable_scene_antialiasing() {
+	public Term getBuiltInSlot_E_enable_scene_antialiasing() {
 		return termNo;
 	}
-	protected Term getBuiltInSlot_E_menu() {
+	public Term getBuiltInSlot_E_menu() {
 		return PrologEmptyList.instance;
 	}
 	//
@@ -232,33 +220,33 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	// get/set backgroundColor
 	//
 	public void setBackgroundColor1s(ChoisePoint iX, Term a1) {
-		setBackgroundColor(ExtendedColor.argumentToExtendedColor(a1,iX));
+		setBackgroundColor(ColorAttributeConverters.argumentToColorAttribute(a1,iX));
 		changeBackgroundColor(iX);
 	}
-	public void setBackgroundColor(ExtendedColor value) {
+	public void setBackgroundColor(ColorAttribute value) {
 		backgroundColor.set(value);
 	}
 	public void getBackgroundColor0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(getBackgroundColor(iX).toTerm());
+		result.setNonBacktrackableValue(ColorAttributeConverters.toTerm(getBackgroundColor(iX)));
 	}
 	public void getBackgroundColor0fs(ChoisePoint iX) {
 	}
-	public ExtendedColor getBackgroundColor(ChoisePoint iX) {
-		ExtendedColor color= backgroundColor.get();
+	public ColorAttribute getBackgroundColor(ChoisePoint iX) {
+		ColorAttribute color= backgroundColor.get();
 		if (color != null) {
 			return color;
 		} else {
 			Term value= getBuiltInSlot_E_background_color();
-			return ExtendedColor.argumentToExtendedColorSafe(value,iX);
+			return ColorAttributeConverters.argumentToColorAttributeSafe(value,iX);
 		}
 	}
 	public Term getBackgroundColorOrFail(ChoisePoint iX) throws Backtracking {
-		ExtendedColor color= backgroundColor.get();
+		ColorAttribute color= backgroundColor.get();
 		if (color != null) {
-			return color.toTerm();
+			return ColorAttributeConverters.toTerm(color);
 		} else {
 			Term value= getBuiltInSlot_E_background_color();
-			return ExtendedColor.argumentToExtendedColorOrFail(value,iX);
+			return ColorAttributeConverters.argumentToColorAttributeOrFail(value,iX);
 		}
 	}
 	//
@@ -303,66 +291,66 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	// get/set textColor
 	//
 	public void setTextColor1s(ChoisePoint iX, Term a1) {
-		setTextColor(ExtendedColor.argumentToExtendedColor(a1,iX));
+		setTextColor(ColorAttributeConverters.argumentToColorAttribute(a1,iX));
 		changeTextColor(iX);
 	}
-	public void setTextColor(ExtendedColor value) {
+	public void setTextColor(ColorAttribute value) {
 		textColor.set(value);
 	}
 	public void getTextColor0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(getTextColor(iX).toTerm());
+		result.setNonBacktrackableValue(ColorAttributeConverters.toTerm(getTextColor(iX)));
 	}
 	public void getTextColor0fs(ChoisePoint iX) {
 	}
-	public ExtendedColor getTextColor(ChoisePoint iX) {
-		ExtendedColor color= textColor.get();
+	public ColorAttribute getTextColor(ChoisePoint iX) {
+		ColorAttribute color= textColor.get();
 		if (color != null) {
 			return color;
 		} else {
 			Term value= getBuiltInSlot_E_text_color();
-			return ExtendedColor.argumentToExtendedColorSafe(value,iX);
+			return ColorAttributeConverters.argumentToColorAttributeSafe(value,iX);
 		}
 	}
 	public Term getTextColorOrFail(ChoisePoint iX) throws Backtracking {
-		ExtendedColor color= textColor.get();
+		ColorAttribute color= textColor.get();
 		if (color != null) {
-			return color.toTerm();
+			return ColorAttributeConverters.toTerm(color);
 		} else {
 			Term value= getBuiltInSlot_E_text_color();
-			return ExtendedColor.argumentToExtendedColorOrFail(value,iX);
+			return ColorAttributeConverters.argumentToColorAttributeOrFail(value,iX);
 		}
 	}
 	//
 	// get/set spaceColor
 	//
 	public void setSpaceColor1s(ChoisePoint iX, Term a1) {
-		setSpaceColor(ExtendedColor.argumentToExtendedColor(a1,iX));
+		setSpaceColor(ColorAttributeConverters.argumentToColorAttribute(a1,iX));
 		changeSpaceColor(iX);
 	}
-	public void setSpaceColor(ExtendedColor value) {
+	public void setSpaceColor(ColorAttribute value) {
 		spaceColor.set(value);
 	}
 	public void getSpaceColor0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(getSpaceColor(iX).toTerm());
+		result.setNonBacktrackableValue(ColorAttributeConverters.toTerm(getSpaceColor(iX)));
 	}
 	public void getSpaceColor0fs(ChoisePoint iX) {
 	}
-	public ExtendedColor getSpaceColor(ChoisePoint iX) {
-		ExtendedColor color= spaceColor.get();
+	public ColorAttribute getSpaceColor(ChoisePoint iX) {
+		ColorAttribute color= spaceColor.get();
 		if (color != null) {
 			return color;
 		} else {
 			Term value= getBuiltInSlot_E_space_color();
-			return ExtendedColor.argumentToExtendedColorSafe(value,iX);
+			return ColorAttributeConverters.argumentToColorAttributeSafe(value,iX);
 		}
 	}
 	public Term getSpaceColorOrFail(ChoisePoint iX) throws Backtracking {
-		ExtendedColor color= spaceColor.get();
+		ColorAttribute color= spaceColor.get();
 		if (color != null) {
-			return color.toTerm();
+			return ColorAttributeConverters.toTerm(color);
 		} else {
 			Term value= getBuiltInSlot_E_space_color();
-			return ExtendedColor.argumentToExtendedColorOrFail(value,iX);
+			return ColorAttributeConverters.argumentToColorAttributeOrFail(value,iX);
 		}
 	}
 	//
@@ -520,7 +508,6 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	//
 	protected void addMenuIfNecessary(ChoisePoint iX, TranslatedMenuItem[] list) {
-		// createGraphicWindowIfNecessary(iX,false);
 		synchronized (this) {
 			if (graphicWindow != null) {
 				if (list.length > 0) {
@@ -542,18 +529,17 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		createGraphicWindowIfNecessary(iX,false);
 		synchronized (this) {
 			if (graphicWindow != null) {
-				graphicWindow.logicalX.set(eX);
-				graphicWindow.logicalY.set(eY);
+				graphicWindow.setLogicalX(eX);
+				graphicWindow.setLogicalY(eY);
 				graphicWindow.safelyRestoreSize(staticContext);
 				graphicWindow.safelyRepaint();
 			} else if (canvasSpace != null) {
-				// redrawCanvas(iX);
 				canvasSpace.safelyRepaint();
 			}
 		}
 	}
 	public void getActualPosition2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
-		boolean usePixelMeasurements= getUsePixelMeasurements(iX);
+		boolean currentUsePixelMeasurements= getUsePixelMeasurements(iX);
 		Point canvasLocation= new Point();
 		synchronized (this) {
 			if (graphicWindow != null) {
@@ -566,7 +552,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		};
 		double logicalX;
 		double logicalY;
-		if (usePixelMeasurements) {
+		if (currentUsePixelMeasurements) {
 			logicalX= canvasLocation.x;
 			logicalY= canvasLocation.y;
 		} else {
@@ -601,18 +587,17 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		createGraphicWindowIfNecessary(iX,false);
 		synchronized (this) {
 			if (graphicWindow != null) {
-				graphicWindow.logicalWidth.set(eWidth);
-				graphicWindow.logicalHeight.set(eHeight);
+				graphicWindow.setLogicalWidth(eWidth);
+				graphicWindow.setLogicalHeight(eHeight);
 				graphicWindow.safelyRestoreSize(staticContext);
 				graphicWindow.safelyRepaint();
 			} else if (canvasSpace != null) {
-				// redrawCanvas(iX);
 				canvasSpace.safelyRepaint();
 			}
 		}
 	}
 	public void getActualSize2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
-		boolean usePixelMeasurements= getUsePixelMeasurements(iX);
+		boolean currentUsePixelMeasurements= getUsePixelMeasurements(iX);
 		Dimension canvasSize= new Dimension();
 		synchronized (this) {
 			if (graphicWindow != null) {
@@ -625,7 +610,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		};
 		double logicalWidth;
 		double logicalHeight;
-		if (usePixelMeasurements) {
+		if (currentUsePixelMeasurements) {
 			logicalWidth= canvasSize.width;
 			logicalHeight= canvasSize.height;
 		} else {
@@ -662,20 +647,19 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		createGraphicWindowIfNecessary(iX,false);
 		synchronized (this) {
 			if (graphicWindow != null) {
-				graphicWindow.logicalWidth.set(eWidth);
-				graphicWindow.logicalHeight.set(eHeight);
-				graphicWindow.logicalX.set(eX);
-				graphicWindow.logicalY.set(eY);
+				graphicWindow.setLogicalWidth(eWidth);
+				graphicWindow.setLogicalHeight(eHeight);
+				graphicWindow.setLogicalX(eX);
+				graphicWindow.setLogicalY(eY);
 				graphicWindow.safelyRestoreSize(staticContext);
 				graphicWindow.safelyRepaint();
 			} else if (canvasSpace != null) {
-				// redrawCanvas(iX);
 				canvasSpace.safelyRepaint();
 			}
 		}
 	}
 	public void getActualBounds4s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3, PrologVariable a4) {
-		boolean usePixelMeasurements= getUsePixelMeasurements(iX);
+		boolean currentUsePixelMeasurements= getUsePixelMeasurements(iX);
 		Point canvasLocation= new Point();
 		Dimension canvasSize= new Dimension();
 		synchronized (this) {
@@ -691,7 +675,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		double logicalY;
 		double logicalWidth;
 		double logicalHeight;
-		if (usePixelMeasurements) {
+		if (currentUsePixelMeasurements) {
 			logicalX= canvasLocation.x;
 			logicalY= canvasLocation.y;
 			logicalWidth= canvasSize.width;
@@ -742,6 +726,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void releaseSystemResources() {
 		synchronized (this) {
 			if (graphicWindow != null) {
@@ -757,7 +742,6 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		changeTitle(getTitle(iX),iX);
 	}
 	protected void changeTitle(ExtendedTitle title, ChoisePoint iX) {
-		// createGraphicWindowIfNecessary(iX,false);
 		String text= title.getValueOrDefaultText("");
 		synchronized (this) {
 			if (graphicWindow != null) {
@@ -775,7 +759,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	protected void changeBackgroundColor(ChoisePoint iX) {
 		changeBackgroundColor(getBackgroundColor(iX),iX);
 	}
-	protected void changeBackgroundColor(ExtendedColor eColor, ChoisePoint iX) {
+	protected void changeBackgroundColor(ColorAttribute eColor, ChoisePoint iX) {
 		Color color;
 		try {
 			color= eColor.getValue();
@@ -842,8 +826,8 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	///////////////////////////////////////////////////////////////
 	//
 	protected void refreshAttributesOfInternalFrame(InnerPage graphicWindow, ChoisePoint iX) {
-		String title= getTitle(iX).getValueOrDefaultText("");
-		refreshAttributesOfInternalFrame(graphicWindow,title,iX);
+		String currentTitle= getTitle(iX).getValueOrDefaultText("");
+		refreshAttributesOfInternalFrame(graphicWindow,currentTitle,iX);
 	}
 	protected void refreshAttributesOfInternalFrame(InnerPage graphicWindow, String title, ChoisePoint iX) {
 		//
@@ -857,16 +841,15 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 		ExtendedSize eHeight= getHeight(iX);
 		boolean pixelMeasurements= getUsePixelMeasurements(iX);
 		//
-		graphicWindow.logicalWidth.set(eWidth);
-		graphicWindow.logicalHeight.set(eHeight);
-		graphicWindow.logicalX.set(eX);
-		graphicWindow.logicalY.set(eY);
-		graphicWindow.usePixelMeasurements.set(pixelMeasurements);
+		graphicWindow.setLogicalWidth(eWidth);
+		graphicWindow.setLogicalHeight(eHeight);
+		graphicWindow.setLogicalX(eX);
+		graphicWindow.setLogicalY(eY);
+		graphicWindow.setUsePixelMeasurements(pixelMeasurements);
 		//
 		refreshAttributesOfCanvasSpace(iX);
 	}
-	// protected void refreshAttributesOfInternalFrame(InnerPage graphicWindow, ChoisePoint iX) {
-	// }
+	//
 	protected void refreshAttributesOfCanvasSpace(ChoisePoint iX) {
 	}
 	//
@@ -985,7 +968,7 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 				if (canvasSpaceDoesNotExist() && spaceAttributes.controlIsNotInitialized()) {
 					DesktopUtils.createPaneIfNecessary(staticContext);
 					graphicWindow= createInternalFrameIfNecessary(iX,enableMovingWindowToFront);
-					canvasSpace= graphicWindow.canvasSpace;
+					canvasSpace= graphicWindow.getCanvasSpace();
 					addMenuIfNecessary(iX,getMenu(iX));
 				} else if (graphicWindow != null) {
 					if (!suspendRedrawing) {
@@ -1009,10 +992,11 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	//
 	public class Action1s extends Continuation {
-		// private Continuation c0;
+		//
 		public Action1s(Continuation aC, Term actionName) {
 			c0= aC;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			c0.execute(iX);
 		}
@@ -1060,12 +1044,8 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			if (canvasSpaceDoesNotExist()) {
 				canvasSpace= s;
 				canvasSpace.setTargetWorld(this);
-				// ((ExtendedSpace2D)canvasSpace).setCommands(actualCommands);
-				// ((ExtendedSpace2D)canvasSpace).setEnableAntialiasing(sceneAntialiasingIsEnabled);
 				initiateRegisteredCanvasSpace(canvasSpace,iX);
 				enableMouseListeners();
-				// reviseMouseListenerStatus();
-				// reviseMouseMotionListenerStatus();
 			}
 		}
 	}
@@ -1083,11 +1063,6 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 				canvasSpace.skipDelayedRepainting();
 				disableMouseListeners();
 				saveCanvasSpaceAttributes();
-				// canvasSpace.disableMouseListener();
-				// canvasSpace.disableMouseMotionListener();
-				// actualCommands.clear();
-				// retractedCommands.clear();
-				// implementDelayedCleaning= false;
 				canvasSpace= null;
 			};
 			clearCustomControlTables();
@@ -1104,7 +1079,6 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	public void draw(boolean dialogIsModal, ChoisePoint modalChoisePoint) {
 		if (spaceAttributes != null) {
 			if (spaceAttributes.initializeControlIfNecessary()) {
-				// renewCanvasSpaceAttributes(modalChoisePoint);
 				refreshAttributesOfCanvasSpace(modalChoisePoint);
 				long domainSignature1= entry_s_Initialize_0();
 				callInternalProcedure(domainSignature1,dialogIsModal,modalChoisePoint);
@@ -1113,8 +1087,6 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 			callInternalProcedure(domainSignature2,dialogIsModal,modalChoisePoint);
 		}
 	}
-	// protected void renewCanvasSpaceAttributes(ChoisePoint iX) {
-	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -1157,14 +1129,18 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void componentHidden(ComponentEvent e) {
 		sendTheWindowClosedMessage();
 		DesktopUtils.selectNextInternalFrame(staticContext);
 	}
+	@Override
 	public void componentMoved(ComponentEvent e) {
 	}
+	@Override
 	public void componentResized(ComponentEvent e) {
 	}
+	@Override
 	public void componentShown(ComponentEvent e) {
 	}
 	//
@@ -1179,10 +1155,11 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	//
 	public class MouseClicked1s extends Continuation {
-		// private Continuation c0;
+		//
 		public MouseClicked1s(Continuation aC, Term mouseEvent) {
 			c0= aC;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			c0.execute(iX);
 		}
@@ -1192,10 +1169,11 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	//
 	public class MouseEntered1s extends Continuation {
-		// private Continuation c0;
+		//
 		public MouseEntered1s(Continuation aC, Term mouseEvent) {
 			c0= aC;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			c0.execute(iX);
 		}
@@ -1205,10 +1183,11 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	//
 	public class MouseExited1s extends Continuation {
-		// private Continuation c0;
+		//
 		public MouseExited1s(Continuation aC, Term mouseEvent) {
 			c0= aC;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			c0.execute(iX);
 		}
@@ -1218,10 +1197,11 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	//
 	public class MousePressed1s extends Continuation {
-		// private Continuation c0;
+		//
 		public MousePressed1s(Continuation aC, Term mouseEvent) {
 			c0= aC;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			c0.execute(iX);
 		}
@@ -1231,10 +1211,11 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	//
 	public class MouseReleased1s extends Continuation {
-		// private Continuation c0;
+		//
 		public MouseReleased1s(Continuation aC, Term mouseEvent) {
 			c0= aC;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			c0.execute(iX);
 		}
@@ -1244,10 +1225,11 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	//
 	public class MouseDragged1s extends Continuation {
-		// private Continuation c0;
+		//
 		public MouseDragged1s(Continuation aC, Term mouseEvent) {
 			c0= aC;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			c0.execute(iX);
 		}
@@ -1257,10 +1239,11 @@ public abstract class CustomControl extends Alpha implements ComponentListener {
 	}
 	//
 	public class MouseMoved1s extends Continuation {
-		// private Continuation c0;
+		//
 		public MouseMoved1s(Continuation aC, Term mouseEvent) {
 			c0= aC;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			c0.execute(iX);
 		}

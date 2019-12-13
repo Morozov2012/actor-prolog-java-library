@@ -16,9 +16,6 @@ public abstract class DataResourceConsumer extends DataAbstraction {
 		super(id);
 	}
 	//
-	// abstract public Term getBuiltInSlot_E_maximal_waiting_time();
-	// abstract public Term getBuiltInSlot_E_backslash_always_is_separator();
-	//
 	///////////////////////////////////////////////////////////////
 	//
 	public java.awt.image.BufferedImage readImage(ChoisePoint iX) {

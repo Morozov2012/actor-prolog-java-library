@@ -10,6 +10,7 @@ import morozov.terms.*;
 import morozov.terms.signals.*;
 
 public enum PositioningMode {
+	//
 	START,
 	RELATIVE,
 	END;

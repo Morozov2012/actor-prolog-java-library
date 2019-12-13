@@ -29,6 +29,7 @@ public final class PrologEmptySet extends UnderdeterminedSet {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean equals(Object o2) {
 		if (o2 instanceof Term) {
 			return ((Term)o2).isEqualToEmptySet();
@@ -36,6 +37,7 @@ public final class PrologEmptySet extends UnderdeterminedSet {
 			return false;
 		}
 	}
+	@Override
 	public int compare(Object o2) {
 		if (o2 instanceof Term) {
 			return -((Term)o2).compareWithEmptySet();
@@ -43,75 +45,94 @@ public final class PrologEmptySet extends UnderdeterminedSet {
 			return 1;
 		}
 	}
+	@Override
 	public boolean isEqualToEmptySet() {
 		return true;
 	}
+	@Override
 	public int compareWithEmptySet() {
 		return 0;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void isEmptySet(ChoisePoint cp) throws Backtracking {
 	}
+	@Override
 	public boolean thisIsEmptySet() {
 		return true;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void inheritSetElements(PrologOptimizedSet set, ChoisePoint cp) throws Backtracking {
 		set.setNoValueElements();
 	}
-	// public Term checkSetAndGetNamedElement(long aName, ChoisePoint cp) throws Backtracking, TermIsNotASet {
-	//	throw Backtracking.instance;
-	// }
+	@Override
 	public void checkIfTermIsASet(ChoisePoint cp) throws TermIsNotASet {
 	}
+	@Override
 	public Term excludeNamedElements(long[] aNames, ChoisePoint cp) throws Backtracking {
 		return this;
 	}
+	@Override
 	public void hasNoMoreElements(long[] aNames, ChoisePoint cp) throws Backtracking {
 	}
+	@Override
 	public void prohibitNamedElement(long aName, ChoisePoint cp) throws Backtracking {
 	}
+	@Override
 	public void verifySet(long[] aNames, ChoisePoint cp) throws Backtracking {
 	}
+	@Override
 	public long getNextPairName(ChoisePoint cp) throws EndOfSet, TermIsNotASet {
 		throw EndOfSet.instance;
 	}
+	@Override
 	public Term getNextPairValue(ChoisePoint cp) throws EndOfSet, TermIsNotASet, SetElementIsProhibited {
 		throw EndOfSet.instance;
 	}
+	@Override
 	public Term getNextSetTail(ChoisePoint cp) throws EndOfSet, TermIsNotASet {
 		throw EndOfSet.instance;
 	}
+	@Override
 	public Term exploreSetPositiveElements(HashMap<Long,Term> positiveMap, ChoisePoint cp) {
 		return this;
 	}
+	@Override
 	public Term exploreSet(HashMap<Long,Term> positiveMap, HashSet<Long> negativeMap, ChoisePoint cp) {
 		return this;
 	}
+	@Override
 	public Term exploreSet(ChoisePoint cp) {
 		return this;
 	}
+	@Override
 	public void appendNamedElement(long aName, Term aValue, ChoisePoint cp) throws Backtracking {
 		throw Backtracking.instance;
 	}
+	@Override
 	public void appendNamedElementProhibition(long aName, ChoisePoint cp) throws Backtracking {
 	}
+	@Override
 	public void unifyWithProhibitedElement(long aName, Term aTail, Term aSet, ChoisePoint cp) throws Backtracking {
 		aTail.isEmptySet(cp);
 	}
+	@Override
 	public void unifyWithOptimizedSet(PrologOptimizedSet set, ChoisePoint cp) throws Backtracking {
 		set.isEmptySet(cp);
 	}
+	@Override
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		t.isEmptySet(cp);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void unify_with_set(
 			Term aTail,
 			ChoisePoint cp,
@@ -130,18 +151,22 @@ public final class PrologEmptySet extends UnderdeterminedSet {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean isCoveredBySetDomain(long functor, PrologDomain headDomain, PrologDomain baseDomain, ChoisePoint cp, boolean ignoreFreeVariables) {
 		return true;
 	}
+	@Override
 	public boolean isCoveredByEmptySetDomain(PrologDomain baseDomain, ChoisePoint cp, boolean ignoreFreeVariables) {
 		return true;
 	}
+	@Override
 	public Term checkSetTerm(long functor, PrologDomain headDomain, Term initialValue, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
 		return this;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		return "{}";
 	}

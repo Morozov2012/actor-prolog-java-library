@@ -14,17 +14,21 @@ import morozov.terms.signals.*;
 public enum FFmpegThreadTypeName {
 	//
 	FF_THREAD_FRAME {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_THREAD_FRAME;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_THREAD_FRAME;
 		}
 	},
 	FF_THREAD_SLICE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_THREAD_SLICE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_THREAD_SLICE;
 		}

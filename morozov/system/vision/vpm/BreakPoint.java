@@ -43,7 +43,7 @@ public class BreakPoint {
 	//
 	public void addBranch(BigInteger neighbour, TrackSegmentEntryType entryType) {
 		if (entries==null) {
-			entries= new HashSet<BigInteger>();
+			entries= new HashSet<>();
 		};
 		entries.add(neighbour);
 		switch (entryType) {

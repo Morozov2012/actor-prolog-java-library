@@ -12,11 +12,13 @@ import java.awt.font.TextAttribute;
 import java.awt.Font;
 
 public class DiagramPath {
-	public String mother;
-	public double x;
-	public double y;
-	public String[] label;
-	public DiagramArc[] arcs;
+	//
+	protected String mother;
+	protected double x;
+	protected double y;
+	protected String[] label;
+	protected DiagramArc[] arcs;
+	//
 	public DiagramPath(String motherIdentifier, double xx, double yy, String[] text, DiagramArc[] arcList) {
 		mother= motherIdentifier;
 		x= xx;
@@ -24,6 +26,7 @@ public class DiagramPath {
 		label= text;
 		arcs= arcList;
 	}
+	//
 	public void correctArcs(DiagramBox[] boxes) {
 		int nArcs= arcs.length;
 		if (nArcs > 0 && boxes.length > 0) {
@@ -40,7 +43,6 @@ public class DiagramPath {
 		if (x <= Double.MIN_VALUE && y <= Double.MIN_VALUE) {
 			return;
 		} else if (label.length > 0) {
-			// Graphics2D g2= (Graphics2D)g0;
 			double realX= StrictMath.round(size.width * x);
 			double realY= StrictMath.round(size.height * y);
 			//
@@ -64,7 +66,7 @@ public class DiagramPath {
 			//
 			double textX= realX;
 			double textY= realY - textHeight;
-			HashMap<TextAttribute,Object> map= new HashMap<TextAttribute,Object>();
+			HashMap<TextAttribute,Object> map= new HashMap<>();
 			map.put(TextAttribute.FOREGROUND,diagramColors.labelTextColor);
 			Font font= g2.getFont().deriveFont(map);
 			g2.setFont(font);

@@ -13,34 +13,43 @@ import morozov.terms.signals.*;
 import java.util.HashMap;
 
 public enum DatabaseType {
+	//
 	PLAIN {
+		@Override
 		public DatabaseTable createTable(PrologDomain domain, boolean reuseKeyNumbers) {
 			return new DatabaseTable(domain,reuseKeyNumbers);
 		}
+		@Override
 		public DatabaseTable createTable(PrologDomain domain, boolean reuseKeyNumbers, HashMap<String,PrologDomain> currentLocalDomainTable) {
 			return new DatabaseTable(domain,reuseKeyNumbers,currentLocalDomainTable);
 		}
 	},
 	HASH_SET {
+		@Override
 		public DatabaseTable createTable(PrologDomain domain, boolean reuseKeyNumbers) {
 			return new HashSetTable(domain,reuseKeyNumbers);
 		}
+		@Override
 		public DatabaseTable createTable(PrologDomain domain, boolean reuseKeyNumbers, HashMap<String,PrologDomain> currentLocalDomainTable) {
 			return new HashSetTable(domain,reuseKeyNumbers,currentLocalDomainTable);
 		}
 	},
 	HASH_MAP {
+		@Override
 		public DatabaseTable createTable(PrologDomain domain, boolean reuseKeyNumbers) {
 			return new HashMapTable(domain,reuseKeyNumbers);
 		}
+		@Override
 		public DatabaseTable createTable(PrologDomain domain, boolean reuseKeyNumbers, HashMap<String,PrologDomain> currentLocalDomainTable) {
 			return new HashMapTable(domain,reuseKeyNumbers,currentLocalDomainTable);
 		}
 	},
 	LINKED_HASH_MAP {
+		@Override
 		public DatabaseTable createTable(PrologDomain domain, boolean reuseKeyNumbers) {
 			return new LinkedHashMapTable(domain,reuseKeyNumbers);
 		}
+		@Override
 		public DatabaseTable createTable(PrologDomain domain, boolean reuseKeyNumbers, HashMap<String,PrologDomain> currentLocalDomainTable) {
 			return new LinkedHashMapTable(domain,reuseKeyNumbers,currentLocalDomainTable);
 		}

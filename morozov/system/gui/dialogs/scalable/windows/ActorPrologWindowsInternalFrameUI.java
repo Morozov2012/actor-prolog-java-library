@@ -19,6 +19,7 @@ public class ActorPrologWindowsInternalFrameUI extends WindowsInternalFrameUI {
 	public ActorPrologWindowsInternalFrameUI(JInternalFrame w) {
 		super(w);
 	}
+	@Override
 	protected DesktopManager createDesktopManager() {
 		return new ActorPrologWindowsDesktopManager();
 	}

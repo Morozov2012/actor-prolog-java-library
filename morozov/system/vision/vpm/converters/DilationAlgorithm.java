@@ -12,11 +12,13 @@ import morozov.terms.signals.*;
 public enum DilationAlgorithm {
 	//
 	PLAIN_DILATION {
+		@Override
 		public Term toTerm() {
 			return term_PLAIN_DILATION;
 		}
 	},
 	HIERARCHICAL_DILATION {
+		@Override
 		public Term toTerm() {
 			return term_HIERARCHICAL_DILATION;
 		}

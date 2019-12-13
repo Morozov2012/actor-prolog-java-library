@@ -328,7 +328,7 @@ public class GrowingTrack {
 		};
 		if (emptyBuffer) {
 			// Returns the least key greater than or equal to
-			// the given key, or null if there is no such key.
+			// the given key, or null if there is no such key:
 			Long ceilingKey= requestedBreakPoints.ceilingKey(trackEnd);
 			if (ceilingKey==null) {
 				BreakPoint point= new BreakPoint(trackEnd,endTimeInMilliseconds);
@@ -339,7 +339,6 @@ public class GrowingTrack {
 		Collection<BreakPoint> breakPointSet= requestedBreakPoints.values();
 		Iterator<BreakPoint> iterator= breakPointSet.iterator();
 		int firstIndex= 0;
-		int lastIndex= -1;
 		int numberOfPointsToBeDeleted= 0;
 		while (iterator.hasNext()) {
 			BreakPoint breakPoint= iterator.next();
@@ -349,7 +348,7 @@ public class GrowingTrack {
 			if (breakFrameNumber > criticalTime && !emptyBuffer) {
 				break;
 			};
-			lastIndex= -1;
+			int lastIndex= -1;
 			for (int n=0; n < numberOfRecentPoints; n++) {
 				BlobAttributes p= recentPoints.get(n);
 				long t= p.getFrameNumber();
@@ -432,15 +431,15 @@ public class GrowingTrack {
 		}
 	}
 	protected TrackSegment assembleRecentSegment() {
-		int numberOfPoints= recentPoints.size();
+		int pointNumber= recentPoints.size();
 		BlobAttributes p0= recentPoints.get(0);
 		long segmentBeginningPoint= p0.getFrameNumber();
 		long segmentBeginningTime= p0.getTimeInMilliseconds();
 		long segmentEndPoint= segmentBeginningPoint;
 		long segmentEndTime= segmentBeginningTime;
-		long[] frameNumbers= new long[numberOfPoints];
-		BlobAttributes[] blobAttributeArray= new BlobAttributes[numberOfPoints];
-		for (int n=0; n < numberOfPoints; n++) {
+		long[] frameNumbers= new long[pointNumber];
+		BlobAttributes[] blobAttributeArray= new BlobAttributes[pointNumber];
+		for (int n=0; n < pointNumber; n++) {
 			BlobAttributes p1= recentPoints.get(n);
 			blobAttributeArray[n]= p1;
 			segmentEndPoint= p1.getFrameNumber();
@@ -508,8 +507,8 @@ public class GrowingTrack {
 	}
 	public StableTrack createStableTrack() {
 		ArrayList<TrackSegment> list= new ArrayList<>(segments);
-		int numberOfPoints= recentPoints.size();
-		if (numberOfPoints > 0) {
+		int pointNumber= recentPoints.size();
+		if (pointNumber > 0) {
 			TrackSegment recentSegment= assembleRecentSegment();
 			list.add(recentSegment);
 		};
@@ -518,7 +517,7 @@ public class GrowingTrack {
 			blobType,
 			trackBeginning,
 			trackEnd,
-			list.toArray(new TrackSegment[0]),
+			list.toArray(new TrackSegment[list.size()]),
 			minimalTrackDuration,
 			samplingRate,
 			transformationMatrices,

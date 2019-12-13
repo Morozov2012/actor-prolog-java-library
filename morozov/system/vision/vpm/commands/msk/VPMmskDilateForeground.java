@@ -14,6 +14,7 @@ public class VPMmskDilateForeground extends VPMmskHierarchicalMorphologicalFilte
 		algorithm= a;
 	}
 	//
+	@Override
 	public void execute(VPM vpm) {
 		imageWidth= vpm.getOperationalImageWidth();
 		imageHeight= vpm.getOperationalImageHeight();
@@ -61,6 +62,7 @@ resultMatrix[index0]= value;
 		}
 	}
 	//
+	@Override
 	protected void initializeClassInstance() {
 		fullWidth= halfwidth * 2 + 1;
 		numberOfLayers= 1;

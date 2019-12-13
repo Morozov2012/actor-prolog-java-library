@@ -62,15 +62,11 @@ public class DataStoreIO {
 	protected FileChannel channel_ExclusiveAccess;
 	protected FileChannel channel_WriteAccess;
 	protected FileChannel channel_ModeMain;
-	// protected FileChannel channel_ModeBackup1;
-	// protected FileChannel channel_ModeBackup2;
 	protected FileLock lock_ExclusiveAccess;
 	protected FileLock lock_WriteAccess;
 	protected FileLock lock_Mode;
 	//
 	protected SectionIndex lockedSectionIndex;
-	//
-	// public boolean isValid= false;
 	//
 	protected static final int sectionNumber_Mode= 0;
 	protected static final int sectionNumber_ExclusiveAccess= 1;
@@ -319,9 +315,9 @@ public class DataStoreIO {
 	//
 	protected SectionIndex unsafelyReassembleDataStoreIndex(boolean reportActions, Condition externalFileIsFree) {
 		if (Files.exists(subdirectoryPath)) {
-			HashMap<String,FileTime> timeMap= new HashMap<String,FileTime>();
-			HashMap<String,DatabaseTableContainer> tableMap= new HashMap<String,DatabaseTableContainer>();
-			HashMap<String,Long> numberMap= new HashMap<String,Long>();
+			HashMap<String,FileTime> timeMap= new HashMap<>();
+			HashMap<String,DatabaseTableContainer> tableMap= new HashMap<>();
+			HashMap<String,Long> numberMap= new HashMap<>();
 			try {
 				DirectoryStream<Path> stream= Files.newDirectoryStream(subdirectoryPath,externalMainDataMask);
 				try {
@@ -354,7 +350,6 @@ public class DataStoreIO {
 					}
 				}
 			} catch (IOException e) {
-				// throw new FileInputOutputError(subdirectoryPath.toString(),e);
 			};
 			try {
 				DirectoryStream<Path> stream= Files.newDirectoryStream(subdirectoryPath,externalBackupDataMask);
@@ -392,7 +387,7 @@ public class DataStoreIO {
 			};
 			Set<String> entryNameCollection= numberMap.keySet();
 			Iterator<String> entryNameCollectionIterator= entryNameCollection.iterator();
-			HashMap<Long,String> usedNumbers= new HashMap<Long,String>();
+			HashMap<Long,String> usedNumbers= new HashMap<>();
 			long maximalSectionNumber= maximalSystemSectionNumber;
 			while (entryNameCollectionIterator.hasNext()) {
 				String entryName= entryNameCollectionIterator.next();
@@ -402,12 +397,11 @@ public class DataStoreIO {
 				};
 				usedNumbers.put(number,entryName);
 			};
-			HashMap<String,Long> tableIndex= new HashMap<String,Long>();
+			HashMap<String,Long> tableIndex= new HashMap<>();
 			HashSet<Long> freeNumbers= new HashSet<>();
 			for (long n=maximalSystemSectionNumber+1; n<=maximalSectionNumber; n++) {
 				if (usedNumbers.containsKey(n)) {
 					String entryName= usedNumbers.get(n);
-					// DatabaseTableContainer tableContainer= tableMap.get(entryName);
 					tableIndex.put(entryName,n);
 				} else {
 					freeNumbers.add(n);
@@ -560,13 +554,7 @@ public class DataStoreIO {
 	//
 	public void lockSectionFile(String currentEntryName, DatabaseTableContainer currentTableContainer, boolean shared, boolean reuseNumbers, Condition externalFileIsFree) {
 		if (currentTableContainer.getNumberOfExternalFile() <= 0) {
-			// Получается, что секция может быть записана,
-			// даже если мы её хотим использовать по чтению.
-			// И если файл физически только для чтения,
-			// то это приведёт к остановке программы.
 			safelyRegisterEntry(currentEntryName,currentTableContainer,reuseNumbers,externalFileIsFree);
-		// } else {
-		//	openSectionChannels(currentTableContainer);
 		};
 		tryToLockMainLockChannel(currentTableContainer,shared,sleepPeriod,maxRetryNumber,externalFileIsFree);
 	}
@@ -642,9 +630,6 @@ public class DataStoreIO {
 	//
 	public void unsafelyReadSectionIfNecessary(String entryName, DatabaseTableContainer actualTableContainer, Condition externalFileIsFree) {
 		if (actualTableContainer.getNumberOfExternalFile() <= 0) {
-			// Этого не может быть, потому что рассматриваемая
-			// процедура вызывается всегда после
-			// openedDataStore.lockSectionFile.
 			throw new NotInsideTransaction();
 		};
 		try {
@@ -655,9 +640,6 @@ public class DataStoreIO {
 		} catch (Throwable e) {
 		};
 		try {
-			// tryToLockBackupLockChannel(actualTableContainer,false,sleepPeriod,maxRetryNumber,externalFileIsFree);
-			// Захватываем канал в разделяемом режиме,
-			// потому что готовимся ЧИТАТЬ секцию.
 			tryToLockBackupLockChannel(actualTableContainer,true,sleepPeriod,maxRetryNumber,externalFileIsFree);
 			unsafelyReadSectionIfNecessary(entryName,actualTableContainer.sectionPath_BackupData,actualTableContainer,true);
 		} catch (EOFException e) {

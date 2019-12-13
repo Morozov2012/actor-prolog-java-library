@@ -16,6 +16,7 @@ public class ActorPrologParserError extends RuntimeException {
 		return error.getPosition();
 	}
 	//
+	@Override
 	public String toString() {
 		return error.getClass().toString() + "(position:" + Integer.toString(getPosition()) + ")";
 	}

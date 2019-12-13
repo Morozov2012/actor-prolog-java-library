@@ -7,8 +7,7 @@ public class NoneColorMap extends ColorMapRGBA {
 	public NoneColorMap() {
 	}
 	//
-	public int[][] createColorMap(int size, int alpha) {
-		int[][] cm= new int[4][size];
-		return cm;
+	@Override
+	public void createColorMap(int[][] cm, int shift, int bandWidth, int totalSize, int alpha) {
 	}
 }

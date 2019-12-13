@@ -6,16 +6,22 @@ import java.awt.Graphics2D;
 import java.awt.Color;
 
 public class Java2DSetXORMode extends Java2DSetModeCommand {
+	//
 	protected Color color;
+	//
 	public Java2DSetXORMode(Color c) {
 		color= c;
 	}
+	//
+	@Override
 	public void execute(Graphics2D g2, DrawingMode drawingMode) {
 		g2.setXORMode(color);
 	}
+	@Override
 	public boolean isSet_XOR_ModeCommand() {
 		return true;
 	}
+	@Override
 	public boolean equals(Object o) {
 		if (o==null) {
 			return false;

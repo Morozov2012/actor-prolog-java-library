@@ -11,10 +11,14 @@ import morozov.syntax.interfaces.*;
 import morozov.syntax.scanner.*;
 import morozov.syntax.scanner.errors.*;
 import morozov.syntax.signals.*;
+import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.terms.*;
+
 import java.math.BigInteger;
 import java.util.HashSet;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public abstract class ElementaryParser {
 	//
@@ -27,9 +31,6 @@ public abstract class ElementaryParser {
 	protected boolean robustMode= false;
 	//
 	protected HashSet<Long> slotNameHash;
-	//
-	// protected boolean raiseRuntimeExceptions= true;
-	// protected boolean sendErrorMessages= false;
 	//
 	protected boolean previousExpressionWasAVariable= false;
 	protected boolean lastTermHasAsterisk= false;
@@ -54,13 +55,6 @@ public abstract class ElementaryParser {
 	}
 	//
 	///////////////////////////////////////////////////////////////
-	//
-	// public void setRaiseRuntimeExceptions(boolean raiseExceptions) {
-	//	raiseRuntimeExceptions= raiseExceptions;
-	// }
-	// public void setSendErrorMessages(boolean sendMessages) {
-	//	sendErrorMessages= sendMessages;
-	// }
 	//
 	public void setTokens(PrologToken[] array, int p, boolean keepTextPositions) {
 		tokens= array;
@@ -93,6 +87,16 @@ public abstract class ElementaryParser {
 		return lastTermHasAsterisk;
 	}
 	//
+	public Term getTermParsedSlotNames() {
+		Term list= PrologEmptyList.instance;
+		Iterator<Long> slotNameSetIterator= slotNameHash.iterator();
+		while (slotNameSetIterator.hasNext()) {
+			Long currentName= slotNameSetIterator.next();
+			list= new PrologList(new PrologSymbol(currentName),list);
+		};
+		return list;
+	}
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public Term[] stringToTerms(String text, ChoisePoint iX) throws SyntaxError {
@@ -113,8 +117,8 @@ public abstract class ElementaryParser {
 		if (closingTokenType != null) {
 			termsAreInsideBrackets= true;
 		};
-		lastTermHasAsterisk= false;		
-		ArrayList<Term> terms= new ArrayList<Term>();
+		lastTermHasAsterisk= false;
+		ArrayList<Term> terms= new ArrayList<>();
 		while (true) {
 			if (position < numberOfTokens) {
 				PrologToken frontToken= tokens[position];
@@ -122,12 +126,11 @@ public abstract class ElementaryParser {
 				if (termsAreInsideBrackets) {
 					if (frontTokenType==closingTokenType) {
 						position++;
-						return terms.toArray(emptyTermArray);
+						return terms.toArray(new Term[terms.size()]);
 					}
 				} else if (frontTokenType==PrologTokenType.END_OF_TEXT) {
-					return terms.toArray(emptyTermArray);
+					return terms.toArray(new Term[terms.size()]);
 				};
-				// terms.add(parseTerm(iX));
 				terms.add(parseExpression(false,0,iX));
 				if (position < numberOfTokens) {
 ///////////////////////////////////////////////////////////////////////
@@ -143,11 +146,11 @@ if (termsAreInsideBrackets) {
 		modifyTermAsterisk(terms,secondToken.getPosition(),iX);
 		lastTermHasAsterisk= true;
 		parseRightRoundBracket(iX);
-		return terms.toArray(emptyTermArray);
+		return terms.toArray(new Term[terms.size()]);
 	default:
 		if (secondTokenType==closingTokenType) {
 			position++;
-			return terms.toArray(emptyTermArray);
+			return terms.toArray(new Term[terms.size()]);
 		} else {
 			master.handleError(new CommaIsExpected(secondToken.getPosition()),iX);
 			position++;
@@ -198,9 +201,12 @@ if (termsAreInsideBrackets) {
 			} else {
 				commaExpected= true;
 			};
-			int currentPosition= position;
-			// terms.add(new InternalTerm(parseTerm(iX),currentPosition));
-			terms.add(new InternalTerm(parseExpression(false,0,iX),currentPosition));
+			if (position < numberOfTokens) {
+				int currentPosition= tokens[position].getPosition();
+				terms.add(new InternalTerm(parseExpression(false,0,iX),currentPosition));
+			} else {
+				throw master.handleUnexpectedEndOfTokenList(tokens,iX);
+			}
 		}
 	}
 	//
@@ -222,15 +228,18 @@ if (termsAreInsideBrackets) {
 			} else {
 				commaExpected= true;
 			};
-			int currentPosition= position;
-			// terms.add(parseTerm(iX));
 			terms.add(parseExpression(false,0,iX));
 		}
 	}
 	//
-	///////////////////////////////////////////////////////////////
+//*********************************************************************
+//*********************************************************************
+//******** PARSE TERM *************************************************
+//*********************************************************************
+//*********************************************************************
 	//
 	public Term parseRootTerm(ChoisePoint iX) throws SyntaxError {
+		setUseSecondVariableNameRegister(true);
 		return parseTerm(iX);
 	}
 	//
@@ -254,12 +263,12 @@ if (p2 < numberOfTokens) {
 		return parseStructure(frontToken.getSymbolCode(master,iX),beginningOfTerm,iX);
 	} else if (secondTokenType==PrologTokenType.L_BRACE) {
 		position= position + 2;
-		ArrayList<NamedTerm> arguments= new ArrayList<NamedTerm>();
+		ArrayList<LabeledTerm> arguments= new ArrayList<>();
 		Term result= new PrologSymbol(frontToken.getSymbolCode(master,iX));
 		if (rememberTextPositions) {
 			result= attachTermPosition(result,beginningOfTerm);
 		};
-		arguments.add(new NamedTerm(0,false,result,beginningOfTerm));
+		arguments.add(new LabeledTerm(0,false,result,beginningOfTerm));
 		return parseUnderdeterminedSet(arguments,beginningOfTerm,iX);
 	} else if (secondTokenType==PrologTokenType.QUESTION_MARK) {
 		checkWhetherSymbolIsASlot(frontToken,iX);
@@ -288,7 +297,7 @@ return parseList(beginningOfTerm,iX);
 ///////////////////////////////////////////////////////////////////////
 previousExpressionWasAVariable= false;
 position++;
-ArrayList<NamedTerm> arguments= new ArrayList<NamedTerm>();
+ArrayList<LabeledTerm> arguments= new ArrayList<>();
 return parseUnderdeterminedSet(arguments,beginningOfTerm,iX);
 ///////////////////////////////////////////////////////////////////////
 				}
@@ -300,9 +309,9 @@ previousExpressionWasAVariable= false;
 int p2= position + 1;
 if (p2 < numberOfTokens && tokens[p2].getType()==PrologTokenType.L_BRACE) {
 	position= position + 2;
-	ArrayList<NamedTerm> arguments= new ArrayList<NamedTerm>();
+	ArrayList<LabeledTerm> arguments= new ArrayList<>();
 	Term firstPairValue= parseInteger(frontToken,beginningOfTerm,iX);
-	arguments.add(new NamedTerm(0,false,firstPairValue,beginningOfTerm));
+	arguments.add(new LabeledTerm(0,false,firstPairValue,beginningOfTerm));
 	return parseUnderdeterminedSet(arguments,beginningOfTerm,iX);
 } else {
 	position++;
@@ -318,9 +327,9 @@ previousExpressionWasAVariable= false;
 int p2= position + 1;
 if (p2 < numberOfTokens && tokens[p2].getType()==PrologTokenType.L_BRACE) {
 	position= position + 2;
-	ArrayList<NamedTerm> arguments= new ArrayList<NamedTerm>();
+	ArrayList<LabeledTerm> arguments= new ArrayList<>();
 	Term firstPairValue= parseReal(frontToken,beginningOfTerm,iX);
-	arguments.add(new NamedTerm(0,false,firstPairValue,beginningOfTerm));
+	arguments.add(new LabeledTerm(0,false,firstPairValue,beginningOfTerm));
 	return parseUnderdeterminedSet(arguments,beginningOfTerm,iX);
 } else {
 	position++;
@@ -329,23 +338,23 @@ if (p2 < numberOfTokens && tokens[p2].getType()==PrologTokenType.L_BRACE) {
 ///////////////////////////////////////////////////////////////////////
 				}
 				// break;
-			case STRING:
+			case STRING_SEGMENT:
 				{
 ///////////////////////////////////////////////////////////////////////
 previousExpressionWasAVariable= false;
-int p2= position + 1;
-if (p2 < numberOfTokens && tokens[p2].getType()==PrologTokenType.L_BRACE) {
-	position= position + 2;
-	ArrayList<NamedTerm> arguments= new ArrayList<NamedTerm>();
-	Term firstPairValue= new PrologString(frontToken.getStringValue(master,iX));
+position++;
+String stringContent= parseString(frontToken.getStringValue(master,iX),iX);
+if (position < numberOfTokens && tokens[position].getType()==PrologTokenType.L_BRACE) {
+	position++;
+	ArrayList<LabeledTerm> arguments= new ArrayList<>();
+	Term firstPairValue= new PrologString(stringContent);
 	if (rememberTextPositions) {
 		firstPairValue= attachTermPosition(firstPairValue,beginningOfTerm);
 	};
-	arguments.add(new NamedTerm(0,false,firstPairValue,beginningOfTerm));
+	arguments.add(new LabeledTerm(0,false,firstPairValue,beginningOfTerm));
 	return parseUnderdeterminedSet(arguments,beginningOfTerm,iX);
 } else {
-	position++;
-	Term result= new PrologString(frontToken.getStringValue(master,iX));
+	Term result= new PrologString(stringContent);
 	if (rememberTextPositions) {
 		result= attachTermPosition(result,beginningOfTerm);
 	};
@@ -354,23 +363,23 @@ if (p2 < numberOfTokens && tokens[p2].getType()==PrologTokenType.L_BRACE) {
 ///////////////////////////////////////////////////////////////////////
 				}
 				// break;
-			case BINARY:
+			case BINARY_SEGMENT:
 				{
 ///////////////////////////////////////////////////////////////////////
 previousExpressionWasAVariable= false;
-int p2= position + 1;
-if (p2 < numberOfTokens && tokens[p2].getType()==PrologTokenType.L_BRACE) {
-	position= position + 2;
-	ArrayList<NamedTerm> arguments= new ArrayList<NamedTerm>();
-	Term firstPairValue= new PrologBinary(frontToken.getBinaryValue(master,iX));
+position++;
+byte[] binaryContent= parseBinary(frontToken.getBinaryValue(master,iX),iX);
+if (position < numberOfTokens && tokens[position].getType()==PrologTokenType.L_BRACE) {
+	position++;
+	ArrayList<LabeledTerm> arguments= new ArrayList<>();
+	Term firstPairValue= new PrologBinary(binaryContent);
 	if (rememberTextPositions) {
 		firstPairValue= attachTermPosition(firstPairValue,beginningOfTerm);
 	};
-	arguments.add(new NamedTerm(0,false,firstPairValue,beginningOfTerm));
+	arguments.add(new LabeledTerm(0,false,firstPairValue,beginningOfTerm));
 	return parseUnderdeterminedSet(arguments,beginningOfTerm,iX);
 } else {
-	position++;
-	Term result= new PrologBinary(frontToken.getBinaryValue(master,iX));
+	Term result= new PrologBinary(binaryContent);
 	if (rememberTextPositions) {
 		result= attachTermPosition(result,beginningOfTerm);
 	};
@@ -386,12 +395,12 @@ previousExpressionWasAVariable= false;
 int p2= position + 1;
 if (p2 < numberOfTokens && tokens[p2].getType()==PrologTokenType.L_BRACE) {
 	position= position + 2;
-	ArrayList<NamedTerm> arguments= new ArrayList<NamedTerm>();
+	ArrayList<LabeledTerm> arguments= new ArrayList<>();
 	Term firstPairValue= PrologUnknownValue.instance;
 	if (rememberTextPositions) {
 		firstPairValue= attachTermPosition(firstPairValue,beginningOfTerm);
 	};
-	arguments.add(new NamedTerm(0,false,firstPairValue,beginningOfTerm));
+	arguments.add(new LabeledTerm(0,false,firstPairValue,beginningOfTerm));
 	return parseUnderdeterminedSet(arguments,beginningOfTerm,iX);
 } else {
 	position++;
@@ -445,6 +454,8 @@ return result;
 		}
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
 	protected Term parseSymbolOrSlot(PrologToken token, int beginningOfTerm, ChoisePoint iX) throws SyntaxError {
 		if (token.isInQuotes(master,iX)) {
 			return parseSymbol(token.getSymbolCode(master,iX),beginningOfTerm);
@@ -453,6 +464,71 @@ return result;
 		}
 	}
 	//
+	protected String parseString(String firstSegment, ChoisePoint iX) throws SyntaxError {
+		if (position >= numberOfTokens) {
+			return firstSegment;
+		} else {
+			PrologToken secondToken= tokens[position];
+			PrologTokenType secondTokenType= secondToken.getType();
+			if (secondTokenType==PrologTokenType.STRING_SEGMENT) {
+				StringBuilder buffer= new StringBuilder();
+				buffer.append(firstSegment);
+				position++;
+				String secondSegment= secondToken.getStringValue(master,iX);
+				buffer.append(secondSegment);
+				while (true) {
+					if (position >= numberOfTokens) {
+						return buffer.toString();
+					};
+					PrologToken thirdToken= tokens[position];
+					PrologTokenType thirdTokenType= thirdToken.getType();
+					if (thirdTokenType==PrologTokenType.STRING_SEGMENT) {
+						position++;
+						String thirdSegment= thirdToken.getStringValue(master,iX);
+						buffer.append(thirdSegment);
+					} else {
+						return buffer.toString();
+					}
+				}
+			} else {
+				return firstSegment;
+			}
+		}
+	}
+	//
+	protected byte[] parseBinary(byte[] firstSegment, ChoisePoint iX) throws SyntaxError {
+		if (position >= numberOfTokens) {
+			return firstSegment;
+		} else {
+			PrologToken secondToken= tokens[position];
+			PrologTokenType secondTokenType= secondToken.getType();
+			if (secondTokenType==PrologTokenType.BINARY_SEGMENT) {
+				ArrayList<byte[]> arrayList= new ArrayList<>();
+				arrayList.add(firstSegment);
+				position++;
+				byte[] secondSegment= secondToken.getBinaryValue(master,iX);
+				arrayList.add(secondSegment);
+				while (true) {
+					if (position >= numberOfTokens) {
+						return GeneralConverters.arrayListToByteArray(arrayList);
+					};
+					PrologToken thirdToken= tokens[position];
+					PrologTokenType thirdTokenType= thirdToken.getType();
+					if (thirdTokenType==PrologTokenType.BINARY_SEGMENT) {
+						position++;
+						byte[] thirdSegment= thirdToken.getBinaryValue(master,iX);
+						arrayList.add(thirdSegment);
+					} else {
+						return GeneralConverters.arrayListToByteArray(arrayList);
+					}
+				}
+			} else {
+				return firstSegment;
+			}
+		}
+	}
+	//
+	abstract public void setUseSecondVariableNameRegister(boolean mode);
 	abstract protected Term parseStructure(long functorCode, int beginningOfTerm, ChoisePoint iX) throws SyntaxError;
 	abstract protected Term parseSymbol(long functorCode, int beginningOfTerm);
 	abstract protected Term parseSlot(long functorCode, int beginningOfTerm, ChoisePoint iX) throws SyntaxError;
@@ -460,7 +536,7 @@ return result;
 	abstract protected Term parseReal(PrologToken token, int beginningOfTerm, ChoisePoint iX) throws SyntaxError;
 	abstract protected Term createTermEmptyList();
 	abstract protected Term parseListTail(int textPosition, ChoisePoint iX) throws SyntaxError;
-	abstract protected Term createTermListElement(Term internalTerm, Term tail);
+	abstract public Term createTermListElement(Term internalTerm, Term tail);
 	abstract protected Term parseWorld(PrologToken token, ChoisePoint iX) throws SyntaxError;
 	abstract protected Term parseVariable(String variableName, int beginningOfTerm, ChoisePoint iX) throws SyntaxError;
 	abstract protected Term parseFunctionCallInSlot(long symbolCode, int beginningOfTerm, int questionMarkPosition, ChoisePoint iX) throws SyntaxError;
@@ -566,8 +642,8 @@ return result;
 				};
 				break;
 			};
-			for (int n=arguments.size()-1; n >= 0; n--) {
-				InternalTerm internalTerm= arguments.get(n);
+			for (int k=arguments.size()-1; k >= 0; k--) {
+				InternalTerm internalTerm= arguments.get(k);
 				result= createTermListElement(internalTerm.getValue(),result);
 				if (rememberTextPositions) {
 					result= attachTermPosition(result,internalTerm.getPosition());
@@ -577,70 +653,119 @@ return result;
 		}
 	}
 	//
-	///////////////////////////////////////////////////////////////
-	//
-	protected Term parseUnderdeterminedSet(ArrayList<NamedTerm> arguments, int beginningOfTerm, ChoisePoint iX) throws SyntaxError {
-		Term result;
-		if (position < numberOfTokens) {
-			PrologToken secondToken= tokens[position];
-			int secontTokenPosition= secondToken.getPosition();
-			PrologTokenType secondTokenType= secondToken.getType();
-			switch (secondTokenType) {
-			case R_BRACE:
-				result= createTermEmptySet();
+	protected ListElements parseListElements(int beginningOfTerm, ChoisePoint iX) throws SyntaxError {
+		if (position >= numberOfTokens) {
+			throw master.handleUnexpectedEndOfTokenList(tokens,iX);
+		};
+		PrologToken secondToken= tokens[position];
+		PrologTokenType secondTokenType= secondToken.getType();
+		if (secondTokenType==PrologTokenType.R_SQUARE_BRACKET) {
+			position++;
+			Term result= createTermEmptyList();
+			if (rememberTextPositions) {
+				result= attachTermPosition(result,beginningOfTerm);
+			};
+			return new ListElements(null,false,result,-1);
+		} else {
+			ArrayList<InternalTerm> arguments= parseInternalMetaTerms(iX);
+			if (position >= numberOfTokens) {
+				throw master.handleUnexpectedEndOfTokenList(tokens,iX);
+			};
+			PrologToken thirdToken= tokens[position];
+			PrologTokenType thirdTokenType= thirdToken.getType();
+			Term result;
+			boolean hasTail= false;
+			int barPosition= -1;
+			switch (thirdTokenType) {
+			case R_SQUARE_BRACKET:
+				result= createTermEmptyList();
 				if (rememberTextPositions) {
-					result= attachTermPosition(result,beginningOfTerm);
+					result= attachTermPosition(result,tokens[position].getPosition());
 				};
 				position++;
 				break;
 			case BAR:
-				if (arguments.size() > 0 || robustMode) {
-					position++;
-					// position= position + 2;
-					result= createTermSetTail(secontTokenPosition,iX);
-					parseRightBrace(iX);
-				} else {
-					master.handleError(new EmptySetCannotContainATail(secontTokenPosition),iX);
-					position++;
-					result= createTermEmptySet();
-					if (rememberTextPositions) {
-						result= attachTermPosition(result,beginningOfTerm);
-					}
-				};
+				position++;
+				result= parseListTail(thirdToken.getPosition(),iX);
+				parseRightSquareBracket(iX);
+				hasTail= true;
+				barPosition= thirdToken.getPosition();
 				break;
 			default:
-				result= parsePairs(arguments,iX);
-				previousExpressionWasAVariable= false;
-				parseRightBrace(iX);
+				master.handleError(new RightSquareBracketIsExpected(thirdToken.getPosition()),iX);
+				position++;
+				result= createTermEmptyList();
+				if (rememberTextPositions) {
+					result= attachTermPosition(result,tokens[position].getPosition());
+				};
 				break;
 			};
-			for (int n=arguments.size()-1; n >= 0; n--) {
-				NamedTerm pair= arguments.get(n);
-				long key= pair.getKeyCode();
-				for (int k=0; k < n; k++) {
-					if (arguments.get(k).getKeyCode()==key) {
-						master.handleError(new UnderdeterminedSetCannotContainElementsWithEqualNames(pair.getPosition()),iX);
-					}
-				};
-				result= createTermSetElement(pair,result);
-				if (rememberTextPositions) {
-					result= attachTermPosition(result,pair.getPosition());
-				}
-			};
-			previousExpressionWasAVariable= false;
-			return result;
-		} else {
-			throw master.handleUnexpectedEndOfTokenList(tokens,iX);
+			return new ListElements(arguments,hasTail,result,barPosition);
 		}
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
+	protected Term parseUnderdeterminedSet(ArrayList<LabeledTerm> arguments, int beginningOfTerm, ChoisePoint iX) throws SyntaxError {
+		Term result;
+		if (position >= numberOfTokens) {
+			throw master.handleUnexpectedEndOfTokenList(tokens,iX);
+		};
+		PrologToken secondToken= tokens[position];
+		int secontTokenPosition= secondToken.getPosition();
+		PrologTokenType secondTokenType= secondToken.getType();
+		switch (secondTokenType) {
+		case R_BRACE:
+			result= createTermEmptySet();
+			if (rememberTextPositions) {
+				result= attachTermPosition(result,beginningOfTerm);
+			};
+			position++;
+			break;
+		case BAR:
+			if (arguments.size() > 0 || robustMode) {
+				position++;
+				result= parseSetTail(secontTokenPosition,iX);
+				parseRightBrace(iX);
+			} else {
+				master.handleError(new EmptySetCannotContainATail(secontTokenPosition),iX);
+				position++;
+				result= createTermEmptySet();
+				if (rememberTextPositions) {
+					result= attachTermPosition(result,beginningOfTerm);
+				}
+			};
+			break;
+		default:
+			result= parsePairs(arguments,iX);
+			previousExpressionWasAVariable= false;
+			parseRightBrace(iX);
+			break;
+		};
+		for (int n=arguments.size()-1; n >= 0; n--) {
+			LabeledTerm pair= arguments.get(n);
+			long key= pair.getKeyCode();
+			for (int k=0; k < n; k++) {
+				if (arguments.get(k).getKeyCode()==key) {
+					master.handleError(new UnderdeterminedSetCannotContainElementsWithEqualNames(pair.getPosition()),iX);
+				}
+			};
+			result= createTermSetElement(pair,result);
+			if (rememberTextPositions) {
+				result= attachTermPosition(result,pair.getPosition());
+			}
+		};
+		previousExpressionWasAVariable= false;
+		return result;
+	}
+	//
 	abstract protected Term createTermEmptySet();
-	abstract protected Term createTermSetTail(int textPosition, ChoisePoint iX) throws SyntaxError;
-	abstract protected Term createTermSetElement(NamedTerm pair, Term tail);
+	abstract protected Term parseSetTail(int textPosition, ChoisePoint iX) throws SyntaxError;
+	abstract protected Term createTermSetElement(LabeledTerm pair, Term tail);
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected Term parsePairs(ArrayList<NamedTerm> terms, ChoisePoint iX) throws SyntaxError {
+	protected Term parsePairs(ArrayList<LabeledTerm> terms, ChoisePoint iX) throws SyntaxError {
 		boolean commaExpected= false;
 		while (true) {
 			if (commaExpected) {
@@ -657,7 +782,7 @@ return result;
 				case BAR:
 					{
 					position++;
-					Term tail= createTermSetTail(secontTokenPosition,iX);
+					Term tail= parseSetTail(secontTokenPosition,iX);
 					return tail;
 					}
 				default:
@@ -693,10 +818,9 @@ case COLON:
 	{
 		checkWhetherSymbolIsNotASlot(frontToken,iX);
 		position++;
-		// Term pairValue= parseTerm(iX);
 		long pairNameCode= frontToken.getSymbolCode(master,iX);
 		Term pairValue= parseExpression(false,0,iX);
-		terms.add(new NamedTerm(pairNameCode,true,pairValue,pairPosition));
+		terms.add(new LabeledTerm(pairNameCode,true,pairValue,pairPosition));
 	};
 	break;
 case IMPLICATION:
@@ -705,7 +829,7 @@ case IMPLICATION:
 		position++;
 		long pairNameCode= frontToken.getSymbolCode(master,iX);
 		Term pairValue= parseTermAfterMinus(pairPosition,iX);
-		terms.add(new NamedTerm(pairNameCode,true,pairValue,pairPosition));
+		terms.add(new LabeledTerm(pairNameCode,true,pairValue,pairPosition));
 	};
 	break;
 default:
@@ -733,10 +857,9 @@ case COLON:
 		if (key.compareTo(BigInteger.ZERO) < 0) {
 			master.handleError(new NegativeNumbersAreNotAllowedHere(frontToken.getPosition()),iX);
 		} else {
-			long pairNameCode= PrologInteger.toLong(key);
-			// Term pairValue= parseTerm(iX);
+			long pairNameCode= Arithmetic.toLong(key);
 			Term pairValue= parseExpression(false,0,iX);
-			terms.add(new NamedTerm(pairNameCode,false,pairValue,pairPosition));
+			terms.add(new LabeledTerm(pairNameCode,false,pairValue,pairPosition));
 		}
 	};
 	break;
@@ -747,9 +870,9 @@ case IMPLICATION:
 		if (key.compareTo(BigInteger.ZERO) < 0) {
 			master.handleError(new NegativeNumbersAreNotAllowedHere(frontToken.getPosition()),iX);
 		} else {
-			long pairNameCode= PrologInteger.toLong(key);
+			long pairNameCode= Arithmetic.toLong(key);
 			Term pairValue= parseTermAfterMinus(pairPosition,iX);
-			terms.add(new NamedTerm(pairNameCode,false,pairValue,pairPosition));
+			terms.add(new LabeledTerm(pairNameCode,false,pairValue,pairPosition));
 		}
 	};
 	break;
@@ -767,12 +890,13 @@ default:
 		}
 	}
 	//
-	abstract protected NamedTerm parseInestimablePairValue(long pairNameCode, boolean isInQuotes, int pairPosition, ChoisePoint iX) throws SyntaxError;
-	abstract protected NamedTerm parseInestimablePairValue(BigInteger key, int pairPosition, ChoisePoint iX) throws SyntaxError;
+	abstract protected LabeledTerm parseInestimablePairValue(long pairNameCode, boolean isInQuotes, int pairPosition, ChoisePoint iX) throws SyntaxError;
+	abstract protected LabeledTerm parseInestimablePairValue(BigInteger key, int pairPosition, ChoisePoint iX) throws SyntaxError;
 	//
 	///////////////////////////////////////////////////////////////
 	//
 	public Term parseRootExpression(ChoisePoint iX) throws SyntaxError {
+		setUseSecondVariableNameRegister(true);
 		return parseExpression(iX);
 	}
 	//
@@ -793,20 +917,65 @@ default:
 		}
 	}
 	//
+	public long parseClassName(ChoisePoint iX) throws SyntaxError, NoClassNameIsFound {
+		if (position >= numberOfTokens) {
+			throw master.handleUnexpectedEndOfTokenList(tokens,iX);
+		};
+		PrologToken firstToken= tokens[position];
+		PrologTokenType firstTokenType= firstToken.getType();
+		if (firstTokenType==PrologTokenType.SYMBOL) {
+			position++;
+			checkWhetherClassNameIsEnclosedInApostrophes(firstToken,iX);
+			return firstToken.getSymbolCode(master,iX);
+		} else {
+			master.handleError(new ClassNameIsExpected(firstToken.getPosition()),iX);
+			throw NoClassNameIsFound.instance;
+		}
+	}
+	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void parseGivenToken(PrologTokenType givenTokenType, ChoisePoint iX) throws AnotherTokenIsExpected, SyntaxError {
+	protected void checkWhetherSymbolConstantIsEnclosedInApostrophes(PrologToken token, ChoisePoint iX) throws SyntaxError {
+		if (robustMode) {
+			return;
+		};
+		if (!token.isInQuotes(master,iX)) {
+			master.handleError(new SymbolConstantIsToBeEnclosedInApostrophes(token.getPosition()),iX);
+		}
+	}
+	//
+	protected void checkWhetherClassNameIsEnclosedInApostrophes(PrologToken token, ChoisePoint iX) throws SyntaxError {
+		if (robustMode) {
+			return;
+		};
+		if (!token.isInQuotes(master,iX)) {
+			master.handleError(new ClassNameIsToBeEnclosedInApostrophes(token.getPosition()),iX);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public int parseGivenToken(PrologTokenType givenTokenType, ChoisePoint iX) throws AnotherTokenIsExpected, SyntaxError {
 		if (position < numberOfTokens) {
 			PrologToken frontToken= tokens[position];
-			int beginningOfTerm= frontToken.getPosition();
 			PrologTokenType frontTokenType= frontToken.getType();
 			if (frontTokenType==givenTokenType) {
 				position++;
+				return frontToken.getPosition();
 			} else {
 				throw AnotherTokenIsExpected.instance;
 			}
 		} else {
 			throw master.handleUnexpectedEndOfTokenList(tokens,iX);
+		}
+	}
+	//
+	public void parseLeftRoundBracket(ChoisePoint iX) throws SyntaxError {
+		try {
+			parseGivenToken(PrologTokenType.L_ROUND_BRACKET,iX);
+		} catch (AnotherTokenIsExpected e) {
+			master.handleError(new LeftRoundBracketIsExpected(tokens[position].getPosition()),iX);
+			position++;
 		}
 	}
 	//
@@ -837,6 +1006,15 @@ default:
 		}
 	}
 	//
+	public void parseLeftBrace(ChoisePoint iX) throws SyntaxError {
+		try {
+			parseGivenToken(PrologTokenType.L_BRACE,iX);
+		} catch (AnotherTokenIsExpected e) {
+			master.handleError(new LeftBraceIsExpected(tokens[position].getPosition()),iX);
+			position++;
+		}
+	}
+	//
 	public void parseRightBrace(ChoisePoint iX) throws SyntaxError {
 		try {
 			parseGivenToken(PrologTokenType.R_BRACE,iX);
@@ -846,12 +1024,14 @@ default:
 		}
 	}
 	//
-	public void parseQuestionMark(ChoisePoint iX) throws SyntaxError {
+	public int parseQuestionMark(ChoisePoint iX) throws SyntaxError {
 		try {
-			parseGivenToken(PrologTokenType.QUESTION_MARK,iX);
+			return parseGivenToken(PrologTokenType.QUESTION_MARK,iX);
 		} catch (AnotherTokenIsExpected e) {
-			master.handleError(new QuestionMarkIsExpected(tokens[position].getPosition()),iX);
+			int tokenPosition= tokens[position].getPosition();
+			master.handleError(new QuestionMarkIsExpected(tokenPosition),iX);
 			position++;
+			return tokenPosition;
 		}
 	}
 	//
@@ -864,12 +1044,48 @@ default:
 		}
 	}
 	//
-	public void parseExternal(ChoisePoint iX) throws SyntaxError {
+	public void parseRange(ChoisePoint iX) throws SyntaxError {
+		try {
+			parseGivenToken(PrologTokenType.RANGE,iX);
+		} catch (AnotherTokenIsExpected e) {
+			master.handleError(new RangeIsExpected(tokens[position].getPosition()),iX);
+			position++;
+		}
+	}
+	//
+	public void parseColon(ChoisePoint iX) throws SyntaxError {
+		try {
+			parseGivenToken(PrologTokenType.COLON,iX);
+		} catch (AnotherTokenIsExpected e) {
+			master.handleError(new ColonIsExpected(tokens[position].getPosition()),iX);
+			position++;
+		}
+	}
+	//
+	public void parseSemicolon(ChoisePoint iX) throws SyntaxError {
+		try {
+			parseGivenToken(PrologTokenType.SEMICOLON,iX);
+		} catch (AnotherTokenIsExpected e) {
+			master.handleError(new SemicolonIsExpected(tokens[position].getPosition()),iX);
+			position++;
+		}
+	}
+	//
+	public void parseEquation(ChoisePoint iX) throws SyntaxError {
+		try {
+			parseGivenToken(PrologTokenType.EQ,iX);
+		} catch (AnotherTokenIsExpected e) {
+			master.handleError(new EquationIsExpected(tokens[position].getPosition()),iX);
+			position++;
+		}
+	}
+	//
+	public void parseTheExternalKeyword(ChoisePoint iX) throws SyntaxError {
 		if (position >= numberOfTokens) {
 			throw master.handleUnexpectedEndOfTokenList(tokens,iX);
 		};
 		PrologToken nextToken= tokens[position];
-		if (nextToken.getType()==PrologTokenType.SYMBOL) {
+		if (nextToken.getType()==PrologTokenType.KEYWORD) {
 			if (!nextToken.isInQuotes(master,iX)) {
 				long symbolCode= nextToken.getSymbolCode(master,iX);
 				if (symbolCode != SymbolCodes.symbolCode_E_external) {
@@ -881,7 +1097,99 @@ default:
 				position++;
 			}
 		} else {
-			master.handleError(new SymbolIsExpected(nextToken.getPosition()),iX);
+			master.handleError(new TheExternalKeywordIsExpected(nextToken.getPosition()),iX);
+			position++;
+		}
+	}
+	//
+	public boolean parseTheInterfaceOrMetainterfaceKeyword(ChoisePoint iX) throws SyntaxError {
+		boolean isMetainterface= false;
+		if (position >= numberOfTokens) {
+			throw master.handleUnexpectedEndOfTokenList(tokens,iX);
+		};
+		PrologToken nextToken= tokens[position];
+		if (nextToken.getType()==PrologTokenType.KEYWORD) {
+			if (!nextToken.isInQuotes(master,iX)) {
+				long symbolCode= nextToken.getSymbolCode(master,iX);
+				if (symbolCode==SymbolCodes.symbolCode_E_metainterface) {
+					isMetainterface= true;
+				} else if (symbolCode != SymbolCodes.symbolCode_E_interface) {
+					master.handleError(new TheInterfaceKeywordIsExpected(nextToken.getPosition()),iX);
+				};
+				position++;
+			} else {
+				master.handleError(new SymbolEnclosedInApostrophesIsNotExpectedHere(nextToken.getPosition()),iX);
+				position++;
+			}
+		} else {
+			master.handleError(new TheInterfaceKeywordIsExpected(nextToken.getPosition()),iX);
+			position++;
+		};
+		return isMetainterface;
+	}
+	//
+	public void parseTheClassKeyword(ChoisePoint iX) throws SyntaxError {
+		if (position >= numberOfTokens) {
+			throw master.handleUnexpectedEndOfTokenList(tokens,iX);
+		};
+		PrologToken nextToken= tokens[position];
+		if (nextToken.getType()==PrologTokenType.KEYWORD) {
+			if (!nextToken.isInQuotes(master,iX)) {
+				long symbolCode= nextToken.getSymbolCode(master,iX);
+				if (symbolCode != SymbolCodes.symbolCode_E_class) {
+					master.handleError(new TheClassKeywordIsExpected(nextToken.getPosition()),iX);
+				};
+				position++;
+			} else {
+				master.handleError(new SymbolEnclosedInApostrophesIsNotExpectedHere(nextToken.getPosition()),iX);
+				position++;
+			}
+		} else {
+			master.handleError(new TheClassKeywordIsExpected(nextToken.getPosition()),iX);
+			position++;
+		}
+	}
+	//
+	public void parseTheSpecializedKeyword(ChoisePoint iX) throws SyntaxError {
+		if (position >= numberOfTokens) {
+			throw master.handleUnexpectedEndOfTokenList(tokens,iX);
+		};
+		PrologToken nextToken= tokens[position];
+		if (nextToken.getType()==PrologTokenType.KEYWORD) {
+			if (!nextToken.isInQuotes(master,iX)) {
+				long symbolCode= nextToken.getSymbolCode(master,iX);
+				if (symbolCode != SymbolCodes.symbolCode_E_specialized) {
+					master.handleError(new TheSpecializedKeywordIsExpected(nextToken.getPosition()),iX);
+				};
+				position++;
+			} else {
+				master.handleError(new SymbolEnclosedInApostrophesIsNotExpectedHere(nextToken.getPosition()),iX);
+				position++;
+			}
+		} else {
+			master.handleError(new TheSpecializedKeywordIsExpected(nextToken.getPosition()),iX);
+			position++;
+		}
+	}
+	//
+	public void parseTheFromKeyword(ChoisePoint iX) throws SyntaxError {
+		if (position >= numberOfTokens) {
+			throw master.handleUnexpectedEndOfTokenList(tokens,iX);
+		};
+		PrologToken nextToken= tokens[position];
+		if (nextToken.getType()==PrologTokenType.KEYWORD) {
+			if (!nextToken.isInQuotes(master,iX)) {
+				long symbolCode= nextToken.getSymbolCode(master,iX);
+				if (symbolCode != SymbolCodes.symbolCode_E_from) {
+					master.handleError(new TheFromKeywordIsExpected(nextToken.getPosition()),iX);
+				};
+				position++;
+			} else {
+				master.handleError(new SymbolEnclosedInApostrophesIsNotExpectedHere(nextToken.getPosition()),iX);
+				position++;
+			}
+		} else {
+			master.handleError(new TheFromKeywordIsExpected(nextToken.getPosition()),iX);
 			position++;
 		}
 	}
@@ -935,7 +1243,9 @@ default:
 	///////////////////////////////////////////////////////////////
 	//
 	protected boolean symbolIsASlot(long symbolNameCode) {
-		if (slotNameHash != null) {
+		if (symbolNameCode==SymbolCodes.symbolCode_E_self) {
+			return true;
+		} else if (slotNameHash != null) {
 			return slotNameHash.contains(symbolNameCode);
 		} else {
 			return false;
@@ -954,8 +1264,10 @@ default:
 		if (robustMode) {
 			return;
 		};
-		if (token.isInQuotes(master,iX) || !symbolIsASlot(token.getSymbolCode(master,iX))) {
+		if (token.isInQuotes(master,iX)) {
 			master.handleError(new SlotNameIsExpected(token.getPosition()),iX);
+		} else if (!symbolIsASlot(token.getSymbolCode(master,iX))) {
+			master.handleError(new UndefinedSlotName(token.getPosition()),iX);
 		}
 	}
 	//
@@ -970,13 +1282,29 @@ default:
 	//
 	protected long parseTargetSlot(PrologToken token, ChoisePoint iX) throws SyntaxError {
 		long symbolCode= token.getSymbolCode(master,iX);
-		if (token.isInQuotes(master,iX) || !symbolIsASlot(symbolCode)) {
-			master.handleError(new SlotNameIsExpected(token.getPosition()),iX);
+		if (!robustMode) {
+			if (token.isInQuotes(master,iX)) {
+				master.handleError(new SlotNameIsExpected(token.getPosition()),iX);
+			} else if (!symbolIsASlot(symbolCode)) {
+				master.handleError(new UndefinedSlotName(token.getPosition()),iX);
+			}
 		};
 		return symbolCode;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	abstract protected Term attachTermPosition(Term argument, long position);
+	public Term attachTermPositionIfNecessary(Term argument, long position) {
+		if (rememberTextPositions) {
+			return new TermPosition(argument,position);
+		} else {
+			return argument;
+		}
+	}
+	//
+	abstract public Term attachTermPosition(Term argument, long position);
+	//
+	public void handleError(ParserError exception, ChoisePoint iX) throws ParserError {
+		master.handleError(exception,iX);
+	}
 }

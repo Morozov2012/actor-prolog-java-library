@@ -69,24 +69,31 @@ public class ActiveResource extends ActiveWorld {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void actualize(ChoisePoint iX) {
 	}
+	@Override
 	public void startProcesses() {
 	}
+	@Override
 	public void releaseSystemResources() {
 	}
+	@Override
 	public void stopProcesses() {
 	}
 	//
+	@Override
 	public MethodSignature[] getMethodSignatures() {
 		return emptySignatureList;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void extractWorlds(AbstractProcess process, LinkedHashSet<AbstractInternalWorld> list) {
 	}
 	//
+	@Override
 	public AbstractInternalWorld internalWorld() {
 		throw new AnAttemptToExtractInternalWorldFromActiveResource();
 	}
@@ -94,9 +101,11 @@ public class ActiveResource extends ActiveWorld {
 	final public long getPackageCode() {
 		throw new AnAttemptToExtractPackageCodeFromActiveResource();
 	}
+	@Override
 	final public long[] getClassHierarchy() {
 		throw new AnAttemptToExtractClassHierarchyFromActiveResource();
 	}
+	@Override
 	final public long[] getInterfaceHierarchy() {
 		throw new AnAttemptToExtractInterfaceHierarchyFromActiveResource();
 	}
@@ -106,14 +115,19 @@ public class ActiveResource extends ActiveWorld {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void receiveAsyncCall(AsyncCall item) {
 	}
+	@Override
 	public void receiveTimerMessage(AbstractInternalWorld target) {
 	}
+	@Override
 	public void cancelTimerMessage(AbstractInternalWorld target) {
 	}
+	@Override
 	public void sendResidentRequest(Resident resident, long domainSignature, Term[] arguments, boolean sortAndReduceResultList) {
 	}
+	@Override
 	public void withdrawRequest(Resident resident) {
 	}
 	//
@@ -123,40 +137,51 @@ public class ActiveResource extends ActiveWorld {
 	//
 	// Process Flow Messages
 	//
+	@Override
 	protected void processFlowMessages(ChoisePoint iX) {
 	}
 	//
+	@Override
 	public void acceptDirectMessage() {
 	}
+	@Override
 	protected void acceptTimerMessage() {
 	}
+	@Override
 	protected void sendStateOfProcess() {
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void resetResidentOwners() {
 	}
+	@Override
 	protected void informInternalWorldsAboutFailure() {
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Continuation collectSuspendedCalls(Continuation c0, ChoisePoint iX) {
 		return c0;
 	}
 	//
+	@Override
 	public Continuation createActorNeutralizationNode(Continuation aC) {
 		return aC;
 	}
 	//
+	@Override
 	protected boolean removeNewlyProvedOldActors(HashSet<ActorNumber> oldActors) {
 		return false;
 	}
 	//
+	@Override
 	public void clearActorStore() {
 	}
 	//
+	@Override
 	public void registerActorToBeProved(ActorNumber actorNumber, ChoisePoint cp) {
 	}
 }

@@ -23,6 +23,7 @@ import morozov.terms.signals.*;
 import java.math.BigInteger;
 
 public class IntegerField extends ActiveTextField {
+	//
 	public IntegerField(AbstractDialog target, int columns) {
 		this(target,"",columns);
 	}
@@ -31,6 +32,7 @@ public class IntegerField extends ActiveTextField {
 		component= new AIntegerField(target,this,text,columns);
 	}
 	//
+	@Override
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		try {
 			BigInteger number= GeneralConverters.termToRoundInteger(value,iX,false);

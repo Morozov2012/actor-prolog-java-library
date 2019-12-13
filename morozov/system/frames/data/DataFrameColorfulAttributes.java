@@ -59,9 +59,11 @@ public class DataFrameColorfulAttributes extends DataFrameBaseAttributes impleme
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public DetailedColorMap getDetailedMainColorMap() {
 		return detailedMainColorMap;
 	}
+	@Override
 	public DetailedColorMap getDetailedAuxiliaryColorMap() {
 		return detailedAuxiliaryColorMap;
 	}

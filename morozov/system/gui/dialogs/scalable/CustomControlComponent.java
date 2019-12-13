@@ -50,6 +50,7 @@ public abstract class CustomControlComponent extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
@@ -90,6 +91,7 @@ public abstract class CustomControlComponent extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 		currentFont= font;
@@ -102,7 +104,6 @@ public abstract class CustomControlComponent extends ActiveComponent {
 				setDimension(dimension);
 				component.revalidate();
 				targetDialog.doLayout(true);
-				// targetDialog.repaintAfterDelay();
 			};
 			previousDimension= dimension;
 		}

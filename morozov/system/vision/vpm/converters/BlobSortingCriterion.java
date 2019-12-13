@@ -12,46 +12,55 @@ import morozov.terms.signals.*;
 public enum BlobSortingCriterion {
 	//
 	SIZE {
+		@Override
 		public Term toTerm() {
 			return term_SIZE;
 		}
 	},
 	FOREGROUND_AREA {
+		@Override
 		public Term toTerm() {
 			return term_FOREGROUND_AREA;
 		}
 	},
 	CONTOUR_LENGTH {
+		@Override
 		public Term toTerm() {
 			return term_CONTOUR_LENGTH;
 		}
 	},
 	CENTROID_X {
+		@Override
 		public Term toTerm() {
 			return term_CENTROID_X;
 		}
 	},
 	CENTROID_Y {
+		@Override
 		public Term toTerm() {
 			return term_CENTROID_Y;
 		}
 	},
 	LEFT_X {
+		@Override
 		public Term toTerm() {
 			return term_LEFT_X;
 		}
 	},
 	RIGHT_X {
+		@Override
 		public Term toTerm() {
 			return term_RIGHT_X;
 		}
 	},
 	TOP_Y {
+		@Override
 		public Term toTerm() {
 			return term_TOP_Y;
 		}
 	},
 	BOTTOM_Y {
+		@Override
 		public Term toTerm() {
 			return term_BOTTOM_Y;
 		}

@@ -9,6 +9,7 @@ public interface KinectInterface {
 	public void sendInfraredFrame(KinectInfraredFrameInterface frame);
 	public void sendLongExposureInfraredFrame(KinectLongExposureInfraredFrameInterface frame);
 	public void sendMappedColorFrame(KinectMappedColorFrameInterface frame);
-	public void sendPointCloudsFrame(KinectPointCloudsFrameInterface frame);
+	public void sendEntirePointCloudsFrame(KinectPointCloudsFrameInterface frame);
+	public void sendForegroundPointCloudsFrame(KinectForegroundPointCloudsFrameInterface frame);
 	public void sendColorFrame(KinectColorFrameInterface frame);
 }

@@ -18,7 +18,7 @@ import java.math.BigInteger;
 
 public class DatabasePlace {
 	//
-	public DatabaseTableContainer databaseTableContainer;
+	protected DatabaseTableContainer databaseTableContainer;
 	protected boolean isShared= false;
 	protected DataStore dataStore;
 	protected String entry;
@@ -32,7 +32,21 @@ public class DatabasePlace {
 		dataStore= store;
 		entry= tableName;
 		databaseTableContainer= store.getDatabaseTableContainer(entry,domain,type,reuseKN,isShared);
-		// databaseTable.setReuseKeyNumbers(reuseKeyNumbers,currentProcess,true);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public DatabaseTableContainer getDatabaseTableContainer() {
+		return databaseTableContainer;
+	}
+	public boolean isShared() {
+		return isShared;
+	}
+	public DataStore getDataStore() {
+		return dataStore;
+	}
+	public String getEntry() {
+		return entry;
 	}
 	//
 	///////////////////////////////////////////////////////////////

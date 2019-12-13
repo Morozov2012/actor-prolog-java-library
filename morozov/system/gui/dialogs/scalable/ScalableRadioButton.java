@@ -51,21 +51,23 @@ public class ScalableRadioButton extends ScalableAbstractButton {
 		component= new JRadioButton(text,icon,selected);
 		ScalableToggleButtonModel model= new ScalableToggleButtonModel(buttonNumber,text);
 		((JRadioButton)component).setModel(model);
-		// model.addChangeListener(this);
 		model.addActionListener(this);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void putValue(Term value, ChoisePoint iX) {
 	}
 	//
+	@Override
 	public Term getValue() {
 		return PrologUnknownValue.instance;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setAlarmColors(Color fc, Color bc) {
 		BasicRadioButtonUI ui= (BasicRadioButtonUI)((JRadioButton)component).getUI();
 		Icon defaultIcon= ui.getDefaultIcon();
@@ -79,19 +81,15 @@ public class ScalableRadioButton extends ScalableAbstractButton {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setIndividualText(Term value, ChoisePoint iX) {
 		AnnotatedButton.safelyUpdateAbstractButton((AbstractButton)component,value,iX);
-		// ((JButton)component).invalidate();
-		// Без этой команды при изменении надписи на кнопке
-		// соседние кнопки сдвигаются, но перерисовываются
-		// некорректно; новое изображение кнопок ступенькой
-		// накладывается на старое.
 		targetDialog.safelyRevalidateAndRepaint();
 	}
 	//
+	@Override
 	public Term getIndividualText() {
 		if (component!=null) {
-			// String text= ((JRadioButton)component).getText();
 			String text= AnnotatedButton.safelyRestoreText((AbstractButton)component);
 			return new PrologString(text);
 		} else {
@@ -101,6 +99,7 @@ public class ScalableRadioButton extends ScalableAbstractButton {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 		if (component!=null) {
@@ -115,6 +114,7 @@ public class ScalableRadioButton extends ScalableAbstractButton {
 		}
 	}
 	//
+	@Override
 	public void setBackground(Color c) {
 		super.setBackground(c);
 		BasicRadioButtonUI ui= (BasicRadioButtonUI)((JRadioButton)component).getUI();

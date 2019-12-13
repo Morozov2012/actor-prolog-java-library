@@ -28,12 +28,15 @@ public class DoubleDataFrame extends DataFrame implements DoubleDataFrameInterfa
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public DataArrayType getDataArrayType() {
 		return DataArrayType.DOUBLE_FRAME;
 	}
+	@Override
 	public double[] getDoubleData() {
 		return data;
 	}
+	@Override
 	public int getDataSize() {
 		return data.length;
 	}

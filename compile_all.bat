@@ -52,10 +52,68 @@
 @cd ..
 @cd ..
 @cd ..
+@cd e:\java\morozov\syntax\data\domains
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
 @cd e:\java\morozov\syntax\data\errors
 @dir /b *.java > dir.txt
 @javac -Xlint:fallthrough @dir.txt
 @erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd e:\java\morozov\syntax\data\importation
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd e:\java\morozov\syntax\data\initializers
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd e:\java\morozov\syntax\data\initializers\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd e:\java\morozov\syntax\data\parameters
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd e:\java\morozov\syntax\data\subgoals
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd e:\java\morozov\syntax\data\subgoals\modes
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
 @cd ..
 @cd ..
 @cd ..
@@ -234,6 +292,22 @@
 @dir /b *.java > dir.txt
 @javac -Xlint:fallthrough @dir.txt
 @erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd e:\java\morozov\system\converters\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd e:\java\morozov\system\converters\signals
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
 @cd ..
 @cd ..
 @cd ..
@@ -687,6 +761,13 @@
 @cd ..
 @cd ..
 @cd ..
+@cd e:\java\morozov\system\interfaces
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
 @cd e:\java\morozov\system\ip_camera
 @dir /b *.java > dir.txt
 @javac -Xlint:fallthrough @dir.txt
@@ -973,10 +1054,67 @@
 @cd ..
 @cd ..
 @cd ..
+@cd e:\java\morozov\system\sound\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
 @cd e:\java\morozov\system\sound\frames
 @dir /b *.java > dir.txt
 @javac -Xlint:fallthrough @dir.txt
 @erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd e:\java\morozov\system\sound\frames\data
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd e:\java\morozov\system\sound\frames\data\converters
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd e:\java\morozov\system\sound\frames\data\converters\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd e:\java\morozov\system\sound\frames\data\interfaces
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd e:\java\morozov\system\sound\frames\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
 @cd ..
 @cd ..
 @cd ..
@@ -1126,6 +1264,14 @@
 @cd ..
 @cd ..
 @cd e:\java\morozov\system\webcam\errors
+@dir /b *.java > dir.txt
+@javac -Xlint:fallthrough @dir.txt
+@erase dir.txt
+@cd ..
+@cd ..
+@cd ..
+@cd ..
+@cd e:\java\morozov\system\webcam\interfaces
 @dir /b *.java > dir.txt
 @javac -Xlint:fallthrough @dir.txt
 @erase dir.txt

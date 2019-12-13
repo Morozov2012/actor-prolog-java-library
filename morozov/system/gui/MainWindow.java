@@ -13,9 +13,9 @@ import java.awt.GraphicsConfiguration;
 import java.awt.Rectangle;
 
 public class MainWindow extends JFrame {
-	MainWindow(StaticContext context) {
+	//
+	public MainWindow(StaticContext context) {
 		GraphicsEnvironment env= GraphicsEnvironment.getLocalGraphicsEnvironment();
-		// Rectangle bounds= env.getMaximumWindowBounds();
 		GraphicsDevice device= env.getDefaultScreenDevice();
 		GraphicsConfiguration gc= device.getDefaultConfiguration();
 		Rectangle bounds= gc.getBounds();
@@ -28,11 +28,9 @@ public class MainWindow extends JFrame {
 			if (exitOnClose) {
 				setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 			} else {
-				// setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 				setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 			}
 		} catch (SecurityException e) {
-			// setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 			setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 		}
 	}

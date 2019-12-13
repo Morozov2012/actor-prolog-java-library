@@ -74,7 +74,6 @@ public class WindowedR2 {
 		double[] xy= new double[fullLength];
 		double[] x2= new double[fullLength];
 		double[] y2= new double[fullLength];
-		// double[] allWindowedR2Values= new double[fullLength];
 		boolean[] isSelectedWindowedR2Value= new boolean[fullLength];
 		double[] selectedWindowedR2Values= new double[realLength];
 		x1[0]= vectorT[0];
@@ -82,7 +81,6 @@ public class WindowedR2 {
 		xy[0]= vectorT[0] * vectorF[0];
 		x2[0]= vectorT[0] * vectorT[0];
 		y2[0]= vectorF[0] * vectorF[0];
-		// allWindowedR2Values[0]= -1.0;
 		isSelectedWindowedR2Value[0]= true;
 		selectedWindowedR2Values[0]= -1.0;
 		long time1= (long)vectorT[0];
@@ -99,7 +97,6 @@ public class WindowedR2 {
 				xy[counter1]= time2 * value2;
 				x2[counter1]= time2 * time2;
 				y2[counter1]= value2 * value2;
-				// allWindowedR2Values[counter1]= -1.0;
 			} else {
 				double k= (value2-value1)/(time2-time1);
 				for (int t=1; t <= deltaTime; t++) {
@@ -111,7 +108,6 @@ public class WindowedR2 {
 					xy[counter1]= time3 * value3;
 					x2[counter1]= time3 * time3;
 					y2[counter1]= value3 * value3;
-					// allWindowedR2Values[counter1]= -1.0;
 				}
 			};
 			isSelectedWindowedR2Value[counter1]= true;
@@ -160,7 +156,6 @@ public class WindowedR2 {
 			// Сумма квадратов, обусловленная регерессией:
 			double ss= cXY*cXY / cSX;
 			double r2= ss / sumYY2;
-			// allWindowedR2Values[center]= r2;
 			windowedR2Sum1= windowedR2Sum1 + r2;
 			double XYk= r2 * r2;
 			windowedR2Sum2= windowedR2Sum2 + XYk;
@@ -175,9 +170,6 @@ public class WindowedR2 {
 			}
 		};
 		int windowedR2Cardinality= counter3;
-		// int from= windowHalfwidth;
-		// int to= fullLength-windowHalfwidth-1;
-		// int nPoints= to - from + 1;	// Количество точек.
 		int nPoints= fullLength - 2*windowHalfwidth;	// Количество точек.
 		if (nPoints < 0) {
 			nPoints= 0;
@@ -192,9 +184,9 @@ public class WindowedR2 {
 		double centralMoment4= moment4 - 4*moment3*moment1 + 6*moment2*squaredMoment1 - 3*squaredMoment1*squaredMoment1;
 		double windowedR2Mean= moment1;
 		double sigma= StrictMath.sqrt(centralMoment2);
-		double windowedR2StandardDeviation= sigma;
 		double windowedR2Skewness= centralMoment3 / (centralMoment2*sigma);
 		double windowedR2Kurtosis= centralMoment4 / (centralMoment2*centralMoment2);
+		double windowedR2StandardDeviation;
 		if (nPoints > 1) {
 			double windowedR2BiasCorrectedVariance= centralMoment2 * nPoints/(nPoints-1.0);
 			windowedR2StandardDeviation= StrictMath.sqrt(windowedR2BiasCorrectedVariance);

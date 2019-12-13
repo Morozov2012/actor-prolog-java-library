@@ -3,12 +3,16 @@
 package morozov.system.ffmpeg.errors;
 
 public class FFmpegCannotSetDictionaryEntry extends RuntimeException {
-	public String key;
-	public String value;
+	//
+	protected String key;
+	protected String value;
+	//
 	public FFmpegCannotSetDictionaryEntry(String k, String v) {
 		key= k;
 		value= v;
 	}
+	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(" + key + ';' + value + ")";
 	}

@@ -27,12 +27,15 @@ public class I3CameraFlashFrame extends DataFrame implements I3CameraFlashFrameI
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public DataArrayType getDataArrayType() {
 		return DataArrayType.CAMERA_FLASH_FRAME;
 	}
+	@Override
 	public I3CameraFlashAttributesInterface getCameraFlashAttributes() {
 		return attributes;
 	}
+	@Override
 	public int getDataSize() {
 		return 0;
 	}

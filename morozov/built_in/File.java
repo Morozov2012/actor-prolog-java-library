@@ -7,7 +7,7 @@ import morozov.syntax.scanner.errors.*;
 import morozov.syntax.*;
 import morozov.system.*;
 import morozov.system.converters.*;
-import morozov.system.errors.*;
+import morozov.system.converters.errors.*;
 import morozov.system.files.*;
 import morozov.system.files.errors.*;
 import morozov.terms.*;
@@ -62,12 +62,7 @@ public abstract class File extends Text {
 		super(id);
 	}
 	//
-	// abstract public Term getBuiltInSlot_E_name();
-	// abstract public Term getBuiltInSlot_E_extension();
-	// abstract public Term getBuiltInSlot_E_type();
 	abstract public Term getBuiltInSlot_E_random_access();
-	// abstract public Term getBuiltInSlot_E_character_set();
-	// abstract public Term getBuiltInSlot_E_backslash_always_is_separator();
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -95,16 +90,19 @@ public abstract class File extends Text {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void releaseSystemResources() {
 		closeFile();
 		super.releaseSystemResources();
 	}
 	//
+	@Override
 	public void clear0s(ChoisePoint iX) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(iX);
 		fileName.clear();
 	}
 	//
+	@Override
 	public void setString1s(ChoisePoint iX, Term inputText) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(iX);
 		String text= GeneralConverters.argumentToString(inputText,iX);
@@ -128,11 +126,13 @@ public abstract class File extends Text {
 		}
 	}
 	//
+	@Override
 	public void getString0ff(ChoisePoint iX, PrologVariable result) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(iX);
 		CharacterSet requiredCharacterSet= getCharacterSet(iX);
 		result.setNonBacktrackableValue(fileName.getString(requiredCharacterSet));
 	}
+	@Override
 	public void getString0fs(ChoisePoint iX) {
 	}
 	public void getString1ff(ChoisePoint iX, PrologVariable result, Term a1) {
@@ -168,11 +168,8 @@ public abstract class File extends Text {
 		if (currentFileAccessMode != null) {
 			closeFile();
 		};
-		// prologFile.setCurrentFileAccessMode(requiredFileAccessMode);
 		currentFileAccessMode= requiredFileAccessMode;
-		// prologFile.setCurrentRandomAccessMode(requiredRandomAccessMode);
 		currentRandomAccessMode= requiredRandomAccessMode;
-		// prologFile.setCurrentCharacterSet(requiredCharacterSet);
 		currentCharacterSet= requiredCharacterSet;
 		try {
 			if (!fileName.isStandardFile()) {
@@ -187,11 +184,13 @@ public abstract class File extends Text {
 						}
 					} else { // requiredRandomAccessMode
 						if (requiredCharacterSet.isDummyOrDefault()) {
-							// prologFile.randomAccessFile= new RandomAccessFile(textName,"r");
 							randomAccessFile= Files.newByteChannel(
 								path,
 								StandardOpenOption.READ);
 						} else {
+							currentFileAccessMode= null;
+							currentRandomAccessMode= false;
+							currentCharacterSet= null;
 							throw new RandomAccessRequiresTheNoneCharacterSet();
 						}
 					}
@@ -216,15 +215,15 @@ public abstract class File extends Text {
 					} else { // requiredRandomAccessMode
 						if (requiredCharacterSet.isDummyOrDefault()) {
 							SimpleFileName.createDirectories(path,true);
-							// randomAccessFile= new RandomAccessFile(textName,"rw");
 							randomAccessFile= Files.newByteChannel(
 								path,
 								StandardOpenOption.CREATE,
 								StandardOpenOption.TRUNCATE_EXISTING,
 								StandardOpenOption.WRITE);
-							// randomAccessFile.setLength(0);
-							// prologFile.randomAccessFile.truncate(0);
 						} else {
+							currentFileAccessMode= null;
+							currentRandomAccessMode= false;
+							currentCharacterSet= null;
 							throw new RandomAccessRequiresTheNoneCharacterSet();
 						}
 					}
@@ -237,7 +236,6 @@ public abstract class File extends Text {
 								StandardOpenOption.CREATE,
 								StandardOpenOption.APPEND,
 								StandardOpenOption.WRITE);
-							// outputStream= new DataOutputStream(new BufferedOutputStream(new FileOutputStream(textName,true)));
 							outputStream= new DataOutputStream(new BufferedOutputStream(newStream));
 						} else {
 							bufferedWriter= Files.newBufferedWriter(
@@ -250,15 +248,15 @@ public abstract class File extends Text {
 					} else { // requiredRandomAccessMode
 						if (requiredCharacterSet.isDummyOrDefault()) {
 							SimpleFileName.createDirectories(path,true);
-							// randomAccessFile= new RandomAccessFile(textName,"rw");
 							randomAccessFile= Files.newByteChannel(
 								path,
 								StandardOpenOption.CREATE,
 								StandardOpenOption.APPEND,
 								StandardOpenOption.WRITE);
-							// randomAccessFile.seek(randomAccessFile.length());
-							// prologFile.randomAccessFile.position(prologFile.randomAccessFile.size());
 						} else {
+							currentFileAccessMode= null;
+							currentRandomAccessMode= false;
+							currentCharacterSet= null;
 							throw new RandomAccessRequiresTheNoneCharacterSet();
 						}
 					}
@@ -269,7 +267,6 @@ public abstract class File extends Text {
 							OutputStream newStream= Files.newOutputStream(
 								path,
 								StandardOpenOption.CREATE,
-								// StandardOpenOption.APPEND,
 								StandardOpenOption.WRITE);
 							outputStream= new DataOutputStream(new BufferedOutputStream(newStream));
 						} else {
@@ -277,22 +274,20 @@ public abstract class File extends Text {
 								path,
 								requiredCharacterSet.toCharSet(),
 								StandardOpenOption.CREATE,
-								// StandardOpenOption.APPEND,
 								StandardOpenOption.WRITE);
 						}
 					} else { // requiredRandomAccessMode
 						if (requiredCharacterSet.isDummyOrDefault()) {
 							SimpleFileName.createDirectories(path,true);
-							// randomAccessFile= new RandomAccessFile(textName,"rw");
 							randomAccessFile= Files.newByteChannel(
 								path,
 								StandardOpenOption.CREATE,
-								// StandardOpenOption.APPEND,
 								StandardOpenOption.WRITE,
 								StandardOpenOption.READ);
-							// randomAccessFile.seek(randomAccessFile.length());
-							// prologFile.randomAccessFile.position(prologFile.randomAccessFile.size());
 						} else {
+							currentFileAccessMode= null;
+							currentRandomAccessMode= false;
+							currentCharacterSet= null;
 							throw new RandomAccessRequiresTheNoneCharacterSet();
 						}
 					}
@@ -302,8 +297,14 @@ public abstract class File extends Text {
 				if (!requiredRandomAccessMode) {
 					if (requiredFileAccessMode==FileAccessMode.READING) {
 						if (systemName==StandardFileName.STDOUT) {
+							currentFileAccessMode= null;
+							currentRandomAccessMode= false;
+							currentCharacterSet= null;
 							throw new StandardOutputStreamDoesNotSupportThisOperation();
 						} else if (systemName==StandardFileName.STDERR) {
+							currentFileAccessMode= null;
+							currentRandomAccessMode= false;
+							currentCharacterSet= null;
 							throw new StandardErrorOutputStreamDoesNotSupportThisOperation();
 						} else {
 							if (requiredCharacterSet.isDummy()) {
@@ -314,6 +315,9 @@ public abstract class File extends Text {
 						}
 					} else {
 						if (systemName==StandardFileName.STDIN) {
+							currentFileAccessMode= null;
+							currentRandomAccessMode= false;
+							currentCharacterSet= null;
 							throw new StandardInputStreamDoesNotSupportThisOperation();
 						} else if (systemName==StandardFileName.STDOUT) {
 							if (requiredCharacterSet.isDummy()) {
@@ -330,16 +334,22 @@ public abstract class File extends Text {
 						}
 					}
 				} else { // requiredRandomAccessMode
+					currentFileAccessMode= null;
+					currentRandomAccessMode= false;
+					currentCharacterSet= null;
 					throw new StandardStreamsDoNotSupportRandomAccess();
 				}
 			}
 		} catch (FileNotFoundException e) {
-			throw new FileIsNotFound(toString());
+			currentFileAccessMode= null;
+			currentRandomAccessMode= false;
+			currentCharacterSet= null;
+			throw new FileIsNotFound(fileName.toString());
 		} catch (java.io.IOException e) {
-			throw new FileInputOutputError(toString(),e);
-		// } catch (Throwable e) {
-		//	e.printStackTrace();
-		//	throw e;
+			currentFileAccessMode= null;
+			currentRandomAccessMode= false;
+			currentCharacterSet= null;
+			throw new FileInputOutputError(fileName.toString(),e);
 		};
 		currentFileName= fileName;
 	}
@@ -349,7 +359,9 @@ public abstract class File extends Text {
 	}
 	//
 	protected void closeFile() {
-		if (currentFileAccessMode != null) {
+		if (	currentFileAccessMode != null &&
+			currentFileName != null &&
+			currentCharacterSet != null) {
 			try {
 				if (!currentFileName.isStandardFile()) {
 					if (!currentRandomAccessMode) {
@@ -390,28 +402,56 @@ public abstract class File extends Text {
 					flush(false);
 				}
 			} catch (IOException e) {
-// e.printStackTrace();
 				throw new FileInputOutputError(currentFileName.toString(),e);
+			}
+		} else {
+			currentFileName= null;
+			currentFileAccessMode= null;
+			currentRandomAccessMode= false;
+			currentCharacterSet= null;
+			try {
+				if (inputStream != null) {
+					inputStream.close();
+					inputStream= null;
+				};
+				if (bufferedReader != null) {
+					bufferedReader.close();
+					bufferedReader= null;
+				};
+				if (outputStream != null) {
+					outputStream.close();
+					outputStream= null;
+				};
+				if (bufferedWriter != null) {
+					bufferedWriter.close();
+					bufferedWriter= null;
+				}
+			} catch (IOException e) {
+				throw new FileInputOutputError(this.toString(),e);
 			}
 		}
 	}
 	//
+	@Override
 	public void write1ms(ChoisePoint iX, Term... args) {
 		StringBuilder textBuffer= FormatOutput.termsToString(iX,(Term[])args);
 		write_string_buffer(textBuffer);
 	}
 	//
+	@Override
 	public void writeLn1ms(ChoisePoint iX, Term... args) {
 		StringBuilder textBuffer= FormatOutput.termsToString(iX,(Term[])args);
 		textBuffer.append("\n");
 		write_string_buffer(textBuffer);
 	}
 	//
+	@Override
 	public void writeF2ms(ChoisePoint iX, Term... args) {
 		StringBuilder textBuffer= FormatOutput.termsToFormattedString(iX,(Term[])args);
 		write_string_buffer(textBuffer);
 	}
 	//
+	@Override
 	public void newLine0s(ChoisePoint iX) {
 		write_string_buffer(new StringBuilder("\n"));
 	}
@@ -431,7 +471,6 @@ public abstract class File extends Text {
 							}
 						}
 					} else {
-						// randomAccessFile.writeBytes(textBuffer.toString());
 						randomAccessFile.write(ByteBuffer.wrap(textBuffer.toString().getBytes(completeCharset)));
 					}
 				} else {
@@ -549,7 +588,6 @@ public abstract class File extends Text {
 							buffer.rewind();
 							return buffer.getChar();
 						} catch (Throwable e) {
-							// e.printStackTrace();
 							throw Backtracking.instance;
 						}
 					}
@@ -623,7 +661,6 @@ public abstract class File extends Text {
 				} else {
 					StandardFileName systemName= currentFileName.getSystemName();
 					if (systemName==StandardFileName.STDIN) {
-						// String value= stdin.readLine();
 						String value;
 						if (currentCharacterSet.isDummy()) {
 							// Deprecated. This method does not properly convert bytes
@@ -667,12 +704,11 @@ public abstract class File extends Text {
 		} catch (NonReadableChannelException e) {
 			throw e;
 		} catch (Throwable e) {
-//e.printStackTrace();
 			return -1;
 		}
 	}
 	protected String readLineFromSeekableByteChannel(SeekableByteChannel channel) throws IOException {
-		StringBuffer input= new StringBuffer();
+		StringBuilder input= new StringBuilder();
 		int c= -1;
 		boolean eol= false;
 		while (!eol) {
@@ -837,19 +873,12 @@ public abstract class File extends Text {
 				if (!currentFileName.isStandardFile()) {
 					if (currentRandomAccessMode) {
 						if (pM==PositioningMode.RELATIVE) {
-							// long currentPosition= randomAccessFile.getFilePointer();
 							long currentPosition= randomAccessFile.position();
-							// randomAccessFile.seek(currentPosition+position);
 							randomAccessFile.position(currentPosition+position);
-							// randomAccessFile.seek(position);
 						} else if (pM==PositioningMode.END) {
-							// long length= randomAccessFile.length();
 							long length= randomAccessFile.size();
-							// randomAccessFile.seek(length-position-1);
-							// randomAccessFile.seek(length+position);
 							randomAccessFile.position(length+position);
 						} else {
-							// randomAccessFile.seek(position);
 							randomAccessFile.position(position);
 						}
 					} else {
@@ -931,9 +960,7 @@ public abstract class File extends Text {
 		}
 	}
 	protected void endOfRandomAccessFile() throws Backtracking, IOException {
-		// long position= randomAccessFile.getFilePointer();
 		long position= randomAccessFile.position();
-		// long length= randomAccessFile.length();
 		long length= randomAccessFile.size();
 		if (length >= position + 1) {
 			throw Backtracking.instance;
@@ -966,14 +993,12 @@ public abstract class File extends Text {
 				} else {
 					StandardFileName systemName= currentFileName.getSystemName();
 					if (systemName==StandardFileName.STDOUT) {
-						// stdout.flush();
 						if (currentCharacterSet.isDummy()) {
 							outputStream.flush();
 						} else {
 							bufferedWriter.flush();
 						}
 					} else if (systemName==StandardFileName.STDERR) {
-						// stderr.flush();
 						if (currentCharacterSet.isDummy()) {
 							outputStream.flush();
 						} else {
@@ -1016,22 +1041,24 @@ public abstract class File extends Text {
 		}
 	}
 	//
+	@Override
 	public void doesExist0s(ChoisePoint iX) throws Backtracking {
 		try {
 			ExtendedFileName fileName= retrieveRealLocalFileName(iX);
 			int timeout= getMaximalWaitingTimeInMilliseconds(iX);
-			CharacterSet characterSet= getCharacterSet(iX);
-			fileName.isExistentLocalResource(timeout,characterSet,staticContext);
+			CharacterSet givenCharacterSet= getCharacterSet(iX);
+			fileName.isExistentLocalResource(timeout,givenCharacterSet,staticContext);
 		} catch (Throwable e) {
 			throw Backtracking.instance;
 		}
 	}
+	@Override
 	public void doesExist1s(ChoisePoint iX, Term a1) throws Backtracking {
 		try {
 			ExtendedFileName fileName= retrieveRealLocalFileName(a1,iX);
 			int timeout= getMaximalWaitingTimeInMilliseconds(iX);
-			CharacterSet characterSet= getCharacterSet(iX);
-			fileName.isExistentLocalResource(timeout,characterSet,staticContext);
+			CharacterSet givenCharacterSet= getCharacterSet(iX);
+			fileName.isExistentLocalResource(timeout,givenCharacterSet,staticContext);
 		} catch (Throwable e) {
 			throw Backtracking.instance;
 		}

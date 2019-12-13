@@ -12,8 +12,8 @@ import morozov.terms.signals.*;
 
 public class DialogIdentifierOrAuto {
 	//
-	public String name;
-	public boolean isAutomatic;
+	protected String name;
+	protected boolean isAutomatic;
 	//
 	protected static Term termAuto= new PrologSymbol(SymbolCodes.symbolCode_E_auto);
 	//
@@ -23,6 +23,15 @@ public class DialogIdentifierOrAuto {
 	}
 	public DialogIdentifierOrAuto() {
 		isAutomatic= true;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public String getName() {
+		return name;
+	}
+	public boolean isAutomatic() {
+		return isAutomatic;
 	}
 	//
 	///////////////////////////////////////////////////////////////

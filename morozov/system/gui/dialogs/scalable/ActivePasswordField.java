@@ -39,6 +39,7 @@ public class ActivePasswordField extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
@@ -50,12 +51,14 @@ public class ActivePasswordField extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void putValue(Term value, ChoisePoint iX) {
 		if (component!=null) {
 			((APasswordField)component).setText(value.toString(iX));
 		}
 	}
 	//
+	@Override
 	public Term getValue() {
 		if (component!=null) {
 			return new PrologString(new String(((APasswordField)component).getPassword()));
@@ -66,8 +69,10 @@ public class ActivePasswordField extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setGeneralForeground(Color c) {
 	}
+	@Override
 	public void setGeneralBackground(Color c) {
 	}
 	//

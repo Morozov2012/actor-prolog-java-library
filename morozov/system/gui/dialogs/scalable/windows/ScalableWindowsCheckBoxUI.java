@@ -15,10 +15,14 @@ import javax.swing.AbstractButton;
 import com.sun.java.swing.plaf.windows.WindowsCheckBoxUI;
 
 public class ScalableWindowsCheckBoxUI extends WindowsCheckBoxUI {
-	private boolean icon_is_copied= false;
+	//
+	protected boolean icon_is_copied= false;
+	//
 	public static ComponentUI createUI(JComponent c) {
 		return new ScalableWindowsCheckBoxUI();
 	}
+	//
+	@Override
 	public void installDefaults(AbstractButton b) {
 		super.installDefaults(b);
 		if(!icon_is_copied) {
@@ -28,6 +32,7 @@ public class ScalableWindowsCheckBoxUI extends WindowsCheckBoxUI {
 			icon_is_copied= true;
 		}
 	}
+	@Override
 	public void uninstallDefaults(AbstractButton b) {
 		super.uninstallDefaults(b);
 		icon_is_copied= false;

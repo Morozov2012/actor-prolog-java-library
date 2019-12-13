@@ -14,6 +14,7 @@ import java.awt.Point;
 import java.awt.Color;
 
 public interface DialogOperations {
+	//
 	public void initiate(StaticContext context);
 	public Window getWindow();
 	//
@@ -47,7 +48,6 @@ public interface DialogOperations {
 	//
 	public void invalidate();
 	public void validate();
-	// public void validateTree();
 	public void revalidate();
 	public void repaint();
 	public void repaintParent();

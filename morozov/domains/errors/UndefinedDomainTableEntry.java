@@ -3,7 +3,9 @@
 package morozov.domains.errors;
 
 public class UndefinedDomainTableEntry extends RuntimeException {
-	public String domainName;
+	//
+	protected String domainName;
+	//
 	public UndefinedDomainTableEntry(String name) {
 		domainName= name;
 	}

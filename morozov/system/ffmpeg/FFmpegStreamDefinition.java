@@ -10,10 +10,10 @@ import target.*;
 
 import morozov.run.*;
 import morozov.system.converters.*;
+import morozov.system.errors.*;
 import morozov.system.ffmpeg.converters.*;
 import morozov.system.ffmpeg.errors.*;
 import morozov.terms.*;
-import morozov.terms.errors.*;
 import morozov.terms.signals.*;
 
 import java.util.ArrayList;
@@ -27,7 +27,6 @@ public class FFmpegStreamDefinition {
 	protected Integer codecId;
 	protected Integer codecTag;
 	protected Integer bitRate;
-	// protected FFmpegCodecOption[] codecOptions;
 	protected Integer bitRateTolerance;
 	protected Integer globalQuality;
 	protected Integer compressionLevel;
@@ -85,8 +84,6 @@ public class FFmpegStreamDefinition {
 	protected Integer qMax;
 	protected Integer maxQDiff;
 	protected Integer rcBufferSize;
-	// protected Integer rcOverrideCount;
-	// protected Integer rcOverride;
 	protected Integer rcMaxRate;
 	protected Integer rcMinRate;
 	protected Double rcMaxAvailableVbvUse;
@@ -121,7 +118,6 @@ public class FFmpegStreamDefinition {
 			Integer givenCodecId,
 			Integer givenCodecTag,
 			Integer givenBitRate,
-			// FFmpegCodecOption[] givenCodecOptions,
 			Integer givenBitRateTolerance,
 			Integer givenGlobalQuality,
 			Integer givenCompressionLevel,
@@ -179,8 +175,6 @@ public class FFmpegStreamDefinition {
 			Integer givenQMax,
 			Integer givenMaxQDiff,
 			Integer givenRcBufferSize,
-			// Integer givenRcOverrideCount,
-			// Integer givenRcOverride,
 			Integer givenRcMaxRate,
 			Integer givenRcMinRate,
 			Double givenRcMaxAvailableVbvUse,
@@ -206,7 +200,6 @@ public class FFmpegStreamDefinition {
 		codecId= givenCodecId;
 		codecTag= givenCodecTag;
 		bitRate= givenBitRate;
-		// codecOptions= givenCodecOptions;
 		bitRateTolerance= givenBitRateTolerance;
 		globalQuality= givenGlobalQuality;
 		compressionLevel= givenCompressionLevel;
@@ -264,8 +257,6 @@ public class FFmpegStreamDefinition {
 		qMax= givenQMax;
 		maxQDiff= givenMaxQDiff;
 		rcBufferSize= givenRcBufferSize;
-		// rcOverrideCount= givenRcOverrideCount;
-		// rcOverride= givenRcOverride;
 		rcMaxRate= givenRcMaxRate;
 		rcMinRate= givenRcMinRate;
 		rcMaxAvailableVbvUse= givenRcMaxAvailableVbvUse;
@@ -639,12 +630,6 @@ public class FFmpegStreamDefinition {
 			};
 			c.time_base(timeBase);
 		};
-		// if (width != null) {
-		//	c.width(width);
-		// };
-		// if (height != null) {
-		//	c.height(height);
-		// };
 		if (gopSize != null) {
 			c.gop_size(gopSize);
 		};
@@ -889,15 +874,15 @@ public class FFmpegStreamDefinition {
 			// if unknown. Array is terminated by 0.
 			LongPointer channelLayouts= codec.channel_layouts();
 			if (channelLayouts != null) {
-				long channelLayout= channelLayouts.get(0);
-				if (channelLayout != 0) {
-					c.channel_layout(channelLayout);
+				long currentChannelLayout= channelLayouts.get(0);
+				if (currentChannelLayout != 0) {
+					c.channel_layout(currentChannelLayout);
 					int position= 0;
 					while (true) {
-						channelLayout= channelLayouts.get(position);
-						if (channelLayout==0) {
+						currentChannelLayout= channelLayouts.get(position);
+						if (currentChannelLayout==0) {
 							break;
-						} else if (channelLayout==userDefinedChannelLayout) {
+						} else if (currentChannelLayout==userDefinedChannelLayout) {
 							c.channel_layout(userDefinedChannelLayout);
 							break;
 						};
@@ -912,9 +897,9 @@ public class FFmpegStreamDefinition {
 			// if unknown. Array is terminated by 0.
 			LongPointer channelLayouts= codec.channel_layouts();
 			if (channelLayouts != null) {
-				long channelLayout= channelLayouts.get(0);
-				if (channelLayout != 0) {
-					c.channel_layout(channelLayout);
+				long currentChannelLayout= channelLayouts.get(0);
+				if (currentChannelLayout != 0) {
+					c.channel_layout(currentChannelLayout);
 					c.channels(av_get_channel_layout_nb_channels(c.channel_layout()));
 				}
 			}
@@ -1028,26 +1013,24 @@ public class FFmpegStreamDefinition {
 	public static FFmpegStreamDefinition[] listToStreamDefinitions(Term value, ChoisePoint iX) {
 		value= value.dereferenceValue(iX);
 		ArrayList<FFmpegStreamDefinition> streamArray= new ArrayList<>();
-		Term nextHead= null;
 		Term currentTail= value;
 		try {
 			while (true) {
-				nextHead= currentTail.getNextListHead(iX);
+				Term nextHead= currentTail.getNextListHead(iX);
 				FFmpegStreamDefinition stream= argumentToStreamDefinition(nextHead,iX);
 				streamArray.add(stream);
 				currentTail= currentTail.getNextListTail(iX);
 			}
 		} catch (EndOfList e1) {
 		} catch (TermIsNotAList e2) {
-			// throw new WrongArgumentIsNotFFmpegStream(value);
 			FFmpegStreamDefinition stream= argumentToStreamDefinition(currentTail,iX);
 			streamArray.add(stream);
 		};
-		return streamArray.toArray(new FFmpegStreamDefinition[0]);
+		return streamArray.toArray(new FFmpegStreamDefinition[streamArray.size()]);
 	}
 	//
 	public static FFmpegStreamDefinition argumentToStreamDefinition(Term value, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		HashMap<Long,Term> setPositiveMap= new HashMap<>();
 		Term setEnd= value.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
 		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -1055,7 +1038,6 @@ public class FFmpegStreamDefinition {
 			Integer givenCodecId= null;
 			Integer givenCodecTag= null;
 			Integer givenBitRate= null;
-			// FFmpegCodecOption[] givenCodecOptions= null;
 			Integer givenBitRateTolerance= null;
 			Integer givenGlobalQuality= null;
 			Integer givenCompressionLevel= null;
@@ -1113,8 +1095,6 @@ public class FFmpegStreamDefinition {
 			Integer givenQMax= null;
 			Integer givenMaxQDiff= null;
 			Integer givenRcBufferSize= null;
-			// Integer givenRcOverrideCount= null;
-			// Integer givenRcOverride= null;
 			Integer givenRcMaxRate= null;
 			Integer givenRcMinRate= null;
 			Double givenRcMaxAvailableVbvUse= null;
@@ -1149,8 +1129,6 @@ public class FFmpegStreamDefinition {
 					givenCodecTag= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_bit_rate) {
 					givenBitRate= GeneralConverters.argumentToSmallInteger(pairValue,iX);
-				// } else if (pairName==SymbolCodes.symbolCode_E_codec_options) {
-				//	givenCodecOptions= FFmpegCodecOption.argumentToCodecOptions(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_bit_rate_tolerance) {
 					givenBitRateTolerance= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_global_quality) {
@@ -1265,10 +1243,6 @@ public class FFmpegStreamDefinition {
 					givenMaxQDiff= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_rc_buffer_size) {
 					givenRcBufferSize= GeneralConverters.argumentToSmallInteger(pairValue,iX);
-				// } else if (pairName==SymbolCodes.symbolCode_E_rc_override_count) {
-				//	givenRcOverrideCount= GeneralConverters.argumentToSmallInteger(pairValue,iX);
-				// } else if (pairName==SymbolCodes.symbolCode_E_rc_override) {
-				//	givenRcOverride= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_rc_max_rate) {
 					givenRcMaxRate= GeneralConverters.argumentToSmallInteger(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_rc_min_rate) {
@@ -1321,7 +1295,6 @@ public class FFmpegStreamDefinition {
 				givenCodecId,
 				givenCodecTag,
 				givenBitRate,
-				// givenCodecOptions,
 				givenBitRateTolerance,
 				givenGlobalQuality,
 				givenCompressionLevel,
@@ -1379,8 +1352,6 @@ public class FFmpegStreamDefinition {
 				givenQMax,
 				givenMaxQDiff,
 				givenRcBufferSize,
-				// givenRcOverrideCount,
-				// givenRcOverride,
 				givenRcMaxRate,
 				givenRcMinRate,
 				givenRcMaxAvailableVbvUse,

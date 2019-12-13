@@ -4,10 +4,8 @@ package morozov.built_in;
 
 import morozov.run.*;
 import morozov.system.converters.*;
-import morozov.system.errors.*;
 import morozov.system.gui.*;
 import morozov.terms.*;
-import morozov.terms.signals.*;
 import morozov.worlds.*;
 
 import java.awt.Window;
@@ -24,72 +22,48 @@ public abstract class DesktopWindow extends Alpha {
 	///////////////////////////////////////////////////////////////
 	//
 	public void getEnvironmentVariable1ff(ChoisePoint iX, PrologVariable result, Term a1) throws Backtracking {
-		try {
-			String name= a1.getStringValue(iX);
-			String value= System.getenv(name);
-			if (value != null) {
-				result.setNonBacktrackableValue(new PrologString(value));
-			} else {
-				throw Backtracking.instance;
-			}
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a1);
+		String name= GeneralConverters.argumentToString(a1,iX);
+		String value= System.getenv(name);
+		if (value != null) {
+			result.setNonBacktrackableValue(new PrologString(value));
+		} else {
+			throw Backtracking.instance;
 		}
 	}
 	public void getEnvironmentVariable1fs(ChoisePoint iX, Term a1) throws Backtracking {
-		try {
-			String name= a1.getStringValue(iX);
-			String value= System.getenv(name);
-			if (value==null) {
-				throw Backtracking.instance;
-			}
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a1);
+		String name= GeneralConverters.argumentToString(a1,iX);
+		String value= System.getenv(name);
+		if (value==null) {
+			throw Backtracking.instance;
 		}
 	}
 	//
 	public void getSystemProperty1ff(ChoisePoint iX, PrologVariable result, Term a1) throws Backtracking {
-		try {
-			String name= a1.getStringValue(iX);
-			String value= System.getProperty(name);
-			if (value != null) {
-				result.setNonBacktrackableValue(new PrologString(value));
-			} else {
-				throw Backtracking.instance;
-			}
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a1);
+		String name= GeneralConverters.argumentToString(a1,iX);
+		String value= System.getProperty(name);
+		if (value != null) {
+			result.setNonBacktrackableValue(new PrologString(value));
+		} else {
+			throw Backtracking.instance;
 		}
 	}
 	public void getSystemProperty1fs(ChoisePoint iX, Term a1) throws Backtracking {
-		try {
-			String name= a1.getStringValue(iX);
-			String value= System.getProperty(name);
-			if (value==null) {
-				throw Backtracking.instance;
-			}
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a1);
+		String name= GeneralConverters.argumentToString(a1,iX);
+		String value= System.getProperty(name);
+		if (value==null) {
+			throw Backtracking.instance;
 		}
 	}
 	//
 	public void setSystemProperty2s(ChoisePoint iX, Term a1, Term a2) {
-		try {
-			String name= a1.getStringValue(iX);
-			String value= a2.getStringValue(iX);
-			System.setProperty(name,value);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a1);
-		}
+		String name= GeneralConverters.argumentToString(a1,iX);
+		String value= GeneralConverters.argumentToString(a2,iX);
+		System.setProperty(name,value);
 	}
 	//
 	public void removeSystemProperty1s(ChoisePoint iX, Term a1) {
-		try {
-			String name= a1.getStringValue(iX);
-			System.clearProperty(name);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(a1);
-		}
+		String name= GeneralConverters.argumentToString(a1,iX);
+		System.clearProperty(name);
 	}
 	//
 	public void setExitOnClose1s(ChoisePoint iX, Term a1) {
@@ -200,8 +174,6 @@ public abstract class DesktopWindow extends Alpha {
 			if (!DesktopUtils.safelyIsHidden(mainWindow)) {
 				throw Backtracking.instance;
 			}
-		// } else {
-		//	throw Backtracking.instance;
 		}
 	}
 	//

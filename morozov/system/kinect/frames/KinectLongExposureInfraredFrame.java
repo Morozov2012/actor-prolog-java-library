@@ -54,6 +54,7 @@ public class KinectLongExposureInfraredFrame extends KinectFrame implements Kine
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public short[] getLongExposureInfrared() {
 		return longExposureInfrared;
 	}

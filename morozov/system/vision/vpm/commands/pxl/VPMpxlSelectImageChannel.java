@@ -14,6 +14,7 @@ public class VPMpxlSelectImageChannel extends VPM_FrameCommand {
 		channelName= name;
 	}
 	//
+	@Override
 	public void execute(VPM vpm) {
 		vpm.selectImageChannel(channelName);
 	}

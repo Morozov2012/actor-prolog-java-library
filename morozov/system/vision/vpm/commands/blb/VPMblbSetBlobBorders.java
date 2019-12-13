@@ -17,6 +17,7 @@ public class VPMblbSetBlobBorders extends VPM_FrameCommand {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void execute(VPM vpm) {
 		vpm.blbSetBlobBorders(horizontalBorderWidth,verticalBorderWidth);
 	}

@@ -14,145 +14,181 @@ import morozov.terms.signals.*;
 public enum FFmpeg_IDCT_AlgorithmName {
 	//
 	FF_IDCT_AUTO {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_IDCT_AUTO;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_IDCT_AUTO;
 		}
 	},
 	FF_IDCT_INT {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_IDCT_INT;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_IDCT_INT;
 		}
 	},
 	FF_IDCT_SIMPLE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_IDCT_SIMPLE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_IDCT_SIMPLE;
 		}
 	},
 	FF_IDCT_SIMPLEMMX {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_IDCT_SIMPLEMMX;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_IDCT_SIMPLEMMX;
 		}
 	},
 	FF_IDCT_ARM {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_IDCT_ARM;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_IDCT_ARM;
 		}
 	},
 	FF_IDCT_ALTIVEC {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_IDCT_ALTIVEC;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_IDCT_ALTIVEC;
 		}
 	},
 	FF_IDCT_SH4 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_IDCT_SH4;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_IDCT_SH4;
 		}
 	},
 	FF_IDCT_SIMPLEARM {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_IDCT_SIMPLEARM;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_IDCT_SIMPLEARM;
 		}
 	},
 	FF_IDCT_IPP {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_IDCT_IPP;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_IDCT_IPP;
 		}
 	},
 	FF_IDCT_XVID {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_IDCT_XVID;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_IDCT_XVID;
 		}
 	},
 	FF_IDCT_XVIDMMX {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_IDCT_XVIDMMX;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_IDCT_XVIDMMX;
 		}
 	},
 	FF_IDCT_SIMPLEARMV5TE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_IDCT_SIMPLEARMV5TE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_IDCT_SIMPLEARMV5TE;
 		}
 	},
 	FF_IDCT_SIMPLEARMV6 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_IDCT_SIMPLEARMV6;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_IDCT_SIMPLEARMV6;
 		}
 	},
 	FF_IDCT_SIMPLEVIS {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_IDCT_SIMPLEVIS;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_IDCT_SIMPLEVIS;
 		}
 	},
 	FF_IDCT_FAAN {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_IDCT_FAAN;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_IDCT_FAAN;
 		}
 	},
 	FF_IDCT_SIMPLENEON {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_IDCT_SIMPLENEON;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_IDCT_SIMPLENEON;
 		}
 	},
 	FF_IDCT_SIMPLEALPHA {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_IDCT_SIMPLEALPHA;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_IDCT_SIMPLEALPHA;
 		}
 	},
 	FF_IDCT_SIMPLEAUTO {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_IDCT_SIMPLEAUTO;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_IDCT_SIMPLEAUTO;
 		}

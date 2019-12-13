@@ -12,9 +12,9 @@ import morozov.terms.signals.*;
 
 public class ProcessBuilderCommand {
 	//
-	public String text;
-	public boolean isAutomatic;
-	public boolean isExtensionSpecific;
+	protected String text;
+	protected boolean isAutomatic;
+	protected boolean isExtensionSpecific;
 	//
 	public ProcessBuilderCommand() {
 		text= "";
@@ -36,6 +36,18 @@ public class ProcessBuilderCommand {
 			isAutomatic= false;
 			isExtensionSpecific= false;
 		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public String getText() {
+		return text;
+	}
+	public boolean isAutomatic() {
+		return isAutomatic;
+	}
+	public boolean isExtensionSpecific() {
+		return isExtensionSpecific;
 	}
 	//
 	///////////////////////////////////////////////////////////////

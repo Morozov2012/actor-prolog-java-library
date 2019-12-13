@@ -9,8 +9,8 @@ import java.util.ArrayList;
 
 public class SuspendedCallTableState extends Term {
 	//
-	private ArrayList<SuspendedCall> table;
-	private int currentSize;
+	protected ArrayList<SuspendedCall> table;
+	protected int currentSize;
 	//
 	private static final long serialVersionUID= 0xA10A10748C93A20BL; // -6842638591075311093L
 	//
@@ -24,15 +24,19 @@ public class SuspendedCallTableState extends Term {
 		table= callTable;
 		currentSize= callTable.size();
 	}
+	//
+	@Override
 	public void clear() {
 		for(int i=table.size(); i > currentSize; i--) {
 			table.remove(i-1);
 		}
 	}
-	// General "Unify With" function
+	// General "Unify With" function:
+	@Override
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		throw new SpecialTermCannotBeUnified();
 	}
+	@Override
 	public String toString() {
 		return "SuspendedCallTableState=" + currentSize;
 	}

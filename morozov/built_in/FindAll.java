@@ -7,6 +7,7 @@ import target.*;
 import morozov.run.*;
 import morozov.run.errors.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.terms.*;
 import morozov.worlds.*;
 
@@ -47,7 +48,7 @@ public abstract class FindAll extends Lambda {
 	}
 	//
 	public class Collect extends Continuation {
-		// private Continuation c0;
+		//
 		private long predicateSignatureNumber;
 		private boolean subgoalIsCallOfFunction;
 		private boolean clauseIsFunction;
@@ -61,13 +62,14 @@ public abstract class FindAll extends Lambda {
 			argumentList= (Term[])args;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			collect_items(c0,iX,predicateSignatureNumber,subgoalIsCallOfFunction,clauseIsFunction,argumentList);
 		}
 	}
 	//
-	private void collect_items(Continuation c0, ChoisePoint iX, long predicateSignatureNumber, boolean subgoalIsCallOfFunction, boolean clauseIsFunction, Term[] args) throws Backtracking {
-		CollectingMode reduceResultList= CollectingMode.argumentToCollectingMode(getBuiltInSlot_E_mode(),iX);
+	protected void collect_items(Continuation c0, ChoisePoint iX, long predicateSignatureNumber, boolean subgoalIsCallOfFunction, boolean clauseIsFunction, Term[] args) throws Backtracking {
+		CollectingMode reduceResultList= CollectingModeConverters.argumentToCollectingMode(getBuiltInSlot_E_mode(),iX);
 		long worldDomainSignatureNumber;
 		if (clauseIsFunction) {
 			worldDomainSignatureNumber= domainSignatureOfSubgoal_1_InClause_3(predicateSignatureNumber);
@@ -81,34 +83,33 @@ public abstract class FindAll extends Lambda {
 			if (subgoalIsCallOfFunction) {
 				targetArguments= new Term[args.length];
 				targetArguments[0]= result;
-				for(int i= 1; i < args.length; i++) {
-					targetArguments[i]= args[i];
-				}
+				System.arraycopy(args,1,targetArguments,1,args.length-1);
 			} else {
 				targetArguments= new Term[args.length+1];
 				targetArguments[0]= result;
-				for(int i= 0; i < args.length; i++) {
-					targetArguments[i+1]= args[i];
-				}
+				System.arraycopy(args,0,targetArguments,1,args.length);
 			}
 		} else {
 			targetArguments= args;
 		};
 		final AbstractCollection<Term> resultSet;
 		if (reduceResultList==CollectingMode.SET) {
-			resultSet= new TreeSet<Term>(new TermComparator(true));
+			resultSet= new TreeSet<>(new TermComparator(true));
 		} else {
-			resultSet= new ArrayList<Term>();
+			resultSet= new ArrayList<>();
 		};
 		Continuation completion= new Continuation() {
+			@Override
 			public void execute(ChoisePoint iX) throws Backtracking {
 				Term newResult= result.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 				resultSet.add(newResult);
 				throw Backtracking.instance;
 			}
+			@Override
 			public boolean isPhaseTermination() {
 				return false;
 			}
+			@Override
 			public String toString() {
 				return "RememberResult&Backtrack;";
 			}
@@ -122,7 +123,7 @@ public abstract class FindAll extends Lambda {
 			newIndex.freeTrail();
 			if (subgoalIsCallOfFunction && clauseIsFunction) {
 				Term resultList= PrologEmptyList.instance;
-				Term[] resultArray= resultSet.toArray(new Term[0]);
+				Term[] resultArray= resultSet.toArray(new Term[resultSet.size()]);
 				for (int n=resultArray.length-1; n >= 0; n--) {
 					Term currentResult= resultArray[n];
 					resultList= new PrologList(currentResult,resultList);

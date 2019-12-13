@@ -14,129 +14,161 @@ import morozov.terms.signals.*;
 public enum FFmpegDebugOptionName {
 	//
 	FF_DEBUG_PICT_INFO {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DEBUG_PICT_INFO;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DEBUG_PICT_INFO;
 		}
 	},
 	FF_DEBUG_RC {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DEBUG_RC;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DEBUG_RC;
 		}
 	},
 	FF_DEBUG_BITSTREAM {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DEBUG_BITSTREAM;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DEBUG_BITSTREAM;
 		}
 	},
 	FF_DEBUG_MB_TYPE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DEBUG_MB_TYPE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DEBUG_MB_TYPE;
 		}
 	},
 	FF_DEBUG_QP {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DEBUG_QP;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DEBUG_QP;
 		}
 	},
 	FF_DEBUG_DCT_COEFF {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DEBUG_DCT_COEFF;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DEBUG_DCT_COEFF;
 		}
 	},
 	FF_DEBUG_SKIP {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DEBUG_SKIP;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DEBUG_SKIP;
 		}
 	},
 	FF_DEBUG_STARTCODE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DEBUG_STARTCODE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DEBUG_STARTCODE;
 		}
 	},
 	FF_DEBUG_PTS {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DEBUG_PTS;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DEBUG_PTS;
 		}
 	},
 	FF_DEBUG_ER {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DEBUG_ER;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DEBUG_ER;
 		}
 	},
 	FF_DEBUG_MMCO {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DEBUG_MMCO;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DEBUG_MMCO;
 		}
 	},
 	FF_DEBUG_BUGS {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DEBUG_BUGS;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DEBUG_BUGS;
 		}
 	},
 	FF_DEBUG_BUFFERS {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DEBUG_BUFFERS;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DEBUG_BUFFERS;
 		}
 	},
 	FF_DEBUG_THREADS {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DEBUG_THREADS;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DEBUG_THREADS;
 		}
 	},
 	FF_DEBUG_GREEN_MD {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DEBUG_GREEN_MD;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DEBUG_GREEN_MD;
 		}
 	},
 	FF_DEBUG_NOMC {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_DEBUG_NOMC;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_DEBUG_NOMC;
 		}

@@ -12,11 +12,13 @@ import morozov.terms.signals.*;
 public enum ErodingAlgorithm {
 	//
 	PLAIN_ERODING {
+		@Override
 		public Term toTerm() {
 			return term_PLAIN_ERODING;
 		}
 	},
 	HIERARCHICAL_ERODING {
+		@Override
 		public Term toTerm() {
 			return term_HIERARCHICAL_ERODING;
 		}

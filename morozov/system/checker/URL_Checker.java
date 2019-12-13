@@ -3,8 +3,8 @@
 package morozov.system.checker;
 
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.files.*;
-import morozov.terms.*;
 import morozov.worlds.*;
 
 import java.math.BigInteger;
@@ -22,13 +22,15 @@ import java.util.Calendar;
 import java.util.NoSuchElementException;
 
 public class URL_Checker extends ThreadHolder {
+	//
 	protected SortedMap<BigInteger,FutureEvent> eventTable= Collections.synchronizedSortedMap(new TreeMap<BigInteger,FutureEvent>());
-	private static final BigInteger oneMillion= BigInteger.valueOf(1000000);
+	protected static final BigInteger oneMillion= BigInteger.valueOf(1000000);
 	//
 	public URL_Checker(ActiveWorld process) {
 		super(process);
 	}
 	//
+	@Override
 	public void run() {
 		while (!stopThisThread.get()) {
 			BigInteger firstKey= null;
@@ -36,7 +38,6 @@ public class URL_Checker extends ThreadHolder {
 				firstKey= eventTable.firstKey();
 			} catch (NoSuchElementException e) {
 			};
-			// GregorianCalendar calendar= new GregorianCalendar();
 			Calendar calendar= Calendar.getInstance();
 			BigInteger currentTime= BigInteger.valueOf(calendar.getTimeInMillis()).multiply(oneMillion);
 			if (firstKey==null) {
@@ -50,7 +51,7 @@ public class URL_Checker extends ThreadHolder {
 				BigInteger delayInNanoseconds= firstKey.subtract(currentTime);
 				BigInteger delayInMilliseconds= delayInNanoseconds.divide(oneMillion); //,MathContext.DECIMAL128);
 				BigInteger nanoDelay= delayInNanoseconds.remainder(oneMillion); //,MathContext.DECIMAL128);
-				long timeout= PrologInteger.toLong(delayInMilliseconds);
+				long timeout= Arithmetic.toLong(delayInMilliseconds);
 				int nanos= nanoDelay.intValue();
 				if (timeout > 0 || nanos > 0) {
 					synchronized (this) {

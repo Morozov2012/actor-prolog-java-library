@@ -35,48 +35,62 @@ public class KinectFrameWritableBaseAttributes extends KinectFrameBaseAttributes
 			givenCorrectionY);
 	}
 	//
+	@Override
 	public void setDeviceType(byte type) {
 		deviceType= type;
 	}
+	@Override
 	public void setFocalLengthX(float x) {
 		focalLengthX= x;
 	}
+	@Override
 	public void setFocalLengthY(float y) {
 		focalLengthY= y;
 	}
+	@Override
 	public void setFocalLength(float x, float y) {
 		focalLengthX= x;
 		focalLengthY= y;
 	}
+	@Override
 	public void setDepthFrameWidth(int width) {
 		depthFrameWidth= width;
 	}
+	@Override
 	public void setDepthFrameHeight(int height) {
 		depthFrameHeight= height;
 	}
+	@Override
 	public void setDepthFrameSize(int width, int height) {
 		depthFrameWidth= width;
 		depthFrameHeight= height;
 	}
+	@Override
 	public void setColorFrameWidth(int width) {
 		colorFrameWidth= width;
 	}
+	@Override
 	public void setColorFrameHeight(int height) {
 		colorFrameHeight= height;
 	}
+	@Override
 	public void setColorFrameSize(int width, int height) {
 		colorFrameWidth= width;
 		colorFrameHeight= height;
 	}
+	@Override
 	public void setNumberOfSkeletons(int number) {
 		numberOfSkeletons= number;
 	}
+	@Override
 	public void setCorrectionX(int x) {
 		correctionX= x;
 	}
+	@Override
 	public void setCorrectionY(int y) {
 		correctionY= y;
 	}
+	@Override
 	public void setCorrection(int x, int y) {
 		correctionX= x;
 		correctionY= y;

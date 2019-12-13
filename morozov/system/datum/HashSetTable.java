@@ -15,7 +15,7 @@ import java.util.HashSet;
 
 public class HashSetTable extends DatabaseTable {
 	//
-	protected HashSet<Term> databaseHash= new HashSet<Term>();
+	protected HashSet<Term> databaseHash= new HashSet<>();
 	//
 	protected static Term termHashSet= new PrologSymbol(SymbolCodes.symbolCode_E_HashSet);
 	//
@@ -36,12 +36,14 @@ public class HashSetTable extends DatabaseTable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term getType() {
 		return termHashSet;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public DatabaseRecord insertRecord(Term copy, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX, boolean isInnerOperation) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
 		if (!databaseHash.contains(copy)) {
@@ -58,6 +60,7 @@ public class HashSetTable extends DatabaseTable {
 		}
 	}
 	//
+	@Override
 	public DatabaseRecord appendRecord(Term copy, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX, boolean isInnerOperation) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
 		if (!databaseHash.contains(copy)) {
@@ -74,6 +77,7 @@ public class HashSetTable extends DatabaseTable {
 		}
 	}
 	//
+	@Override
 	public void findRecord(PrologVariable outputResult, Term inputResult, boolean hasOutputArgument, Continuation c0, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) throws Backtracking {
 		container.claimReadingAccess(currentProcess,checkPrivileges);
 		if (!hasOutputArgument) {
@@ -92,6 +96,7 @@ public class HashSetTable extends DatabaseTable {
 		}
 	}
 	//
+	@Override
 	public void retractAll(ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
 		databaseHash.clear();
@@ -100,6 +105,7 @@ public class HashSetTable extends DatabaseTable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void retractCurrentRecord(DatabaseRecord currentRecord, ActiveWorld currentProcess, boolean checkPrivileges, ChoisePoint iX) {
 		container.claimModifyingAccess(currentProcess,checkPrivileges);
 		databaseHash.remove(currentRecord.content);
@@ -108,9 +114,10 @@ public class HashSetTable extends DatabaseTable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Object clone() {
 		HashSetTable o= (HashSetTable)super.clone();
-		o.databaseHash= new HashSet<Term>();
+		o.databaseHash= new HashSet<>();
 		return o;
 	}
 }

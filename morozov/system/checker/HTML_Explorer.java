@@ -24,7 +24,7 @@ public class HTML_Explorer extends HTML_BasicExplorer {
 	protected String[][] referenceContainersTable;
 	protected String[][] specialEntitiesTable;
 	//
-	protected Stack<String> tagNesting= new Stack<String>();
+	protected Stack<String> tagNesting= new Stack<>();
 	//
 	public HTML_Explorer(
 			boolean aExtractAttributes,
@@ -89,7 +89,7 @@ public class HTML_Explorer extends HTML_BasicExplorer {
 	}
 	//
 	protected Term extractTagStructure(URI baseURI, Pattern pattern) {
-		ArrayList<Term> items= new ArrayList<Term>();
+		ArrayList<Term> items= new ArrayList<>();
 		StringBuilder textBuffer= new StringBuilder();
 		while(stack.peek() < text.length()) {
 			int p1= stack.peek();
@@ -100,14 +100,12 @@ public class HTML_Explorer extends HTML_BasicExplorer {
 				continue;
 			};
 			try {
-				// skipSpaces();
 				if (text.regionMatches(stack.peek(),"<",0,1)) {
 					if (text.regionMatches(stack.peek()+1,"!--",0,3)) {
 						shiftTextPosition(4);
 						skipCurrentComment();
 						continue;
 					};
-					// skipSpaces();
 					if (isEndOfBlock()) {
 						break;
 					} else {
@@ -201,7 +199,7 @@ public class HTML_Explorer extends HTML_BasicExplorer {
 	protected Term extractReferences(URI baseURI, String mask) {
 		char[] nativePattern= mask.toCharArray();
 		Pattern pattern= FileNameMask.wildcard2UnixPattern(nativePattern);
-		ArrayList<String> items= new ArrayList<String>();
+		ArrayList<String> items= new ArrayList<>();
 		while(stack.peek() < text.length()) {
 			int p1= stack.peek();
 			int p2= text.indexOf('<',p1);
@@ -244,7 +242,6 @@ public class HTML_Explorer extends HTML_BasicExplorer {
 		};
 		try {
 			stack.push(stack.peek());
-			// skipSpaces();
 			if (text.regionMatches(stack.peek(),"<",0,1)) {
 				shiftTextPosition(1);
 				String currentTag= tagNesting.peek();
@@ -295,13 +292,11 @@ public class HTML_Explorer extends HTML_BasicExplorer {
 			};
 			for (int n= 0; n < referenceContainersTable.length; n++) {
 				if (containerName.equals(referenceContainersTable[n][0])) {
-					// shiftTextPosition(containerName.length());
 					int p1= stack.peek();
 					String path= extractPairValue(referenceContainersTable[n][1]);
 					path= scanURI(path,baseURI);
-					// skipCurrentTag();
 					if (isEnabledReference(path,pattern)) {
-						ArrayList<Term> tagAttributes= new ArrayList<Term>();
+						ArrayList<Term> tagAttributes= new ArrayList<>();
 						if (extractAttributes) {
 							stack.set(stack.size()-1,p1);
 							extractTagAttributes(tagAttributes);
@@ -376,7 +371,7 @@ public class HTML_Explorer extends HTML_BasicExplorer {
 			}
 		};
 		if (flag) {
-			ArrayList<Term> tagAttributes= new ArrayList<Term>();
+			ArrayList<Term> tagAttributes= new ArrayList<>();
 			if (extractAttributes) {
 				extractTagAttributes(tagAttributes);
 			};

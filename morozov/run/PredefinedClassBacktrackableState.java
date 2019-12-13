@@ -9,8 +9,8 @@ import java.util.ArrayList;
 
 public class PredefinedClassBacktrackableState extends Term {
 	//
-	private ArrayList<PredefinedClassRecord> table;
-	private int currentSize;
+	protected ArrayList<PredefinedClassRecord> table;
+	protected int currentSize;
 	//
 	private static final long serialVersionUID= 0x7E032CB9D9844490L; // 9080150450438947984L
 	//
@@ -24,15 +24,18 @@ public class PredefinedClassBacktrackableState extends Term {
 		table= stack;
 		currentSize= stack.size();
 	}
+	@Override
 	public void clear() {
 		for(int i=table.size(); i > currentSize; i--) {
 			table.remove(i-1);
 		}
 	}
-	// General "Unify With" function
+	// General "Unify With" function:
+	@Override
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		throw new SpecialTermCannotBeUnified();
 	}
+	@Override
 	public String toString() {
 		return "PredefinedClassBacktrackableState=" + currentSize;
 	}

@@ -28,8 +28,8 @@ public class DomainIntegerConstant extends DomainAlternative {
 		constantValue= BigInteger.valueOf(value);
 	}
 	//
+	@Override
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
-		// t= t.dereferenceValue(cp);
 		t= t.dereferenceValue(cp);
 		if (ignoreFreeVariables && t.thisIsFreeVariable()) {
 			return true;
@@ -46,22 +46,28 @@ public class DomainIntegerConstant extends DomainAlternative {
 		}
 	}
 	//
+	@Override
 	public boolean isEqualTo(DomainAlternative a, HashSet<PrologDomainPair> stack) {
 		return a.isEqualToIntegerConstant(constantValue);
 	}
+	@Override
 	public boolean isEqualToIntegerConstant(BigInteger value) {
 		return constantValue.compareTo(value)==0;
 	}
+	@Override
 	public boolean coversAlternative(DomainAlternative a, PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) {
 		return false;
 	}
+	@Override
 	public boolean isCoveredByInteger() {
 		return true;
 	}
+	@Override
 	public boolean isCoveredByIntegerRange(BigInteger value1, BigInteger value2) {
 		return (value1.compareTo(constantValue)<=0) && (value2.compareTo(constantValue)>=0);
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
 		return PrologDomainName.tagDomainAlternative_IntegerConstant + "(" + FormatOutput.integerToString(constantValue) + ")";
 	}

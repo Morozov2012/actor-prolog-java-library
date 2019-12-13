@@ -18,6 +18,7 @@ public class SyntaxError extends Exception {
 		return position;
 	}
 	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(position:" + Integer.toString(position) + ")";
 	}

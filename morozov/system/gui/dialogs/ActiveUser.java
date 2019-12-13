@@ -16,8 +16,8 @@ import java.util.HashMap;
 public class ActiveUser extends ActiveWorld {
 	//
 	protected AbstractDialog targetDialog= null;
-	protected HashMap<SlotVariable,DialogEntry> slotMap= new HashMap<SlotVariable,DialogEntry>();
-	protected HashSet<DialogEvent> userInterfaceMessages= new HashSet<DialogEvent>();
+	protected HashMap<SlotVariable,DialogEntry> slotMap= new HashMap<>();
+	protected HashSet<DialogEvent> userInterfaceMessages= new HashSet<>();
 	//
 	private static final long serialVersionUID= 0x4DB5653AB96D4F75L; // 5599493014598537077L
 	//
@@ -39,25 +39,32 @@ public class ActiveUser extends ActiveWorld {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void actualize(ChoisePoint iX) {
 	}
+	@Override
 	public void startProcesses() {
 		start();
 	}
+	@Override
 	public void releaseSystemResources() {
 	}
+	@Override
 	public void stopProcesses() {
 		stop();
 	}
 	//
+	@Override
 	public MethodSignature[] getMethodSignatures() {
 		return emptySignatureList;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void extractWorlds(AbstractProcess process, LinkedHashSet<AbstractInternalWorld> list) {
 	}
+	@Override
 	public AbstractInternalWorld internalWorld() {
 		throw new AnAttemptToExtractInternalWorldFromActiveUser();
 	}
@@ -65,9 +72,11 @@ public class ActiveUser extends ActiveWorld {
 	final public long getPackageCode() {
 		throw new AnAttemptToExtractPackageCodeFromActiveUser();
 	}
+	@Override
 	final public long[] getClassHierarchy() {
 		throw new AnAttemptToExtractClassHierarchyFromActiveUser();
 	}
+	@Override
 	final public long[] getInterfaceHierarchy() {
 		throw new AnAttemptToExtractInterfaceHierarchyFromActiveUser();
 	}
@@ -77,14 +86,19 @@ public class ActiveUser extends ActiveWorld {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void receiveAsyncCall(AsyncCall item) {
 	}
+	@Override
 	public void receiveTimerMessage(AbstractInternalWorld target) {
 	}
+	@Override
 	public void cancelTimerMessage(AbstractInternalWorld target) {
 	}
+	@Override
 	public void sendResidentRequest(Resident resident, long domainSignature, Term[] arguments, boolean sortAndReduceResultList) {
 	}
+	@Override
 	public void withdrawRequest(Resident resident) {
 	}
 	//
@@ -151,9 +165,8 @@ public class ActiveUser extends ActiveWorld {
 				if (slot.thisIsSlotVariable()) {
 					slot.registerVariables(this,false,item.isInsistent);
 					slotMap.put((SlotVariable)slot,item);
-					Term initialValue= null;
 					try {
-						initialValue= item.getExistedValue();
+						Term initialValue= item.getExistedValue();
 						slot.unifyWith(initialValue,rootCP);
 					} catch (Backtracking b) {
 					}
@@ -166,18 +179,9 @@ public class ActiveUser extends ActiveWorld {
 		for (int i= 0; i < slots.length; i++) {
 			DialogEntry item= slots[i];
 			if (item.isSlotName) {
-				// Term value= targetWorld.getSlotByName(item.name);
 				Term value= item.getSlotByName(targetWorld,rootCP);
 				value= value.extractSlotVariable();
-				// if (!value.thisIsSlotVariable()) {
-				// Constant slots are to be used too.
 				item.putValue(DialogControlOperation.VALUE,value.copyValue(rootCP,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES),rootCP);
-				// }
-				//if (!value.thisIsSlotVariable()) {
-				//	item.putValue(value.copyValue(rootCP,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES),rootCP);
-				//} else {
-				//	item.putValue(value.copyValue(rootCP,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES),rootCP);
-				//}
 			}
 		}
 	}
@@ -195,6 +199,7 @@ public class ActiveUser extends ActiveWorld {
 	//
 	// Process Flow Messages
 	//
+	@Override
 	protected void processFlowMessages(ChoisePoint iX) {
 		synchronized (this) {
 			quicklyProcessFlowMessages(iX);
@@ -215,9 +220,11 @@ public class ActiveUser extends ActiveWorld {
 	//
 	// Process One Direct Message
 	//
+	@Override
 	public void acceptDirectMessage() {
 	}
 	//
+	@Override
 	protected void acceptTimerMessage() {
 		synchronized (this) {
 			quicklyAcceptTimerMessage();
@@ -233,7 +240,6 @@ public class ActiveUser extends ActiveWorld {
 		};
 		if (messagesToBeProcessed.length > 0) {
 			for (int n=0; n < messagesToBeProcessed.length; n++) {
-				// targetDialog.transmitEntryValue(messagesToBeProcessed[n].entry,rootCP);
 				messagesToBeProcessed[n].transmitEntryValue(targetDialog,rootCP);
 			};
 			targetDialog.prepareAndSendFlowMessages();
@@ -245,33 +251,41 @@ public class ActiveUser extends ActiveWorld {
 		}
 	}
 	//
+	@Override
 	protected void sendStateOfProcess() {
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void resetResidentOwners() {
 	}
+	@Override
 	protected void informInternalWorldsAboutFailure() {
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Continuation collectSuspendedCalls(Continuation c0, ChoisePoint iX) {
 		return c0;
 	}
 	//
+	@Override
 	public Continuation createActorNeutralizationNode(Continuation aC) {
 		return aC;
 	}
 	//
+	@Override
 	protected boolean removeNewlyProvedOldActors(HashSet<ActorNumber> oldActors) {
 		return false;
 	}
 	//
+	@Override
 	public void clearActorStore() {
 	}
 	//
+	@Override
 	public void registerActorToBeProved(ActorNumber actorNumber, ChoisePoint cp) {
 	}
 	//

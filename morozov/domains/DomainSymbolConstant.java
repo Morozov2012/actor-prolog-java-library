@@ -28,8 +28,8 @@ public class DomainSymbolConstant extends DomainAlternative {
 		constantCode= code;
 	}
 	//
+	@Override
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
-		// t= t.dereferenceValue(cp);
 		t= t.dereferenceValue(cp);
 		if (ignoreFreeVariables && t.thisIsFreeVariable()) {
 			return true;
@@ -46,19 +46,23 @@ public class DomainSymbolConstant extends DomainAlternative {
 		}
 	}
 	//
+	@Override
 	public boolean isEqualTo(DomainAlternative a, HashSet<PrologDomainPair> stack) {
 		return a.isEqualToSymbolConstant(constantCode);
 	}
+	@Override
 	public boolean isEqualToSymbolConstant(long value) {
 		return constantCode == value;
 	}
+	@Override
 	public boolean coversAlternative(DomainAlternative a, PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) {
 		return false;
 	}
+	@Override
 	public boolean isCoveredBySymbol() {
 		return true;
 	}
-	// Converting Term to String
+	// Converting Term to String:
 	private void writeObject(ObjectOutputStream stream) throws IOException {
 		stream.defaultWriteObject();
 		stream.writeObject(SymbolNames.retrieveSymbolName(constantCode));
@@ -69,6 +73,7 @@ public class DomainSymbolConstant extends DomainAlternative {
 		constantCode= SymbolNames.insertSymbolName(symbolName.identifier);
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
 		String text= SymbolNames.retrieveSymbolName(constantCode).toRawString(encoder);
 		return PrologDomainName.tagDomainAlternative_SymbolConstant + "(\'" + text + "\')";

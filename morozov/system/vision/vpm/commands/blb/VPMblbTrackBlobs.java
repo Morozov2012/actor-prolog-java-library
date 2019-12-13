@@ -74,6 +74,7 @@ public class VPMblbTrackBlobs extends VPM_FrameCommand {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void execute(VPM vpm) {
 		trackBlobs(vpm);
 	}
@@ -90,14 +91,12 @@ public class VPMblbTrackBlobs extends VPM_FrameCommand {
 		timeInMilliseconds= vpm.getRecentTimeInMilliseconds();
 		transformationMatrices= vpm.getTransformationMatrices();
 		currentBlobTypes= vpm.getBlobTypes();
-		// currentBlobRectangles= vpm.getBlobRectangles();
 		currentBlobAttributes= vpm.getBlobAttributes();
 		//
 		minimalTrackDuration= vpm.getMinimalTrackDuration();
 		maximalTrackDuration= vpm.getMaximalTrackDuration();
 		maximalBlobInvisibilityInterval= vpm.getMaximalBlobInvisibilityInterval();
 		maximalTrackRetentionInterval= vpm.getMaximalTrackRetentionInterval();
-		// inverseTransformationMatrix= vpm.getInverseTransformationMatrix();
 		samplingRate= vpm.getSamplingRate();
 		r2WindowHalfwidth= vpm.getR2WindowHalfwidth();
 		applyCharacteristicLengthMedianFiltering= vpm.getCharacteristicLengthMedianFilteringMode();
@@ -110,12 +109,12 @@ public class VPMblbTrackBlobs extends VPM_FrameCommand {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	// IDENTIFY BLOBS
+	// IDENTIFY BLOBS:
 	public void trackBlobs() {
 		if (currentBlobTypes==null) {
 			return;
 		};
-		// CHECK PREVIOUS BLOBS
+		// CHECK PREVIOUS BLOBS:
 		if (previousBlobRectangles==null) {
 			previousBlobRectangles= new int[0][0];
 		};
@@ -224,7 +223,7 @@ public class VPMblbTrackBlobs extends VPM_FrameCommand {
 				numberOfUsedPreviousBlobs++;
 			}
 		};
-		// CHECK INVISIBLE BLOBS
+		// CHECK INVISIBLE BLOBS:
 		if (invisibleBlobRectangles==null) {
 			invisibleBlobRectangles= new int[0][4];
 		};
@@ -313,7 +312,7 @@ public class VPMblbTrackBlobs extends VPM_FrameCommand {
 				usedInvisibleBlobs[index2]= true;
 			}
 		};
-		// CREATE NEW TRACKS
+		// CREATE NEW TRACKS:
 		for (int k=0; k < numberOfActiveBlobs; k++) {
 			if (currentBlobIdentifiers[k].compareTo(BigInteger.ZERO) <= 0) {
 				recentBlobIdentifier= recentBlobIdentifier.add(BigInteger.ONE);
@@ -336,8 +335,8 @@ public class VPMblbTrackBlobs extends VPM_FrameCommand {
 				tracks.put(recentBlobIdentifier,track);
 			}
 		};
-		// PREPARE DEFERRED OPERATIONS
-		// Prepare creation of inputs
+		// PREPARE DEFERRED OPERATIONS:
+		// Prepare creation of inputs:
 		for (int n=0; n < numberOfIntersections1; n++) {
 			int index1a= blobIntersections1[n].getIndex1();
 			if (collisionCounters1[index1a] > 1) {
@@ -363,7 +362,7 @@ public class VPMblbTrackBlobs extends VPM_FrameCommand {
 				}
 			}
 		};
-		// Prepare creation of outputs
+		// Prepare creation of outputs:
 		for (int n=0; n < numberOfIntersections1; n++) {
 			int index2= blobIntersections1[n].getIndex2();
 			if (collisionCounters2[index2] > 1) {
@@ -381,7 +380,7 @@ public class VPMblbTrackBlobs extends VPM_FrameCommand {
 				}
 			}
 		};
-		// PROLONG & DELETE INVISIBLE BLOBS
+		// PROLONG & DELETE INVISIBLE BLOBS:
 		int numberOfProlongedBlobs= 0;
 		for (int k=0; k < numberOfInvisibleBlobs; k++) {
 			if (usedInvisibleBlobs[k]) {
@@ -406,9 +405,7 @@ public class VPMblbTrackBlobs extends VPM_FrameCommand {
 				continue;
 			};
 			prolongedBlobTypes[numberOfProlongedBlobs]= previousBlobTypes[k];
-			for (int m=0; m < 4; m++) {
-				prolongedBlobRectangles[numberOfProlongedBlobs][m]= previousBlobRectangles[k][m];
-			};
+			System.arraycopy(previousBlobRectangles[k],0,prolongedBlobRectangles[numberOfProlongedBlobs],0,4);
 			prolongedBlobIdentifiers[numberOfProlongedBlobs]= previousBlobIdentifiers[k];
 			prolongedBlobDelays[numberOfProlongedBlobs]= 1;
 			prolongedTrackDurations[numberOfProlongedBlobs]= previousTrackDurations[k];
@@ -423,15 +420,13 @@ public class VPMblbTrackBlobs extends VPM_FrameCommand {
 				continue;
 			};
 			prolongedBlobTypes[numberOfProlongedBlobs]= invisibleBlobTypes[k];
-			for (int m=0; m < 4; m++) {
-				prolongedBlobRectangles[numberOfProlongedBlobs][m]= invisibleBlobRectangles[k][m];
-			};
+			System.arraycopy(invisibleBlobRectangles[k],0,prolongedBlobRectangles[numberOfProlongedBlobs],0,4);
 			prolongedBlobIdentifiers[numberOfProlongedBlobs]= invisibleBlobIdentifiers[k];
 			prolongedBlobDelays[numberOfProlongedBlobs]= invisibleBlobDelays[k] + 1;
 			prolongedTrackDurations[numberOfProlongedBlobs]= invisibleTrackDurations[k];
 			numberOfProlongedBlobs++;
 		};
-		// STOP TRACKS
+		// STOP TRACKS:
 		for (int k=0; k < numberOfInvisibleBlobs; k++) {
 			BigInteger identifier= invisibleBlobIdentifiers[k];
 			GrowingTrack track= tracks.get(identifier);
@@ -448,15 +443,16 @@ public class VPMblbTrackBlobs extends VPM_FrameCommand {
 				}
 			}
 		};
-		// STORE PROLONGED BLOBS
+		// STORE PROLONGED BLOBS:
 		invisibleBlobTypes= prolongedBlobTypes;
 		invisibleBlobRectangles= prolongedBlobRectangles;
 		invisibleBlobIdentifiers= prolongedBlobIdentifiers;
 		invisibleBlobDelays= prolongedBlobDelays;
 		invisibleTrackDurations= prolongedTrackDurations;
-		// IDENTIFY OBJECTS
-		HashSet<BigInteger> tracksToBeInspected= new HashSet<>();
-		// ERASE OLD TRACKS
+		// IDENTIFY OBJECTS:
+		HashSet<BigInteger> tracksToBeInspected;
+		tracksToBeInspected= new HashSet<>();
+		// ERASE OLD TRACKS:
 		Set<BigInteger> trackIdentifiers= tracks.keySet();
 		Iterator<BigInteger> trackIterator= trackIdentifiers.iterator();
 		while (trackIterator.hasNext()) {
@@ -472,7 +468,7 @@ public class VPMblbTrackBlobs extends VPM_FrameCommand {
 				}
 			}
 		};
-		// UPDATE TRACKS
+		// UPDATE TRACKS:
 		for (int k=0; k < numberOfActiveBlobs; k++) {
 			BigInteger identifier= currentBlobIdentifiers[k];
 			BlobAttributes blobAttributes= currentBlobAttributes[k];
@@ -484,6 +480,7 @@ public class VPMblbTrackBlobs extends VPM_FrameCommand {
 		}
 	}
 	//
+	@Override
 	public void forgetStatistics() {
 		recentBlobIdentifier= BigInteger.ZERO;
 		currentBlobTypes= null;

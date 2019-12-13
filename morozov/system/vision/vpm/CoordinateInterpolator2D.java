@@ -4,17 +4,14 @@ package morozov.system.vision.vpm;
 
 public abstract class CoordinateInterpolator2D extends Interpolator2D {
 	//
-	protected int meshWidth= 1;
-	protected int meshHeight= 1;
-	//
-	protected double targetMeshEpsilon= 4;
+	protected double targetCoordinateInterpolatorMeshEpsilon= 4;
 	protected double physicalCoordinateEpsilon= 0.001;
 	protected int maxPixelDistanceIterations= 100;
 	//
 	///////////////////////////////////////////////////////////////
 	//
 	public CoordinateInterpolator2D() {
-		meshEpsilon= targetMeshEpsilon;
+		meshEpsilon= targetCoordinateInterpolatorMeshEpsilon;
 	}
 	public CoordinateInterpolator2D(double epsilon, int iterations) {
 		super();
@@ -24,6 +21,7 @@ public abstract class CoordinateInterpolator2D extends Interpolator2D {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public double computeDefaultValue() {
 		return Double.NaN;
 	}

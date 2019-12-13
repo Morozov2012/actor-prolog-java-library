@@ -20,8 +20,8 @@ public class DomainBinary extends DomainAlternative {
 	public DomainBinary() {
 	}
 	//
+	@Override
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
-		// t= t.dereferenceValue(cp);
 		t= t.dereferenceValue(cp);
 		if (ignoreFreeVariables && t.thisIsFreeVariable()) {
 			return true;
@@ -35,19 +35,24 @@ public class DomainBinary extends DomainAlternative {
 		}
 	}
 	//
+	@Override
 	public boolean isEqualTo(DomainAlternative a, HashSet<PrologDomainPair> stack) {
 		return a.isEqualToBinary();
 	}
+	@Override
 	public boolean isEqualToBinary() {
 		return true;
 	}
+	@Override
 	public boolean coversAlternative(DomainAlternative a, PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) {
 		return a.isCoveredByBinary();
 	}
+	@Override
 	public boolean isCoveredByBinary() {
 		return true;
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
 		return PrologDomainName.tagDomainAlternative_Binary;
 	}

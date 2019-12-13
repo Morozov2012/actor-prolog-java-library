@@ -60,8 +60,8 @@ public class KinectForegroundPointCloudsFrame extends KinectPointCloudsFrame imp
 			pointClouds[n]= new ForegroundPointCloud();
 		};
 		FrameSize frameSize= FrameSize.computePlayerIndexFrameSize(givenPlayerIndex);
-		int frameWidth= frameSize.width;
-		int frameHeight= frameSize.height;
+		int frameWidth= frameSize.getWidth();
+		int frameHeight= frameSize.getHeight();
 		int counter1= -1;
 		for (int h=0; h < frameHeight; h++) {
 			for (int w=0; w < frameWidth; w++) {
@@ -79,9 +79,11 @@ public class KinectForegroundPointCloudsFrame extends KinectPointCloudsFrame imp
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public ForegroundPointCloud[] getPointClouds() {
 		return pointClouds;
 	}
+	@Override
 	public float[] getXYZ() {
 		if (xyz != null) {
 			return xyz;

@@ -24,11 +24,11 @@ import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
 
 public class APasswordField
-	extends JPasswordField
-	implements ActiveDocumentReportListener, FocusListener {
+		extends JPasswordField
+		implements ActiveDocumentReportListener, FocusListener {
 	//
-	AbstractDialog targetDialog= null;
-	ActiveComponent targetComponent= null;
+	protected AbstractDialog targetDialog= null;
+	protected ActiveComponent targetComponent= null;
 	//
 	public APasswordField(AbstractDialog tD, ActiveComponent tC, String text,int columns) {
 		super(text,columns);
@@ -36,29 +36,28 @@ public class APasswordField
 		targetComponent= tC;
 		ActivePlainDocument activeDocument= (ActivePlainDocument)getDocument();
 		activeDocument.addReportListener(this);
-		// setHorizontalAlignment(JTextField.RIGHT);
 		addFocusListener(this);
 	}
-	// Method to create default model
+	// Method to create default model:
+	@Override
 	protected Document createDefaultModel() {
 		return new ActivePlainDocument();
 	}
 	//
+	@Override
 	public void reportSuccess() {
-		// By default, just beep
-		// Toolkit.getDefaultToolkit().beep();
 		if (targetDialog!=null) {
 			targetDialog.reportValueUpdate(targetComponent);
 		}
 	}
+	@Override
 	public void reportFailure() {
-		// By default, just beep
-		// Toolkit.getDefaultToolkit().beep();
 		if (targetDialog!=null) {
 			targetDialog.reportValueUpdate(targetComponent);
 		}
 	}
 	//
+	@Override
 	public void processComponentKeyEvent(KeyEvent evt) {
 		switch (evt.getID()) {
 		case KeyEvent.KEY_PRESSED:
@@ -78,9 +77,11 @@ public class APasswordField
 		super.processComponentKeyEvent(evt);
 	}
 	//
+	@Override
 	public void focusGained(FocusEvent e) {
 		// Invoked when a component gains the keyboard focus.
 	}
+	@Override
 	public void focusLost(FocusEvent e) {
 		// Invoked when a component loses the keyboard focus.
 		targetDialog.reportCompleteEditing(targetComponent);

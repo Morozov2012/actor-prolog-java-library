@@ -46,8 +46,8 @@ public class TVImageHeader implements Serializable {
 	//
 	protected static short expectedCookie= (short)0xFAAC;
 	//
-	private static final long serialVersionUID= 0xCF69CDEC6BC4E815L;
 	// private static final long serialVersionUID= 0x73E85DA4CF373B53L;
+	private static final long serialVersionUID= 0xCF69CDEC6BC4E815L;
 	//
 	static {
 		int estimatedSize= size();
@@ -178,22 +178,6 @@ public class TVImageHeader implements Serializable {
 		if (zero != 0 && reportWarnings) {
 			System.out.printf("WARNING: TVFilterImageHeader.TVImageHeader.Zero != 0\n");
 		};
-		/*
-		System.out.printf("TVImageHeader::Indicator (0 or 110): %s\n",indicator);
-		System.out.printf("TVImageHeader::RelTime: %s\n",relTime);
-		System.out.printf("TVImageHeader::ApparentPPL: %s\n",apparentPPL);
-		System.out.printf("TVImageHeader::obsolete: %s\n",obsolete);
-		System.out.printf("TVImageHeader::zero: %s\n",zero);
-		System.out.printf("TVImageHeader::FileTime: %s\n",fileTime);
-		System.out.printf("TVImageHeader::RECT: %s x %s + %s + %s\n",rectWidth,rectHeight,rectLeft,rectTop);
-		for (int k=0; k < 10; k++) {
-			System.out.printf("(TVImageHeader::forExpansion[%02d]: %02x\n",k,forExpansion[k]);
-		};
-		System.out.printf("TVImageHeader::AlertLevel: %x\n",alertLevel);
-		System.out.printf("TVImageHeader::PaneSet: %x\n",paneSet);
-		System.out.printf("TVImageHeader::PaneSets: %x\n",paneSets);
-		System.out.printf("TVImageHeader::Version: %x\n",version);
-		*/
 		TVPPIFRead hWIF= TVPPIFRead.readTVPPIFRead(in);
 		if (hWIF.getCookie() != expectedCookie && reportWarnings) {
 			System.out.printf("WARNING: Incorrect Cookie %x. Expected %x\n",hWIF.getCookie(),expectedCookie);

@@ -34,6 +34,7 @@ public class VPMpxlSmoothImage extends VPM_FrameCommand {
 		halfwidth= h;
 	}
 	//
+	@Override
 	public void execute(VPM vpm) {
 		imageWidth= vpm.getOperationalImageWidth();
 		imageHeight= vpm.getOperationalImageHeight();

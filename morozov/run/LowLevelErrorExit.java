@@ -6,7 +6,7 @@ import morozov.terms.*;
 
 public class LowLevelErrorExit extends ErrorExit {
 	//
-	private Throwable exception;
+	protected Throwable exception;
 	//
 	public LowLevelErrorExit(ChoisePoint cp, Throwable e) {
 		super(e);
@@ -14,10 +14,11 @@ public class LowLevelErrorExit extends ErrorExit {
 		exception= e;
 	}
 	//
+	@Override
 	public Term createTerm() {
-		// return new PrologString("LowLevelErrorExit("+exception.toString()+")");
 		return new PrologString(exception.toString());
 	}
+	@Override
 	public String toString() {
 		return exception.toString();
 	}

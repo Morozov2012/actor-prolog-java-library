@@ -16,8 +16,8 @@ public abstract class ThermalDataAcquisitionBuffer extends ZoomDataAcquisitionBu
 	protected OnOff autorangingMode;
 	protected OnOff averagingMode;
 	protected OnOff doubleColorMapMode;
-	protected DetailedColorMap mainColorMap;
-	protected DetailedColorMap auxiliaryColorMap;
+	protected IterativeDetailedColorMap iterativeDetailedMainColorMap;
+	protected IterativeDetailedColorMap iterativeDetailedAuxiliaryColorMap;
 	protected NumericalValue lowerTemperatureBound;
 	protected NumericalValue upperTemperatureBound;
 	protected NumericalValue lowerMainTemperatureQuantile;
@@ -64,6 +64,7 @@ public abstract class ThermalDataAcquisitionBuffer extends ZoomDataAcquisitionBu
 	abstract public Term getBuiltInSlot_E_lower_auxiliary_temperature_quantile();
 	abstract public Term getBuiltInSlot_E_upper_auxiliary_temperature_quantile();
 	abstract public Term getBuiltInSlot_E_use_recorded_temperature_range_commands();
+	@Override
 	abstract public Term getBuiltInSlot_E_use_recorded_color_map_commands();
 	//
 	///////////////////////////////////////////////////////////////
@@ -83,6 +84,7 @@ public abstract class ThermalDataAcquisitionBuffer extends ZoomDataAcquisitionBu
 	}
 	public void getAutorangingMode0fs(ChoisePoint iX) {
 	}
+	@Override
 	public OnOff getAutorangingMode(ChoisePoint iX) {
 		if (autorangingMode != null) {
 			return autorangingMode;
@@ -107,6 +109,7 @@ public abstract class ThermalDataAcquisitionBuffer extends ZoomDataAcquisitionBu
 	}
 	public void getAveragingMode0fs(ChoisePoint iX) {
 	}
+	@Override
 	public OnOff getAveragingMode(ChoisePoint iX) {
 		if (averagingMode != null) {
 			return averagingMode;
@@ -131,6 +134,7 @@ public abstract class ThermalDataAcquisitionBuffer extends ZoomDataAcquisitionBu
 	}
 	public void getDoubleColorMapMode0fs(ChoisePoint iX) {
 	}
+	@Override
 	public OnOff getDoubleColorMapMode(ChoisePoint iX) {
 		if (doubleColorMapMode != null) {
 			return doubleColorMapMode;
@@ -143,46 +147,48 @@ public abstract class ThermalDataAcquisitionBuffer extends ZoomDataAcquisitionBu
 	// get/set main_color_map
 	//
 	public void setMainColorMap1s(ChoisePoint iX, Term a1) {
-		setMainColorMap(ColorMapConverters.argumentToColorMap(a1,iX));
+		setMainColorMap(ColorMapConverters.argumentToIterativeDetailedColorMap(a1,iX));
 		updateAttributes(iX);
 	}
-	public void setMainColorMap(DetailedColorMap value) {
-		mainColorMap= value;
+	public void setMainColorMap(IterativeDetailedColorMap value) {
+		iterativeDetailedMainColorMap= value;
 	}
 	public void getMainColorMap0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(ColorMapConverters.toTerm(getMainColorMap(iX)));
+		result.setNonBacktrackableValue(ColorMapConverters.detailedColorMapToTerm(getMainColorMap(iX)));
 	}
 	public void getMainColorMap0fs(ChoisePoint iX) {
 	}
-	public DetailedColorMap getMainColorMap(ChoisePoint iX) {
-		if (mainColorMap != null) {
-			return mainColorMap;
+	@Override
+	public IterativeDetailedColorMap getMainColorMap(ChoisePoint iX) {
+		if (iterativeDetailedMainColorMap != null) {
+			return iterativeDetailedMainColorMap;
 		} else {
 			Term value= getBuiltInSlot_E_main_color_map();
-			return ColorMapConverters.argumentToColorMap(value,iX);
+			return ColorMapConverters.argumentToIterativeDetailedColorMap(value,iX);
 		}
 	}
 	//
 	// get/set auxiliary_color_map
 	//
 	public void setAuxiliaryColorMap1s(ChoisePoint iX, Term a1) {
-		setAuxiliaryColorMap(ColorMapConverters.argumentToColorMap(a1,iX));
+		setAuxiliaryColorMap(ColorMapConverters.argumentToIterativeDetailedColorMap(a1,iX));
 		updateAttributes(iX);
 	}
-	public void setAuxiliaryColorMap(DetailedColorMap value) {
-		auxiliaryColorMap= value;
+	public void setAuxiliaryColorMap(IterativeDetailedColorMap value) {
+		iterativeDetailedAuxiliaryColorMap= value;
 	}
 	public void getAuxiliaryColorMap0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(ColorMapConverters.toTerm(getAuxiliaryColorMap(iX)));
+		result.setNonBacktrackableValue(ColorMapConverters.detailedColorMapToTerm(getAuxiliaryColorMap(iX)));
 	}
 	public void getAuxiliaryColorMap0fs(ChoisePoint iX) {
 	}
-	public DetailedColorMap getAuxiliaryColorMap(ChoisePoint iX) {
-		if (auxiliaryColorMap != null) {
-			return auxiliaryColorMap;
+	@Override
+	public IterativeDetailedColorMap getAuxiliaryColorMap(ChoisePoint iX) {
+		if (iterativeDetailedAuxiliaryColorMap != null) {
+			return iterativeDetailedAuxiliaryColorMap;
 		} else {
 			Term value= getBuiltInSlot_E_auxiliary_color_map();
-			return ColorMapConverters.argumentToColorMap(value,iX);
+			return ColorMapConverters.argumentToIterativeDetailedColorMap(value,iX);
 		}
 	}
 	//
@@ -194,13 +200,13 @@ public abstract class ThermalDataAcquisitionBuffer extends ZoomDataAcquisitionBu
 	}
 	public void setLowerTemperatureBound(NumericalValue value) {
 		lowerTemperatureBound= value;
-		// camera.setLowerTemperatureBound(value.toDouble());
 	}
 	public void getLowerTemperatureBound0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(NumericalValueConverters.toTerm(getLowerTemperatureBound(iX)));
 	}
 	public void getLowerTemperatureBound0fs(ChoisePoint iX) {
 	}
+	@Override
 	public NumericalValue getLowerTemperatureBound(ChoisePoint iX) {
 		if (lowerTemperatureBound != null) {
 			return lowerTemperatureBound;
@@ -218,13 +224,13 @@ public abstract class ThermalDataAcquisitionBuffer extends ZoomDataAcquisitionBu
 	}
 	public void setUpperTemperatureBound(NumericalValue value) {
 		upperTemperatureBound= value;
-		// camera.setUpperTemperatureBound(value.toDouble());
 	}
 	public void getUpperTemperatureBound0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(NumericalValueConverters.toTerm(getUpperTemperatureBound(iX)));
 	}
 	public void getUpperTemperatureBound0fs(ChoisePoint iX) {
 	}
+	@Override
 	public NumericalValue getUpperTemperatureBound(ChoisePoint iX) {
 		if (upperTemperatureBound != null) {
 			return upperTemperatureBound;
@@ -248,6 +254,7 @@ public abstract class ThermalDataAcquisitionBuffer extends ZoomDataAcquisitionBu
 	}
 	public void getLowerMainTemperatureQuantile0fs(ChoisePoint iX) {
 	}
+	@Override
 	public NumericalValue getLowerMainTemperatureQuantile(ChoisePoint iX) {
 		if (lowerMainTemperatureQuantile != null) {
 			return lowerMainTemperatureQuantile;
@@ -271,6 +278,7 @@ public abstract class ThermalDataAcquisitionBuffer extends ZoomDataAcquisitionBu
 	}
 	public void getUpperMainTemperatureQuantile0fs(ChoisePoint iX) {
 	}
+	@Override
 	public NumericalValue getUpperMainTemperatureQuantile(ChoisePoint iX) {
 		if (upperMainTemperatureQuantile != null) {
 			return upperMainTemperatureQuantile;
@@ -294,6 +302,7 @@ public abstract class ThermalDataAcquisitionBuffer extends ZoomDataAcquisitionBu
 	}
 	public void getLowerAuxiliaryTemperatureQuantile0fs(ChoisePoint iX) {
 	}
+	@Override
 	public NumericalValue getLowerAuxiliaryTemperatureQuantile(ChoisePoint iX) {
 		if (lowerAuxiliaryTemperatureQuantile != null) {
 			return lowerAuxiliaryTemperatureQuantile;
@@ -317,6 +326,7 @@ public abstract class ThermalDataAcquisitionBuffer extends ZoomDataAcquisitionBu
 	}
 	public void getUpperAuxiliaryTemperatureQuantile0fs(ChoisePoint iX) {
 	}
+	@Override
 	public NumericalValue getUpperAuxiliaryTemperatureQuantile(ChoisePoint iX) {
 		if (upperAuxiliaryTemperatureQuantile != null) {
 			return upperAuxiliaryTemperatureQuantile;
@@ -352,6 +362,7 @@ public abstract class ThermalDataAcquisitionBuffer extends ZoomDataAcquisitionBu
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void resetCounters() {
 		synchronized (numberOfRecentReceivedFrame) {
 			super.resetCounters();
@@ -367,6 +378,7 @@ public abstract class ThermalDataAcquisitionBuffer extends ZoomDataAcquisitionBu
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void commit() {
 		synchronized (numberOfRecentReceivedFrame) {
 			super.commit();

@@ -3,10 +3,14 @@
 package morozov.system.gui.dialogs.errors;
 
 public class UnknownDialogEntryCode extends RuntimeException {
-	public long entryCode;
+	//
+	protected long entryCode;
+	//
 	public UnknownDialogEntryCode(long code) {
 		entryCode= code;
 	}
+	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(" + Long.toString(entryCode) + ")";
 	}

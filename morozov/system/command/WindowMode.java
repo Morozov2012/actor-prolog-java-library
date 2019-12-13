@@ -12,21 +12,25 @@ import morozov.terms.signals.*;
 public enum WindowMode {
 	//
 	INVISIBLE {
+		@Override
 		public Term toTerm() {
 			return termInvisible;
 		}
 	},
 	MINIMIZED {
+		@Override
 		public Term toTerm() {
 			return termMinimized;
 		}
 	},
 	RESTORED {
+		@Override
 		public Term toTerm() {
 			return termRestored;
 		}
 	},
 	MAXIMIZED {
+		@Override
 		public Term toTerm() {
 			return termMaximized;
 		}

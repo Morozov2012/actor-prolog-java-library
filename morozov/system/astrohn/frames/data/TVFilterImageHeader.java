@@ -85,26 +85,9 @@ public class TVFilterImageHeader implements Serializable {
 		int columns= Integer.reverseBytes(in.readInt());
 		int rows= Integer.reverseBytes(in.readInt());
 		boolean linesAreRows= in.readBoolean();
-		/*
-		System.out.printf("LENGTH: %s, FORMAT: %s, SIZE: %s x %s, LinesAreRows: %s\n",length,format,columns,rows,linesAreRows);
-		*/
 		TVImageHeader hdr= TVImageHeader.readTVImageHeader(in,reportWarnings);
 		int lengthOfRest= lengthP - constantHeaderSize();
-		//int columns= hdr.getColumns();
-		//int rows= hdr.getRows();
 		TVVidImage image= TVVidImage.readTVVidImage(in,lengthOfRest,reportWarnings);
-		byte[] imageData= image.getImageData();
-		/*
-		int index= 0;
-		for (int k=0; k < rows; k++) {
-			for (int m=0; m < columns; m++) {
-				System.out.printf(" %02x",imageData[index]);
-				index++;
-			};
-			System.out.printf("\n\n");
-		};
-		System.out.printf("\n\n");
-		*/
 		return new TVFilterImageHeader(
 			length,
 			format,

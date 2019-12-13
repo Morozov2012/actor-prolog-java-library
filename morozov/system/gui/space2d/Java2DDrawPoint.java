@@ -6,17 +6,22 @@ import java.awt.Graphics2D;
 import java.awt.geom.Line2D;
 
 public class Java2DDrawPoint extends Java2DCommand {
+	//
 	protected double x1;
 	protected double y1;
+	//
 	public Java2DDrawPoint(double aX1, double aY1) {
 		x1= aX1;
 		y1= aY1;
 	}
+	//
+	@Override
 	public void execute(Graphics2D g2, DrawingMode drawingMode) {
 		double factorX= drawingMode.getFactorX();
 		double factorY= drawingMode.getFactorY();
 		g2.draw(new Line2D.Double(x1*factorX,y1*factorY,x1*factorX,y1*factorY));
 	}
+	@Override
 	public boolean equals(Object o) {
 		if (o==null) {
 			return false;

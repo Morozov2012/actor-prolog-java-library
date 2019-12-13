@@ -9,10 +9,10 @@ import morozov.worlds.*;
 
 public class SuspendedInternalCall extends SuspendedCall {
 	//
-	public Term target;
-	public AbstractInternalWorld currentWorld;
-	public long domainSignatureNumber;
-	public Term[] arguments;
+	protected Term target;
+	protected AbstractInternalWorld currentWorld;
+	protected long domainSignatureNumber;
+	protected Term[] arguments;
 	//
 	private static final long serialVersionUID= 0xADFB8C2C76565377L; // -5909975963401825417L
 	//
@@ -28,6 +28,8 @@ public class SuspendedInternalCall extends SuspendedCall {
 		domainSignatureNumber= number;
 		arguments= list;
 	}
+	//
+	@Override
 	public Continuation formContinuation(ActiveWorld currentProcess, ChoisePoint iX, Continuation c0) {
 		if (!isReleased) {
 			Term targetWorld= target.dereferenceValue(iX);

@@ -5,7 +5,7 @@ package morozov.built_in;
 import morozov.run.*;
 import morozov.system.*;
 import morozov.system.converters.*;
-import morozov.system.errors.*;
+import morozov.system.converters.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
 import morozov.worlds.*;
@@ -19,11 +19,11 @@ public abstract class Timer extends Alpha {
 	public TimeInterval period= null;
 	public TimeInterval initialDelay= null;
 	//
-	private java.util.Timer scheduler;
-	private LocalTimerTask currentTask;
-	private boolean isRepeatedAction= false;
-	private long currentPeriod= 1000;
-	private long currentFirstDelay= 1000;
+	protected java.util.Timer scheduler;
+	protected LocalTimerTask currentTask;
+	protected boolean isRepeatedAction= false;
+	protected long currentPeriod= 1000;
+	protected long currentFirstDelay= 1000;
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -45,12 +45,12 @@ public abstract class Timer extends Alpha {
 	// get/set period
 	//
 	public void setPeriod1s(ChoisePoint iX, Term a1) {
-		setPeriod(TimeInterval.argumentSecondsToTimeInterval(a1,iX));
+		setPeriod(TimeIntervalConverters.argumentSecondsToTimeInterval(a1,iX));
 		changePeriod(iX);
 	}
 	public void setPeriod2s(ChoisePoint iX, Term a1, Term a2) {
-		TimeInterval p= TimeInterval.argumentSecondsToTimeInterval(a1,iX);
-		TimeInterval d= TimeInterval.argumentSecondsToTimeInterval(a2,iX);
+		TimeInterval p= TimeIntervalConverters.argumentSecondsToTimeInterval(a1,iX);
+		TimeInterval d= TimeIntervalConverters.argumentSecondsToTimeInterval(a2,iX);
 		setPeriod(p);
 		setInitialDelay(d);
 		changePeriod(iX);
@@ -59,7 +59,7 @@ public abstract class Timer extends Alpha {
 		period= value;
 	}
 	public void getPeriod0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(getPeriod(iX).toTerm());
+		result.setNonBacktrackableValue(TimeIntervalConverters.toTerm(getPeriod(iX)));
 	}
 	public void getPeriod0fs(ChoisePoint iX) {
 	}
@@ -68,21 +68,21 @@ public abstract class Timer extends Alpha {
 			return period;
 		} else {
 			Term value= getBuiltInSlot_E_period();
-			return TimeInterval.argumentSecondsToTimeInterval(value,iX);
+			return TimeIntervalConverters.argumentSecondsToTimeInterval(value,iX);
 		}
 	}
 	//
 	// get/set initialDelay
 	//
 	public void setInitialDelay1s(ChoisePoint iX, Term a1) {
-		setInitialDelay(TimeInterval.argumentSecondsToTimeInterval(a1,iX));
+		setInitialDelay(TimeIntervalConverters.argumentSecondsToTimeInterval(a1,iX));
 		changePeriod(iX);
 	}
 	public void setInitialDelay(TimeInterval value) {
 		initialDelay= value;
 	}
 	public void getInitialDelay0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(getInitialDelay(iX).toTerm());
+		result.setNonBacktrackableValue(TimeIntervalConverters.toTerm(getInitialDelay(iX)));
 	}
 	public void getInitialDelay0fs(ChoisePoint iX) {
 	}
@@ -91,7 +91,7 @@ public abstract class Timer extends Alpha {
 			return initialDelay;
 		} else {
 			Term value= getBuiltInSlot_E_initial_delay();
-			return TimeInterval.argumentSecondsToTimeInterval(value,iX);
+			return TimeIntervalConverters.argumentSecondsToTimeInterval(value,iX);
 		}
 	}
 	//
@@ -124,6 +124,7 @@ public abstract class Timer extends Alpha {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void releaseSystemResources() {
 		closeTimer();
 		super.releaseSystemResources();
@@ -162,7 +163,7 @@ public abstract class Timer extends Alpha {
 	}
 	//
 	public void delay1s(ChoisePoint iX, Term n1) {
-		long delay= TimeInterval.argumentSecondsToTimeInterval(n1,iX).toMillisecondsLong();
+		long delay= TimeIntervalConverters.argumentSecondsToTimeInterval(n1,iX).toMillisecondsLong();
 		if (scheduler==null) {
 			scheduler= new java.util.Timer(false);
 		};
@@ -202,12 +203,12 @@ public abstract class Timer extends Alpha {
 	}
 	//
 	public class Tick0s extends Continuation {
-		// private Continuation c0;
 		//
 		public Tick0s(Continuation aC) {
 			c0= aC;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			c0.execute(iX);
 		}
@@ -216,9 +217,7 @@ public abstract class Timer extends Alpha {
 	///////////////////////////////////////////////////////////////
 	//
 	public static void time3s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3) {
-		// Calendar calendar= new GregorianCalendar();
 		Calendar calendar= Calendar.getInstance();
-		// int hours= calendar.get(Calendar.HOUR);
 		int hours= calendar.get(Calendar.HOUR_OF_DAY);
 		int minutes= calendar.get(Calendar.MINUTE);
 		int seconds= calendar.get(Calendar.SECOND);
@@ -227,9 +226,7 @@ public abstract class Timer extends Alpha {
 		a3.setBacktrackableValue(new PrologInteger(seconds),iX);
 	}
 	public static void time4s(ChoisePoint iX, PrologVariable a1, PrologVariable a2, PrologVariable a3, PrologVariable a4) {
-		// Calendar calendar= new GregorianCalendar();
 		Calendar calendar= Calendar.getInstance();
-		// int hours= calendar.get(Calendar.HOUR);
 		int hours= calendar.get(Calendar.HOUR_OF_DAY);
 		int minutes= calendar.get(Calendar.MINUTE);
 		int seconds= calendar.get(Calendar.SECOND);
@@ -241,7 +238,6 @@ public abstract class Timer extends Alpha {
 	}
 	public static void time0ff(ChoisePoint iX, PrologVariable result) {
 		Calendar calendar= Calendar.getInstance();
-		// int hours= calendar.get(Calendar.HOUR);
 		int hours= calendar.get(Calendar.HOUR_OF_DAY);
 		int minutes= calendar.get(Calendar.MINUTE);
 		int seconds= calendar.get(Calendar.SECOND);
@@ -317,27 +313,27 @@ public abstract class Timer extends Alpha {
 	///////////////////////////////////////////////////////////////
 	//
 	public void sleep1s(ChoisePoint iX, Term n1) {
-		BigDecimal nanos= TimeInterval.argumentSecondsToTimeInterval(n1,iX).toNanosecondsBigDecimal();
+		BigDecimal nanos= TimeIntervalConverters.argumentSecondsToTimeInterval(n1,iX).toNanosecondsBigDecimal();
 		SystemUtils.sleep(nanos,currentProcess);
 	}
 	//
 	public void setPriority1s(ChoisePoint iX, Term n1) {
 		try {
 			int priority= GeneralConverters.termToProcessPriority(n1,iX);
-			currentProcess.thread.setPriority(priority);
+			currentProcess.getThread().setPriority(priority);
 		} catch (TermIsNotProcessPriority e) {
 			throw new WrongArgumentIsNotProcessPriority(n1);
 		}
 	}
 	//
 	public void getPriority0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(GeneralConverters.ProcessPriorityToTerm(currentProcess.thread.getPriority()));
+		result.setNonBacktrackableValue(GeneralConverters.ProcessPriorityToTerm(currentProcess.getThread().getPriority()));
 	}
 	public void getPriority0fs(ChoisePoint iX) {
 	}
 	//
 	public void getPriorityNumber0ff(ChoisePoint iX, PrologVariable result) {
-		result.setNonBacktrackableValue(new PrologInteger(currentProcess.thread.getPriority()));
+		result.setNonBacktrackableValue(new PrologInteger(currentProcess.getThread().getPriority()));
 	}
 	public void getPriorityNumber0fs(ChoisePoint iX) {
 	}

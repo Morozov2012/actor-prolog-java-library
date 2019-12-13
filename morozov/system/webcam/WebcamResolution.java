@@ -13,71 +13,85 @@ import morozov.terms.signals.*;
 public enum WebcamResolution {
 	//
 	CIF(352,288) {
+		@Override
 		public Term toTerm() {
 			return termCIF;
 		}
 	},
 	HD720(1280,720) {
+		@Override
 		public Term toTerm() {
 			return termHD720;
 		}
 	},
 	HD720P(1280,720) {
+		@Override
 		public Term toTerm() {
 			return termHD720P;
 		}
 	},
 	HVGA(480,400) {
+		@Override
 		public Term toTerm() {
 			return termHVGA;
 		}
 	},
 	PAL(768,576) {
+		@Override
 		public Term toTerm() {
 			return termPAL;
 		}
 	},
 	QQVGA(176,144) {
+		@Override
 		public Term toTerm() {
 			return termQQVGA;
 		}
 	},
 	QVGA(320,240) {
+		@Override
 		public Term toTerm() {
 			return termQVGA;
 		}
 	},
 	QXGA(2048,1536) {
+		@Override
 		public Term toTerm() {
 			return termQXGA;
 		}
 	},
 	SVGA(800,600) {
+		@Override
 		public Term toTerm() {
 			return termSVGA;
 		}
 	},
 	SXGA(1280,1024) {
+		@Override
 		public Term toTerm() {
 			return termSXGA;
 		}
 	},
 	UXGA(1600,1200) {
+		@Override
 		public Term toTerm() {
 			return termUXGA;
 		}
 	},
 	VGA(640,480) {
+		@Override
 		public Term toTerm() {
 			return termVGA;
 		}
 	},
 	WXGA(1280,768) {
+		@Override
 		public Term toTerm() {
 			return termWXGA;
 		}
 	},
 	XGA(1024,768) {
+		@Override
 		public Term toTerm() {
 			return termXGA;
 		}

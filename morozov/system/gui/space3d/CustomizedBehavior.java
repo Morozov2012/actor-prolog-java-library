@@ -29,10 +29,12 @@ public class CustomizedBehavior extends Behavior {
 		wakeupCondition= condition;
 	}
 	//
+	@Override
 	public void initialize() {
 		wakeupOn(wakeupCondition);
 	}
 	//
+	@Override
 	public void processStimulus(Enumeration criteria) {
 		long domainSignature= targetWorld.entry_s_Action_1_i();
 		Term predicateArgument= name.toTerm();

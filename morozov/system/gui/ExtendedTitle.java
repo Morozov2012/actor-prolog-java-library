@@ -13,8 +13,8 @@ import morozov.terms.signals.*;
 
 public class ExtendedTitle {
 	//
-	private boolean useDefaultTitle= true;
-	private String value= "";
+	protected boolean useDefaultTitle= true;
+	protected String value= "";
 	//
 	protected static Term termDefault= new PrologSymbol(SymbolCodes.symbolCode_E_default);
 	//
@@ -27,8 +27,11 @@ public class ExtendedTitle {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void useDefaultTitle() {
-		useDefaultTitle= true;
+	public void setUseDefaultTitle(boolean mode) {
+		useDefaultTitle= mode;
+	}
+	public void setUseDefaultTitle() {
+		setUseDefaultTitle(true);
 	}
 	//
 	public boolean isDefault() {
@@ -136,6 +139,7 @@ public class ExtendedTitle {
 		}
 	}
 	//
+	@Override
 	public String toString() {
 		return "(" +
 			String.format("%B,",useDefaultTitle) +

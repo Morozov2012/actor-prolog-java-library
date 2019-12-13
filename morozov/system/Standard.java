@@ -7,7 +7,7 @@ import target.*;
 import morozov.domains.*;
 import morozov.domains.errors.*;
 import morozov.run.*;
-import morozov.system.errors.*;
+import morozov.system.converters.errors.*;
 import morozov.terms.*;
 import morozov.terms.errors.*;
 import morozov.terms.signals.*;
@@ -15,6 +15,7 @@ import morozov.terms.signals.*;
 import java.math.BigInteger;
 
 public class Standard {
+	//
 	public static void errorExit(ChoisePoint cp, Term value) {
 		value= value.dereferenceValue(cp);
 		if (value.thisIsFreeVariable()) {
@@ -25,14 +26,19 @@ public class Standard {
 				throw new NamedErrorExit(cp,code);
 			} catch (TermIsNotASymbol e1) {
 				try {
-					BigInteger number= value.getIntegerValue(cp);
-					if (number.compareTo(BigInteger.ZERO) >= 0) {
-						throw new CodedErrorExit(cp,number);
-					} else {
+					String text= value.getStringValue(cp);
+					throw new NamedErrorExit(cp,text);
+				} catch (TermIsNotAString e2) {
+					try {
+						BigInteger number= value.getIntegerValue(cp);
+						if (number.compareTo(BigInteger.ZERO) >= 0) {
+							throw new CodedErrorExit(cp,number);
+						} else {
+							throw new UndefinedErrorExit(cp);
+						}
+					} catch (TermIsNotAnInteger e3) {
 						throw new UndefinedErrorExit(cp);
 					}
-				} catch (TermIsNotAnInteger e2) {
-					throw new UndefinedErrorExit(cp);
 				}
 			}
 		}

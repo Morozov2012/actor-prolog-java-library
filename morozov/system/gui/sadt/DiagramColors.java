@@ -4,7 +4,7 @@ package morozov.system.gui.sadt;
 
 import target.*;
 
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.*;
 import morozov.system.signals.*;
 
@@ -13,44 +13,44 @@ import java.awt.Color;
 
 public class DiagramColors {
 	//
-	private static final String defaultDiagramFontName= Font.MONOSPACED;
-	private static final int defaultDiagramFontSize= 14;
-	private static final int defaultDiagramFontStyle= Font.PLAIN;
+	protected static final String defaultDiagramFontName= Font.MONOSPACED;
+	protected static final int defaultDiagramFontSize= 14;
+	protected static final int defaultDiagramFontStyle= Font.PLAIN;
 	//
-	public int minimalFontSize= 1;
+	protected int minimalFontSize= 1;
 	//
-	public String fontName;
-	public int fontSize;
-	public int fontStyle;
+	protected String fontName;
+	protected int fontSize;
+	protected int fontStyle;
 	//
-	public Font initialFont;
-	public Font minimalFont;
+	protected Font initialFont;
+	protected Font minimalFont;
 	//
-	private static final Color defaultSuccessDrawingForegroundColor= null;
-	private static final Color defaultSuccessDrawingBackgroundColor= Color.GREEN;
-	private static final Color defaultSuccessTextForegroundColor= Color.BLACK;
-	private static final Color defaultSuccessTextBackgroundColor= null;
+	protected static final Color defaultSuccessDrawingForegroundColor= null;
+	protected static final Color defaultSuccessDrawingBackgroundColor= Color.GREEN;
+	protected static final Color defaultSuccessTextForegroundColor= Color.BLACK;
+	protected static final Color defaultSuccessTextBackgroundColor= null;
 	//
-	public Color successDrawingForegroundColor;
-	public Color successDrawingBackgroundColor;
-	public Color successTextForegroundColor;
-	public Color successTextBackgroundColor;
+	protected Color successDrawingForegroundColor;
+	protected Color successDrawingBackgroundColor;
+	protected Color successTextForegroundColor;
+	protected Color successTextBackgroundColor;
 	//
-	private static final Color defaultFailureDrawingForegroundColor= null;
-	private static final Color defaultFailureDrawingBackgroundColor= Color.RED;
-	private static final Color defaultFailureTextForegroundColor= Color.BLACK;
-	private static final Color defaultFailureTextBackgroundColor= null;
+	protected static final Color defaultFailureDrawingForegroundColor= null;
+	protected static final Color defaultFailureDrawingBackgroundColor= Color.RED;
+	protected static final Color defaultFailureTextForegroundColor= Color.BLACK;
+	protected static final Color defaultFailureTextBackgroundColor= null;
 	//
-	public Color failureDrawingForegroundColor;
-	public Color failureDrawingBackgroundColor;
-	public Color failureTextForegroundColor;
-	public Color failureTextBackgroundColor;
+	protected Color failureDrawingForegroundColor;
+	protected Color failureDrawingBackgroundColor;
+	protected Color failureTextForegroundColor;
+	protected Color failureTextBackgroundColor;
 	//
-	private static final Color defaultLabelTextColor= Color.BLACK;
-	private static final Color defaultLabelSpaceColor= new Color(0x00E0E0E0);
+	protected static final Color defaultLabelTextColor= Color.BLACK;
+	protected static final Color defaultLabelSpaceColor= new Color(0x00E0E0E0);
 	//
-	public Color labelTextColor;
-	public Color labelSpaceColor;
+	protected Color labelTextColor;
+	protected Color labelSpaceColor;
 	//
 	public DiagramColors() {
 		try {
@@ -69,54 +69,54 @@ public class DiagramColors {
 			fontStyle= defaultDiagramFontStyle;
 		};
 		try {
-			successDrawingForegroundColor= ExtendedColor.argumentToColorSafe(DefaultOptions.successDrawingForegroundColor,null);
+			successDrawingForegroundColor= ColorAttributeConverters.argumentToColorSafe(DefaultOptions.successDrawingForegroundColor,null);
 		} catch (TermIsSymbolDefault e1) {
 			successDrawingForegroundColor= defaultSuccessDrawingForegroundColor;
 		};
 		try {
-			successDrawingBackgroundColor= ExtendedColor.argumentToColorSafe(DefaultOptions.successDrawingBackgroundColor,null);
+			successDrawingBackgroundColor= ColorAttributeConverters.argumentToColorSafe(DefaultOptions.successDrawingBackgroundColor,null);
 		} catch (TermIsSymbolDefault e1) {
 			successDrawingBackgroundColor= defaultSuccessDrawingBackgroundColor;
 		};
 		try {
-			successTextForegroundColor= ExtendedColor.argumentToColorSafe(DefaultOptions.successTextForegroundColor,null);
+			successTextForegroundColor= ColorAttributeConverters.argumentToColorSafe(DefaultOptions.successTextForegroundColor,null);
 		} catch (TermIsSymbolDefault e1) {
 			successTextForegroundColor= defaultSuccessTextForegroundColor;
 		};
 		try {
-			successTextBackgroundColor= ExtendedColor.argumentToColorSafe(DefaultOptions.successTextBackgroundColor,null);
+			successTextBackgroundColor= ColorAttributeConverters.argumentToColorSafe(DefaultOptions.successTextBackgroundColor,null);
 		} catch (TermIsSymbolDefault e1) {
 			successTextBackgroundColor= defaultSuccessTextBackgroundColor;
 		};
 		initialFont= DiagramUtils.computeFont(fontName,fontSize,fontStyle,successTextForegroundColor,successTextBackgroundColor);
 		minimalFont= DiagramUtils.computeFont(fontName,minimalFontSize,fontStyle,successTextForegroundColor,successTextBackgroundColor);
 		try {
-			failureDrawingForegroundColor= ExtendedColor.argumentToColorSafe(DefaultOptions.failureDrawingForegroundColor,null);
+			failureDrawingForegroundColor= ColorAttributeConverters.argumentToColorSafe(DefaultOptions.failureDrawingForegroundColor,null);
 		} catch (TermIsSymbolDefault e1) {
 			failureDrawingForegroundColor= defaultFailureDrawingForegroundColor;
 		};
 		try {
-			failureDrawingBackgroundColor= ExtendedColor.argumentToColorSafe(DefaultOptions.failureDrawingBackgroundColor,null);
+			failureDrawingBackgroundColor= ColorAttributeConverters.argumentToColorSafe(DefaultOptions.failureDrawingBackgroundColor,null);
 		} catch (TermIsSymbolDefault e1) {
 			failureDrawingBackgroundColor= defaultFailureDrawingBackgroundColor;
 		};
 		try {
-			failureTextForegroundColor= ExtendedColor.argumentToColorSafe(DefaultOptions.failureTextForegroundColor,null);
+			failureTextForegroundColor= ColorAttributeConverters.argumentToColorSafe(DefaultOptions.failureTextForegroundColor,null);
 		} catch (TermIsSymbolDefault e1) {
 			failureTextForegroundColor= defaultFailureTextForegroundColor;
 		};
 		try {
-			failureTextBackgroundColor= ExtendedColor.argumentToColorSafe(DefaultOptions.failureTextBackgroundColor,null);
+			failureTextBackgroundColor= ColorAttributeConverters.argumentToColorSafe(DefaultOptions.failureTextBackgroundColor,null);
 		} catch (TermIsSymbolDefault e1) {
 			failureTextBackgroundColor= defaultFailureTextBackgroundColor;
 		};
 		try {
-			labelTextColor= ExtendedColor.argumentToColorSafe(DefaultOptions.textLabelForegroundColor,null);
+			labelTextColor= ColorAttributeConverters.argumentToColorSafe(DefaultOptions.textLabelForegroundColor,null);
 		} catch (TermIsSymbolDefault e1) {
 			labelTextColor= defaultLabelTextColor;
 		};
 		try {
-			labelSpaceColor= ExtendedColor.argumentToColorSafe(DefaultOptions.textLabelBackgroundColor,null);
+			labelSpaceColor= ColorAttributeConverters.argumentToColorSafe(DefaultOptions.textLabelBackgroundColor,null);
 		} catch (TermIsSymbolDefault e1) {
 			labelSpaceColor= defaultLabelSpaceColor;
 		};

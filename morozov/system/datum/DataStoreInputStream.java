@@ -13,7 +13,6 @@ import java.io.IOException;
 public class DataStoreInputStream extends ObjectInputStream {
 	//
 	protected boolean someWorldIsDetected= false;
-	// protected boolean analyseDataTables= false;
 	protected DatabaseTable currentDatabaseTable= null;
 	protected boolean aWorldIsDetectedInTable= false;
 	//
@@ -21,12 +20,12 @@ public class DataStoreInputStream extends ObjectInputStream {
 	//
 	public DataStoreInputStream(InputStream out) throws IOException {
 		super(out);
-		// analyseDataTables= mode;
 		enableResolveObject(true);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected final Object resolveObject(Object obj) throws IOException {
 		if (obj instanceof ExternalWorldInterface) {
 			ExternalWorldInterface stub= (ExternalWorldInterface)obj;

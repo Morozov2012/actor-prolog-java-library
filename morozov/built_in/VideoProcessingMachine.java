@@ -34,8 +34,8 @@ public abstract class VideoProcessingMachine
 	protected List<VPM_FrameCommand> actualFrameCommands= Collections.synchronizedList(new ArrayList<VPM_FrameCommand>());
 	protected List<VPM_SnapshotCommand> actualSnapshotCommands= Collections.synchronizedList(new ArrayList<VPM_SnapshotCommand>());
 	//
-	protected ArrayList<VPM_FrameCommand> temporaryFrameCommands= new ArrayList<VPM_FrameCommand>();
-	protected ArrayList<VPM_SnapshotCommand> temporarySnapshotCommands= new ArrayList<VPM_SnapshotCommand>();
+	protected ArrayList<VPM_FrameCommand> temporaryFrameCommands= new ArrayList<>();
+	protected ArrayList<VPM_SnapshotCommand> temporarySnapshotCommands= new ArrayList<>();
 	//
 	protected boolean instructionListUpdateIsSuspended= false;
 	//
@@ -54,7 +54,7 @@ public abstract class VideoProcessingMachine
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	// brightness_histogram_tail_coefficient
+	// BrightnessHistogramTailCoefficient
 	//
 	public void setBrightnessHistogramTailCoefficient1s(ChoisePoint iX, Term a1) {
 		setBrightnessHistogramTailCoefficient(GeneralConverters.argumentToReal(a1,iX));
@@ -77,7 +77,7 @@ public abstract class VideoProcessingMachine
 		}
 	}
 	//
-	// color_histogram_tail_coefficient
+	// ColorHistogramTailCoefficient
 	//
 	public void setColorHistogramTailCoefficient1s(ChoisePoint iX, Term a1) {
 		setColorHistogramTailCoefficient(GeneralConverters.argumentToReal(a1,iX));
@@ -104,11 +104,13 @@ public abstract class VideoProcessingMachine
 	//
 	// MinimalTrainingInterval
 	//
+	@Override
 	public void setMinimalTrainingInterval(int frames, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setMinimalTrainingInterval(frames);
 	}
+	@Override
 	public int getMinimalTrainingInterval(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -117,11 +119,13 @@ public abstract class VideoProcessingMachine
 	//
 	// MaximalTrainingInterval
 	//
+	@Override
 	public void setMaximalTrainingInterval(int frames, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setMaximalTrainingInterval(frames);
 	}
+	@Override
 	public int getMaximalTrainingInterval(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -130,11 +134,13 @@ public abstract class VideoProcessingMachine
 	//
 	// HorizontalBlobBorder
 	//
+	@Override
 	public void setHorizontalBlobBorder(int size, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setHorizontalBlobBorder(size);
 	}
+	@Override
 	public int getHorizontalBlobBorder(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -143,11 +149,13 @@ public abstract class VideoProcessingMachine
 	//
 	// VerticalBlobBorder
 	//
+	@Override
 	public void setVerticalBlobBorder(int size, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setVerticalBlobBorder(size);
 	}
+	@Override
 	public int getVerticalBlobBorder(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -156,11 +164,13 @@ public abstract class VideoProcessingMachine
 	//
 	// HorizontalExtraBorderCoefficient
 	//
+	@Override
 	public void setHorizontalExtraBorderCoefficient(double coefficient, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setHorizontalExtraBorderCoefficient(coefficient);
 	}
+	@Override
 	public double getHorizontalExtraBorderCoefficient(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -169,11 +179,13 @@ public abstract class VideoProcessingMachine
 	//
 	// VerticalExtraBorderCoefficient
 	//
+	@Override
 	public void setVerticalExtraBorderCoefficient(double coefficient, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setVerticalExtraBorderCoefficient(coefficient);
 	}
+	@Override
 	public double getVerticalExtraBorderCoefficient(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -182,11 +194,13 @@ public abstract class VideoProcessingMachine
 	//
 	// MinimalBlobIntersectionArea
 	//
+	@Override
 	public void setMinimalBlobIntersectionArea(int size, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setMinimalBlobIntersectionArea(size);
 	}
+	@Override
 	public int getMinimalBlobIntersectionArea(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -195,11 +209,13 @@ public abstract class VideoProcessingMachine
 	//
 	// MinimalBlobSize
 	//
+	@Override
 	public void setMinimalBlobSize(int size, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setMinimalBlobSize(size);
 	}
+	@Override
 	public int getMinimalBlobSize(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -208,11 +224,13 @@ public abstract class VideoProcessingMachine
 	//
 	// MinimalTrackDuration
 	//
+	@Override
 	public void setMinimalTrackDuration(int frames, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setMinimalTrackDuration(frames);
 	}
+	@Override
 	public int getMinimalTrackDuration(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -221,11 +239,13 @@ public abstract class VideoProcessingMachine
 	//
 	// MaximalTrackDuration
 	//
+	@Override
 	public void setMaximalTrackDuration(int frames, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setMaximalTrackDuration(frames);
 	}
+	@Override
 	public int getMaximalTrackDuration(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -247,11 +267,13 @@ public abstract class VideoProcessingMachine
 	//
 	// MaximalBlobInvisibilityInterval
 	//
+	@Override
 	public void setMaximalBlobInvisibilityInterval(int frames, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setMaximalBlobInvisibilityInterval(frames);
 	}
+	@Override
 	public int getMaximalBlobInvisibilityInterval(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -260,11 +282,13 @@ public abstract class VideoProcessingMachine
 	//
 	// MaximalTrackRetentionInterval
 	//
+	@Override
 	public void setMaximalTrackRetentionInterval(int frames, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setMaximalTrackRetentionInterval(frames);
 	}
+	@Override
 	public int getMaximalTrackRetentionInterval(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -273,11 +297,13 @@ public abstract class VideoProcessingMachine
 	//
 	// InverseTransformationMatrix
 	//
+	@Override
 	public void setInverseTransformationMatrix(double[][] matrix, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setInverseTransformationMatrix(matrix);
 	}
+	@Override
 	public double[][] getInverseTransformationMatrix(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -286,11 +312,13 @@ public abstract class VideoProcessingMachine
 	//
 	// SamplingRate
 	//
+	@Override
 	public void setSamplingRate(double rate, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setSamplingRate(rate);
 	}
+	@Override
 	public double getSamplingRate(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -299,11 +327,13 @@ public abstract class VideoProcessingMachine
 	//
 	// R2WindowHalfwidth
 	//
+	@Override
 	public void setR2WindowHalfwidth(int halfwidth, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setR2WindowHalfwidth(halfwidth);
 	}
+	@Override
 	public int getR2WindowHalfwidth(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -312,11 +342,13 @@ public abstract class VideoProcessingMachine
 	//
 	// CharacteristicLengthMedianFilteringMode
 	//
+	@Override
 	public void setCharacteristicLengthMedianFilteringMode(boolean mode, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setCharacteristicLengthMedianFilteringMode(mode);
 	}
+	@Override
 	public boolean getCharacteristicLengthMedianFilteringMode(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -325,11 +357,13 @@ public abstract class VideoProcessingMachine
 	//
 	// CharacteristicLengthMedianFilterHalfwidth
 	//
+	@Override
 	public void setCharacteristicLengthMedianFilterHalfwidth(int halfwidth, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setCharacteristicLengthMedianFilterHalfwidth(halfwidth);
 	}
+	@Override
 	public int getCharacteristicLengthMedianFilterHalfwidth(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -338,11 +372,13 @@ public abstract class VideoProcessingMachine
 	//
 	// VelocityMedianFilteringMode
 	//
+	@Override
 	public void setVelocityMedianFilteringMode(boolean mode, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setVelocityMedianFilteringMode(mode);
 	}
+	@Override
 	public boolean getVelocityMedianFilteringMode(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -351,11 +387,13 @@ public abstract class VideoProcessingMachine
 	//
 	// VelocityMedianFilterHalfwidth
 	//
+	@Override
 	public void setVelocityMedianFilterHalfwidth(int halfwidth, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setVelocityMedianFilterHalfwidth(halfwidth);
 	}
+	@Override
 	public int getVelocityMedianFilterHalfwidth(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -364,11 +402,13 @@ public abstract class VideoProcessingMachine
 	//
 	// SynthesizedImageTransparency
 	//
+	@Override
 	public void setSynthesizedImageTransparency(int transparency, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setSynthesizedImageTransparency(transparency);
 	}
+	@Override
 	public int getSynthesizedImageTransparency(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -377,11 +417,13 @@ public abstract class VideoProcessingMachine
 	//
 	// SynthesizedImageRectangularBlobsMode
 	//
+	@Override
 	public void setSynthesizedImageRectangularBlobsMode(boolean mode, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
 		machine.setSynthesizedImageRectangularBlobsMode(mode);
 	}
+	@Override
 	public boolean getSynthesizedImageRectangularBlobsMode(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -390,6 +432,7 @@ public abstract class VideoProcessingMachine
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void process(java.awt.image.BufferedImage nativeImage, long frameNumber, long timeInMilliseconds, boolean takeFrameIntoAccount, ChoisePoint iX, GenericImageEncodingAttributes attributes) {
 		createVideoProcessingMachineIfNecessary(iX);
 		if (nativeImage != null) {
@@ -397,6 +440,7 @@ public abstract class VideoProcessingMachine
 			machine.processImage(nativeImage,frameNumber,timeInMilliseconds,takeFrameIntoAccount);
 		}
 	}
+	@Override
 	public void process(byte[] bytes, long frameNumber, long timeInMilliseconds, boolean takeFrameIntoAccount, ChoisePoint iX, GenericImageEncodingAttributes attributes) {
 		createVideoProcessingMachineIfNecessary(iX);
 		java.awt.image.BufferedImage nativeImage= Space2DWriter.bytesToImage(bytes);
@@ -478,6 +522,7 @@ public abstract class VideoProcessingMachine
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void commit(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -488,17 +533,21 @@ public abstract class VideoProcessingMachine
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void resetSettings(ChoisePoint iX) {
 		reset(true,false,false,iX);
 	}
 	//
+	@Override
 	public void resetStatistics(ChoisePoint iX) {
 		reset(false,true,false,iX);
 	}
+	@Override
 	public void resetResults(ChoisePoint iX) {
 		reset(false,false,true,iX);
 	}
 	//
+	@Override
 	public void resetAll(ChoisePoint iX) {
 		reset(true,true,true,iX);
 	}
@@ -565,9 +614,11 @@ public abstract class VideoProcessingMachine
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term getFrameNumberOrSpacer(ChoisePoint iX) {
 		return new PrologInteger(getFrameNumber(iX));
 	}
+	@Override
 	public long getFrameNumber(ChoisePoint iX) {
 		VPM machine= vpm.get();
 		if (machine != null) {
@@ -577,9 +628,11 @@ public abstract class VideoProcessingMachine
 		}
 	}
 	//
+	@Override
 	public Term getFrameTimeOrSpacer(ChoisePoint iX) {
 		return new PrologInteger(getFrameTime(iX));
 	}
+	@Override
 	public long getFrameTime(ChoisePoint iX) {
 		VPM machine= vpm.get();
 		if (machine != null) {
@@ -591,11 +644,13 @@ public abstract class VideoProcessingMachine
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void getRecentImage(Term image, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		java.awt.image.BufferedImage nativeImage= vpm.get().getCommittedRecentImage();
 		modifyImage(image,nativeImage,iX);
 	}
+	@Override
 	public byte[] getSerializedRecentImage(ChoisePoint iX) {
 		VPM machine= vpm.get();
 		if (machine != null) {
@@ -606,11 +661,13 @@ public abstract class VideoProcessingMachine
 		}
 	}
 	//
+	@Override
 	public void getPreprocessedImage(Term image, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		java.awt.image.BufferedImage nativeImage= vpm.get().getCommittedPreprocessedImage();
 		modifyImage(image,nativeImage,iX);
 	}
+	@Override
 	public byte[] getSerializedPreprocessedImage(ChoisePoint iX) {
 		VPM machine= vpm.get();
 		if (machine != null) {
@@ -621,11 +678,13 @@ public abstract class VideoProcessingMachine
 		}
 	}
 	//
+	@Override
 	public void getForegroundImage(Term image, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		java.awt.image.BufferedImage nativeImage= vpm.get().getCommittedForegroundImage();
 		modifyImage(image,nativeImage,iX);
 	}
+	@Override
 	public byte[] getSerializedForegroundImage(ChoisePoint iX) {
 		VPM machine= vpm.get();
 		if (machine != null) {
@@ -636,11 +695,13 @@ public abstract class VideoProcessingMachine
 		}
 	}
 	//
+	@Override
 	public void getSynthesizedImage(Term image, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		java.awt.image.BufferedImage nativeImage= vpm.get().getCommittedSynthesizedImage();
 		modifyImage(image,nativeImage,iX);
 	}
+	@Override
 	public byte[] getSerializedSynthesizedImage(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		VPM machine= vpm.get();
@@ -658,11 +719,13 @@ public abstract class VideoProcessingMachine
 		int layerNumber= GeneralConverters.argumentToSmallRoundInteger(a2,iX);
 		getBackgroundImage(a1,layerNumber,iX);
 	}
+	@Override
 	public void getBackgroundImage(Term image, int layerNumber, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		java.awt.image.BufferedImage nativeImage= vpm.get().getBackgroundImage(layerNumber);
 		modifyImage(image,nativeImage,iX);
 	}
+	@Override
 	public byte[] getSerializedBackgroundImage(int layerNumber, ChoisePoint iX) {
 		VPM machine= vpm.get();
 		if (machine != null) {
@@ -677,11 +740,13 @@ public abstract class VideoProcessingMachine
 		int layerNumber= GeneralConverters.argumentToSmallRoundInteger(a2,iX);
 		getSigmaImage(a1,layerNumber,iX);
 	}
+	@Override
 	public void getSigmaImage(Term image, int layerNumber, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		java.awt.image.BufferedImage nativeImage= vpm.get().getSigmaImage(layerNumber);
 		modifyImage(image,nativeImage,iX);
 	}
+	@Override
 	public byte[] getSerializedSigmaImage(int layerNumber, ChoisePoint iX) {
 		VPM machine= vpm.get();
 		if (machine != null) {
@@ -694,10 +759,12 @@ public abstract class VideoProcessingMachine
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term getBlobs(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		return vpm.get().getCommittedBlobs();
 	}
+	@Override
 	public byte[] getSerializedBlobs(ChoisePoint iX) {
 		VPM machine= vpm.get();
 		if (machine != null) {
@@ -708,10 +775,12 @@ public abstract class VideoProcessingMachine
 		}
 	}
 	//
+	@Override
 	public Term getTracks(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		return vpm.get().getCommittedTracks();
 	}
+	@Override
 	public byte[] getSerializedTracks(ChoisePoint iX) {
 		VPM machine= vpm.get();
 		if (machine != null) {
@@ -722,10 +791,12 @@ public abstract class VideoProcessingMachine
 		}
 	}
 	//
+	@Override
 	public Term getChronicle(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		return vpm.get().getCommittedChronicle();
 	}
+	@Override
 	public byte[] getSerializedChronicle(ChoisePoint iX) {
 		VPM machine= vpm.get();
 		if (machine != null) {
@@ -736,10 +807,12 @@ public abstract class VideoProcessingMachine
 		}
 	}
 	//
+	@Override
 	public Term getConnectedGraphs(ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		return vpm.get().getCommittedConnectedGraphs();
 	}
+	@Override
 	public byte[] getSerializedConnectedGraphs(ChoisePoint iX) {
 		VPM machine= vpm.get();
 		if (machine != null) {
@@ -752,11 +825,13 @@ public abstract class VideoProcessingMachine
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public double[] physicalCoordinates(int pixelX, int pixelY, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		return vpm.get().physicalCoordinates(pixelX,pixelY);
 	}
 	//
+	@Override
 	public double characteristicLength(int x, int y, ChoisePoint iX) {
 		createVideoProcessingMachineIfNecessary(iX);
 		return vpm.get().characteristicLength(x,y);
@@ -765,17 +840,17 @@ public abstract class VideoProcessingMachine
 	///////////////////////////////////////////////////////////////
 	//
 	public void imgGetSubimage4s(ChoisePoint iX, Term a1, Term a2, Term a3, Term a4) {
-		int x= GeneralConverters.argumentToSmallInteger(a1,iX);
-		int y= GeneralConverters.argumentToSmallInteger(a2,iX);
-		int width= GeneralConverters.argumentToSmallInteger(a3,iX);
-		int height= GeneralConverters.argumentToSmallInteger(a4,iX);
-		appendFrameCommand(new VPMimgGetSubimage(x,y,width,height));
+		int currentX= GeneralConverters.argumentToSmallInteger(a1,iX);
+		int currentY= GeneralConverters.argumentToSmallInteger(a2,iX);
+		int currentWidth= GeneralConverters.argumentToSmallInteger(a3,iX);
+		int currentHeight= GeneralConverters.argumentToSmallInteger(a4,iX);
+		appendFrameCommand(new VPMimgGetSubimage(currentX,currentY,currentWidth,currentHeight));
 	}
 	//
 	public void imgResizeImage2s(ChoisePoint iX, Term a1, Term a2) {
-		int width= GeneralConverters.argumentToSmallInteger(a1,iX);
-		int height= GeneralConverters.argumentToSmallInteger(a2,iX);
-		appendFrameCommand(new VPMimgResizeImage(width,height));
+		int currentWidth= GeneralConverters.argumentToSmallInteger(a1,iX);
+		int currentHeight= GeneralConverters.argumentToSmallInteger(a2,iX);
+		appendFrameCommand(new VPMimgResizeImage(currentWidth,currentHeight));
 	}
 	//
 	public void imgApplyGaussianFilter1s(ChoisePoint iX, Term a1) {
@@ -910,39 +985,39 @@ public abstract class VideoProcessingMachine
 	//
 	public void mskSelectPolygon1s(ChoisePoint iX, Term a1) {
 		Point2DArrays arrays= Point2DArrays.argumentToPoint2DArrays(a1,iX);
-		appendFrameCommand(new VPMmskSelectPolygon(arrays.xPoints,arrays.yPoints,false));
+		appendFrameCommand(new VPMmskSelectPolygon(arrays.getXPoints(),arrays.getYPoints(),false));
 	}
 	public void mskSelectPolygon2s(ChoisePoint iX, Term a1, Term a2) {
 		Point2DArrays arrays= Point2DArrays.argumentToPoint2DArrays(a1,iX);
 		YesNo useStandardizedCoordinates= YesNoConverters.argument2YesNo(a2,iX);
-		appendFrameCommand(new VPMmskSelectPolygon(arrays.xPoints,arrays.yPoints,useStandardizedCoordinates.toBoolean()));
+		appendFrameCommand(new VPMmskSelectPolygon(arrays.getXPoints(),arrays.getYPoints(),useStandardizedCoordinates.toBoolean()));
 	}
 	public void mskAddPolygon1s(ChoisePoint iX, Term a1) {
 		Point2DArrays arrays= Point2DArrays.argumentToPoint2DArrays(a1,iX);
-		appendFrameCommand(new VPMmskAddPolygon(arrays.xPoints,arrays.yPoints,false));
+		appendFrameCommand(new VPMmskAddPolygon(arrays.getXPoints(),arrays.getYPoints(),false));
 	}
 	public void mskAddPolygon2s(ChoisePoint iX, Term a1, Term a2) {
 		Point2DArrays arrays= Point2DArrays.argumentToPoint2DArrays(a1,iX);
 		YesNo useStandardizedCoordinates= YesNoConverters.argument2YesNo(a2,iX);
-		appendFrameCommand(new VPMmskAddPolygon(arrays.xPoints,arrays.yPoints,useStandardizedCoordinates.toBoolean()));
+		appendFrameCommand(new VPMmskAddPolygon(arrays.getXPoints(),arrays.getYPoints(),useStandardizedCoordinates.toBoolean()));
 	}
 	public void mskExcludePolygon1s(ChoisePoint iX, Term a1) {
 		Point2DArrays arrays= Point2DArrays.argumentToPoint2DArrays(a1,iX);
-		appendFrameCommand(new VPMmskExcludePolygon(arrays.xPoints,arrays.yPoints,false));
+		appendFrameCommand(new VPMmskExcludePolygon(arrays.getXPoints(),arrays.getYPoints(),false));
 	}
 	public void mskExcludePolygon2s(ChoisePoint iX, Term a1, Term a2) {
 		Point2DArrays arrays= Point2DArrays.argumentToPoint2DArrays(a1,iX);
 		YesNo useStandardizedCoordinates= YesNoConverters.argument2YesNo(a2,iX);
-		appendFrameCommand(new VPMmskExcludePolygon(arrays.xPoints,arrays.yPoints,useStandardizedCoordinates.toBoolean()));
+		appendFrameCommand(new VPMmskExcludePolygon(arrays.getXPoints(),arrays.getYPoints(),useStandardizedCoordinates.toBoolean()));
 	}
 	public void mskFlipPolygon1s(ChoisePoint iX, Term a1) {
 		Point2DArrays arrays= Point2DArrays.argumentToPoint2DArrays(a1,iX);
-		appendFrameCommand(new VPMmskFlipPolygon(arrays.xPoints,arrays.yPoints,false));
+		appendFrameCommand(new VPMmskFlipPolygon(arrays.getXPoints(),arrays.getYPoints(),false));
 	}
 	public void mskFlipPolygon2s(ChoisePoint iX, Term a1, Term a2) {
 		Point2DArrays arrays= Point2DArrays.argumentToPoint2DArrays(a1,iX);
 		YesNo useStandardizedCoordinates= YesNoConverters.argument2YesNo(a2,iX);
-		appendFrameCommand(new VPMmskFlipPolygon(arrays.xPoints,arrays.yPoints,useStandardizedCoordinates.toBoolean()));
+		appendFrameCommand(new VPMmskFlipPolygon(arrays.getXPoints(),arrays.getYPoints(),useStandardizedCoordinates.toBoolean()));
 	}
 	//
 	public void mskSelectAll0s(ChoisePoint iX) {

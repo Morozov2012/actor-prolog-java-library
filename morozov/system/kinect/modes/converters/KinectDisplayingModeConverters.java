@@ -5,12 +5,12 @@ package morozov.system.kinect.modes.converters;
 import target.*;
 
 import morozov.run.*;
+import morozov.system.errors.*;
 import morozov.system.kinect.modes.*;
 import morozov.system.kinect.modes.converters.errors.*;
 import morozov.system.kinect.modes.interfaces.*;
 import morozov.system.kinect.modes.tools.*;
 import morozov.terms.*;
-import morozov.terms.errors.*;
 import morozov.terms.signals.*;
 
 import java.util.HashMap;
@@ -28,7 +28,7 @@ public class KinectDisplayingModeConverters {
 				throw new WrongArgumentIsNotKinectDisplayingMode(attributes);
 			}
 		} catch (TermIsNotASymbol e) {
-			HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+			HashMap<Long,Term> setPositiveMap= new HashMap<>();
 			Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 			setEnd= setEnd.dereferenceValue(iX);
 			if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {

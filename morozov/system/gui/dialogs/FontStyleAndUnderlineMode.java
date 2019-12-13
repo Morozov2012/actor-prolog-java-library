@@ -3,8 +3,10 @@
 package morozov.system.gui.dialogs;
 
 public class FontStyleAndUnderlineMode {
-	public int style;
-	public boolean isUnderlined;
+	//
+	protected int style;
+	protected boolean isUnderlined;
+	//
 	public FontStyleAndUnderlineMode(int s, boolean m) {
 		style= s;
 		isUnderlined= m;

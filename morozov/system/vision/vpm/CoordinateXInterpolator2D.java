@@ -4,8 +4,6 @@ package morozov.system.vision.vpm;
 
 public class CoordinateXInterpolator2D extends CoordinateInterpolator2D {
 	//
-	///////////////////////////////////////////////////////////////
-	//
 	public CoordinateXInterpolator2D() {
 	}
 	public CoordinateXInterpolator2D(double epsilon, int iterations) {
@@ -14,6 +12,7 @@ public class CoordinateXInterpolator2D extends CoordinateInterpolator2D {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public double computeMatrixItem(int x, int y, double[][] matrix, double[][] extraArguments2) {
 		if (matrix.length==0) {
 			return x;
@@ -31,7 +30,6 @@ public class CoordinateXInterpolator2D extends CoordinateInterpolator2D {
 			double h= matrix[1][2];
 			double i= matrix[2][2];
 			double u= (a*x + b*y + c) / (g*x + h*y + i);
-			// double v= (d*x + e*y + f) / (g*x + h*y + i);
 			return u;
 		}
 	}

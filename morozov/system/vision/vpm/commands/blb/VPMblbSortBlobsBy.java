@@ -24,6 +24,7 @@ public class VPMblbSortBlobsBy extends VPM_FrameCommand {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void execute(VPM vpm) {
 		BlobGroup group= vpm.getRecentBlobGroup();
 		if (group==null) {
@@ -34,6 +35,5 @@ public class VPMblbSortBlobsBy extends VPM_FrameCommand {
 		};
 		BlobAttributes[] attributeArray= group.getAttributeArray();
 		Arrays.sort(attributeArray,blobComparator);
-		// group.setAttributeArray(attributeArray);
 	}
 }

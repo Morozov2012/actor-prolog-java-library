@@ -16,10 +16,10 @@ public class OwnDomainWrapper
 	//
 	protected DomainAlternative ownDomain;
 	//
-	public static HashMap<DomainAlternative,ExternalDomainInterface> ownDomainRegister= new HashMap<>();
-	public static HashMap<ExternalDomainInterface,OwnDomainWrapper> invertedOwnDomainRegister= new HashMap<>();
+	protected static HashMap<DomainAlternative,ExternalDomainInterface> ownDomainRegister= new HashMap<>();
+	protected static HashMap<ExternalDomainInterface,OwnDomainWrapper> invertedOwnDomainRegister= new HashMap<>();
 	//
-	public static HashMap<ExternalDomainInterface,ForeignDomainWrapper> foreignDomainRegister= new HashMap<>();
+	protected static HashMap<ExternalDomainInterface,ForeignDomainWrapper> foreignDomainRegister= new HashMap<>();
 	//
 	private static final long serialVersionUID= 0x66889E2B6928F6EBL; // 7388329097986373355L
 	//
@@ -67,14 +67,17 @@ public class OwnDomainWrapper
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean isEqualTo(DomainAlternative a, HashSet<PrologDomainPair> stack) {
 		return ownDomain.isEqualTo(a,stack);
 	}
 	//
+	@Override
 	public boolean coversAlternative(DomainAlternative a, PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) {
 		return ownDomain.coversAlternative(a,ownerDomain,stack);
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
 		return ownDomain.toString(encoder);
 	}

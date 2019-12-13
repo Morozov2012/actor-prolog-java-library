@@ -24,23 +24,22 @@ public abstract class MonoArgumentDomainItem extends DomainAlternative {
 		domainTableEntry= entry;
 	}
 	//
+	@Override
 	public void initiate() {
-		// synchronized (this) {
 		if (domainItem==null) {
 			domainItem= DomainTable.getDomainAlternatives(domainTableEntry);
 		}
-		// }
 	}
 	//
+	@Override
 	public void collectLocalDomainTable(HashMap<String,PrologDomain> localDomainTable) {
-		// initiateDomainItemIfNecessary();
 		if (!localDomainTable.containsKey(domainTableEntry)) {
 			localDomainTable.put(domainTableEntry,domainItem);
 			domainItem.collectLocalDomainTable(localDomainTable);
 		}
 	}
+	@Override
 	public void acceptLocalDomainTable(HashMap<String,PrologDomain> localDomainTable) {
-		// initiateDomainItemIfNecessary();
 		if (domainItem == null) {
 			domainItem= localDomainTable.get(domainTableEntry);
 		}
@@ -48,9 +47,9 @@ public abstract class MonoArgumentDomainItem extends DomainAlternative {
 	//
 	abstract protected String getMonoArgumentDomainTag();
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
-		// initiateDomainItemIfNecessary();
-		StringBuffer buffer= new StringBuffer();
+		StringBuilder buffer= new StringBuilder();
 		buffer.append(getMonoArgumentDomainTag());
 		buffer.append("(\"");
 		buffer.append(FormatOutput.encodeString(domainTableEntry,false,encoder));

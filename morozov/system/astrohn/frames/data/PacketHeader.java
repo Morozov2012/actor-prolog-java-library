@@ -47,11 +47,6 @@ public class PacketHeader {
 		int magic= Integer.reverseBytes(in.readInt());
 		int dataType= Integer.reverseBytes(in.readInt());
 		int length= Integer.reverseBytes(in.readInt());
-		/*
-		System.out.printf("PacketHeader::magic: %x\n",magic);
-		System.out.printf("PacketHeader::dataType: %d\n",dataType);
-		System.out.printf("PacketHeader::length: %d\n",length);
-		*/
 		return new PacketHeader(magic,dataType,length);
 	}
 	//

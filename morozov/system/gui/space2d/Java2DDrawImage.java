@@ -2,13 +2,14 @@
 
 package morozov.system.gui.space2d;
 
-import morozov.terms.*;
+import morozov.system.*;
 
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.Color;
 
 public class Java2DDrawImage extends Java2DCommand {
+	//
 	protected Image image;
 	protected Color color= null;
 	protected double x1= 0;
@@ -32,11 +33,13 @@ public class Java2DDrawImage extends Java2DCommand {
 		x1= aX1;
 		y1= aY1;
 	}
+	//
+	@Override
 	public void execute(Graphics2D g2, DrawingMode drawingMode) {
 		double factorX= drawingMode.getFactorX();
 		double factorY= drawingMode.getFactorY();
-		int integerX= PrologInteger.toInteger(x1*factorX);
-		int integerY= PrologInteger.toInteger(y1*factorY);
+		int integerX= Arithmetic.toInteger(x1*factorX);
+		int integerY= Arithmetic.toInteger(y1*factorY);
 		if (color==null) {
 			g2.drawImage(image,integerX,integerY,null);
 		} else {

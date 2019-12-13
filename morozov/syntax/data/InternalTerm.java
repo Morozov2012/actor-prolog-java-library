@@ -21,6 +21,7 @@ public class InternalTerm {
 		return position;
 	}
 	//
+	@Override
 	public String toString() {
 		return value.toString();
 	}

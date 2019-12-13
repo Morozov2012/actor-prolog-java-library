@@ -14,11 +14,11 @@ public class DetailedColorMap implements Serializable {
 	protected Color[] colors;
 	//
 	protected ColorMapName name;
-	protected ColorMapSize size;
-	protected YesNoDefault reverseScale;
-	protected YesNoDefault reverseMinimalValue;
-	protected YesNoDefault reverseMaximalValue;
-	protected TincturingCoefficient tincturingCoefficient;
+	protected ColorMapSize size= ColorMapSize.instanceDefault;
+	protected YesNoDefault reverseScale= YesNoDefault.DEFAULT;
+	protected YesNoDefault reverseMinimalValue= YesNoDefault.DEFAULT;
+	protected YesNoDefault reverseMaximalValue= YesNoDefault.DEFAULT;
+	protected TincturingCoefficient tincturingCoefficient= TincturingCoefficient.instanceDefault;
 	//
 	protected transient int[][] solidMatrix;
 	//
@@ -77,23 +77,7 @@ public class DetailedColorMap implements Serializable {
 	public DetailedColorMap(Color[] array) {
 		useCustomMap= true;
 		colors= array;
-		size= ColorMapSize.instanceDefault;
-		if (getDefaultReverseCustomColorMapScale()) {
-			reverseScale= YesNoDefault.YES;
-		} else {
-			reverseScale= YesNoDefault.NO;
-		};
-		if (getDefaultReverseCustomColorMapMinimalValue()) {
-			reverseMinimalValue= YesNoDefault.YES;
-		} else {
-			reverseMinimalValue= YesNoDefault.NO;
-		};
-		if (getDefaultReverseCustomColorMapMaximalValue()) {
-			reverseMaximalValue= YesNoDefault.YES;
-		} else {
-			reverseMaximalValue= YesNoDefault.NO;
-		};
-		tincturingCoefficient= TincturingCoefficient.instanceDefault;
+		size= new ColorMapSize(array.length);
 	}
 	//
 	///////////////////////////////////////////////////////////////

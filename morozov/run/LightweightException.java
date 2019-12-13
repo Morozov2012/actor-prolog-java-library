@@ -3,6 +3,7 @@
 package morozov.run;
 
 public class LightweightException extends Exception {
+	//
 	public LightweightException() {
 		super(null,null,false,false);
 	}
@@ -18,9 +19,12 @@ public class LightweightException extends Exception {
 	public LightweightException(Throwable cause) {
 		super((cause==null ? null : cause.toString()),cause,false,false);
 	}
+	//
+	@Override
 	public Throwable fillInStackTrace() {
 		return this;
 	}
+	@Override
 	public void setStackTrace(StackTraceElement[] stackTrace) {
 	}
 }

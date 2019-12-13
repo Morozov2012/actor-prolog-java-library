@@ -2,12 +2,23 @@
 
 package morozov.system;
 
-public class DeviceIdentifier {
+import java.io.Serializable;
+
+public class DeviceIdentifier implements Serializable {
 	//
 	public static DeviceIdentifier DEFAULT= new DeviceIdentifier();
 	//
 	protected boolean isDefault;
 	protected String name;
+	//
+	private static final long serialVersionUID= 0xA8F417CB8B7B22CCL; // -6272362218034355508
+	//
+	// static {
+	//	// SerialVersionChecker.check(serialVersionUID,"morozov.system","DeviceIdentifier");
+	//	SerialVersionChecker.report("morozov.system","DeviceIdentifier");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public DeviceIdentifier(String s) {
 		isDefault= false;

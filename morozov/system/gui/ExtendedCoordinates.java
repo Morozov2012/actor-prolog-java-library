@@ -6,9 +6,9 @@ import morozov.system.gui.signals.*;
 
 public class ExtendedCoordinates {
 	//
-	public ExtendedCoordinate x;
-	public ExtendedCoordinate y;
-	public boolean usePixelMeasurements;
+	protected ExtendedCoordinate x;
+	protected ExtendedCoordinate y;
+	protected boolean usePixelMeasurements;
 	//
 	public ExtendedCoordinates(ExtendedCoordinate a, ExtendedCoordinate b, boolean mode) {
 		x= a;
@@ -20,14 +20,22 @@ public class ExtendedCoordinates {
 		y= new ExtendedCoordinate(b);
 		usePixelMeasurements= mode;
 	}
+	//
+	public ExtendedCoordinate getX() {
+		return x;
+	}
+	public ExtendedCoordinate getY() {
+		return y;
+	}
+	public boolean usePixelMeasurements() {
+		return usePixelMeasurements;
+	}
+	//
 	public boolean areCentered() throws UseDefaultLocation {
 		if (x.isCentered() || y.isCentered()) {
 			return true;
 		} else {
 			return false;
 		}
-	}
-	public boolean usePixelMeasurements() {
-		return usePixelMeasurements;
 	}
 }

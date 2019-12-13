@@ -15,14 +15,14 @@ import java.util.Map;
 
 public class StaticContext {
 	//
-	private static HashSet<Window> ownerlessWindows= new HashSet<Window>();
+	protected static HashSet<Window> ownerlessWindows= new HashSet<>();
 	//
-	private AbstractProcess rootProcess;
-	private JApplet applet;
-	private String[] arguments;
-	private Window systemWindow;
+	protected AbstractProcess rootProcess;
+	protected JApplet applet;
+	protected String[] arguments;
+	protected Window systemWindow;
 	//
-	private Map<String,StaticAttributes> contextList= Collections.synchronizedMap(new HashMap<String,StaticAttributes>());
+	protected Map<String,StaticAttributes> contextList= Collections.synchronizedMap(new HashMap<String,StaticAttributes>());
 	//
 	public StaticContext(AbstractProcess self, JApplet program, String[] args, Window[] windows) {
 		rootProcess= self;

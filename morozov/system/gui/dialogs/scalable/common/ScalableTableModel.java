@@ -14,7 +14,7 @@ package morozov.system.gui.dialogs.scalable.common;
 
 import morozov.run.*;
 import morozov.system.gui.dialogs.*;
-import morozov.system.errors.*;
+import morozov.system.converters.errors.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 
@@ -28,16 +28,14 @@ public class ScalableTableModel extends AbstractTableModel {
 	protected AbstractDialog targetDialog= null;
 	protected ATable table= null;
 	protected int numberOfColumns= 0;
-	// protected int numberOfRows= 0;
 	protected String[] columnNames;
-	protected ArrayList<ArrayList<String>> content= new ArrayList<ArrayList<String>>();
+	protected ArrayList<ArrayList<String>> content= new ArrayList<>();
 	protected ScalableTableResident resident= null;
 	protected AtomicBoolean useResident= new AtomicBoolean(false);
 	//
 	public ScalableTableModel(AbstractDialog dialog, ATable control, ScalableTableColumnDescription[] columnDescriptions, Term initialValue, ChoisePoint iX) {
 		targetDialog= dialog;
 		table= control;
-		// numberOfRows= height;
 		numberOfColumns= columnDescriptions.length;
 		columnNames= new String[numberOfColumns];
 		for (int n=0; n < numberOfColumns; n++) {
@@ -73,15 +71,12 @@ public class ScalableTableModel extends AbstractTableModel {
 				try {
 					while (true) {
 						Term currentRow= value.getNextListHead(iX);
-						ArrayList<String> contentRow= new ArrayList<String>();
+						ArrayList<String> contentRow= new ArrayList<>();
 						content.add(contentRow);
 						try {
-							// int n= 1;
 							while (true) {
 								Term currentItem= currentRow.getNextListHead(iX);
 								contentRow.add(currentItem.toString(iX));
-								// numberOfColumns= StrictMath.max(n,numberOfColumns);
-								// n++;
 								currentRow= currentRow.getNextListTail(iX);
 							}
 						} catch (EndOfList e2) {
@@ -98,18 +93,21 @@ public class ScalableTableModel extends AbstractTableModel {
 		}
 	}
 	//
+	@Override
 	public int getColumnCount() {
 		return numberOfColumns;
 	}
+	@Override
 	public int getRowCount() {
 		synchronized (content) {
-			// return numberOfRows;
 			return content.size();
 		}
 	}
+	@Override
 	public String getColumnName(int col) {
 		return columnNames[col];
 	}
+	@Override
 	public Object getValueAt(int row, int col) {
 		synchronized (content) {
 			if (row + 1 <= content.size()) {
@@ -124,6 +122,7 @@ public class ScalableTableModel extends AbstractTableModel {
 			}
 		}
 	}
+	@Override
 	public Class getColumnClass(int c) {
 		return String.class;
 	}
@@ -165,7 +164,6 @@ public class ScalableTableModel extends AbstractTableModel {
 					row= new PrologList(new PrologString(cell),row);
 				};
 				result= new PrologList(row,result);
-				// result= new PrologList(new PrologInteger(rowNumber),result);
 			}
 		};
 		return result;

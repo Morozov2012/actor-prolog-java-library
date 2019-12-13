@@ -8,13 +8,14 @@ import java.math.BigInteger;
 
 public class CodedErrorExit extends ErrorExit {
 	//
-	private BigInteger numericCode;
+	protected BigInteger numericCode;
 	//
 	public CodedErrorExit(ChoisePoint cp, BigInteger number) {
 		choisePoint= cp;
 		numericCode= number;
 	}
 	//
+	@Override
 	public boolean isNormalTerminationOfTheProgram() {
 		if (numericCode.compareTo(BigInteger.ZERO)==0) {
 			return true;
@@ -23,9 +24,11 @@ public class CodedErrorExit extends ErrorExit {
 		}
 	}
 	//
+	@Override
 	public Term createTerm() {
 		return new PrologInteger(numericCode);
 	}
+	@Override
 	public String toString() {
 		return numericCode.toString();
 	}

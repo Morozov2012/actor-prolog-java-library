@@ -7,6 +7,7 @@ import morozov.system.ffmpeg.*;
 public interface FFmpegInterface {
 	//
 	public void sendFFmpegFrame(FFmpegFrame frame);
+	public void sendFFmpegAudioData(FFmpegAudioData frame);
 	public void resetCounters();
 	//
 	public void setDeliveredDescription(String value);
@@ -14,8 +15,8 @@ public interface FFmpegInterface {
 	public void setDeliveredRegistrationTime(String value);
 	public void setDeliveredRegistrationDate(String value);
 	//
-	public void completeDataReading(long numberOfAcquiredFrames);
-	public void completeDataReading(long numberOfFrameToBeAcquired, Throwable e);
+	public void completeDataReading(long numberOfAcquiredVideoFrames);
+	public void completeDataReading(long numberOfVideoFrameToBeAcquired, Throwable e);
 	//
 	public void completeDataWriting(long numberOfFrames, Throwable e);
 	//

@@ -5,6 +5,7 @@ package morozov.system.gui;
 import target.*;
 
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.gui.errors.*;
 import morozov.system.gui.signals.*;
 import morozov.system.signals.*;
@@ -15,12 +16,12 @@ import java.math.BigInteger;
 
 public class ExtendedCoordinate {
 	//
-	private boolean locateFigureInDefaultPosition= true;
-	private boolean locateFigureInTheCentre= false;
+	protected boolean locateFigureInDefaultPosition= true;
+	protected boolean locateFigureInTheCentre= false;
 	//
-	private boolean useDoubleValue= false;
-	private BigInteger integerValue;
-	private double doubleValue= 0;
+	protected boolean useDoubleValue= false;
+	protected BigInteger integerValue;
+	protected double doubleValue= 0;
 	//
 	protected static String stringDefault= "default";
 	protected static String stringCentered= "centered";
@@ -44,8 +45,11 @@ public class ExtendedCoordinate {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void useDefaultLocation() {
-		locateFigureInDefaultPosition= true;
+	public void setUseDefaultLocation(boolean mode) {
+		locateFigureInDefaultPosition= mode;
+	}
+	public void setUseDefaultLocation() {
+		setUseDefaultLocation(true);
 	}
 	//
 	public boolean isDefault() {
@@ -87,9 +91,9 @@ public class ExtendedCoordinate {
 			throw CentreFigure.instance;
 		} else {
 			if (useDoubleValue) {
-				return PrologInteger.toInteger(doubleValue);
+				return Arithmetic.toInteger(doubleValue);
 			} else {
-				return PrologInteger.toInteger(integerValue);
+				return Arithmetic.toInteger(integerValue);
 			}
 		}
 	}
@@ -113,14 +117,14 @@ public class ExtendedCoordinate {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
 			ExtendedCoordinate coordinate= new ExtendedCoordinate();
-			coordinate.useDefaultLocation();
+			coordinate.setUseDefaultLocation();
 			return coordinate;
 		} else {
 			try {
 				return argumentToExtendedCoordinate(value,iX);
 			} catch (RuntimeException e) {
 				ExtendedCoordinate coordinate= new ExtendedCoordinate();
-				coordinate.useDefaultLocation();
+				coordinate.setUseDefaultLocation();
 				return coordinate;
 			}
 		}
@@ -146,7 +150,7 @@ public class ExtendedCoordinate {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_default) {
-				coordinate.useDefaultLocation();
+				coordinate.setUseDefaultLocation();
 				return coordinate;
 			} else if (code==SymbolCodes.symbolCode_E_centered) {
 				coordinate.centreFigure();
@@ -217,6 +221,7 @@ public class ExtendedCoordinate {
 		}
 	}
 	//
+	@Override
 	public String toString() {
 		if (locateFigureInDefaultPosition) {
 			return stringDefault;

@@ -50,6 +50,9 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 	protected KinectColorMap peopleColors;
 	//
 	protected NumericalValue maximalChronicleLength;
+	protected NumericalValue sceneDepthThreshold;
+	protected KinectSurfaceType sceneSurfaceType;
+	protected ColorSubstitutionMode colorSubstitutionMode;
 	//
 	protected int computedHorizontalCorrection= ExtendedCorrectionTools.getDefaultHorizontalCorrection();
 	protected int computedVerticalCorrection= ExtendedCorrectionTools.getDefaultVerticalCorrection();
@@ -75,7 +78,6 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 	//
 	protected KinectFrameInterface recentKinectFrame;
 	//
-	// protected AtomicLong numberOfRecentKinectFrame= new AtomicLong(-1);
 	protected long numberOfRepeatedFrame= -1;
 	//
 	protected KinectFrameInterface committedKinectFrame;
@@ -89,8 +91,6 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 	//
 	protected KinectLookupTable kinectLookupTable= new KinectLookupTable();
 	protected AtomicReference<Appearance> sceneAppearance= new AtomicReference<>(null);
-	protected NumericalValue sceneDepthThreshold;
-	protected KinectSurfaceType sceneSurfaceType;
 	//
 	protected AtomicReference<KinectFrameType> deliveredFrameType= new AtomicReference<>();
 	protected AtomicReference<KinectFrameType[]> deliveredDataAcquisitionMode= new AtomicReference<>();
@@ -130,6 +130,7 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 	abstract public Term getBuiltInSlot_E_maximal_chronicle_length();
 	abstract public Term getBuiltInSlot_E_scene_depth_threshold();
 	abstract public Term getBuiltInSlot_E_scene_surface_type();
+	abstract public Term getBuiltInSlot_E_color_substitution_mode();
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -316,8 +317,31 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 		}
 	}
 	//
+	// get/set color_substitution_mode
+	//
+	public void setColorSubstitutionMode1s(ChoisePoint iX, Term a1) {
+		setColorSubstitutionMode(ColorSubstitutionModeConverters.argumentToColorSubstitutionMode(a1,iX));
+	}
+	public void setColorSubstitutionMode(ColorSubstitutionMode value) {
+		colorSubstitutionMode= value;
+	}
+	public void getColorSubstitutionMode0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(ColorSubstitutionModeConverters.toTerm(getColorSubstitutionMode(iX)));
+	}
+	public void getColorSubstitutionMode0fs(ChoisePoint iX) {
+	}
+	public ColorSubstitutionMode getColorSubstitutionMode(ChoisePoint iX) {
+		if (colorSubstitutionMode != null) {
+			return colorSubstitutionMode;
+		} else {
+			Term value= getBuiltInSlot_E_color_substitution_mode();
+			return ColorSubstitutionModeConverters.argumentToColorSubstitutionMode(value,iX);
+		}
+	}
+	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void updateAttributes(ChoisePoint iX) {
 	}
 	//
@@ -356,7 +380,6 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 		}
 	}
 	//
-	//
 	public void isConnected0s(ChoisePoint iX) throws Backtracking {
 		KinectDeviceInterface currentDevice= getInputDevice(iX);
 		if (currentDevice != null) {
@@ -381,6 +404,7 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void resetCounters() {
 		synchronized (numberOfRecentReceivedFrame) {
 			super.resetCounters();
@@ -406,6 +430,7 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 		}
 	}
 	//
+	@Override
 	protected void resetFrameRate() {
 		committedFrameNumber= -1;
 		committedFrameTime= -1;
@@ -435,13 +460,16 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 		start(requireExclusiveAccess,iX);
 	}
 	//
-	protected void activateDataAcquisition(ChoisePoint iX) {
+	@Override
+	protected void activateDataAcquisition(boolean flushBuffers, ChoisePoint iX) {
 		KinectDeviceInterface device= actingDevice.get();
 		if (device != null) {
+			super.activateDataAcquisition(flushBuffers,iX);
 			device.activate(iX);
 		}
 	}
 	//
+	@Override
 	protected void startRecording(DataAcquisitionBufferOperatingMode currentOperatingMode, boolean requireExclusiveAccess, ChoisePoint iX) {
 		KinectDeviceInterface currentDevice= getInputDevice(iX);
 		if (currentDevice != null) {
@@ -449,21 +477,21 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 			int currentWriteBufferSize= getWriteBufferSize(iX);
 			KinectPerformanceOptimization currentPerformanceOptimization= getDataAcquisitionOptimization(iX);
 			ExtendedFileName currentFileName= retrieveRealLocalFileName(iX);
-			int currentOutputDebugInformation= PrologInteger.toInteger(getOutputDebugInformation(iX));
+			int currentOutputDebugInformation= Arithmetic.toInteger(getOutputDebugInformation(iX));
 			frameRecordingTask.setWriteBufferSize(currentWriteBufferSize);
 			frameRecordingTask.setOutputDebugInformation(currentOutputDebugInformation);
 			frameRecordingTask.reset(currentFileName);
 			actingDevice.set(currentDevice);
 			setActingMetadata(iX);
 			currentDevice.registerListener(currentDisplayingMode,currentPerformanceOptimization,requireExclusiveAccess,iX);
-			actingDataAcquisitionBufferOperatingMode.set(currentOperatingMode);
+			super.startRecording(currentOperatingMode,requireExclusiveAccess,iX);
 			try {
 				updateActingDisplayingMode(currentDisplayingMode,iX);
 				updateActingDataAcquisitionMode(currentDevice.getDataAcquisitionMode());
 				actingExclusiveAccessFlag.set(requireExclusiveAccess);
 				currentDevice.activate(iX);
 			} catch (Throwable e) {
-				actingDataAcquisitionBufferOperatingMode.set(null);
+				resetActingMode();
 				throw e;
 			}
 		} else {
@@ -471,6 +499,7 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 		}
 	}
 	//
+	@Override
 	protected void startReadingOrPlaying(boolean doActivateReading, DataAcquisitionBufferOperatingMode currentOperatingMode, ChoisePoint iX) {
 		ExtendedFileName currentFileName= retrieveRealLocalFileName(iX);
 		int currentTimeout= getMaximalWaitingTimeInMilliseconds(iX);
@@ -479,6 +508,7 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 		int currentReadBufferSize= getReadBufferSize(iX);
 		NumericalValue currentMaximalChronicleLength= getMaximalChronicleLength(iX);
 		NumericalValue currentSlowMotionCoefficient= getSlowMotionCoefficient(iX);
+		int currentOutputDebugInformation= Arithmetic.toInteger(getOutputDebugInformation(iX));
 		actingReadBufferSize.set(currentReadBufferSize);
 		actingDevice.set(null);
 		actingDataAcquisitionBufferOperatingMode.set(currentOperatingMode);
@@ -488,13 +518,15 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 			frameReadingTask.setSlowMotionCoefficient(currentSlowMotionCoefficient);
 			frameReadingTask.setMaximalFrameDelay(getMaximalFrameDelay(iX));
 			frameReadingTask.setDisplayingMode(currentDisplayingMode);
+			frameReadingTask.setOutputDebugInformation(currentOutputDebugInformation);
 			frameReadingTask.startReading(doActivateReading,currentFileName,currentTimeout,currentCharacterSet,staticContext);
 		} catch (Throwable e) {
-			actingDataAcquisitionBufferOperatingMode.set(null);
+			resetActingMode();
 			throw e;
 		}
 	}
 	//
+	@Override
 	protected void startListening(DataAcquisitionBufferOperatingMode currentOperatingMode, boolean requireExclusiveAccess, ChoisePoint iX) {
 		KinectDeviceInterface currentDevice= getInputDevice(iX);
 		if (currentDevice != null) {
@@ -512,7 +544,7 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 				actingExclusiveAccessFlag.set(requireExclusiveAccess);
 				currentDevice.activate(iX);
 			} catch (Throwable e) {
-				actingDataAcquisitionBufferOperatingMode.set(null);
+				resetActingMode();
 				throw e;
 			}
 		} else {
@@ -524,21 +556,14 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 	//
 	protected void updateActingDisplayingModeIfNecessary(ChoisePoint iX) {
 		if (actingDisplayingMode.get()==null) {
-			// int currentTimeout= getMaximalWaitingTimeInMilliseconds(iX);
-			// CharacterSet currentCharacterSet= getCharacterSet(iX);
 			KinectDisplayingModeInterface currentDisplayingMode= getDisplayingMode(iX);
 			int currentReadBufferSize= getReadBufferSize(iX);
 			NumericalValue currentMaximalChronicleLength= getMaximalChronicleLength(iX);
-			// NumericalValue currentSlowMotionCoefficient= getSlowMotionCoefficient(iX);
 			actingReadBufferSize.set(currentReadBufferSize);
 			actingDevice.set(null);
-			actingDataAcquisitionBufferOperatingMode.set(null);
+			resetActingMode();
 			updateActingDisplayingMode(currentDisplayingMode,iX);
 			actingMaximalChronicleLength.set(currentMaximalChronicleLength);
-			// frameReadingTask.setSlowMotionCoefficient(currentSlowMotionCoefficient);
-			// frameReadingTask.setMaximalFrameDelay(getMaximalFrameDelay(iX));
-			// frameReadingTask.setDisplayingMode(currentDisplayingMode);
-			// frameReadingTask.startReading(doActivateReading,currentFileName,currentTimeout,currentCharacterSet,staticContext);
 		}
 	}
 	//
@@ -586,6 +611,7 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void suspendRecording(ChoisePoint iX) {
 		KinectDeviceInterface device= actingDevice.get();
 		if (device != null) {
@@ -593,6 +619,7 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 		};
 		super.suspendRecording(iX);
 	}
+	@Override
 	protected void suspendListening(ChoisePoint iX) {
 		KinectDeviceInterface device= actingDevice.get();
 		if (device != null) {
@@ -603,30 +630,34 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void stopRecording(ChoisePoint iX) {
 		KinectDeviceInterface device= actingDevice.get();
 		if (device != null) {
 			device.cancelListener(iX);
 			frameRecordingTask.close();
 			actingDevice.set(null);
-			actingDataAcquisitionBufferOperatingMode.set(null);
-		}
+		};
+		super.stopRecording(iX);
 	}
+	@Override
 	protected void stopListening(ChoisePoint iX) {
 		KinectDeviceInterface device= actingDevice.get();
 		if (device != null) {
 			device.cancelListener(iX);
 			actingDevice.set(null);
-			actingDataAcquisitionBufferOperatingMode.set(null);
-		}
+		};
+		super.stopListening(iX);
 	}
 	//
+	@Override
 	protected boolean committedFrameIsNull() {
 		return (committedKinectFrame==null);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected boolean dataAcquisitionIsActive() {
 		KinectDeviceInterface device= actingDevice.get();
 		if (device != null) {
@@ -639,6 +670,7 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected boolean dataAcquisitionIsSuspended() {
 		KinectDeviceInterface device= actingDevice.get();
 		if (device != null) {
@@ -651,6 +683,7 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void commit0s(ChoisePoint iX) throws Backtracking {
 		if (committedFrameWasAssignedDirectly.get()) {
 			if (committedKinectFrame==null) {
@@ -673,7 +706,6 @@ public abstract class KinectBuffer extends DataAcquisitionBuffer implements Kine
 		synchronized (numberOfRecentReceivedFrame) {
 			committedKinectFrame= recentKinectFrame;
 			if (!recentFrameIsRepeated) {
-				// committedFrameNumber= numberOfRecentKinectFrame.get();
 				committedFrameNumber= numberOfRecentReceivedFrame.get();
 				updateSkeletonHistory= true;
 			} else {
@@ -712,16 +744,13 @@ case DETECT_AND_TRACK_SKELETONS:
 			KinectSkeletonsFrameInterface firstSkeletonsFrame= rawSkeletonsHistory.get(0);
 			KinectSkeletonsFrameInterface lastSkeletonsFrame= rawSkeletonsHistory.get(historySize-1);
 			long minimalTime= firstSkeletonsFrame.getSkeletonsFrameTime();
-			long maximalTime= lastSkeletonsFrame.getSkeletonsFrameTime();
 			if (committedFrameTime >= minimalTime) {
-				// if (committedFrameTime <= maximalTime) {
 ///////////////////////////////////////////////////////////////////////
 KinectSkeletonsFrameInterface selectedSkeletonsFrame= firstSkeletonsFrame;
 long delay1= committedFrameTime - minimalTime;
 if (delay1 < 0) {
 	delay1= -delay1;
 };
-// long DELAY= delay1;
 for (int k=0; k < historySize; k++) {
 	KinectSkeletonsFrameInterface currentSkeletonsFrame= rawSkeletonsHistory.get(k);
 	long time2= currentSkeletonsFrame.getSkeletonsFrameTime();
@@ -733,25 +762,21 @@ for (int k=0; k < historySize; k++) {
 		if (delay2 < delay1) {
 			selectedSkeletonsFrame= currentSkeletonsFrame;
 			lastElementToBeCopied= k;
-// DELAY= delay2;
 		};
 		break;
 	} else {
 		selectedSkeletonsFrame= currentSkeletonsFrame;
 		lastElementToBeCopied= k;
 		delay1= delay2;
-// DELAY= delay1;
 	}
 }
 ///////////////////////////////////////////////////////////////////////
-				// }
 			};
 			List<KinectSkeletonsFrameInterface> subList= rawSkeletonsHistory.subList(0,lastElementToBeCopied+1);
-			copyOfRawSkeletonsHistory= subList.toArray(new KinectSkeletonsFrameInterface[0]);
-			// rawSkeletonsHistory.clear();
+			copyOfRawSkeletonsHistory= subList.toArray(new KinectSkeletonsFrameInterface[subList.size()]);
 			subList.clear();
 		} else {
-			copyOfRawSkeletonsHistory= rawSkeletonsHistory.toArray(new KinectSkeletonsFrameInterface[0]);
+			copyOfRawSkeletonsHistory= rawSkeletonsHistory.toArray(new KinectSkeletonsFrameInterface[rawSkeletonsHistory.size()]);
 			rawSkeletonsHistory.clear();
 		}
 	};
@@ -843,17 +868,6 @@ default:
 		};
 		double rate= computeFrameRate(deltaN,deltaTime);
 		a1.setBacktrackableValue(new PrologReal(rate),iX);
-		/*
-		long deltaN= committedFrameNumber - firstCommittedFrameNumber;
-		long deltaTime= committedFrameTime - firstCommittedFrameTime;
-		double rate;
-		if (deltaTime > 0) {
-			rate= deltaN * 1000.0 / deltaTime;
-		} else {
-			rate= -1.0;
-		};
-		a1.setBacktrackableValue(new PrologReal(rate),iX);
-		*/
 	}
 	//
 	public void getRecentImage1s(ChoisePoint iX, Term value) {
@@ -866,7 +880,17 @@ default:
 			if (committedKinectFrame instanceof KinectPointCloudsFrameInterface && currentDisplayingMode.getActingFrameType() == KinectFrameType.DEVICE_TUNING) {
 				KinectPointCloudsFrameInterface pointCloudsFrame= (KinectPointCloudsFrameInterface)committedKinectFrame;
 				KinectPeopleIndexMode currentPeopleIndexMode= currentDisplayingMode.getActingPeopleIndexMode();
-				TunedBufferedImage tunedImage= FrameDrawingUtils.tuneProgramAndCreateMappedBufferedImage(pointCloudsFrame.getXYZ(),pointCloudsFrame.getMappedRed(),pointCloudsFrame.getMappedGreen(),pointCloudsFrame.getMappedBlue(),currentPeopleIndexMode,pointCloudsFrame.getPlayerIndex(),false,pointCloudsFrame.getFocalLengthX(),pointCloudsFrame.getFocalLengthY(),pointCloudsFrame.getCorrectionX(),pointCloudsFrame.getCorrectionY());
+				TunedBufferedImage tunedImage= FrameDrawingUtils.tuneProgramAndCreateMappedBufferedImage(
+					pointCloudsFrame.getXYZ(),
+					pointCloudsFrame.getMappedRed(),
+					pointCloudsFrame.getMappedGreen(),
+					pointCloudsFrame.getMappedBlue(),
+					currentPeopleIndexMode,
+					pointCloudsFrame.getPlayerIndex(),
+					pointCloudsFrame.getFocalLengthX(),
+					pointCloudsFrame.getFocalLengthY(),
+					pointCloudsFrame.getCorrectionX(),
+					pointCloudsFrame.getCorrectionY());
 				if (tunedImage != null) {
 					nativeImage= tunedImage.getImage();
 					computedHorizontalCorrection= tunedImage.getHorizontalCorrection();
@@ -887,12 +911,11 @@ default:
 		updateAttributesIfNecessary(iX);
 		KinectDisplayingModeInterface currentDisplayingMode= getDisplayingMode(iX);
 		KinectColorMap currentColorMap= getColorMap(iX);
-		KinectColorMap currentPeopleColors= getPeopleColors(iX);
 		a1= a1.dereferenceValue(iX);
 		if (a1 instanceof BufferedScene) {
 			BufferedScene scene= (BufferedScene)a1;
 			if (committedKinectFrame != null) {
-				Kinect2Java3D.setBufferedScene(scene,committedKinectFrame,currentDisplayingMode,currentColorMap,currentPeopleColors,null,kinectLookupTable,getSceneDepthThreshold(iX),getSceneSurfaceType(iX),sceneAppearance.get());
+				Kinect2Java3D.setBufferedScene(scene,committedKinectFrame,currentDisplayingMode,currentColorMap,null,kinectLookupTable,getSceneDepthThreshold(iX),getSceneSurfaceType(iX),getColorSubstitutionMode(iX),sceneAppearance.get());
 			} else {
 				throw new KinectFrameIsNotCommitted();
 			}
@@ -904,7 +927,6 @@ default:
 		updateAttributesIfNecessary(iX);
 		KinectDisplayingModeInterface currentDisplayingMode= getDisplayingMode(iX);
 		KinectColorMap currentColorMap= getColorMap(iX);
-		KinectColorMap currentPeopleColors= getPeopleColors(iX);
 		a1= a1.dereferenceValue(iX);
 		a2= a2.dereferenceValue(iX);
 		if (a1 instanceof BufferedScene) {
@@ -913,7 +935,7 @@ default:
 				BufferedImage bufferedImage= (BufferedImage)a2;
 				java.awt.image.BufferedImage nativeImage= bufferedImage.getImage();
 				if (committedKinectFrame != null) {
-					Kinect2Java3D.setBufferedScene(scene,committedKinectFrame,currentDisplayingMode,currentColorMap,currentPeopleColors,nativeImage,kinectLookupTable,getSceneDepthThreshold(iX),getSceneSurfaceType(iX),sceneAppearance.get());
+					Kinect2Java3D.setBufferedScene(scene,committedKinectFrame,currentDisplayingMode,currentColorMap,nativeImage,kinectLookupTable,getSceneDepthThreshold(iX),getSceneSurfaceType(iX),getColorSubstitutionMode(iX),sceneAppearance.get());
 				} else {
 					throw new KinectFrameIsNotCommitted();
 				}
@@ -928,12 +950,12 @@ default:
 	public void getRecentMapping1s(ChoisePoint iX, Term a1) {
 		updateAttributesIfNecessary(iX);
 		KinectDisplayingModeInterface currentDisplayingMode= getDisplayingMode(iX);
-		KinectColorMap currentPeopleColors= getPeopleColors(iX);
+		KinectColorMap currentColorMap= getColorMap(iX);
 		a1= a1.dereferenceValue(iX);
 		if (a1 instanceof BufferedImage) {
 			BufferedImage mappedImage= (BufferedImage)a1;
 			if (committedKinectFrame != null) {
-				java.awt.image.BufferedImage nativeMappedImage= Kinect2Java3D.computeMappedImage(committedKinectFrame,currentDisplayingMode,/*currentColorMap,*/currentPeopleColors,null,kinectLookupTable);
+				java.awt.image.BufferedImage nativeMappedImage= Kinect2Java3D.computeMappedImage(committedKinectFrame,currentDisplayingMode,currentColorMap,null,kinectLookupTable,getColorSubstitutionMode(iX));
 				GenericImageEncodingAttributes attributes= getImageEncodingAttributes(iX);
 				mappedImage.setImage(nativeMappedImage,attributes);
 			} else {
@@ -946,7 +968,7 @@ default:
 	public void getRecentMapping2s(ChoisePoint iX, Term a1, Term a2) {
 		updateAttributesIfNecessary(iX);
 		KinectDisplayingModeInterface currentDisplayingMode= getDisplayingMode(iX);
-		KinectColorMap currentPeopleColors= getPeopleColors(iX);
+		KinectColorMap currentColorMap= getColorMap(iX);
 		a1= a1.dereferenceValue(iX);
 		a2= a2.dereferenceValue(iX);
 		if (a1 instanceof BufferedImage) {
@@ -955,7 +977,7 @@ default:
 				BufferedImage textureImage= (BufferedImage)a2;
 				java.awt.image.BufferedImage nativeTextureImage= textureImage.getImage();
 				if (committedKinectFrame != null) {
-					java.awt.image.BufferedImage nativeMappedImage= Kinect2Java3D.computeMappedImage(committedKinectFrame,currentDisplayingMode,/*currentColorMap,*/currentPeopleColors,nativeTextureImage,kinectLookupTable);
+					java.awt.image.BufferedImage nativeMappedImage= Kinect2Java3D.computeMappedImage(committedKinectFrame,currentDisplayingMode,currentColorMap,nativeTextureImage,kinectLookupTable,getColorSubstitutionMode(iX));
 					GenericImageEncodingAttributes attributes= getImageEncodingAttributes(iX);
 					mappedImage.setImage(nativeMappedImage,attributes);
 				} else {
@@ -976,8 +998,8 @@ default:
 		kinectLookupTable.loadLookupTable(fileName,timeout,requestedCharacterSet,0,0,staticContext,iX);
 	}
 	public void setLookupTable3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
-		int correctionX= PrologInteger.toInteger(GeneralConverters.argumentToStrictInteger(a2,iX));
-		int correctionY= PrologInteger.toInteger(GeneralConverters.argumentToStrictInteger(a3,iX));
+		int correctionX= Arithmetic.toInteger(GeneralConverters.argumentToStrictInteger(a2,iX));
+		int correctionY= Arithmetic.toInteger(GeneralConverters.argumentToStrictInteger(a3,iX));
 		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		CharacterSet requestedCharacterSet= getCharacterSet(iX);
 		ExtendedFileName fileName= retrieveRealGlobalFileNameWithoutExtension(a1,iX);
@@ -1125,11 +1147,9 @@ default:
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public boolean sendDataFrame(DataFrameInterface frame) {
-		return false;
-	}
-	//
+	@Override
 	public boolean sendKinectFrame(KinectFrameInterface frame) {
+		flushAudioSystemIfNecessary();
 		DataAcquisitionBufferOperatingMode currentOperatingMode= actingDataAcquisitionBufferOperatingMode.get();
 		if (currentOperatingMode != null && currentOperatingMode==DataAcquisitionBufferOperatingMode.RECORDING) {
 			long currentFrameNumber= updateRecentFrame(frame);
@@ -1215,12 +1235,10 @@ default:
 	//
 	protected long updateRecentFrame(KinectFrameInterface frame) {
 		synchronized (numberOfRecentReceivedFrame) {
+			long currentNumber= numberOfRecentReceivedFrame.incrementAndGet();
+			updateHistory(frame);
 			recentKinectFrame= frame;
 			committedFrameWasAssignedDirectly.set(false);
-			// numberOfRecentKinectFrame.set(recentKinectFrame.getSerialNumber());
-			long currentNumber= numberOfRecentReceivedFrame.incrementAndGet();
-			// numberOfRecentKinectFrame.set(currentNumber);
-			updateHistory(frame);
 			recentFrameIsRepeated= false;
 			numberOfRepeatedFrame= -1;
 			numberOfRecentReceivedFrame.notifyAll();
@@ -1232,7 +1250,6 @@ default:
 		if (recentDataFrame==null) {
 			return;
 		};
-		// updateHistory(new EnumeratedKinectFrame(recentDataFrame,numberOfRecentKinectFrame.get()));
 		updateHistory(new EnumeratedKinectFrame(recentDataFrame,numberOfRecentReceivedFrame.get()));
 	}
 	//
@@ -1278,16 +1295,19 @@ default:
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void completeDataReading(long numberOfAcquiredFrames) {
 		actingDevice.set(null);
 		super.completeDataReading(numberOfAcquiredFrames);
 	}
 	//
+	@Override
 	public void completeDataReading(long numberOfFrameToBeAcquired, Throwable e) {
 		actingDevice.set(null);
 		super.completeDataReading(numberOfFrameToBeAcquired,e);
 	}
 	//
+	@Override
 	public void completeDataWriting(long numberOfFrame, Throwable e) {
 		actingDevice.set(null);
 		super.completeDataWriting(numberOfFrame,e);
@@ -1295,6 +1315,7 @@ default:
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void acceptRequestedFrame(EnumeratedFrame enumeratedFrame) {
 		EnumeratedKinectFrame selectedFrame= (EnumeratedKinectFrame)enumeratedFrame;
 		recentKinectFrame= selectedFrame.getFrame();
@@ -1303,6 +1324,7 @@ default:
 		numberOfRepeatedFrame= selectedFrame.getNumberOfFrame();
 	}
 	//
+	@Override
 	protected void acceptRetrievedFrame(EnumeratedFrame enumeratedFrame) {
 		EnumeratedKinectFrame selectedFrame= (EnumeratedKinectFrame)enumeratedFrame;
 		KinectFrameInterface kinectFrame= selectedFrame.getFrame();
@@ -1320,6 +1342,7 @@ default:
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void extractFrame(String key, CompoundFrameInterface container) {
 		if (committedKinectFrame != null) {
 			EnumeratedKinectFrame enumeratedFrame= new EnumeratedKinectFrame(
@@ -1331,8 +1354,8 @@ default:
 		}
 	}
 	//
+	@Override
 	public void extractSettings(String key, CompoundFrameInterface container, ChoisePoint iX) {
-		// if (committedFrame != null) {
 		KinectDeviceInterface device= actingDevice.get();
 		if (device != null) {
 			KinectFrameWritableBaseAttributes attributes= device.createKinectFrameWritableBaseAttributes();
@@ -1343,11 +1366,9 @@ default:
 				-1);
 			container.insertComponent(key,enumeratedFrame);
 		}
-		// } else {
-		//	throw new CompoundFrameIsNotCommitted();
-		// }
 	}
 	//
+	@Override
 	public void assignFrame(String key, CompoundFrameInterface container, ChoisePoint iX) {
 		updateActingDisplayingModeIfNecessary(iX);
 		EnumeratedKinectFrame enumeratedFrame= (EnumeratedKinectFrame)container.getComponent(key);
@@ -1359,8 +1380,6 @@ default:
 			} else {
 				committedKinectFrame= frame;
 				committedFrameWasAssignedDirectly.set(true);
-				// committedFrameNumber= enumeratedFrame.getNumberOfFrame();
-				// committedFrameNumber= numberOfRecentKinectFrame.incrementAndGet();
 				committedFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
 				updateCommittedFrameTime(true,actingDisplayingMode.get());
 			}

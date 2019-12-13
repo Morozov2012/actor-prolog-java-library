@@ -3,7 +3,9 @@
 package morozov.syntax.errors;
 
 public class WorldDeserializingError extends ParserError {
-	public Exception exception;
+	//
+	protected Exception exception;
+	//
 	public WorldDeserializingError(int p, Exception e) {
 		super(p,e);
 		exception= e;

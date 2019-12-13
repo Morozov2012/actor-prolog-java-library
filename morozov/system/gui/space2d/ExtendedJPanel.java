@@ -48,6 +48,7 @@ public class ExtendedJPanel extends JPanel {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void paintComponent(Graphics g) {
 		if (currentCommands != null) {
 			Graphics2D g2= (Graphics2D)g;
@@ -58,13 +59,9 @@ public class ExtendedJPanel extends JPanel {
 			};
 			quicklyCorrectSizeIfNecessary();
 			Dimension size= getSize();
-			// Dimension size= new Dimension();
-			// safelyGetComponentSize(size);
 			Canvas2DScalingFactor currentScalingFactor= scalingFactor.get();
 			synchronized (currentCommands) {
-				// super.safelyPaintComponent(g);
 				super.paintComponent(g);
-				//// ((JPanel)control).paintComponent(g);
 				DrawingMode drawingMode= new DrawingMode(size,currentScalingFactor);
 				if (redrawingIsSuspended.get()) {
 					Java2DCommand[] oldCommandArray= oldCommands.get();
@@ -87,10 +84,7 @@ public class ExtendedJPanel extends JPanel {
 	protected void quicklyCorrectSizeIfNecessary() {
 		if (owner.get() != null) {
 			Dimension currentSize= getSize();
-			// Dimension currentSize= new Dimension();
-			// safelyGetComponentSize(currentSize);
 			Dimension minimumSize= getMinimumSize();
-			// Dimension minimumSize= safelyGetComponentMinimumSize();
 			if (currentSize.width != minimumSize.width || currentSize.height != minimumSize.height) {
 				setSize(minimumSize);
 			}

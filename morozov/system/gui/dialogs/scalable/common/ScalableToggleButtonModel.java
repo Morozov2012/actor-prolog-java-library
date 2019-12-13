@@ -48,6 +48,7 @@ public class ScalableToggleButtonModel extends ToggleButtonModel {
 		uncertaintyFlag= flag;
 	}
 	//
+	@Override
 	public void setSelected(boolean flag) {
 		uncertaintyFlag= false;
 		super.setSelected(flag);

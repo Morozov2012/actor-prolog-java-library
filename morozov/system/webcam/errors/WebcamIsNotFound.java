@@ -3,11 +3,13 @@
 package morozov.system.webcam.errors;
 
 public class WebcamIsNotFound extends RuntimeException {
-	public String name;
+	//
+	protected String name;
 	//
 	public WebcamIsNotFound(String text) {
 		name= text;
 	}
+	@Override
 	public String toString() {
 		if (name != null) {
 			return this.getClass().toString() + "(" + name.toString() + ")";

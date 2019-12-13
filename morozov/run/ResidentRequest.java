@@ -7,11 +7,11 @@ import morozov.worlds.*;
 
 public class ResidentRequest {
 	//
-	public AbstractWorld target;
-	public Resident resident;
-	public long domainSignature;
-	public Term[] arguments;
-	public boolean sortAndReduceResultList;
+	protected AbstractWorld target;
+	protected Resident resident;
+	protected long domainSignature;
+	protected Term[] arguments;
+	protected boolean sortAndReduceResultList;
 	//
 	public ResidentRequest(AbstractWorld world, Resident sender, long signature, Term[] list, boolean mode) {
 		target= world;
@@ -19,5 +19,24 @@ public class ResidentRequest {
 		domainSignature= signature;
 		arguments= list;
 		sortAndReduceResultList= mode;
+	}
+	//
+	public AbstractWorld getTarget() {
+		return target;
+	};
+	public Resident getResident() {
+		return resident;
+	}
+	public long getDomainSignature() {
+		return domainSignature;
+	}
+	public Term[] getArguments() {
+		return arguments;
+	}
+	public int getArgumentsLength() {
+		return arguments.length;
+	}
+	public boolean sortAndReduceResultList() {
+		return sortAndReduceResultList;
 	}
 }

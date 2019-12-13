@@ -47,7 +47,7 @@ public class i3EZUSBDriver {
 	protected Context context;
 	protected int kernelDriverIsAttached;
 	//
-	protected DeviceHandle handle; // = new DeviceHandle();
+	protected DeviceHandle handle;
 	protected Device m_USBDevice;
 	protected EndpointDescriptor m_USBRecvEndPoint;
 	protected EndpointDescriptor m_USBSendEndPoint;
@@ -60,10 +60,9 @@ public class i3EZUSBDriver {
 	protected AtomicBoolean m_bOpen= new AtomicBoolean(false);
 	protected DeviceIdentifier currentDeviceIdentifier;
 	protected int m_iMaxPacketSize;
-	protected AtomicInteger m_iReadTimeOut= new AtomicInteger(70); // 50; // 15;
+	protected AtomicInteger m_iReadTimeOut= new AtomicInteger(70);
 	protected AtomicInteger m_iWriteTimeOut= new AtomicInteger(70); // 50; // 500; // 50;
 	protected AtomicInteger m_iOutputDebugInformation= new AtomicInteger(0);
-	// protected AtomicBoolean reportUSBTransferDelays= new AtomicBoolean(false);
 	//
 	protected int maximalNumberOfTailReadingFailures= 50; // 10; // 50; // 500; // 100; 1000;
 	//
@@ -656,7 +655,6 @@ public class i3EZUSBDriver {
 	//
 	public void disconnectDevice() {
 		if (m_bOpen.get()) {
-			// boolean reportDelays= reportUSBTransferDelays.get();
 			boolean reportDelays= reportUSBTransferDelays();
 			try {
 				long time1= 0;
@@ -813,11 +811,6 @@ public class i3EZUSBDriver {
 		if (iSize % PACKET_TIMES != 0) {
 			iSize+= PACKET_TIMES - (iSize % PACKET_TIMES);
 		};
-		int iRepeat= iSize / MAX_BYTES_PER_PACKET;
-		if (iSize % MAX_BYTES_PER_PACKET != 0) {
-			iRepeat++;
-		};
-		// boolean reportDelays= reportUSBTransferDelays.get();
 		boolean reportDelays= reportUSBTransferDelays();
 		try {
 			// controlTransfer:
@@ -865,7 +858,6 @@ public class i3EZUSBDriver {
 				(short)(iSize >> 9),
 				(short)48879,
 				m_VenByteBuf,
-				// m_iReadTimeOut);
 				m_iWriteTimeOut.get());
 			if (reportDelays) {
 				long time12= System.currentTimeMillis();
@@ -888,7 +880,6 @@ public class i3EZUSBDriver {
 			//
 			int readTimeOut= m_iReadTimeOut.get();
 			int i= 0;
-			// int numberOfFailures= 0;
 			while (iSize > 0) {
 				try {
 					int iRecvSize= Math.min(MAX_BYTES_PER_PACKET,iSize);
@@ -966,7 +957,7 @@ public class i3EZUSBDriver {
 						writeLater("bulk transfer... ");
 						time21= System.currentTimeMillis();
 					};
-					int result= LibUsb.bulkTransfer(
+					LibUsb.bulkTransfer(
 						handle,
 						m_USBRecvEndPointAddress,
 						byteBufTemp,
@@ -984,7 +975,6 @@ public class i3EZUSBDriver {
 							writeLater(String.format("USB Transfer Error: iRecv(%s) != iRecvSize(%s); byteBufTemp.capacity(): %s; MAX_BYTES_PER_PACKET: %s; iSize: %s\n",iRecv,iRecvSize,byteBufTemp.capacity(),MAX_BYTES_PER_PACKET,iSize));
 						};
 						if (iRecv > iRecvSize) {
-							iRecv= 0;
 							readTail(auxiliaryByteBufTemp,transferedBytes,iRecvSize);
 						};
 						return iOffset;
@@ -992,7 +982,6 @@ public class i3EZUSBDriver {
 					byteBufTemp.get(buf,iOffset,iRecv);
 					byteBufTemp.clear();
 					iOffset+= iRecv;
-					// iSize-= iRecv;
 					iSize-= iRecvSize;
 					i++;
 				} catch (Exception e) {
@@ -1011,6 +1000,7 @@ public class i3EZUSBDriver {
 		}
 	}
 	//
+	@SuppressWarnings("CallToThreadDumpStack")
 	public int write(byte[] buf, int iSize) {
 		int iOffset= 0;
 		if (iSize % PACKET_TIMES != 0) {
@@ -1020,7 +1010,6 @@ public class i3EZUSBDriver {
 		if (iSize % MAX_BYTES_PER_PACKET != 0) {
 			iRepeat++;
 		};
-		// boolean reportDelays= reportUSBTransferDelays.get();
 		boolean reportDelays= reportUSBTransferDelays();
 		try {
 			long time11= 0;
@@ -1065,7 +1054,7 @@ public class i3EZUSBDriver {
 						writeLater("bulk transfer... ");
 						time21= System.currentTimeMillis();
 					};
-					int result= LibUsb.bulkTransfer(
+					LibUsb.bulkTransfer(
 						handle,
 						(byte)m_USBSendEndPointAddress,
 						byteBufTemp,
@@ -1079,8 +1068,6 @@ public class i3EZUSBDriver {
 					byteBufTemp.flip();
 					int iSend= transferedBytes.get();
 					iOffset+= iSend;
-					// iSize-= 16384;
-					// iSize-= iSend;
 					iSize-= iWriteSize;
 					i++;
 				} catch (Exception e) {
@@ -1101,7 +1088,6 @@ public class i3EZUSBDriver {
 	//
 	protected void readTail(ByteBuffer auxiliaryByteBufTemp, IntBuffer transferedBytes, int iRecvSize) {
 		long time1= System.currentTimeMillis();
-		// boolean reportDelays= reportUSBTransferDelays.get();
 		boolean reportDelays= reportUSBTransferDelays();
 		if (reportAdmissibleErrors()) {
 			writeLater("CALL: READ TAIL\n");
@@ -1121,7 +1107,7 @@ public class i3EZUSBDriver {
 					writeLater("bulk transfer... ");
 					time1= System.currentTimeMillis();
 				};
-				int result= LibUsb.bulkTransfer(
+				LibUsb.bulkTransfer(
 					handle,
 					m_USBRecvEndPointAddress,
 					auxiliaryByteBufTemp,
@@ -1143,7 +1129,6 @@ public class i3EZUSBDriver {
 			if (reportAdmissibleErrors()) {
 				writeLater(String.format("Exception: %s\n",e));
 			}
-			// return;
 		}
 	}
 	//
@@ -1176,6 +1161,7 @@ public class i3EZUSBDriver {
 	//
 	public static void writeLater(final String text) {
 		SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				System.err.print(text);
 			}

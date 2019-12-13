@@ -40,13 +40,9 @@ public class I3Camera {
 	protected i3EZUSBDriver m_EZUSB= new i3EZUSBDriver();
 	protected CommonData commData= new CommonData();
 	protected ShutterLess shutterLess= new ShutterLess(commData);
-	// protected TemperatureTable tempTable= new TemperatureTable();
 	//
 	protected float[] m_pdSL_FpaTempArray= new float[4];
 	protected float m_dFpaTemp= 0.0f;
-	// protected double[] ambientConstA= new double[2];
-	// protected double[] ambientConstB= new double[2];
-	// protected double[] sortFpaTemp= new double[3];
 	protected short recognizedCode1= (short)0;
 	protected short recognizedCode2= (short)0;
 	protected short recognizedCode3= (short)0;
@@ -61,7 +57,6 @@ public class I3Camera {
 	protected boolean bIsCalcTemperatrueMapFinished= false;
 	//
 	protected int m_iOffsetCount= 0;
-	// protected double m_dSkimOsAvg= 0.0d;
 	protected double[] TempDataDouble= null;
 	protected double[] AGCDataDouble= null;
 	protected int multiOsNum= 0;
@@ -73,8 +68,6 @@ public class I3Camera {
 	protected AtomicInteger numberOfDeadPixels= new AtomicInteger(0);
 	protected AtomicInteger numberOfVoltageAnomalousPixels= new AtomicInteger(0);
 	protected AtomicInteger numberOfTemperatureAnomalousPixels= new AtomicInteger(0);
-	//
-	// protected static double[] multiChamberTemp_m5_15_40= new double[]{-5.0d, 15.0d, 40.0d};
 	//
 	protected static int maximalNumberOfAttempts= 100;
 	protected static int maximalDeadPixelEliminationRadius= 5;
@@ -1374,8 +1367,6 @@ for (int radius=1; radius <= maximalDeadPixelEliminationRadius; radius++) {
 			double m_dShutterCenterTemp= commData.m_dShutterCenterTemp;
 			for (int k=0; k < m_pdShutterTemp.length; k++) {
 				m_TargetTemperatures[k]= m_TargetTemperatures[k] - m_pdShutterTemp[k] + m_dShutterCenterTemp;
-				// m_TargetTemperatures[k]= m_TargetTemperatures[k] + m_dShutterCenterTemp;
-				// m_TargetTemperatures[k]= - m_pdShutterTemp[k] + m_dShutterCenterTemp;
 			};
 			if (enableAnomalousPixelElimination && eliminateAnomalousPixels.get()) {
 				eliminateAnomalousPixels(m_TargetTemperatures);
@@ -1421,7 +1412,7 @@ for (int radius=1; radius <= maximalDeadPixelEliminationRadius; radius++) {
 		while (!flashReloadCommand()) {
 			delay(50);
 		};
-		//readFlashData();
+		// readFlashData();
 		// if (m_EZUSB.reportFlashAttributes()) {
 		//	reportSensorAttributes();
 		// };
@@ -1516,7 +1507,6 @@ for (int radius=1; radius <= maximalDeadPixelEliminationRadius; radius++) {
 	}
 	//
 	public void dumpMemory() {
-		// computeTempDataDouble();
 		compute_FPA_Temperature();
 		computeTemperatureMap();
 		computeCorrectedTargetTemperatures();
@@ -1525,8 +1515,6 @@ for (int radius=1; radius <= maximalDeadPixelEliminationRadius; radius++) {
 		double[] m_pdShutterTemp= commData.m_pdShutterTemp;
 		double[] m_pdSL_SkimOs= shutterLess.m_pdSL_SkimOs;
 		double[] actualTemperature= commData.getTargetTemperatures();
-		// double[] vector_calcTemp_Table= new double[actualTemperature.length];
-		// double[] something= new double[actualTemperature.length];
 		double[] targetTemperatures= commData.getTargetTemperatures();
 		int windowingWidth= commData.getWindowingWidth();
 		int windowingHeight= commData.getWindowingHeight();
@@ -1592,6 +1580,7 @@ for (int radius=1; radius <= maximalDeadPixelEliminationRadius; radius++) {
 	//
 	public static void writeLater(final String text) {
 		SwingUtilities.invokeLater(new Runnable() {
+			@Override
 			public void run() {
 				System.err.print(text);
 			}

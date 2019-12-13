@@ -8,16 +8,19 @@ import java.awt.geom.Line2D;
 import java.awt.Color;
 
 public class DiagramArc {
-	public double x1;
-	public double y1;
-	public double x2;
-	public double y2;
+	//
+	protected double x1;
+	protected double y1;
+	protected double x2;
+	protected double y2;
+	//
 	public DiagramArc(double xx1, double yy1, double xx2, double yy2) {
 		x1= xx1;
 		y1= yy1;
 		x2= xx2;
 		y2= yy2;
 	}
+	//
 	public void correctStartPoint(DiagramBox[] boxes) {
 		if (boxes.length > 0) {
 			if ((x2 - x1) > (y2 - y1)) {
@@ -73,8 +76,6 @@ public class DiagramArc {
 		}
 	}
 	public void draw(Graphics2D g2, Dimension size) {
-		// Graphics2D g2= (Graphics2D)g0;
-		// DesktopUtils.setRenderingHints(g2);
 		double xA= StrictMath.round(size.width * x1);
 		double yA= StrictMath.round(size.height * y1);
 		double xB= StrictMath.round(size.width * x2);

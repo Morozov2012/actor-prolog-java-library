@@ -22,8 +22,6 @@ public class CommittedSkeletons implements Serializable {
 	protected LinkedHashMap<Integer,SkeletonTrack> tracks= new LinkedHashMap<>();
 	protected ArrayList<TrackTerm> arrayOfCompleteTrackTerms= new ArrayList<>();
 	protected ArrayList<KinectFrameNumberAndTime> arrayOfTime= new ArrayList<>();
-	// protected long beginningRawSkeletonTime= -1;
-	// protected long recentRawSkeletonTime= -1;
 	//
 	private static final long serialVersionUID= 0xA932C898F2141FB2L; // -6254716373242208334L
 	//
@@ -40,8 +38,6 @@ public class CommittedSkeletons implements Serializable {
 		tracks.clear();
 		arrayOfCompleteTrackTerms.clear();
 		arrayOfTime.clear();
-		// beginningRawSkeletonTime= -1;
-		// recentRawSkeletonTime= -1;
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -109,8 +105,7 @@ public class CommittedSkeletons implements Serializable {
 			SkeletonTerm recentSkeletonTerm= track.getRecentSkeletonTerm();
 			if (recentSkeletonTerm != null) {
 				recentSkeletonTermArray.add(recentSkeletonTerm.getTerm());
-			};
-			// trackKeySetIterator.remove();
+			}
 		};
 		Term committedTracksTerm= GeneralConverters.arrayListToTerm(arrayOfIncompleteTrackTerms);
 		Term[] arrayOfCommittedTrackTerms= new Term[arrayOfCompleteTrackTerms.size()];
@@ -188,19 +183,6 @@ public class CommittedSkeletons implements Serializable {
 			recentSkeletonTermArray.add(track.getSkeletonTerm(givenFrameTime));
 		};
 		Term committedTracksTerm= GeneralConverters.arrayListToTerm(arrayOfIncompleteTrackTerms);
-		// ArrayList<TrackTerm> targetCompleteTrackTerms= new ArrayList<>();
-		// for (int n=0; n < arrayOfCompleteTrackTerms.size(); n++) {
-		//	TrackTerm trackTerm= arrayOfCompleteTrackTerms.get(n);
-		//	if (trackTerm.getLastFrameNumber() > givenFrameNumber) {
-		//		break;
-		//	};
-		//	targetCompleteTrackTerms.add(trackTerm);
-		// };
-		// Term[] arrayOfCommittedTrackTerms= new Term[targetCompleteTrackTerms.size()];
-		// for (int n=0; n < targetCompleteTrackTerms.size(); n++) {
-		//	arrayOfCommittedTrackTerms[n]= targetCompleteTrackTerms.get(n).getTerm();
-		// };
-		// committedTracksTerm= GeneralConverters.arrayToList(arrayOfCommittedTrackTerms,committedTracksTerm);
 		return committedTracksTerm;
 	}
 	//

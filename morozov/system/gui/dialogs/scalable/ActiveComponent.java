@@ -15,7 +15,7 @@ package morozov.system.gui.dialogs.scalable;
 import target.*;
 
 import morozov.run.*;
-import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.errors.*;
 import morozov.system.signals.*;
@@ -86,15 +86,18 @@ public abstract class ActiveComponent
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		return value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 	}
+	@Override
 	public Term standardizeRange(Term value, ChoisePoint iX) throws RejectRange {
 		return value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void putValue(DialogControlOperation operation, Term value, ChoisePoint iX) {
 		switch (operation) {
 			case VALUE:
@@ -115,6 +118,7 @@ public abstract class ActiveComponent
 		}
 	}
 	//
+	@Override
 	public Term getValue(DialogControlOperation operation) {
 		switch (operation) {
 			case VALUE:
@@ -139,14 +143,17 @@ public abstract class ActiveComponent
 		return PrologUnknownValue.instance;
 	}
 	//
+	@Override
 	public void putRange(Term value, ChoisePoint iX) {
 	}
+	@Override
 	public Term getRange() {
 		return PrologUnknownValue.instance;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setIsEnabled(boolean mode) {
 		if (component != null) {
 			if (mode) {
@@ -157,6 +164,7 @@ public abstract class ActiveComponent
 		}
 	}
 	//
+	@Override
 	public boolean isEnabled(boolean mode) {
 		if (component != null) {
 			return (component.isEnabled() == mode);
@@ -167,6 +175,7 @@ public abstract class ActiveComponent
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setPadding(
 			GridBagLayout gBL,
 			boolean flagTop, boolean flagLeft, boolean flagBottom, boolean flagRight,
@@ -179,6 +188,7 @@ public abstract class ActiveComponent
 		horizontalPadding= valueHorizontal;
 		verticalPadding= valueVertical;
 	}
+	@Override
 	public void setScaling(double valueHorizontal, double valueVertical) {
 		horizontalScaling= valueHorizontal;
 		verticalScaling= valueVertical;
@@ -186,6 +196,7 @@ public abstract class ActiveComponent
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setGeneralFont(Font font) {
 		if (font==null) {
 			return;
@@ -222,12 +233,7 @@ public abstract class ActiveComponent
 			};
 			setFont(font);
 			setMargin();
-			// component.setMinimumSize(component.getPreferredSize());
-			// Предположительно, это может помочь в борьбе
-			// с проблемой схлопывания текстовых полей:
 			component.setMinimumSize(component.getPreferredSize());
-			// component.repaint();
-			// component.validate();
 			component.invalidate();
 		}
 	}
@@ -237,6 +243,7 @@ public abstract class ActiveComponent
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setGeneralForeground(Color c) {
 		textColor= c;
 		if (component != null) {
@@ -253,6 +260,7 @@ public abstract class ActiveComponent
 			setGeneralFont(colourlessFont);
 		}
 	}
+	@Override
 	public void setGeneralSpaceColor(Color c) {
 		spaceColor= c;
 		if (component != null) {
@@ -262,6 +270,7 @@ public abstract class ActiveComponent
 			setGeneralFont(colourlessFont);
 		}
 	}
+	@Override
 	public void setGeneralBackground(Color c) {
 		backgroundColor= c;
 		if (component != null) {
@@ -285,6 +294,7 @@ public abstract class ActiveComponent
 			}
 		}
 	}
+	@Override
 	public void setAlarmColors(Color fc, Color bc) {
 	}
 	//
@@ -299,7 +309,7 @@ public abstract class ActiveComponent
 	//
 	public void setIndividualTextColor(Term value, ChoisePoint iX) {
 		try {
-			individualTextColor= ExtendedColor.argumentToColorSafe(value,iX);
+			individualTextColor= ColorAttributeConverters.argumentToColorSafe(value,iX);
 			setForeground(individualTextColor);
 		} catch (TermIsSymbolDefault e) {
 			individualTextColor= null;
@@ -313,7 +323,7 @@ public abstract class ActiveComponent
 	//
 	public void setIndividualSpaceColor(Term value, ChoisePoint iX) {
 		try {
-			individualSpaceColor= ExtendedColor.argumentToColorSafe(value,iX);
+			individualSpaceColor= ColorAttributeConverters.argumentToColorSafe(value,iX);
 		} catch (TermIsSymbolDefault e) {
 			individualSpaceColor= null;
 		};
@@ -325,7 +335,7 @@ public abstract class ActiveComponent
 	//
 	public void setIndividualBackgroundColor(Term value, ChoisePoint iX) {
 		try {
-			individualBackgroundColor= ExtendedColor.argumentToColorSafe(value,iX);
+			individualBackgroundColor= ColorAttributeConverters.argumentToColorSafe(value,iX);
 			setBackground(individualBackgroundColor);
 		} catch (TermIsSymbolDefault e) {
 			individualBackgroundColor= null;
@@ -346,21 +356,21 @@ public abstract class ActiveComponent
 	//
 	public Term getIndividualTextColor() {
 		if (individualTextColor != null) {
-			return ExtendedColor.colorToTerm(individualTextColor);
+			return ColorAttributeConverters.colorToTerm(individualTextColor);
 		} else {
 			return termDefault;
 		}
 	}
 	public Term getIndividualSpaceColor() {
 		if (individualSpaceColor != null) {
-			return ExtendedColor.colorToTerm(individualSpaceColor);
+			return ColorAttributeConverters.colorToTerm(individualSpaceColor);
 		} else {
 			return termDefault;
 		}
 	}
 	public Term getIndividualBackgroundColor() {
 		if (individualBackgroundColor != null) {
-			return ExtendedColor.colorToTerm(individualBackgroundColor);
+			return ColorAttributeConverters.colorToTerm(individualBackgroundColor);
 		} else {
 			return termDefault;
 		}
@@ -391,16 +401,19 @@ public abstract class ActiveComponent
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void actionPerformed(ActionEvent event) {
 		if (targetDialog != null) {
 			targetDialog.reportValueUpdate(this);
 		}
 	}
+	@Override
 	public void stateChanged(ChangeEvent event) {
 		if (targetDialog != null) {
 			targetDialog.reportValueUpdate(this);
 		}
 	}
+	@Override
 	public void valueChanged(ListSelectionEvent event) {
 		if (targetDialog != null) {
 			targetDialog.reportValueUpdate(this);
@@ -417,17 +430,11 @@ public abstract class ActiveComponent
 		}
 	}
 	//
+	@Override
 	public void focusGained(FocusEvent e) {
 	}
+	@Override
 	public void focusLost(FocusEvent e) {
-		// area.revalidate();
-		// area.repaint();
-		// revalidateAndRepaint();
-		// 2013.12.07: Без этих комманд происходят престранные
-		// вещи. Нажимаю кнопку, открывается новый (модальный)
-		// диалог, закрываю диалог, и потом текущий диалог
-		// некорректно перерисовывается.
-		// См. пример test_117_45_enable_disable_01_jdk.a.
 		targetDialog.safelyRevalidateAndRepaint();
 	}
 }

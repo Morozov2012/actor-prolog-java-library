@@ -5,6 +5,7 @@ package morozov.system.gui.dialogs;
 import target.*;
 
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.converters.*;
 import morozov.system.gui.*;
 import morozov.system.gui.signals.*;
@@ -28,22 +29,22 @@ public class DialogUtils {
 	public static int calculateAbsoluteCoordinate(ExtendedCoordinate lZ, int spaceBeginning, int spaceLimit, double gridZ, double rDZ)
 			throws UseDefaultLocation {
 		try {
-			return PrologInteger.toInteger(spaceBeginning + lZ.getDoubleValue() / gridZ * spaceLimit );
+			return Arithmetic.toInteger(spaceBeginning + lZ.getDoubleValue() / gridZ * spaceLimit );
 		} catch (CentreFigure e) {
-			return PrologInteger.toInteger(spaceBeginning + ((double)spaceLimit - rDZ) / 2);
+			return Arithmetic.toInteger(spaceBeginning + ((double)spaceLimit - rDZ) / 2);
 		}
 	}
 	public static int calculateAbsoluteCoordinate(ExtendedCoordinate lZ, int spaceBeginning, int spaceLimit, double rDZ)
 			throws UseDefaultLocation {
 		try {
-			return PrologInteger.toInteger(spaceBeginning + lZ.getDoubleValue());
+			return Arithmetic.toInteger(spaceBeginning + lZ.getDoubleValue());
 		} catch (CentreFigure e) {
-			return PrologInteger.toInteger(spaceBeginning + ((double)spaceLimit - rDZ) / 2);
+			return Arithmetic.toInteger(spaceBeginning + ((double)spaceLimit - rDZ) / 2);
 		}
 	}
 	//
 	public static ArrayList<String> listToStringVector(Term tail, ChoisePoint iX) {
-		ArrayList<String> array= new ArrayList<String>();
+		ArrayList<String> array= new ArrayList<>();
 		listToStringVector(array,tail,iX);
 		return array;
 	}
@@ -72,7 +73,7 @@ public class DialogUtils {
 	}
 	//
 	public static ArrayList<String> listToStringArray(Term tail, ChoisePoint iX) {
-		ArrayList<String> array= new ArrayList<String>();
+		ArrayList<String> array= new ArrayList<>();
 		listToStringArray(array,tail,iX);
 		return array;
 	}
@@ -101,7 +102,7 @@ public class DialogUtils {
 	}
 	//
 	public static ArrayList<ArrayList<String>> tableToStringArray(Term tail, ChoisePoint iX) {
-		ArrayList<ArrayList<String>> array= new ArrayList<ArrayList<String>>();
+		ArrayList<ArrayList<String>> array= new ArrayList<>();
 		tableToStringArray(array,tail,iX);
 		return array;
 	}
@@ -114,7 +115,7 @@ public class DialogUtils {
 		try {
 			while (true) {
 				Term rowTail= tail.getNextListHead(iX);
-				ArrayList<String> columns= new ArrayList<String>();
+				ArrayList<String> columns= new ArrayList<>();
 				try {
 					while (true) {
 						Term cell= rowTail.getNextListHead(iX);
@@ -133,7 +134,6 @@ public class DialogUtils {
 						columns.add(rowTail.toString(iX));
 					}
 				};
-				// listToStringArray(columns,value,iX);
 				array.add(columns);
 				tail= tail.getNextListTail(iX);
 			}
@@ -144,7 +144,7 @@ public class DialogUtils {
 				return;
 			};
 			if (!tail.thisIsUnknownValue()) {
-				ArrayList<String> columns= new ArrayList<String>();
+				ArrayList<String> columns= new ArrayList<>();
 				columns.add(tail.toString(iX));
 				array.add(columns);
 			}
@@ -152,7 +152,7 @@ public class DialogUtils {
 	}
 	//
 	public static ArrayList<Term> listToTermArray(Term tail, ChoisePoint iX) {
-		ArrayList<Term> array= new ArrayList<Term>();
+		ArrayList<Term> array= new ArrayList<>();
 		listToTermArray(array,tail,iX);
 		return array;
 	}
@@ -164,7 +164,7 @@ public class DialogUtils {
 		};
 		try {
 			BigInteger bigInteger= tail.getIntegerValue(iX);
-			if (PrologInteger.isSmallInteger(bigInteger)) {
+			if (Arithmetic.isSmallInteger(bigInteger)) {
 				array.add(new PrologInteger(bigInteger));
 			} else {
 				return;
@@ -173,7 +173,7 @@ public class DialogUtils {
 			try {
 				double number= StrictMath.round(tail.getRealValue(iX));
 				BigInteger bigInteger= GeneralConverters.doubleToBigInteger(number);
-				if (PrologInteger.isSmallInteger(bigInteger)) {
+				if (Arithmetic.isSmallInteger(bigInteger)) {
 					array.add(new PrologInteger(bigInteger));
 				} else {
 					return;
@@ -195,7 +195,6 @@ public class DialogUtils {
 							}
 						} catch (EndOfList e5) {
 						} catch (TermIsNotAList e5) {
-							// listToTermArray(array,tail,iX);
 						}
 					}
 				}
@@ -204,7 +203,7 @@ public class DialogUtils {
 	}
 	//
 	public static ArrayList<Term> tableToTermArray(Term tail, ChoisePoint iX) {
-		ArrayList<Term> array= new ArrayList<Term>();
+		ArrayList<Term> array= new ArrayList<>();
 		tableToTermArray(array,tail,iX);
 		return array;
 	}
@@ -220,7 +219,7 @@ public class DialogUtils {
 		};
 		try {
 			BigInteger bigInteger= tail.getIntegerValue(iX);
-			if (PrologInteger.isSmallInteger(bigInteger)) {
+			if (Arithmetic.isSmallInteger(bigInteger)) {
 				array.add(new PrologInteger(bigInteger));
 			} else {
 				return;
@@ -229,7 +228,7 @@ public class DialogUtils {
 			try {
 				double number= StrictMath.round(tail.getRealValue(iX));
 				BigInteger bigInteger= GeneralConverters.doubleToBigInteger(number);
-				if (PrologInteger.isSmallInteger(bigInteger)) {
+				if (Arithmetic.isSmallInteger(bigInteger)) {
 					array.add(new PrologInteger(bigInteger));
 				} else {
 					return;
@@ -248,12 +247,10 @@ public class DialogUtils {
 							while (true) {
 								Term currentRow= tail.getNextListHead(iX);
 								rowToTermArray(array,currentRow,iX);
-								// listToTermArray(array,value,iX);
 								tail= tail.getNextListTail(iX);
 							}
 						} catch (EndOfList e5) {
 						} catch (TermIsNotAList e5) {
-							// listToTermArray(array,tail,iX);
 						}
 					}
 				}
@@ -266,13 +263,9 @@ public class DialogUtils {
 		if (tail.thisIsFreeVariable()) {
 			return;
 		};
-		// if (tail.thisIsUnknownValue()) {
-		//	array.add(PrologUnknownValue.instance);
-		//	return;
-		// };
 		try {
 			BigInteger bigInteger= tail.getIntegerValue(iX);
-			if (PrologInteger.isSmallInteger(bigInteger)) {
+			if (Arithmetic.isSmallInteger(bigInteger)) {
 				array.add(new PrologInteger(bigInteger));
 			} else {
 				return;
@@ -281,7 +274,7 @@ public class DialogUtils {
 			try {
 				double number= StrictMath.round(tail.getRealValue(iX));
 				BigInteger bigInteger= GeneralConverters.doubleToBigInteger(number);
-				if (PrologInteger.isSmallInteger(bigInteger)) {
+				if (Arithmetic.isSmallInteger(bigInteger)) {
 					array.add(new PrologInteger(bigInteger));
 				} else {
 					return;
@@ -307,7 +300,6 @@ public class DialogUtils {
 							}
 						} catch (EndOfList e5) {
 						} catch (TermIsNotAList e5) {
-							// listToTermArray(array,tail,iX);
 						}
 					}
 				}
@@ -325,7 +317,7 @@ public class DialogUtils {
 		};
 		try {
 			BigInteger bigInteger= value.getIntegerValue(iX);
-			if (PrologInteger.isSmallInteger(bigInteger)) {
+			if (Arithmetic.isSmallInteger(bigInteger)) {
 				return value;
 			} else {
 				throw TermIsNotFrontCell.instance;
@@ -334,7 +326,7 @@ public class DialogUtils {
 			try {
 				double number= StrictMath.round(value.getRealValue(iX));
 				BigInteger bigInteger= GeneralConverters.doubleToBigInteger(number);
-				if (PrologInteger.isSmallInteger(bigInteger)) {
+				if (Arithmetic.isSmallInteger(bigInteger)) {
 					return new PrologInteger(bigInteger);
 				} else {
 					throw TermIsNotFrontCell.instance;
@@ -373,7 +365,7 @@ public class DialogUtils {
 	public static int termToSmallIntegerOrReject(Term value, ChoisePoint iX) throws RejectValue {
 		try {
 			BigInteger bigInteger= value.getIntegerValue(iX);
-			if (PrologInteger.isSmallInteger(bigInteger)) {
+			if (Arithmetic.isSmallInteger(bigInteger)) {
 				return bigInteger.intValue();
 			} else {
 				throw RejectValue.instance;
@@ -382,13 +374,12 @@ public class DialogUtils {
 			try {
 				double number= StrictMath.round(value.getRealValue(iX));
 				BigInteger bigInteger= GeneralConverters.doubleToBigInteger(number);
-				if (PrologInteger.isSmallInteger(bigInteger)) {
+				if (Arithmetic.isSmallInteger(bigInteger)) {
 					return bigInteger.intValue();
 				} else {
 					throw RejectValue.instance;
 				}
 			} catch (TermIsNotAReal e2) {
-				// return PrologUnknownValue.instance;
 				throw RejectValue.instance;
 			}
 		}
@@ -404,25 +395,25 @@ public class DialogUtils {
 			Color individualTextColor,
 			Color textColor) {
 		if (supervisoryTextColor != null) {
-			Map<TextAttribute,Object> map= new HashMap<TextAttribute,Object>();
+			Map<TextAttribute,Object> map= new HashMap<>();
 			map.put(TextAttribute.FOREGROUND,supervisoryTextColor);
 			font= font.deriveFont(map);
 		} else if (individualSpaceColor != null) {
-			Map<TextAttribute,Object> map= new HashMap<TextAttribute,Object>();
+			Map<TextAttribute,Object> map= new HashMap<>();
 			map.put(TextAttribute.BACKGROUND,individualSpaceColor);
 			refineTextColor(map,individualTextColor,textColor);
 			font= font.deriveFont(map);
 		} else if (spaceColor != null) {
-			Map<TextAttribute,Object> map= new HashMap<TextAttribute,Object>();
+			Map<TextAttribute,Object> map= new HashMap<>();
 			map.put(TextAttribute.BACKGROUND,spaceColor);
 			refineTextColor(map,individualTextColor,textColor);
 			font= font.deriveFont(map);
 		} else if (individualTextColor != null) {
-			Map<TextAttribute,Object> map= new HashMap<TextAttribute,Object>();
+			Map<TextAttribute,Object> map= new HashMap<>();
 			map.put(TextAttribute.FOREGROUND,individualTextColor);
 			font= font.deriveFont(map);
 		} else if (textColor != null) {
-			Map<TextAttribute,Object> map= new HashMap<TextAttribute,Object>();
+			Map<TextAttribute,Object> map= new HashMap<>();
 			map.put(TextAttribute.FOREGROUND,textColor);
 			font= font.deriveFont(map);
 		};

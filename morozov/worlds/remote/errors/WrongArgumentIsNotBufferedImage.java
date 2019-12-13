@@ -6,14 +6,18 @@ import morozov.terms.*;
 import morozov.worlds.remote.*;
 
 public class WrongArgumentIsNotBufferedImage extends RuntimeException {
+	//
 	protected ExternalWorldInterface world1;
 	protected Term world2;
+	//
 	public WrongArgumentIsNotBufferedImage(ExternalWorldInterface w) {
 		world1= w;
 	}
 	public WrongArgumentIsNotBufferedImage(Term w) {
 		world2= w;
 	}
+	//
+	@Override
 	public String toString() {
 		if (world1 != null) {
 			return	this.getClass().toString() + "(" + world1.toString() + ")";

@@ -32,14 +32,17 @@ public class ExtendedCorrection implements ExtendedCorrectionInterface, Serializ
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean getUseDefaultCorrection() {
 		return useDefaultCorrection;
 	}
 	//
+	@Override
 	public int getValue() {
 		return value;
 	}
 	//
+	@Override
 	public int getHorizontalCorrection() {
 		if (useDefaultCorrection) {
 			return ExtendedCorrectionTools.getDefaultHorizontalCorrection();
@@ -47,6 +50,7 @@ public class ExtendedCorrection implements ExtendedCorrectionInterface, Serializ
 			return value;
 		}
 	}
+	@Override
 	public int getVerticalCorrection() {
 		if (useDefaultCorrection) {
 			return ExtendedCorrectionTools.getDefaultVerticalCorrection();

@@ -15,11 +15,15 @@ import javax.swing.plaf.metal.MetalRadioButtonUI;
 import java.awt.Color;
 
 public class ScalableMetalRadioButtonUI extends MetalRadioButtonUI {
+	//
 	protected Color background;
 	protected boolean icon_is_copied= false;
+	//
 	public static ComponentUI createUI(JComponent c) {
 		return new ScalableMetalRadioButtonUI();
 	}
+	//
+	@Override
 	public void installDefaults(AbstractButton b) {
 		super.installDefaults(b);
 		if(!icon_is_copied) {
@@ -29,6 +33,7 @@ public class ScalableMetalRadioButtonUI extends MetalRadioButtonUI {
 			icon_is_copied= true;
 		}
 	}
+	@Override
 	public void uninstallDefaults(AbstractButton b) {
 		super.uninstallDefaults(b);
 		icon_is_copied= false;

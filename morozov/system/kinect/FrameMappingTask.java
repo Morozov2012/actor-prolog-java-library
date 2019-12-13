@@ -20,11 +20,11 @@ public class FrameMappingTask extends Thread implements FrameMappingTaskInterfac
 	//
 	protected ConsolidatedDataAcquisitionModeInterface recentDataAcquisitionMode= new ConsolidatedDataAcquisitionMode();
 	//
-	protected boolean depthDataAreUpdated= false;
-	protected boolean infraredDataAreUpdated= false;
-	protected boolean longExposureInfraredDataAreUpdated= false;
-	protected boolean colorDataAreUpdated= false;
-	protected boolean skeletonDataAreUpdated= false;
+	protected boolean depthDataIsUpdated= false;
+	protected boolean infraredDataIsUpdated= false;
+	protected boolean longExposureInfraredDataIsUpdated= false;
+	protected boolean colorDataIsUpdated= false;
+	protected boolean skeletonDataIsUpdated= false;
 	//
 	protected long localNumberOfDepthFrame= 0;
 	protected long localNumberOfInfraredFrame= 0;
@@ -36,7 +36,8 @@ public class FrameMappingTask extends Thread implements FrameMappingTaskInterfac
 	protected AtomicLong serialNumberOfInfraredFrame= new AtomicLong(0);
 	protected AtomicLong serialNumberOfLongExposureInfraredFrame= new AtomicLong(0);
 	protected AtomicLong serialNumberOfMappedColorFrame= new AtomicLong(0);
-	protected AtomicLong serialNumberOfPointCloudsFrame= new AtomicLong(0);
+	protected AtomicLong serialNumberOfEntirePointCloudsFrame= new AtomicLong(0);
+	protected AtomicLong serialNumberOfForegroundPointCloudsFrame= new AtomicLong(0);
 	protected AtomicLong serialNumberOfColorFrame= new AtomicLong(0);
 	//
 	protected AtomicInteger durationOfSkeletonsDemonstration= new AtomicInteger(0);
@@ -91,18 +92,20 @@ public class FrameMappingTask extends Thread implements FrameMappingTaskInterfac
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void initialize(KinectFrameBaseAttributesInterface attributes) {
 		synchronized (this) {
 			recentBaseAttributes= attributes;
 		}
 	}
+	@Override
 	public void resetCounters() {
 		synchronized (this) {
-			depthDataAreUpdated= false;
-			infraredDataAreUpdated= false;
-			longExposureInfraredDataAreUpdated= false;
-			colorDataAreUpdated= false;
-			skeletonDataAreUpdated= false;
+			depthDataIsUpdated= false;
+			infraredDataIsUpdated= false;
+			longExposureInfraredDataIsUpdated= false;
+			colorDataIsUpdated= false;
+			skeletonDataIsUpdated= false;
 			//
 			localNumberOfDepthFrame= 0;
 			localNumberOfInfraredFrame= 0;
@@ -114,7 +117,8 @@ public class FrameMappingTask extends Thread implements FrameMappingTaskInterfac
 			serialNumberOfInfraredFrame.set(0);
 			serialNumberOfLongExposureInfraredFrame.set(0);
 			serialNumberOfMappedColorFrame.set(0);
-			serialNumberOfPointCloudsFrame.set(0);
+			serialNumberOfEntirePointCloudsFrame.set(0);
+			serialNumberOfForegroundPointCloudsFrame.set(0);
 			serialNumberOfColorFrame.set(0);
 			//
 			durationOfSkeletonsDemonstration.set(0);
@@ -144,12 +148,14 @@ public class FrameMappingTask extends Thread implements FrameMappingTaskInterfac
 			resetInternalArrays= false;
 		}
 	}
+	@Override
 	public void setModeDataAcquisition(ConsolidatedDataAcquisitionModeInterface mode) {
 		synchronized (this) {
 			recentDataAcquisitionMode= mode;
 		}
 	}
 	//
+	@Override
 	public int getHorizontalCorrection() {
 		if (recentBaseAttributes != null) {
 			return recentBaseAttributes.getCorrectionX();
@@ -157,6 +163,7 @@ public class FrameMappingTask extends Thread implements FrameMappingTaskInterfac
 			return ExtendedCorrectionTools.getDefaultHorizontalCorrection();
 		}
 	}
+	@Override
 	public int getVerticalCorrection() {
 		if (recentBaseAttributes != null) {
 			return recentBaseAttributes.getCorrectionY();
@@ -164,6 +171,7 @@ public class FrameMappingTask extends Thread implements FrameMappingTaskInterfac
 			return ExtendedCorrectionTools.getDefaultVerticalCorrection();
 		}
 	}
+	@Override
 	public void setCorrection(int x, int y) {
 		if (recentBaseAttributes != null) {
 			if (recentBaseAttributes instanceof KinectFrameWritableBaseAttributesInterface) {
@@ -173,21 +181,25 @@ public class FrameMappingTask extends Thread implements FrameMappingTaskInterfac
 		}
 	}
 	//
+	@Override
 	public int getSkeletonReleaseTime() {
 		return skeletonReleaseTime.get();
 	}
+	@Override
 	public void setSkeletonReleaseTime(int length) {
 		skeletonReleaseTime.set(length);
 	}
+	@Override
 	public void resetSkeletonReleaseTime() {
 		skeletonReleaseTime.set(defaultSkeletonReleaseTime);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setDepthFrame(long time, short[] depthFrame, byte[] playerIndex, float[] xyz, float[] uv) {
 		synchronized (this) {
-			depthDataAreUpdated= true;
+			depthDataIsUpdated= true;
 			localNumberOfDepthFrame++;
 			recentDepthFrameTime= time;
 			recentDepthFrame= depthFrame;
@@ -197,9 +209,10 @@ public class FrameMappingTask extends Thread implements FrameMappingTaskInterfac
 			notify();
 		}
 	}
+	@Override
 	public void setSkeletonFrame(long time, boolean[] skeletonTracked, float[] positions, float[] orientations, byte[] jointStatus) {
 		synchronized (this) {
-			skeletonDataAreUpdated= true;
+			skeletonDataIsUpdated= true;
 			localNumberOfSkeletonFrame++;
 			durationOfSkeletonsDemonstration.set(0);
 			recentSkeletonTime= time;
@@ -210,28 +223,31 @@ public class FrameMappingTask extends Thread implements FrameMappingTaskInterfac
 			notify();
 		}
 	}
+	@Override
 	public void setColorFrame(long time, byte[] colorFrame) {
 		synchronized (this) {
-			colorDataAreUpdated= true;
+			colorDataIsUpdated= true;
 			localNumberOfColorFrame++;
 			recentColorFrameTime= time;
 			recentColorData= colorFrame;
 			notify();
 		}
 	}
+	@Override
 	public void setInfraredFrame(long time, short[] infraredFrame) {
 		synchronized (this) {
-			infraredDataAreUpdated= true;
+			infraredDataIsUpdated= true;
 			localNumberOfInfraredFrame++;
 			recentInfraredFrameTime= time;
 			recentInfraredFrame= infraredFrame;
 			notify();
 		}
 	}
+	@Override
 	public void setLongExposureInfraredFrame(long time, short[] longExposureInfraredFrame) {
 		synchronized (this) {
 			localNumberOfLongExposureInfraredFrame++;
-			longExposureInfraredDataAreUpdated= true;
+			longExposureInfraredDataIsUpdated= true;
 			recentLongExposureInfraredFrameTime= time;
 			recentLongExposureInfraredFrame= longExposureInfraredFrame;
 			notify();
@@ -240,15 +256,16 @@ public class FrameMappingTask extends Thread implements FrameMappingTaskInterfac
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void run() {
 		while (!stopThisThread.get()) {
 			try {
 				synchronized (this) {
-					if (	!depthDataAreUpdated &&
-						!infraredDataAreUpdated &&
-						!longExposureInfraredDataAreUpdated &&
-						!colorDataAreUpdated &&
-						!skeletonDataAreUpdated) {
+					if (	!depthDataIsUpdated &&
+						!infraredDataIsUpdated &&
+						!longExposureInfraredDataIsUpdated &&
+						!colorDataIsUpdated &&
+						!skeletonDataIsUpdated) {
 						wait();
 					}
 				};
@@ -260,6 +277,7 @@ public class FrameMappingTask extends Thread implements FrameMappingTaskInterfac
 		}
 	}
 	//
+	@Override
 	public void mapFrames() {
 		ConsolidatedDataAcquisitionModeInterface dataAcquisitionMode;
 		boolean depthDataWereUpdated;
@@ -291,21 +309,21 @@ public class FrameMappingTask extends Thread implements FrameMappingTaskInterfac
 		short[] longExposureInfraredFrame;
 		synchronized (this) {
 			dataAcquisitionMode= recentDataAcquisitionMode;
-			depthDataWereUpdated= depthDataAreUpdated;
-			infraredDataWereUpdated= infraredDataAreUpdated;
-			longExposureInfraredDataWereUpdated= longExposureInfraredDataAreUpdated;
-			colorDataWereUpdated= colorDataAreUpdated;
-			skeletonDataWereUpdated= skeletonDataAreUpdated;
+			depthDataWereUpdated= depthDataIsUpdated;
+			infraredDataWereUpdated= infraredDataIsUpdated;
+			longExposureInfraredDataWereUpdated= longExposureInfraredDataIsUpdated;
+			colorDataWereUpdated= colorDataIsUpdated;
+			skeletonDataWereUpdated= skeletonDataIsUpdated;
 			currentLocalNumberOfDepthFrame= localNumberOfDepthFrame;
 			currentLocalNumberOfInfraredFrame= localNumberOfInfraredFrame;
 			currentLocalNumberOfLongExposureInfraredFrame= localNumberOfLongExposureInfraredFrame;
 			currentLocalNumberOfColorFrame= localNumberOfColorFrame;
 			currentLocalNumberOfSkeletonFrame= localNumberOfSkeletonFrame;
-			depthDataAreUpdated= false;
-			infraredDataAreUpdated= false;
-			longExposureInfraredDataAreUpdated= false;
-			colorDataAreUpdated= false;
-			skeletonDataAreUpdated= false;
+			depthDataIsUpdated= false;
+			infraredDataIsUpdated= false;
+			longExposureInfraredDataIsUpdated= false;
+			colorDataIsUpdated= false;
+			skeletonDataIsUpdated= false;
 			depthFrameTime= recentDepthFrameTime;
 			depthFrame= recentDepthFrame;
 			playerIndex= recentPlayerIndex;
@@ -338,8 +356,8 @@ public class FrameMappingTask extends Thread implements FrameMappingTaskInterfac
 		if (depthDataWereUpdated) {
 			if (uv != null) {
 				FrameSize uvFrameSize= FrameSize.computeUVFrameSize(uv);
-				int uvFrameWidth= uvFrameSize.width;
-				int uvFrameHeight= uvFrameSize.height;
+				int uvFrameWidth= uvFrameSize.getWidth();
+				int uvFrameHeight= uvFrameSize.getHeight();
 				if (uvFrameWidth > 0 && uvFrameHeight > 0) {
 					float[][] u= new float[uvFrameWidth][uvFrameHeight];
 					float[][] v= new float[uvFrameWidth][uvFrameHeight];
@@ -363,8 +381,8 @@ public class FrameMappingTask extends Thread implements FrameMappingTaskInterfac
 					int uvFrameHeight= computedU[0].length;
 					if (uvFrameHeight > 0) {
 						FrameSize colorFrameSize= FrameSize.computeColorFrameSize(colorData);
-						int colorFrameWidth= colorFrameSize.width;
-						int colorFrameHeight= colorFrameSize.height;
+						int colorFrameWidth= colorFrameSize.getWidth();
+						int colorFrameHeight= colorFrameSize.getHeight();
 						if (colorFrameWidth > 0 || colorFrameHeight > 0) {
 							byte[][] mappedRed= new byte[uvFrameWidth][uvFrameHeight];
 							byte[][] mappedGreen= new byte[uvFrameWidth][uvFrameHeight];
@@ -391,32 +409,31 @@ public class FrameMappingTask extends Thread implements FrameMappingTaskInterfac
 				}
 			}
 		};
-		if (skeletonDataWereUpdated || depthDataWereUpdated || colorDataAreUpdated) {
+		if (skeletonDataWereUpdated || depthDataWereUpdated || colorDataIsUpdated) {
 			int depthFrameWidth= -1;
 			int depthFrameHeight= -1;
 			if (depthFrame != null) {
 				FrameSize depthFrameSize= FrameSize.computeDepthFrameSize(depthFrame);
-				depthFrameWidth= depthFrameSize.width;
-				depthFrameHeight= depthFrameSize.height;
+				depthFrameWidth= depthFrameSize.getWidth();
+				depthFrameHeight= depthFrameSize.getHeight();
 			} else if (infraredFrame != null) {
 				FrameSize infraredFrameSize= FrameSize.computeInfraredFrameSize(infraredFrame);
-				depthFrameWidth= infraredFrameSize.width;
-				depthFrameHeight= infraredFrameSize.height;
+				depthFrameWidth= infraredFrameSize.getWidth();
+				depthFrameHeight= infraredFrameSize.getHeight();
 			} else if (longExposureInfraredFrame != null) {
 				FrameSize longExposureInfraredFrameSize= FrameSize.computeLongExposureInfraredFrameSize(longExposureInfraredFrame);
-				depthFrameWidth= longExposureInfraredFrameSize.width;
-				depthFrameHeight= longExposureInfraredFrameSize.height;
+				depthFrameWidth= longExposureInfraredFrameSize.getWidth();
+				depthFrameHeight= longExposureInfraredFrameSize.getHeight();
 			};
 			if (depthFrameWidth > 0 || depthFrameHeight > 0) {
 				int colorFrameWidth= -1;
 				int colorFrameHeight= -1;
 				if (colorData != null) {
 					FrameSize colorFrameSize= FrameSize.computeColorFrameSize(colorData);
-					colorFrameWidth= colorFrameSize.width;
-					colorFrameHeight= colorFrameSize.height;
+					colorFrameWidth= colorFrameSize.getWidth();
+					colorFrameHeight= colorFrameSize.getHeight();
 				};
 				if (!skeletonDataWereUpdated && durationOfSkeletonsDemonstration.get() >= skeletonReleaseTime.get()) {
-				// if (durationOfSkeletonsDemonstration.get() >= skeletonReleaseTime.get()) {
 					synchronized (this) {
 						recentSkeletonTime= -1;
 						recentSkeletonTracked= null;
@@ -523,33 +540,32 @@ public class FrameMappingTask extends Thread implements FrameMappingTaskInterfac
 				owner.sendMappedColorFrame(frame);
 			}
 		};
-		if (dataAcquisitionMode.getPointCloudsAreRequested()) {
+		if (dataAcquisitionMode.getEntirePointCloudsAreRequested()) {
 			if (xyz != null && computedMappedRed != null && computedMappedGreen != null && computedMappedBlue != null) {
-				KinectPointCloudsFrame frame;
-				if (dataAcquisitionMode.getBackgroundIsNotRequested()) {
-					if (playerIndex != null) {
-						frame= new KinectForegroundPointCloudsFrame(
-							serialNumberOfPointCloudsFrame.incrementAndGet(),
-							currentLocalNumberOfDepthFrame,
-							currentLocalNumberOfColorFrame,
-							currentLocalNumberOfSkeletonFrame,
-							depthFrameTime,
-							colorFrameTime,
-							skeletonTime,
-							xyz,
-							computedMappedRed,
-							computedMappedGreen,
-							computedMappedBlue,
-							computedSkeletons,
-							computedDimensions,
-							playerIndex,
-							baseAttributes);
-						owner.sendPointCloudsFrame(frame);
-					}
-				} else {
-
-					frame= new KinectPointCloudsFrame(
-						serialNumberOfPointCloudsFrame.incrementAndGet(),
+				KinectPointCloudsFrame frame= new KinectPointCloudsFrame(
+					serialNumberOfEntirePointCloudsFrame.incrementAndGet(),
+					currentLocalNumberOfDepthFrame,
+					currentLocalNumberOfColorFrame,
+					currentLocalNumberOfSkeletonFrame,
+					depthFrameTime,
+					colorFrameTime,
+					skeletonTime,
+					xyz,
+					computedMappedRed,
+					computedMappedGreen,
+					computedMappedBlue,
+					computedSkeletons,
+					computedDimensions,
+					playerIndex,
+					baseAttributes);
+				owner.sendEntirePointCloudsFrame(frame);
+			}
+		};
+		if (dataAcquisitionMode.getForegroundPointCloudsAreRequested()) {
+			if (xyz != null && computedMappedRed != null && computedMappedGreen != null && computedMappedBlue != null) {
+				if (playerIndex != null) {
+					KinectForegroundPointCloudsFrame frame= new KinectForegroundPointCloudsFrame(
+						serialNumberOfForegroundPointCloudsFrame.incrementAndGet(),
 						currentLocalNumberOfDepthFrame,
 						currentLocalNumberOfColorFrame,
 						currentLocalNumberOfSkeletonFrame,
@@ -564,7 +580,7 @@ public class FrameMappingTask extends Thread implements FrameMappingTaskInterfac
 						computedDimensions,
 						playerIndex,
 						baseAttributes);
-					owner.sendPointCloudsFrame(frame);
+					owner.sendForegroundPointCloudsFrame(frame);
 				}
 			}
 		};

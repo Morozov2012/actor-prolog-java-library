@@ -5,7 +5,7 @@ package morozov.built_in;
 import target.*;
 
 import morozov.run.*;
-import morozov.system.errors.*;
+import morozov.system.converters.*;
 import morozov.system.gui.*;
 import morozov.system.gui.sadt.*;
 import morozov.system.gui.sadt.errors.*;
@@ -28,6 +28,7 @@ public abstract class FunctionModel extends Alpha {
 		super(id);
 	}
 	//
+	@Override
 	public void releaseSystemResources() {
 		synchronized (this) {
 			DiagramUtils.safelyDisposeAllDiagrams(staticContext);
@@ -69,25 +70,17 @@ public abstract class FunctionModel extends Alpha {
 	}
 	//
 	public void showModel1s(ChoisePoint iX, Term value) {
-		try {
-			String identifier= value.getStringValue(iX);
-			DesktopUtils.createPaneIfNecessary(staticContext);
-			createActiveDiagramIfNecessary();
-			diagram.showModel(identifier);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(value);
-		}
+		String identifier= GeneralConverters.argumentToString(value,iX);
+		DesktopUtils.createPaneIfNecessary(staticContext);
+		createActiveDiagramIfNecessary();
+		diagram.showModel(identifier);
 	}
 	//
 	public void showDescription1s(ChoisePoint iX, Term value) {
-		try {
-			String identifier= value.getStringValue(iX);
-			DesktopUtils.createPaneIfNecessary(staticContext);
-			createActiveDiagramIfNecessary();
-			diagram.showDescription(identifier);
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(value);
-		}
+		String identifier= GeneralConverters.argumentToString(value,iX);
+		DesktopUtils.createPaneIfNecessary(staticContext);
+		createActiveDiagramIfNecessary();
+		diagram.showDescription(identifier);
 	}
 	//
 	protected void createActiveDiagramIfNecessary() {

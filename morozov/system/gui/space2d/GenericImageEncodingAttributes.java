@@ -7,9 +7,9 @@ import target.*;
 import morozov.run.*;
 import morozov.system.*;
 import morozov.system.converters.*;
+import morozov.system.errors.*;
 import morozov.system.gui.space2d.errors.*;
 import morozov.terms.*;
-import morozov.terms.errors.*;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -46,7 +46,7 @@ public class GenericImageEncodingAttributes implements Serializable {
 		if (attributes==null) {
 			return new GenericImageEncodingAttributes();
 		} else {
-			HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+			HashMap<Long,Term> setPositiveMap= new HashMap<>();
 			Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 			setEnd= setEnd.dereferenceValue(iX);
 			if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {

@@ -3,7 +3,7 @@
 package morozov.system.files;
 
 import morozov.run.*;
-import morozov.system.errors.*;
+import morozov.system.converters.errors.*;
 import morozov.system.files.errors.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
@@ -11,8 +11,9 @@ import morozov.terms.signals.*;
 import java.util.ArrayList;
 
 public class FileUtils {
+	//
 	public static FileNameMask[] argumentToFileNameMasks(Term types, ChoisePoint iX) {
-		ArrayList<FileNameMask> list= new ArrayList<FileNameMask>();
+		ArrayList<FileNameMask> list= new ArrayList<>();
 		Term nextHead= null;
 		Term currentTail= types;
 		try {
@@ -32,11 +33,11 @@ public class FileUtils {
 		} catch (TermIsNotAString e) {
 			throw new WrongArgumentIsNotAString(nextHead);
 		};
-		return list.toArray(new FileNameMask[0]);
+		return list.toArray(new FileNameMask[list.size()]);
 	}
 	//
 	protected static String[] stringToWildcards(String wildcardText) {
-		ArrayList<String> list= new ArrayList<String>();
+		ArrayList<String> list= new ArrayList<>();
 		int length= wildcardText.length();
 		int currentPosition= 0;
 		while (true) {
@@ -60,7 +61,7 @@ public class FileUtils {
 				break;
 			}
 		};
-		return list.toArray(new String[0]);
+		return list.toArray(new String[list.size()]);
 	}
 	//
 	///////////////////////////////////////////////////////////////

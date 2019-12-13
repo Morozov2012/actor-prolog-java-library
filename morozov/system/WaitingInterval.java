@@ -2,13 +2,8 @@
 
 package morozov.system;
 
-import target.*;
-
-import morozov.run.*;
-import morozov.system.errors.*;
+import morozov.system.converters.*;
 import morozov.system.signals.*;
-import morozov.terms.*;
-import morozov.terms.signals.*;
 
 import java.math.BigDecimal;
 
@@ -16,6 +11,15 @@ public class WaitingInterval extends TimeInterval {
 	//
 	protected boolean isDefault= false;
 	protected boolean isAny= false;
+	//
+	private static final long serialVersionUID= 0x296F8CC7491D1062L; // 2985759865522950242
+	//
+	// static {
+	//	// SerialVersionChecker.check(serialVersionUID,"morozov.system","WaitingInterval");
+	//	SerialVersionChecker.report("morozov.system","WaitingInterval");
+	// }
+	//
+	///////////////////////////////////////////////////////////////
 	//
 	public WaitingInterval(boolean d, boolean a) {
 		super(false,0.0,null,null);
@@ -37,26 +41,11 @@ public class WaitingInterval extends TimeInterval {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected static Term termAny= new PrologSymbol(SymbolCodes.symbolCode_E_any);
-	protected static Term termDefault= new PrologSymbol(SymbolCodes.symbolCode_E_default);
-	protected static int anyActionPeriod= 0;
-	protected static BigDecimal decimalAnyActionPeriod= BigDecimal.valueOf(anyActionPeriod);
-	//
-	///////////////////////////////////////////////////////////////
-	//
-	public static WaitingInterval argumentToWaitingInterval(Term a, ChoisePoint iX) {
-		try {
-			long code= a.getSymbolValue(iX);
-			if (code==SymbolCodes.symbolCode_E_any) {
-				return new WaitingInterval(false,true);
-			} else if (code==SymbolCodes.symbolCode_E_default) {
-				return new WaitingInterval(true,false);
-			} else {
-				throw new WrongArgumentIsNotWaitingInterval(a);
-			}
-		} catch (TermIsNotASymbol b) {
-			return new WaitingInterval(argumentSecondsToTimeInterval(a,iX));
-		}
+	public boolean isDefault() {
+		return isDefault;
+	}
+	public boolean isAny() {
+		return isAny;
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -65,7 +54,7 @@ public class WaitingInterval extends TimeInterval {
 		if (isDefault) {
 			return defaultValue;
 		} else if (isAny) {
-			return decimalAnyActionPeriod;
+			return WaitingIntervalConverters.decimalAnyActionPeriod;
 		} else {
 			return toNanosecondsBigDecimal();
 		}
@@ -73,31 +62,11 @@ public class WaitingInterval extends TimeInterval {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public int toMillisecondsIntegerOrDefault(Term defaultWaitingInterval, ChoisePoint iX) {
-		if (isDefault) {
-			return TimeInterval.argumentSecondsToTimeInterval(defaultWaitingInterval,iX).toMillisecondsInteger();
-		} else if (isAny) {
-			return anyActionPeriod; // A timeout of zero is interpreted as an infinite timeout.
-		} else {
-			return toMillisecondsInteger();
-		}
-	}
-	//
-	public long toMillisecondsLongOrDefault(Term defaultWaitingInterval, ChoisePoint iX) {
-		if (isDefault) {
-			return TimeInterval.argumentSecondsToTimeInterval(defaultWaitingInterval,iX).toMillisecondsLong();
-		} else if (isAny) {
-			return anyActionPeriod; // A timeout of zero is interpreted as an infinite timeout.
-		} else {
-			return toMillisecondsLong();
-		}
-	}
-	//
 	public int toMillisecondsIntegerOrDefault(int defaultWaitingInterval) {
 		if (isDefault) {
 			return defaultWaitingInterval;
 		} else if (isAny) {
-			return anyActionPeriod; // A timeout of zero is interpreted as an infinite timeout.
+			return WaitingIntervalConverters.anyActionPeriod; // A timeout of zero is interpreted as an infinite timeout.
 		} else {
 			return toMillisecondsInteger();
 		}
@@ -107,7 +76,7 @@ public class WaitingInterval extends TimeInterval {
 		if (isDefault) {
 			return defaultWaitingInterval;
 		} else if (isAny) {
-			return anyActionPeriod; // A timeout of zero is interpreted as an infinite timeout.
+			return WaitingIntervalConverters.anyActionPeriod; // A timeout of zero is interpreted as an infinite timeout.
 		} else {
 			return toMillisecondsLong();
 		}
@@ -120,18 +89,6 @@ public class WaitingInterval extends TimeInterval {
 			throw UseAnyInterval.instance;
 		} else {
 			return toMillisecondsLong();
-		}
-	}
-	//
-	///////////////////////////////////////////////////////////////
-	//
-	public Term toTerm() {
-		if (isDefault) {
-			return termDefault;
-		} else if (isAny) {
-			return termAny;
-		} else {
-			return super.toTerm();
 		}
 	}
 }

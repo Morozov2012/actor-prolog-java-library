@@ -6,11 +6,11 @@ import morozov.system.kinect.modes.*;
 
 public class KinectDisplayingModeTools {
 	//
-	protected static KinectFrameType defaultFrameType= KinectFrameType.COLORED_DEPTH_MAPS;
-	protected static KinectPeopleIndexMode defaultPeopleIndexMode= KinectPeopleIndexMode.PAINT_PEOPLE;
-	protected static KinectCircumscriptionMode defaultCircumscriptionMode= KinectCircumscriptionMode.SKELETON_PARALLELEPIPEDS;
-	protected static KinectCircumscriptionMode[] defaultCircumscriptionModes= new KinectCircumscriptionMode[]{defaultCircumscriptionMode};
-	protected static KinectSkeletonsMode defaultSkeletonsMode= KinectSkeletonsMode.DETECT_AND_TRACK_SKELETONS;
+	protected static final KinectFrameType defaultFrameType= KinectFrameType.COLORED_DEPTH_MAPS;
+	protected static final KinectPeopleIndexMode defaultPeopleIndexMode= KinectPeopleIndexMode.PAINT_PEOPLE;
+	protected static final KinectCircumscriptionMode defaultCircumscriptionMode= KinectCircumscriptionMode.SKELETON_PARALLELEPIPEDS;
+	protected static final KinectCircumscriptionMode[] defaultCircumscriptionModes= new KinectCircumscriptionMode[]{defaultCircumscriptionMode};
+	protected static final KinectSkeletonsMode defaultSkeletonsMode= KinectSkeletonsMode.DETECT_AND_TRACK_SKELETONS;
 	//
 	public static KinectFrameType getDefaultFrameType() {
 		return defaultFrameType;

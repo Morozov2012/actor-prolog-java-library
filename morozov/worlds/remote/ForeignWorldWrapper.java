@@ -19,7 +19,7 @@ import java.util.HashMap;
 
 public class ForeignWorldWrapper extends AbstractWorld {
 	//
-	public ExternalWorldInterface stub;
+	protected ExternalWorldInterface stub;
 	//
 	protected HashMap<Long,Long> signatureMap= new HashMap<>();
 	//
@@ -37,6 +37,7 @@ public class ForeignWorldWrapper extends AbstractWorld {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void sendResidentRequest(Resident resident, long domainSignatureNumber, Term[] arguments, boolean sortAndReduceResultList) {
 		Long externalSignatureNumber= changeSignatureNumber(domainSignatureNumber);
                 try {
@@ -52,6 +53,7 @@ public class ForeignWorldWrapper extends AbstractWorld {
 		}
 	}
 	//
+	@Override
 	public void withdrawRequest(Resident resident) {
                 try {
 			ExternalResidentInterface residentStub= OwnResidentWrapper.registerResident(resident);
@@ -61,15 +63,16 @@ public class ForeignWorldWrapper extends AbstractWorld {
 		}
 	}
 	//
+	@Override
 	public void receiveAsyncCall(AsyncCall item) {
-		long domainSignatureNumber= item.domainSignatureNumber;
+		long domainSignatureNumber= item.getDomainSignatureNumber();
 		Long externalSignatureNumber= changeSignatureNumber(domainSignatureNumber);
-		byte[] byteArray= GeneralConverters.serializeArguments(item.arguments);
+		byte[] byteArray= GeneralConverters.serializeArguments(item.getArguments());
                 try {
 			stub.receiveAsyncCall(
 				externalSignatureNumber,
-				item.isControlCall,
-				item.useBuffer,
+				item.isControlCall(),
+				item.useBuffer(),
 				byteArray);
 		} catch (RemoteException e) {
 			throw new RemoteCallError(e);
@@ -135,47 +138,59 @@ public class ForeignWorldWrapper extends AbstractWorld {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void startProcesses() {
 	}
+	@Override
 	public void releaseSystemResources() {
 	}
+	@Override
 	public void stopProcesses() {
 	}
 	//
+	@Override
 	public MethodSignature[] getMethodSignatures() {
 		return emptySignatureList;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean thisIsOwnWorld() {
 		return false;
 	}
 	//
+	@Override
 	public boolean thisIsForeignWorld() {
 		return true;
 	}
 	//
+	@Override
 	public boolean isInternalWorldOf(AbstractProcess currentProcess) {
 		return false;
 	}
 	//
+	@Override
 	public AbstractInternalWorld getInternalWorld(ChoisePoint cp) throws Backtracking, TermIsNotAWorld, TermIsDummyWorld, TermIsUnboundVariable {
 		throw Backtracking.instance;
 	}
 	//
+	@Override
 	public AbstractInternalWorld internalWorld(AbstractProcess process, ChoisePoint cp) throws Backtracking {
 		throw Backtracking.instance;
 	}
 	//
+	@Override
 	public AbstractInternalWorld internalWorld(ChoisePoint iX) {
 		throw new AnAttemptToExtractInternalWorldFromForeignWorldWrapper();
 	}
 	//
+	@Override
 	public AbstractInternalWorld internalWorld() {
 		throw new AnAttemptToExtractInternalWorldFromForeignWorldWrapper();
 	}
 	//
+	@Override
 	public boolean isNumberOfTemporaryActor() {
 		return false;
 	}

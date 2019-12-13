@@ -21,8 +21,8 @@ import java.math.BigInteger;
 
 public class PrologStructure extends Term {
 	//
-	private long functor;
-	private Term[] arguments;
+	protected long functor;
+	protected Term[] arguments;
 	//
 	private static final long serialVersionUID= 0xDB99B241209C67E0L; // -2622869315176863776L
 	//
@@ -39,6 +39,7 @@ public class PrologStructure extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public int hashCode() {
 		int sum= PrologSymbol.calculateHashCode(functor);
 		for (int i= 0; i < arguments.length; i++) {
@@ -46,6 +47,7 @@ public class PrologStructure extends Term {
 		};
 		return sum;
 	}
+	@Override
 	public boolean equals(Object o2) {
 		if (o2 instanceof Term) {
 			return ((Term)o2).isEqualToStructure(functor,arguments);
@@ -53,6 +55,7 @@ public class PrologStructure extends Term {
 			return false;
 		}
 	}
+	@Override
 	public int compare(Object o2) {
 		if (o2 instanceof Term) {
 			return -((Term)o2).compareWithStructure(functor,arguments);
@@ -60,6 +63,7 @@ public class PrologStructure extends Term {
 			return 1;
 		}
 	}
+	@Override
 	public boolean isEqualToStructure(long f2, Term[] a2) {
 		if (functor==f2) {
 			return TermComparator.areEqualTermArrays(arguments,a2);
@@ -67,6 +71,7 @@ public class PrologStructure extends Term {
 			return false;
 		}
 	}
+	@Override
 	public int compareWithStructure(long f2, Term[] a2) {
 		if (functor==f2) {
 			return TermComparator.compareTwoTermArrays(arguments,a2);
@@ -77,18 +82,22 @@ public class PrologStructure extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term[] isStructure(long aFunctor, int aArity, ChoisePoint cp) throws Backtracking {
 		if ( functor==aFunctor && arguments.length==aArity ) {
 			return arguments;
 		};
 		throw Backtracking.instance;
 	}
+	@Override
 	public long getStructureFunctor(ChoisePoint cp) throws TermIsNotAStructure {
 		return functor;
 	}
+	@Override
 	public Term[] getStructureArguments(ChoisePoint cp) throws TermIsNotAStructure {
 		return arguments;
 	}
+	@Override
 	public void unifyWithStructure(long aFunctor, Term[] values, Term structure, ChoisePoint cp) throws Backtracking {
 		if (functor==aFunctor && arguments.length==values.length) {
 			for (int i= 0; i < arguments.length; i++) {
@@ -98,22 +107,26 @@ public class PrologStructure extends Term {
 			throw Backtracking.instance;
 		}
 	}
+	@Override
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		t.unifyWithStructure(functor,arguments,this,cp);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void registerVariables(ActiveWorld process, boolean isSuspending, boolean isProtecting) {
 		for (int i= 0; i < arguments.length; i++) {
 			arguments[i].registerVariables(process,isSuspending,isProtecting);
 		}
 	}
+	@Override
 	public void registerTargetWorlds(HashSet<AbstractWorld> worlds, ChoisePoint cp) {
 		for (int i= 0; i < arguments.length; i++) {
 			arguments[i].registerTargetWorlds(worlds,cp);
 		}
 	}
+	@Override
 	public PrologStructure circumscribe() {
 		Term[] aContents= new Term[arguments.length];
 		for (int i= 0; i < arguments.length; i++) {
@@ -121,6 +134,7 @@ public class PrologStructure extends Term {
 		};
 		return new PrologStructure(functor,aContents);
 	}
+	@Override
 	public PrologStructure copyValue(ChoisePoint cp, TermCircumscribingMode mode) {
 		Term[] aContents= new Term[arguments.length];
 		for (int i= 0; i < arguments.length; i++) {
@@ -128,6 +142,7 @@ public class PrologStructure extends Term {
 		};
 		return new PrologStructure(functor,aContents);
 	}
+	@Override
 	public PrologStructure copyGroundValue(ChoisePoint cp) throws TermIsUnboundVariable {
 		Term[] aContents= new Term[arguments.length];
 		for (int i= 0; i < arguments.length; i++) {
@@ -135,6 +150,7 @@ public class PrologStructure extends Term {
 		};
 		return new PrologStructure(functor,aContents);
 	}
+	@Override
 	public PrologStructure substituteWorlds(HashMap<AbstractWorld,Term> map, ChoisePoint cp) {
 		Term[] aContents= new Term[arguments.length];
 		for (int i= 0; i < arguments.length; i++) {
@@ -145,6 +161,7 @@ public class PrologStructure extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void compareWithTerm(Term a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
@@ -163,10 +180,11 @@ public class PrologStructure extends Term {
 			throw new OperationIsNotDefinedForTheArgument(this);
 		}
 	}
+	@Override
 	public void compareWithBigInteger(BigInteger a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
-			if (!op.eval(BigInteger.valueOf(timeInMillis),a.multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger))) {
+			if (!op.eval(BigInteger.valueOf(timeInMillis),a.multiply(TimeUnitsConverters.oneDayLengthInMillisecondsBigInteger))) {
 				throw Backtracking.instance;
 			}
 		} else if (functor==SymbolCodes.symbolCode_E_time) {
@@ -187,10 +205,11 @@ public class PrologStructure extends Term {
 			throw new OperationIsNotDefinedForTheArgument(this);
 		}
 	}
+	@Override
 	public void compareWithLong(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
-			if (!op.eval(BigInteger.valueOf(timeInMillis),BigInteger.valueOf(a).multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger))) {
+			if (!op.eval(BigInteger.valueOf(timeInMillis),BigInteger.valueOf(a).multiply(TimeUnitsConverters.oneDayLengthInMillisecondsBigInteger))) {
 				throw Backtracking.instance;
 			}
 		} else if (functor==SymbolCodes.symbolCode_E_time) {
@@ -211,10 +230,11 @@ public class PrologStructure extends Term {
 			throw new OperationIsNotDefinedForTheArgument(this);
 		}
 	}
+	@Override
 	public void compareWithDouble(double a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
-			if (!op.eval(BigInteger.valueOf(timeInMillis),GeneralConverters.doubleValueToBigInteger(a).multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger))) {
+			if (!op.eval(BigInteger.valueOf(timeInMillis),GeneralConverters.doubleValueToBigInteger(a).multiply(TimeUnitsConverters.oneDayLengthInMillisecondsBigInteger))) {
 				throw Backtracking.instance;
 			}
 		} else if (functor==SymbolCodes.symbolCode_E_time) {
@@ -235,6 +255,7 @@ public class PrologStructure extends Term {
 			throw new OperationIsNotDefinedForTheArgument(this);
 		}
 	}
+	@Override
 	public void compareWithDate(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
@@ -245,6 +266,7 @@ public class PrologStructure extends Term {
 			throw new OperationIsNotDefinedForTheArgument(this);
 		}
 	}
+	@Override
 	public void compareTermWith(Term a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
@@ -263,10 +285,11 @@ public class PrologStructure extends Term {
 			throw new OperationIsNotDefinedForTheArgument(this);
 		}
 	}
+	@Override
 	public void compareBigIntegerWith(BigInteger a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
-			if (!op.eval(a.multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(timeInMillis))) {
+			if (!op.eval(a.multiply(TimeUnitsConverters.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(timeInMillis))) {
 				throw Backtracking.instance;
 			}
 		} else if (functor==SymbolCodes.symbolCode_E_time) {
@@ -287,10 +310,11 @@ public class PrologStructure extends Term {
 			throw new OperationIsNotDefinedForTheArgument(this);
 		}
 	}
+	@Override
 	public void compareLongWith(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
-			if (!op.eval(BigInteger.valueOf(a).multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(timeInMillis))) {
+			if (!op.eval(BigInteger.valueOf(a).multiply(TimeUnitsConverters.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(timeInMillis))) {
 				throw Backtracking.instance;
 			}
 		} else if (functor==SymbolCodes.symbolCode_E_time) {
@@ -311,10 +335,11 @@ public class PrologStructure extends Term {
 			throw new OperationIsNotDefinedForTheArgument(this);
 		}
 	}
+	@Override
 	public void compareDoubleWith(double a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
-			if (!op.eval(GeneralConverters.doubleValueToBigInteger(a).multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(timeInMillis))) {
+			if (!op.eval(GeneralConverters.doubleValueToBigInteger(a).multiply(TimeUnitsConverters.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(timeInMillis))) {
 				throw Backtracking.instance;
 			}
 		} else if (functor==SymbolCodes.symbolCode_E_time) {
@@ -335,6 +360,7 @@ public class PrologStructure extends Term {
 			throw new OperationIsNotDefinedForTheArgument(this);
 		}
 	}
+	@Override
 	public void compareDateWith(long a, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
@@ -345,6 +371,7 @@ public class PrologStructure extends Term {
 			throw new OperationIsNotDefinedForTheArgument(this);
 		}
 	}
+	@Override
 	public void compareListWith(Term aHead, Term aTail, ChoisePoint iX, ComparisonOperation op) throws Backtracking {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
@@ -369,6 +396,7 @@ public class PrologStructure extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term reactWithTerm(Term a, ChoisePoint iX, BinaryOperation op) {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
@@ -387,10 +415,11 @@ public class PrologStructure extends Term {
 			throw new OperationIsNotDefinedForTheArgument(this);
 		}
 	}
+	@Override
 	public Term reactWithBigInteger(BigInteger a, ChoisePoint iX, BinaryOperation op) {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
-			return op.evalDate(BigInteger.valueOf(timeInMillis),a.multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger));
+			return op.evalDate(BigInteger.valueOf(timeInMillis),a.multiply(TimeUnitsConverters.oneDayLengthInMillisecondsBigInteger));
 		} else if (functor==SymbolCodes.symbolCode_E_time) {
 			if (arguments.length==3) {
 				long timeInMillis= GeneralConverters.argumentsToTimeInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
@@ -405,10 +434,11 @@ public class PrologStructure extends Term {
 			throw new OperationIsNotDefinedForTheArgument(this);
 		}
 	}
+	@Override
 	public Term reactWithLong(long a, ChoisePoint iX, BinaryOperation op) {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
-			return op.evalDate(BigInteger.valueOf(timeInMillis),BigInteger.valueOf(a).multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger));
+			return op.evalDate(BigInteger.valueOf(timeInMillis),BigInteger.valueOf(a).multiply(TimeUnitsConverters.oneDayLengthInMillisecondsBigInteger));
 		} else if (functor==SymbolCodes.symbolCode_E_time) {
 			if (arguments.length==3) {
 				long timeInMillis= GeneralConverters.argumentsToTimeInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
@@ -423,10 +453,11 @@ public class PrologStructure extends Term {
 			throw new OperationIsNotDefinedForTheArgument(this);
 		}
 	}
+	@Override
 	public Term reactWithDouble(double a, ChoisePoint iX, BinaryOperation op) {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
-			return op.evalDate(BigInteger.valueOf(timeInMillis),GeneralConverters.doubleValueToBigInteger(a).multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger));
+			return op.evalDate(BigInteger.valueOf(timeInMillis),GeneralConverters.doubleValueToBigInteger(a).multiply(TimeUnitsConverters.oneDayLengthInMillisecondsBigInteger));
 		} else if (functor==SymbolCodes.symbolCode_E_time) {
 			if (arguments.length==3) {
 				long timeInMillis= GeneralConverters.argumentsToTimeInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
@@ -441,6 +472,7 @@ public class PrologStructure extends Term {
 			throw new OperationIsNotDefinedForTheArgument(this);
 		}
 	}
+	@Override
 	public Term reactWithDate(long a, ChoisePoint iX, BinaryOperation op) {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
@@ -449,6 +481,7 @@ public class PrologStructure extends Term {
 			throw new WrongArgumentIsNotADate(this);
 		}
 	}
+	@Override
 	public Term reactWithTime(long a, ChoisePoint iX, BinaryOperation op) {
 		if (functor==SymbolCodes.symbolCode_E_time) {
 			if (arguments.length==3) {
@@ -464,10 +497,11 @@ public class PrologStructure extends Term {
 			throw new WrongArgumentIsNotATime(this);
 		}
 	}
+	@Override
 	public Term reactBigIntegerWith(BigInteger a, ChoisePoint iX, BinaryOperation op) {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
-			return op.evalDate(a.multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(timeInMillis));
+			return op.evalDate(a.multiply(TimeUnitsConverters.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(timeInMillis));
 		} else if (functor==SymbolCodes.symbolCode_E_time) {
 			if (arguments.length==3) {
 				long timeInMillis= GeneralConverters.argumentsToTimeInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
@@ -482,10 +516,11 @@ public class PrologStructure extends Term {
 			throw new OperationIsNotDefinedForTheArgument(this);
 		}
 	}
+	@Override
 	public Term reactLongWith(long a, ChoisePoint iX, BinaryOperation op) {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
-			return op.evalDate(BigInteger.valueOf(a).multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(timeInMillis));
+			return op.evalDate(BigInteger.valueOf(a).multiply(TimeUnitsConverters.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(timeInMillis));
 		} else if (functor==SymbolCodes.symbolCode_E_time) {
 			if (arguments.length==3) {
 				long timeInMillis= GeneralConverters.argumentsToTimeInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
@@ -500,10 +535,11 @@ public class PrologStructure extends Term {
 			throw new OperationIsNotDefinedForTheArgument(this);
 		}
 	}
+	@Override
 	public Term reactDoubleWith(double a, ChoisePoint iX, BinaryOperation op) {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
-			return op.evalDate(GeneralConverters.doubleValueToBigInteger(a).multiply(TimeUnits.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(timeInMillis));
+			return op.evalDate(GeneralConverters.doubleValueToBigInteger(a).multiply(TimeUnitsConverters.oneDayLengthInMillisecondsBigInteger),BigInteger.valueOf(timeInMillis));
 		} else if (functor==SymbolCodes.symbolCode_E_time) {
 			if (arguments.length==3) {
 				long timeInMillis= GeneralConverters.argumentsToTimeInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
@@ -518,6 +554,7 @@ public class PrologStructure extends Term {
 			throw new OperationIsNotDefinedForTheArgument(this);
 		}
 	}
+	@Override
 	public Term reactDateWith(long a, ChoisePoint iX, BinaryOperation op) {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
@@ -526,6 +563,7 @@ public class PrologStructure extends Term {
 			throw new WrongArgumentIsNotADate(this);
 		}
 	}
+	@Override
 	public Term reactTimeWith(long a, ChoisePoint iX, BinaryOperation op) {
 		if (functor==SymbolCodes.symbolCode_E_time) {
 			if (arguments.length==3) {
@@ -541,6 +579,7 @@ public class PrologStructure extends Term {
 			throw new WrongArgumentIsNotATime(this);
 		}
 	}
+	@Override
 	public Term reactListWith(Term aHead, Term aTail, ChoisePoint iX, BinaryOperation op) {
 		if (functor==SymbolCodes.symbolCode_E_date && arguments.length==3) {
 			long timeInMillis= GeneralConverters.argumentsToDateInMilliseconds(arguments[0],arguments[1],arguments[2],this,iX);
@@ -577,6 +616,7 @@ public class PrologStructure extends Term {
 		SymbolName symbolName= (SymbolName)stream.readObject();
 		functor= SymbolNames.insertSymbolName(symbolName.identifier);
 	}
+	@Override
 	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		StringBuilder buffer= new StringBuilder();
 		buffer.append(SymbolNames.retrieveSymbolName(functor).toSafeString(encoder));

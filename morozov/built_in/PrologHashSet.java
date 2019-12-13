@@ -13,6 +13,7 @@ public abstract class PrologHashSet extends Database {
 		super(id);
 	}
 	//
+	@Override
 	public DatabaseType getDatabaseType() {
 		return DatabaseType.HASH_SET;
 	}

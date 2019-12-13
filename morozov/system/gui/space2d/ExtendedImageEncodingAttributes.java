@@ -10,11 +10,11 @@ import morozov.terms.*;
 
 public class ExtendedImageEncodingAttributes extends GenericImageEncodingAttributes {
 	//
-	public ImageFileFormat format;
-	public NumericalValue compressionQuality;
-	public Boolean progressiveMode;
-	public Boolean interlacing;
-	public String comment;
+	protected ImageFileFormat format;
+	protected NumericalValue compressionQuality;
+	protected Boolean progressiveMode;
+	protected Boolean interlacing;
+	protected String comment;
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -36,6 +36,7 @@ public class ExtendedImageEncodingAttributes extends GenericImageEncodingAttribu
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public ImageFileFormat getFormat() {
 		if (format != null) {
 			return format;
@@ -44,6 +45,7 @@ public class ExtendedImageEncodingAttributes extends GenericImageEncodingAttribu
 		}
 	}
 	//
+	@Override
 	public void setWriterAttributes(Space2DWriter writer) {
 		if (compressionQuality != null) {
 			writer.setCompressionQuality(NumericalValueConverters.toDouble(compressionQuality));
@@ -61,6 +63,7 @@ public class ExtendedImageEncodingAttributes extends GenericImageEncodingAttribu
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term toTerm() {
 		if (format==null && compressionQuality==null && progressiveMode==null && interlacing==null && comment==null) {
 			return PrologEmptySet.instance;

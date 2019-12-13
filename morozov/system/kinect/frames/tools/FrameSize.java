@@ -6,8 +6,8 @@ import morozov.system.kinect.frames.tools.errors.*;
 
 public class FrameSize {
 	//
-	public int width;
-	public int height;
+	protected int width;
+	protected int height;
 	//
 	public FrameSize(int w, int h) {
 		width= w;

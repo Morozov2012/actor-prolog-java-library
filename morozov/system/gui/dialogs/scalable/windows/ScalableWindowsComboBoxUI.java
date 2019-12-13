@@ -29,15 +29,18 @@ import java.awt.Color;
 */
 
 public class ScalableWindowsComboBoxUI extends BasicComboBoxUI implements ScalableComboBoxUI {
+	//
 	protected Color background;
 	protected JButton button;
+	//
 	public static ComponentUI createUI(JComponent c) {
 		return new ScalableWindowsComboBoxUI();
 	}
+	//
+	@Override
 	protected JButton createArrowButton() {
 		button = new ScalableComboBoxArrowButton(
 					BasicArrowButton.SOUTH,
-					// BasicArrowButton.WEST,
 					UIManager.getColor("ComboBox.buttonBackground"),
 					UIManager.getColor("ComboBox.buttonShadow"),
 					UIManager.getColor("ComboBox.buttonDarkShadow"),
@@ -46,41 +49,40 @@ public class ScalableWindowsComboBoxUI extends BasicComboBoxUI implements Scalab
 			button.setBackground(background);
 		};
 		button.setName("ComboBox.arrowButton");
-		// button.setInsets(new Insets(10,15,3,4));
 		return button;
 	}
 	//
+	@Override
 	protected void installDefaults() {
-		// UIManager.put("ComboBox.squareButton",false);
 		UIManager.put("ComboBox.squareButton",true);
 		super.installDefaults();
 	}
 	//
 	@SuppressWarnings("unchecked")
+	@Override
 	protected Dimension getDisplaySize() {
-		Dimension result= new Dimension();
 		ListCellRenderer renderer= comboBox.getRenderer();
 		if (renderer == null) {
 			renderer= new DefaultListCellRenderer();
 		}
-		// sameBaseline= true;
 		Object prototypeValue= comboBox.getPrototypeDisplayValue();
-		// Calculates the dimension based on the prototype value
+		// Calculates the dimension based on the prototype value:
 		Component rendererComponent= renderer.getListCellRendererComponent(listBox,prototypeValue,-1,false,false);
-		result= getSizeForComponent(rendererComponent);
+		Dimension result= getSizeForComponent(rendererComponent);
 		if ( comboBox.isEditable() ) {
 			Dimension d= editor.getPreferredSize();
 			result.width= Math.max(result.width,d.width);
 			result.height= Math.max(result.height,d.height);
 		};
-		// calculate in the padding
-		Insets padding= UIManager.getInsets("ComboBox.padding");
-		if (padding!=null) {
-			result.width += padding.left + padding.right;
-			result.height += padding.top + padding.bottom;
+		//
+		Insets comboBoxPadding= UIManager.getInsets("ComboBox.padding");
+		if (comboBoxPadding!=null) {
+			result.width += comboBoxPadding.left + comboBoxPadding.right;
+			result.height += comboBoxPadding.top + comboBoxPadding.bottom;
 		};
 		return result;
 	}
+	@Override
 	protected Dimension getSizeForComponent(Component comp) {
 		currentValuePane.add(comp);
 		comp.setFont(comboBox.getFont());
@@ -88,6 +90,7 @@ public class ScalableWindowsComboBoxUI extends BasicComboBoxUI implements Scalab
 		currentValuePane.remove(comp);
 		return d;
 	}
+	@Override
 	public void setBackground(Color c) {
 		background= c;
 		if (button != null && background != null) {

@@ -6,7 +6,7 @@ import morozov.run.*;
 
 public abstract class OwnWorld extends AbstractWorld {
 	//
-	public StaticContext staticContext;
+	protected StaticContext staticContext;
 	//
 	private static final long serialVersionUID= 0xF479391FAB6F87EL; // 1101010889101211774L
 	//

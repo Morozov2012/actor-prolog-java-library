@@ -20,6 +20,7 @@ public class SimpleDomainName extends PrologDomainName {
 		name= n;
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
 		return tagDomainName_Simple + "(\"" + FormatOutput.encodeString(name,false,encoder) + "\")";
 	}

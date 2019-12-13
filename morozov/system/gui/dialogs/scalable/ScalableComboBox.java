@@ -13,6 +13,7 @@ package morozov.system.gui.dialogs.scalable;
 */
 
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.converters.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
@@ -49,19 +50,13 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 		isEditable= useEditor;
 		enableSorting= sortList;
 		if (enableSorting) {
-			// Arrays.sort(items,new AlphabeticComparator());
 			sortedStrings= new SortedStrings(items);
-			items= sortedStrings.sortedArray;
+			items= sortedStrings.getSortedArray();
 		};
-		JComboBox<String> comboBox= new JComboBox<String>(items);
-		component= comboBox; // new JComboBox<String>(items);
-		comboBox.setPrototypeDisplayValue(createPrototypeString(PrologInteger.toInteger(visibleColumnCount)));
-		comboBox.setMaximumRowCount(PrologInteger.toInteger(visibleRowCount));
-		// if (useTabStops) {
-		//	TabListCellRenderer renderer= new TabListCellRenderer(items);
-		//	comboBox.setRenderer(renderer);
-		// };
-		// comboBox.addKeyListener(new ListSearcher(comboBox));
+		JComboBox<String> comboBox= new JComboBox<>(items);
+		component= comboBox;
+		comboBox.setPrototypeDisplayValue(createPrototypeString(Arithmetic.toInteger(visibleColumnCount)));
+		comboBox.setMaximumRowCount(Arithmetic.toInteger(visibleRowCount));
 		if (isEditable) {
 			Component textField= comboBox.getEditor().getEditorComponent();
 			if (textField instanceof JTextField) {
@@ -72,21 +67,19 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 		} else {
 			comboBox.addActionListener(this);
 		};
-		// comboBox.addItemListener(this);
-		// comboBox.addListSelectionListener(component);
 		comboBox.setEditable(isEditable);
 		comboBox.addFocusListener(this);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
 			throw RejectValue.instance;
 		} else {
 			ArrayList<Term> items= DialogUtils.listToTermArray(value,iX);
-			// return GeneralConverters.arrayListToTerm(items);
 			if (items.size() >= 1) {
 				return items.get(items.size()-1);
 			} else {
@@ -95,6 +88,7 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 		}
 	}
 	//
+	@Override
 	public Term standardizeRange(Term value, ChoisePoint iX) {
 		ArrayList<String> items= DialogUtils.listToStringArray(value,iX);
 		return GeneralConverters.stringArrayToList(items);
@@ -102,6 +96,7 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void putValue(Term value, ChoisePoint iX) {
 		if (component!=null) {
 			synchronized (component) {
@@ -155,6 +150,7 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 		}
 	}
 	//
+	@Override
 	public void putRange(Term value, ChoisePoint iX) {
 		if (component!=null) {
 			synchronized (component) {
@@ -163,6 +159,7 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 		}
 	}
 	//
+	@Override
 	public Term getValue() {
 		if (component!=null) {
 			synchronized (component) {
@@ -174,18 +171,14 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 							if (text != null) {
 								return new PrologString(text);
 							} else {
-								// return PrologUnknownValue.instance;
 								return new PrologString("");
 							}
 						} catch (NullPointerException e) {
-							// return PrologUnknownValue.instance;
 							return new PrologString("");
 						}
 					} else {
 						Object selectedValue= ((JComboBox)component).getSelectedItem();
 						if (selectedValue==null) {
-							// return PrologEmptyList.instance;
-							// return PrologUnknownValue.instance;
 							return new PrologString("");
 						} else {
 							return new PrologString(selectedValue.toString());
@@ -194,7 +187,6 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 				} else {
 					Object selectedValue= ((JComboBox)component).getSelectedItem();
 					if (selectedValue==null) {
-						// return PrologUnknownValue.instance;
 						return PrologEmptyList.instance;
 					} else {
 						return new PrologString(selectedValue.toString());
@@ -202,11 +194,11 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 				}
 			}
 		} else {
-			// return PrologEmptyList.instance;
 			return PrologUnknownValue.instance;
 		}
 	}
 	//
+	@Override
 	public Term getRange() {
 		if (component!=null) {
 			synchronized (component) {
@@ -218,13 +210,13 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 				return result;
 			}
 		} else {
-			// return PrologEmptyList.instance;
 			return PrologUnknownValue.instance;
 		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setBackground(Color c) {
 		super.setBackground(c);
 		if (component!=null) {
@@ -266,34 +258,33 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 	protected void addListOfItems(Term list, ChoisePoint iX) {
 		String[] items= GeneralConverters.termToStrings(list,iX);
 		if (enableSorting) {
-			// Arrays.sort(items,new AlphabeticComparator());
 			sortedStrings= new SortedStrings(items);
-			items= sortedStrings.sortedArray;
+			items= sortedStrings.getSortedArray();
 		};
 		JComboBox<String> comboBox= (JComboBox<String>)component;
-		// ((JComboBox)component).removeAllItems();
 		comboBox.removeAllItems();
 		for (int n=0; n < items.length; n++) {
-			// ((JComboBox)component).addItem(makeObj(items[n]));
-			// ((JComboBox)component).addItem(items[n]);
 			comboBox.addItem(items[n]);
 		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void changedUpdate(DocumentEvent e) {
 		// Gives notification that an attribute or set of attributes changed.
 		if (targetDialog!=null) {
 			targetDialog.reportValueUpdate(this);
 		}
 	}
+	@Override
 	public void insertUpdate(DocumentEvent e) {
 		// Gives notification that there was an insert into the document.
 		if (targetDialog!=null) {
 			targetDialog.reportValueUpdate(this);
 		}
 	}
+	@Override
 	public void removeUpdate(DocumentEvent e) {
 		// Gives notification that a portion of the document has been removed.
 		if (targetDialog!=null) {
@@ -303,6 +294,7 @@ public class ScalableComboBox extends ActiveComponent implements ActionListener,
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void actionPerformed(ActionEvent event) {
 		if (targetDialog!=null) {
 			targetDialog.reportValueUpdate(this);

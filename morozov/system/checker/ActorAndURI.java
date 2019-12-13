@@ -7,13 +7,16 @@ import morozov.run.*;
 import java.net.URI;
 
 public class ActorAndURI {
-	public ActorNumber actorNumber;
-	public URI uri;
+	//
+	protected ActorNumber actorNumber;
+	protected URI uri;
+	//
 	public ActorAndURI(ActorNumber a, URI i) {
 		actorNumber= a;
 		uri= i;
 	}
 	//
+	@Override
 	public boolean equals(Object o) {
 		if (o==null) {
 			return false;
@@ -33,10 +36,12 @@ public class ActorAndURI {
 		}
 	}
 	//
+	@Override
 	public int hashCode() {
 		return actorNumber.hashCode() + uri.hashCode();
 	}
 	//
+	@Override
 	public String toString() {
 		return "<" + actorNumber.toString() + ";" + uri.toString() + ">";
 	}

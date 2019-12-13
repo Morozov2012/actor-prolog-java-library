@@ -6,12 +6,13 @@ import morozov.system.gui.space3d.*;
 
 public class OperationIsNotDefinedForThisTypeOfNode extends RuntimeException {
 	//
-	public ContentType type;
+	protected ContentType type;
 	//
 	public OperationIsNotDefinedForThisTypeOfNode(ContentType t) {
 		type= t;
 	}
 	//
+	@Override
 	public String toString() {
 		return	this.getClass().toString() +
 			"(" + type.toString() + ")";

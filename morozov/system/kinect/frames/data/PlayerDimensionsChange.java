@@ -31,6 +31,7 @@ public class PlayerDimensionsChange implements PlayerDimensionsChangeInterface, 
 	//
 	/////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void subtract(PlayerDimensionsInterface left, PlayerDimensionsInterface right) {
 		if (left.areInitialized_Depth3D_Bounds() && right.areInitialized_Depth3D_Bounds()) {
 			areInitialized= true;
@@ -45,6 +46,7 @@ public class PlayerDimensionsChange implements PlayerDimensionsChangeInterface, 
 		changeOfMaximalZ= left.getMaximalZ_3D() - right.getMaximalZ_3D();
 	}
 	//
+	@Override
 	public void subtract(PlayerDimensionsChangeInterface left, PlayerDimensionsChangeInterface right) {
 		if (left.areInitialized() && right.areInitialized()) {
 			areInitialized= true;
@@ -61,24 +63,31 @@ public class PlayerDimensionsChange implements PlayerDimensionsChangeInterface, 
 	//
 	/////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean areInitialized() {
 		return areInitialized;
 	}
+	@Override
 	public float getChangeOfMinimalX() {
 		return changeOfMinimalX;
 	}
+	@Override
 	public float getChangeOfMaximalX() {
 		return changeOfMaximalX;
 	}
+	@Override
 	public float getChangeOfMinimalY() {
 		return changeOfMinimalY;
 	}
+	@Override
 	public float getChangeOfMaximalY() {
 		return changeOfMaximalY;
 	}
+	@Override
 	public float getChangeOfMinimalZ() {
 		return changeOfMinimalZ;
 	}
+	@Override
 	public float getChangeOfMaximalZ() {
 		return changeOfMaximalZ;
 	}

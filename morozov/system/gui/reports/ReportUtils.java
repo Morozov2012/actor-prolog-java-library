@@ -62,6 +62,7 @@ public class ReportUtils {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						panel.setText(text);
 					}
@@ -79,6 +80,7 @@ public class ReportUtils {
 			final StringBuilder text= new StringBuilder();
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						text.append(panel.getText());
 					}
@@ -100,6 +102,7 @@ public class ReportUtils {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						if (invokeUpdate) {
 							panel.setFont(font01);
@@ -118,9 +121,10 @@ public class ReportUtils {
 		if (SwingUtilities.isEventDispatchThread()) {
 			return panel.getFont();
 		} else {
-			final AtomicReference<Font> font= new AtomicReference<Font>();
+			final AtomicReference<Font> font= new AtomicReference<>();
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						font.set(panel.getFont());
 					}
@@ -136,9 +140,10 @@ public class ReportUtils {
 		if (SwingUtilities.isEventDispatchThread()) {
 			return panel.getFontMetrics(panel.getFont());
 		} else {
-			final AtomicReference<FontMetrics> value= new AtomicReference<FontMetrics>();
+			final AtomicReference<FontMetrics> value= new AtomicReference<>();
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						value.set(panel.getFontMetrics(panel.getFont()));
 					}

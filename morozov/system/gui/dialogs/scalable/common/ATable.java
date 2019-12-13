@@ -13,6 +13,7 @@ package morozov.system.gui.dialogs.scalable.common;
 */
 
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.*;
 import morozov.terms.*;
@@ -34,31 +35,25 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ATable extends JScrollPane {
 	//
-	public JTable table= null;
+	protected JTable table= null;
 	protected AbstractDialog targetDialog= null;
 	protected ActiveComponent targetComponent= null;
 	protected int length;
-	// protected int height;
 	protected AtomicBoolean tableIsInitiated= new AtomicBoolean(false);
 	protected int[] initiallySelectedIndices;
 	//
 	public ATable(AbstractDialog tD, ActiveComponent tC, double tableLength, double tableHeight, ScalableTableColors colors, ScalableTableColumnDescription[] columnDescriptions, Term initialValue, ChoisePoint iX) {
 		targetDialog= tD;
 		targetComponent= tC;
-		length= PrologInteger.toInteger(tableLength);
-		// height= PrologInteger.toInteger(tableHeight);
+		length= Arithmetic.toInteger(tableLength);
 		table= new ExtendedJTable(tableHeight,colors,columnDescriptions,new ScalableTableModel(targetDialog,this,columnDescriptions,initialValue,iX),iX);
-		// table.setFillsViewportHeight(true);
 		table.setFillsViewportHeight(false);
-		// targetDialog.doLayout(true);
 		setViewportSize(getFont());
-		// Dimension tableSize= table.getPreferredSize();
-		// table.setPreferredScrollableViewportSize(tableSize);
-		// setMinimumSize(tableSize);
 		setViewportView(table);
 		table.getSelectionModel().addListSelectionListener(targetComponent);
 	}
 	//
+	@Override
 	public void addFocusListener(FocusListener l) {
 		if (table!=null) {
 			table.addFocusListener(l);
@@ -127,6 +122,7 @@ public class ATable extends JScrollPane {
 		}
 	}
 	//
+	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 		if (table!=null) {
@@ -191,15 +187,15 @@ public class ATable extends JScrollPane {
 				int[] selection;
 				if (tableIsInitiated.compareAndSet(false,true)) {
 					int selectionMode= selectionModel.getSelectionMode();
-					int length= initiallySelectedIndices.length;
+					int selectedIndicesLength= initiallySelectedIndices.length;
 					synchronized (tableIsInitiated) {
 						if (selectionMode==ListSelectionModel.SINGLE_SELECTION) {
-							if (length > 1) {
-								length= 1;
+							if (selectedIndicesLength > 1) {
+								selectedIndicesLength= 1;
 							}
 						};
-						selection= new int[length];
-						for (int n= 0; n < length; n++) {
+						selection= new int[selectedIndicesLength];
+						for (int n= 0; n < selectedIndicesLength; n++) {
 							selection[n]= initiallySelectedIndices[n] - 1;
 						}
 					}
@@ -229,7 +225,6 @@ public class ATable extends JScrollPane {
 					selectionModel.setValueIsAdjusting(false);
 				};
 				targetDialog.doLayout(true);
-				Dimension tableSize= table.getPreferredSize();
 				targetDialog.safelyRepaint();
 				targetDialog.repaintAfterDelay();
 			}
@@ -257,7 +252,6 @@ public class ATable extends JScrollPane {
 			}
 		} else {
 			return PrologEmptyList.instance;
-			// return PrologUnknownValue.instance;
 		}
 	}
 	//
@@ -274,6 +268,7 @@ public class ATable extends JScrollPane {
 		table.addRowSelectionInterval(index0,index1);
 	}
 	//
+	@Override
 	public void setEnabled(boolean mode) {
 		if (table != null) {
 			if (mode) {
@@ -300,6 +295,7 @@ public class ATable extends JScrollPane {
 		}
 	}
 	//
+	@Override
 	public boolean isEnabled() {
 		if (table != null) {
 			return super.isEnabled() && table.isEnabled();

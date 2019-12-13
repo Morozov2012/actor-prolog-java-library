@@ -25,32 +25,40 @@ public class ArgumentNumber extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		throw new WrongArgumentIsArgumentNumber(t);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean thisIsArgumentNumber() {
 		return true;
 	}
+	@Override
 	public long getNumber() {
 		return value;
 	}
+	@Override
 	public ArgumentNumber add(long deltaN) {
 		return new ArgumentNumber(value+deltaN);
 	}
+	@Override
 	public ArgumentNumber subtract(long deltaN) {
 		return new ArgumentNumber(value-deltaN);
 	}
+	@Override
 	public void isArityEqualTo(long v, ChoisePoint cp) throws Backtracking {
 		if (value != v)
 			throw Backtracking.instance;
 	}
+	@Override
 	public void isArityMoreOrEqualTo(long v, ChoisePoint cp) throws Backtracking {
 		if (value < v)
 			throw Backtracking.instance;
 	}
+	@Override
 	public void verifyListOfRestValues(long deltaN, Term list, ChoisePoint cp) {
 		long counter= value + deltaN;
 		Term tail= list;
@@ -63,6 +71,7 @@ public class ArgumentNumber extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		return String.format("%d",value);
 	}

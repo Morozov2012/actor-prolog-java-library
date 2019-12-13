@@ -7,13 +7,13 @@ import morozov.worlds.*;
 
 public class SuspendedAsyncCall extends SuspendedCall {
 	//
-	public long domainSignatureNumber;
-	public Term target;
-	public AbstractInternalWorld currentWorld;
-	public boolean isControlCall;
-	public boolean sendImmediately;
-	public boolean useBuffer;
-	public Term[] arguments;
+	protected long domainSignatureNumber;
+	protected Term target;
+	protected AbstractInternalWorld currentWorld;
+	protected boolean isControlCall;
+	protected boolean sendImmediately;
+	protected boolean useBuffer;
+	protected Term[] arguments;
 	//
 	private static final long serialVersionUID= 0xF37E951DB7B69E6CL; // -901118920558731668L
 	//
@@ -30,10 +30,10 @@ public class SuspendedAsyncCall extends SuspendedCall {
 		currentWorld= aCW;
 		isControlCall= type;
 		useBuffer= buffer;
-		// procName= name;
 		arguments= list;
 	}
 	//
+	@Override
 	public Continuation formContinuation(ActiveWorld currentProcess, ChoisePoint iX, Continuation c0) {
 		if (!isReleased) {
 			Term targetWorld= target.dereferenceValue(iX);
@@ -41,6 +41,7 @@ public class SuspendedAsyncCall extends SuspendedCall {
 				currentProcess.registerBinding(new SuspendedCallState(this));
 				isReleased= true;
 				return new Continuation(c0) {
+						@Override
 						public void execute(ChoisePoint iX) throws Backtracking {
 							if (sendImmediately) {
 								currentWorld.sendAsyncCall(iX,domainSignatureNumber,target,currentWorld,isControlCall,useBuffer,arguments);

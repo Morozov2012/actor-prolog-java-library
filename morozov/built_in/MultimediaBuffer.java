@@ -4,6 +4,7 @@ package morozov.built_in;
 
 import morozov.run.*;
 import morozov.system.*;
+import morozov.system.converters.*;
 import morozov.system.files.*;
 import morozov.system.frames.*;
 import morozov.system.frames.converters.*;
@@ -32,7 +33,6 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 	//
 	protected AtomicLong counterOfNewCompoundFrames= new AtomicLong(-1);
 	//
-	// protected AtomicLong numberOfRecentFrame= new AtomicLong(-1);
 	protected long numberOfRepeatedFrame= -1;
 	//
 	protected long committedFrameNumber= -1;
@@ -82,6 +82,7 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void resetCounters() {
 		synchronized (numberOfRecentReceivedFrame) {
 			super.resetCounters();
@@ -89,11 +90,11 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 			recentFrame= null;
 			recentFrameIsRepeated= false;
 			committedFrame= null;
-			// numberOfRecentFrame.set(-1);
 			numberOfRepeatedFrame= -1;
 		}
 	}
 	//
+	@Override
 	protected void resetFrameRate() {
 		committedFrameNumber= -1;
 		committedFrameTime= -1;
@@ -112,6 +113,7 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 		openFile(false,fileName,iX);
 	}
 	//
+	@Override
 	public void start0s(ChoisePoint iX) {
 		ExtendedFileName fileName= retrieveRealLocalFileName(iX);
 		openFile(true,fileName,iX);
@@ -125,6 +127,7 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 				break;
 			case PLAYING:
 				frameReadingTask.setStopAfterSingleReading(false);
+				frameReadingTask.setApplyAudioDataTiming(!synchronizeAudioStreamWithFrontVideoFrame());
 				if (activateDataTransfer) {
 					frameReadingTask.activateReading();
 				};
@@ -138,12 +141,9 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 			case SPECULATIVE_READING:
 				frameReadingTask.setStopAfterSingleReading(true);
 				break;
-			// case DISPLAYING:
-			//	break;
 			}
 		} else {
 			resetCounters();
-			// updateAttributes(iX);
 			MultimediaBufferOperatingMode currentOperatingMode= getOperatingMode(iX);
 			switch (currentOperatingMode) {
 			case RECORDING:
@@ -151,6 +151,7 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 				break;
 			case PLAYING:
 				frameReadingTask.setStopAfterSingleReading(false);
+				frameReadingTask.setApplyAudioDataTiming(!synchronizeAudioStreamWithFrontVideoFrame());
 				startReadingOrPlaying(activateDataTransfer,currentFileName,currentOperatingMode,iX);
 				break;
 			case READING:
@@ -162,17 +163,13 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 				startReadingOrPlaying(false,currentFileName,currentOperatingMode,iX);
 				frameReadingTask.readGivenNumberOfFrames(actingReadBufferSize.get());
 				break;
-			// case DISPLAYING:
-			//	startDisplaying(currentOperatingMode,iX);
-			//	break;
 			}
 		}
 	}
 	//
 	protected void startRecording(boolean activateDataTransfer, ExtendedFileName currentFileName, MultimediaBufferOperatingMode currentOperatingMode, ChoisePoint iX) {
 		int currentWriteBufferSize= getWriteBufferSize(iX);
-		// ExtendedFileName currentFileName= retrieveRealLocalFileName(iX);
-		int currentOutputDebugInformation= PrologInteger.toInteger(getOutputDebugInformation(iX));
+		int currentOutputDebugInformation= Arithmetic.toInteger(getOutputDebugInformation(iX));
 		frameRecordingTask.setWriteBufferSize(currentWriteBufferSize);
 		frameRecordingTask.setOutputDebugInformation(currentOutputDebugInformation);
 		frameRecordingTask.reset(currentFileName);
@@ -183,12 +180,12 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 	}
 	//
 	protected void startReadingOrPlaying(boolean activateDataTransfer, ExtendedFileName currentFileName, MultimediaBufferOperatingMode currentOperatingMode, ChoisePoint iX) {
-		// ExtendedFileName currentFileName= retrieveRealLocalFileName(iX);
 		int currentTimeout= getMaximalWaitingTimeInMilliseconds(iX);
 		CharacterSet currentCharacterSet= getCharacterSet(iX);
 		int currentReadBufferSize= getReadBufferSize(iX);
 		NumericalValue currentSlowMotionCoefficient= getSlowMotionCoefficient(iX);
 		IntegerAttribute currentMaximalFrameDelay= getMaximalFrameDelay(iX);
+		int currentOutputDebugInformation= Arithmetic.toInteger(getOutputDebugInformation(iX));
 		//
 		actingReadBufferSize.set(currentReadBufferSize);
 		actingMultimediaBufferOperatingMode.set(currentOperatingMode);
@@ -196,18 +193,13 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 			frameReadingTask.setSlowMotionCoefficient(currentSlowMotionCoefficient);
 			frameReadingTask.setMaximalFrameDelay(currentMaximalFrameDelay);
 			frameReadingTask.setDisplayingMode(null);
+			frameReadingTask.setOutputDebugInformation(currentOutputDebugInformation);
 			frameReadingTask.startReading(activateDataTransfer,currentFileName,currentTimeout,currentCharacterSet,staticContext);
 		} catch (Throwable e) {
 			actingMultimediaBufferOperatingMode.set(null);
 			throw e;
 		}
 	}
-	//
-	// protected void startDisplaying(MultimediaBufferOperatingMode currentOperatingMode, ChoisePoint iX) {
-	//	int currentReadBufferSize= getReadBufferSize(iX);
-	//	actingReadBufferSize.set(currentReadBufferSize);
-	//	actingMultimediaBufferOperatingMode.set(currentOperatingMode);
-	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -219,6 +211,7 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void pause0s(ChoisePoint iX) {
 		MultimediaBufferOperatingMode currentOperatingMode= actingMultimediaBufferOperatingMode.get();
 		if (currentOperatingMode==null) {
@@ -232,13 +225,12 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 		case SPECULATIVE_READING:
 			frameReadingTask.suspendReading();
 			break;
-		// case DISPLAYING:
-		//	break;
 		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void stop0s(ChoisePoint iX) {
 		stop(iX);
 	}
@@ -259,14 +251,12 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 			actingMultimediaBufferOperatingMode.set(null);
 			frameReadingTask.closeReading();
 			break;
-		// case DISPLAYING:
-		//	actingMultimediaBufferOperatingMode.set(null);
-		//	break;
 		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void isOpen0s(ChoisePoint iX) throws Backtracking {
 		MultimediaBufferOperatingMode currentOperatingMode= actingMultimediaBufferOperatingMode.get();
 		if (currentOperatingMode==null) {
@@ -285,13 +275,12 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 				throw Backtracking.instance;
 			};
 			break;
-		// case DISPLAYING:
-		//	break;
 		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void isActive0s(ChoisePoint iX) throws Backtracking {
 		MultimediaBufferOperatingMode currentOperatingMode= actingMultimediaBufferOperatingMode.get();
 		if (currentOperatingMode==null) {
@@ -309,13 +298,12 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 				throw Backtracking.instance;
 			};
 			break;
-		// case DISPLAYING:
-		//	break;
 		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void isSuspended0s(ChoisePoint iX) throws Backtracking {
 		MultimediaBufferOperatingMode currentOperatingMode= actingMultimediaBufferOperatingMode.get();
 		if (currentOperatingMode==null) {
@@ -331,13 +319,12 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 				throw Backtracking.instance;
 			};
 			break;
-		// case DISPLAYING:
-		//	throw Backtracking.instance;
 		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void eof0s(ChoisePoint iX) throws Backtracking {
 		MultimediaBufferOperatingMode currentOperatingMode= actingMultimediaBufferOperatingMode.get();
 		if (currentOperatingMode==null) {
@@ -353,13 +340,12 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 				throw Backtracking.instance;
 			};
 			break;
-		// case DISPLAYING:
-		//	throw Backtracking.instance;
 		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void commit0s(ChoisePoint iX) throws Backtracking {
 		if (committedFrameWasAssignedDirectly.get()) {
 			if (committedFrame==null) {
@@ -375,12 +361,12 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 		}
 	}
 	//
+	@Override
 	protected void commit() {
 		synchronized (numberOfRecentReceivedFrame) {
 			super.commit();
 			committedFrame= recentFrame;
 			if (!recentFrameIsRepeated) {
-				// committedFrameNumber= numberOfRecentFrame.get();
 				committedFrameNumber= numberOfRecentReceivedFrame.get();
 			} else {
 				committedFrameNumber= numberOfRepeatedFrame;
@@ -408,6 +394,7 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void isCommitted0s(ChoisePoint iX) throws Backtracking {
 		synchronized (numberOfRecentReceivedFrame) {
 			if (committedFrameIsNull()) {
@@ -459,14 +446,17 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean sendDataFrame(DataFrameInterface frame) {
 		return false;
 	}
 	//
+	@Override
 	public boolean sendKinectFrame(KinectFrameInterface frame) {
 		return false;
 	}
 	//
+	@Override
 	public boolean sendCompoundFrame(CompoundFrameInterface frame) {
 		MultimediaBufferOperatingMode currentOperatingMode= actingMultimediaBufferOperatingMode.get();
 		CompoundArrayType arrayType= frame.getCompoundArrayType();
@@ -526,19 +516,10 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 			return -1;
 		};
 		synchronized (numberOfRecentReceivedFrame) {
-			long currentFrameNumber= -1;
-			if (frame instanceof CompoundFrameInterface) {
-				recentFrame= frame;
-				committedFrameWasAssignedDirectly.set(false);
-				// numberOfRecentFrame.set(recentFrame.getSerialNumber());
-				// long currentNumber=
-				currentFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
-				// numberOfRecentFrame.set(currentNumber);
-				updateHistory((CompoundFrameInterface)frame);
-			} else {
-				return currentFrameNumber;
-			};
-			// long currentFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
+			long currentFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
+			updateHistory(frame);
+			recentFrame= frame;
+			committedFrameWasAssignedDirectly.set(false);
 			recentFrameIsRepeated= false;
 			numberOfRepeatedFrame= -1;
 			numberOfRecentReceivedFrame.notifyAll();
@@ -550,12 +531,12 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 		if (recentDataFrame==null) {
 			return;
 		};
-		// updateHistory(new EnumeratedCompoundFrame(recentDataFrame,numberOfRecentFrame.get()));
 		updateHistory(new EnumeratedCompoundFrame(recentDataFrame,numberOfRecentReceivedFrame.get()));
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void acceptRequestedFrame(EnumeratedFrame enumeratedFrame) {
 		EnumeratedCompoundFrame selectedFrame= (EnumeratedCompoundFrame)enumeratedFrame;
 		recentFrame= selectedFrame.getFrame();
@@ -564,6 +545,7 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 		numberOfRepeatedFrame= selectedFrame.getNumberOfFrame();
 	}
 	//
+	@Override
 	protected void acceptRetrievedFrame(EnumeratedFrame enumeratedFrame) {
 		EnumeratedCompoundFrame selectedFrame= (EnumeratedCompoundFrame)enumeratedFrame;
 		CompoundFrameInterface compoundFrame= selectedFrame.getFrame();
@@ -575,6 +557,7 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected boolean isSpeculativeReadingMode() {
 		MultimediaBufferOperatingMode currentOperatingMode= actingMultimediaBufferOperatingMode.get();
 		return (currentOperatingMode==MultimediaBufferOperatingMode.SPECULATIVE_READING);
@@ -583,12 +566,11 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 	///////////////////////////////////////////////////////////////
 	//
 	public void assignFrameTime1s(ChoisePoint iX, Term a1) {
-		TimeInterval timeInterval= TimeInterval.argumentMillisecondsToTimeInterval(a1,iX);
+		TimeInterval timeInterval= TimeIntervalConverters.argumentMillisecondsToTimeInterval(a1,iX);
 		if (committedFrame==null) {
 			committedFrameNumber= counterOfNewCompoundFrames.incrementAndGet();
 			committedFrame= new CompoundFrame(
 				committedFrameNumber,
-				// System.currentTimeMillis()
 				timeInterval.toMillisecondsLong()
 				);
 		} else {
@@ -744,7 +726,6 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 			recordCompoundFrame(committedFrame,committedFrameNumber,CompoundArrayType.DATA_FRAME);
 			committedFrame= null;
 			committedFrameWasAssignedDirectly.set(false);
-			// committedFrameNumber= -1;
 		} else {
 			throw new CompoundFrameIsNotFormed();
 		}
@@ -754,7 +735,6 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 			recordCompoundFrame(committedFrame,committedFrameNumber,CompoundArrayType.CONTROL_FRAME);
 			committedFrame= null;
 			committedFrameWasAssignedDirectly.set(false);
-			// committedFrameNumber= -1;
 		} else {
 			throw new CompoundFrameIsNotFormed();
 		}
@@ -762,6 +742,7 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void extractFrame(String key, CompoundFrameInterface container) {
 		if (committedFrame != null) {
 			EnumeratedCompoundFrame enumeratedFrame= new EnumeratedCompoundFrame(
@@ -773,18 +754,16 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 		}
 	}
 	//
+	@Override
 	public void extractSettings(String key, CompoundFrameInterface container, ChoisePoint iX) {
-		// if (committedFrame != null) {
 		setActingMetadata(iX);
 		EnumeratedCompoundFrame enumeratedFrame= new EnumeratedCompoundFrame(
 			createDescriptionCompoundFrame(),
 			-1);
 		container.insertComponent(key,enumeratedFrame);
-		// } else {
-		//	throw new CompoundFrameIsNotCommitted();
-		// }
 	}
 	//
+	@Override
 	public void assignFrame(String key, CompoundFrameInterface container, ChoisePoint iX) {
 		EnumeratedCompoundFrame enumeratedFrame= (EnumeratedCompoundFrame)container.getComponent(key);
 		synchronized (numberOfRecentReceivedFrame) {
@@ -795,8 +774,6 @@ public abstract class MultimediaBuffer extends ReadWriteBuffer {
 			} else {
 				committedFrame= frame;
 				committedFrameWasAssignedDirectly.set(true);
-				// committedFrameNumber= enumeratedFrame.getNumberOfFrame();
-				// committedFrameNumber= numberOfRecentFrame.incrementAndGet();
 				committedFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
 				updateCommittedFrameTime();
 			}

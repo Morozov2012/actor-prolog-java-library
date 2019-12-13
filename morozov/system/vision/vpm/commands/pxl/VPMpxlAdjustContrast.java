@@ -22,6 +22,7 @@ public class VPMpxlAdjustContrast extends VPM_FrameCommand {
 		computeThresholds= false;
 	}
 	//
+	@Override
 	public void execute(VPM vpm) {
 		int[] red= vpm.getMatrixRed();
 		int[] green= vpm.getMatrixGreen();

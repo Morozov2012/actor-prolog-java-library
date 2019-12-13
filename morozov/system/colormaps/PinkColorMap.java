@@ -7,12 +7,13 @@ public class PinkColorMap extends HotColorMap {
 	public PinkColorMap() {
 	}
 	//
-	public int[][] createColorMap(int size, int alpha) {
-		int[][] cm= super.createColorMap(size,alpha);
-		if (size <= 0) {
+	@Override
+	public int[][] createColorMap(int totalSize, int numberOfBands, int alpha) {
+		int[][] cm= super.createColorMap(totalSize,numberOfBands,alpha);
+		if (totalSize <= 0) {
 			return cm;
 		};
-		int p1= size-1;
+		int p1= totalSize-1;
 		if (p1 <= 0) {
 			cm[0][0]= maximalIndex;
 			cm[1][0]= maximalIndex;

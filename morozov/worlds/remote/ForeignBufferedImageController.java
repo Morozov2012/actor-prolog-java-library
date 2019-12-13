@@ -61,13 +61,13 @@ public class ForeignBufferedImageController {
 					image.setImage(nativeImage,attributes);
 				} else if (value instanceof ForeignWorldWrapper) {
 					GenericImageEncodingAttributes attributes= stub.getCurrentImageEncodingAttributes();
-					ForeignWorldWrapper wrapper= (ForeignWorldWrapper)value;
-					wrapper.setImage(nativeImage,attributes);
+					ForeignWorldWrapper currentWrapper= (ForeignWorldWrapper)value;
+					currentWrapper.setImage(nativeImage,attributes);
 				} else {
 					throw new WrongArgumentIsNotBufferedImage(value);
 				}
 			} catch (OwnWorldIsNotVideoProcessingMachine e) {
-				throw new WrongArgumentIsNotVideoProcessingMachine(wrapper);
+				throw new WrongArgumentIsNotVideoProcessingMachine(value);
 			} catch (RemoteException e) {
 				throw new RemoteCallError(e);
 			}

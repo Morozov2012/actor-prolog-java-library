@@ -22,6 +22,7 @@ public abstract class UnderdeterminedSet extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean equals(Object o2) {
 		if (o2 instanceof Term) {
 			return ((Term)o2).isEqualToSet(this);
@@ -29,6 +30,7 @@ public abstract class UnderdeterminedSet extends Term {
 			return false;
 		}
 	}
+	@Override
 	public int compare(Object o2) {
 		if (o2 instanceof Term) {
 			return -((Term)o2).compareWithSet(this);
@@ -36,26 +38,28 @@ public abstract class UnderdeterminedSet extends Term {
 			return 1;
 		}
 	}
+	@Override
 	public boolean isEqualToSet(UnderdeterminedSet o2) {
 		return compareWithSet(o2)==0;
 	}
+	@Override
 	public int compareWithSet(UnderdeterminedSet o2) {
-		HashMap<Long,Term> leftSetPositiveMap= new HashMap<Long,Term>();
-		HashSet<Long> leftSetNegativeMap= new HashSet<Long>();
+		HashMap<Long,Term> leftSetPositiveMap= new HashMap<>();
+		HashSet<Long> leftSetNegativeMap= new HashSet<>();
 		ChoisePoint cp= null;
 		Term leftSetEnd= exploreSet(leftSetPositiveMap,leftSetNegativeMap,cp);
 		leftSetEnd= leftSetEnd.dereferenceValue(cp);
 		if (!leftSetEnd.thisIsEmptySet() && !leftSetEnd.thisIsUnknownValue()) {
 			throw new WrongArgumentIsNotBoundVariable(this);
 		};
-		HashMap<Long,Term> rightSetPositiveMap= new HashMap<Long,Term>();
-		HashSet<Long> rightSetNegativeMap= new HashSet<Long>();
+		HashMap<Long,Term> rightSetPositiveMap= new HashMap<>();
+		HashSet<Long> rightSetNegativeMap= new HashSet<>();
 		Term rightSetEnd= o2.exploreSet(rightSetPositiveMap,rightSetNegativeMap,cp);
 		rightSetEnd= rightSetEnd.dereferenceValue(cp);
 		if (!rightSetEnd.thisIsEmptySet() && !rightSetEnd.thisIsUnknownValue()) {
 			throw new WrongArgumentIsNotBoundVariable(o2);
 		};
-		TreeSet<Long> nameList= new TreeSet<Long>();
+		TreeSet<Long> nameList= new TreeSet<>();
 		TermComparator.insertNamesIntoTree(nameList,leftSetPositiveMap);
 		TermComparator.insertNamesIntoTree(nameList,leftSetNegativeMap);
 		TermComparator.insertNamesIntoTree(nameList,rightSetPositiveMap);
@@ -85,6 +89,7 @@ public abstract class UnderdeterminedSet extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean thisIsUnderdeterminedSet() {
 		return true;
 	}

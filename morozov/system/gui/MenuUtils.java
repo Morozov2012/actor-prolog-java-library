@@ -11,7 +11,7 @@ public class MenuUtils {
 	public static Term mouseEvent2Term(MouseEvent ev, int windowWidth, int windowHeight, int sizeFactor, long mouseTypeCode) {
 		//
 		Term value= PrologEmptySet.instance;
-		long flag= SymbolCodes.symbolCode_E_no;
+		long flag;
 		//
 		if (ev.isShiftDown()) {
 			flag= SymbolCodes.symbolCode_E_yes;

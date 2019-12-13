@@ -28,28 +28,58 @@ public class TokenInteger10 extends PrologToken {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public PrologTokenType getType() {
 		return PrologTokenType.INTEGER;
 	}
+	@Override
 	public BigInteger getIntegerValue(LexicalScannerMasterInterface master, ChoisePoint iX) throws LexicalScannerError {
 		return value;
 	}
+	@Override
 	public BigInteger getIntegerValueOrBacktrack() throws Backtracking {
 		return value;
 	}
+	@Override
 	public BigInteger getIntegerValueOrTermIsNotAnInteger() throws TermIsNotAnInteger {
 		return value;
 	}
+	@Override
 	public boolean isExtendedNumber(LexicalScannerMasterInterface master, ChoisePoint iX) {
 		return isExtendedNumber;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
+	public boolean correspondsToActorPrologTerm(Term argument, ChoisePoint iX) {
+		try {
+			long functor= argument.getStructureFunctor(iX);
+			if (functor != SymbolCodes.symbolCode_E_integer_10) {
+				return false;
+			};
+			Term[] list= argument.getStructureArguments(iX);
+			if (list.length != 1) {
+				return false;
+			};
+			argument= list[0];
+			BigInteger v= argument.getIntegerValue(iX);
+			return value.equals(v);
+		} catch (TermIsNotAStructure e) {
+			return false;
+		} catch (TermIsNotAnInteger e) {
+			return false;
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	@Override
 	public Term toActorPrologTerm() {
 		Term[] arguments= new Term[]{new PrologInteger(value)};
 		return new PrologStructure(SymbolCodes.symbolCode_E_integer_10,arguments);
 	}
+	@Override
 	public String toString() {
 		return FormatOutput.integerToString(value);
 	}

@@ -38,6 +38,7 @@ public class Space2D_PNG_Writer extends Space2DWriter {
 	//		}
 	//	}
 	// }
+	@Override
 	public void setComment(String comment) {
 		String[] names= metadata.getMetadataFormatNames();
 		int length= names.length;

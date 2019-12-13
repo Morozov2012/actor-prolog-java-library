@@ -10,8 +10,10 @@ import morozov.run.*;
 import morozov.syntax.scanner.*;
 import morozov.syntax.scanner.errors.*;
 import morozov.syntax.scanner.interfaces.*;
+import morozov.system.*;
+import morozov.system.converters.errors.*;
+import morozov.system.converters.signals.*;
 import morozov.system.datum.*;
-import morozov.system.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
 import morozov.terms.errors.*;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.HashMap;
@@ -106,7 +109,7 @@ public class GeneralConverters {
 	//
 	public static int argumentToSmallRoundInteger(Term value, ChoisePoint iX) {
 		try {
-			return PrologInteger.toInteger(termToRoundInteger(value,iX,false));
+			return Arithmetic.toInteger(termToRoundInteger(value,iX,false));
 		} catch (TermIsNotAnInteger e) {
 			throw new WrongArgumentIsNotAnInteger(value);
 		}
@@ -300,10 +303,7 @@ if (tokens.length==2) {
 			int year= a1.getSmallIntegerValue(iX);
 			int month= monthToInteger(a2,iX);
 			int day= a3.getSmallIntegerValue(iX);
-			// Calendar calendar= Calendar.getInstance();
 			calendar.set(year,month-1,day);
-			// long timeInMillis= calendar.getTimeInMillis();
-			// return timeInMillis;
 		} catch (TermIsNotAnInteger e) {
 			throw new WrongArgumentIsNotADate(term);
 		} catch (Backtracking b) {
@@ -387,12 +387,10 @@ if (tokens.length==2) {
 			int minutes= a2.getSmallIntegerValue(iX);
 			int seconds= a3.getSmallIntegerValue(iX);
 			int milliseconds= a4.getSmallIntegerValue(iX);
-			// Calendar calendar= Calendar.getInstance();
 			calendar.set(Calendar.HOUR_OF_DAY,hours);
 			calendar.set(Calendar.MINUTE,minutes);
 			calendar.set(Calendar.SECOND,seconds);
 			calendar.set(Calendar.MILLISECOND,milliseconds);
-			// return calendar.getTimeInMillis();
 		} catch (TermIsNotAnInteger e) {
 			throw new WrongArgumentIsNotATime(term);
 		}
@@ -428,12 +426,10 @@ if (tokens.length==2) {
 			int minutes= a2.getSmallIntegerValue(iX);
 			int seconds= a3.getSmallIntegerValue(iX);
 			int milliseconds= 0;
-			// Calendar calendar= Calendar.getInstance();
 			calendar.set(Calendar.HOUR_OF_DAY,hours);
 			calendar.set(Calendar.MINUTE,minutes);
 			calendar.set(Calendar.SECOND,seconds);
 			calendar.set(Calendar.MILLISECOND,milliseconds);
-			// return calendar.getTimeInMillis();
 		} catch (TermIsNotAnInteger e) {
 			throw new WrongArgumentIsNotATime(term);
 		}
@@ -443,7 +439,7 @@ if (tokens.length==2) {
 	//
 	public static Term millisecondsToDate(BigInteger value) {
 		Calendar calendar= Calendar.getInstance();
-		calendar.setTimeInMillis(PrologInteger.toLong(value));
+		calendar.setTimeInMillis(Arithmetic.toLong(value));
 		return formDate(calendar);
 	}
 	//
@@ -462,12 +458,11 @@ if (tokens.length==2) {
 	//
 	public static Term millisecondsToTime(BigInteger value) {
 		Calendar calendar= Calendar.getInstance();
-		calendar.setTimeInMillis(PrologInteger.toLong(value));
+		calendar.setTimeInMillis(Arithmetic.toLong(value));
 		return formTime(calendar);
 	}
 	//
 	public static Term formTime(Calendar calendar) {
-		// int hours= calendar.get(Calendar.HOUR);
 		int hours= calendar.get(Calendar.HOUR_OF_DAY);
 		int minutes= calendar.get(Calendar.MINUTE);
 		int seconds= calendar.get(Calendar.SECOND);
@@ -536,37 +531,7 @@ if (tokens.length==2) {
 		}
 	}
 	//
-	/*
 	public static BigInteger doubleToBigInteger(double value) throws TermIsNotAReal {
-		value= StrictMath.round(value);
-		String text= String.format("%1f",value);
-		int indexBound= text.length() - 1;
-		int p1= 0;
-		while (true) {
-			if (p1 <= indexBound) {
-				int code= text.codePointAt(p1);
-				if (code >= '0' && code <= '9') {
-					p1++;
-					continue;
-				} else if (code=='-' || code=='+') {
-					p1++;
-					continue;
-				} else {
-					break;
-				}
-			} else {
-				break;
-			}
-		};
-		try {
-			return new BigInteger(text.substring(0,p1));
-		} catch (NumberFormatException nfe) {
-			throw TermIsNotAReal.instance;
-		}
-	}
-	*/
-	public static BigInteger doubleToBigInteger(double value) throws TermIsNotAReal {
-		// value= StrictMath.round(value);
 		try {
 			return (new BigDecimal(value,MathContext.DECIMAL128)).toBigInteger();
 		} catch (NumberFormatException e) {
@@ -753,6 +718,16 @@ if (tokens.length==2) {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public static long argumentToSymbol(Term value, ChoisePoint iX) {
+		try {
+			return value.getSymbolValue(iX);
+		} catch (TermIsNotASymbol e) {
+			throw new WrongArgumentIsNotASymbol(value);
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public static String argumentToString(Term value, ChoisePoint iX) {
 		try {
 			return value.getStringValue(iX);
@@ -789,9 +764,9 @@ if (tokens.length==2) {
 	}
 	//
 	public static String[] termToStrings(Term value, ChoisePoint iX, boolean makeUpperCaseStrings) {
-		ArrayList<String> stringList= new ArrayList<String>();
+		ArrayList<String> stringList= new ArrayList<>();
 		termToStrings(stringList,value,iX,makeUpperCaseStrings);
-		return stringList.toArray(new String[0]);
+		return stringList.toArray(new String[stringList.size()]);
 	}
 	//
 	public static void termToStrings(ArrayList<String> stringList, Term value, ChoisePoint iX, boolean makeUpperCaseStrings) {
@@ -835,7 +810,15 @@ if (tokens.length==2) {
 	}
 	//
 	public static Term codeArrayToSymbolList(HashSet<Long> symbolCodeList) {
-		Long[] array= symbolCodeList.toArray(new Long[0]);
+		Long[] array= symbolCodeList.toArray(new Long[symbolCodeList.size()]);
+		Term result= PrologEmptyList.instance;
+		for (int n=array.length-1; n >= 0; n--) {
+			result= new PrologList(new PrologSymbol(array[n]),result);
+		};
+		return result;
+	}
+	//
+	public static Term codeArrayToSymbolList(long[] array) {
 		Term result= PrologEmptyList.instance;
 		for (int n=array.length-1; n >= 0; n--) {
 			result= new PrologList(new PrologSymbol(array[n]),result);
@@ -853,12 +836,32 @@ if (tokens.length==2) {
 		}
 	}
 	//
+	public static byte[] arrayListToByteArray(ArrayList<byte[]> arrayList) {
+		Iterator<byte[]> iterator= arrayList.iterator();
+		int totalLength= 0;
+		while (iterator.hasNext()) {
+			byte[] element= iterator.next();
+			totalLength+= element.length;
+		};
+		byte[] totalArray= new byte[totalLength];
+		iterator= arrayList.iterator();
+		int shift= 0;
+		while (iterator.hasNext()) {
+			byte[] element= iterator.next();
+			for (int k=0; k < element.length; k++) {
+				totalArray[shift]= element[k];
+				shift++;
+			}
+		};
+		return totalArray;
+	}
+	//
 	///////////////////////////////////////////////////////////////
 	//
 	public static BigInteger[] argumentToIntegers(Term value, ChoisePoint iX) {
-		ArrayList<BigInteger> integerList= new ArrayList<BigInteger>();
+		ArrayList<BigInteger> integerList= new ArrayList<>();
 		argumentToIntegers(integerList,value,iX);
-		return integerList.toArray(new BigInteger[0]);
+		return integerList.toArray(new BigInteger[integerList.size()]);
 	}
 	//
 	public static void argumentToIntegers(ArrayList<BigInteger> integerList, Term value, ChoisePoint iX) {
@@ -884,7 +887,7 @@ if (tokens.length==2) {
 	}
 	//
 	public static long[] argumentToLongIntegers(Term value, ChoisePoint iX) {
-		ArrayList<Long> integerList= new ArrayList<Long>();
+		ArrayList<Long> integerList= new ArrayList<>();
 		argumentToLongIntegers(integerList,value,iX);
 		long[] array= new long[integerList.size()];
 		for (int n=0; n < array.length; n++) {
@@ -905,7 +908,7 @@ if (tokens.length==2) {
 		} catch (EndOfList e1) {
 		} catch (TermIsNotAList e1) {
 			try {
-				long result= PrologInteger.toLong(termToRoundInteger(currentTail,iX,true));
+				long result= Arithmetic.toLong(termToRoundInteger(currentTail,iX,true));
 				integerList.add(result);
 			} catch (TermIsNotAnInteger e2) {
 				throw new WrongArgumentIsNotAnInteger(currentTail);
@@ -920,7 +923,7 @@ if (tokens.length==2) {
 	public static String codesToString(BigInteger[] numbers) {
 		char[] codes= new char[numbers.length];
 		for (int n=0; n < numbers.length; n++) {
-			codes[n]= PrologInteger.toCharacter(numbers[n]);
+			codes[n]= Arithmetic.toCharacter(numbers[n]);
 		};
 		return new String(codes);
 	}
@@ -952,7 +955,7 @@ if (tokens.length==2) {
 	///////////////////////////////////////////////////////////////
 	//
 	public static Term[] listToArray(Term tail, ChoisePoint iX) {
-		ArrayList<Term> buffer= new ArrayList<Term>();
+		ArrayList<Term> buffer= new ArrayList<>();
 		try {
 			while (true) {
 				Term value= tail.getNextListHead(iX);
@@ -974,7 +977,6 @@ if (tokens.length==2) {
 		return result;
 	}
 	public static Term arrayToList(Term[] array, Term result) {
-		// Term result= PrologEmptyList.instance;
 		for (int n=array.length-1; n >= 0; n--) {
 			result= new PrologList(array[n],result);
 		};
@@ -1000,7 +1002,6 @@ if (tokens.length==2) {
 		return result;
 	}
 	public static Term arrayListToTerm(ArrayList<Term> array, Term result) {
-		// Term result= PrologEmptyList.instance;
 		for (int n=array.size()-1; n >= 0; n--) {
 			result= new PrologList(array.get(n),result);
 		};
@@ -1032,7 +1033,7 @@ if (tokens.length==2) {
 	}
 	//
 	public static Term[] termsToArray(ChoisePoint iX, Term... args) {
-		ArrayList<Term> argumentList= new ArrayList<Term>();
+		ArrayList<Term> argumentList= new ArrayList<>();
 		for(int i= 0; i < args.length; i++) {
 			Term item= args[i];
 			if (item.thisIsArgumentNumber()) {
@@ -1049,7 +1050,7 @@ if (tokens.length==2) {
 				argumentList.add(item);
 			}
 		};
-		return argumentList.toArray(new Term[0]);
+		return argumentList.toArray(new Term[argumentList.size()]);
 	}
 	//
 	public static double[][] argumentToMatrix(Term value, ChoisePoint iX) {
@@ -1170,6 +1171,17 @@ if (tokens.length==2) {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public static BalancedNameTreeNode stringArrayToBalancedNameTree(String[] names) {
+		EnumeratedName[] array= new EnumeratedName[names.length];
+		for (int k=0; k < names.length; k++) {
+			array[k]= new EnumeratedName(k+1,names[k]);
+		};
+		Arrays.sort(array);
+		return EnumeratedName.toBalancedNameTree(array);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	public static byte[] serializeArgument(Term argument) {
 		ByteArrayOutputStream outputStream= new ByteArrayOutputStream();
 		try {
@@ -1245,9 +1257,9 @@ if (tokens.length==2) {
 				argument= (Term)objectStream.readObject();
 				if (objectStream.worldsAreDetected()) {
 					MethodSignature ownSignature= MethodSignatures.getSignature(domainSignatureNumber);
-					MethodArgument[] signatureArguments= ownSignature.arguments;
+					MethodArgument[] signatureArguments= ownSignature.getArguments();
 					if (signatureArguments.length > 0) {
-						if (!signatureArguments[0].domain.coversTerm(argument,null,false)) {
+						if (!signatureArguments[0].getDomain().coversTerm(argument,null,false)) {
 							throw new WrongTermDoesNotBelongToDomain(argument);
 						}
 					} else {
@@ -1314,10 +1326,10 @@ if (tokens.length==2) {
 				arguments= (Term[])objectStream.readObject();
 				if (objectStream.worldsAreDetected()) {
 					MethodSignature ownSignature= MethodSignatures.getSignature(domainSignatureNumber);
-					MethodArgument[] signatureArguments= ownSignature.arguments;
+					MethodArgument[] signatureArguments= ownSignature.getArguments();
 					if (signatureArguments.length == arguments.length) {
 						for (int n=0; n < arguments.length; n++) {
-							if (!signatureArguments[n].domain.coversTerm(arguments[n],iX,false)) {
+							if (!signatureArguments[n].getDomain().coversTerm(arguments[n],iX,false)) {
 								throw new WrongTermDoesNotBelongToDomain(arguments[n]);
 							}
 						}

@@ -5,11 +5,13 @@ package morozov.system;
 public enum OnOff {
 	//
 	ON {
+		@Override
 		public boolean toBoolean() {
 			return true;
 		}
 	},
 	OFF {
+		@Override
 		public boolean toBoolean() {
 			return false;
 		}

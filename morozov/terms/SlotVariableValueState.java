@@ -28,18 +28,21 @@ public class SlotVariableValueState extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void clear() {
 		table.remove(insertedActor);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		throw new SpecialTermCannotBeUnified();
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		return "SlotVariableValueState:" + insertedActor;
 	}

@@ -11,9 +11,9 @@ import java.math.BigInteger;
 
 public class BehaviorName {
 	//
-	public String textName= "";
-	public BigInteger numericalName;
-	public boolean isTextName= true;
+	protected String textName= "";
+	protected BigInteger numericalName;
+	protected boolean isTextName= true;
 	//
 	public BehaviorName(String text) {
 		textName= text;

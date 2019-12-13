@@ -4,7 +4,7 @@ package morozov.system.gui;
 
 import target.*;
 
-import morozov.system.errors.*;
+import morozov.system.converters.errors.*;
 import morozov.system.gui.errors.*;
 import morozov.run.*;
 import morozov.terms.*;
@@ -19,11 +19,12 @@ import javax.swing.Box;
 import java.util.ArrayList;
 
 public class TranslatedMenuItem {
-	public String name= "";
-	public String accelerator= "";
-	public TranslatedMenuItem[] submenu= null;
-	public boolean isSeparator= false;
-	public boolean isSpacer= false;
+	//
+	protected String name= "";
+	protected String accelerator= "";
+	protected TranslatedMenuItem[] submenu= null;
+	protected boolean isSeparator= false;
+	protected boolean isSpacer= false;
 	protected static Term termSeparator= new PrologSymbol(SymbolCodes.symbolCode_E_separator);
 	protected static Term termSpacer= new PrologSymbol(SymbolCodes.symbolCode_E_spacer);
 	//
@@ -50,7 +51,7 @@ public class TranslatedMenuItem {
 	///////////////////////////////////////////////////////////////
 	//
 	public static TranslatedMenuItem[] argumentToTranslatedMenuItems(Term value, ChoisePoint iX) {
-		ArrayList<TranslatedMenuItem> vector= new ArrayList<TranslatedMenuItem>();
+		ArrayList<TranslatedMenuItem> vector= new ArrayList<>();
 		term2TranslatedMenuItems(vector,true,value,iX);
 		return vector.toArray(new TranslatedMenuItem[vector.size()]);
 	}
@@ -130,7 +131,7 @@ public class TranslatedMenuItem {
 								menuActionName= menuActionName.substring(0,p1);
 							};
 							TranslatedMenuItem item= new TranslatedMenuItem(menuActionName);
-							ArrayList<TranslatedMenuItem> sublist= new ArrayList<TranslatedMenuItem>();
+							ArrayList<TranslatedMenuItem> sublist= new ArrayList<>();
 							term2TranslatedMenuItems(sublist,false,arguments[1],iX);
 							item.setSubmenu(sublist.toArray(new TranslatedMenuItem[sublist.size()]));
 							vector.add(item);

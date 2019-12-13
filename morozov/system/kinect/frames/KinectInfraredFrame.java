@@ -54,6 +54,7 @@ public class KinectInfraredFrame extends KinectFrame implements KinectInfraredFr
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public short[] getInfrared() {
 		return infrared;
 	}

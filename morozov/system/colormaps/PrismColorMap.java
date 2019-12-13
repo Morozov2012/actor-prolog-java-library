@@ -7,12 +7,13 @@ public class PrismColorMap extends ColorMapRGBA {
 	public PrismColorMap() {
 	}
 	//
-	public int[][] createColorMap(int size, int alpha) {
-		int[][] cm= new int[4][size];
-		if (size <= 0) {
+	@Override
+	public int[][] createColorMap(int totalSize, int numberOfBands, int alpha) {
+		int[][] cm= new int[4][totalSize];
+		if (totalSize <= 0) {
 			return cm;
 		};
-		int p1= size-1;
+		int p1= totalSize-1;
 		if (p1 <= 0) {
 			cm[0][0]= maximalIndex * 2 / 3;
 			cm[1][0]= 0;
@@ -20,7 +21,7 @@ public class PrismColorMap extends ColorMapRGBA {
 			cm[3][0]= alpha;
 			return cm;
 		};
-		int bandWidth= size / 10 / 6;
+		int bandWidth= totalSize / numberOfBands / 6;
 		int k= 0;
 		int m= 0;
 		for (int n=0; n<=p1; n++) {
@@ -73,5 +74,10 @@ public class PrismColorMap extends ColorMapRGBA {
 			}
 		};
 		return cm;
+	}
+	//
+	@Override
+	public int getDefaultNumberOfBands() {
+		return 6;
 	}
 }

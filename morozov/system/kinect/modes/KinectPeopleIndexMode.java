@@ -13,32 +13,34 @@ public enum KinectPeopleIndexMode {
 	PAINT_PEOPLE {
 	},
 	EXTRACT_PEOPLE {
+		@Override
 		public boolean peopleAreToBeExtracted() {
 			return true;
 		}
+		@Override
 		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode) {
-			consolidatedMode.setBackgroundIsNotRequested(true);
 			consolidatedMode.refineKinectDataAcquisitionMode(J4KSDK.DEPTH | J4KSDK.PLAYER_INDEX);
 		}
 	},
 	ADAPTIVELY_EXTRACT_PEOPLE {
+		@Override
 		public boolean peopleAreToBeExtracted() {
 			return true;
 		}
+		@Override
 		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode) {
-			consolidatedMode.setBackgroundIsNotRequested(true);
 			consolidatedMode.refineKinectDataAcquisitionMode(J4KSDK.DEPTH | J4KSDK.PLAYER_INDEX);
 		}
 	},
 	PROJECT_PEOPLE {
+		@Override
 		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode) {
-			consolidatedMode.setBackgroundIsNotRequested(false);
 			consolidatedMode.refineKinectDataAcquisitionMode(J4KSDK.DEPTH | J4KSDK.UV | J4KSDK.COLOR | J4KSDK.PLAYER_INDEX);
 		}
 	},
 	NONE {
+		@Override
 		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode) {
-			consolidatedMode.setBackgroundIsNotRequested(false);
 		}
 	};
 	//
@@ -49,7 +51,6 @@ public enum KinectPeopleIndexMode {
 	}
 	//
 	public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode) {
-		consolidatedMode.setBackgroundIsNotRequested(false);
 		consolidatedMode.refineKinectDataAcquisitionMode(J4KSDK.DEPTH | J4KSDK.PLAYER_INDEX);
 	}
 }

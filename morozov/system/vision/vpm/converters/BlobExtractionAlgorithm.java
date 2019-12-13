@@ -12,11 +12,13 @@ import morozov.terms.signals.*;
 public enum BlobExtractionAlgorithm {
 	//
 	TWO_PASS_BLOB_EXTRACTION {
+		@Override
 		public Term toTerm() {
 			return term_TWO_PASS_BLOB_EXTRACTION;
 		}
 	},
 	MULTIPASS_BLOB_EXTRACTION {
+		@Override
 		public Term toTerm() {
 			return term_MULTIPASS_BLOB_EXTRACTION;
 		}

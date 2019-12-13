@@ -32,20 +32,10 @@ public abstract class Database extends DataAbstraction {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	// abstract public long entry_s_Update_0();
-	//
-	// abstract public Term getBuiltInSlot_E_name();
-	// abstract public Term getBuiltInSlot_E_extension();
-	// abstract public Term getBuiltInSlot_E_maximal_waiting_time();
-	// abstract public Term getBuiltInSlot_E_character_set();
-	// abstract public Term getBuiltInSlot_E_backslash_always_is_separator();
-	// protected Term getBuiltInSlot_E_transaction_waiting_period()
-	// abstract public Term getBuiltInSlot_E_transaction_sleep_period();
-	// abstract public Term getBuiltInSlot_E_transaction_maximal_retry_number();
 	abstract public Term getBuiltInSlot_E_place();
-	abstract protected PrologDomain getBuiltInSlotDomain_E_target_data();
+	abstract public PrologDomain getBuiltInSlotDomain_E_target_data();
 	//
-	protected Term getBuiltInSlot_E_reuse_key_numbers() {
+	public Term getBuiltInSlot_E_reuse_key_numbers() {
 		return new PrologSymbol(SymbolCodes.symbolCode_E_yes);
 	}
 	//
@@ -105,6 +95,7 @@ public abstract class Database extends DataAbstraction {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setWatchUpdates1s(ChoisePoint iX, Term a1) {
 		super.setWatchUpdates1s(iX,a1);
 		if (!getWatchUpdates(iX)) {
@@ -138,7 +129,7 @@ public abstract class Database extends DataAbstraction {
 	//
 	public DatabaseTable getDatabaseTable(ChoisePoint iX) {
 		if (place != null) {
-			return place.databaseTableContainer.getTable();
+			return place.getDatabaseTableContainer().getTable();
 		} else {
 			Term value= getBuiltInSlot_E_place();
 			return DatabaseTableContainer.argumentToDatabaseTable(value,this,iX);
@@ -147,7 +138,7 @@ public abstract class Database extends DataAbstraction {
 	//
 	public DatabaseTableContainer getDatabaseTableContainer(ChoisePoint iX) {
 		if (place != null) {
-			return place.databaseTableContainer;
+			return place.getDatabaseTableContainer();
 		} else {
 			Term value= getBuiltInSlot_E_place();
 			PrologDomain domain= getBuiltInSlotDomain_E_target_data();
@@ -195,8 +186,6 @@ public abstract class Database extends DataAbstraction {
 			place.unregisterWatcher(this,currentProcess);
 		} else {
 			Term value= getBuiltInSlot_E_place();
-			// PrologDomain domain= getBuiltInSlotDomain_E_target_data();
-			// boolean reuseKN= getReuseKeyNumbers(iX);
 			DatabaseTableContainer.convertTermToDatabaseTableAndUnregisterWatcher(value,this,currentProcess,iX);
 		}
 	}
@@ -235,7 +224,7 @@ public abstract class Database extends DataAbstraction {
 		getDatabaseTable(iX).appendRecord(copy,currentProcess,true,iX,false);
 	}
 	public class Find1s extends Continuation {
-		// private Continuation c0;
+		//
 		protected PrologVariable outputResult;
 		protected Term inputResult;
 		protected boolean hasOutputArgument;
@@ -251,6 +240,7 @@ public abstract class Database extends DataAbstraction {
 			hasOutputArgument= false;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			getDatabaseTable(iX).findRecord(outputResult,inputResult,hasOutputArgument,c0,currentProcess,true,iX);
 		}
@@ -270,7 +260,7 @@ public abstract class Database extends DataAbstraction {
 		}
 	}
 	public class Match extends Continuation {
-		// private Continuation c0;
+		//
 		protected PrologVariable argumentResult;
 		protected Term pattern;
 		protected boolean isFunctionCall;
@@ -280,13 +270,14 @@ public abstract class Database extends DataAbstraction {
 			pattern= aP;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			getDatabaseTable(iX).matchRecord(argumentResult,pattern,isFunctionCall,c0,currentProcess,true,iX);
 		}
 	}
 	//
 	public class Retract1s extends Continuation {
-		// private Continuation c0;
+		//
 		protected PrologVariable outputResult;
 		protected Term inputResult;
 		protected boolean hasOutputArgument;
@@ -302,6 +293,7 @@ public abstract class Database extends DataAbstraction {
 			hasOutputArgument= false;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			getDatabaseTable(iX).retractRecord(outputResult,inputResult,hasOutputArgument,c0,currentProcess,true,iX);
 		}
@@ -388,12 +380,12 @@ public abstract class Database extends DataAbstraction {
 	}
 	//
 	public class Update0s extends Continuation {
-		// private Continuation c0;
 		//
 		public Update0s(Continuation aC) {
 			c0= aC;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			c0.execute(iX);
 		}

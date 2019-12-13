@@ -57,6 +57,7 @@ public abstract class ZoomDataAcquisitionBuffer extends DataAcquisitionBuffer {
 	}
 	public void getZoomImage0fs(ChoisePoint iX) {
 	}
+	@Override
 	public YesNo getZoomImage(ChoisePoint iX) {
 		if (zoomImage != null) {
 			return zoomImage;
@@ -80,6 +81,7 @@ public abstract class ZoomDataAcquisitionBuffer extends DataAcquisitionBuffer {
 	}
 	public void getZoomingCoefficient0fs(ChoisePoint iX) {
 	}
+	@Override
 	public NumericalValue getZoomingCoefficient(ChoisePoint iX) {
 		if (zoomingCoefficient != null) {
 			return zoomingCoefficient;

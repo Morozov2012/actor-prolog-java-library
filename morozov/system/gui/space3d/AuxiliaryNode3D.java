@@ -6,14 +6,13 @@ import target.*;
 
 import morozov.built_in.*;
 import morozov.run.*;
-import morozov.system.*;
 import morozov.system.converters.*;
+import morozov.system.converters.errors.*;
 import morozov.system.errors.*;
 import morozov.system.gui.*;
 import morozov.system.gui.space3d.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
-import morozov.terms.errors.*;
 import morozov.terms.signals.*;
 
 import java.awt.Font;
@@ -76,7 +75,7 @@ public class AuxiliaryNode3D extends Tools3D {
 		try { // Alpha3D
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Alpha3D,1,iX);
 			Term attributes= arguments[0];
-			HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+			HashMap<Long,Term> setPositiveMap= new HashMap<>();
 			Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 			setEnd= setEnd.dereferenceValue(iX);
 			if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -94,28 +93,22 @@ public class AuxiliaryNode3D extends Tools3D {
 					} else if (pairName==SymbolCodes.symbolCode_E_decreasingEnable) {
 						decreasingEnable= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					} else if (pairName==SymbolCodes.symbolCode_E_increasingAlphaDuration) {
-						// long increasingAlphaDuration= pairValue.getLongIntegerValue(iX);
-						long increasingAlphaDuration= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+						long increasingAlphaDuration= TimeIntervalConverters.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setIncreasingAlphaDuration(increasingAlphaDuration);
 					} else if (pairName==SymbolCodes.symbolCode_E_decreasingAlphaDuration) {
-						// long decreasingAlphaDuration= pairValue.getLongIntegerValue(iX);
-						long decreasingAlphaDuration= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+						long decreasingAlphaDuration= TimeIntervalConverters.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setDecreasingAlphaDuration(decreasingAlphaDuration);
 					} else if (pairName==SymbolCodes.symbolCode_E_alphaAtZeroDuration) {
-						// long alphaAtZeroDuration= pairValue.getLongIntegerValue(iX);
-						long alphaAtZeroDuration= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+						long alphaAtZeroDuration= TimeIntervalConverters.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setAlphaAtZeroDuration(alphaAtZeroDuration);
 					} else if (pairName==SymbolCodes.symbolCode_E_alphaAtOneDuration) {
-						// long alphaAtOneDuration= pairValue.getLongIntegerValue(iX);
-						long alphaAtOneDuration= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+						long alphaAtOneDuration= TimeIntervalConverters.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setAlphaAtOneDuration(alphaAtOneDuration);
 					} else if (pairName==SymbolCodes.symbolCode_E_increasingAlphaRampDuration) {
-						// long increasingAlphaRampDuration= pairValue.getLongIntegerValue(iX);
-						long increasingAlphaRampDuration= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+						long increasingAlphaRampDuration= TimeIntervalConverters.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setIncreasingAlphaRampDuration(increasingAlphaRampDuration);
 					} else if (pairName==SymbolCodes.symbolCode_E_decreasingAlphaRampDuration) {
-						// long decreasingAlphaRampDuration= pairValue.getLongIntegerValue(iX);
-						long decreasingAlphaRampDuration= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+						long decreasingAlphaRampDuration= TimeIntervalConverters.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setDecreasingAlphaRampDuration(decreasingAlphaRampDuration);
 					} else if (pairName==SymbolCodes.symbolCode_E_loopCount) {
 						try {
@@ -125,16 +118,13 @@ public class AuxiliaryNode3D extends Tools3D {
 							throw new WrongArgumentIsNotAnInteger(pairValue);
 						}
 					} else if (pairName==SymbolCodes.symbolCode_E_startTime) {
-						// long startTime= pairValue.getLongIntegerValue(iX);
-						long startTime= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+						long startTime= TimeIntervalConverters.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setStartTime(startTime);
 					} else if (pairName==SymbolCodes.symbolCode_E_triggerTime) {
-						// long triggerTime= pairValue.getLongIntegerValue(iX);
-						long triggerTime= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+						long triggerTime= TimeIntervalConverters.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setTriggerTime(triggerTime);
 					} else if (pairName==SymbolCodes.symbolCode_E_phaseDelayDuration) {
-						// long phaseDelayDuration= pairValue.getLongIntegerValue(iX);
-						long phaseDelayDuration= TimeInterval.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
+						long phaseDelayDuration= TimeIntervalConverters.argumentMillisecondsToTimeInterval(pairValue,iX).toMillisecondsLong();
 						node.setPhaseDelayDuration(phaseDelayDuration);
 					} else {
 						throw new WrongArgumentIsUnknownAlphaAttribute(key);
@@ -160,7 +150,7 @@ public class AuxiliaryNode3D extends Tools3D {
 		try { // Bounds
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_BoundingSphere,1,iX);
 			Term attributes= arguments[0];
-			HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+			HashMap<Long,Term> setPositiveMap= new HashMap<>();
 			Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 			setEnd= setEnd.dereferenceValue(iX);
 			if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -193,7 +183,7 @@ public class AuxiliaryNode3D extends Tools3D {
 		try { // Transform3D
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Transform3D,1,iX);
 			Term attributes= arguments[0];
-			HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+			HashMap<Long,Term> setPositiveMap= new HashMap<>();
 			Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 			setEnd= setEnd.dereferenceValue(iX);
 			if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -376,7 +366,7 @@ public class AuxiliaryNode3D extends Tools3D {
 		try { // GeometryInfo
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_GeometryInfo,1,iX);
 			Term attributes= arguments[0];
-			HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+			HashMap<Long,Term> setPositiveMap= new HashMap<>();
 			Set<Long> nameList= setPositiveMap.keySet();
 			Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 			setEnd= setEnd.dereferenceValue(iX);
@@ -468,7 +458,7 @@ public class AuxiliaryNode3D extends Tools3D {
 		try { // Appearance
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Appearance,1,iX);
 			Term attributes= arguments[0];
-			HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+			HashMap<Long,Term> setPositiveMap= new HashMap<>();
 			Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 			setEnd= setEnd.dereferenceValue(iX);
 			if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -551,7 +541,6 @@ public class AuxiliaryNode3D extends Tools3D {
 						throw new WrongArgumentIsUnknownAppearanceAttribute(key);
 					}
 				};
-				// node.setLineAttributes(new LineAttributes(1,LineAttributes.PATTERN_SOLID,true));
 				return node;
 			} else {
 				throw new WrongArgumentIsNotEndedSetOfAttributes(setEnd);
@@ -564,7 +553,7 @@ public class AuxiliaryNode3D extends Tools3D {
 		try { // Texture2D
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Texture2D,1,iX);
 			Term attributes= arguments[0];
-			HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+			HashMap<Long,Term> setPositiveMap= new HashMap<>();
 			Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 			setEnd= setEnd.dereferenceValue(iX);
 			if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -696,7 +685,7 @@ public class AuxiliaryNode3D extends Tools3D {
 		try { // Material
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_Material,1,iX);
 			Term attributes= arguments[0];
-			HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+			HashMap<Long,Term> setPositiveMap= new HashMap<>();
 			Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 			setEnd= setEnd.dereferenceValue(iX);
 			if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -714,8 +703,6 @@ public class AuxiliaryNode3D extends Tools3D {
 						Color3f color= term2Color3(pairValue,iX);
 						node.setEmissiveColor(color);
 					} else if (pairName==SymbolCodes.symbolCode_E_diffuseColor) {
-						// Color3f color= term2Color3(pairValue,iX);
-						// node.setDiffuseColor(color);
 						extractDiffuseColor(node,pairValue,iX);
 					} else if (pairName==SymbolCodes.symbolCode_E_specularColor) {
 						Color3f color= term2Color3(pairValue,iX);
@@ -743,7 +730,7 @@ public class AuxiliaryNode3D extends Tools3D {
 		try { // ColoringAttributes
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_ColoringAttributes,1,iX);
 			Term attributes= arguments[0];
-			HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+			HashMap<Long,Term> setPositiveMap= new HashMap<>();
 			Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 			setEnd= setEnd.dereferenceValue(iX);
 			if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -796,7 +783,7 @@ public class AuxiliaryNode3D extends Tools3D {
 		try { // PolygonAttributes
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_PolygonAttributes,1,iX);
 			Term attributes= arguments[0];
-			HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+			HashMap<Long,Term> setPositiveMap= new HashMap<>();
 			Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 			setEnd= setEnd.dereferenceValue(iX);
 			if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -813,19 +800,14 @@ public class AuxiliaryNode3D extends Tools3D {
 					Term pairValue= setPositiveMap.get(key);
 					if (pairName==SymbolCodes.symbolCode_E_rasterizationMode) {
 						polygonRasterizationMode= argumentToRasterizationMode(pairValue,iX);
-						// iterator.remove();
 					} else if (pairName==SymbolCodes.symbolCode_E_cullFace) {
 						cullFace= argumentToFaceCullingMode(pairValue,iX);
-						// iterator.remove();
 					} else if (pairName==SymbolCodes.symbolCode_E_polygonOffsetBias) {
 						polygonOffsetBias= (float)GeneralConverters.argumentToReal(pairValue,iX);
-						// iterator.remove();
 					} else if (pairName==SymbolCodes.symbolCode_E_polygonOffsetFactor) {
 						polygonOffsetFactor= (float)GeneralConverters.argumentToReal(pairValue,iX);
-						// iterator.remove();
 					} else if (pairName==SymbolCodes.symbolCode_E_backFaceNormalFlip) {
 						backFaceNormalFlip= YesNoConverters.termYesNo2Boolean(pairValue,iX);
-						// iterator.remove();
 					} else {
 						throw new WrongArgumentIsUnknownPolygonAttribute(key);
 					}
@@ -898,7 +880,7 @@ public class AuxiliaryNode3D extends Tools3D {
 		try { // ObjectTransparency
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_TransparencyAttributes,1,iX);
 			Term attributes= arguments[0];
-			HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+			HashMap<Long,Term> setPositiveMap= new HashMap<>();
 			Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 			setEnd= setEnd.dereferenceValue(iX);
 			if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -992,7 +974,7 @@ public class AuxiliaryNode3D extends Tools3D {
 		return (QuadArray)attributesToPlainGeometryArray(PlainGeometryArrayType.QUAD,attributes,iX);
 	}
 	protected static GeometryArray attributesToPlainGeometryArray(PlainGeometryArrayType type, Term attributes, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		HashMap<Long,Term> setPositiveMap= new HashMap<>();
 		Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
 		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -1073,7 +1055,7 @@ public class AuxiliaryNode3D extends Tools3D {
 		return (TriangleFanArray)attributesToGeometryStripArray(GeometryStripArrayType.FAN,attributes,iX);
 	}
 	public static GeometryStripArray attributesToGeometryStripArray(GeometryStripArrayType type, Term attributes, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		HashMap<Long,Term> setPositiveMap= new HashMap<>();
 		Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
 		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -1158,7 +1140,7 @@ public class AuxiliaryNode3D extends Tools3D {
 		return (IndexedQuadArray)attributesToIndexedGeometryArray(PlainGeometryArrayType.QUAD,attributes,iX);
 	}
 	public static IndexedGeometryArray attributesToIndexedGeometryArray(PlainGeometryArrayType type, Term attributes, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		HashMap<Long,Term> setPositiveMap= new HashMap<>();
 		Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
 		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -1255,7 +1237,7 @@ public class AuxiliaryNode3D extends Tools3D {
 		return (IndexedTriangleFanArray)attributesToIndexedGeometryStripArray(GeometryStripArrayType.FAN,attributes,iX);
 	}
 	public static IndexedGeometryStripArray attributesToIndexedGeometryStripArray(GeometryStripArrayType type, Term attributes, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		HashMap<Long,Term> setPositiveMap= new HashMap<>();
 		Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
 		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -1352,7 +1334,7 @@ public class AuxiliaryNode3D extends Tools3D {
 		}
 	}
 	public static Text3D attributesToText3D(Term attributes, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		HashMap<Long,Term> setPositiveMap= new HashMap<>();
 		Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
 		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -1370,8 +1352,6 @@ public class AuxiliaryNode3D extends Tools3D {
 				} else if (pairName==SymbolCodes.symbolCode_E_string) {
 					text= pairValue.toString(iX);
 					iterator.remove();
-				// } else {
-				//	throw new WrongArgumentIsUnknownText3DAttribute(key);
 				}
 			};
 			Text3D node;
@@ -1431,12 +1411,6 @@ public class AuxiliaryNode3D extends Tools3D {
 						node.setCapability(Text3D.ALLOW_BOUNDING_BOX_READ);
 					};
 					iterator.remove();
-				// } else if (pairName==SymbolCodes.symbolCode_E_allowBoundingBoxWrite) {
-				//	boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
-				//	if (mode) {
-				//		node.setCapability(Text3D.ALLOW_BOUNDING_BOX_WRITE);
-				//	};
-				//	iterator.remove();
 				} else if (pairName==SymbolCodes.symbolCode_E_allowCharacterSpacingRead) {
 					boolean mode= YesNoConverters.termYesNo2Boolean(pairValue,iX);
 					if (mode) {
@@ -1497,8 +1471,6 @@ public class AuxiliaryNode3D extends Tools3D {
 						node.setCapability(Text3D.ALLOW_STRING_WRITE);
 					};
 					iterator.remove();
-				// } else {
-				//	throw new WrongArgumentIsUnknownText3DAttribute(key);
 				}
 			};
 			extractGeometryAttributes(node,nameList,setPositiveMap,iX);
@@ -1515,7 +1487,6 @@ public class AuxiliaryNode3D extends Tools3D {
 					node.setPosition(new Point3f(basePosition.x,(float)(basePosition.y-(upperPoint.y-lowerPoint.y)/2),basePosition.z));
 				} else if (verticalAlignment==VerticalAlignment.TOP) {
 					node.setPosition(new Point3f(basePosition.x,(float)(basePosition.y-(upperPoint.y-lowerPoint.y)),basePosition.z));
-				// } else if (verticalAlignment==VerticalAlignment.BOTTOM) {
 				}
 			};
 			return node;
@@ -1582,7 +1553,7 @@ public class AuxiliaryNode3D extends Tools3D {
 		}
 	}
 	public static Font3D attributesToFont3D(Term attributes, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		HashMap<Long,Term> setPositiveMap= new HashMap<>();
 		Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
 		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -1629,11 +1600,6 @@ public class AuxiliaryNode3D extends Tools3D {
 			if (fontStyle==null) {
 				fontStyle= Font.PLAIN; // Actor Prolog default value
 			};
-			// Passing null for the FontExtrusion parameter results
-			// in no extrusion being done.
-			// if (extrudePath==null) {
-			//	extrudePath= new FontExtrusion(); // Actor Prolog default value
-			// };
 			Font3D node;
 			Font font= new Font(fontName,fontStyle,fontSize);
 			if (tessellationTolerance==null) {
@@ -1655,7 +1621,7 @@ public class AuxiliaryNode3D extends Tools3D {
 		}
 	}
 	public static FontExtrusion attributesToFontExtrusion(Term attributes, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		HashMap<Long,Term> setPositiveMap= new HashMap<>();
 		Term setEnd= attributes.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
 		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {

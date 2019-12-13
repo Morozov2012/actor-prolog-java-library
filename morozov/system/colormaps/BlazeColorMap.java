@@ -15,22 +15,28 @@ public class BlazeColorMap extends CubicSplineColorMapRGBA {
 	public BlazeColorMap() {
 	}
 	//
+	@Override
 	public double[][] getRedChannelDefinition() {
 		return redChannelDefinition;
 	}
+	@Override
 	public double[][] getGreenChannelDefinition() {
 		return greenChannelDefinition;
 	}
+	@Override
 	public double[][] getBlueChannelDefinition() {
 		return blueChannelDefinition;
 	}
 	//
+	@Override
 	public int[][] getRedChannelConstraints() {
 		return redChannelConstraints;
 	}
+	@Override
 	public int[][] getGreenChannelConstraints() {
 		return greenChannelConstraints;
 	}
+	@Override
 	public int[][] getBlueChannelConstraints() {
 		return blueChannelConstraints;
 	}

@@ -70,7 +70,7 @@ public class VPM_Snapshot extends GenericVideoProcessingMachineSnapshot {
 		matrixHSB= mHSB;
 		imageWasAdjusted= isAdjusted;
 		outputChannelName= channelName;
-		blobGroups= blobGroupArray.toArray(new BlobGroup[0]);
+		blobGroups= blobGroupArray.toArray(new BlobGroup[blobGroupArray.size()]);
 		for (int k=0; k < actualSnapshotCommands.length; k++) {
 			actualSnapshotCommands[k].execute(this);
 		}
@@ -85,21 +85,26 @@ public class VPM_Snapshot extends GenericVideoProcessingMachineSnapshot {
 		refuseSlowTracks= true;
 	}
 	//
+	@Override
 	protected boolean getRefuseSlowTracks() {
 		return refuseSlowTracks;
 	}
+	@Override
 	protected double getVelocityThreshold() {
 		return velocityThreshold;
 	}
+	@Override
 	protected double getDistanceThreshold() {
 		return distanceThreshold;
 	}
+	@Override
 	protected double getFuzzyThresholdBorder() {
 		return fuzzyThresholdBorder;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected Term createPrologBlobs() {
 		if (blobGroups==null) {
 			return PrologEmptyList.instance;
@@ -120,6 +125,7 @@ public class VPM_Snapshot extends GenericVideoProcessingMachineSnapshot {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void createForegroundImageIfNecessary() {
 		if (foregroundImage==null) {
 			createForegroundMaskIfNecessary();
@@ -196,6 +202,7 @@ public class VPM_Snapshot extends GenericVideoProcessingMachineSnapshot {
 		}
 	}
 	//
+	@Override
 	protected void fillUpForegroundImageWithAllChannels(int[] alphaPixels) {
 		if (imageWasAdjusted) {
 			WritableRaster imageRaster= foregroundImage.getRaster();
@@ -208,6 +215,7 @@ public class VPM_Snapshot extends GenericVideoProcessingMachineSnapshot {
 		}
 	}
 	//
+	@Override
 	protected void fillUpSynthesizedImage(int[] alphaPixels) {
 		if (imageWasAdjusted) {
 			WritableRaster imageRaster= synthesizedImage.getRaster();

@@ -14,41 +14,51 @@ import morozov.terms.signals.*;
 public enum FFmpegStandardComplianceName {
 	//
 	FF_COMPLIANCE_VERY_STRICT {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_COMPLIANCE_VERY_STRICT;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_COMPLIANCE_VERY_STRICT;
 		}
 	},
 	FF_COMPLIANCE_STRICT {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_COMPLIANCE_STRICT;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_COMPLIANCE_STRICT;
 		}
 	},
 	FF_COMPLIANCE_NORMAL {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_COMPLIANCE_NORMAL;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_COMPLIANCE_NORMAL;
 		}
 	},
 	FF_COMPLIANCE_UNOFFICIAL {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_COMPLIANCE_UNOFFICIAL;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_COMPLIANCE_UNOFFICIAL;
 		}
 	},
 	FF_COMPLIANCE_EXPERIMENTAL {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_COMPLIANCE_EXPERIMENTAL;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_COMPLIANCE_EXPERIMENTAL;
 		}

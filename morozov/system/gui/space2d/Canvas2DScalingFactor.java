@@ -12,41 +12,51 @@ import morozov.terms.signals.*;
 public enum Canvas2DScalingFactor {
 	//
 	MIN {
+		@Override
 		public int computeScalingCoefficient(int width, int height) {
 			return StrictMath.min(width,height);
 		}
+		@Override
 		public Term toTerm() {
 			return termMin;
 		}
 	},
 	MAX {
+		@Override
 		public int computeScalingCoefficient(int width, int height) {
 			return StrictMath.max(width,height);
 		}
+		@Override
 		public Term toTerm() {
 			return termMax;
 		}
 	},
 	WIDTH {
+		@Override
 		public int computeScalingCoefficient(int width, int height) {
 			return width;
 		}
+		@Override
 		public Term toTerm() {
 			return termWidth;
 		}
 	},
 	HEIGHT {
+		@Override
 		public int computeScalingCoefficient(int width, int height) {
 			return height;
 		}
+		@Override
 		public Term toTerm() {
 			return termHeight;
 		}
 	},
 	INDEPENDENT {
+		@Override
 		public int computeScalingCoefficient(int width, int height) {
 			return -1;
 		}
+		@Override
 		public Term toTerm() {
 			return termIndependent;
 		}

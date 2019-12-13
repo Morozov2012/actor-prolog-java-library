@@ -17,9 +17,11 @@ public abstract class ActorNumber extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean thisIsActorNumber() {
 		return true;
 	}
+	@Override
 	public int hashCode() {
 		return System.identityHashCode(this);
 	}

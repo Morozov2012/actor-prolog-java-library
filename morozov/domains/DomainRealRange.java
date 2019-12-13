@@ -26,8 +26,8 @@ public class DomainRealRange extends DomainAlternative {
 		rightBound= right;
 	}
 	//
+	@Override
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
-		// t= t.dereferenceValue(cp);
 		t= t.dereferenceValue(cp);
 		if (ignoreFreeVariables && t.thisIsFreeVariable()) {
 			return true;
@@ -45,22 +45,28 @@ public class DomainRealRange extends DomainAlternative {
 		}
 	}
 	//
+	@Override
 	public boolean isEqualTo(DomainAlternative a, HashSet<PrologDomainPair> stack) {
 		return a.isEqualToRealRange(leftBound,rightBound);
 	}
+	@Override
 	public boolean isEqualToRealRange(double value1, double value2) {
 		return Arithmetic.realsAreEqual(leftBound,value1) && Arithmetic.realsAreEqual(rightBound,value2);
 	}
+	@Override
 	public boolean isCoveredByReal() {
 		return true;
 	}
+	@Override
 	public boolean coversAlternative(DomainAlternative a, PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) {
 		return a.isCoveredByRealRange(leftBound,rightBound);
 	}
+	@Override
 	public boolean isCoveredByRealRange(double value1, double value2) {
 		return (value1 <= leftBound) && (value2 >= rightBound);
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
 		return PrologDomainName.tagDomainAlternative_RealRange + "(" + FormatOutput.realToString(leftBound) + "," + FormatOutput.realToString(rightBound) + ")";
 	}

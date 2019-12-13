@@ -6,5 +6,6 @@ import morozov.system.kinect.frames.data.interfaces.*;
 
 public interface KinectForegroundPointCloudsFrameInterface extends KinectPointCloudsFrameInterface {
 	public ForegroundPointCloudInterface[] getPointClouds();
+	@Override
 	public float[] getXYZ();
 }

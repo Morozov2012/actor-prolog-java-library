@@ -12,6 +12,7 @@ public class LocalCustomizedPickCanvasTask extends TimerTask {
 		pickCanvas= canvas;
 	}
 	//
+	@Override
 	public void run() {
 		pickCanvas.mouseWatch();
 	}

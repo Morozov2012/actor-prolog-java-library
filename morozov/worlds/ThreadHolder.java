@@ -18,6 +18,7 @@ import java.awt.Window;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ThreadHolder extends Thread {
+	//
 	protected ActiveWorld currentProcess;
 	protected AtomicBoolean hasMessagesToBeProcessed= new AtomicBoolean(true);
 	protected AtomicBoolean stopThisThread= new AtomicBoolean(false);
@@ -29,6 +30,7 @@ public class ThreadHolder extends Thread {
 		currentProcess= process;
 	}
 	//
+	@Override
 	public void run() {
 		currentProcess.hasUpdatedPort.set(true);
 		while (!stopThisThread.get()) {
@@ -102,6 +104,7 @@ public class ThreadHolder extends Thread {
 		runtime.exit(1);
 	}
 	//
+	@SuppressWarnings("CallToThreadDumpStack")
 	public void reportErrorPosition(Throwable error, long p, long u, int s) {
 		String textPosition;
 		if (p >= 0) {

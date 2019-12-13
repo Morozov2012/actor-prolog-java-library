@@ -10,7 +10,9 @@ import morozov.system.converters.*;
 import morozov.terms.signals.*;
 
 public enum ActiveDocumentFormat {
+	//
 	INTEGER {
+		@Override
 		boolean verify(String text) {
 			try {
 				GeneralConverters.stringToStrictInteger(text);
@@ -21,6 +23,7 @@ public enum ActiveDocumentFormat {
 		}
 	},
 	REAL {
+		@Override
 		boolean verify(String text) {
 			try {
 				GeneralConverters.stringToReal(text);
@@ -31,10 +34,11 @@ public enum ActiveDocumentFormat {
 		}
 	},
 	TEXT {
+		@Override
 		boolean verify(String text) {
 			return true;
 		}
 	};
+	//
 	abstract boolean verify(String text);
-	// abstract String format(Number number);
 }

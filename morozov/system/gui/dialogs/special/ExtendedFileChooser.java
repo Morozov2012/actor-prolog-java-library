@@ -13,6 +13,8 @@ import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 
 public class ExtendedFileChooser extends JFileChooser {
+	//
+	@Override
 	public void approveSelection() {
 		if (getDialogType() == JFileChooser.SAVE_DIALOG) {
 			if (isMultiSelectionEnabled()) {
@@ -72,6 +74,7 @@ public class ExtendedFileChooser extends JFileChooser {
 		}
 	}
 	//
+	@Override
 	public boolean isTraversable(java.io.File f) {
 		try {
 			return super.isTraversable(f);

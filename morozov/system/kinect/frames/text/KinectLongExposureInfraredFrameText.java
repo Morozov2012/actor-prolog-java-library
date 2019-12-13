@@ -13,7 +13,6 @@ public class KinectLongExposureInfraredFrameText {
 	//
 	public static void writeText(KinectLongExposureInfraredFrameInterface frame, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {
 		if (exportMode==ExportMode.SKELETONS) {
-			// super.writeText(writer,exportMode,locale);
 			KinectFrameText.writeRootFrameText(frame,writer,exportMode,locale);
 		} else {
 			writeLongExposureInfraredFrameText(frame,writer,exportMode,locale);
@@ -22,7 +21,6 @@ public class KinectLongExposureInfraredFrameText {
 	//
 	public static void writeLongExposureInfraredFrameText(KinectLongExposureInfraredFrameInterface frame, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {
 		writer.write("; LONG EXPOSURE INFRARED FRAME:\n");
-		// super.writeText(writer,exportMode,locale);
 		KinectFrameText.writeRootFrameText(frame,writer,exportMode,locale);
 		short[] longExposureInfrared= frame.getLongExposureInfrared();
 		writer.write(String.format(locale,"; Long exposure infrared matrix: %d\n",longExposureInfrared.length));

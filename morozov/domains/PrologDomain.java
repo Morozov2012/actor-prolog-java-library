@@ -197,7 +197,7 @@ public class PrologDomain implements Serializable {
 				Term[] arguments= value.getStructureArguments(iX);
 				if (arguments.length==2) {
 					PrologDomainName domainName= PrologDomainName.termToPrologDomainName(arguments[0],iX);
-					ArrayList<DomainAlternative> alternatives= new ArrayList<DomainAlternative>();
+					ArrayList<DomainAlternative> alternatives= new ArrayList<>();
 					Term nextHead;
 					Term currentTail= arguments[1];
 					try {
@@ -211,7 +211,7 @@ public class PrologDomain implements Serializable {
 					} catch (TermIsNotAList e) {
 						throw TermIsNotPrologDomain.instance;
 					};
-					DomainAlternative[] array= alternatives.toArray(new DomainAlternative[0]);
+					DomainAlternative[] array= alternatives.toArray(new DomainAlternative[alternatives.size()]);
 					return new PrologDomain(domainName,array);
 				} else {
 					throw TermIsNotPrologDomain.instance;
@@ -238,7 +238,7 @@ public class PrologDomain implements Serializable {
 	}
 	//
 	public String toString(CharsetEncoder encoder) {
-		StringBuffer buffer= new StringBuffer();
+		StringBuilder buffer= new StringBuilder();
 		buffer.append(PrologDomainName.tagDomainItem_Domain);
 		buffer.append("(");
 		buffer.append(name.toString(encoder));
@@ -254,6 +254,7 @@ public class PrologDomain implements Serializable {
 		return buffer.toString();
 	}
 	//
+	@Override
 	public String toString() {
 		return toString(null);
 	}

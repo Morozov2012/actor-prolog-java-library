@@ -33,8 +33,8 @@ public abstract class Application extends Alpha {
 	public Boolean enableMultipleInstances= null;
 	//
 	protected long processCounter= 0;
-	protected HashSet<Process> accountableProceses= new HashSet<Process>();
-	protected HashSet<PendingProcess> supervisors= new HashSet<PendingProcess>();
+	protected HashSet<Process> accountableProceses= new HashSet<>();
+	protected HashSet<PendingProcess> supervisors= new HashSet<>();
 	//
 	protected static final FileSystem fileSystem= FileSystems.getDefault();
 	//
@@ -48,7 +48,6 @@ public abstract class Application extends Alpha {
 	abstract public Term getBuiltInSlot_E_arguments();
 	abstract public Term getBuiltInSlot_E_window_mode();
 	abstract public Term getBuiltInSlot_E_enable_multiple_instances();
-	// abstract public Term getBuiltInSlot_E_backslash_always_is_separator();
 	//
 	abstract public long entry_s_End_1_i();
 	//
@@ -147,6 +146,7 @@ public abstract class Application extends Alpha {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void releaseSystemResources() {
 		Iterator<PendingProcess> processList= supervisors.iterator();
 		while (processList.hasNext()) {
@@ -158,34 +158,34 @@ public abstract class Application extends Alpha {
 	}
 	//
 	public void activate0s(ChoisePoint iX) {
-		ProcessBuilderCommand command= getCommand(iX);
-		String arguments= getArguments(iX);
-		activate(iX,command,arguments,true);
+		ProcessBuilderCommand currentCommand= getCommand(iX);
+		String currentArguments= getArguments(iX);
+		activate(iX,currentCommand,currentArguments,true);
 	}
 	public void activate1s(ChoisePoint iX, Term a1) {
-		ProcessBuilderCommand command= ProcessBuilderCommand.argumentToProcessBuilderCommand(a1,iX);
-		String arguments= getArguments(iX);
-		activate(iX,command,arguments,false);
+		ProcessBuilderCommand currentCommand= ProcessBuilderCommand.argumentToProcessBuilderCommand(a1,iX);
+		String currentArguments= getArguments(iX);
+		activate(iX,currentCommand,currentArguments,false);
 	}
 	public void activate2s(ChoisePoint iX, Term a1, Term a2) {
-		ProcessBuilderCommand command= ProcessBuilderCommand.argumentToProcessBuilderCommand(a1,iX);
-		String arguments= GeneralConverters.argumentToString(a2,iX);
-		activate(iX,command,arguments,false);
+		ProcessBuilderCommand currentCommand= ProcessBuilderCommand.argumentToProcessBuilderCommand(a1,iX);
+		String currentArguments= GeneralConverters.argumentToString(a2,iX);
+		activate(iX,currentCommand,currentArguments,false);
 	}
 	protected void activate(ChoisePoint iX, ProcessBuilderCommand command, String arguments, boolean isAccountableSubprocess) {
-		if (command.isAutomatic) {
-			if (command.isExtensionSpecific) {
+		if (command.isAutomatic()) {
+			if (command.isExtensionSpecific()) {
 				boolean backslashIsSeparator= getBackslashAlwaysIsSeparator(iX);
 				boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
 				SimpleFileName simpleFile= SimpleFileName.argumentToSimpleFileName(arguments,backslashIsSeparator,acceptOnlyURI);
-				String extension= command.text;
+				String extension= command.getText();
 				RelativeFileName relativeFile= simpleFile.formRelativeFileName(true,extension);
 				arguments= relativeFile.toString();
 			};
 			activateBrowser(arguments,iX);
 		} else {
 			boolean enableMultipleInstancesFlag= getEnableMultipleInstances(iX);
-			activateProcessBuilder(command.text,arguments,isAccountableSubprocess,enableMultipleInstancesFlag);
+			activateProcessBuilder(command.getText(),arguments,isAccountableSubprocess,enableMultipleInstancesFlag);
 		}
 	}
 	//
@@ -209,6 +209,7 @@ public abstract class Application extends Alpha {
 			c0= aC;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			c0.execute(iX);
 		}
@@ -234,7 +235,6 @@ public abstract class Application extends Alpha {
 			}
 		} catch (IOException e) {
 			throw new FileInputOutputError(commandText,e);
-		// } catch (InterruptedException e) {
 		}
 	}
 	//
@@ -274,7 +274,6 @@ public abstract class Application extends Alpha {
 					if (Files.exists(path)) {
 						desktop.open(path.toFile());
 					} else if (quotesAreEliminated) {
-						// throw new WrongArgumentIsNotFileName(new PrologString(commandText));
 						desktop.open(path.toFile());
 					} else {
 						commandText= FileUtils.deleteQuotationMarks(commandText);
@@ -283,7 +282,6 @@ public abstract class Application extends Alpha {
 				} else {
 					desktop.browse(extendedFile.get_URI_OfResource());
 				}
-			// } catch (URISyntaxException e) {
 			} catch (WrongArgumentIsMalformedURL e) {
 				if (quotesAreEliminated) {
 					throw new WrongArgumentIsNotFileName(new PrologString(commandText));

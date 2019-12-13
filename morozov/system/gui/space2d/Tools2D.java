@@ -8,12 +8,12 @@ import morozov.built_in.*;
 import morozov.run.*;
 import morozov.system.*;
 import morozov.system.converters.*;
+import morozov.system.converters.errors.*;
 import morozov.system.errors.*;
 import morozov.system.gui.*;
 import morozov.system.gui.space2d.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
-import morozov.terms.errors.*;
 import morozov.terms.signals.*;
 
 import java.awt.Color;
@@ -38,6 +38,7 @@ import java.math.BigInteger;
 public class Tools2D {
 	//
 	public static int defaultTransparency= 0; // JDK uses 1, 2, 3
+	//
 	protected static final FileSystem fileSystem= FileSystems.getDefault();
 	//
 	///////////////////////////////////////////////////////////////
@@ -86,7 +87,7 @@ public class Tools2D {
 	///////////////////////////////////////////////////////////////
 	//
 	public static RenderingHints argumentToRenderingHints(Term value, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		HashMap<Long,Term> setPositiveMap= new HashMap<>();
 		Term setEnd= value.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
 		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -120,7 +121,7 @@ public class Tools2D {
 				} else if (pairName==SymbolCodes.symbolCode_E_text_LCD_contrast) {
 					try {
 						BigInteger contrast= GeneralConverters.termToStrictInteger(pairValue,iX,false);
-						Integer mode= PrologInteger.toInteger(contrast);
+						Integer mode= Arithmetic.toInteger(contrast);
 						rh.put(RenderingHints.KEY_TEXT_LCD_CONTRAST,mode);
 					} catch (TermIsNotAnInteger e1) {
 						throw new WrongArgumentIsNotAnInteger(pairValue);
@@ -305,9 +306,8 @@ public class Tools2D {
 		Color[] colors= new Color[termArray.length];
 		for (int n=0; n < termArray.length; n++) {
 			try {
-				colors[n]= ExtendedColor.argumentToColor(termArray[n],iX);
+				colors[n]= ColorAttributeConverters.argumentToColor(termArray[n],iX);
 			} catch (TermIsSymbolDefault e2) {
-				// throw new WrongArgumentIsNotAColor(pairValue);
 				if (n % 2 == 0) {
 					colors[n]= Color.WHITE; // Actor Prolog default value
 				} else {
@@ -367,7 +367,7 @@ public class Tools2D {
 		try { // quadrantRotation
 			Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_quadrantRotation,1,iX);
 			BigInteger quadrants= GeneralConverters.argumentToRoundInteger(arguments[0],iX);
-			int numquadrants= PrologInteger.toInteger(quadrants);
+			int numquadrants= Arithmetic.toInteger(quadrants);
 			AffineTransform transform= new AffineTransform();
 			transform.setToQuadrantRotation(numquadrants);
 			return transform;
@@ -396,7 +396,6 @@ public class Tools2D {
 			transform.setToTranslation(tx,ty);
 			return transform;
 		} catch (Backtracking b5) {
-			// TranslationMatrix
 			Term[] termArray= GeneralConverters.listToArray(value,iX);
 			int numberOfRows= termArray.length;
 			double[][] rows= new double[numberOfRows][];
@@ -446,11 +445,11 @@ public class Tools2D {
 	///////////////////////////////////////////////////////////////
 	//
 	public static Font argumentToFont2D(Term value, Canvas2D targetWorld, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		HashMap<Long,Term> setPositiveMap= new HashMap<>();
 		Term setEnd= value.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
 		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
-			HashMap<TextAttribute,Object> fontAttributes= new HashMap<TextAttribute,Object>();
+			HashMap<TextAttribute,Object> fontAttributes= new HashMap<>();
 			Set<Long> nameList= setPositiveMap.keySet();
 			Iterator<Long> iterator= nameList.iterator();
 			while(iterator.hasNext()) {
@@ -498,12 +497,7 @@ public class Tools2D {
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_background) {
 					BrushAttributes attributes= BrushAttributes.argumentToBrushAttributes(pairValue,targetWorld,iX);
-					if (attributes.isSwitch) {
-						// if (!attributes.fillFigures) {
-						//	Paint paint= new Color(0,0,0,0);
-						//	fontAttributes.put(TextAttribute.BACKGROUND,paint);
-						// }
-					} else {
+					if (!attributes.isSwitch) {
 						Paint paint= attributes.paint;
 						fontAttributes.put(TextAttribute.BACKGROUND,paint);
 					}
@@ -655,7 +649,7 @@ public class Tools2D {
 			}
 		} catch (TermIsNotASymbol e1) {
 			try {
-				return PrologInteger.toInteger(GeneralConverters.termToRoundInteger(value,iX,false));
+				return Arithmetic.toInteger(GeneralConverters.termToRoundInteger(value,iX,false));
 			} catch (TermIsNotAnInteger e2) {
 				throw new WrongArgumentIsNotFontSuperscript2D(value);
 			}
@@ -684,7 +678,7 @@ public class Tools2D {
 			}
 		} catch (TermIsNotASymbol e1) {
 			try {
-				return PrologInteger.toInteger(GeneralConverters.termToRoundInteger(value,iX,false));
+				return Arithmetic.toInteger(GeneralConverters.termToRoundInteger(value,iX,false));
 			} catch (TermIsNotAnInteger e2) {
 				throw new WrongArgumentIsNotFontUnderline2D(value);
 			}
@@ -718,7 +712,7 @@ public class Tools2D {
 			}
 		} catch (TermIsNotASymbol e1) {
 			try {
-				return PrologInteger.toInteger(GeneralConverters.termToRoundInteger(value,iX,false));
+				return Arithmetic.toInteger(GeneralConverters.termToRoundInteger(value,iX,false));
 			} catch (TermIsNotAnInteger e2) {
 				throw new WrongArgumentIsNotFontBidiEmbedding2D(value);
 			}
@@ -762,7 +756,7 @@ public class Tools2D {
 			}
 		} catch (TermIsNotASymbol e1) {
 			try {
-				return PrologInteger.toInteger(GeneralConverters.termToRoundInteger(value,iX,false));
+				return Arithmetic.toInteger(GeneralConverters.termToRoundInteger(value,iX,false));
 			} catch (TermIsNotAnInteger e2) {
 				throw new WrongArgumentIsNotFontUnderline2D(value);
 			}
@@ -781,7 +775,7 @@ public class Tools2D {
 			}
 		} catch (TermIsNotASymbol e1) {
 			try {
-				return PrologInteger.toInteger(GeneralConverters.termToRoundInteger(value,iX,false));
+				return Arithmetic.toInteger(GeneralConverters.termToRoundInteger(value,iX,false));
 			} catch (TermIsNotAnInteger e2) {
 				throw new WrongArgumentIsNotFontKerning2D(value);
 			}
@@ -800,7 +794,7 @@ public class Tools2D {
 			}
 		} catch (TermIsNotASymbol e1) {
 			try {
-				return PrologInteger.toInteger(GeneralConverters.termToRoundInteger(value,iX,false));
+				return Arithmetic.toInteger(GeneralConverters.termToRoundInteger(value,iX,false));
 			} catch (TermIsNotAnInteger e2) {
 				throw new WrongArgumentIsNotFontLigatures2D(value);
 			}
@@ -869,7 +863,6 @@ public class Tools2D {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_default) {
-				// throw TermIsSymbolDefault.instance;
 				return java.awt.image.BufferedImage.TYPE_CUSTOM;
 			} else if (code==SymbolCodes.symbolCode_E_TYPE_3BYTE_BGR) {
 				return java.awt.image.BufferedImage.TYPE_3BYTE_BGR;
@@ -947,7 +940,6 @@ public class Tools2D {
 		try {
 			long code= value.getSymbolValue(iX);
 			if (code==SymbolCodes.symbolCode_E_default) {
-				// throw TermIsSymbolDefault.instance;
 				return defaultTransparency;
 			} else if (code==SymbolCodes.symbolCode_E_OPAQUE) {
 				return Transparency.OPAQUE;

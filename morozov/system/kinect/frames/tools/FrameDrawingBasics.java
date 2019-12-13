@@ -10,8 +10,8 @@ public class FrameDrawingBasics {
 	//
 	protected static int maxColorValue= 255;
 	//
-	public static int spotRadiusX= 3;
-	public static int spotRadiusY= 2;
+	protected static int spotRadiusX= 3;
+	protected static int spotRadiusY= 2;
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -108,7 +108,6 @@ public class FrameDrawingBasics {
 					for (int x=-1; x <= 1; x++) {
 						for (int y=-1; y <= 1; y++) {
 							int point2= width * (h+y) + (w+x);
-							// if (pixels[point2] == noDifferenceMarker) {
 							if (pixels[point2] != value) {
 								spaceCounter++;
 							}

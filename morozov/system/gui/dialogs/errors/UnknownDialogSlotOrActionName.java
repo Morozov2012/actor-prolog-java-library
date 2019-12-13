@@ -3,10 +3,14 @@
 package morozov.system.gui.dialogs.errors;
 
 public class UnknownDialogSlotOrActionName extends RuntimeException {
-	public String name;
+	//
+	protected String name;
+	//
 	public UnknownDialogSlotOrActionName(String n) {
 		name= n;
 	}
+	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(" + name.toString() + ")";
 	}

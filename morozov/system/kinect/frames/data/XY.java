@@ -27,22 +27,27 @@ public class XY implements XY_Interface, Serializable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public int getX() {
 		return x;
 	}
+	@Override
 	public int getX(int shift, float ratio) {
 		return shift + (int)(x * ratio);
 	}
 	//
+	@Override
 	public int getY() {
 		return y;
 	}
+	@Override
 	public int getY(int shift, float ratio) {
 		return shift + (int)(y * ratio);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public String toString() {
 		return XY_Tools.toString(this);
 	}

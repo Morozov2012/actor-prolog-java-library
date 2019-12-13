@@ -5,7 +5,7 @@ package morozov.built_in;
 import morozov.run.*;
 import morozov.run.errors.*;
 import morozov.system.converters.*;
-import morozov.system.errors.*;
+import morozov.system.converters.errors.*;
 import morozov.system.indices.*;
 import morozov.system.indices.errors.*;
 import morozov.terms.*;
@@ -17,7 +17,7 @@ import java.util.HashMap;
 
 public abstract class LambdaArray extends Lambda {
 	//
-	protected HashMap<ArrayIndices,SlotVariable> volume= new HashMap<ArrayIndices,SlotVariable>();
+	protected HashMap<ArrayIndices,SlotVariable> volume= new HashMap<>();
 	//
 	protected IndexRange[] indicesRange= null;
 	protected Boolean indexChecking= null;
@@ -272,6 +272,7 @@ public abstract class LambdaArray extends Lambda {
 			givenIndices= a1;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			IndexRange[] indexRanges= getIndicesRange(iX);
 			boolean checkIndicesRange= getIndexChecking(iX);
@@ -377,9 +378,9 @@ radiusLoop: while (true) {
 			BigInteger[] indices= new BigInteger[numberOfIndicesToBeInstantiated];
 			for (int n=0; n < numberOfIndicesToBeInstantiated; n++) {
 				if (bits[n]) {
-					indices[n]= rangesOfIndicesToBeInstantiated[n].center.subtract(radius);
+					indices[n]= rangesOfIndicesToBeInstantiated[n].getCenter().subtract(radius);
 				} else {
-					indices[n]= rangesOfIndicesToBeInstantiated[n].center.subtract(radius).add(BigInteger.ONE);
+					indices[n]= rangesOfIndicesToBeInstantiated[n].getCenter().subtract(radius).add(BigInteger.ONE);
 				}
 			};
 			shellCoveringLoop: while (true) {
@@ -432,18 +433,18 @@ if (processBacktracking || skipPass) {
 			BigInteger previousValue= indices[n];
 			if (bits[n]) {
 				indices[n]= rangesOfIndicesToBeInstantiated[n].reflectValue(previousValue);
-				if (previousValue.compareTo(rangesOfIndicesToBeInstantiated[n].center) < 0) {
+				if (previousValue.compareTo(rangesOfIndicesToBeInstantiated[n].getCenter()) < 0) {
 					break;
 				} else {
 					continue;
 				}
 			} else {
 				BigInteger newValue= previousValue.add(BigInteger.ONE);
-				if (newValue.compareTo(rangesOfIndicesToBeInstantiated[n].center.add(radius)) < 0) {
+				if (newValue.compareTo(rangesOfIndicesToBeInstantiated[n].getCenter().add(radius)) < 0) {
 					indices[n]= newValue;
 					break;
 				} else {
-					indices[n]= rangesOfIndicesToBeInstantiated[n].center.subtract(radius).add(BigInteger.ONE);
+					indices[n]= rangesOfIndicesToBeInstantiated[n].getCenter().subtract(radius).add(BigInteger.ONE);
 					continue;
 				}
 			}

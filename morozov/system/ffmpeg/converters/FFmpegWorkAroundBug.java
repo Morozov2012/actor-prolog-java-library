@@ -195,6 +195,6 @@ public class FFmpegWorkAroundBug {
 		if (value != 0) {
 			flags.add(new FFmpegWorkAroundBug(value));
 		};
-		return flags.toArray(new FFmpegWorkAroundBug[0]);
+		return flags.toArray(new FFmpegWorkAroundBug[flags.size()]);
 	}
 }

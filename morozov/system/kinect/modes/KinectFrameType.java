@@ -9,86 +9,110 @@ import morozov.system.kinect.modes.interfaces.*;
 public enum KinectFrameType {
 	//
 	DEPTH_MAPS {
-		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode) {
+		@Override
+		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode, boolean extractPeople) {
 			consolidatedMode.setDepthMapsAreRequested(true);
 			consolidatedMode.refineKinectDataAcquisitionMode(J4KSDK.DEPTH);
 		}
+		@Override
 		public boolean requiresFrameType(KinectDataArrayType proposedFrameType) {
 			return (proposedFrameType == KinectDataArrayType.DEPTH_FRAME);
 		}
+		@Override
 		public boolean requiresColorFrameResolution() {
 			return false;
 		}
 	},
 	COLORED_DEPTH_MAPS {
-		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode) {
+		@Override
+		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode, boolean extractPeople) {
 			consolidatedMode.setDepthMapsAreRequested(true);
 			consolidatedMode.refineKinectDataAcquisitionMode(J4KSDK.DEPTH);
 		}
+		@Override
 		public boolean requiresFrameType(KinectDataArrayType proposedFrameType) {
 			return (proposedFrameType == KinectDataArrayType.DEPTH_FRAME);
 		}
 	},
 	INFRARED {
-		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode) {
+		@Override
+		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode, boolean extractPeople) {
 			consolidatedMode.setInfraredFramesAreRequested(true);
 			consolidatedMode.refineKinectDataAcquisitionMode(J4KSDK.INFRARED);
 		}
+		@Override
 		public boolean requiresFrameType(KinectDataArrayType proposedFrameType) {
 			return (proposedFrameType == KinectDataArrayType.INFRARED_FRAME);
 		}
 	},
 	LONG_EXPOSURE_INFRARED {
-		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode) {
+		@Override
+		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode, boolean extractPeople) {
 			consolidatedMode.setLongExposureInfraredFramesAreRequested(true);
 			consolidatedMode.refineKinectDataAcquisitionMode(J4KSDK.LONG_EXPOSURE_INFRARED);
 		}
+		@Override
 		public boolean requiresFrameType(KinectDataArrayType proposedFrameType) {
 			return (proposedFrameType == KinectDataArrayType.LONG_EXPOSURE_INFRARED_FRAME);
 		}
 	},
 	MAPPED_COLOR {
-		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode) {
+		@Override
+		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode, boolean extractPeople) {
 			consolidatedMode.setMappedColorFramesAreRequested(true);
 			consolidatedMode.refineKinectDataAcquisitionMode(J4KSDK.DEPTH | J4KSDK.UV | J4KSDK.COLOR);
 		}
+		@Override
 		public boolean requiresFrameType(KinectDataArrayType proposedFrameType) {
 			return (proposedFrameType == KinectDataArrayType.MAPPED_COLOR_FRAME);
 		}
 	},
 	POINT_CLOUDS {
-		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode) {
-			consolidatedMode.setPointCloudsAreRequested(true);
+		@Override
+		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode, boolean extractPeople) {
+			if (extractPeople) {
+				consolidatedMode.setForegroundPointCloudsAreRequested(true);
+			} else {
+				consolidatedMode.setEntirePointCloudsAreRequested(true);
+			};
 			consolidatedMode.refineKinectDataAcquisitionMode(J4KSDK.DEPTH | J4KSDK.XYZ | J4KSDK.UV | J4KSDK.COLOR);
 		}
+		@Override
 		public boolean requiresFrameType(KinectDataArrayType proposedFrameType) {
 			return (proposedFrameType == KinectDataArrayType.POINT_CLOUDS_FRAME);
 		}
 	},
 	COLOR {
-		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode) {
+		@Override
+		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode, boolean extractPeople) {
 			consolidatedMode.setColorFramesAreRequested(true);
 			consolidatedMode.refineKinectDataAcquisitionMode(J4KSDK.COLOR);
 		}
+		@Override
 		public boolean requiresFrameType(KinectDataArrayType proposedFrameType) {
 			return (proposedFrameType == KinectDataArrayType.COLOR_FRAME);
 		}
+		@Override
 		public boolean requiresColorFrameResolution() {
 			return true;
 		}
 	},
 	DEVICE_TUNING {
-		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode) {
-			consolidatedMode.setPointCloudsAreRequested(true);
+		@Override
+		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode, boolean extractPeople) {
+			consolidatedMode.setEntirePointCloudsAreRequested(true);
 			consolidatedMode.refineKinectDataAcquisitionMode(J4KSDK.DEPTH | J4KSDK.XYZ | J4KSDK.UV | J4KSDK.COLOR);
 		}
+		@Override
 		public boolean requiresFrameType(KinectDataArrayType proposedFrameType) {
 			return (proposedFrameType == KinectDataArrayType.POINT_CLOUDS_FRAME);
 		}
 	},
 	NONE {
-		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode) {
+		@Override
+		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode, boolean extractPeople) {
 		}
+		@Override
 		public boolean requiresFrameType(KinectDataArrayType proposedFrameType) {
 			return (proposedFrameType == KinectDataArrayType.DEPTH_FRAME);
 		}
@@ -96,7 +120,7 @@ public enum KinectFrameType {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	abstract public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode);
+	abstract public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode, boolean extractPeople);
 	abstract public boolean requiresFrameType(KinectDataArrayType proposedFrameType);
 	//
 	public boolean requiresColorFrameResolution() {

@@ -29,7 +29,6 @@ public abstract class IPCamera extends ZoomDataAcquisitionBuffer implements IPCa
 	protected IPCameraDataAcquisition ipCameraDataAcquisition= new IPCameraDataAcquisition();
 	//
 	protected AtomicLong counterOfAcquiredIPCameraFrames= new AtomicLong(-1);
-	// protected AtomicLong numberOfRecentIPCameraFrame= new AtomicLong(-1);
 	//
 	protected long numberOfRepeatedColorFrame= -1;
 	//
@@ -89,24 +88,26 @@ public abstract class IPCamera extends ZoomDataAcquisitionBuffer implements IPCa
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setOutputDebugInformation(BigInteger value) {
 		super.setOutputDebugInformation(value);
-		int mode= PrologInteger.toInteger(value);
+		int mode= Arithmetic.toInteger(value);
 		ipCameraDataAcquisition.setOutputDebugInformation(mode);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void resetCounters() {
 		synchronized (numberOfRecentReceivedFrame) {
 			super.resetCounters();
 			counterOfAcquiredIPCameraFrames.set(-1);
-			// numberOfRecentIPCameraFrame.set(-1);
 			numberOfRepeatedColorFrame= -1;
 			committedIPCameraFrameImage= null;
 		}
 	}
 	//
+	@Override
 	protected void resetFrameRate() {
 		committedColorFrameNumber= -1;
 		committedColorFrameTime= -1;
@@ -116,51 +117,59 @@ public abstract class IPCamera extends ZoomDataAcquisitionBuffer implements IPCa
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected void activateDataAcquisition(ChoisePoint iX) {
+	@Override
+	protected void activateDataAcquisition(boolean flushBuffers, ChoisePoint iX) {
 		ActionPeriod period= getConnectionAttemptPeriod(iX);
 		int givenConnectionAttemptPeriod= period.toMillisecondsOrDefault(defaultDeviceConnectionAttemptPeriod);
 		ipCameraDataAcquisition.setServerAttributes(
 			getCameraURL(iX),
 			givenConnectionAttemptPeriod);
-		int currentOutputDebugInformation= PrologInteger.toInteger(getOutputDebugInformation(iX));
+		int currentOutputDebugInformation= Arithmetic.toInteger(getOutputDebugInformation(iX));
+		super.activateDataAcquisition(flushBuffers,iX);
 		ipCameraDataAcquisition.activateDataTransfer(currentOutputDebugInformation);
 	}
 	//
+	@Override
 	protected void suspendRecording(ChoisePoint iX) {
 		ipCameraDataAcquisition.suspendDataTransfer();
 		super.suspendRecording(iX);
 	}
+	@Override
 	protected void suspendListening(ChoisePoint iX) {
 		ipCameraDataAcquisition.suspendDataTransfer();
 		super.suspendListening(iX);
 	}
 	//
+	@Override
 	protected void stopRecording(ChoisePoint iX) {
 		ipCameraDataAcquisition.stopDataTransfer();
 		super.stopRecording(iX);
 	}
+	@Override
 	protected void stopListening(ChoisePoint iX) {
 		ipCameraDataAcquisition.stopDataTransfer();
 		super.stopListening(iX);
 	}
 	//
+	@Override
 	protected boolean dataAcquisitionIsActive() {
 		return !ipCameraDataAcquisition.isSuspended();
 	}
 	//
+	@Override
 	protected boolean dataAcquisitionIsSuspended() {
 		return ipCameraDataAcquisition.isSuspended();
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void commit() {
 		synchronized (numberOfRecentReceivedFrame) {
 			super.commit();
 			committedFrame= recentFrame;
 			committedIPCameraFrameImage= null;
 			if (!recentFrameIsRepeated) {
-				// committedColorFrameNumber= numberOfRecentIPCameraFrame.get();
 				committedColorFrameNumber= numberOfRecentReceivedFrame.get();
 			} else {
 				committedColorFrameNumber= numberOfRepeatedColorFrame;
@@ -278,18 +287,19 @@ public abstract class IPCamera extends ZoomDataAcquisitionBuffer implements IPCa
 				nativeColorImage= getNativeColorImage();
 			}
 		};
-		int width= -1;
-		int height= -1;
+		int currentWidth= -1;
+		int currentHeight= -1;
 		if (nativeColorImage != null) {
-			width= nativeColorImage.getWidth();
-			height= nativeColorImage.getHeight();
+			currentWidth= nativeColorImage.getWidth();
+			currentHeight= nativeColorImage.getHeight();
 		};
-		a1.setBacktrackableValue(new PrologInteger(width),iX);
-		a2.setBacktrackableValue(new PrologInteger(height),iX);
+		a1.setBacktrackableValue(new PrologInteger(currentWidth),iX);
+		a2.setBacktrackableValue(new PrologInteger(currentHeight),iX);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setIPCameraData(byte[] array, long time) {
 		dataAcquisitionError.set(null);
 		IPCameraFrame frame= new IPCameraFrame(
@@ -297,47 +307,29 @@ public abstract class IPCamera extends ZoomDataAcquisitionBuffer implements IPCa
 			time,
 			array,
 			recentAttributes.get());
+		flushAudioSystemIfNecessary();
 		sendDataFrame(frame);
 	}
-	// public void setAudioData(byte[] buffer, long time) {
-	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected long updateRecentFrame(DataFrameInterface frame) {
-		if (frame.isLightweightFrame()) {
-			return -1;
+	@Override
+	protected long acceptFrame(DataFrameInterface frame, long currentFrameNumber) {
+		if (frame instanceof IPCameraFrameInterface) {
+			IPCameraFrameInterface ipCameraFrame= (IPCameraFrameInterface)frame;
+			currentFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
+			updateHistory(ipCameraFrame);
 		};
-		synchronized (numberOfRecentReceivedFrame) {
-			long currentFrameNumber= -1;
-			if (frame instanceof IPCameraFrameInterface) {
-				recentFrame= frame;
-				committedFrameWasAssignedDirectly.set(false);
-				// numberOfRecentIPCameraFrame.set(recentFrame.getSerialNumber());
-				currentFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
-				// numberOfRecentIPCameraFrame.set(currentNumber);
-				updateHistory((IPCameraFrameInterface)frame);
-			} else {
-				return currentFrameNumber;
-			};
-			// long currentFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
-			recentFrameIsRepeated= false;
+		currentFrameNumber= super.acceptFrame(frame,currentFrameNumber);
+		if (currentFrameNumber >= 0) {
 			numberOfRepeatedColorFrame= -1;
-			numberOfRecentReceivedFrame.notifyAll();
-			return currentFrameNumber;
-		}
-	}
-	//
-	protected void updateHistory(IPCameraFrameInterface ipCameraFrame) {
-		if (ipCameraFrame==null) {
-			return;
 		};
-		// updateHistory(new EnumeratedDataFrame(ipCameraFrame,numberOfRecentIPCameraFrame.get()));
-		updateHistory(new EnumeratedDataFrame(ipCameraFrame,numberOfRecentReceivedFrame.get()));
+		return currentFrameNumber;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void acceptRequestedFrame(EnumeratedFrame enumeratedFrame) {
 		EnumeratedDataFrame selectedFrame= (EnumeratedDataFrame)enumeratedFrame;
 		recentFrame= selectedFrame.getFrame();
@@ -346,6 +338,7 @@ public abstract class IPCamera extends ZoomDataAcquisitionBuffer implements IPCa
 		numberOfRepeatedColorFrame= selectedFrame.getNumberOfFrame();
 	}
 	//
+	@Override
 	protected void acceptRetrievedFrame(EnumeratedFrame enumeratedFrame) {
 		EnumeratedDataFrame selectedFrame= (EnumeratedDataFrame)enumeratedFrame;
 		DataFrameInterface colorFrame= selectedFrame.getFrame();
@@ -358,6 +351,7 @@ public abstract class IPCamera extends ZoomDataAcquisitionBuffer implements IPCa
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void extractFrame(String key, CompoundFrameInterface container) {
 		if (committedFrame != null) {
 			EnumeratedDataFrame enumeratedFrame= new EnumeratedDataFrame(
@@ -369,14 +363,13 @@ public abstract class IPCamera extends ZoomDataAcquisitionBuffer implements IPCa
 		}
 	}
 	//
+	@Override
 	public void assignFrame(String key, CompoundFrameInterface container, ChoisePoint iX) {
 		EnumeratedDataFrame enumeratedFrame= (EnumeratedDataFrame)container.getComponent(key);
 		synchronized (numberOfRecentReceivedFrame) {
 			committedFrame= enumeratedFrame.getFrame();
 			committedFrameWasAssignedDirectly.set(true);
 			committedIPCameraFrameImage= null;
-			// committedColorFrameNumber= enumeratedFrame.getNumberOfFrame();
-			// committedColorFrameNumber= numberOfRecentIPCameraFrame.incrementAndGet();
 			committedColorFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
 			updateCommittedFrameTime();
 		}

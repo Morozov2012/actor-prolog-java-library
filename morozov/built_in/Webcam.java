@@ -19,6 +19,7 @@ import morozov.system.signals.*;
 import morozov.system.webcam.*;
 import morozov.system.webcam.converters.*;
 import morozov.system.webcam.errors.*;
+import morozov.system.webcam.interfaces.*;
 import morozov.terms.*;
 import morozov.worlds.*;
 
@@ -35,25 +36,28 @@ import java.util.concurrent.TimeoutException;
 
 public abstract class Webcam
 		extends ZoomDataAcquisitionBuffer
-		implements WebcamDiscoveryListener, WebcamListener {
+		implements
+			WebcamDiscoveryListener,
+			WebcamDataConsumerInterface {
 	//
 	public WebcamName defaultName= null;
-	// public WaitingInterval maximalWaitingTime= null;
+	//
+	protected WebcamAcquisitionTask webcamAcquisitionTask= new WebcamAcquisitionTask(this);
 	//
 	protected com.github.sarxos.webcam.Webcam currentWebcam= null;
 	protected boolean isConnected= false;
 	protected boolean isWebcamArrayListener= false;
-	// protected boolean isWebcamStateListener= true;
 	//
 	protected AtomicLong counterOfAcquiredFrames= new AtomicLong(-1);
-	// protected AtomicLong numberOfRecentAcceptedFrame= new AtomicLong(-1);
 	//
 	protected long numberOfRepeatedFrame= -1;
 	//
+	protected int initialValueOfFirstFrameIndicator= -3;
+	//
 	protected long committedFrameNumber= -1;
 	protected long committedFrameTime= -1;
-	protected long firstCommittedFrameNumber= -1;
-	protected long firstCommittedFrameTime= -1;
+	protected long firstCommittedFrameNumber= initialValueOfFirstFrameIndicator;
+	protected long firstCommittedFrameTime= initialValueOfFirstFrameIndicator;
 	//
 	protected static WaitingInterval defaultWaitingInterval= new WaitingInterval(true,false);
 	protected static long longDefaultInterval= 1000 * 60;	// 1 minute
@@ -62,12 +66,10 @@ public abstract class Webcam
 	///////////////////////////////////////////////////////////////
 	//
 	abstract public Term getBuiltInSlot_E_default_name();
-	// abstract public Term getBuiltInSlot_E_maximal_waiting_time();
 	//
 	abstract public long entry_s_WebcamAdded_1_i();
 	abstract public long entry_s_WebcamRemoved_1_i();
 	abstract public long entry_s_WebcamStarted_1_i();
-	// abstract public long entry_s_WebcamImageObtained_1_i();
 	abstract public long entry_s_WebcamStopped_1_i();
 	abstract public long entry_s_WebcamDisposed_1_i();
 	//
@@ -173,6 +175,7 @@ public abstract class Webcam
 					isConnected= true;
 				} else {
 					currentWebcam= null;
+					webcamAcquisitionTask.setCurrentWebcam(null);
 				}
 			} else {
 				throw new WebcamIsNotConnected();
@@ -183,16 +186,20 @@ public abstract class Webcam
 	}
 	//
 	public void getActualResolution2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
-		if (isConnected) {
-			if (currentWebcam != null) {
-				Dimension size= currentWebcam.getViewSize();
-				a1.setBacktrackableValue(new PrologInteger(size.width),iX);
-				a2.setBacktrackableValue(new PrologInteger(size.height),iX);
-			} else {
-				throw new WebcamIsNotConnected();
-			}
+		if (isConnected && currentWebcam != null) {
+			Dimension size= currentWebcam.getViewSize();
+			a1.setBacktrackableValue(new PrologInteger(size.width),iX);
+			a2.setBacktrackableValue(new PrologInteger(size.height),iX);
 		} else {
-			throw new WebcamIsNotConnected();
+			int currentWidth= -1;
+			int currentHeight= -1;
+			if (committedFrame != null && committedFrame instanceof RGBFrame) {
+				RGBFrame rgbFrame= (RGBFrame)committedFrame;
+				currentWidth= rgbFrame.getWidth();
+				currentHeight= rgbFrame.getHeight();
+			};
+			a1.setBacktrackableValue(new PrologInteger(currentWidth),iX);
+			a2.setBacktrackableValue(new PrologInteger(currentHeight),iX);
 		}
 	}
 	//
@@ -214,13 +221,12 @@ public abstract class Webcam
 	///////////////////////////////////////////////////////////////
 	//
 	public void getWebcamList0ff(ChoisePoint iX, PrologVariable result) {
-		// WaitingInterval interval= getMaximalWaitingTime(iX);
 		result.setNonBacktrackableValue(getWebcamList(defaultWaitingInterval));
 	}
 	public void getWebcamList0fs(ChoisePoint iX) {
 	}
 	public void getWebcamList1ff(ChoisePoint iX, PrologVariable result, Term a1) {
-		WaitingInterval interval= WaitingInterval.argumentToWaitingInterval(a1,iX);
+		WaitingInterval interval= WaitingIntervalConverters.argumentToWaitingInterval(a1,iX);
 		result.setNonBacktrackableValue(getWebcamList(interval));
 	}
 	public void getWebcamList1fs(ChoisePoint iX, Term a1) {
@@ -275,10 +281,12 @@ public abstract class Webcam
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void webcamFound(WebcamDiscoveryEvent event) {
 		long domainSignature= entry_s_WebcamAdded_1_i();
 		processWebcamDiscoveryEvent(domainSignature,event);
 	}
+	@Override
 	public void webcamGone(WebcamDiscoveryEvent event) {
 		long domainSignature= entry_s_WebcamRemoved_1_i();
 		processWebcamDiscoveryEvent(domainSignature,event);
@@ -287,7 +295,6 @@ public abstract class Webcam
 	protected void processWebcamDiscoveryEvent(long domainSignature, WebcamDiscoveryEvent event) {
 		Term predicateArgument= new PrologString(event.getWebcam().getName());
 		Term[] arguments= new Term[]{predicateArgument};
-		// 2018.10.30: AsyncCall call= new AsyncCall(domainSignature,this,true,false,arguments,true);
 		AsyncCall call= new AsyncCall(domainSignature,this,true,true,arguments,true);
 		transmitAsyncCall(call,null);
 	}
@@ -302,34 +309,38 @@ public abstract class Webcam
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void webcamOpen(WebcamEvent event) {
 		long domainSignature= entry_s_WebcamStarted_1_i();
 		processWebcamEvent(domainSignature,event);
 	}
-	public void webcamImageObtained(WebcamEvent event) {
-		// long domainSignature= entry_s_WebcamImageObtained_1_i();
-		// processWebcamEvent(domainSignature,event);
+	@Override
+	public void webcamImageObtained(java.awt.image.BufferedImage nativeImage) {
+		if (nativeImage==null) {
+			return;
+		};
 		DataAcquisitionBufferOperatingMode actingOperatingMode= actingDataAcquisitionBufferOperatingMode.get();
 		if (actingOperatingMode==null) {
 			return;
 		};
 		if (	actingOperatingMode==DataAcquisitionBufferOperatingMode.LISTENING ||
 			actingOperatingMode==DataAcquisitionBufferOperatingMode.RECORDING) {
-			java.awt.image.BufferedImage nativeImage= currentWebcam.getImage();
 			RGBFrame frame= new RGBFrame(
 				nativeImage,
-				// this,
 				convertImageToBytes(nativeImage),
 				counterOfAcquiredFrames.incrementAndGet(),
 				System.currentTimeMillis(),
 				recentAttributes.get());
+			flushAudioSystemIfNecessary();
 			sendDataFrame(frame);
 		}
 	}
+	@Override
 	public void webcamClosed(WebcamEvent event) {
 		long domainSignature= entry_s_WebcamStopped_1_i();
 		processWebcamEvent(domainSignature,event);
 	}
+	@Override
 	public void webcamDisposed(WebcamEvent event) {
 		long domainSignature= entry_s_WebcamDisposed_1_i();
 		processWebcamEvent(domainSignature,event);
@@ -338,7 +349,6 @@ public abstract class Webcam
 	protected void processWebcamEvent(long domainSignature, WebcamEvent event) {
 		Term predicateArgument= new PrologString(event.getSource().getName());
 		Term[] arguments= new Term[]{predicateArgument};
-		// 2018.10.30: AsyncCall call= new AsyncCall(domainSignature,this,true,false,arguments,true);
 		AsyncCall call= new AsyncCall(domainSignature,this,true,true,arguments,true);
 		transmitAsyncCall(call,null);
 	}
@@ -354,49 +364,49 @@ public abstract class Webcam
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void resetCounters() {
 		synchronized (numberOfRecentReceivedFrame) {
 			super.resetCounters();
 			counterOfAcquiredFrames.set(-1);
-			// numberOfRecentAcceptedFrame.set(-1);
 			numberOfRepeatedFrame= -1;
 		}
 	}
 	//
+	@Override
 	protected void resetFrameRate() {
+		super.resetFrameRate();
 		committedFrameNumber= -1;
 		committedFrameTime= -1;
-		firstCommittedFrameNumber= -1;
-		firstCommittedFrameTime= -1;
+		firstCommittedFrameNumber= initialValueOfFirstFrameIndicator;
+		firstCommittedFrameTime= initialValueOfFirstFrameIndicator;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void start0s(ChoisePoint iX) {
 		WebcamName webcamName= getDefaultName(iX);
-		// WaitingInterval interval= getMaximalWaitingTime(iX);
 		start(webcamName,defaultWaitingInterval,iX);
 	}
 	public void start1ff(ChoisePoint iX, PrologVariable result, Term a1) {
 		WebcamName webcamName= WebcamName.argumentToWebcamName(a1,iX);
-		// WaitingInterval interval= getMaximalWaitingTime(iX);
 		boolean value= start(webcamName,defaultWaitingInterval,iX);
 		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(value));
 	}
 	public void start1fs(ChoisePoint iX, Term a1) {
 		WebcamName webcamName= WebcamName.argumentToWebcamName(a1,iX);
-		// WaitingInterval interval= getMaximalWaitingTime(iX);
 		start(webcamName,defaultWaitingInterval,iX);
 	}
 	public void start2ff(ChoisePoint iX, PrologVariable result, Term a1, Term a2) {
 		WebcamName webcamName= WebcamName.argumentToWebcamName(a1,iX);
-		WaitingInterval interval= WaitingInterval.argumentToWaitingInterval(a2,iX);
+		WaitingInterval interval= WaitingIntervalConverters.argumentToWaitingInterval(a2,iX);
 		boolean value= start(webcamName,interval,iX);
 		result.setNonBacktrackableValue(YesNoConverters.boolean2TermYesNo(value));
 	}
 	public void start2fs(ChoisePoint iX, Term a1, Term a2) {
 		WebcamName webcamName= WebcamName.argumentToWebcamName(a1,iX);
-		WaitingInterval interval= WaitingInterval.argumentToWaitingInterval(a2,iX);
+		WaitingInterval interval= WaitingIntervalConverters.argumentToWaitingInterval(a2,iX);
 		start(webcamName,interval,iX);
 	}
 	//
@@ -409,47 +419,50 @@ public abstract class Webcam
 			if (currentOperatingMode==DataAcquisitionBufferOperatingMode.RECORDING) {
 				actingDataAcquisitionBufferOperatingMode.set(currentOperatingMode);
 				try {
-					return startRecording(webcamName,interval,iX);
+					return startRecording(webcamName,interval,currentOperatingMode,iX);
 				} catch (Throwable e) {
-					actingDataAcquisitionBufferOperatingMode.set(null);
+					resetActingMode();
 					throw e;
 				}
 			} else if (currentOperatingMode==DataAcquisitionBufferOperatingMode.LISTENING) {
 				actingDataAcquisitionBufferOperatingMode.set(currentOperatingMode);
 				try {
-					return prepareAndActivateListening(webcamName,interval,iX);
+					return prepareAndActivateListening(webcamName,interval,true,iX);
 				} catch (Throwable e) {
-					actingDataAcquisitionBufferOperatingMode.set(null);
+					resetActingMode();
 					throw e;
 				}
 			}
 		} else if (actingOperatingMode==DataAcquisitionBufferOperatingMode.RECORDING) {
-			return startRecording(webcamName,interval,iX);
+			return startRecording(webcamName,interval,actingOperatingMode,iX);
 		} else if (actingOperatingMode==DataAcquisitionBufferOperatingMode.LISTENING) {
-			return prepareAndActivateListening(webcamName,interval,iX);
+			return prepareAndActivateListening(webcamName,interval,false,iX);
 		};
 		super.start(false,iX);
-		// resetFrameRate();
 		return true;
 	}
 	//
-	protected boolean startRecording(WebcamName webcamName, WaitingInterval interval, ChoisePoint iX) {
+	protected boolean startRecording(WebcamName webcamName, WaitingInterval interval, DataAcquisitionBufferOperatingMode currentOperatingMode, ChoisePoint iX) {
 		if (isConnected) {
 			return true;
 		};
 		int currentWriteBufferSize= getWriteBufferSize(iX);
 		ExtendedFileName currentFileName= retrieveRealLocalFileName(iX);
-		int currentOutputDebugInformation= PrologInteger.toInteger(getOutputDebugInformation(iX));
+		int currentOutputDebugInformation= Arithmetic.toInteger(getOutputDebugInformation(iX));
 		frameRecordingTask.setWriteBufferSize(currentWriteBufferSize);
 		frameRecordingTask.setOutputDebugInformation(currentOutputDebugInformation);
 		frameRecordingTask.reset(currentFileName);
 		setActingMetadata(iX);
+		super.startRecording(currentOperatingMode,false,iX);
 		return checkAndActivateWebcam(webcamName,interval,iX);
 	}
 	//
-	protected boolean prepareAndActivateListening(WebcamName webcamName, WaitingInterval interval, ChoisePoint iX) {
+	protected boolean prepareAndActivateListening(WebcamName webcamName, WaitingInterval interval, boolean flushBuffers, ChoisePoint iX) {
 		int currentReadBufferSize= getReadBufferSize(iX);
+		int currentOutputDebugInformation= Arithmetic.toInteger(getOutputDebugInformation(iX));
 		actingReadBufferSize.set(currentReadBufferSize);
+		webcamAcquisitionTask.setOutputDebugInformation(currentOutputDebugInformation);
+		super.activateDataAcquisition(flushBuffers,iX);
 		return checkAndActivateWebcam(webcamName,interval,iX);
 	}
 	//
@@ -475,6 +488,7 @@ public abstract class Webcam
 				for (com.github.sarxos.webcam.Webcam webcam : webcams) {
 					if (textName.equals(webcam.getName())) {
 						currentWebcam= webcam;
+						webcamAcquisitionTask.setCurrentWebcam(currentWebcam);
 						nameIsFound= true;
 						break;
 					}
@@ -486,10 +500,13 @@ public abstract class Webcam
 				try {
 					long timeout= interval.toMillisecondsLongOrDefault();
 					currentWebcam= com.github.sarxos.webcam.Webcam.getDefault(timeout);
+					webcamAcquisitionTask.setCurrentWebcam(currentWebcam);
 				} catch (UseDefaultInterval e) {
 					currentWebcam= com.github.sarxos.webcam.Webcam.getDefault(longDefaultInterval);
+					webcamAcquisitionTask.setCurrentWebcam(currentWebcam);
 				} catch (UseAnyInterval e) {
 					currentWebcam= com.github.sarxos.webcam.Webcam.getDefault(longAnyInterval);
+					webcamAcquisitionTask.setCurrentWebcam(currentWebcam);
 				};
 				if (currentWebcam==null) {
 					throw new DefaultWebcamIsNotFound();
@@ -498,7 +515,6 @@ public abstract class Webcam
 			if (currentWebcam==null) {
 				throw new WebcamIsNotFound(webcamName.toString());
 			};
-			// if (isWebcamStateListener) {
 			WebcamListener[] webcamListeners= currentWebcam.getWebcamListeners();
 			boolean isElement= false;
 			for (int k=0; k < webcamListeners.length; k++) {
@@ -508,11 +524,8 @@ public abstract class Webcam
 				}
 			};
 			if (!isElement) {
-				currentWebcam.addWebcamListener(this);
+				currentWebcam.addWebcamListener(webcamAcquisitionTask);
 			};
-			// } else {
-			//	currentWebcam.removeWebcamListener(this);
-			// };
 			try {
 				int viewWidth= eW.getIntegerValue();
 				int viewHeight= eH.getIntegerValue();
@@ -524,36 +537,44 @@ public abstract class Webcam
 			boolean result= currentWebcam.open(true);
 			if (!result) {
 				currentWebcam= null;
+				webcamAcquisitionTask.setCurrentWebcam(null);
 			};
 			isConnected= result;
 			return result;
 		} catch (TimeoutException e) {
 			currentWebcam= null;
+			webcamAcquisitionTask.setCurrentWebcam(null);
 			throw new WebcamTimeoutException();
 		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected void activateDataAcquisition(ChoisePoint iX) {
+	@Override
+	protected void activateDataAcquisition(boolean flushBuffers, ChoisePoint iX) {
 		WebcamName webcamName= getDefaultName(iX);
-		// WaitingInterval interval= getMaximalWaitingTime(iX);
+		int currentOutputDebugInformation= Arithmetic.toInteger(getOutputDebugInformation(iX));
+		super.activateDataAcquisition(flushBuffers,iX);
 		checkAndActivateWebcam(webcamName,defaultWaitingInterval,iX);
 	}
 	//
+	@Override
 	protected void suspendRecording(ChoisePoint iX) {
 		stopWebcam(iX);
 		super.suspendRecording(iX);
 	}
+	@Override
 	protected void suspendListening(ChoisePoint iX) {
 		stopWebcam(iX);
 		super.suspendListening(iX);
 	}
 	//
+	@Override
 	protected void stopRecording(ChoisePoint iX) {
 		stopWebcam(iX);
 		super.stopRecording(iX);
 	}
+	@Override
 	protected void stopListening(ChoisePoint iX) {
 		stopWebcam(iX);
 		super.stopListening(iX);
@@ -564,11 +585,13 @@ public abstract class Webcam
 			if (currentWebcam != null) {
 				currentWebcam.close();
 				currentWebcam= null;
+				webcamAcquisitionTask.setCurrentWebcam(null);
 			};
 			isConnected= false;
 		}
 	}
 	//
+	@Override
 	protected boolean dataAcquisitionIsActive() {
 		if (isConnected) {
 			if (currentWebcam != null) {
@@ -576,45 +599,24 @@ public abstract class Webcam
 			} else {
 				return false;
 			}
-			// return true;
 		} else {
 			return false;
 		}
 	}
 	//
+	@Override
 	protected boolean dataAcquisitionIsSuspended() {
 		return !dataAcquisitionIsActive();
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected void containsNewFrame() throws Backtracking {
-		DataAcquisitionBufferOperatingMode actingOperatingMode= actingDataAcquisitionBufferOperatingMode.get();
-		if (actingOperatingMode==DataAcquisitionBufferOperatingMode.LISTENING) {
-			if (isConnected) {
-				if (currentWebcam != null) {
-					if (!currentWebcam.isImageNew()) {
-						throw Backtracking.instance;
-					}
-				} else {
-					throw Backtracking.instance;
-				}
-			} else {
-				throw Backtracking.instance;
-			}
-		} else {
-			super.containsNewFrame();
-		}
-	}
-	//
-	///////////////////////////////////////////////////////////////
-	//
+	@Override
 	protected void commit() {
 		synchronized (numberOfRecentReceivedFrame) {
 			super.commit();
 			committedFrame= recentFrame;
 			if (!recentFrameIsRepeated) {
-				// committedFrameNumber= numberOfRecentAcceptedFrame.get();
 				committedFrameNumber= numberOfRecentReceivedFrame.get();
 			} else {
 				committedFrameNumber= numberOfRepeatedFrame;
@@ -630,8 +632,12 @@ public abstract class Webcam
 			committedFrameTime= -1;
 		};
 		if (firstCommittedFrameTime < 0) {
-			firstCommittedFrameNumber= committedFrameNumber;
-			firstCommittedFrameTime= committedFrameTime;
+			if (firstCommittedFrameTime == -1) {
+				firstCommittedFrameNumber= committedFrameNumber;
+				firstCommittedFrameTime= committedFrameTime;
+			} else {
+				firstCommittedFrameTime++;
+			}
 		}
 	}
 	//
@@ -662,6 +668,19 @@ public abstract class Webcam
 	}
 	//
 	public void getRecentFrameRate1s(ChoisePoint iX, PrologVariable a1) {
+		boolean canUseDelta;
+		long deltaN;
+		long deltaTime;
+		synchronized (numberOfRecentReceivedFrame) {
+			canUseDelta= (firstCommittedFrameNumber >= 0);
+			deltaN= committedFrameNumber - firstCommittedFrameNumber;
+			deltaTime= committedFrameTime - firstCommittedFrameTime;
+		};
+		double currentFrameRate= computeFrameRate(canUseDelta,deltaN,deltaTime);
+		a1.setBacktrackableValue(new PrologReal(currentFrameRate),iX);
+	}
+	//
+	public void getCameraFrameRate1s(ChoisePoint iX, PrologVariable a1) {
 		double currentFrameRate;
 		DataAcquisitionBufferOperatingMode actingOperatingMode= actingDataAcquisitionBufferOperatingMode.get();
 		if (	actingOperatingMode==DataAcquisitionBufferOperatingMode.LISTENING ||
@@ -739,53 +758,35 @@ public abstract class Webcam
 				nativeImage= getImage((RGBFrameInterface)committedFrame);
 			}
 		};
-		int width= -1;
-		int height= -1;
+		int currentWidth= -1;
+		int currentHeight= -1;
 		if (nativeImage != null) {
-			width= nativeImage.getWidth();
-			height= nativeImage.getHeight();
+			currentWidth= nativeImage.getWidth();
+			currentHeight= nativeImage.getHeight();
 		};
-		a1.setBacktrackableValue(new PrologInteger(width),iX);
-		a2.setBacktrackableValue(new PrologInteger(height),iX);
+		a1.setBacktrackableValue(new PrologInteger(currentWidth),iX);
+		a2.setBacktrackableValue(new PrologInteger(currentHeight),iX);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected long updateRecentFrame(DataFrameInterface frame) {
-		if (frame.isLightweightFrame()) {
-			return -1;
+	@Override
+	protected long acceptFrame(DataFrameInterface frame, long currentFrameNumber) {
+		if (frame instanceof RGBFrameInterface) {
+			RGBFrameInterface colorFrame= (RGBFrameInterface)frame;
+			currentFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
+			updateHistory(colorFrame);
 		};
-		synchronized (numberOfRecentReceivedFrame) {
-			long currentFrameNumber= -1;
-			if (frame instanceof RGBFrameInterface) {
-				recentFrame= frame;
-				committedFrameWasAssignedDirectly.set(false);
-				// long currentNumber=
-				currentFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
-				// numberOfRecentAcceptedFrame.set(currentNumber);
-				RGBFrameInterface colorFrame= (RGBFrameInterface)frame;
-				updateHistory(colorFrame);
-			} else {
-				return currentFrameNumber;
-			};
-			// long currentFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
-			recentFrameIsRepeated= false;
+		currentFrameNumber= super.acceptFrame(frame,currentFrameNumber);
+		if (currentFrameNumber >= 0) {
 			numberOfRepeatedFrame= -1;
-			numberOfRecentReceivedFrame.notifyAll();
-			return currentFrameNumber;
-		}
-	}
-	//
-	protected void updateHistory(RGBFrameInterface recentDataFrame) {
-		if (recentDataFrame==null) {
-			return;
 		};
-		// updateHistory(new EnumeratedDataFrame(recentDataFrame,numberOfRecentAcceptedFrame.get()));
-		updateHistory(new EnumeratedDataFrame(recentDataFrame,numberOfRecentReceivedFrame.get()));
+		return currentFrameNumber;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void acceptRequestedFrame(EnumeratedFrame enumeratedFrame) {
 		EnumeratedDataFrame selectedFrame= (EnumeratedDataFrame)enumeratedFrame;
 		recentFrame= selectedFrame.getFrame();
@@ -794,6 +795,7 @@ public abstract class Webcam
 		numberOfRepeatedFrame= selectedFrame.getNumberOfFrame();
 	}
 	//
+	@Override
 	protected void acceptRetrievedFrame(EnumeratedFrame enumeratedFrame) {
 		EnumeratedDataFrame selectedFrame= (EnumeratedDataFrame)enumeratedFrame;
 		RGBFrameInterface colorFrame= (RGBFrameInterface)selectedFrame.getFrame();
@@ -805,6 +807,7 @@ public abstract class Webcam
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void extractFrame(String key, CompoundFrameInterface container) {
 		if (committedFrame != null) {
 			EnumeratedDataFrame enumeratedFrame= new EnumeratedDataFrame(
@@ -816,12 +819,12 @@ public abstract class Webcam
 		}
 	}
 	//
+	@Override
 	public void assignFrame(String key, CompoundFrameInterface container, ChoisePoint iX) {
 		EnumeratedDataFrame enumeratedFrame= (EnumeratedDataFrame)container.getComponent(key);
 		synchronized (numberOfRecentReceivedFrame) {
 			committedFrame= enumeratedFrame.getFrame();
 			committedFrameWasAssignedDirectly.set(true);
-			// committedFrameNumber= numberOfRecentAcceptedFrame.incrementAndGet();
 			committedFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
 			updateCommittedFrameTime();
 		}

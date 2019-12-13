@@ -8,6 +8,7 @@ public class VPMmskAddPolygon extends VPMmskApplyPolygon {
 		super(aX,aY,useStandardizedCoordinates);
 	}
 	//
+	@Override
 	protected void applyPolygon(boolean[] foregroundMask, int[] imagePixels) {
 		int vectorLength= foregroundMask.length;
 		for (int k=0; k < vectorLength; k++) {

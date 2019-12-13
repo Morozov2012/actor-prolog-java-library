@@ -14,7 +14,7 @@ public class KinectCircumscriptionModesConverters {
 	public static KinectCircumscriptionMode[] argumentToKinectCircumscriptionModes(Term value, ChoisePoint iX) {
 		ArrayList<KinectCircumscriptionMode> arrayOfModes= new ArrayList<>();
 		argumentToArrayOfKinectCircumscriptionModes(value,arrayOfModes,iX);
-		return arrayOfModes.toArray(new KinectCircumscriptionMode[0]);
+		return arrayOfModes.toArray(new KinectCircumscriptionMode[arrayOfModes.size()]);
 	}
 	//
 	protected static void argumentToArrayOfKinectCircumscriptionModes(Term value, ArrayList<KinectCircumscriptionMode> array, ChoisePoint iX) {

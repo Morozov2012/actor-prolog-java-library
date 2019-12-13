@@ -91,11 +91,13 @@ public abstract class ImageSubtractor
 	//
 	// MinimalTrainingInterval
 	//
+	@Override
 	public void setMinimalTrainingInterval(int frames, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setMinimalTrainingInterval(frames);
 	}
+	@Override
 	public int getMinimalTrainingInterval(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -104,11 +106,13 @@ public abstract class ImageSubtractor
 	//
 	// MaximalTrainingInterval
 	//
+	@Override
 	public void setMaximalTrainingInterval(int frames, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setMaximalTrainingInterval(frames);
 	}
+	@Override
 	public int getMaximalTrainingInterval(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -271,11 +275,13 @@ public abstract class ImageSubtractor
 	//
 	// HorizontalBlobBorder
 	//
+	@Override
 	public void setHorizontalBlobBorder(int size, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setHorizontalBlobBorder(size);
 	}
+	@Override
 	public int getHorizontalBlobBorder(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -284,11 +290,13 @@ public abstract class ImageSubtractor
 	//
 	// VerticalBlobBorder
 	//
+	@Override
 	public void setVerticalBlobBorder(int size, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setVerticalBlobBorder(size);
 	}
+	@Override
 	public int getVerticalBlobBorder(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -297,11 +305,13 @@ public abstract class ImageSubtractor
 	//
 	// HorizontalExtraBorderCoefficient
 	//
+	@Override
 	public void setHorizontalExtraBorderCoefficient(double coefficient, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setHorizontalExtraBorderCoefficient(coefficient);
 	}
+	@Override
 	public double getHorizontalExtraBorderCoefficient(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -310,11 +320,13 @@ public abstract class ImageSubtractor
 	//
 	// VerticalExtraBorderCoefficient
 	//
+	@Override
 	public void setVerticalExtraBorderCoefficient(double coefficient, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setVerticalExtraBorderCoefficient(coefficient);
 	}
+	@Override
 	public double getVerticalExtraBorderCoefficient(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -323,11 +335,13 @@ public abstract class ImageSubtractor
 	//
 	// MinimalBlobIntersectionArea
 	//
+	@Override
 	public void setMinimalBlobIntersectionArea(int size, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setMinimalBlobIntersectionArea(size);
 	}
+	@Override
 	public int getMinimalBlobIntersectionArea(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -336,11 +350,13 @@ public abstract class ImageSubtractor
 	//
 	// MinimalBlobSize
 	//
+	@Override
 	public void setMinimalBlobSize(int size, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setMinimalBlobSize(size);
 	}
+	@Override
 	public int getMinimalBlobSize(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -349,11 +365,13 @@ public abstract class ImageSubtractor
 	//
 	// MinimalTrackDuration
 	//
+	@Override
 	public void setMinimalTrackDuration(int frames, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setMinimalTrackDuration(frames);
 	}
+	@Override
 	public int getMinimalTrackDuration(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -362,11 +380,13 @@ public abstract class ImageSubtractor
 	//
 	// MaximalTrackDuration
 	//
+	@Override
 	public void setMaximalTrackDuration(int frames, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setMaximalTrackDuration(frames);
 	}
+	@Override
 	public int getMaximalTrackDuration(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -388,11 +408,13 @@ public abstract class ImageSubtractor
 	//
 	// MaximalBlobInvisibilityInterval
 	//
+	@Override
 	public void setMaximalBlobInvisibilityInterval(int frames, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setMaximalBlobInvisibilityInterval(frames);
 	}
+	@Override
 	public int getMaximalBlobInvisibilityInterval(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -401,11 +423,13 @@ public abstract class ImageSubtractor
 	//
 	// MaximalTrackRetentionInterval
 	//
+	@Override
 	public void setMaximalTrackRetentionInterval(int frames, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setMaximalTrackRetentionInterval(frames);
 	}
+	@Override
 	public int getMaximalTrackRetentionInterval(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -414,37 +438,29 @@ public abstract class ImageSubtractor
 	//
 	// InverseTransformationMatrix
 	//
+	@Override
 	public void setInverseTransformationMatrix(double[][] matrix, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setInverseTransformationMatrix(matrix);
 	}
-	// public void setSerializedInverseTransformationMatrix(byte[] bytes, ChoisePoint iX) {
-	//	createImageSubtractorIfNecessary(iX);
-	//	PlainImageSubtractor subtractor= imageSubtractor.get();
-	//	double[][] matrix= GeneralConverters.deserializeMatrix(bytes);
-	//	subtractor.setInverseTransformationMatrix(matrix);
-	// }
 	//
+	@Override
 	public double[][] getInverseTransformationMatrix(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		return subtractor.getInverseTransformationMatrix();
 	}
-	// public byte[] getSerializedInverseTransformationMatrix(ChoisePoint iX) {
-	//	createImageSubtractorIfNecessary(iX);
-	//	PlainImageSubtractor subtractor= imageSubtractor.get();
-	//	double[][] matrix= getInverseTransformationMatrix();
-	//	return GeneralConverters.serializeMatrix(matrix);
-	// }
 	//
 	// SamplingRate
 	//
+	@Override
 	public void setSamplingRate(double rate, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setSamplingRate(rate);
 	}
+	@Override
 	public double getSamplingRate(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -453,11 +469,13 @@ public abstract class ImageSubtractor
 	//
 	// R2WindowHalfwidth
 	//
+	@Override
 	public void setR2WindowHalfwidth(int halfwidth, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setR2WindowHalfwidth(halfwidth);
 	}
+	@Override
 	public int getR2WindowHalfwidth(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -466,11 +484,13 @@ public abstract class ImageSubtractor
 	//
 	// CharacteristicLengthMedianFilteringMode
 	//
+	@Override
 	public void setCharacteristicLengthMedianFilteringMode(boolean mode, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setCharacteristicLengthMedianFilteringMode(mode);
 	}
+	@Override
 	public boolean getCharacteristicLengthMedianFilteringMode(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -479,11 +499,13 @@ public abstract class ImageSubtractor
 	//
 	// CharacteristicLengthMedianFilterHalfwidth
 	//
+	@Override
 	public void setCharacteristicLengthMedianFilterHalfwidth(int halfwidth, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setCharacteristicLengthMedianFilterHalfwidth(halfwidth);
 	}
+	@Override
 	public int getCharacteristicLengthMedianFilterHalfwidth(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -492,11 +514,13 @@ public abstract class ImageSubtractor
 	//
 	// VelocityMedianFilteringMode
 	//
+	@Override
 	public void setVelocityMedianFilteringMode(boolean mode, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setVelocityMedianFilteringMode(mode);
 	}
+	@Override
 	public boolean getVelocityMedianFilteringMode(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -505,11 +529,13 @@ public abstract class ImageSubtractor
 	//
 	// VelocityMedianFilterHalfwidth
 	//
+	@Override
 	public void setVelocityMedianFilterHalfwidth(int halfwidth, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setVelocityMedianFilterHalfwidth(halfwidth);
 	}
+	@Override
 	public int getVelocityMedianFilterHalfwidth(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -606,11 +632,13 @@ public abstract class ImageSubtractor
 	//
 	// SynthesizedImageTransparency
 	//
+	@Override
 	public void setSynthesizedImageTransparency(int transparency, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setSynthesizedImageTransparency(transparency);
 	}
+	@Override
 	public int getSynthesizedImageTransparency(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -619,11 +647,13 @@ public abstract class ImageSubtractor
 	//
 	// SynthesizedImageRectangularBlobsMode
 	//
+	@Override
 	public void setSynthesizedImageRectangularBlobsMode(boolean mode, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		subtractor.setSynthesizedImageRectangularBlobsMode(mode);
 	}
+	@Override
 	public boolean getSynthesizedImageRectangularBlobsMode(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -642,18 +672,16 @@ public abstract class ImageSubtractor
 	//
 	protected void subtract(Term frame, Term image, boolean takeFrameIntoAccount, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
-		long frameNumber= PrologInteger.toLong(GeneralConverters.argumentToRoundInteger(frame,iX));
+		long frameNumber= Arithmetic.toLong(GeneralConverters.argumentToRoundInteger(frame,iX));
 		java.awt.image.BufferedImage nativeImage= acquireNativeImage(image,iX);
 		GenericImageEncodingAttributes attributes= getCurrentImageEncodingAttributes();
 		subtract(frameNumber,nativeImage,takeFrameIntoAccount,iX,attributes);
 	}
-	// abstract public void subtract(long frameNumber, java.awt.image.BufferedImage nativeImage, boolean takeFrameIntoAccount, ChoisePoint iX, GenericImageEncodingAttributes attributes);
 	//
 	public void subtract(long frameNumber, java.awt.image.BufferedImage nativeImage, boolean takeFrameIntoAccount, ChoisePoint iX, GenericImageEncodingAttributes attributes) {
 		createImageSubtractorIfNecessary(iX);
 		if (nativeImage != null) {
 			PlainImageSubtractor subtractor= imageSubtractor.get();
-			// subtractor.subtractImageAndAnalyseBlobs(frameNumber,nativeImage,takeFrameIntoAccount);
 			subtractor.processImage(nativeImage,frameNumber,-1,takeFrameIntoAccount);
 		}
 	}
@@ -662,11 +690,11 @@ public abstract class ImageSubtractor
 		java.awt.image.BufferedImage nativeImage= Space2DWriter.bytesToImage(bytes);
 		if (nativeImage != null) {
 			PlainImageSubtractor subtractor= imageSubtractor.get();
-			// subtractor.subtractImageAndAnalyseBlobs(frameNumber,nativeImage,takeFrameIntoAccount);
 			subtractor.processImage(nativeImage,frameNumber,-1,takeFrameIntoAccount);
 		}
 	}
 	//
+	@Override
 	public void process(java.awt.image.BufferedImage nativeImage, long frameNumber, long timeInMilliseconds, boolean takeFrameIntoAccount, ChoisePoint iX, GenericImageEncodingAttributes attributes) {
 		createImageSubtractorIfNecessary(iX);
 		if (nativeImage != null) {
@@ -674,6 +702,7 @@ public abstract class ImageSubtractor
 			subtractor.processImage(nativeImage,frameNumber,timeInMilliseconds,takeFrameIntoAccount);
 		}
 	}
+	@Override
 	public void process(byte[] bytes, long frameNumber, long timeInMilliseconds, boolean takeFrameIntoAccount, ChoisePoint iX, GenericImageEncodingAttributes attributes) {
 		createImageSubtractorIfNecessary(iX);
 		java.awt.image.BufferedImage nativeImage= Space2DWriter.bytesToImage(bytes);
@@ -780,6 +809,7 @@ public abstract class ImageSubtractor
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void commit(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
@@ -790,17 +820,21 @@ public abstract class ImageSubtractor
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void resetSettings(ChoisePoint iX) {
 		reset(true,false,false,iX);
 	}
 	//
+	@Override
 	public void resetStatistics(ChoisePoint iX) {
 		reset(false,true,false,iX);
 	}
+	@Override
 	public void resetResults(ChoisePoint iX) {
 		reset(false,false,true,iX);
 	}
 	//
+	@Override
 	public void resetAll(ChoisePoint iX) {
 		reset(true,true,true,iX);
 	}
@@ -889,6 +923,7 @@ public abstract class ImageSubtractor
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public long getFrameNumber(ChoisePoint iX) {
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		if (subtractor != null) {
@@ -897,10 +932,12 @@ public abstract class ImageSubtractor
 			return -1;
 		}
 	}
+	@Override
 	public Term getFrameNumberOrSpacer(ChoisePoint iX) {
 		return new PrologInteger(getFrameNumber(iX));
 	}
 	//
+	@Override
 	public long getFrameTime(ChoisePoint iX) {
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		if (subtractor != null) {
@@ -909,17 +946,20 @@ public abstract class ImageSubtractor
 			return -1;
 		}
 	}
+	@Override
 	public Term getFrameTimeOrSpacer(ChoisePoint iX) {
 		return new PrologInteger(getFrameTime(iX));
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void getRecentImage(Term image, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		java.awt.image.BufferedImage nativeImage= imageSubtractor.get().getCommittedRecentImage();
 		modifyImage(image,nativeImage,iX);
 	}
+	@Override
 	public byte[] getSerializedRecentImage(ChoisePoint iX) {
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		if (subtractor != null) {
@@ -930,11 +970,13 @@ public abstract class ImageSubtractor
 		}
 	}
 	//
+	@Override
 	public void getPreprocessedImage(Term image, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		java.awt.image.BufferedImage nativeImage= imageSubtractor.get().getCommittedPreprocessedImage();
 		modifyImage(image,nativeImage,iX);
 	}
+	@Override
 	public byte[] getSerializedPreprocessedImage(ChoisePoint iX) {
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		if (subtractor != null) {
@@ -945,11 +987,13 @@ public abstract class ImageSubtractor
 		}
 	}
 	//
+	@Override
 	public void getForegroundImage(Term image, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		java.awt.image.BufferedImage nativeImage= imageSubtractor.get().getCommittedForegroundImage();
 		modifyImage(image,nativeImage,iX);
 	}
+	@Override
 	public byte[] getSerializedForegroundImage(ChoisePoint iX) {
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		if (subtractor != null) {
@@ -960,11 +1004,13 @@ public abstract class ImageSubtractor
 		}
 	}
 	//
+	@Override
 	public void getSynthesizedImage(Term image, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		java.awt.image.BufferedImage nativeImage= imageSubtractor.get().getCommittedSynthesizedImage();
 		modifyImage(image,nativeImage,iX);
 	}
+	@Override
 	public byte[] getSerializedSynthesizedImage(ChoisePoint iX) {
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		if (subtractor != null) {
@@ -977,11 +1023,13 @@ public abstract class ImageSubtractor
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void getBackgroundImage(Term image, int layerNumber, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		java.awt.image.BufferedImage nativeImage= imageSubtractor.get().getCommittedBackgroundImage();
 		modifyImage(image,nativeImage,iX);
 	}
+	@Override
 	public byte[] getSerializedBackgroundImage(int layerNumber, ChoisePoint iX) {
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		if (subtractor != null) {
@@ -992,11 +1040,13 @@ public abstract class ImageSubtractor
 		}
 	}
 	//
+	@Override
 	public void getSigmaImage(Term image, int layerNumber, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		java.awt.image.BufferedImage nativeImage= imageSubtractor.get().getCommittedSigmaImage();
 		modifyImage(image,nativeImage,iX);
 	}
+	@Override
 	public byte[] getSerializedSigmaImage(int layerNumber, ChoisePoint iX) {
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		if (subtractor != null) {
@@ -1009,11 +1059,13 @@ public abstract class ImageSubtractor
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term getBlobs(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		return subtractor.getCommittedBlobs();
 	}
+	@Override
 	public byte[] getSerializedBlobs(ChoisePoint iX) {
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		if (subtractor != null) {
@@ -1024,11 +1076,13 @@ public abstract class ImageSubtractor
 		}
 	}
 	//
+	@Override
 	public Term getTracks(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		return subtractor.getCommittedTracks();
 	}
+	@Override
 	public byte[] getSerializedTracks(ChoisePoint iX) {
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		if (subtractor != null) {
@@ -1039,11 +1093,13 @@ public abstract class ImageSubtractor
 		}
 	}
 	//
+	@Override
 	public Term getChronicle(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		return subtractor.getCommittedChronicle();
 	}
+	@Override
 	public byte[] getSerializedChronicle(ChoisePoint iX) {
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		if (subtractor != null) {
@@ -1054,11 +1110,13 @@ public abstract class ImageSubtractor
 		}
 	}
 	//
+	@Override
 	public Term getConnectedGraphs(ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		return subtractor.getCommittedConnectedGraphs();
 	}
+	@Override
 	public byte[] getSerializedConnectedGraphs(ChoisePoint iX) {
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		if (subtractor != null) {
@@ -1071,12 +1129,14 @@ public abstract class ImageSubtractor
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public double[] physicalCoordinates(int pixelX, int pixelY, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();
 		return subtractor.physicalCoordinates(pixelX,pixelY);
 	}
 	//
+	@Override
 	public double characteristicLength(int x, int y, ChoisePoint iX) {
 		createImageSubtractorIfNecessary(iX);
 		PlainImageSubtractor subtractor= imageSubtractor.get();

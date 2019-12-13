@@ -33,14 +33,13 @@ public class DomainOptimizedSet extends MultiArgumentDomainItem {
 		keys= keyList;
 	}
 	//
+	@Override
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
-		// initiateDomainItemsIfNecessary();
-		// t= t.dereferenceValue(cp);
 		t= t.dereferenceValue(cp);
 		if (ignoreFreeVariables && t.thisIsFreeVariable()) {
 			return true;
 		} else {
-			HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+			HashMap<Long,Term> setPositiveMap= new HashMap<>();
 			Term setEnd= t.exploreSetPositiveElements(setPositiveMap,cp);
 			setEnd= setEnd.dereferenceValue(cp);
 			if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -49,12 +48,9 @@ public class DomainOptimizedSet extends MultiArgumentDomainItem {
 				setOfKeys.toArray(keyArray);
 				for (int n=0; n < keyArray.length; n++) {
 					long currentKey= keyArray[n];
-					// Term value= setPositiveMap.get(currentKey).retrieveSetElementValue(cp);
 					Term value= setPositiveMap.get(currentKey);
-					// value= value.dereferenceValue(cp);
 					value= value.dereferenceValue(cp);
 					if (ignoreFreeVariables && value.thisIsFreeVariable()) {
-						// return true;
 						continue;
 					} else {
 						boolean elementIsFound= false;
@@ -82,16 +78,14 @@ public class DomainOptimizedSet extends MultiArgumentDomainItem {
 			}
 		}
 	}
+	@Override
 	public boolean coversOptimizedSet(long[] keysOfTerms, Term[] elements, Term tail, PrologDomain baseDomain, ChoisePoint cp, boolean ignoreFreeVariables) {
-		// initiateDomainItemsIfNecessary();
 		for (int n=0; n < keysOfTerms.length; n++) {
 			long currentKey= keysOfTerms[n];
 			try {
 				Term value= elements[n].retrieveSetElementValue(cp);
-				// value= value.dereferenceValue(cp);
 				value= value.dereferenceValue(cp);
 				if (ignoreFreeVariables && value.thisIsFreeVariable()) {
-					// return true;
 					continue;
 				} else {
 					boolean elementIsFound= false;
@@ -115,13 +109,13 @@ public class DomainOptimizedSet extends MultiArgumentDomainItem {
 		};
 		return tail.isCoveredByDomain(baseDomain,cp,ignoreFreeVariables);
 	}
+	@Override
 	public Term checkAndOptimizeTerm(Term t, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
-		// initiateDomainItemsIfNecessary();
 		Term[] arguments= checkCollectAndOptimizeSetElements(t,cp,baseDomain,true);
 		return new PrologOptimizedSet(arguments,keys);
 	}
+	@Override
 	public Term checkTerm(Term t, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
-		// initiateDomainItemsIfNecessary();
 		Term[] arguments= checkCollectAndOptimizeSetElements(t,cp,baseDomain,false);
 		Term set= PrologEmptySet.instance;
 		for (int n=arguments.length-1; n >= 0; n--) {
@@ -134,13 +128,13 @@ public class DomainOptimizedSet extends MultiArgumentDomainItem {
 		};
 		return set;
 	}
+	@Override
 	public Term checkOptimizedSet(long[] keysOfTerms, Term[] elements, Term tail, Term initialValue, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
-		// initiateDomainItemsIfNecessary();
 		Term[] arguments= checkCollectAndOptimizeSetElements(initialValue,cp,baseDomain,true);
 		return new PrologOptimizedSet(arguments,keys);
 	}
 	protected Term[] checkCollectAndOptimizeSetElements(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean optimizeTerms) throws DomainAlternativeDoesNotCoverTerm {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		HashMap<Long,Term> setPositiveMap= new HashMap<>();
 		Term setEnd= t.exploreSetPositiveElements(setPositiveMap,cp);
 		setEnd= setEnd.dereferenceValue(cp);
 		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -156,7 +150,7 @@ public class DomainOptimizedSet extends MultiArgumentDomainItem {
 					};
 					setPositiveMap.remove(currentKey);
 				} else {
-					arguments[n]= null; // PrologNoValue.instance;
+					arguments[n]= null;
 				}
 			};
 			if (setPositiveMap.isEmpty()) {
@@ -173,8 +167,8 @@ public class DomainOptimizedSet extends MultiArgumentDomainItem {
 			throw new DomainAlternativeDoesNotCoverTerm(position1);
 		}
 	}
+	@Override
 	public PrologDomain getPairDomain(long key) throws TermIsNotPairDomainAlternative {
-		// initiateDomainItemsIfNecessary();
 		int elementNumber= -1;
 		for (int n=0; n < keys.length; n++) {
 			if (key==keys[n]) {
@@ -189,12 +183,12 @@ public class DomainOptimizedSet extends MultiArgumentDomainItem {
 		}
 	}
 	//
+	@Override
 	public boolean isEqualTo(DomainAlternative a, HashSet<PrologDomainPair> stack) {
-		// initiateDomainItemsIfNecessary();
 		return a.isEqualToOptimizedSet(keys,domainItems,stack);
 	}
+	@Override
 	public boolean isEqualToOptimizedSet(long[] listOfNamesAndCodes, PrologDomain[] domains, HashSet<PrologDomainPair> stack) {
-		// initiateDomainItemsIfNecessary();
 		if (listOfNamesAndCodes.length==keys.length && domains.length==domainItems.length) {
 			try {
 				for (int n=0; n < domains.length; n++) {
@@ -212,15 +206,16 @@ public class DomainOptimizedSet extends MultiArgumentDomainItem {
 			return false;
 		}
 	}
+	@Override
 	public boolean isCoveredBySetAny() {
 		return true;
 	}
+	@Override
 	public boolean coversAlternative(DomainAlternative a, PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) {
-		// initiateDomainItemsIfNecessary();
 		return a.isCoveredByOptimizedSet(keys,domainItems,stack);
 	}
+	@Override
 	public boolean isCoveredByOptimizedSet(long[] listOfNamesAndCodes, PrologDomain[] domains, HashSet<PrologDomainPair> stack) {
-		// initiateDomainItemsIfNecessary();
 		if (listOfNamesAndCodes.length >= keys.length && domains.length >= domainItems.length) {
 			try {
 				for (int n=0; n < keys.length; n++) {
@@ -246,7 +241,6 @@ public class DomainOptimizedSet extends MultiArgumentDomainItem {
 		}
 	}
 	public boolean isCoveredBySet(PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) {
-		// initiateDomainItemsIfNecessary();
 		for (int n=0; n < keys.length; n++) {
 			long currentKey= keys[n];
 			PrologDomain currentDomain= domainItems[n];
@@ -262,7 +256,7 @@ public class DomainOptimizedSet extends MultiArgumentDomainItem {
 		};
 		return true;
 	}
-	// Converting Term to String
+	// Converting Term to String:
 	private void writeObject(ObjectOutputStream stream) throws IOException {
 		stream.defaultWriteObject();
 		for (int i= 0; i < keys.length; i++) {
@@ -283,13 +277,14 @@ public class DomainOptimizedSet extends MultiArgumentDomainItem {
 		}
 	}
 	//
+	@Override
 	protected String getMultiArgumentDomainTag() {
 		return PrologDomainName.tagDomainAlternative_OptimizedSet;
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
-		// initiateDomainItemsIfNecessary();
-		StringBuffer buffer= new StringBuffer();
+		StringBuilder buffer= new StringBuilder();
 		buffer.append(getMultiArgumentDomainTag());
 		buffer.append("([");
 		if (keys.length > 0) {

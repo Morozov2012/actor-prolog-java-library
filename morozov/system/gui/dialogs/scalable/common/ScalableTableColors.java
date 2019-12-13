@@ -15,10 +15,12 @@ package morozov.system.gui.dialogs.scalable.common;
 import morozov.terms.*;
 
 public class ScalableTableColors {
-	public Term titleForegroundColor;
-	public Term titleBackgroundColor;
-	public Term cellBackgroundColor;
-	public Term emptyCellsColor;
+	//
+	protected Term titleForegroundColor;
+	protected Term titleBackgroundColor;
+	protected Term cellBackgroundColor;
+	protected Term emptyCellsColor;
+	//
 	public ScalableTableColors(Term titleText, Term titleBackground, Term cellBackground, Term emptyCells) {
 		titleForegroundColor= titleText;
 		titleBackgroundColor= titleBackground;

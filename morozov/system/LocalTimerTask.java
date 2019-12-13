@@ -7,20 +7,17 @@ import morozov.worlds.*;
 import java.util.TimerTask;
 
 public class LocalTimerTask extends TimerTask {
-	private ActiveWorld currentProcess;
-	private AbstractInternalWorld targetWorld;
+	//
+	protected ActiveWorld currentProcess;
+	protected AbstractInternalWorld targetWorld;
 	//
 	public LocalTimerTask(ActiveWorld process, AbstractInternalWorld target) {
 		currentProcess= process;
 		targetWorld= target;
 	}
 	//
+	@Override
 	public void run() {
-// try {
-// System.err.printf("LocalTimerTask:run()\n");
 		currentProcess.receiveTimerMessage(targetWorld);
-// } catch (Throwable eee) {
-// eee.printStackTrace();
-// }
 	}
 }

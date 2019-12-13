@@ -5,16 +5,18 @@ package morozov.system;
 import target.*;
 
 import morozov.run.*;
+import morozov.system.converters.*;
 import morozov.system.errors.*;
 import morozov.terms.*;
 import morozov.worlds.*;
 
 import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.math.MathContext;
 import java.util.ArrayList;
 
 public class Arithmetic {
-	// "Check all" operations
+	// "Check all" operations:
 	public static void check_all_arguments(ChoisePoint cp, Term[] array, TermCheckOperation operation) throws Backtracking {
 		for(int i= 0; i < array.length; i++) {
 			if (!operation.eval(cp,array[i].dereferenceValue(cp))) {
@@ -29,7 +31,7 @@ public class Arithmetic {
 			}
 		}
 	}
-	// Comparison operations
+	// Comparison operations:
 	public static void compare_two_numbers(ChoisePoint iX, Term a1, Term a2, ComparisonOperation operation) throws Backtracking {
 		a1.compareWithTerm(a2,iX,operation);
 	}
@@ -77,24 +79,7 @@ public class Arithmetic {
 			return false;
 		}
 	}
-	// public static boolean realsAreEqual(double v, double value) {
-	//	if (value==v) {
-	//		return true;
-	//	} else {
-	//		long n= DefaultOptions.significantDigitsNumber;
-	//		if (n > 0) {
-	//			String fString= String.format("%%1.%de",n-1);
-	//			String s1= String.format(fString,value);
-	//			String s2= String.format(fString,v);
-	//			if (s1.equals(s2)) {
-	//				return true;
-	//			}
-	//		};
-	//		return false;
-	//	}
-	// }
-	//
-	// Arithmetic operations
+	// Arithmetic operations:
 	public static void calculate_nullary_arithmetic_function(ChoisePoint iX, PrologVariable result, NullaryArithmeticOperation operation) {
 		result.setNonBacktrackableValue(operation.eval());
 	}
@@ -112,7 +97,7 @@ public class Arithmetic {
 	}
 	//
 	public static Term calculate_multi_argument_function(ChoisePoint iX, MultiArgumentArithmeticOperation operation, Term... args) {
-		ArrayList<Term> argumentTable= new ArrayList<Term>();
+		ArrayList<Term> argumentTable= new ArrayList<>();
 		for(int i= 0; i < args.length; i++) {
 			Term item= args[i];
 			if (item.thisIsArgumentNumber()) {
@@ -132,11 +117,129 @@ public class Arithmetic {
 		if (argumentTable.size() > 0) {
 			ExtremumValue currentExtremum= new ExtremumValue();
 			for(int i= 0; i < argumentTable.size(); i++) {
-				currentExtremum.refine(iX,operation,argumentTable.get(i));
+				ExtremumValueConverters.refine(currentExtremum,iX,operation,argumentTable.get(i));
 			};
-			return currentExtremum.value();
+			return ExtremumValueConverters.value(currentExtremum);
 		} else {
 			throw new NoArgumentsAreProvided();
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public static int toInteger(BigInteger value) {
+		if (DefaultOptions.integerOverflowCheck) {
+			if (value.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
+				throw new IntegerValueIsTooBig();
+			} else if (value.compareTo(BigInteger.valueOf(Integer.MIN_VALUE)) < 0) {
+				throw new IntegerValueIsTooSmall();
+			} else {
+				return value.intValue();
+			}
+		} else {
+			return value.intValue();
+		}
+	}
+	public static int toInteger(BigDecimal value) {
+		if (DefaultOptions.integerOverflowCheck) {
+			if (value.compareTo(BigDecimal.valueOf(Integer.MAX_VALUE)) > 0) {
+				throw new IntegerValueIsTooBig();
+			} else if (value.compareTo(BigDecimal.valueOf(Integer.MIN_VALUE)) < 0) {
+				throw new IntegerValueIsTooSmall();
+			} else {
+				return value.intValue();
+			}
+		} else {
+			return value.intValue();
+		}
+	}
+	public static int toInteger(long value) {
+		if (DefaultOptions.integerOverflowCheck) {
+			if (value > Integer.MAX_VALUE) {
+				throw new IntegerValueIsTooBig();
+			} else if (value < Integer.MIN_VALUE) {
+				throw new IntegerValueIsTooSmall();
+			} else {
+				return (int)value;
+			}
+		} else {
+			return (int)value;
+		}
+	}
+	public static int toInteger(double value) {
+		value= StrictMath.round(value);
+		if (DefaultOptions.integerOverflowCheck) {
+			if (value > Integer.MAX_VALUE) {
+				throw new IntegerValueIsTooBig();
+			} else if (value < Integer.MIN_VALUE) {
+				throw new IntegerValueIsTooSmall();
+			} else {
+				return (int)value;
+			}
+		} else {
+			return (int)value;
+		}
+	}
+	public static char toCharacter(BigInteger value) {
+		if (DefaultOptions.integerOverflowCheck) {
+			if (value.compareTo(BigInteger.valueOf(Character.MAX_VALUE)) > 0) {
+				throw new IntegerValueIsTooBig();
+			} else if (value.compareTo(BigInteger.valueOf(Character.MIN_VALUE)) < 0) {
+				throw new IntegerValueIsTooSmall();
+			} else {
+				return (char)value.intValue();
+			}
+		} else {
+			return (char)value.intValue();
+		}
+	}
+	public static long toLong(BigInteger value) {
+		if (DefaultOptions.integerOverflowCheck) {
+			if (value.compareTo(BigInteger.valueOf(Long.MAX_VALUE)) > 0) {
+				throw new IntegerValueIsTooBig();
+			} else if (value.compareTo(BigInteger.valueOf(Long.MIN_VALUE)) < 0) {
+				throw new IntegerValueIsTooSmall();
+			} else {
+				return value.longValue();
+			}
+		} else {
+			return value.longValue();
+		}
+	}
+	public static long toLong(BigDecimal value) {
+		if (DefaultOptions.integerOverflowCheck) {
+			if (value.compareTo(BigDecimal.valueOf(Long.MAX_VALUE)) > 0) {
+				throw new IntegerValueIsTooBig();
+			} else if (value.compareTo(BigDecimal.valueOf(Long.MIN_VALUE)) < 0) {
+				throw new IntegerValueIsTooSmall();
+			} else {
+				return value.longValue();
+			}
+		} else {
+			return value.longValue();
+		}
+	}
+	public static long toLong(double value) {
+		value= StrictMath.round(value);
+		if (DefaultOptions.integerOverflowCheck) {
+			if (value > Long.MAX_VALUE) {
+				throw new IntegerValueIsTooBig();
+			} else if (value < Long.MIN_VALUE) {
+				throw new IntegerValueIsTooSmall();
+			} else {
+				return (long)value;
+			}
+		} else {
+			return (long)value;
+		}
+	}
+	public static boolean isSmallInteger(BigInteger value) {
+		if (value.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
+			return false;
+		} else if (value.compareTo(BigInteger.valueOf(Integer.MIN_VALUE)) < 0) {
+			return false;
+		} else {
+			return true;
 		}
 	}
 }

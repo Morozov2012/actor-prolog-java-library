@@ -28,8 +28,6 @@ public class ActiveFieldErrorBorder extends EmptyBorder {
 	protected Color failureForegroundColor;
 	protected Color failureBackgroundColor;
 	//
-	// protected boolean activeFieldValueIsValid= true;
-	//
 	public ActiveFieldErrorBorder(Component c, Insets insets) {
 		super(insets);
 		component= c;
@@ -40,8 +38,7 @@ public class ActiveFieldErrorBorder extends EmptyBorder {
 		failureBackgroundColor= bc;
 	}
 	//
-	// public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
-	// }
+	@Override
 	public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
 		Graphics2D g2= (Graphics2D)g;
 		//
@@ -50,12 +47,10 @@ public class ActiveFieldErrorBorder extends EmptyBorder {
 			float dash1[]= {5.0f,1.0f};
 			BasicStroke solid= new BasicStroke(2,BasicStroke.CAP_BUTT,BasicStroke.JOIN_MITER);
 			BasicStroke dashed= new BasicStroke(2,BasicStroke.CAP_BUTT,BasicStroke.JOIN_MITER,10.0f,dash1,0.0f);
-			// g2.setPaint(Color.BLUE);
 			g2.setPaint(failureForegroundColor);
 			g2.setStroke(solid);
 			g2.draw(new Rectangle2D.Float(x+1,y+1,width-2,height-2));
 			g2.setStroke(dashed);
-			// g2.setPaint(Color.MAGENTA);
 			g2.setPaint(failureBackgroundColor);
 			g2.draw(new Rectangle2D.Float(x+1,y+1,width-2,height-2));
 			g2.setStroke(oS);

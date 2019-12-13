@@ -10,27 +10,32 @@ import javax.swing.*;
 import com.sun.java.swing.plaf.windows.*;
 
 public class ActorPrologWindowsLookAndFeel extends WindowsLookAndFeel {
+	//
 	static final String windowsPackageName= "morozov.system.gui.dialogs.scalable.windows.";
-	// Return an identifier for this class
+	// Return an identifier for this class:
+	@Override
 	public String getID() {
 		return "ActorPrologWindows";
 	}
-	// Return the name of our look-and-feel
+	// Return the name of our look-and-feel:
+	@Override
 	public String getName() {
 		return "Actor Prolog Windows";
 	}
-	// Return a description of the LAF
+	// Return a description of the LAF:
+	@Override
 	public String getDescription() {
 		return "Actor Prolog Windows Look and Feel";
 	}
-	// Our LAF is not native
+	// Our LAF is not native:
 	// public boolean isNativeLookAndFeel() {
 	//	return false;
 	// }
-	// Our LAF is always supported
+	// Our LAF is always supported:
 	// public boolean isSupportedLookAndFeel() {
 	//	return true;
 	// }
+	@Override
 	protected void initClassDefaults(UIDefaults table) {
 		super.initClassDefaults(table);
 		Object[] uiDefaults= {
@@ -50,14 +55,17 @@ public class ActorPrologWindowsLookAndFeel extends WindowsLookAndFeel {
 		ActorPrologWindowsInternalFrameUI c4= new ActorPrologWindowsInternalFrameUI(null);
 		ActorPrologWindowsDesktopPaneUI c5= new ActorPrologWindowsDesktopPaneUI();
 	}
+	@Override
 	protected void initComponentDefaults(UIDefaults table) {
 		super.initComponentDefaults(table);
 		Object checkBoxIconLazyValue= new UIDefaults.LazyValue() {
+			@Override
 			public Object createValue(UIDefaults table) {
 				return new ScalableWindowsCheckBoxIcon();
 			}
 		};
 		Object radioButtonIconLazyValue= new UIDefaults.LazyValue() {
+			@Override
 			public Object createValue(UIDefaults table) {
 				return new ScalableWindowsRadioButtonIcon();
 			}

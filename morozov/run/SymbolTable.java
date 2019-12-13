@@ -13,37 +13,39 @@ import java.util.Collections;
 
 public abstract class SymbolTable {
 	//
-	public static SymbolName[] initialContent;
-	public static Map<Integer,SymbolName> symbolNameHash= Collections.synchronizedMap(new HashMap<Integer,SymbolName>());
-	public static Map<String,Integer> symbolCodeHash= Collections.synchronizedMap(new HashMap<String,Integer>());
-	public static volatile int staticTableSize;
-	public static volatile int totalTableSize;
+	protected static SymbolName[] initialContent;
+	protected static Map<Integer,SymbolName> symbolNameHash= Collections.synchronizedMap(new HashMap<Integer,SymbolName>());
+	protected static Map<String,Integer> symbolCodeHash= Collections.synchronizedMap(new HashMap<String,Integer>());
+	protected static volatile int staticTableSize;
+	protected static volatile int totalTableSize;
+	//
+	protected static int[][] predefinedClassNames;
+	protected static Map<Integer,Integer> predefinedClassNameMap= Collections.synchronizedMap(new HashMap<Integer,Integer>());
 	//
 	protected final static int firstSymbolCode= 100;
 	//
 	public static void initializeSymbolTable() {
 		synchronized (symbolCodeHash) {
-			// SymbolName[] initialContent= getStaticSymbolNames();
-			for (int n=0; n<initialContent.length; n++) {
-				symbolNameHash.put(n,initialContent[n]);
-				symbolCodeHash.put(initialContent[n].identifier,n);
+			for (int k=0; k < initialContent.length; k++) {
+				symbolNameHash.put(k,initialContent[k]);
+				symbolCodeHash.put(initialContent[k].identifier,k);
 			};
 			staticTableSize= initialContent.length;
 			totalTableSize= initialContent.length;
+			int numberOfPredefinedClasses= predefinedClassNames.length;
+			for (int k=0; k < numberOfPredefinedClasses; k++) {
+				int[] pair= predefinedClassNames[k];
+				predefinedClassNameMap.put(pair[0],pair[1]);
+			}
 		}
 	}
-	// abstract public SymbolName[] getStaticSymbolNames();
 	public static SymbolName retrieveSymbolName(long value) {
 		if (value - firstSymbolCode > Integer.MAX_VALUE) {
 			throw new IncorrecSymbolCode();
 		};
 		int absoluteCode= (int)(value-firstSymbolCode);
 		if (SymbolNames.staticTableSize > absoluteCode) {
-if (initialContent.length > absoluteCode && absoluteCode >= 0) {
 			return initialContent[absoluteCode];
-} else {
-	return new SymbolName("???",false);
-}
 		} else {
 			SymbolName name= symbolNameHash.get(absoluteCode);
 			if (name==null) {
@@ -87,5 +89,12 @@ if (initialContent.length > absoluteCode && absoluteCode >= 0) {
 				}
 			}
 		}
+	}
+	//
+	public static boolean isPredefinedClassName(long code) {
+		return predefinedClassNameMap.containsKey((int)code);
+	}
+	public static int getPredefinedClassAncestorName(long code) {
+		return predefinedClassNameMap.get((int)code);
 	}
 }

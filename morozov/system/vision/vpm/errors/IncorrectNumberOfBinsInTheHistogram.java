@@ -12,6 +12,7 @@ public class IncorrectNumberOfBinsInTheHistogram extends RuntimeException {
 		providedNumberOfBins= n2;
 	}
 	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(" +
 			Integer.toString(expectedNumberOfBins) + "<>" +

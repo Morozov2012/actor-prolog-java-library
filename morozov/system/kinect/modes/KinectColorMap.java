@@ -4,23 +4,15 @@ package morozov.system.kinect.modes;
 
 import morozov.system.*;
 import morozov.system.kinect.modes.tools.*;
-import morozov.system.modes.*;
+import morozov.system.interfaces.*;
 
-import java.awt.Color;
+import java.io.Serializable;
 
-public class KinectColorMap extends DetailedColorMap {
+public class KinectColorMap implements Serializable {
 	//
+	protected IterativeDetailedColorMapInterface iterativeDetailedColorMap;
 	protected int[][] periodicMatrix;
 	protected int maximalNumberOfSkeletons= -1;
-	//
-	protected static DetailedColorMap defaultKinectColorMap=
-		new DetailedColorMap(
-			ColorMapName.OCEAN,
-			ColorMapSize.instanceDefault,
-			YesNoDefault.YES,
-			YesNoDefault.NO,
-			YesNoDefault.NO,
-			TincturingCoefficient.instanceDefault);
 	//
 	private static final long serialVersionUID= 0x969020A0B5547BA0L; // -7597536696764957792L;
 	//
@@ -30,40 +22,128 @@ public class KinectColorMap extends DetailedColorMap {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public KinectColorMap(ColorMapName n, ColorMapSize s, YesNoDefault rS, YesNoDefault rMinV, YesNoDefault rMaxV, TincturingCoefficient tC) {
-		super(n,s,rS,rMinV,rMaxV,tC);
-	}
-	public KinectColorMap(Color[] array, ColorMapSize s, YesNoDefault rS, YesNoDefault rMinV, YesNoDefault rMaxV, TincturingCoefficient tC) {
-		super(array,s,rS,rMinV,rMaxV,tC);
-	}
-	public KinectColorMap(Color[] array) {
-		super(array);
+	public KinectColorMap(IterativeDetailedColorMap map) {
+		map.setDefaultName(getDefaultName());
+		map.setDefaultSize(getDefaultSize());
+		map.setDefaultReverseScale(getDefaultReverseScale());
+		map.setDefaultReverseColors(getDefaultReverseColors());
+		map.setDefaultLowerQuantile(getDefaultLowerQuantile());
+		map.setDefaultUpperQuantile(getDefaultUpperQuantile());
+		map.setDefaultLowerBoundIsZero(getDefaultLowerBoundIsZero());
+		map.setDefaultUpperBoundIsZero(getDefaultUpperBoundIsZero());
+		map.setDefaultPaletteIterations(getDefaultPaletteIterations());
+		map.setDefaultReverseMinimalValue(getDefaultReverseMinimalValue());
+		map.setDefaultReverseMaximalValue(getDefaultReverseMaximalValue());
+		map.setDefaultTincturingCoefficient(getDefaultTincturingCoefficient());
+		map.setDefaultBackgroundColor(getDefaultBackgroundColor());
+		iterativeDetailedColorMap= map;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static DetailedColorMap getDefaultColorMap() {
-		return defaultKinectColorMap;
+	public IterativeDetailedColorMapInterface getIterativeDetailedColorMap() {
+		return iterativeDetailedColorMap;
 	}
-	public ColorMapName getDefaultColorMapName() {
+	public int[][] getPeriodicMatrix() {
+		return periodicMatrix;
+	}
+	public int getMaximalNumberOfSkeletons() {
+		return maximalNumberOfSkeletons;
+	}
+	//
+	public ColorMapName getName() {
+		return iterativeDetailedColorMap.getName();
+	}
+	public ColorMapSize getSize() {
+		return iterativeDetailedColorMap.getSize();
+	}
+	public YesNoDefault getReverseScale() {
+		return iterativeDetailedColorMap.getReverseScale();
+	}
+	public YesNoDefault getReverseColors() {
+		return iterativeDetailedColorMap.getReverseColors();
+	}
+	public RealAttribute getLowerQuantile() {
+		return iterativeDetailedColorMap.getLowerQuantile();
+	}
+	public RealAttribute getUpperQuantile() {
+		return iterativeDetailedColorMap.getUpperQuantile();
+	}
+	public YesNoDefault getLowerBoundIsZero() {
+		return iterativeDetailedColorMap.getLowerBoundIsZero();
+	}
+	public YesNoDefault getUpperBoundIsZero() {
+		return iterativeDetailedColorMap.getUpperBoundIsZero();
+	}
+	public IntegerAttribute getPaletteIterations() {
+		return iterativeDetailedColorMap.getPaletteIterations();
+	}
+	public YesNoDefault getReverseMinimalValue() {
+		return iterativeDetailedColorMap.getReverseMinimalValue();
+	}
+	public YesNoDefault getReverseMaximalValue() {
+		return iterativeDetailedColorMap.getReverseMaximalValue();
+	}
+	public TincturingCoefficient getTincturingCoefficient() {
+		return iterativeDetailedColorMap.getTincturingCoefficient();
+	}
+	public double getColorMapTincturingCoefficient() {
+		return iterativeDetailedColorMap.getTincturingCoefficient().getColorMapTincturingCoefficient();
+	}
+	public double getPeopleColorsTincturingCoefficient() {
+		return TincturingCoefficientTools.getPeopleColorsTincturingCoefficient(iterativeDetailedColorMap.getTincturingCoefficient());
+	}
+	public ColorAttribute getBackgroundColor() {
+		return iterativeDetailedColorMap.getBackgroundColor();
+	}
+	//
+	public int[][] toColors() {
+		return iterativeDetailedColorMap.toColors();
+	}
+	public long toNumberOfBands() {
+		return iterativeDetailedColorMap.toNumberOfBands();
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public ColorMapName getDefaultName() {
 		return ColorMapName.OCEAN;
 	}
-	public DataColorMap getDefaultDataColorMap() {
-		return DataColorMap.OCEAN;
+	public ColorMapSize getDefaultSize() {
+		return ColorMapSize.instanceDefault;
 	}
-	//
-	public boolean getDefaultReverseCustomColorMapScale() {
-		return true;
+	public YesNoDefault getDefaultReverseScale() {
+		return YesNoDefault.YES;
 	}
-	public boolean getDefaultReverseCustomColorMapMinimalValue() {
-		return true;
+	public YesNoDefault getDefaultReverseColors() {
+		return YesNoDefault.DEFAULT;
 	}
-	public boolean getDefaultReverseCustomColorMapMaximalValue() {
-		return false;
+	public RealAttribute getDefaultLowerQuantile() {
+		return RealAttribute.instanceDefault;
 	}
-	//
-	public double getPeopleColorsTincturingCoefficient() {
-		return TincturingCoefficientTools.getPeopleColorsTincturingCoefficient(tincturingCoefficient);
+	public RealAttribute getDefaultUpperQuantile() {
+		return RealAttribute.instanceDefault;
+	}
+	public YesNoDefault getDefaultLowerBoundIsZero() {
+		return YesNoDefault.DEFAULT;
+	}
+	public YesNoDefault getDefaultUpperBoundIsZero() {
+		return YesNoDefault.DEFAULT;
+	}
+	public IntegerAttribute getDefaultPaletteIterations() {
+		return IntegerAttribute.instanceDefault;
+	}
+	public YesNoDefault getDefaultReverseMinimalValue() {
+		return YesNoDefault.YES;
+	}
+	public YesNoDefault getDefaultReverseMaximalValue() {
+		return YesNoDefault.DEFAULT;
+	}
+	public TincturingCoefficient getDefaultTincturingCoefficient() {
+		return TincturingCoefficient.instanceDefault;
+	}
+	public ColorAttribute getDefaultBackgroundColor() {
+		return ColorAttribute.instanceDefault;
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -101,8 +181,8 @@ public class KinectColorMap extends DetailedColorMap {
 	//
 	public int[][] computePeopleColors(int requiredSize) {
 		int[][] matrix1;
-		if (useCustomMap) {
-			int length= colors.length;
+		if (iterativeDetailedColorMap.getUseCustomMap()) {
+			int length= iterativeDetailedColorMap.getColors().length;
 			if (length <= 0) {
 				int[] red= KinectColorMapTools.getPeopleDefaultColorRed();
 				int[] green= KinectColorMapTools.getPeopleDefaultColorGreen();
@@ -115,17 +195,17 @@ public class KinectColorMap extends DetailedColorMap {
 					array[2][n]= blue[n] / peopleIndexRatio;
 					array[3][n]= 0;
 				};
-				return refineColorPalette(
+				return iterativeDetailedColorMap.refineColorPalette(
 					array,
-					length,
-					reverseScale.toBoolean(false),
-					reverseMinimalValue.toBoolean(false),
-					reverseMaximalValue.toBoolean(false));
+					iterativeDetailedColorMap.getReverseScale().toBoolean(false),
+					iterativeDetailedColorMap.getReverseColors().toBoolean(false),
+					iterativeDetailedColorMap.getReverseMinimalValue().toBoolean(false),
+					iterativeDetailedColorMap.getReverseMaximalValue().toBoolean(false));
 			} else {
-				return computeColors(requiredSize);
+				return iterativeDetailedColorMap.computeColors(requiredSize);
 			}
 		} else {
-			return computeColors(requiredSize);
+			return iterativeDetailedColorMap.computeColors(requiredSize);
 		}
 	}
 }

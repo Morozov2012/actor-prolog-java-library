@@ -44,29 +44,30 @@ public class Control2D extends CustomControlComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void putValue(Term value, ChoisePoint iX) {
 		if (component!=null) {
 			value= value.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 			if (value instanceof morozov.built_in.Canvas2D) {
 				if (currentValue != null) {
-					currentValue.release(targetDialog.isModal,iX);
+					currentValue.release(targetDialog.isModal(),iX);
 				};
 				currentValue= (morozov.built_in.Canvas2D)value;
 				currentValue.registerCanvasSpace(space2D,iX);
-				currentValue.draw(targetDialog.isModal,iX);
-				// targetDialog.invalidate();
-				// targetDialog.repaint();
+				currentValue.draw(targetDialog.isModal(),iX);
 				targetDialog.safelyInvalidateAndRepaint();
 			}
 		}
 	}
 	//
+	@Override
 	public Term getValue() {
 		return currentValue;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setDimension(Dimension dimension) {
 		if (component!=null) {
 			space2D.getControl().setMinimumSize(dimension);

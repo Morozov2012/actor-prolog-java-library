@@ -10,6 +10,7 @@ public class VPMmskContourForeground extends VPM_FrameCommand {
 	public VPMmskContourForeground() {
 	}
 	//
+	@Override
 	public void execute(VPM vpm) {
 		int imageWidth= vpm.getOperationalImageWidth();
 		int imageHeight= vpm.getOperationalImageHeight();

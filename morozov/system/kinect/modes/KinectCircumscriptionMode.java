@@ -9,6 +9,7 @@ import morozov.system.kinect.modes.interfaces.*;
 public enum KinectCircumscriptionMode {
 	//
 	TOTAL_RECTANGLES {
+		@Override
 		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode, KinectFrameType frameType) {
 			consolidatedMode.setCircumscriptionIsRequested(true);
 			consolidatedMode.refineKinectDataAcquisitionMode(J4KSDK.DEPTH | J4KSDK.PLAYER_INDEX);
@@ -18,6 +19,7 @@ public enum KinectCircumscriptionMode {
 		}
 	},
 	SKELETON_RECTANGLES {
+		@Override
 		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode, KinectFrameType frameType) {
 			consolidatedMode.setCircumscriptionIsRequested(true);
 			consolidatedMode.refineKinectDataAcquisitionMode(J4KSDK.DEPTH | J4KSDK.PLAYER_INDEX | J4KSDK.SKELETON);
@@ -27,6 +29,7 @@ public enum KinectCircumscriptionMode {
 		}
 	},
 	TOTAL_PARALLELEPIPEDS {
+		@Override
 		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode, KinectFrameType frameType) {
 			consolidatedMode.setCircumscriptionIsRequested(true);
 			consolidatedMode.refineKinectDataAcquisitionMode(J4KSDK.DEPTH | J4KSDK.XYZ | J4KSDK.PLAYER_INDEX);
@@ -36,6 +39,7 @@ public enum KinectCircumscriptionMode {
 		}
 	},
 	SKELETON_PARALLELEPIPEDS {
+		@Override
 		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode, KinectFrameType frameType) {
 			consolidatedMode.setCircumscriptionIsRequested(true);
 			consolidatedMode.refineKinectDataAcquisitionMode(J4KSDK.DEPTH | J4KSDK.PLAYER_INDEX | J4KSDK.SKELETON);
@@ -45,6 +49,7 @@ public enum KinectCircumscriptionMode {
 		}
 	},
 	NONE {
+		@Override
 		public void refineDataAcquisitionMode(ConsolidatedDataAcquisitionModeInterface consolidatedMode, KinectFrameType frameType) {
 		}
 	};

@@ -14,11 +14,11 @@ public class KinectDisplayingMode implements KinectDisplayingModeInterface {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public static KinectFrameType defaultFrameType= KinectFrameType.COLORED_DEPTH_MAPS;
-	public static KinectPeopleIndexMode defaultPeopleIndexMode= KinectPeopleIndexMode.PAINT_PEOPLE;
-	public static KinectCircumscriptionMode defaultCircumscriptionMode= KinectCircumscriptionMode.SKELETON_PARALLELEPIPEDS;
-	public static KinectCircumscriptionMode[] defaultCircumscriptionModes= new KinectCircumscriptionMode[]{defaultCircumscriptionMode};
-	public static KinectSkeletonsMode defaultSkeletonsMode= KinectSkeletonsMode.DETECT_AND_TRACK_SKELETONS;
+	public static final KinectFrameType defaultFrameType= KinectFrameType.COLORED_DEPTH_MAPS;
+	public static final KinectPeopleIndexMode defaultPeopleIndexMode= KinectPeopleIndexMode.PAINT_PEOPLE;
+	public static final KinectCircumscriptionMode defaultCircumscriptionMode= KinectCircumscriptionMode.SKELETON_PARALLELEPIPEDS;
+	public static final KinectCircumscriptionMode[] defaultCircumscriptionModes= new KinectCircumscriptionMode[]{defaultCircumscriptionMode};
+	public static final KinectSkeletonsMode defaultSkeletonsMode= KinectSkeletonsMode.DETECT_AND_TRACK_SKELETONS;
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -35,22 +35,28 @@ public class KinectDisplayingMode implements KinectDisplayingModeInterface {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean getUseDefaultMode() {
 		return useDefaultMode;
 	}
+	@Override
 	public KinectFrameType getLocalFrameType() {
 		return frameType;
 	}
+	@Override
 	public KinectPeopleIndexMode getLocalPeopleIndexMode() {
 		return peopleIndexMode;
 	}
+	@Override
 	public KinectCircumscriptionMode[] getLocalCircumscriptionModes() {
 		return circumscriptionModes;
 	}
+	@Override
 	public KinectSkeletonsMode getLocalSkeletonsMode() {
 		return skeletonsMode;
 	}
 	//
+	@Override
 	public KinectFrameType getActingFrameType() {
 		if (useDefaultMode) {
 			return defaultFrameType;
@@ -58,6 +64,7 @@ public class KinectDisplayingMode implements KinectDisplayingModeInterface {
 			return frameType;
 		}
 	}
+	@Override
 	public KinectPeopleIndexMode getActingPeopleIndexMode() {
 		if (useDefaultMode) {
 			return defaultPeopleIndexMode;
@@ -65,6 +72,7 @@ public class KinectDisplayingMode implements KinectDisplayingModeInterface {
 			return peopleIndexMode;
 		}
 	}
+	@Override
 	public KinectCircumscriptionMode[] getActingCircumscriptionModes() {
 		if (useDefaultMode) {
 			return defaultCircumscriptionModes;
@@ -72,6 +80,7 @@ public class KinectDisplayingMode implements KinectDisplayingModeInterface {
 			return circumscriptionModes;
 		}
 	}
+	@Override
 	public KinectSkeletonsMode getActingSkeletonsMode() {
 		if (useDefaultMode) {
 			return defaultSkeletonsMode;
@@ -80,6 +89,7 @@ public class KinectDisplayingMode implements KinectDisplayingModeInterface {
 		}
 	}
 	//
+	@Override
 	public boolean requiresFrameType(KinectFrameType type) {
 		if (useDefaultMode) {
 			return defaultFrameType == type;
@@ -87,6 +97,7 @@ public class KinectDisplayingMode implements KinectDisplayingModeInterface {
 			return frameType == type;
 		}
 	}
+	@Override
 	public boolean requiresFrameType(KinectDataArrayType type) {
 		if (useDefaultMode) {
 			return defaultFrameType.requiresFrameType(type);
@@ -94,6 +105,7 @@ public class KinectDisplayingMode implements KinectDisplayingModeInterface {
 			return frameType.requiresFrameType(type);
 		}
 	}
+	@Override
 	public boolean requiresPeopleIndexMode(KinectPeopleIndexMode mode) {
 		if (useDefaultMode) {
 			return defaultPeopleIndexMode == mode;
@@ -101,6 +113,7 @@ public class KinectDisplayingMode implements KinectDisplayingModeInterface {
 			return peopleIndexMode == mode;
 		}
 	}
+	@Override
 	public boolean requiresCircumscriptionMode(KinectCircumscriptionMode mode) {
 		if (useDefaultMode) {
 			return defaultCircumscriptionMode == mode;
@@ -117,6 +130,7 @@ public class KinectDisplayingMode implements KinectDisplayingModeInterface {
 			}
 		}
 	}
+	@Override
 	public boolean requiresSkeletonsMode(KinectSkeletonsMode mode) {
 		if (useDefaultMode) {
 			return defaultSkeletonsMode == mode;
@@ -124,10 +138,4 @@ public class KinectDisplayingMode implements KinectDisplayingModeInterface {
 			return skeletonsMode == mode;
 		}
 	}
-	//
-	///////////////////////////////////////////////////////////////
-	//
-	// public String toString() {
-	//	return KinectDisplayingModeConverters.toTerm(this).toString();
-	// }
 }

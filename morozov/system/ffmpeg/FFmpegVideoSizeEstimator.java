@@ -5,7 +5,7 @@
 // and all the FFmpeg project team (https://ffmpeg.org).
 // Thanks to Stephen Dranger, Martin Bohme, and
 // Michael Penkov for tutorials on FFmpeg.
-// Thanks to Samuel Audet for the JavaCPP project
+// Thanks to Samuel Audet for the JavaCPP project.
 // (https://github.com/bytedeco/javacpp).
 
 package morozov.system.ffmpeg;
@@ -25,21 +25,22 @@ public class FFmpegVideoSizeEstimator extends FFmpegFrameReadingTask {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public long estimateVideoSize(ExtendedFileName fileName, int timeout, CharacterSet characterSet, String formatName, FFmpegStreamDefinition[] streams, FFmpegCodecOption[] options, StaticContext staticContext) {
+	public long estimateVideoSize(ExtendedFileName fileName, int timeout, CharacterSet characterSet, String formatName, FFmpegStreamDefinition[] streams, FFmpegCodecOption[][] options, StaticContext staticContext) {
 		openReading(fileName,timeout,characterSet,formatName,streams,options,staticContext);
 		try {
 			readAllFrames();
 		} finally {
 			closeReading();
 		};
-		return totalNumberOfFrames;
+		return totalNumberOfVideoFrames;
 	}
 	//
+	@SuppressWarnings("CallToThreadDumpStack")
 	protected void readAllFrames() {
 		try {
 			synchronized (this) {
 				while (true) {
-					boolean isEOF= readOnePacket(pCodecCtx,pFrameInitial,pFrameRGB,sws_ctx,true);
+					boolean isEOF= readOnePacket(true);
 					if (isEOF) {
 						break;
 					}
@@ -48,7 +49,7 @@ public class FFmpegVideoSizeEstimator extends FFmpegFrameReadingTask {
 		} catch (InterruptedException e) {
 		} catch (Throwable e) {
 			e.printStackTrace();
-			owner.completeDataReading(computeCurrentFrameNumber(),e);
+			owner.completeDataReading(computeCurrentVideoFrameNumber(),e);
 		}
 	}
 }

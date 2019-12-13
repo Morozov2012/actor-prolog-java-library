@@ -20,35 +20,45 @@ public class DomainAny extends DomainAlternative {
 	public DomainAny() {
 	}
 	//
+	@Override
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
 		return true;
 	}
+	@Override
 	public boolean coversOptimizedSet(long[] keys, Term[] elements, Term tail, PrologDomain baseDomain, ChoisePoint cp, boolean ignoreFreeVariables) {
 		return true;
 	}
+	@Override
 	public Term checkAndOptimizeTerm(Term t, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
 		return t.dereferenceValue(cp);
 	}
+	@Override
 	public Term checkTerm(Term t, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
 		return t.dereferenceValue(cp);
 	}
+	@Override
 	public Term checkOptimizedSet(long[] keys, Term[] elements, Term tail, Term initialValue, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
 		return initialValue.dereferenceValue(cp);
 	}
+	@Override
 	public PrologDomain getPairDomain(long key) throws TermIsNotPairDomainAlternative {
 		return new PrologAnyDomain();
 	}
 	//
+	@Override
 	public boolean isEqualTo(DomainAlternative a, HashSet<PrologDomainPair> stack) {
 		return a.isEqualToAny();
 	}
+	@Override
 	public boolean isEqualToAny() {
 		return true;
 	}
+	@Override
 	public boolean coversAlternative(DomainAlternative a, PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) {
 		return true;
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
 		return PrologDomainName.tagDomainAlternative_Any;
 	}

@@ -17,16 +17,15 @@ import java.awt.Component;
 public class ColoredTableCellHeaderRenderer
 		extends JLabel
 		implements TableCellRenderer {
-	// Color titleForegroundColor;
+	//
 	public ColoredTableCellHeaderRenderer(Color titleForeground, Color titleBackground) {
-		// titleForegroundColor= titleForeground;
 		setOpaque(true);
 		setForeground(titleForeground);
 		setBackground(titleBackground);
 	}
+	//
+	@Override
 	public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-		// setOpaque(true);
-		// setForeground(titleForegroundColor);
 		setFont(table.getFont());
 		setHorizontalAlignment(SwingConstants.CENTER);
 		setBorder(UIManager.getBorder("TableHeader.cellBorder"));

@@ -14,15 +14,13 @@ import java.io.Serializable;
 public class EnumeratedFFmpegFrame extends EnumeratedFrame implements Serializable {
 	//
 	protected transient FFmpegFrameInterface frame;
-	// protected java.awt.image.BufferedImage image;
 	protected byte[] byteArray;
 	protected int width;
 	protected int height;
-	protected long time;
-	// protected AVRational timeBase;
+	protected long timeInMilliseconds;
+	protected long timeInBaseUnits;
 	protected int timeBaseNumerator;
 	protected int timeBaseDenominator;
-	// protected AVRational averageFrameRate;
 	protected int averageFrameRateNumerator;
 	protected int averageFrameRateDenominator;
 	protected long number;
@@ -46,12 +44,11 @@ public class EnumeratedFFmpegFrame extends EnumeratedFrame implements Serializab
 		byteArray= targetClass.convertImageToBytes(image);
 		width= image.getWidth();
 		height= image.getHeight();
-		time= givenFrame.getTime();
-		// protected AVRational timeBase;
+		timeInMilliseconds= givenFrame.getTimeInMilliseconds();
+		timeInBaseUnits= givenFrame.getTimeInBaseUnits();
 		AVRational timeBase= givenFrame.getTimeBase();
 		timeBaseNumerator= timeBase.num();
 		timeBaseDenominator= timeBase.den();
-		// protected AVRational averageFrameRate;
 		AVRational averageFrameRate= givenFrame.getAverageFrameRate();
 		averageFrameRateNumerator= averageFrameRate.num();
 		averageFrameRateDenominator= averageFrameRate.den();
@@ -65,7 +62,8 @@ public class EnumeratedFFmpegFrame extends EnumeratedFrame implements Serializab
 		if (frame==null) {
 			frame= new FFmpegFrame(
 				Space2DWriter.bytesToImage(byteArray),
-				time,
+				timeInMilliseconds,
+				timeInBaseUnits,
 				av_make_q(timeBaseNumerator,timeBaseDenominator),
 				av_make_q(averageFrameRateNumerator,averageFrameRateDenominator),
 				number);
@@ -77,7 +75,8 @@ public class EnumeratedFFmpegFrame extends EnumeratedFrame implements Serializab
 		return numberOfFrame;
 	}
 	//
+	@Override
 	public long getTime() {
-		return time;
+		return timeInMilliseconds;
 	}
 }

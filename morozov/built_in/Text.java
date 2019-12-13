@@ -4,9 +4,8 @@ package morozov.built_in;
 
 import morozov.run.*;
 import morozov.system.*;
-import morozov.system.errors.*;
+import morozov.system.converters.*;
 import morozov.terms.*;
-import morozov.terms.signals.*;
 import morozov.worlds.*;
 
 public abstract class Text extends SymbolicInformation {
@@ -24,16 +23,14 @@ public abstract class Text extends SymbolicInformation {
 	///////////////////////////////////////////////////////////////
 	//
 	public void setString1s(ChoisePoint iX, Term inputText) {
-		try {
-			textString= new StringBuilder(inputText.getStringValue(iX));
-		} catch (TermIsNotAString e) {
-			throw new WrongArgumentIsNotAString(inputText);
-		}
+		textString= new StringBuilder(GeneralConverters.argumentToString(inputText,iX));
 	}
 	//
+	@Override
 	public void getString0ff(ChoisePoint iX, PrologVariable result) {
 		result.setNonBacktrackableValue(new PrologString(textString.toString()));
 	}
+	@Override
 	public void getString0fs(ChoisePoint iX) {
 	}
 	//

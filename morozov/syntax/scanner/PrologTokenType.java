@@ -4,376 +4,627 @@ package morozov.syntax.scanner;
 
 import target.*;
 
+import morozov.run.*;
 import morozov.syntax.scanner.signals.*;
 import morozov.terms.*;
+import morozov.terms.signals.*;
 
 public enum PrologTokenType {
 	//
 	END_OF_TEXT {
+		@Override
 		public boolean isFinalToken() {
 			return true;
 		}
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_end_of_text;
+		}
+		@Override
 		String toText() {
 			return "";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termEndOfText;
 		}
 	},
 	REST_OF_TEXT {
+		@Override
 		public boolean isFinalToken() {
 			return true;
 		}
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_rest_of_text;
+		}
+		@Override
 		String toText() {
 			return "";
 		}
+		@Override
 		Term toActorPrologTerm() throws TokenIsCompound {
 			return termRestOfText;
 		}
 	},
 	END_OF_LINE {
+		@Override
 		public boolean isFinalToken() {
 			return true;
 		}
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_end_of_line;
+		}
+		@Override
 		String toText() {
 			return "\n";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termEndOfLine;
 		}
 	},
 	INTEGER {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return false;
+		}
+		@Override
 		String toText() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
+		@Override
 		Term toActorPrologTerm() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
 	},
 	REAL {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return false;
+		}
+		@Override
 		String toText() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
+		@Override
 		Term toActorPrologTerm() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
 	},
 	SYMBOL {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return false;
+		}
+		@Override
 		String toText() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
+		@Override
 		Term toActorPrologTerm() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
 	},
-	STRING {
+	STRING_SEGMENT {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return false;
+		}
+		@Override
 		String toText() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
+		@Override
 		Term toActorPrologTerm() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
 	},
-	BINARY {
+	BINARY_SEGMENT {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return false;
+		}
+		@Override
 		String toText() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
+		@Override
 		Term toActorPrologTerm() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
 	},
 	KEYWORD {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return false;
+		}
+		@Override
 		String toText() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
+		@Override
 		Term toActorPrologTerm() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
 	},
 	VARIABLE {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return false;
+		}
+		@Override
 		String toText() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
+		@Override
 		Term toActorPrologTerm() throws TokenIsCompound {
 			throw TokenIsCompound.instance;
 		}
 	},
 	COMMA {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_comma;
+		}
+		@Override
 		String toText() {
 			return ",";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termComma;
 		}
 	},
 	DOT {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_dot;
+		}
+		@Override
 		String toText() {
 			return ".";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termDot;
 		}
 	},
 	EXCLAM {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_exclam;
+		}
+		@Override
 		String toText() {
 			return "!";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termExclam;
 		}
 	},
 	COLON {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_colon;
+		}
+		@Override
 		String toText() {
 			return ":";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termColon;
 		}
 	},
 	SEMICOLON {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_semicolon;
+		}
+		@Override
 		String toText() {
 			return ";";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termSemicolon;
 		}
 	},
 	QUESTION_MARK {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_question_mark;
+		}
+		@Override
 		String toText() {
 			return "?";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termQuestionMark;
 		}
 	},
 	NUMBER_SIGN {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_number_sign;
+		}
+		@Override
 		String toText() {
 			return "#";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termNumberSign;
 		}
 	},
 	L_ROUND_BRACKET {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_l_round_bracket;
+		}
+		@Override
 		String toText() {
 			return "(";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termLRoundBracket;
 		}
 	},
 	R_ROUND_BRACKET {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_r_round_bracket;
+		}
+		@Override
 		String toText() {
 			return ")";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termRRoundBracket;
 		}
 	},
 	BAR {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_bar;
+		}
+		@Override
 		String toText() {
 			return "|";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termBar;
 		}
 	},
 	L_BRACE {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_l_brace;
+		}
+		@Override
 		String toText() {
 			return "{";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termLBrace;
 		}
 	},
 	R_BRACE {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_r_brace;
+		}
+		@Override
 		String toText() {
 			return "}";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termRBrace;
 		}
 	},
 	L_SQUARE_BRACKET {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_l_square_bracket;
+		}
+		@Override
 		String toText() {
 			return "[";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termLSquareBracket;
 		}
 	},
 	R_SQUARE_BRACKET {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_r_square_bracket;
+		}
+		@Override
 		String toText() {
 			return "]";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termRSquareBracket;
 		}
 	},
 	MULTIPLY {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_multiply;
+		}
+		@Override
 		String toText() {
 			return "*";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termMyltiply;
 		}
 	},
 	PLUS {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_plus;
+		}
+		@Override
 		String toText() {
 			return "+";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termPlus;
 		}
 	},
 	MINUS {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_minus;
+		}
+		@Override
 		String toText() {
 			return "-";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termMinus;
 		}
 	},
 	DIVIDE {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_divide;
+		}
+		@Override
 		String toText() {
 			return "/";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termDivide;
 		}
 	},
 	LT {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_lt;
+		}
+		@Override
 		String toText() {
 			return "<";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termLT;
 		}
 	},
 	EQ {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_eq;
+		}
+		@Override
 		String toText() {
 			return "=";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termEQ;
 		}
 	},
 	GT {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_gt;
+		}
+		@Override
 		String toText() {
 			return ">";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termGT;
 		}
 	},
 	DATA_MESSAGE {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_data_message;
+		}
+		@Override
 		String toText() {
 			return "<<";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termInformationalMessage;
 		}
 	},
 	CONTROL_MESSAGE {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_control_message;
+		}
+		@Override
 		String toText() {
 			return "<-";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termControlMessage;
 		}
 	},
 	RESIDENT {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_resident;
+		}
+		@Override
 		String toText() {
 			return "??";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termResident;
 		}
 	},
 	IMPLICATION {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_implication;
+		}
+		@Override
 		String toText() {
 			return ":-";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termImplication;
 		}
 	},
 	EQUALITY {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_equality;
+		}
+		@Override
 		String toText() {
 			return "==";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termEquality;
 		}
 	},
 	ASSIGNMENT {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_assignment;
+		}
+		@Override
 		String toText() {
 			return ":=";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termAssignment;
 		}
 	},
 	NE {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_ne;
+		}
+		@Override
 		String toText() {
 			return "<>";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termNE;
 		}
 	},
 	LE {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_le;
+		}
+		@Override
 		String toText() {
 			return "<=";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termLE;
 		}
 	},
 	GE {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_ge;
+		}
+		@Override
 		String toText() {
 			return ">=";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termGE;
 		}
 	},
 	RANGE {
+		@Override
+		boolean correspondsToSymbolCode(long code) {
+			return code==SymbolCodes.symbolCode_E_range;
+		}
+		@Override
 		String toText() {
 			return "..";
 		}
+		@Override
 		Term toActorPrologTerm() {
 			initiateStaticTermsIfNecessary();
 			return termRange;
@@ -469,6 +720,20 @@ public enum PrologTokenType {
 		return false;
 	}
 	//
+	///////////////////////////////////////////////////////////////
+	//
+	public boolean correspondsToActorPrologTerm(Term argument, ChoisePoint iX) {
+		try {
+			long code= argument.getSymbolValue(iX);
+			return correspondsToSymbolCode(code);
+		} catch (TermIsNotASymbol e) {
+			return false;
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	abstract boolean correspondsToSymbolCode(long code);
 	abstract String toText() throws TokenIsCompound;
 	abstract Term toActorPrologTerm() throws TokenIsCompound;
 }

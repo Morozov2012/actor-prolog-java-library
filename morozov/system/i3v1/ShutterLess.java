@@ -36,7 +36,6 @@ public class ShutterLess {
 	protected double[] m_pdInitOnTimeCorr= new double[]{0.1475d, -2.0964d, 11.024d, -26.576d, 24.463d};
 	//
 	protected static double[] multiChamberTemp_m20_10_50= new double[]{-20.0d, 10.0d, 50.0d};
-	// DEBUG: protected static double[] multiChamberTemp_m20_10_50= new double[]{-5.0d, 15.0d, 40.0d};
 	protected static double[] multiChamberTemp_m10_0_10_25_40= new double[]{-10.0d, 0.0d, 10.0d, 25.0d, 40.0d};
 	//
 	protected static final double coefficient11= 7146.4357337d;
@@ -239,7 +238,7 @@ public class ShutterLess {
 		} else {
 			double result= (((m_dTemperatureGain * (coefficient14 + Math.sqrt(coefficient13 - correctedValue))) / coefficient15) - m_dTemperatureOffset) + m_dTestTempOffset;
 			if (!isCelsius) {
-				result= commData.convCelsiusToFaherenheit(result);
+				result= CommonData.convCelsiusToFaherenheit(result);
 			};
 			return result;
 		}
@@ -261,7 +260,7 @@ public class ShutterLess {
 			}
 		};
 		if (!isCelsius) {
-			commData.convCelsiusToFaherenheit(targetArray);
+			CommonData.convCelsiusToFaherenheit(targetArray);
 		};
 		return targetArray;
 	}

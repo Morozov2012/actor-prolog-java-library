@@ -38,16 +38,19 @@ public class DialogJInternalFrame
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void initiate(StaticContext context) {
 		staticContext= context;
 	}
 	//
+	@Override
 	public Window getWindow() {
 		return null;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void addToDesktopIfNecessary(StaticContext context) {
 		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(staticContext);
 		desktop.safelyAdd(this,DesktopUtils.DIALOG_LAYER);
@@ -55,41 +58,53 @@ public class DialogJInternalFrame
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void safelySetVisible(boolean b) {
 		DesktopUtils.safelySetVisible(b,this);
 	}
+	@Override
 	public void safelyDispose() {
 		DesktopUtils.safelyDispose(this);
 	}
+	@Override
 	public void safelyMaximize() {
 		DesktopUtils.safelyMaximize(this);
 	}
+	@Override
 	public void safelyMinimize() {
 		DesktopUtils.safelyMinimize(this);
 	}
+	@Override
 	public void safelyRestore() {
 		DesktopUtils.safelyRestore(this);
 	}
+	@Override
 	public boolean safelyIsVisible() {
 		return DesktopUtils.safelyIsVisible(this);
 	}
+	@Override
 	public boolean safelyIsHidden() {
 		return DesktopUtils.safelyIsHidden(this);
 	}
+	@Override
 	public boolean safelyIsMaximized() {
 		return DesktopUtils.safelyIsMaximized(this);
 	}
+	@Override
 	public boolean safelyIsMinimized() {
 		return DesktopUtils.safelyIsMinimized(this);
 	}
+	@Override
 	public boolean safelyIsRestored() {
 		return DesktopUtils.safelyIsRestored(this);
 	}
+	@Override
 	public void safelySetAlwaysOnTop(boolean b) {
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Rectangle computeParentLayoutSize() {
 		//
 		MainDesktopPane desktop= StaticDesktopAttributes.retrieveMainDesktopPane(dialog.staticContext);
@@ -110,6 +125,7 @@ public class DialogJInternalFrame
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void repaintParent() {
 		Container container= getParent();
 		if (container != null) {
@@ -119,27 +135,32 @@ public class DialogJInternalFrame
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void doSuperLayout() {
 		super.doLayout();
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setLocationByPlatform(boolean locationByPlatform) {
 	}
+	@Override
 	public Dimension getRealMinimumSize() {
 		return getUI().getMinimumSize(this);
 	}
+	@Override
 	public Dimension getRealPreferredSize() {
 		return getUI().getPreferredSize(this);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void safelyPositionMainPanel() {	// To be called from DesktopUtils
+	public void safelyPositionMainPanel() {
 		dialog.safelyPositionMainPanel();
 	}
 	//
+	@Override
 	public void doLayout() {
 		if (insideDoLayout.compareAndSet(false,true)) {
 			try {
@@ -150,41 +171,52 @@ public class DialogJInternalFrame
 		}
 	}
 	//
+	@Override
 	public void internalFrameActivated(InternalFrameEvent e) {
 		// Invoked when an internal frame is activated.
 	}
+	@Override
 	public void internalFrameClosed(InternalFrameEvent e) {
 		// Invoked when an internal frame has been closed.
 	}
+	@Override
 	public void internalFrameClosing(InternalFrameEvent e) {
 		// Invoked when an internal frame is in the process
 		// of being closed.
 		dialog.sendTheWindowClosingOrWindowClosedMessage();
 	}
+	@Override
 	public void internalFrameDeactivated(InternalFrameEvent e) {
 		// Invoked when an internal frame is de-activated.
 	}
+	@Override
 	public void internalFrameDeiconified(InternalFrameEvent e) {
 		// Invoked when an internal frame is de-iconified.
 	}
+	@Override
 	public void internalFrameIconified(InternalFrameEvent e) {
 		// Invoked when an internal frame is iconified.
 	}
+	@Override
 	public void internalFrameOpened(InternalFrameEvent e) {
 		// Invoked when a internal frame has been opened.
 	}
 	//
+	@Override
 	public void mouseClicked(MouseEvent event) {
 	}
+	@Override
 	public void mouseEntered(MouseEvent event) {
 	}
+	@Override
 	public void mouseExited(MouseEvent event) {
 	}
+	@Override
 	public void mousePressed(MouseEvent event) {
 		mousePressedOrReleased(event);
 	}
+	@Override
 	public void mouseReleased(MouseEvent event) {
-		// mousePressedOrReleased(event);
 	}
 	//
 	private void mousePressedOrReleased(MouseEvent event) {
@@ -193,10 +225,8 @@ public class DialogJInternalFrame
 				try {
 					if (isMaximum()) {
 						setMaximum(false);
-						// safelyRestore();
 					} else {
 						setMaximum(true);
-						// safelyMaximize();
 					}
 				} catch (PropertyVetoException e) {
 				}

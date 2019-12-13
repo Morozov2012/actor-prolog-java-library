@@ -15,10 +15,10 @@ import java.awt.Font;
 
 public class ExtendedFontStyle {
 	//
-	private boolean useDefaultFontStyle= true;
-	private boolean isBold= false;
-	private boolean isItalic= false;
-	private boolean isUnderlined= false;
+	protected boolean useDefaultFontStyle= true;
+	protected boolean isBold= false;
+	protected boolean isItalic= false;
+	protected boolean isUnderlined= false;
 	//
 	protected static Term termDefault= new PrologSymbol(SymbolCodes.symbolCode_E_default);
 	//
@@ -33,8 +33,11 @@ public class ExtendedFontStyle {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void useDefaultFontStyle() {
-		useDefaultFontStyle= true;
+	public void setUseDefaultFontStyle(boolean mode) {
+		useDefaultFontStyle= mode;
+	}
+	public void setUseDefaultFontStyle() {
+		setUseDefaultFontStyle(true);
 	}
 	//
 	public boolean isDefault() {
@@ -96,8 +99,6 @@ public class ExtendedFontStyle {
 		} else {
 			try {
 				return argumentToExtendedFontStyle(value,iX);
-			// } catch (IsNotFontStyle e) {
-			//	return new ExtendedFontStyle();
 			} catch (RuntimeException e) {
 				return new ExtendedFontStyle();
 			}
@@ -174,7 +175,6 @@ public class ExtendedFontStyle {
 			try {
 				return termToFontStyle(value,iX);
 			} catch (IsNotFontStyle e) {
-				// throw new WrongArgumentIsNotFontStyle(value);
 				throw TermIsSymbolDefault.instance;
 			} catch (RuntimeException e) {
 				throw TermIsSymbolDefault.instance;
@@ -190,7 +190,6 @@ public class ExtendedFontStyle {
 			try {
 				return fontIsUnderlined(value,iX);
 			} catch (IsNotFontStyle e) {
-				// throw new WrongArgumentIsNotFontStyle(value);
 				throw TermIsSymbolDefault.instance;
 			} catch (RuntimeException e) {
 				throw TermIsSymbolDefault.instance;
@@ -352,6 +351,7 @@ public class ExtendedFontStyle {
 		}
 	}
 	//
+	@Override
 	public String toString() {
 		return "(" +
 			String.format("%B,",useDefaultFontStyle) +

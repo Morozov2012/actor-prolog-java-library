@@ -12,21 +12,25 @@ import morozov.terms.signals.*;
 public enum PushOperationMode {
 	//
 	SELECT_ALL {
+		@Override
 		public Term toTerm() {
 			return term_SELECT_ALL;
 		}
 	},
 	SELECT_NOTHING {
+		@Override
 		public Term toTerm() {
 			return term_SELECT_NOTHING;
 		}
 	},
 	DUPLICATE_FOREGROUND {
+		@Override
 		public Term toTerm() {
 			return term_DUPLICATE_FOREGROUND;
 		}
 	},
 	FLIP_FOREGROUND {
+		@Override
 		public Term toTerm() {
 			return term_FLIP_FOREGROUND;
 		}

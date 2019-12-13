@@ -25,6 +25,7 @@ public final class PrologNoValue extends Term {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean equals(Object o2) {
 		if (o2 instanceof Term) {
 			return ((Term)o2).isEqualToNoValue();
@@ -32,6 +33,7 @@ public final class PrologNoValue extends Term {
 			return false;
 		}
 	}
+	@Override
 	public int compare(Object o2) {
 		if (o2 instanceof Term) {
 			return -((Term)o2).compareWithNoValue();
@@ -39,32 +41,39 @@ public final class PrologNoValue extends Term {
 			return 1;
 		}
 	}
+	@Override
 	public boolean isEqualToNoValue() {
 		return true;
 	}
+	@Override
 	public int compareWithNoValue() {
 		return 0;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void isNoValue(ChoisePoint cp) throws Backtracking {
 	}
+	@Override
 	public boolean thisIsNoValue() {
 		return true;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void unifyWith(Term t, ChoisePoint cp) throws Backtracking {
 		t.isNoValue(cp);
 	}
+	@Override
 	public Term retrieveSetElementValue(ChoisePoint cp) throws Backtracking, TermIsNotSetElement {
 		throw Backtracking.instance;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		return namePrologNoValue;
 	}

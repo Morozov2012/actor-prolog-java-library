@@ -9,9 +9,21 @@ package morozov.system.gui.dialogs.scalable.common;
 import java.util.Arrays;
 
 public class SortedStrings {
-	public String[] initialArray;
-	public String[] sortedArray;
-	public int[] reverseIndex;
+	//
+	protected String[] initialArray;
+	protected String[] sortedArray;
+	protected int[] reverseIndex;
+	//
+	public String[] getInitialArray() {
+		return initialArray;
+	}
+	public String[] getSortedArray() {
+		return sortedArray;
+	}
+	public int[] getReverseIndex() {
+		return reverseIndex;
+	}
+	//
 	public SortedStrings(String[] inputList) {
 		initialArray= inputList;
 		StringWithNumber[] pairs= new StringWithNumber[initialArray.length];
@@ -26,6 +38,7 @@ public class SortedStrings {
 			reverseIndex[pairs[n].number]= n;
 		};
 	}
+	//
 	public int resolveIndex(int index) {
 		return reverseIndex[index];
 	}

@@ -6,6 +6,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.Arc2D;
 
 public class Java2DDrawArc extends Java2DCommand {
+	//
 	protected double x1;
 	protected double y1;
 	protected double figureWidth;
@@ -13,6 +14,7 @@ public class Java2DDrawArc extends Java2DCommand {
 	protected double start;
 	protected double extent;
 	protected int type;
+	//
 	public Java2DDrawArc(double aX1, double aY1, double aH, double aW, double aStart, double aExtent, int aType) {
 		x1= aX1;
 		y1= aY1;
@@ -22,11 +24,14 @@ public class Java2DDrawArc extends Java2DCommand {
 		extent= aExtent;
 		type= aType;
 	}
+	//
+	@Override
 	public void execute(Graphics2D g2, DrawingMode drawingMode) {
 		double factorX= drawingMode.getFactorX();
 		double factorY= drawingMode.getFactorY();
 		drawingMode.drawShape(g2,new Arc2D.Double(x1*factorX,y1*factorY,figureWidth*factorX,figureHeight*factorY,start,extent,type));
 	}
+	@Override
 	public boolean equals(Object o) {
 		if (o==null) {
 			return false;

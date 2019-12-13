@@ -11,12 +11,21 @@ import morozov.terms.*;
 
 public class Point2DArrays {
 	//
-	public double[] xPoints;
-	public double[] yPoints;
+	protected double[] xPoints;
+	protected double[] yPoints;
 	//
 	public Point2DArrays(double[] xList, double[] yList) {
 		xPoints= xList;
 		yPoints= yList;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public double[] getXPoints() {
+		return xPoints;
+	}
+	public double[] getYPoints() {
+		return yPoints;
 	}
 	//
 	///////////////////////////////////////////////////////////////

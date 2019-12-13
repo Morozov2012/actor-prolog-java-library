@@ -22,18 +22,17 @@ import java.nio.file.WatchKey;
 import java.nio.file.StandardWatchEventKinds;
 
 public class UpdatesWatchHolder extends Thread {
+	//
 	protected OpenedDataStore currentDataStore;
-	// protected ActiveWorld currentProcess;
 	protected AtomicBoolean stopThisThread= new AtomicBoolean(false);
 	protected Path subdirectoryPath;
 	protected WatchService watcher;
 	protected WatchKey key;
-	protected HashMap<Path,HashSet<UpdatesWatchTarget>> targets= new HashMap<Path,HashSet<UpdatesWatchTarget>>();
+	protected HashMap<Path,HashSet<UpdatesWatchTarget>> targets= new HashMap<>();
 	//
 	protected static final FileSystem fileSystem= FileSystems.getDefault();
 	//
 	public UpdatesWatchHolder(OpenedDataStore openedDataStore, Path path) {
-		// currentProcess= process;
 		setDaemon(true);
 		currentDataStore= openedDataStore;
 		subdirectoryPath= path;
@@ -43,7 +42,6 @@ public class UpdatesWatchHolder extends Thread {
 			throw new CannotCreateWatchService();
 		};
 		try {
-			// key= subdirectoryPath.register(watcher,StandardWatchEventKinds.ENTRY_CREATE,StandardWatchEventKinds.ENTRY_DELETE,StandardWatchEventKinds.ENTRY_MODIFY);
 			key= subdirectoryPath.register(watcher,StandardWatchEventKinds.ENTRY_DELETE,StandardWatchEventKinds.ENTRY_MODIFY);
 		} catch (IOException e) {
 			throw new CannotRegisterWatchService(subdirectoryPath.toString());
@@ -54,7 +52,7 @@ public class UpdatesWatchHolder extends Thread {
 		synchronized (targets) {
 			HashSet<UpdatesWatchTarget> hash= targets.get(mainDataPath);
 			if (hash==null) {
-				hash= new HashSet<UpdatesWatchTarget>();
+				hash= new HashSet<>();
 				targets.put(mainDataPath,hash);
 			};
 			hash.add(new UpdatesWatchTarget(database,container));
@@ -78,15 +76,15 @@ public class UpdatesWatchHolder extends Thread {
 		}
 	}
 	//
+	@Override
 	public void run() {
 		while (!stopThisThread.get()) {
 			try {
-				WatchKey key= watcher.take();
+				WatchKey watcherKey= watcher.take();
 				synchronized (targets) {
-					for (WatchEvent<?> event: key.pollEvents()) {
+					for (WatchEvent<?> event: watcherKey.pollEvents()) {
 						WatchEvent.Kind kind= event.kind();
 						if (kind == StandardWatchEventKinds.OVERFLOW) {
-							// HashMap<Path,HashSet<DataAbstraction>> targetWorlds= new HashMap<Path,HashSet<DataAbstraction>>();
 							Set<Path> targetsKeySet= targets.keySet();
 							Iterator<Path> targetsKeySetIterator= targetsKeySet.iterator();
 							while (targetsKeySetIterator.hasNext()) {
@@ -101,7 +99,7 @@ public class UpdatesWatchHolder extends Thread {
 						}
 					}
 				};
-				key.reset();
+				watcherKey.reset();
 			} catch (InterruptedException e) {
 			} catch (ThreadDeath e) {
 				return;

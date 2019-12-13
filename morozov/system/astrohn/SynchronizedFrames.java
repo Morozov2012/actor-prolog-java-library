@@ -51,6 +51,7 @@ public class SynchronizedFrames extends EnumeratedFrame implements Serializable 
 		return numberOfColorFrame;
 	}
 	//
+	@Override
 	public long getTime() {
 		return terahertzFrame.getTime();
 	}

@@ -22,6 +22,7 @@ public class VPMblbSelectSuperiorBlob extends VPM_FrameCommand {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void execute(VPM vpm) {
 		BlobGroup group= vpm.getRecentBlobGroup();
 		if (group==null) {

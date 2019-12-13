@@ -15,6 +15,7 @@ public class DummyWorldDomainName extends PrologDomainName {
 	public DummyWorldDomainName() {
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
 		return tagDomainName_DummyWorld;
 	}

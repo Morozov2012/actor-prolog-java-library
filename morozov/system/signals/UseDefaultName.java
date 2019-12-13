@@ -5,6 +5,7 @@ package morozov.system.signals;
 import morozov.run.*;
 
 public final class UseDefaultName extends LightweightException {
+	//
 	public static final UseDefaultName instance= new UseDefaultName();
 	//
 	private UseDefaultName() {

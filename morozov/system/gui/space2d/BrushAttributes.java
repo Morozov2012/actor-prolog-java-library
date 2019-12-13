@@ -6,12 +6,11 @@ import target.*;
 
 import morozov.built_in.*;
 import morozov.run.*;
-import morozov.system.*;
 import morozov.system.converters.*;
+import morozov.system.errors.*;
 import morozov.system.gui.space2d.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
-import morozov.terms.errors.*;
 import morozov.terms.signals.*;
 
 import java.awt.Color;
@@ -31,9 +30,9 @@ import java.awt.geom.AffineTransform;
 
 public class BrushAttributes {
 	//
-	public boolean isSwitch= false;
-	public boolean fillFigures= true;
-	public Paint paint;
+	protected boolean isSwitch= false;
+	protected boolean fillFigures= true;
+	protected Paint paint;
 	//
 	public BrushAttributes(Paint p) {
 		paint= p;
@@ -81,7 +80,7 @@ public class BrushAttributes {
 		} catch (Backtracking b6) {
 		try { // Color
 			try {
-				Color color= ExtendedColor.argumentToColor(value,iX);
+				Color color= ColorAttributeConverters.argumentToColor(value,iX);
 				return new BrushAttributes(color);
 			} catch (TermIsSymbolDefault b7) {
 				throw Backtracking.instance;
@@ -101,7 +100,7 @@ public class BrushAttributes {
 	///////////////////////////////////////////////////////////////
 	//
 	protected static Paint attributesToGradientPaint(Term value, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		HashMap<Long,Term> setPositiveMap= new HashMap<>();
 		Term setEnd= value.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
 		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -124,16 +123,14 @@ public class BrushAttributes {
 					p2= Tools2D.argumentToPoint2D(pairValue,iX);
 				} else if (pairName==SymbolCodes.symbolCode_E_color1) {
 					try {
-						color1= ExtendedColor.argumentToColor(pairValue,iX);
+						color1= ColorAttributeConverters.argumentToColor(pairValue,iX);
 					} catch (TermIsSymbolDefault e1) {
-						// throw new WrongArgumentIsNotAColor(pairValue);
 						color1= Color.WHITE; // Actor Prolog default value
 					}
 				} else if (pairName==SymbolCodes.symbolCode_E_color2) {
 					try {
-						color2= ExtendedColor.argumentToColor(pairValue,iX);
+						color2= ColorAttributeConverters.argumentToColor(pairValue,iX);
 					} catch (TermIsSymbolDefault e2) {
-						// throw new WrongArgumentIsNotAColor(pairValue);
 						color2= Color.BLACK; // Actor Prolog default value
 					}
 				} else {
@@ -159,7 +156,7 @@ public class BrushAttributes {
 	}
 	//
 	protected static LinearGradientPaint attributesToLinearGradientPaint(Term value, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		HashMap<Long,Term> setPositiveMap= new HashMap<>();
 		Term setEnd= value.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
 		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -225,7 +222,7 @@ public class BrushAttributes {
 	}
 	//
 	protected static RadialGradientPaint attributesToRadialGradientPaint(Term value, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		HashMap<Long,Term> setPositiveMap= new HashMap<>();
 		Term setEnd= value.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
 		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
@@ -294,7 +291,7 @@ public class BrushAttributes {
 	}
 	//
 	protected static TexturePaint attributesToTexturePaint(Term value, Canvas2D targetWorld, ChoisePoint iX) {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		HashMap<Long,Term> setPositiveMap= new HashMap<>();
 		Term setEnd= value.exploreSetPositiveElements(setPositiveMap,iX);
 		setEnd= setEnd.dereferenceValue(iX);
 		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {

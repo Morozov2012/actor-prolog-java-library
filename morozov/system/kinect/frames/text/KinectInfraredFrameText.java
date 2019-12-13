@@ -13,7 +13,6 @@ public class KinectInfraredFrameText {
 	//
 	public static void writeText(KinectInfraredFrameInterface frame, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {
 		if (exportMode==ExportMode.SKELETONS) {
-			// super.writeText(writer,exportMode,locale);
 			KinectFrameText.writeRootFrameText(frame,writer,exportMode,locale);
 		} else {
 			writeInfraredFrameText(frame,writer,exportMode,locale);
@@ -22,7 +21,6 @@ public class KinectInfraredFrameText {
 	//
 	public static void writeInfraredFrameText(KinectInfraredFrameInterface frame, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {
 		writer.write("; INFRARED FRAME:\n");
-		// super.writeText(writer,exportMode,locale);
 		KinectFrameText.writeRootFrameText(frame,writer,exportMode,locale);
 		short[] infrared= frame.getInfrared();
 		writer.write(String.format(locale,"; Infrared matrix: %d\n",infrared.length));

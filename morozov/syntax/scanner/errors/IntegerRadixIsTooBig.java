@@ -6,7 +6,7 @@ import java.math.BigInteger;
 
 public class IntegerRadixIsTooBig extends LexicalScannerError {
 	//
-	BigInteger radix;
+	protected BigInteger radix;
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -17,6 +17,7 @@ public class IntegerRadixIsTooBig extends LexicalScannerError {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(" + radix.toString() + ")";
 	}

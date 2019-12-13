@@ -89,6 +89,7 @@ public class ImageSubtractorSnapshot extends GenericVideoProcessingMachineSnapsh
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected Term createPrologBlobs() {
 		if (blobAttributeArray==null) {
 			return PrologEmptyList.instance;
@@ -112,6 +113,7 @@ public class ImageSubtractorSnapshot extends GenericVideoProcessingMachineSnapsh
 			synthesizedImage= null;
 		}
 	}
+	@Override
 	synchronized protected boolean getRefuseSlowTracks() {
 		return refuseSlowTracks;
 	}
@@ -123,6 +125,7 @@ public class ImageSubtractorSnapshot extends GenericVideoProcessingMachineSnapsh
 			synthesizedImage= null;
 		}
 	}
+	@Override
 	synchronized public double getVelocityThreshold() {
 		return velocityThreshold;
 	}
@@ -134,6 +137,7 @@ public class ImageSubtractorSnapshot extends GenericVideoProcessingMachineSnapsh
 			synthesizedImage= null;
 		}
 	}
+	@Override
 	synchronized public double getDistanceThreshold() {
 		return distanceThreshold;
 	}
@@ -145,6 +149,7 @@ public class ImageSubtractorSnapshot extends GenericVideoProcessingMachineSnapsh
 			synthesizedImage= null;
 		}
 	}
+	@Override
 	synchronized public double getFuzzyThresholdBorder() {
 		return fuzzyThresholdBorder;
 	}
@@ -194,9 +199,8 @@ public class ImageSubtractorSnapshot extends GenericVideoProcessingMachineSnapsh
 		for (int k=0; k < numberOfBands; k++) {
 			for (int n=0; n < operationalVectorLength; n++) {
 				int sum= backgroundSum[k][n];
-				int mean= 0;
 				if (backgroundN > 0) {
-					mean= sum / backgroundN;
+					int mean= sum / backgroundN;
 					double dispersion= (backgroundSumX2[k][n] / backgroundN) - mean*mean;
 					pixels[k][n]= (int)Math.sqrt(dispersion);
 				}
@@ -218,6 +222,7 @@ public class ImageSubtractorSnapshot extends GenericVideoProcessingMachineSnapsh
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void createForegroundImageIfNecessary() {
 		if (foregroundImage==null) {
 			createForegroundMaskIfNecessary();

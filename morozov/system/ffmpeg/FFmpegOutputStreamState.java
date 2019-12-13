@@ -18,13 +18,14 @@ public class FFmpegOutputStreamState {
 	public long samples_count;	// int
 	public AVFrame frame;
 	public AVFrame tmp_frame;
-	// public AVPicture tmp_picture;
-	// public float t, tincr, tincr2;
 	public SwsContext sws_ctx;
 	public SwrContext swr_ctx;
 	public Integer nbSamples;
 	public Integer sourceImageWidth;
 	public Integer sourceImageHeight;
+	//
+	protected long quantityOfRecordedFrames= -1;
+	protected long initialTime= -1;
 	//
 	public int getSourceImageWidth(int defaultWidth) {
 		if (sourceImageWidth != null) {
@@ -39,5 +40,29 @@ public class FFmpegOutputStreamState {
 		} else {
 			return defaultHeight;
 		}
+	}
+	public long increaseFrameCounter(long frameTime) {
+		long currentRealTime= frameTime;
+		if (quantityOfRecordedFrames < 0) {
+			quantityOfRecordedFrames= 1;
+			initialTime= currentRealTime;
+			return 0;
+		};
+		long duration= currentRealTime - initialTime;
+		long proposedQuantityOfRecordedFrames= quantityOfRecordedFrames + 1;
+		if (duration > 0) {
+			AVRational streamTimeBase= st.time_base();
+			double doubleExpectedNewQuantityOfRecordedFrames=
+				((double)duration / 1000) * ((double)streamTimeBase.den() / streamTimeBase.num());
+			long longExpectedNewQuantityOfRecordedFrames=
+				(long)StrictMath.round(doubleExpectedNewQuantityOfRecordedFrames);
+			long delta= longExpectedNewQuantityOfRecordedFrames - proposedQuantityOfRecordedFrames;
+			if (delta >= 0) {
+				quantityOfRecordedFrames= proposedQuantityOfRecordedFrames;
+			};
+			return delta;
+		};
+		quantityOfRecordedFrames= proposedQuantityOfRecordedFrames;
+		return 0;
 	}
 }

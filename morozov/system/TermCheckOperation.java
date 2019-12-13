@@ -3,7 +3,7 @@
 package morozov.system;
 
 import morozov.run.*;
-import morozov.system.errors.*;
+import morozov.system.converters.errors.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 import morozov.worlds.*;
@@ -14,41 +14,49 @@ import java.math.BigInteger;
 public enum TermCheckOperation {
 	//
 	FREE {
+		@Override
 		public boolean eval(ChoisePoint iX, Term value) {
 			return value.dereferenceValue(iX).thisIsFreeVariable();
 		}
 	},
 	BOUND {
+		@Override
 		public boolean eval(ChoisePoint iX, Term value) {
 			return !value.dereferenceValue(iX).thisIsFreeVariable();
 		}
 	},
 	SYMBOL {
+		@Override
 		public boolean eval(ChoisePoint iX, Term value) {
 			return (value instanceof PrologSymbol);
 		}
 	},
 	STRING {
+		@Override
 		public boolean eval(ChoisePoint iX, Term value) {
 			return (value instanceof PrologString);
 		}
 	},
 	BINARY {
+		@Override
 		public boolean eval(ChoisePoint iX, Term value) {
 			return (value instanceof PrologBinary);
 		}
 	},
 	INTEGER {
+		@Override
 		public boolean eval(ChoisePoint iX, Term value) {
 			return (value instanceof PrologInteger);
 		}
 	},
 	REAL {
+		@Override
 		public boolean eval(ChoisePoint iX, Term value) {
 			return (value instanceof PrologReal);
 		}
 	},
 	NUMERICAL {
+		@Override
 		public boolean eval(ChoisePoint iX, Term value) {
 			return
 				(value instanceof PrologInteger) ||
@@ -56,12 +64,14 @@ public enum TermCheckOperation {
 		}
 	},
 	CLASS_INSTANCE {
+		@Override
 		public boolean eval(ChoisePoint iX, Term value) {
 			return
 				(value instanceof AbstractWorld);
 		}
 	},
 	INTERNAL_WORLD {
+		@Override
 		public boolean eval(ChoisePoint iX, Term value, ActiveWorld currentProcess) {
 			if (value instanceof AbstractProcess) {
 				AbstractProcess process= (AbstractProcess)value;
@@ -81,11 +91,13 @@ public enum TermCheckOperation {
 				return false;
 			}
 		}
+		@Override
 		public boolean eval(ChoisePoint iX, Term value) {
 			return false;
 		}
 	},
 	EXTERNAL_WORLD {
+		@Override
 		public boolean eval(ChoisePoint iX, Term value, ActiveWorld currentProcess) {
 			if (value instanceof AbstractProcess) {
 				AbstractProcess process= (AbstractProcess)value;
@@ -105,11 +117,13 @@ public enum TermCheckOperation {
 				return false;
 			}
 		}
+		@Override
 		public boolean eval(ChoisePoint iX, Term value) {
 			return false;
 		}
 	},
 	REMOTE_WORLD {
+		@Override
 		public boolean eval(ChoisePoint iX, Term value, ActiveWorld currentProcess) {
 			if (value instanceof ForeignWorldWrapper) {
 				return true;
@@ -117,6 +131,7 @@ public enum TermCheckOperation {
 				return false;
 			}
 		}
+		@Override
 		public boolean eval(ChoisePoint iX, Term value) {
 			if (value instanceof ForeignWorldWrapper) {
 				return true;
@@ -126,6 +141,7 @@ public enum TermCheckOperation {
 		}
 	},
 	EVEN {
+		@Override
 		public boolean eval(ChoisePoint iX, Term value) {
 			try {
 				BigInteger n= value.getIntegerValue(iX);
@@ -137,6 +153,7 @@ public enum TermCheckOperation {
 		}
 	},
 	ODD {
+		@Override
 		public boolean eval(ChoisePoint iX, Term value) {
 			try {
 				BigInteger n= value.getIntegerValue(iX);
@@ -148,6 +165,7 @@ public enum TermCheckOperation {
 		}
 	},
 	NAN {
+		@Override
 		public boolean eval(ChoisePoint iX, Term value) {
 			try {
 				double r= value.getRealValue(iX);
@@ -158,6 +176,7 @@ public enum TermCheckOperation {
 		}
 	},
 	INFINITE {
+		@Override
 		public boolean eval(ChoisePoint iX, Term value) {
 			try {
 				double r= value.getRealValue(iX);
@@ -168,6 +187,7 @@ public enum TermCheckOperation {
 		}
 	},
 	FINITE {
+		@Override
 		public boolean eval(ChoisePoint iX, Term value) {
 			try {
 				double r= value.getRealValue(iX);
@@ -177,8 +197,9 @@ public enum TermCheckOperation {
 			}
 		}
 	};
+	//
 	abstract public boolean eval(ChoisePoint iX, Term value);
-	// abstract public boolean eval(ChoisePoint iX, Term value, ActiveWorld currentProcess);
+	//
 	public boolean eval(ChoisePoint iX, Term value, ActiveWorld currentProcess) {
 		return eval(iX,value);
 	}

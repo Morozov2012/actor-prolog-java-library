@@ -13,75 +13,65 @@ import morozov.system.frames.data.*;
 import morozov.system.frames.data.interfaces.*;
 import morozov.system.frames.interfaces.*;
 import morozov.system.frames.tools.*;
+import morozov.system.i3v1.frames.data.*;
+import morozov.system.interfaces.*;
 import morozov.system.kinect.frames.interfaces.*;
 import morozov.system.modes.*;
 import morozov.system.modes.converters.*;
+import morozov.system.sound.*;
+import morozov.system.sound.frames.*;
+import morozov.system.sound.frames.data.interfaces.*;
+import morozov.system.sound.frames.interfaces.*;
+import morozov.system.sound.interfaces.*;
 import morozov.terms.*;
 import morozov.worlds.*;
 
-import java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
+public abstract class DataAcquisitionBuffer
+		extends ReadWriteBuffer
+		implements AudioDataConsumerInterface {
+	//
+	///////////////////////////////////////////////////////////////
+	// Data Acquisition Attributes
+	///////////////////////////////////////////////////////////////
 	//
 	protected DataAcquisitionBufferOperatingMode operatingMode;
-	protected DetailedColorMap mainColorMap;
-	protected DetailedColorMap auxilairyColorMap;
+	protected YesNo attachAudioData;
+	protected IterativeDetailedColorMapInterface mainColorMap;
+	protected IterativeDetailedColorMapInterface auxilairyColorMap;
 	protected YesNo useRecordedColorMapCommands;
-	//
 	protected ActionPeriod connectionAttemptPeriod;
 	protected Integer maximalErrorsQuantity;
 	//
 	protected AtomicReference<DataAcquisitionBufferOperatingMode> actingDataAcquisitionBufferOperatingMode= new AtomicReference<>();
+	protected AtomicBoolean actingAttachAudioData= new AtomicBoolean(false);
+	//
+	protected static int defaultDeviceConnectionAttemptPeriod= 100;
+	protected static final Term term100= new PrologInteger(100);
+	//
+	///////////////////////////////////////////////////////////////
+	// Audio Data Acquisition Processes & Modes
+	///////////////////////////////////////////////////////////////
+	//
+	protected SoundFramingTask soundFramingTask= new SoundFramingTask(this);
 	//
 	protected AtomicReference<DataAcquisitionError> dataAcquisitionError= new AtomicReference<>();
 	//
-	protected AtomicLong counterOfRecentAttributes= new AtomicLong(-1);
-	// protected AtomicLong numberOfRecentReceivedFrame= new AtomicLong(-1);
+	protected AtomicBoolean waitFirstVideoFrame= new AtomicBoolean(false);
+	protected AtomicInteger firstVideoFrameIsReceived= new AtomicInteger(0);
+	protected int numberOfInitialFramesToBeReceived= 2;
 	//
-	protected AtomicReference<DataFrameColorfulAttributesInterface> recentAttributes= new AtomicReference<>();
-	protected boolean recentFrameIsRepeated= false;
-	//
-	protected AtomicReference<DetailedColorMap> ownMainColorMap= new AtomicReference<>();
-	protected AtomicReference<DetailedColorMap> ownAuxiliaryColorMap= new AtomicReference<>();
-	protected AtomicReference<DetailedColorMap> recordedMainColorMap= new AtomicReference<>();
-	protected AtomicReference<DetailedColorMap> recordedAuxiliaryColorMap= new AtomicReference<>();
-	//
-	protected AtomicLong ownMainColorMapSerialNumber= new AtomicLong(-1);
-	protected AtomicLong ownAuxiliaryColorMapSerialNumber= new AtomicLong(-1);
-	protected AtomicLong recordedMainColorMapSerialNumber= new AtomicLong(-1);
-	protected AtomicLong recordedAuxiliaryColorMapSerialNumber= new AtomicLong(-1);
+	///////////////////////////////////////////////////////////////
+	// Data Frame Reading/Writing Processes & Modes
+	///////////////////////////////////////////////////////////////
 	//
 	protected DataFrameInterface recentFrame;
 	protected DataFrameInterface committedFrame;
 	//
-	// protected AtomicBoolean containsNewFrame= new AtomicBoolean(false);
-	//
-	protected AtomicReference<DetailedColorMap> deliveredMainColorMap= new AtomicReference<>();
-	protected AtomicReference<DetailedColorMap> deliveredAuxiliaryColorMap= new AtomicReference<>();
-	//
-	protected Term deliveredMainColorMapTerm;
-	protected Term deliveredAuxiliaryColorMapTerm;
-	//
-	protected static YesNo defaultZoomMode= YesNo.NO;
-	protected static NumericalValue defaultZoomingCoefficient= new NumericalValue(5.0);
-	protected static OnOff defaultAutorangingMode= OnOff.OFF;
-	protected static OnOff defaultDoubleColorMapMode= OnOff.OFF;
-	protected static OnOff defaultAveragingMode= OnOff.OFF;
-	protected static DetailedColorMap defaultMainColorMap= DetailedColorMap.getDefaultColorMap();
-	protected static DetailedColorMap defaultAuxiliaryColorMap= DetailedColorMap.getDefaultGrayColorMap();
-	//
-	protected static NumericalValue defaultLowerTemperatureBound= new NumericalValue(0.0d);
-	protected static NumericalValue defaultUpperTemperatureBound= new NumericalValue(65_536.0d);
-	protected static NumericalValue defaultLowerTemperatureQuantile1= new NumericalValue(0.0d);
-	protected static NumericalValue defaultUpperTemperatureQuantile1= new NumericalValue(65_536.0d);
-	protected static NumericalValue defaultLowerTemperatureQuantile2= new NumericalValue(0.0d);
-	protected static NumericalValue defaultUpperTemperatureQuantile2= new NumericalValue(65_536.0d);
-	//
-	protected static int defaultDeviceConnectionAttemptPeriod= 100;
-	//
-	// protected static Term termNo= new PrologSymbol(SymbolCodes.symbolCode_E_no);
-	protected static final Term term100= new PrologInteger(100);
+	protected boolean recentFrameIsRepeated= false;
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -104,24 +94,11 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	// abstract public long entry_s_FrameObtained_0();
-	// abstract public long entry_s_DataTransferCompletion_0();
-	// abstract public long entry_s_BufferOverflow_0();
-	// abstract public long entry_s_BufferDeallocation_0();
-	// abstract public long entry_s_DataTransferError_1_i();
-	//
 	abstract public Term getBuiltInSlot_E_operating_mode();
-	// abstract public Term getBuiltInSlot_E_description();
-	// abstract public Term getBuiltInSlot_E_copyright();
-	// abstract public Term getBuiltInSlot_E_registration_date();
-	// abstract public Term getBuiltInSlot_E_registration_time();
+	abstract public Term getBuiltInSlot_E_attach_audio_data();
 	public Term getBuiltInSlot_E_use_recorded_color_map_commands() {
 		return termNo;
 	}
-	// abstract public Term getBuiltInSlot_E_write_buffer_size();
-	// abstract public Term getBuiltInSlot_E_read_buffer_size();
-	// abstract public Term getBuiltInSlot_E_slow_motion_coefficient();
-	// abstract public Term getBuiltInSlot_E_maximal_frame_delay();
 	//
 	public Term getBuiltInSlot_E_connection_attempt_period() {
 		return termDefault;
@@ -154,6 +131,29 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 		}
 	}
 	//
+	// get/set attach_audio_data
+	//
+	public void setAttachAudioData1s(ChoisePoint iX, Term a1) {
+		setAttachAudioData(YesNoConverters.argument2YesNo(a1,iX));
+	}
+	public void setAttachAudioData(YesNo value) {
+		attachAudioData= value;
+		actingAttachAudioData.set(attachAudioData.toBoolean());
+	}
+	public void getAttachAudioData0ff(ChoisePoint iX, PrologVariable result) {
+		result.setNonBacktrackableValue(YesNoConverters.toTerm(getAttachAudioData(iX)));
+	}
+	public void getAttachAudioData0fs(ChoisePoint iX) {
+	}
+	public YesNo getAttachAudioData(ChoisePoint iX) {
+		if (attachAudioData != null) {
+			return attachAudioData;
+		} else {
+			Term value= getBuiltInSlot_E_attach_audio_data();
+			return YesNoConverters.argument2YesNo(value,iX);
+		}
+	}
+	//
 	// get/set use_recorded_color_map_commands
 	//
 	public void setUseRecordedColorMapCommands1s(ChoisePoint iX, Term a1) {
@@ -180,14 +180,14 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 	// get/set connection_attempt_period
 	//
 	public void setConnectionAttemptPeriod1s(ChoisePoint iX, Term a1) {
-		setConnectionAttemptPeriod(ActionPeriod.argumentToActionPeriod(a1,iX));
+		setConnectionAttemptPeriod(ActionPeriodConverters.argumentToActionPeriod(a1,iX));
 	}
 	public void setConnectionAttemptPeriod(ActionPeriod value) {
 		connectionAttemptPeriod= value;
 	}
 	public void getConnectionAttemptPeriod0ff(ChoisePoint iX, PrologVariable result) {
 		ActionPeriod value= getConnectionAttemptPeriod(iX);
-		result.setNonBacktrackableValue(value.toTerm());
+		result.setNonBacktrackableValue(ActionPeriodConverters.toTerm(value));
 	}
 	public void getConnectionAttemptPeriod0fs(ChoisePoint iX) {
 	}
@@ -196,7 +196,7 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 			return connectionAttemptPeriod;
 		} else {
 			Term value= getBuiltInSlot_E_connection_attempt_period();
-			return ActionPeriod.argumentToActionPeriod(value,iX);
+			return ActionPeriodConverters.argumentToActionPeriod(value,iX);
 		}
 	}
 	//
@@ -224,76 +224,25 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected void updateAttributesIfNecessary(ChoisePoint iX) {
-		if (recentAttributes.get()==null) {
-			updateAttributes(iX);
+	public void flushMicrophoneBuffer0s(ChoisePoint iX) {
+		flushMicrophoneBuffer();
+	}
+	//
+	public void flushMicrophoneBuffer() {
+		soundFramingTask.flush(false,true);
+	}
+	//
+	public void microphoneIsAvailable0s(ChoisePoint iX) throws Backtracking {
+		if (!soundFramingTask.microphoneIsAvailable()) {
+			throw Backtracking.instance;
 		}
 	}
 	//
-	protected void updateAttributes(ChoisePoint iX) {
-		DataFrameColorfulAttributes attributes= new DataFrameColorfulAttributes(
-			counterOfRecentAttributes.incrementAndGet(),
-			getAutorangingMode(iX).toBoolean(),
-			getDoubleColorMapMode(iX).toBoolean(),
-			DataRange.BOUNDS, // getSelectedDataRange(),
-			NumericalValueConverters.toDouble(getLowerTemperatureBound(iX)),
-			NumericalValueConverters.toDouble(getUpperTemperatureBound(iX)),
-			NumericalValueConverters.toDouble(getLowerMainTemperatureQuantile(iX)),
-			NumericalValueConverters.toDouble(getUpperMainTemperatureQuantile(iX)),
-			NumericalValueConverters.toDouble(getLowerAuxiliaryTemperatureQuantile(iX)),
-			NumericalValueConverters.toDouble(getUpperAuxiliaryTemperatureQuantile(iX)),
-			getMainColorMap(iX),
-			getAuxiliaryColorMap(iX),
-			getAveragingMode(iX).toBoolean(),
-			getZoomImage(iX).toBoolean(),
-			getZoomingCoefficient(iX));
-		recentAttributes.set(attributes);
+	public void microphoneIsActive0s(ChoisePoint iX) throws Backtracking {
+		if (!soundFramingTask.microphoneIsActive()) {
+			throw Backtracking.instance;
+		}
 	}
-	//
-	public YesNo getZoomImage(ChoisePoint iX) {
-		return defaultZoomMode;
-	}
-	public NumericalValue getZoomingCoefficient(ChoisePoint iX) {
-		return defaultZoomingCoefficient;
-	}
-	//
-	public OnOff getAutorangingMode(ChoisePoint iX) {
-		return defaultAutorangingMode;
-	}
-	public OnOff getAveragingMode(ChoisePoint iX) {
-		return defaultAveragingMode;
-	}
-	public OnOff getDoubleColorMapMode(ChoisePoint iX) {
-		return defaultDoubleColorMapMode;
-	}
-	//
-	public DetailedColorMap getMainColorMap(ChoisePoint iX) {
-		return defaultMainColorMap;
-	}
-	public DetailedColorMap getAuxiliaryColorMap(ChoisePoint iX) {
-		return defaultAuxiliaryColorMap;
-	}
-	//
-	public NumericalValue getLowerTemperatureBound(ChoisePoint iX) {
-		return defaultLowerTemperatureBound;
-	}
-	public NumericalValue getUpperTemperatureBound(ChoisePoint iX) {
-		return defaultUpperTemperatureBound;
-	}
-	public NumericalValue getLowerMainTemperatureQuantile(ChoisePoint iX) {
-		return defaultLowerTemperatureQuantile1;
-	}
-	public NumericalValue getUpperMainTemperatureQuantile(ChoisePoint iX) {
-		return defaultUpperTemperatureQuantile1;
-	}
-	public NumericalValue getLowerAuxiliaryTemperatureQuantile(ChoisePoint iX) {
-		return defaultLowerTemperatureQuantile2;
-	}
-	public NumericalValue getUpperAuxiliaryTemperatureQuantile(ChoisePoint iX) {
-		return defaultUpperTemperatureQuantile2;
-	}
-	//
-	///////////////////////////////////////////////////////////////
 	//
 	public void recentDataAcquisitionError1s(ChoisePoint iX, PrologVariable a1) throws Backtracking {
 		DataAcquisitionError error= dataAcquisitionError.get();
@@ -306,91 +255,10 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected void updateOwnMainColorMap(DataFrameBaseAttributesInterface attributes) {
-		boolean doUpdateColorMap= false;
-		if (ownMainColorMap.get()==null) {
-			doUpdateColorMap= true;
-		} else {
-			long serialNumber= attributes.getSerialNumber();
-			if (ownMainColorMapSerialNumber.get() != serialNumber) {
-				doUpdateColorMap= true;
-			}
-		};
-		if (doUpdateColorMap) {
-			if (attributes instanceof DataFrameColorfulAttributes) {
-				ownMainColorMap.set(((DataFrameColorfulAttributes)attributes).getDetailedMainColorMap());
-			} else {
-				DataColorMap dataMainColorMap= attributes.getMainColorMap();
-				ownMainColorMap.set(new DetailedColorMap(dataMainColorMap));
-			}
-		}
-	}
-	protected void updateOwnAuxiliaryColorMap(DataFrameBaseAttributesInterface attributes) {
-		boolean doUpdateColorMap= false;
-		if (ownAuxiliaryColorMap.get()==null) {
-			doUpdateColorMap= true;
-		} else {
-			long serialNumber= attributes.getSerialNumber();
-			if (ownAuxiliaryColorMapSerialNumber.get() != serialNumber) {
-				doUpdateColorMap= true;
-			}
-		};
-		if (doUpdateColorMap) {
-			if (attributes instanceof DataFrameColorfulAttributes) {
-				ownAuxiliaryColorMap.set(((DataFrameColorfulAttributes)attributes).getDetailedAuxiliaryColorMap());
-			} else {
-				DataColorMap dataAuxiliaryColorMap= attributes.getAuxiliaryColorMap();
-				ownAuxiliaryColorMap.set(new DetailedColorMap(dataAuxiliaryColorMap));
-			}
-		}
-	}
-	//
-	protected void updateRecordedMainColorMap(DataFrameBaseAttributesInterface attributes) {
-		boolean doUpdateColorMap= false;
-		if (recordedMainColorMap.get()==null) {
-			doUpdateColorMap= true;
-		} else {
-			long serialNumber= attributes.getSerialNumber();
-			if (recordedMainColorMapSerialNumber.get() != serialNumber) {
-				doUpdateColorMap= true;
-			}
-		};
-		if (doUpdateColorMap) {
-			if (attributes instanceof DataFrameColorfulAttributes) {
-				recordedMainColorMap.set(((DataFrameColorfulAttributes)attributes).getDetailedMainColorMap());
-			} else {
-				DataColorMap dataMainColorMap= attributes.getMainColorMap();
-				recordedMainColorMap.set(new DetailedColorMap(dataMainColorMap));
-			}
-		}
-	}
-	protected void updateRecordedAuxiliaryColorMap(DataFrameBaseAttributesInterface attributes) {
-		boolean doUpdateColorMap= false;
-		if (recordedAuxiliaryColorMap.get()==null) {
-			doUpdateColorMap= true;
-		} else {
-			long serialNumber= attributes.getSerialNumber();
-			if (recordedAuxiliaryColorMapSerialNumber.get() != serialNumber) {
-				doUpdateColorMap= true;
-			}
-		};
-		if (doUpdateColorMap) {
-			if (attributes instanceof DataFrameColorfulAttributes) {
-				recordedAuxiliaryColorMap.set(((DataFrameColorfulAttributes)attributes).getDetailedAuxiliaryColorMap());
-			} else {
-				DataColorMap dataAuxiliaryColorMap= attributes.getAuxiliaryColorMap();
-				recordedAuxiliaryColorMap.set(new DetailedColorMap(dataAuxiliaryColorMap));
-			}
-		}
-	}
-	//
-	///////////////////////////////////////////////////////////////
-	//
+	@Override
 	protected void resetCounters() {
 		synchronized (numberOfRecentReceivedFrame) {
 			super.resetCounters();
-			counterOfRecentAttributes.set(-1);
-			// numberOfRecentReceivedFrame.set(-1);
 			ownMainColorMap.set(null);
 			ownAuxiliaryColorMap.set(null);
 			recordedMainColorMap.set(null);
@@ -402,55 +270,55 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 			recentFrame= null;
 			recentFrameIsRepeated= false;
 			committedFrame= null;
-			// containsNewFrame.set(false);
 			dataAcquisitionError.set(null);
-			// dataReadingError.set(null);
-			// dataWritingError.set(null);
 			deliveredMainColorMap.set(null);
 			deliveredAuxiliaryColorMap.set(null);
-			// deliveredDescription.set(null);
-			// deliveredCopyright.set(null);
-			// deliveredRegistrationDate.set(null);
-			// deliveredRegistrationTime.set(null);
 			deliveredMainColorMapTerm= null;
 			deliveredAuxiliaryColorMapTerm= null;
-			// deliveredDescriptionTerm= null;
-			// deliveredCopyrightTerm= null;
-			// deliveredRegistrationDateTerm= null;
-			// deliveredRegistrationTimeTerm= null;
+		}
+	}
+	//
+	@Override
+	protected void resetAudioDataCounters() {
+		synchronized (numberOfRecentReceivedAudioData) {
+			super.resetAudioDataCounters();
+			counterOfAcquiredAudioFrames.set(-1);
 		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void start0s(ChoisePoint iX) {
 		start(false,iX);
 	}
 	//
 	public void start(boolean requireExclusiveAccess, ChoisePoint iX) {
 		DataAcquisitionBufferOperatingMode actingOperatingMode= actingDataAcquisitionBufferOperatingMode.get();
+		boolean currentOutputAudioData= actingOutputAudioData.get();
 		if (actingOperatingMode != null) {
 			switch (actingOperatingMode) {
 			case RECORDING:
-				activateDataAcquisition(iX);
+				activateDataAcquisition(false,iX);
 				break;
 			case PLAYING:
+				frameReadingTask.setOutputAudioData(currentOutputAudioData);
 				frameReadingTask.setStopAfterSingleReading(false);
+				frameReadingTask.setApplyAudioDataTiming(!synchronizeAudioStreamWithFrontVideoFrame());
 				frameReadingTask.activateReading();
 				break;
 			case READING:
+				frameReadingTask.setOutputAudioData(currentOutputAudioData);
 				frameReadingTask.setStopAfterSingleReading(true);
 				frameReadingTask.activateReading();
 				break;
 			case SPECULATIVE_READING:
+				frameReadingTask.setOutputAudioData(currentOutputAudioData);
 				frameReadingTask.setStopAfterSingleReading(true);
-				// frameReadingTask.activateReading();
 				break;
 			case LISTENING:
-				activateDataAcquisition(iX);
+				activateDataAcquisition(false,iX);
 				break;
-			// case DISPLAYING:
-			//	break;
 			}
 		} else {
 			resetCounters();
@@ -462,6 +330,7 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 				break;
 			case PLAYING:
 				frameReadingTask.setStopAfterSingleReading(false);
+				frameReadingTask.setApplyAudioDataTiming(!synchronizeAudioStreamWithFrontVideoFrame());
 				startReadingOrPlaying(true,currentOperatingMode,iX);
 				break;
 			case READING:
@@ -476,16 +345,17 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 			case LISTENING:
 				startListening(currentOperatingMode,requireExclusiveAccess,iX);
 				break;
-			// case DISPLAYING:
-			//	startDisplaying(currentOperatingMode,iX);
-			//	break;
 			}
 		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected void activateDataAcquisition(ChoisePoint iX) {
+	protected void activateDataAcquisition(boolean flushBuffers, ChoisePoint iX) {
+		boolean currentAttachAudioData= getAttachAudioData(iX).toBoolean();
+		boolean currentOutputAudioData= getOutputAudioData(iX).toBoolean();
+		int currentOutputDebugInformation= Arithmetic.toInteger(getOutputDebugInformation(iX));
+		activateAudioSystemIfNecessary(flushBuffers,currentAttachAudioData,currentOutputAudioData,currentOutputDebugInformation);
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -493,36 +363,42 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 	protected void startRecording(DataAcquisitionBufferOperatingMode currentOperatingMode, boolean requireExclusiveAccess, ChoisePoint iX) {
 		int currentWriteBufferSize= getWriteBufferSize(iX);
 		ExtendedFileName currentFileName= retrieveRealLocalFileName(iX);
-		int currentOutputDebugInformation= PrologInteger.toInteger(getOutputDebugInformation(iX));
+		int currentOutputDebugInformation= Arithmetic.toInteger(getOutputDebugInformation(iX));
 		frameRecordingTask.setWriteBufferSize(currentWriteBufferSize);
 		frameRecordingTask.setOutputDebugInformation(currentOutputDebugInformation);
 		frameRecordingTask.reset(currentFileName);
 		setActingMetadata(iX);
 		actingDataAcquisitionBufferOperatingMode.set(currentOperatingMode);
 		try {
-			activateDataAcquisition(iX);
+			activateDataAcquisition(true,iX);
 		} catch (Throwable e) {
-			actingDataAcquisitionBufferOperatingMode.set(null);
+			resetActingMode();
 			throw e;
 		}
 	}
 	//
 	protected void startReadingOrPlaying(boolean doActivateReading, DataAcquisitionBufferOperatingMode currentOperatingMode, ChoisePoint iX) {
 		ExtendedFileName currentFileName= retrieveRealLocalFileName(iX);
+		boolean currentAttachAudioData= getAttachAudioData(iX).toBoolean();
+		boolean currentOutputAudioData= getOutputAudioData(iX).toBoolean();
 		int currentTimeout= getMaximalWaitingTimeInMilliseconds(iX);
 		CharacterSet currentCharacterSet= getCharacterSet(iX);
 		int currentReadBufferSize= getReadBufferSize(iX);
 		NumericalValue currentSlowMotionCoefficient= getSlowMotionCoefficient(iX);
 		IntegerAttribute currentMaximalFrameDelay= getMaximalFrameDelay(iX);
+		int currentOutputDebugInformation= Arithmetic.toInteger(getOutputDebugInformation(iX));
 		actingReadBufferSize.set(currentReadBufferSize);
 		actingDataAcquisitionBufferOperatingMode.set(currentOperatingMode);
+		activateAudioSystemIfNecessary(true,currentAttachAudioData,currentOutputAudioData,currentOutputDebugInformation);
 		try {
 			frameReadingTask.setSlowMotionCoefficient(currentSlowMotionCoefficient);
 			frameReadingTask.setMaximalFrameDelay(currentMaximalFrameDelay);
+			frameReadingTask.setOutputAudioData(currentOutputAudioData);
 			frameReadingTask.setDisplayingMode(null);
+			frameReadingTask.setOutputDebugInformation(currentOutputDebugInformation);
 			frameReadingTask.startReading(doActivateReading,currentFileName,currentTimeout,currentCharacterSet,staticContext);
 		} catch (Throwable e) {
-			actingDataAcquisitionBufferOperatingMode.set(null);
+			resetActingMode();
 			throw e;
 		}
 	}
@@ -532,21 +408,55 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 		actingReadBufferSize.set(currentReadBufferSize);
 		actingDataAcquisitionBufferOperatingMode.set(currentOperatingMode);
 		try {
-			activateDataAcquisition(iX);
+			activateDataAcquisition(true,iX);
 		} catch (Throwable e) {
-			actingDataAcquisitionBufferOperatingMode.set(null);
+			resetActingMode();
 			throw e;
 		}
 	}
 	//
-	// protected void startDisplaying(DataAcquisitionBufferOperatingMode currentOperatingMode, ChoisePoint iX) {
-	//	int currentReadBufferSize= getReadBufferSize(iX);
-	//	actingReadBufferSize.set(currentReadBufferSize);
-	//	actingDataAcquisitionBufferOperatingMode.set(currentOperatingMode);
-	// }
+	@Override
+	protected void activateAudioSystemIfNecessary(boolean flushBuffers, boolean currentAttachAudioData, boolean currentOutputAudioData, int currentOutputDebugInformation) {
+		super.activateAudioSystemIfNecessary(flushBuffers,currentAttachAudioData,currentOutputAudioData,currentOutputDebugInformation);
+		actingAttachAudioData.set(currentAttachAudioData);
+		if (currentAttachAudioData) {
+			soundFramingTask.setOutputDebugInformation(currentOutputDebugInformation);
+			AudioFormatBaseAttributesInterface format= soundFramingTask.getAudioFormat();
+			recentAudioFormat.set(format);
+			if (flushBuffers) {
+				soundFramingTask.flush(true,true);
+			};
+			soundFramingTask.startDataTransfer();
+		}
+	}
+	//
+	@Override
+	public void implementAudioSystemReset(boolean forgetAudioFormat) {
+		resetAudioDataCounters();
+		if (forgetAudioFormat) {
+			recentAudioFormat.set(null);
+		};
+		if (synchronizeAudioStreamWithFrontVideoFrame()) {
+			waitFirstVideoFrame.set(true);
+			firstVideoFrameIsReceived.set(0);
+		}
+	}
+	//
+	@Override
+	public void implementAudioFormatReset() {
+		recentAudioFormat.set(null);
+	}
+	//
+	@Override
+	protected void resetActingMode() {
+		super.resetActingMode();
+		actingDataAcquisitionBufferOperatingMode.set(null);
+		actingAttachAudioData.set(false);
+	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void pause0s(ChoisePoint iX) {
 		DataAcquisitionBufferOperatingMode currentOperatingMode= actingDataAcquisitionBufferOperatingMode.get();
 		if (currentOperatingMode==null) {
@@ -564,12 +474,11 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 		case LISTENING:
 			suspendListening(iX);
 			break;
-		// case DISPLAYING:
-		//	break;
 		}
 	}
 	//
 	protected void suspendRecording(ChoisePoint iX) {
+		stopAudioSystemIfNecessary(iX);
 	}
 	protected void suspendReading(ChoisePoint iX) {
 		if (frameReadingTask != null) {
@@ -577,10 +486,12 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 		}
 	}
 	protected void suspendListening(ChoisePoint iX) {
+		stopAudioSystemIfNecessary(iX);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void stop0s(ChoisePoint iX) {
 		stop(iX);
 	}
@@ -602,31 +513,72 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 		case LISTENING:
 			stopListening(iX);
 			break;
-		// case DISPLAYING:
-		//	stopDisplaying(iX);
-		//	break;
+		}
+	}
+	//
+	protected void doStop() {
+		DataAcquisitionBufferOperatingMode currentOperatingMode= actingDataAcquisitionBufferOperatingMode.get();
+		if (currentOperatingMode==null) {
+			return;
+		};
+		switch (currentOperatingMode) {
+		case RECORDING:
+			doStopRecording();
+			break;
+		case PLAYING:
+		case READING:
+		case SPECULATIVE_READING:
+			doStopReading();
+			break;
+		case LISTENING:
+			doStopListening();
+			break;
 		}
 	}
 	//
 	protected void stopRecording(ChoisePoint iX) {
-		actingDataAcquisitionBufferOperatingMode.set(null);
-		frameRecordingTask.close();
+		doStopRecording();
 	}
+	protected void doStopRecording() {
+		resetActingMode();
+		frameRecordingTask.close();
+		doStopAudioSystemIfNecessary();
+	}
+	//
 	protected void stopReading(ChoisePoint iX) {
-		actingDataAcquisitionBufferOperatingMode.set(null);
+		doStopReading();
+	}
+	protected void doStopReading() {
+		resetActingMode();
 		if (frameReadingTask != null) {
 			frameReadingTask.closeReading();
 		}
 	}
+	//
 	protected void stopListening(ChoisePoint iX) {
-		actingDataAcquisitionBufferOperatingMode.set(null);
+		doStopListening();
 	}
-	// protected void stopDisplaying(ChoisePoint iX) {
-	//	actingDataAcquisitionBufferOperatingMode.set(null);
-	// }
+	protected void doStopListening() {
+		resetActingMode();
+		doStopAudioSystemIfNecessary();
+	}
+	//
+	@Override
+	protected void stopAudioSystemIfNecessary(ChoisePoint iX) {
+		super.stopAudioSystemIfNecessary(iX);
+		actingAttachAudioData.set(false);
+		soundFramingTask.stopDataTransfer();
+	}
+	@Override
+	protected void doStopAudioSystemIfNecessary() {
+		super.doStopAudioSystemIfNecessary();
+		actingAttachAudioData.set(false);
+		soundFramingTask.stopDataTransfer();
+	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void isOpen0s(ChoisePoint iX) throws Backtracking {
 		DataAcquisitionBufferOperatingMode currentOperatingMode= actingDataAcquisitionBufferOperatingMode.get();
 		if (currentOperatingMode==null) {
@@ -650,13 +602,12 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 				throw Backtracking.instance;
 			};
 			break;
-		// case DISPLAYING:
-		//	break;
 		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void isActive0s(ChoisePoint iX) throws Backtracking {
 		DataAcquisitionBufferOperatingMode currentOperatingMode= actingDataAcquisitionBufferOperatingMode.get();
 		if (currentOperatingMode==null) {
@@ -682,8 +633,6 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 				throw Backtracking.instance;
 			};
 			break;
-		// case DISPLAYING:
-		//	break;
 		}
 	}
 	//
@@ -693,6 +642,7 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void isSuspended0s(ChoisePoint iX) throws Backtracking {
 		DataAcquisitionBufferOperatingMode currentOperatingMode= actingDataAcquisitionBufferOperatingMode.get();
 		if (currentOperatingMode==null) {
@@ -716,8 +666,6 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 				throw Backtracking.instance;
 			};
 			break;
-		// case DISPLAYING:
-		//	throw Backtracking.instance;
 		}
 	}
 	//
@@ -727,6 +675,7 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void eof0s(ChoisePoint iX) throws Backtracking {
 		DataAcquisitionBufferOperatingMode currentOperatingMode= actingDataAcquisitionBufferOperatingMode.get();
 		if (currentOperatingMode==null) {
@@ -744,13 +693,12 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 			break;
 		case LISTENING:
 			throw Backtracking.instance;
-		// case DISPLAYING:
-		//	throw Backtracking.instance;
 		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void commit0s(ChoisePoint iX) throws Backtracking {
 		if (committedFrameWasAssignedDirectly.get()) {
 			if (committedFrame==null) {
@@ -768,6 +716,7 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void isCommitted0s(ChoisePoint iX) throws Backtracking {
 		synchronized (numberOfRecentReceivedFrame) {
 			if (committedFrameIsNull()) {
@@ -782,68 +731,33 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	protected int[][] prepareMainColorMap(boolean doNotControlColorMaps, DataFrameBaseAttributesInterface attributes) {
-		int[][] colorMap;
-		if (doNotControlColorMaps) {
-			updateRecordedMainColorMap(attributes);
-			colorMap= recordedMainColorMap.get().toColors();
-		} else {
-			updateOwnMainColorMap(recentAttributes.get());
-			colorMap= ownMainColorMap.get().toColors();
-		};
-		return colorMap;
-	}
-	//
-	protected int[][] prepareAuxiliaryColorMap(boolean doNotControlColorMaps, DataFrameBaseAttributesInterface attributes) {
-		int[][] colorMap;
-		if (doNotControlColorMaps) {
-			updateRecordedAuxiliaryColorMap(attributes);
-			colorMap= recordedAuxiliaryColorMap.get().toColors();
-		} else {
-			updateOwnAuxiliaryColorMap(recentAttributes.get());
-			colorMap= ownAuxiliaryColorMap.get().toColors();
-		};
-		return colorMap;
-	}
-	//
-	///////////////////////////////////////////////////////////////
-	//
-	public void getDeliveredColorMaps2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
-		if (deliveredMainColorMapTerm==null) {
-			DetailedColorMap colorMap= deliveredMainColorMap.get();
-			if (colorMap != null) {
-				deliveredMainColorMapTerm= ColorMapConverters.toTerm(colorMap);
-			}
-		};
-		if (deliveredAuxiliaryColorMapTerm==null) {
-			DetailedColorMap colorMap= deliveredAuxiliaryColorMap.get();
-			if (colorMap != null) {
-				deliveredAuxiliaryColorMapTerm= ColorMapConverters.toTerm(colorMap);
-			}
-		};
-		a1.setBacktrackableValue(deliveredMainColorMapTerm,iX);
-		a2.setBacktrackableValue(deliveredAuxiliaryColorMapTerm,iX);
-	}
-	//
-	///////////////////////////////////////////////////////////////
-	//
 	public void setDataAcquisitionError(DataAcquisitionError error) {
 		dataAcquisitionError.set(error);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean sendDataFrame(DataFrameInterface frame) {
 		DataAcquisitionBufferOperatingMode currentOperatingMode= actingDataAcquisitionBufferOperatingMode.get();
 		if (currentOperatingMode != null && currentOperatingMode==DataAcquisitionBufferOperatingMode.RECORDING) {
-			long currentFrameNumber= updateRecentFrame(frame);
+			long currentFrameNumber;
+			if (frame instanceof AudioDataFrameInterface) {
+				AudioDataFrameInterface audioDataFrame= (AudioDataFrameInterface)frame;
+				currentFrameNumber= updateRecentAudioData(audioDataFrame);
+			} else {
+				currentFrameNumber= updateRecentFrame(frame);
+			};
 			if (currentFrameNumber == 0) {
 				ModeFrame modeFrame= createModeFrame(frame.getBaseAttributes());
 				frameRecordingTask.store(modeFrame);
 			};
 			frameRecordingTask.store(frame);
-			// sendFrameObtained();
-			sendFrameObtainedIfNecessary(frame);
+			if (frame instanceof AudioDataFrameInterface) {
+				sendAudioDataObtained();
+			} else {
+				sendFrameObtainedIfNecessary(frame);
+			};
 			return true;
 		} else {
 			DataArrayType dataArrayType= frame.getDataArrayType();
@@ -854,14 +768,25 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 				deliveredRegistrationDate.set(modeFrame.getRegistrationDate());
 				deliveredRegistrationTime.set(modeFrame.getRegistrationTime());
 				return false;
+			} else if (frame instanceof AudioDataFrameInterface) {
+				AudioDataFrameInterface audioDataFrame= (AudioDataFrameInterface)frame;
+				byte[] audioDataArray= audioDataFrame.getAudioData();
+				if (actingOutputAudioData.get()) {
+					soundPlayingTask.generateSound(audioDataArray);
+				};
+				updateRecentAudioData(audioDataFrame);
+				sendAudioDataObtained();
+				return true;
 			} else {
 				DataFrameBaseAttributesInterface attributes= frame.getBaseAttributes();
-				if (attributes instanceof DataFrameColorfulAttributes) {
+				if (attributes instanceof ThermalDataFrameColorfulAttributes) {
+					deliveredMainColorMap.set(((ThermalDataFrameColorfulAttributes)attributes).getDetailedMainColorMap());
+					deliveredAuxiliaryColorMap.set(((ThermalDataFrameColorfulAttributes)attributes).getDetailedAuxiliaryColorMap());
+				} else if (attributes instanceof DataFrameColorfulAttributes) {
 					deliveredMainColorMap.set(((DataFrameColorfulAttributes)attributes).getDetailedMainColorMap());
 					deliveredAuxiliaryColorMap.set(((DataFrameColorfulAttributes)attributes).getDetailedAuxiliaryColorMap());
 				};
 				updateRecentFrame(frame);
-				// sendFrameObtained();
 				sendFrameObtainedIfNecessary(frame);
 				return true;
 			}
@@ -885,36 +810,146 @@ public abstract class DataAcquisitionBuffer extends ReadWriteBuffer {
 		return modeFrame;
 	}
 	//
+	@Override
 	public boolean sendCompoundFrame(CompoundFrameInterface frame) {
 		return false;
 	}
+	@Override
 	public boolean sendKinectFrame(KinectFrameInterface frame) {
 		return false;
 	}
 	//
 	protected long updateRecentFrame(DataFrameInterface frame) {
-		synchronized (numberOfRecentReceivedFrame) {
-			numberOfRecentReceivedFrame.notifyAll();
+		if (frame.isLightweightFrame()) {
+			return -1;
 		};
-		return -1;
+		synchronized (numberOfRecentReceivedFrame) {
+			long currentFrameNumber= acceptFrame(frame,-1);
+			if (currentFrameNumber >= 0) {
+				numberOfRecentReceivedFrame.notifyAll();
+			};
+			return currentFrameNumber;
+		}
+	}
+	//
+	protected long acceptFrame(DataFrameInterface frame, long currentFrameNumber) {
+		if (frame instanceof AudioDataFrameInterface) {
+			AudioDataFrameInterface audioFrame= (AudioDataFrameInterface)frame;
+			currentFrameNumber= numberOfRecentReceivedFrame.incrementAndGet();
+			updateHistory(audioFrame);
+		};
+		if (currentFrameNumber >= 0) {
+			recentFrame= frame;
+			committedFrameWasAssignedDirectly.set(false);
+			recentFrameIsRepeated= false;
+		};
+		return currentFrameNumber;
+	}
+	//
+	protected void updateHistory(DataFrameInterface recentDataFrame) {
+		if (recentDataFrame==null) {
+			return;
+		};
+		updateHistory(new EnumeratedDataFrame(recentDataFrame,numberOfRecentReceivedFrame.get()));
+	}
+	//
+	protected long updateRecentAudioData(AudioDataFrameInterface frame) {
+		synchronized (numberOfRecentReceivedAudioData) {
+			long currentFrameNumber= numberOfRecentReceivedAudioData.incrementAndGet();
+			recentAudioData= frame;
+			committedAudioDataWasAssignedDirectly.set(false);
+			recentAudioDataIsRepeated= false;
+			return currentFrameNumber;
+		}
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
+	public void setAudioData(byte[] buffer, long time) {
+		if (buffer==null) {
+			return;
+		};
+		boolean currentAttachAudioData= actingAttachAudioData.get();
+		if (currentAttachAudioData) {
+			if (synchronizeAudioStreamWithFrontVideoFrame()) {
+				if (waitFirstVideoFrame.get() && (firstVideoFrameIsReceived.get() < numberOfInitialFramesToBeReceived)) {
+					return;
+				}
+			}
+		} else {
+			return;
+		};
+		DataAcquisitionBufferOperatingMode actingOperatingMode= actingDataAcquisitionBufferOperatingMode.get();
+		if (actingOperatingMode==null) {
+			return;
+		};
+		if (	actingOperatingMode==DataAcquisitionBufferOperatingMode.LISTENING ||
+			actingOperatingMode==DataAcquisitionBufferOperatingMode.RECORDING) {
+			AudioFormatBaseAttributesInterface format= recentAudioFormat.get();
+			if (format==null) {
+				format= soundFramingTask.getAudioFormat();
+				recentAudioFormat.set(format);
+			};
+			if (format != null) {
+				AudioDataFrame frame= new EncodedAudioDataFrame(
+					counterOfAcquiredAudioFrames.incrementAndGet(),
+					time,
+					buffer,
+					format,
+					recentAttributes.get());
+				sendDataFrame(frame);
+			}
+		}
+	}
+	//
+	@Override
+	public void reportMicrophoneAvailability(boolean state) {
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	protected void flushAudioSystemIfNecessary() {
+		boolean givenAttachAudioData= actingAttachAudioData.get();
+		if (givenAttachAudioData) {
+			if (synchronizeAudioStreamWithFrontVideoFrame()) {
+				if (waitFirstVideoFrame.get()) {
+					if (firstVideoFrameIsReceived.getAndIncrement() < numberOfInitialFramesToBeReceived) {
+						flushMicrophoneBuffer();
+						flushAudioBuffer();
+						resetFrameRateAndAudioDataRate();
+						waitFirstVideoFrame.set(false);
+					}
+				}
+			} else {
+				flushMicrophoneBuffer();
+				flushAudioBuffer();
+				resetFrameRateAndAudioDataRate();
+				waitFirstVideoFrame.set(false);
+			}
+		}
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	@Override
 	public void completeDataReading(long numberOfAcquiredFrames) {
-		actingDataAcquisitionBufferOperatingMode.set(null);
+		resetActingMode();
 		super.completeDataReading(numberOfAcquiredFrames);
 	}
+	@Override
 	public void completeDataReading(long numberOfFrameToBeAcquired, Throwable e) {
 		super.completeDataReading(numberOfFrameToBeAcquired,e);
 	}
 	//
+	@Override
 	public void completeDataWriting(long numberOfFrame, Throwable e) {
 		super.completeDataWriting(numberOfFrame,e);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected boolean isSpeculativeReadingMode() {
 		DataAcquisitionBufferOperatingMode currentOperatingMode= actingDataAcquisitionBufferOperatingMode.get();
 		return (currentOperatingMode==DataAcquisitionBufferOperatingMode.SPECULATIVE_READING);

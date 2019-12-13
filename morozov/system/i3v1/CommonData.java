@@ -41,7 +41,6 @@ public class CommonData {
 	//
 	protected double[] m_pdShutterTemp;
 	protected double m_dShutterCenterTemp= 0.0d;
-	// protected double m_ReferentCenterTemp= 0.0d;
 	//
 	///////////////////////////////////////////////////////////////
 	//

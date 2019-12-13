@@ -41,49 +41,61 @@ public class ModeFrame extends DataFrame implements ModeFrameInterface {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean isLightweightFrame() {
 		return true;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public String getDescription() {
 		return description;
 	}
+	@Override
 	public void setDescription(String value) {
 		description= value;
 	}
+	@Override
 	public String getCopyright() {
 		return copyright;
 	}
+	@Override
 	public void setCopyright(String value) {
 		copyright= value;
 	}
+	@Override
 	public String getRegistrationDate() {
 		return registrationDate;
 	}
+	@Override
 	public void setRegistrationDate(String value) {
 		registrationDate= value;
 	}
+	@Override
 	public String getRegistrationTime() {
 		return registrationTime;
 	}
+	@Override
 	public void setRegistrationTime(String value) {
 		registrationTime= value;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public DataArrayType getDataArrayType() {
 		return DataArrayType.MODE_FRAME;
 	}
 	//
+	@Override
 	public int getDataSize() {
 		return 0;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public String toString() {
 		return ModeFrameText.toString(this);
 	}

@@ -6,7 +6,7 @@ import target.*;
 
 import morozov.run.*;
 import morozov.system.*;
-import morozov.system.errors.*;
+import morozov.system.converters.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
@@ -101,5 +101,12 @@ public class YesNoConverters {
 			return termNo;
 		};
 		throw new UnknownYesNo(value);
+	}
+	//
+	public static Term getTermYes() {
+		return termYes;
+	}
+	public static Term getTermNo() {
+		return termNo;
 	}
 }

@@ -15,7 +15,6 @@ public class KinectForegroundPointCloudsFrameText {
 	//
 	public static void writeText(KinectForegroundPointCloudsFrameInterface frame, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {
 		if (exportMode==ExportMode.SKELETONS) {
-			// super.writeText(writer,exportMode,locale);
 			KinectFrameText.writeRootFrameText(frame,writer,exportMode,locale);
 		} else {
 			writeForegroundPointCloudsFrameText(frame,writer,exportMode,locale);
@@ -24,7 +23,6 @@ public class KinectForegroundPointCloudsFrameText {
 	//
 	public static void writeForegroundPointCloudsFrameText(KinectForegroundPointCloudsFrameInterface frame, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {
 		writer.write("; FOREGROUND POINT CLOUDS FRAME:\n");
-		// super.writeText(writer,exportMode,locale);
 		KinectFrameText.writeRootFrameText(frame,writer,exportMode,locale);
 		int expectedNumberOfSkeletons= frame.getNumberOfSkeletons();
 		ForegroundPointCloudInterface[] pointClouds= frame.getPointClouds();

@@ -9,31 +9,44 @@ import java.nio.charset.CharsetEncoder;
 
 public class ChoisePoint {
 	//
-	private int initialSizeOfTrail;
-	public ChoisePoint parentCP;
-	private boolean choisePointState;
-	private long choisePointNumber;
-	public ActorRegister actorRegister;
+	protected int initialSizeOfTrail;
+	protected ChoisePoint parentCP;
+	protected boolean choisePointState;
+	protected long choisePointNumber;
+	protected ActorRegister actorRegister;
 	//
 	public ChoisePoint(ChoisePoint cp) {
 		parentCP= cp;
 		actorRegister= cp.actorRegister;
 		choisePointState= true;
-		initialSizeOfTrail= actorRegister.currentProcess.trail.size();
-		choisePointNumber= ++ actorRegister.currentProcess.recentChoisePointNumber;
+		initialSizeOfTrail= actorRegister.currentProcess.getTrailSize();
+		choisePointNumber= actorRegister.currentProcess.incrementAndGetRecentChoisePointNumber();
 
 	}
 	public ChoisePoint(ChoisePoint cp, ActorRegister register) {
 		parentCP= cp;
 		actorRegister= register;
 		choisePointState= true;
-		initialSizeOfTrail= actorRegister.currentProcess.trail.size();
-		choisePointNumber= ++ actorRegister.currentProcess.recentChoisePointNumber;
+		initialSizeOfTrail= actorRegister.currentProcess.getTrailSize();
+		choisePointNumber= actorRegister.currentProcess.incrementAndGetRecentChoisePointNumber();
 	}
 	//
+	public int getInitialSizeOfTrail() {
+		return initialSizeOfTrail;
+	}
+	public ChoisePoint getParentCP() {
+		return parentCP;
+	}
 	public boolean isEnabled() {
 		return choisePointState;
 	}
+	public long getChoisePointNumber() {
+		return choisePointNumber;
+	}
+	public ActorRegister getActorRegister() {
+		return actorRegister;
+	}
+	//
 	public void disable(ChoisePoint baseChoisePoint) {
 		if (this!=baseChoisePoint) {
 			choisePointState= false;
@@ -57,16 +70,13 @@ public class ChoisePoint {
 	public void enable() {
 		choisePointState= true;
 	}
-	public long getChoisePointNumber() {
-		return choisePointNumber;
-	}
 	public void pushTrail(Term v) {
 		actorRegister.currentProcess.registerBinding(v);
 	}
 	public void freeTrail() {
 		actorRegister.currentProcess.backtrack(choisePointNumber,initialSizeOfTrail);
 	}
-	// public String toString() {
+	//
 	public String toString(ChoisePoint cp, boolean isInner, boolean provideStrictSyntax, boolean encodeWorlds, CharsetEncoder encoder) {
 		if (choisePointState) {
 			return choisePointNumber + ";enabled";

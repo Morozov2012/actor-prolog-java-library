@@ -36,6 +36,7 @@ public class TrackComparator implements Comparator<StableTrack> {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public int compare(StableTrack o1, StableTrack o2) {
 		if (sortingMode==SortingMode.DESCENDING_ORDER) {
 			StableTrack o3= o1;

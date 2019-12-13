@@ -23,13 +23,6 @@ public abstract class WebResource extends SymbolicInformation {
 	///////////////////////////////////////////////////////////////
 	//
 	abstract public Term getBuiltInSlot_E_location();
-	// abstract public Term getBuiltInSlot_E_maximal_waiting_time();
-	// abstract public Term getBuiltInSlot_E_character_set();
-	// abstract public Term getBuiltInSlot_E_backslash_always_is_separator();
-	// abstract public Term getBuiltInSlot_E_mask();
-	// abstract public Term getBuiltInSlot_E_send_full_path();
-	// abstract public Term getBuiltInSlot_E_query();
-	// abstract public Term getBuiltInSlot_E_content_type();
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -57,33 +50,37 @@ public abstract class WebResource extends SymbolicInformation {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public SimpleFileName getName(ChoisePoint iX) {
-		boolean backslashIsSeparator= getBackslashAlwaysIsSeparator(iX);
+		boolean currentBackslashAlwaysIsSeparator= getBackslashAlwaysIsSeparator(iX);
 		boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
-		return new SimpleFileName(getLocation(iX),backslashIsSeparator,acceptOnlyURI);
+		return new SimpleFileName(getLocation(iX),currentBackslashAlwaysIsSeparator,acceptOnlyURI);
 	}
+	@Override
 	public String getExtension(ChoisePoint iX) {
 		return "";
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected ExtendedFileName retrieveRealGlobalFileName(ChoisePoint iX) {
 		SimpleFileName fileName= getName(iX);
 		return fileName.formRealFileNameBasedOnPath(false,true,getExtension(iX),null,staticContext);
 	}
+	@Override
 	protected ExtendedFileName retrieveRealGlobalFileName(Term value, ChoisePoint iX) {
-		boolean backslashAlwaysIsSeparator= getBackslashAlwaysIsSeparator(iX);
+		boolean currentBackslashAlwaysIsSeparator= getBackslashAlwaysIsSeparator(iX);
 		boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
 		ExtendedFileName baseResource= retrieveRealGlobalFileName(iX);
-		SimpleFileName fileName= SimpleFileName.argumentToSimpleFileName(value,backslashAlwaysIsSeparator,acceptOnlyURI,iX);
+		SimpleFileName fileName= SimpleFileName.argumentToSimpleFileName(value,currentBackslashAlwaysIsSeparator,acceptOnlyURI,iX);
 		return fileName.formRealFileNameBasedOnEFN(false,true,getExtension(iX),baseResource,staticContext);
 	}
 	protected ExtendedFileName retrieveRealGlobalFileName(String value, ChoisePoint iX) {
-		boolean backslashAlwaysIsSeparator= getBackslashAlwaysIsSeparator(iX);
+		boolean currentBackslashAlwaysIsSeparator= getBackslashAlwaysIsSeparator(iX);
 		boolean acceptOnlyURI= getAcceptOnlyUniformResourceIdentifiers(iX);
 		ExtendedFileName baseResource= retrieveRealGlobalFileName(iX);
-		SimpleFileName fileName= SimpleFileName.argumentToSimpleFileName(value,backslashAlwaysIsSeparator,acceptOnlyURI);
+		SimpleFileName fileName= SimpleFileName.argumentToSimpleFileName(value,currentBackslashAlwaysIsSeparator,acceptOnlyURI);
 		return fileName.formRealFileNameBasedOnEFN(false,false,"",baseResource,staticContext);
 	}
 	//
@@ -102,20 +99,20 @@ public abstract class WebResource extends SymbolicInformation {
 	//
 	protected Term getUniversalResourceParameters(ChoisePoint iX) {
 		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
-		CharacterSet characterSet= getCharacterSet(iX);
+		CharacterSet currentCharacterSet= getCharacterSet(iX);
 		try {
 			ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
-			return fileName.getUniversalResourceParameters(timeout,characterSet,staticContext,iX);
+			return fileName.getUniversalResourceParameters(timeout,currentCharacterSet,staticContext,iX);
 		} catch (Throwable e) {
 			return SimpleFileName.channelExceptionToName(e);
 		}
 	}
 	protected Term getUniversalResourceParameters(Term argument, ChoisePoint iX) {
 		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
-		CharacterSet characterSet= getCharacterSet(iX);
+		CharacterSet currentCharacterSet= getCharacterSet(iX);
 		try {
 			ExtendedFileName fileName= retrieveRealGlobalFileName(argument,iX);
-			return fileName.getUniversalResourceParameters(timeout,characterSet,staticContext,iX);
+			return fileName.getUniversalResourceParameters(timeout,currentCharacterSet,staticContext,iX);
 		} catch (Throwable e) {
 			return SimpleFileName.channelExceptionToName(e);
 		}
@@ -123,9 +120,11 @@ public abstract class WebResource extends SymbolicInformation {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void getString0ff(ChoisePoint iX, PrologVariable result) {
 		getContent0ff(iX,result);
 	}
+	@Override
 	public void getString0fs(ChoisePoint iX) {
 	}
 	//
@@ -144,20 +143,20 @@ public abstract class WebResource extends SymbolicInformation {
 	//
 	protected Term getUniversalResourceContent(ChoisePoint iX) {
 		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
-		CharacterSet characterSet= getCharacterSet(iX);
+		CharacterSet currentCharacterSet= getCharacterSet(iX);
 		try {
 			ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
-			return fileName.getUniversalResourceContent(timeout,characterSet,staticContext,iX);
+			return fileName.getUniversalResourceContent(timeout,currentCharacterSet,staticContext,iX);
 		} catch (Throwable e) {
 			return SimpleFileName.channelExceptionToName(e);
 		}
 	}
 	protected Term getUniversalResourceContent(Term argument, ChoisePoint iX) {
 		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
-		CharacterSet characterSet= getCharacterSet(iX);
+		CharacterSet currentCharacterSet= getCharacterSet(iX);
 		try {
 			ExtendedFileName fileName= retrieveRealGlobalFileName(argument,iX);
-			return fileName.getUniversalResourceContent(timeout,characterSet,staticContext,iX);
+			return fileName.getUniversalResourceContent(timeout,currentCharacterSet,staticContext,iX);
 		} catch (Throwable e) {
 			return SimpleFileName.channelExceptionToName(e);
 		}

@@ -12,41 +12,49 @@ import morozov.terms.signals.*;
 public enum ImageChannelName {
 	//
 	GRAYSCALE {
+		@Override
 		public Term toTerm() {
 			return term_GRAYSCALE;
 		}
 	},
 	HUE {
+		@Override
 		public Term toTerm() {
 			return term_HUE;
 		}
 	},
 	SATURATION {
+		@Override
 		public Term toTerm() {
 			return term_SATURATION;
 		}
 	},
 	BRIGHTNESS {
+		@Override
 		public Term toTerm() {
 			return term_BRIGHTNESS;
 		}
 	},
 	RED {
+		@Override
 		public Term toTerm() {
 			return term_RED;
 		}
 	},
 	GREEN {
+		@Override
 		public Term toTerm() {
 			return term_GREEN;
 		}
 	},
 	BLUE {
+		@Override
 		public Term toTerm() {
 			return term_BLUE;
 		}
 	},
 	ALL {
+		@Override
 		public Term toTerm() {
 			return term_ALL;
 		}

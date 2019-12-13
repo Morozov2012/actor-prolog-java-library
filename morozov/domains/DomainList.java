@@ -21,10 +21,10 @@ public class DomainList extends MonoArgumentDomainItem {
 		super(entry);
 	}
 	//
+	@Override
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
-		// initiateDomainItemIfNecessary();
 		Term nextHead;
-		Term currentTail= t; // t.dereferenceValue(cp);
+		Term currentTail= t;
 		try {
 			while (true) {
 				currentTail= currentTail.dereferenceValue(cp);
@@ -44,9 +44,8 @@ public class DomainList extends MonoArgumentDomainItem {
 			return false;
 		}
 	}
+	@Override
 	public Term checkAndOptimizeTerm(Term t, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
-		// initiateDomainItemIfNecessary();
-		// t= t.dereferenceValue(cp);
 		try {
 			return new PrologList(
 				domainItem.checkAndOptimizeTerm(t.getNextListHead(cp),cp),
@@ -57,9 +56,8 @@ public class DomainList extends MonoArgumentDomainItem {
 			throw new DomainAlternativeDoesNotCoverTerm(t.getPosition());
 		}
 	}
+	@Override
 	public Term checkTerm(Term t, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
-		// initiateDomainItemIfNecessary();
-		// t= t.dereferenceValue(cp);
 		try {
 			return new PrologList(
 				domainItem.checkTerm(t.getNextListHead(cp),cp),
@@ -71,12 +69,12 @@ public class DomainList extends MonoArgumentDomainItem {
 		}
 	}
 	//
+	@Override
 	public boolean isEqualTo(DomainAlternative a, HashSet<PrologDomainPair> stack) {
-		// initiateDomainItemIfNecessary();
 		return a.isEqualToList(domainItem,stack);
 	}
+	@Override
 	public boolean isEqualToList(PrologDomain domain, HashSet<PrologDomainPair> stack) {
-		// initiateDomainItemIfNecessary();
 		try {
 			domainItem.isEqualTo(domain,stack);
 			return true;
@@ -84,10 +82,12 @@ public class DomainList extends MonoArgumentDomainItem {
 			return false;
 		}
 	}
+	@Override
 	public boolean coversAlternative(DomainAlternative a, PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) {
 		return false;
 	}
 	//
+	@Override
 	protected String getMonoArgumentDomainTag() {
 		return PrologDomainName.tagDomainAlternative_DomainList;
 	}

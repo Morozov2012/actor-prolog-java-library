@@ -13,7 +13,6 @@ public class KinectDepthFrameText {
 	//
 	public static void writeText(KinectDepthFrameInterface frame, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {
 		if (exportMode==ExportMode.SKELETONS) {
-			// super.writeText(writer,exportMode,locale);
 			KinectFrameText.writeRootFrameText(frame,writer,exportMode,locale);
 		} else {
 			writeDepthFrameText(frame,writer,exportMode,locale);
@@ -22,7 +21,6 @@ public class KinectDepthFrameText {
 	//
 	public static void writeDepthFrameText(KinectDepthFrameInterface frame, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {
 		writer.write("; DEPTH FRAME:\n");
-		// super.writeText(writer,exportMode,locale);
 		KinectFrameText.writeRootFrameText(frame,writer,exportMode,locale);
 		short[] depth= frame.getDepth();
 		writer.write(String.format(locale,"; Depth matrix: %d\n",depth.length));

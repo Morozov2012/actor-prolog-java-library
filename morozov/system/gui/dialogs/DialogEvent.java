@@ -6,9 +6,9 @@ import morozov.run.*;
 
 public class DialogEvent {
 	//
-	public DialogEntry entry;
-	public boolean sendFlowMessage;
-	public DialogEventType isControlModificationEvent;
+	protected DialogEntry entry;
+	protected boolean sendFlowMessage;
+	protected DialogEventType isControlModificationEvent;
 	//
 	public DialogEvent(DialogEntry e, boolean isSlot, DialogEventType mode) {
 		entry= e;

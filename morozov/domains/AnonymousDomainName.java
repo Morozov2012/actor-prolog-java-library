@@ -15,6 +15,7 @@ public class AnonymousDomainName extends PrologDomainName {
 	public AnonymousDomainName() {
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
 		return tagDomainName_Anonymous;
 	}

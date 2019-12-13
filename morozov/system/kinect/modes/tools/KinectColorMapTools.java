@@ -8,18 +8,18 @@ import java.awt.Color;
 
 public class KinectColorMapTools {
 	//
-	protected static int maxColorValue= 255;
+	protected static final int maxColorValue= 255;
 	//
-	protected static int[] peopleDefaultColorRed= new int[]
+	protected static final int[] peopleDefaultColorRed= new int[]
 		{maxColorValue,0,0,maxColorValue,maxColorValue,0,maxColorValue};
-	protected static int[] peopleDefaultColorGreen= new int[]
+	protected static final int[] peopleDefaultColorGreen= new int[]
 		{0,maxColorValue,0,maxColorValue,0,maxColorValue,maxColorValue};
-	protected static int[] peopleDefaultColorBlue= new int[]
+	protected static final int[] peopleDefaultColorBlue= new int[]
 		{0,0,maxColorValue,0,maxColorValue,maxColorValue,maxColorValue};
 	//
-	protected static DetailedColorMap peopleDefaultColorMap;
+	public static final int defaultPeopleIndexRatio= 2;
 	//
-	public static int defaultPeopleIndexRatio= 2;
+	protected static DetailedColorMap peopleDefaultColorMap;
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -32,7 +32,7 @@ public class KinectColorMapTools {
 			colors[n]= new Color(red,green,blue);
 		};
 		peopleDefaultColorMap= new DetailedColorMap(colors);
-	}	
+	}
 	//
 	///////////////////////////////////////////////////////////////
 	//

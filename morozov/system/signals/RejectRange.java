@@ -5,6 +5,7 @@ package morozov.system.signals;
 import morozov.run.*;
 
 public final class RejectRange extends LightweightException {
+	//
 	public static final RejectRange instance= new RejectRange();
 	//
 	private RejectRange() {

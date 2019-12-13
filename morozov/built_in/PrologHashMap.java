@@ -15,6 +15,7 @@ public abstract class PrologHashMap extends Database {
 		super(id);
 	}
 	//
+	@Override
 	public DatabaseType getDatabaseType() {
 		return DatabaseType.HASH_MAP;
 	}

@@ -195,6 +195,6 @@ public class FFmpegDebugOption {
 		if (value != 0) {
 			flags.add(new FFmpegDebugOption(value));
 		};
-		return flags.toArray(new FFmpegDebugOption[0]);
+		return flags.toArray(new FFmpegDebugOption[flags.size()]);
 	}
 }

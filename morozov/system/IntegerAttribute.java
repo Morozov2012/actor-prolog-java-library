@@ -2,14 +2,7 @@
 
 package morozov.system;
 
-import target.*;
-
-import morozov.run.*;
-import morozov.system.converters.*;
-import morozov.system.errors.*;
 import morozov.system.signals.*;
-import morozov.terms.*;
-import morozov.terms.signals.*;
 
 import java.io.Serializable;
 
@@ -18,12 +11,14 @@ public class IntegerAttribute implements Serializable {
 	protected boolean useDefaultValue;
 	protected long value;
 	//
-	// private static final long serialVersionUID= 0x2964B349906196E2L; // 2982705981762410210L;
-	// private static final long serialVersionUID= 0x1L; // 1L
+	public static IntegerAttribute instanceDefault= new IntegerAttribute();
+	//
+	// private static final long serialVersionUID= 0xC2AABA3498F8547L; // 876701795279144263
 	private static final long serialVersionUID= 0x2964B349906196E2L; // 2982705981762410210L
 	//
 	// static {
-	//	SerialVersionChecker.check(serialVersionUID,"morozov.system","IntegerAttribute");
+	//	// SerialVersionChecker.check(serialVersionUID,"morozov.system","IntegerAttribute");
+	//	SerialVersionChecker.report("morozov.system","IntegerAttribute");
 	// }
 	//
 	///////////////////////////////////////////////////////////////
@@ -38,11 +33,28 @@ public class IntegerAttribute implements Serializable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public void setUseDefaultValue(boolean mode) {
+		useDefaultValue= mode;
+	}
+	public void setUseDefaultValue() {
+		setUseDefaultValue(true);
+	}
+	//
 	public boolean getUseDefaultValue() {
 		return useDefaultValue;
 	}
+	//
+	public void setValue(long v) {
+		value= v;
+		useDefaultValue= false;
+	}
+	//
 	public long getValue() throws UseDefaultValue {
-		return value;
+		if (useDefaultValue) {
+			throw UseDefaultValue.instance;
+		} else {
+			return value;
+		}
 	}
 	public long getValue(long defaultValue) {
 		if (useDefaultValue) {
@@ -51,34 +63,11 @@ public class IntegerAttribute implements Serializable {
 			return value;
 		}
 	}
-	//
-	///////////////////////////////////////////////////////////////
-	//
-	public static IntegerAttribute argumentToIntegerAttribute(Term value, ChoisePoint iX) {
-		try {
-			long code= value.getSymbolValue(iX);
-			if (code==SymbolCodes.symbolCode_E_default) {
-				return new IntegerAttribute();
-			} else {
-				throw new WrongArgumentIsNotIntegerAttribute(value);
-			}
-		} catch (TermIsNotASymbol e) {
-			long number= GeneralConverters.argumentToLongInteger(value,iX);
-			return new IntegerAttribute(number);
-		}
-	}
-	//
-	///////////////////////////////////////////////////////////////
-	//
-	protected static Term termDefault= new PrologSymbol(SymbolCodes.symbolCode_E_default);
-	//
-	///////////////////////////////////////////////////////////////
-	//
-	public Term toTerm() {
-		try {
-			return new PrologInteger(getValue());
-		} catch (UseDefaultValue e) {
-			return termDefault;
+	public IntegerAttribute getValue(IntegerAttribute defaultValue) {
+		if (useDefaultValue) {
+			return defaultValue;
+		} else {
+			return this;
 		}
 	}
 }

@@ -2,389 +2,421 @@
 
 package morozov.system;
 
-import target.*;
-
-import morozov.terms.*;
+import morozov.system.converters.*;
 
 import java.math.MathContext;
 import java.math.BigDecimal;
-import java.math.BigInteger;
 
 public enum TimeUnits {
 	//
 	SECONDS {
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(BigDecimal decimalValue) {
-			return decimalValue.multiply(oneNanoBig);
+			return decimalValue.multiply(TimeUnitsConverters.oneNanoBig);
 		}
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(double realValue) {
-			return new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneNanoBig);
+			return new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneNanoBig);
 		}
+		@Override
 		public long toNanosecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.multiply(oneNanoBig));
+			return Arithmetic.toLong(decimalValue.multiply(TimeUnitsConverters.oneNanoBig));
 		}
+		@Override
 		public long toNanosecondsLong(double realValue) {
-			return PrologInteger.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneNanoBig));
+			return Arithmetic.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneNanoBig));
 		}
+		@Override
 		public long toMillisecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.multiply(oneThousandBig));
+			return Arithmetic.toLong(decimalValue.multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public long toMillisecondsLong(double realValue) {
-			return PrologInteger.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneThousandBig));
+			return Arithmetic.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public int toMillisecondsInteger(BigDecimal decimalValue) {
-			return PrologInteger.toInteger(decimalValue.multiply(oneThousandBig));
+			return Arithmetic.toInteger(decimalValue.multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public int toMillisecondsInteger(double realValue) {
-			return PrologInteger.toInteger(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneThousandBig));
-		}
-		public Term toTerm(Term argument) {
-			return new PrologStructure(SymbolCodes.symbolCode_E_seconds,new Term[]{argument});
+			return Arithmetic.toInteger(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneThousandBig));
 		}
 	},
 	MILLISECONDS {
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(BigDecimal decimalValue) {
-			return decimalValue.multiply(oneMillionBig);
+			return decimalValue.multiply(TimeUnitsConverters.oneMillionBig);
 		}
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(double realValue) {
-			return new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneMillionBig);
+			return new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneMillionBig);
 		}
+		@Override
 		public long toNanosecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.multiply(oneMillionBig));
+			return Arithmetic.toLong(decimalValue.multiply(TimeUnitsConverters.oneMillionBig));
 		}
+		@Override
 		public long toNanosecondsLong(double realValue) {
-			return PrologInteger.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneMillionBig));
+			return Arithmetic.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneMillionBig));
 		}
+		@Override
 		public long toMillisecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue);
+			return Arithmetic.toLong(decimalValue);
 		}
+		@Override
 		public long toMillisecondsLong(double realValue) {
-			return PrologInteger.toLong(realValue);
+			return Arithmetic.toLong(realValue);
 		}
+		@Override
 		public int toMillisecondsInteger(BigDecimal decimalValue) {
-			return PrologInteger.toInteger(decimalValue);
+			return Arithmetic.toInteger(decimalValue);
 		}
+		@Override
 		public int toMillisecondsInteger(double realValue) {
-			return PrologInteger.toInteger(realValue);
-		}
-		public Term toTerm(Term argument) {
-			return new PrologStructure(SymbolCodes.symbolCode_E_milliseconds,new Term[]{argument});
+			return Arithmetic.toInteger(realValue);
 		}
 	},
 	MICROSECONDS {
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(BigDecimal decimalValue) {
-			return decimalValue.multiply(oneThousandBig);
+			return decimalValue.multiply(TimeUnitsConverters.oneThousandBig);
 		}
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(double realValue) {
-			return new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneThousandBig);
+			return new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneThousandBig);
 		}
+		@Override
 		public long toNanosecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.multiply(oneThousandBig));
+			return Arithmetic.toLong(decimalValue.multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public long toNanosecondsLong(double realValue) {
-			return PrologInteger.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneThousandBig));
+			return Arithmetic.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public long toMillisecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.divide(oneThousandBig,MathContext.DECIMAL128));
+			return Arithmetic.toLong(decimalValue.divide(TimeUnitsConverters.oneThousandBig,MathContext.DECIMAL128));
 		}
+		@Override
 		public long toMillisecondsLong(double realValue) {
-			return PrologInteger.toLong(realValue / 1000.0);
+			return Arithmetic.toLong(realValue / 1000.0);
 		}
+		@Override
 		public int toMillisecondsInteger(BigDecimal decimalValue) {
-			return PrologInteger.toInteger(decimalValue.divide(oneThousandBig,MathContext.DECIMAL128));
+			return Arithmetic.toInteger(decimalValue.divide(TimeUnitsConverters.oneThousandBig,MathContext.DECIMAL128));
 		}
+		@Override
 		public int toMillisecondsInteger(double realValue) {
-			return PrologInteger.toInteger(realValue / 1000.0);
-		}
-		public Term toTerm(Term argument) {
-			return new PrologStructure(SymbolCodes.symbolCode_E_microseconds,new Term[]{argument});
+			return Arithmetic.toInteger(realValue / 1000.0);
 		}
 	},
 	NANOSECONDS {
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(BigDecimal decimalValue) {
 			return decimalValue;
 		}
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(double realValue) {
 			return new BigDecimal(realValue,MathContext.DECIMAL128);
 		}
+		@Override
 		public long toNanosecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue);
+			return Arithmetic.toLong(decimalValue);
 		}
+		@Override
 		public long toNanosecondsLong(double realValue) {
-			return PrologInteger.toLong(realValue);
+			return Arithmetic.toLong(realValue);
 		}
+		@Override
 		public long toMillisecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.divide(oneMillionBig,MathContext.DECIMAL128));
+			return Arithmetic.toLong(decimalValue.divide(TimeUnitsConverters.oneMillionBig,MathContext.DECIMAL128));
 		}
+		@Override
 		public long toMillisecondsLong(double realValue) {
-			return PrologInteger.toLong(realValue / 1_000_000.0);
+			return Arithmetic.toLong(realValue / 1_000_000.0);
 		}
+		@Override
 		public int toMillisecondsInteger(BigDecimal decimalValue) {
-			return PrologInteger.toInteger(decimalValue.divide(oneMillionBig,MathContext.DECIMAL128));
+			return Arithmetic.toInteger(decimalValue.divide(TimeUnitsConverters.oneMillionBig,MathContext.DECIMAL128));
 		}
+		@Override
 		public int toMillisecondsInteger(double realValue) {
-			return PrologInteger.toInteger(realValue / 1_000_000.0);
-		}
-		public Term toTerm(Term argument) {
-			return new PrologStructure(SymbolCodes.symbolCode_E_nanoseconds,new Term[]{argument});
+			return Arithmetic.toInteger(realValue / 1_000_000.0);
 		}
 	},
 	PICOSECONDS {
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(BigDecimal decimalValue) {
-			return decimalValue.divide(oneThousandBig,MathContext.DECIMAL128);
+			return decimalValue.divide(TimeUnitsConverters.oneThousandBig,MathContext.DECIMAL128);
 		}
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(double realValue) {
 			return new BigDecimal(realValue / 1000,MathContext.DECIMAL128);
 		}
+		@Override
 		public long toNanosecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.divide(oneThousandBig,MathContext.DECIMAL128));
+			return Arithmetic.toLong(decimalValue.divide(TimeUnitsConverters.oneThousandBig,MathContext.DECIMAL128));
 		}
+		@Override
 		public long toNanosecondsLong(double realValue) {
-			return PrologInteger.toLong(realValue / 1000.0);
+			return Arithmetic.toLong(realValue / 1000.0);
 		}
+		@Override
 		public long toMillisecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.divide(oneNanoBig,MathContext.DECIMAL128));
+			return Arithmetic.toLong(decimalValue.divide(TimeUnitsConverters.oneNanoBig,MathContext.DECIMAL128));
 		}
+		@Override
 		public long toMillisecondsLong(double realValue) {
-			return PrologInteger.toLong(realValue / 1_000_000_000.0);
+			return Arithmetic.toLong(realValue / 1_000_000_000.0);
 		}
+		@Override
 		public int toMillisecondsInteger(BigDecimal decimalValue) {
-			return PrologInteger.toInteger(decimalValue.divide(oneNanoBig,MathContext.DECIMAL128));
+			return Arithmetic.toInteger(decimalValue.divide(TimeUnitsConverters.oneNanoBig,MathContext.DECIMAL128));
 		}
+		@Override
 		public int toMillisecondsInteger(double realValue) {
-			return PrologInteger.toInteger(realValue / 1_000_000_000.0);
-		}
-		public Term toTerm(Term argument) {
-			return new PrologStructure(SymbolCodes.symbolCode_E_picoseconds,new Term[]{argument});
+			return Arithmetic.toInteger(realValue / 1_000_000_000.0);
 		}
 	},
 	FEMTOSECONDS {
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(BigDecimal decimalValue) {
-			return decimalValue.divide(oneMillionBig,MathContext.DECIMAL128);
+			return decimalValue.divide(TimeUnitsConverters.oneMillionBig,MathContext.DECIMAL128);
 		}
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(double realValue) {
 			return new BigDecimal(realValue / 1_000_000,MathContext.DECIMAL128);
 		}
+		@Override
 		public long toNanosecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.divide(oneMillionBig,MathContext.DECIMAL128));
+			return Arithmetic.toLong(decimalValue.divide(TimeUnitsConverters.oneMillionBig,MathContext.DECIMAL128));
 		}
+		@Override
 		public long toNanosecondsLong(double realValue) {
-			return PrologInteger.toLong(realValue / 1_000_000.0);
+			return Arithmetic.toLong(realValue / 1_000_000.0);
 		}
+		@Override
 		public long toMillisecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.divide(onePicoBig,MathContext.DECIMAL128));
+			return Arithmetic.toLong(decimalValue.divide(TimeUnitsConverters.onePicoBig,MathContext.DECIMAL128));
 		}
+		@Override
 		public long toMillisecondsLong(double realValue) {
-			return PrologInteger.toLong(realValue / 1_000_000_000_000.0);
+			return Arithmetic.toLong(realValue / 1_000_000_000_000.0);
 		}
+		@Override
 		public int toMillisecondsInteger(BigDecimal decimalValue) {
-			return PrologInteger.toInteger(decimalValue.divide(onePicoBig,MathContext.DECIMAL128));
+			return Arithmetic.toInteger(decimalValue.divide(TimeUnitsConverters.onePicoBig,MathContext.DECIMAL128));
 		}
+		@Override
 		public int toMillisecondsInteger(double realValue) {
-			return PrologInteger.toInteger(realValue / 1_000_000_000_000.0);
-		}
-		public Term toTerm(Term argument) {
-			return new PrologStructure(SymbolCodes.symbolCode_E_femtoseconds,new Term[]{argument});
+			return Arithmetic.toInteger(realValue / 1_000_000_000_000.0);
 		}
 	},
 	MINUTES {
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(BigDecimal decimalValue) {
-			return decimalValue.multiply(oneMinuteInSecondsBig).multiply(oneNanoBig);
+			return decimalValue.multiply(TimeUnitsConverters.oneMinuteInSecondsBig).multiply(TimeUnitsConverters.oneNanoBig);
 		}
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(double realValue) {
-			return new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneMinuteInSecondsBig).multiply(oneNanoBig);
+			return new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneMinuteInSecondsBig).multiply(TimeUnitsConverters.oneNanoBig);
 		}
+		@Override
 		public long toNanosecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.multiply(oneMinuteInSecondsBig).multiply(oneNanoBig));
+			return Arithmetic.toLong(decimalValue.multiply(TimeUnitsConverters.oneMinuteInSecondsBig).multiply(TimeUnitsConverters.oneNanoBig));
 		}
+		@Override
 		public long toNanosecondsLong(double realValue) {
-			return PrologInteger.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneMinuteInSecondsBig).multiply(oneNanoBig));
+			return Arithmetic.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneMinuteInSecondsBig).multiply(TimeUnitsConverters.oneNanoBig));
 		}
+		@Override
 		public long toMillisecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.multiply(oneMinuteInSecondsBig).multiply(oneThousandBig));
+			return Arithmetic.toLong(decimalValue.multiply(TimeUnitsConverters.oneMinuteInSecondsBig).multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public long toMillisecondsLong(double realValue) {
-			return PrologInteger.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneMinuteInSecondsBig).multiply(oneThousandBig));
+			return Arithmetic.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneMinuteInSecondsBig).multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public int toMillisecondsInteger(BigDecimal decimalValue) {
-			return PrologInteger.toInteger(decimalValue.multiply(oneMinuteInSecondsBig).multiply(oneThousandBig));
+			return Arithmetic.toInteger(decimalValue.multiply(TimeUnitsConverters.oneMinuteInSecondsBig).multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public int toMillisecondsInteger(double realValue) {
-			return PrologInteger.toInteger(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneMinuteInSecondsBig).multiply(oneThousandBig));
-		}
-		public Term toTerm(Term argument) {
-			return new PrologStructure(SymbolCodes.symbolCode_E_minutes,new Term[]{argument});
+			return Arithmetic.toInteger(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneMinuteInSecondsBig).multiply(TimeUnitsConverters.oneThousandBig));
 		}
 	},
 	HOURS {
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(BigDecimal decimalValue) {
-			return decimalValue.multiply(oneHourInSecondsBig).multiply(oneNanoBig);
+			return decimalValue.multiply(TimeUnitsConverters.oneHourInSecondsBig).multiply(TimeUnitsConverters.oneNanoBig);
 		}
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(double realValue) {
-			return new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneHourInSecondsBig).multiply(oneNanoBig);
+			return new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneHourInSecondsBig).multiply(TimeUnitsConverters.oneNanoBig);
 		}
+		@Override
 		public long toNanosecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.multiply(oneHourInSecondsBig).multiply(oneNanoBig));
+			return Arithmetic.toLong(decimalValue.multiply(TimeUnitsConverters.oneHourInSecondsBig).multiply(TimeUnitsConverters.oneNanoBig));
 		}
+		@Override
 		public long toNanosecondsLong(double realValue) {
-			return PrologInteger.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneHourInSecondsBig).multiply(oneNanoBig));
+			return Arithmetic.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneHourInSecondsBig).multiply(TimeUnitsConverters.oneNanoBig));
 		}
+		@Override
 		public long toMillisecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.multiply(oneHourInSecondsBig).multiply(oneThousandBig));
+			return Arithmetic.toLong(decimalValue.multiply(TimeUnitsConverters.oneHourInSecondsBig).multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public long toMillisecondsLong(double realValue) {
-			return PrologInteger.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneHourInSecondsBig).multiply(oneThousandBig));
+			return Arithmetic.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneHourInSecondsBig).multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public int toMillisecondsInteger(BigDecimal decimalValue) {
-			return PrologInteger.toInteger(decimalValue.multiply(oneHourInSecondsBig).multiply(oneThousandBig));
+			return Arithmetic.toInteger(decimalValue.multiply(TimeUnitsConverters.oneHourInSecondsBig).multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public int toMillisecondsInteger(double realValue) {
-			return PrologInteger.toInteger(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneHourInSecondsBig).multiply(oneThousandBig));
-		}
-		public Term toTerm(Term argument) {
-			return new PrologStructure(SymbolCodes.symbolCode_E_hours,new Term[]{argument});
+			return Arithmetic.toInteger(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneHourInSecondsBig).multiply(TimeUnitsConverters.oneThousandBig));
 		}
 	},
 	DAYS {
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(BigDecimal decimalValue) {
-			return decimalValue.multiply(oneDayLengthInSecondsBigDecimal).multiply(oneNanoBig);
+			return decimalValue.multiply(TimeUnitsConverters.oneDayLengthInSecondsBigDecimal).multiply(TimeUnitsConverters.oneNanoBig);
 		}
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(double realValue) {
-			return new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneDayLengthInSecondsBigDecimal).multiply(oneNanoBig);
+			return new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneDayLengthInSecondsBigDecimal).multiply(TimeUnitsConverters.oneNanoBig);
 		}
+		@Override
 		public long toNanosecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.multiply(oneDayLengthInSecondsBigDecimal).multiply(oneNanoBig));
+			return Arithmetic.toLong(decimalValue.multiply(TimeUnitsConverters.oneDayLengthInSecondsBigDecimal).multiply(TimeUnitsConverters.oneNanoBig));
 		}
+		@Override
 		public long toNanosecondsLong(double realValue) {
-			return PrologInteger.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneDayLengthInSecondsBigDecimal).multiply(oneNanoBig));
+			return Arithmetic.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneDayLengthInSecondsBigDecimal).multiply(TimeUnitsConverters.oneNanoBig));
 		}
+		@Override
 		public long toMillisecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.multiply(oneDayLengthInSecondsBigDecimal).multiply(oneThousandBig));
+			return Arithmetic.toLong(decimalValue.multiply(TimeUnitsConverters.oneDayLengthInSecondsBigDecimal).multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public long toMillisecondsLong(double realValue) {
-			return PrologInteger.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneDayLengthInSecondsBigDecimal).multiply(oneThousandBig));
+			return Arithmetic.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneDayLengthInSecondsBigDecimal).multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public int toMillisecondsInteger(BigDecimal decimalValue) {
-			return PrologInteger.toInteger(decimalValue.multiply(oneDayLengthInSecondsBigDecimal).multiply(oneThousandBig));
+			return Arithmetic.toInteger(decimalValue.multiply(TimeUnitsConverters.oneDayLengthInSecondsBigDecimal).multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public int toMillisecondsInteger(double realValue) {
-			return PrologInteger.toInteger(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneDayLengthInSecondsBigDecimal).multiply(oneThousandBig));
-		}
-		public Term toTerm(Term argument) {
-			return new PrologStructure(SymbolCodes.symbolCode_E_days,new Term[]{argument});
+			return Arithmetic.toInteger(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneDayLengthInSecondsBigDecimal).multiply(TimeUnitsConverters.oneThousandBig));
 		}
 	},
 	WEEKS {
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(BigDecimal decimalValue) {
-			return decimalValue.multiply(oneWeekLengthInSecondsBigDecimal).multiply(oneNanoBig);
+			return decimalValue.multiply(TimeUnitsConverters.oneWeekLengthInSecondsBigDecimal).multiply(TimeUnitsConverters.oneNanoBig);
 		}
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(double realValue) {
-			return new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneWeekLengthInSecondsBigDecimal).multiply(oneNanoBig);
+			return new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneWeekLengthInSecondsBigDecimal).multiply(TimeUnitsConverters.oneNanoBig);
 		}
+		@Override
 		public long toNanosecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.multiply(oneWeekLengthInSecondsBigDecimal).multiply(oneNanoBig));
+			return Arithmetic.toLong(decimalValue.multiply(TimeUnitsConverters.oneWeekLengthInSecondsBigDecimal).multiply(TimeUnitsConverters.oneNanoBig));
 		}
+		@Override
 		public long toNanosecondsLong(double realValue) {
-			return PrologInteger.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneWeekLengthInSecondsBigDecimal).multiply(oneNanoBig));
+			return Arithmetic.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneWeekLengthInSecondsBigDecimal).multiply(TimeUnitsConverters.oneNanoBig));
 		}
+		@Override
 		public long toMillisecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.multiply(oneWeekLengthInSecondsBigDecimal).multiply(oneThousandBig));
+			return Arithmetic.toLong(decimalValue.multiply(TimeUnitsConverters.oneWeekLengthInSecondsBigDecimal).multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public long toMillisecondsLong(double realValue) {
-			return PrologInteger.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneWeekLengthInSecondsBigDecimal).multiply(oneThousandBig));
+			return Arithmetic.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneWeekLengthInSecondsBigDecimal).multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public int toMillisecondsInteger(BigDecimal decimalValue) {
-			return PrologInteger.toInteger(decimalValue.multiply(oneWeekLengthInSecondsBigDecimal).multiply(oneThousandBig));
+			return Arithmetic.toInteger(decimalValue.multiply(TimeUnitsConverters.oneWeekLengthInSecondsBigDecimal).multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public int toMillisecondsInteger(double realValue) {
-			return PrologInteger.toInteger(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneWeekLengthInSecondsBigDecimal).multiply(oneThousandBig));
-		}
-		public Term toTerm(Term argument) {
-			return new PrologStructure(SymbolCodes.symbolCode_E_weeks,new Term[]{argument});
+			return Arithmetic.toInteger(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneWeekLengthInSecondsBigDecimal).multiply(TimeUnitsConverters.oneThousandBig));
 		}
 	},
 	MONTHS {
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(BigDecimal decimalValue) {
-			return decimalValue.multiply(oneMonthLengthInSecondsBigInteger).multiply(oneNanoBig);
+			return decimalValue.multiply(TimeUnitsConverters.oneMonthLengthInSecondsBigInteger).multiply(TimeUnitsConverters.oneNanoBig);
 		}
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(double realValue) {
-			return new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneMonthLengthInSecondsBigInteger).multiply(oneNanoBig);
+			return new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneMonthLengthInSecondsBigInteger).multiply(TimeUnitsConverters.oneNanoBig);
 		}
+		@Override
 		public long toNanosecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.multiply(oneMonthLengthInSecondsBigInteger).multiply(oneNanoBig));
+			return Arithmetic.toLong(decimalValue.multiply(TimeUnitsConverters.oneMonthLengthInSecondsBigInteger).multiply(TimeUnitsConverters.oneNanoBig));
 		}
+		@Override
 		public long toNanosecondsLong(double realValue) {
-			return PrologInteger.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneMonthLengthInSecondsBigInteger).multiply(oneNanoBig));
+			return Arithmetic.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneMonthLengthInSecondsBigInteger).multiply(TimeUnitsConverters.oneNanoBig));
 		}
+		@Override
 		public long toMillisecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.multiply(oneMonthLengthInSecondsBigInteger).multiply(oneThousandBig));
+			return Arithmetic.toLong(decimalValue.multiply(TimeUnitsConverters.oneMonthLengthInSecondsBigInteger).multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public long toMillisecondsLong(double realValue) {
-			return PrologInteger.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneMonthLengthInSecondsBigInteger).multiply(oneThousandBig));
+			return Arithmetic.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneMonthLengthInSecondsBigInteger).multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public int toMillisecondsInteger(BigDecimal decimalValue) {
-			return PrologInteger.toInteger(decimalValue.multiply(oneMonthLengthInSecondsBigInteger).multiply(oneThousandBig));
+			return Arithmetic.toInteger(decimalValue.multiply(TimeUnitsConverters.oneMonthLengthInSecondsBigInteger).multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public int toMillisecondsInteger(double realValue) {
-			return PrologInteger.toInteger(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneMonthLengthInSecondsBigInteger).multiply(oneThousandBig));
-		}
-		public Term toTerm(Term argument) {
-			return new PrologStructure(SymbolCodes.symbolCode_E_months,new Term[]{argument});
+			return Arithmetic.toInteger(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneMonthLengthInSecondsBigInteger).multiply(TimeUnitsConverters.oneThousandBig));
 		}
 	},
 	YEARS {
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(BigDecimal decimalValue) {
-			return decimalValue.multiply(oneYearLengthInSecondsBigInteger).multiply(oneNanoBig);
+			return decimalValue.multiply(TimeUnitsConverters.oneYearLengthInSecondsBigInteger).multiply(TimeUnitsConverters.oneNanoBig);
 		}
+		@Override
 		public BigDecimal toNanosecondsBigDecimal(double realValue) {
-			return new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneYearLengthInSecondsBigInteger).multiply(oneNanoBig);
+			return new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneYearLengthInSecondsBigInteger).multiply(TimeUnitsConverters.oneNanoBig);
 		}
+		@Override
 		public long toNanosecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.multiply(oneYearLengthInSecondsBigInteger).multiply(oneNanoBig));
+			return Arithmetic.toLong(decimalValue.multiply(TimeUnitsConverters.oneYearLengthInSecondsBigInteger).multiply(TimeUnitsConverters.oneNanoBig));
 		}
+		@Override
 		public long toNanosecondsLong(double realValue) {
-			return PrologInteger.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneYearLengthInSecondsBigInteger).multiply(oneNanoBig));
+			return Arithmetic.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneYearLengthInSecondsBigInteger).multiply(TimeUnitsConverters.oneNanoBig));
 		}
+		@Override
 		public long toMillisecondsLong(BigDecimal decimalValue) {
-			return PrologInteger.toLong(decimalValue.multiply(oneYearLengthInSecondsBigInteger).multiply(oneThousandBig));
+			return Arithmetic.toLong(decimalValue.multiply(TimeUnitsConverters.oneYearLengthInSecondsBigInteger).multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public long toMillisecondsLong(double realValue) {
-			return PrologInteger.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneYearLengthInSecondsBigInteger).multiply(oneThousandBig));
+			return Arithmetic.toLong(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneYearLengthInSecondsBigInteger).multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public int toMillisecondsInteger(BigDecimal decimalValue) {
-			return PrologInteger.toInteger(decimalValue.multiply(oneYearLengthInSecondsBigInteger).multiply(oneThousandBig));
+			return Arithmetic.toInteger(decimalValue.multiply(TimeUnitsConverters.oneYearLengthInSecondsBigInteger).multiply(TimeUnitsConverters.oneThousandBig));
 		}
+		@Override
 		public int toMillisecondsInteger(double realValue) {
-			return PrologInteger.toInteger(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(oneYearLengthInSecondsBigInteger).multiply(oneThousandBig));
-		}
-		public Term toTerm(Term argument) {
-			return new PrologStructure(SymbolCodes.symbolCode_E_years,new Term[]{argument});
+			return Arithmetic.toInteger(new BigDecimal(realValue,MathContext.DECIMAL128).multiply(TimeUnitsConverters.oneYearLengthInSecondsBigInteger).multiply(TimeUnitsConverters.oneThousandBig));
 		}
 	};
-	//
-	///////////////////////////////////////////////////////////////
-	//
-	public static final double oneThousandDouble	= 1000.0;
-	public static final double oneMillionDouble	= 1_000_000.0;
-	public static final BigDecimal oneThousandBig	= BigDecimal.valueOf(1000);
-	public static final BigDecimal oneMillionBig	= BigDecimal.valueOf(1_000_000);
-	public static final BigDecimal oneMicroBig	= BigDecimal.valueOf(1_000_000);
-	public static final BigDecimal oneNanoBig	= BigDecimal.valueOf(1_000_000_000);
-	public static final BigDecimal onePicoBig	= BigDecimal.valueOf(1_000_000_000_000L);
-	public static final BigDecimal oneFemtoBig	= BigDecimal.valueOf(1_000_000_000_000_000L);
-	//
-	public static long oneDayLengthInSecondsLong				= 24 * 60 * 60; // 86_400
-	public static long oneDayLengthInMillisecondsLong			= oneDayLengthInSecondsLong * 1000; // 86_400_000
-	public static long oneWeekLengthInSecondsLong				= 7 * 24 * 60 * 60; // 604_800
-	public static double oneYearLengthInSecondsDouble			= 31556925.9747;
-	public static double oneMonthLengthInSecondsDouble			= 31556925.9747 / 12;
-	//
-	public static final BigDecimal oneMinuteInSecondsBig			= BigDecimal.valueOf(60);
-	public static final BigDecimal oneHourInSecondsBig			= BigDecimal.valueOf(60*60); // 3_600
-	public static BigInteger oneDayLengthInMillisecondsBigInteger		= BigInteger.valueOf(oneDayLengthInMillisecondsLong);
-	public static BigDecimal oneDayLengthInSecondsBigDecimal		= BigDecimal.valueOf(oneDayLengthInSecondsLong);
-	public static BigDecimal oneWeekLengthInSecondsBigDecimal		= BigDecimal.valueOf(oneWeekLengthInSecondsLong);
-	public static final BigDecimal oneYearLengthInSecondsBigInteger		= new BigDecimal(oneYearLengthInSecondsDouble);
-	public static final BigDecimal oneMonthLengthInSecondsBigInteger	= new BigDecimal(oneMonthLengthInSecondsDouble);
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -396,5 +428,4 @@ public enum TimeUnits {
 	abstract public long toMillisecondsLong(double value);
 	abstract public int toMillisecondsInteger(BigDecimal value);
 	abstract public int toMillisecondsInteger(double value);
-	abstract public Term toTerm(Term argument);
 }

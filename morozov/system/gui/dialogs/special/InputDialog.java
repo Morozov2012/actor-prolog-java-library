@@ -30,10 +30,6 @@ public class InputDialog extends JDialog implements PropertyChangeListener {
 	protected JTextField textField; // = new JTextField(10);
 	protected JOptionPane optionPane;
 	//
-	public String getValidatedText() {
-		return typedText;
-	}
-	//
 	public InputDialog(boolean mode, String title, String prompt, String initialValue, String message) {
 		super(JOptionPane.getRootFrame(),title,true);
 		integerNumberExpected= mode;
@@ -45,12 +41,14 @@ public class InputDialog extends JDialog implements PropertyChangeListener {
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		addWindowListener(
 			new WindowAdapter() {
+				@Override
 				public void windowClosing(WindowEvent we) {
 					optionPane.setValue(new Integer(JOptionPane.CLOSED_OPTION));
 				}
 			});
 		addComponentListener(
 			new ComponentAdapter() {
+				@Override
 				public void componentShown(ComponentEvent ce) {
 					textField.requestFocusInWindow();
 				}
@@ -58,10 +56,14 @@ public class InputDialog extends JDialog implements PropertyChangeListener {
 		optionPane.addPropertyChangeListener(this);
 		pack();
 		SpecialUtils.centre(this);
-		// setVisible(true);
 		DesktopUtils.safelySetVisible(true,this);
 	}
 	//
+	public String getValidatedText() {
+		return typedText;
+	}
+	//
+	@Override
 	public void propertyChange(PropertyChangeEvent e) {
 		String prop= e.getPropertyName();
 		if (		isShowing() &&
@@ -117,7 +119,6 @@ public class InputDialog extends JDialog implements PropertyChangeListener {
 	}
 	protected void clearAndHide() {
 		textField.setText(null);
-		// setVisible(false);
 		DesktopUtils.safelySetVisible(false,this);
 	}
 }

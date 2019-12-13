@@ -11,7 +11,6 @@ public class VPMblbComputeColorHistograms extends VPM_FrameCommand {
 	protected int numberOfBins;
 	//
 	protected static int defaultNumberOfBins= 16;
-	// protected static final int maximalColor= 255;
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -25,6 +24,7 @@ public class VPMblbComputeColorHistograms extends VPM_FrameCommand {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void execute(VPM vpm) {
 		BlobGroup group= vpm.getRecentBlobGroup();
 		if (group==null) {
@@ -36,7 +36,6 @@ public class VPMblbComputeColorHistograms extends VPM_FrameCommand {
 			return;
 		};
 		int imageWidth= vpm.getOperationalImageWidth();
-		// int imageHeight= vpm.getOperationalImageHeight();
 		int[] operationalMatrix= vpm.getOperationalMatrix();
 		boolean[] foregroundMask= vpm.getForegroundMask();
 		ImageChannelName outputChannelName= vpm.getOutputChannelName();

@@ -4,7 +4,7 @@ package morozov.system.converters;
 
 import morozov.run.*;
 import morozov.system.*;
-import morozov.system.errors.*;
+import morozov.system.converters.errors.*;
 import morozov.terms.*;
 import morozov.terms.signals.*;
 
@@ -40,25 +40,25 @@ public class NumericalValueConverters {
 	//
 	public static int toInteger(NumericalValue value) {
 		if (value.useDoubleValue()) {
-			return PrologInteger.toInteger(value.getDoubleValue());
+			return Arithmetic.toInteger(value.getDoubleValue());
 		} else {
-			return PrologInteger.toInteger(value.getIntegerValue());
+			return Arithmetic.toInteger(value.getIntegerValue());
 		}
 	}
 	//
 	public static long toLong(NumericalValue value) {
 		if (value.useDoubleValue()) {
-			return PrologInteger.toLong(value.getDoubleValue());
+			return Arithmetic.toLong(value.getDoubleValue());
 		} else {
-			return PrologInteger.toLong(value.getIntegerValue());
+			return Arithmetic.toLong(value.getIntegerValue());
 		}
 	}
 	//
 	public static long toLong(NumericalValue value, long coefficient) {
 		if (value.useDoubleValue()) {
-			return PrologInteger.toLong(value.getDoubleValue() * coefficient);
+			return Arithmetic.toLong(value.getDoubleValue() * coefficient);
 		} else {
-			return PrologInteger.toLong(value.getIntegerValue().multiply(BigInteger.valueOf(coefficient)));
+			return Arithmetic.toLong(value.getIntegerValue().multiply(BigInteger.valueOf(coefficient)));
 		}
 	}
 	//
@@ -113,7 +113,7 @@ while (true) {
 	}
 };
 double normalizedValue= absoluteValue;
-StringBuffer buffer= new StringBuffer();
+StringBuilder buffer= new StringBuilder();
 int counter= 0;
 while (true) {
 	if (normalizedValue < 1) {
@@ -195,7 +195,7 @@ while (absoluteValue.compareTo(BigInteger.ZERO) > 0) {
 		break;
 	}
 };
-StringBuffer buffer= new StringBuffer();
+StringBuilder buffer= new StringBuilder();
 int counter= 0;
 while (true) {
 	if (absoluteValue.equals(BigInteger.ZERO)) {
@@ -261,7 +261,7 @@ while (true) {
 	}
 };
 double normalizedValue= absoluteValue;
-StringBuffer buffer= new StringBuffer();
+StringBuilder buffer= new StringBuilder();
 int counter= 0;
 while (true) {
 	if (normalizedValue < 1) {

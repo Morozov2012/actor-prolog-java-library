@@ -43,63 +43,81 @@ public class KinectSkeletonsFrame implements KinectSkeletonsFrameInterface, Seri
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public long getReceivedFrameNumber() {
 		return receivedFrameNumber;
 	}
+	@Override
 	public long getSkeletonsFrameNumber() {
 		return skeletonsFrameNumber;
 	}
+	@Override
 	public long getSkeletonsFrameTime() {
 		return skeletonsFrameTime;
 	}
+	@Override
 	public GeneralSkeletonInterface[] getSkeletons() {
 		return skeletons;
 	}
+	@Override
 	public boolean hasTrackedSkeletons() {
 		return KinectSkeletonsFrameText.hasTrackedSkeletons(skeletons);
 	}
+	@Override
 	public DimensionsInterface getDimensions() {
 		return dimensions;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public KinectFrameBaseAttributesInterface getBaseAttributes() {
 		return baseAttributes;
 	}
+	@Override
 	public byte getDeviceType() {
 		return baseAttributes.getDeviceType();
 	}
+	@Override
 	public float getFocalLengthX() {
 		return baseAttributes.getFocalLengthX();
 	}
+	@Override
 	public float getFocalLengthY() {
 		return baseAttributes.getFocalLengthY();
 	}
+	@Override
 	public int getDepthFrameWidth() {
 		return baseAttributes.getDepthFrameWidth();
 	}
+	@Override
 	public int getDepthFrameHeight() {
 		return baseAttributes.getDepthFrameHeight();
 	}
+	@Override
 	public int getColorFrameWidth() {
 		return baseAttributes.getColorFrameWidth();
 	}
+	@Override
 	public int getColorFrameHeight() {
 		return baseAttributes.getColorFrameHeight();
 	}
+	@Override
 	public int getNumberOfSkeletons() {
 		return baseAttributes.getNumberOfSkeletons();
 	}
+	@Override
 	public int getCorrectionX() {
 		return baseAttributes.getCorrectionX();
 	}
+	@Override
 	public int getCorrectionY() {
 		return baseAttributes.getCorrectionY();
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean isLightweightFrame() {
 		return true;
 	}

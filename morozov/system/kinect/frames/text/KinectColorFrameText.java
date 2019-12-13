@@ -13,7 +13,6 @@ public class KinectColorFrameText {
 	//
 	public static void writeText(KinectColorFrameInterface frame, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {
 		if (exportMode==ExportMode.SKELETONS) {
-			// super.writeText(frame,writer,exportMode,locale);
 			KinectFrameText.writeRootFrameText(frame,writer,exportMode,locale);
 		} else {
 			writeColorFrameText(frame,writer,exportMode,locale);
@@ -22,7 +21,6 @@ public class KinectColorFrameText {
 	//
 	public static void writeColorFrameText(KinectColorFrameInterface frame, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {
 		writer.write("; COLOR FRAME:\n");
-		// super.writeText(writer,exportMode,locale);
 		KinectFrameText.writeRootFrameText(frame,writer,exportMode,locale);
 		byte[] color= frame.getColor();
 		writer.write(String.format(locale,"; Color matrix: %d\n",color.length));

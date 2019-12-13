@@ -14,25 +14,31 @@ import morozov.terms.signals.*;
 public enum FFmpegMacroblockDecisionModeName {
 	//
 	FF_MB_DECISION_SIMPLE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_MB_DECISION_SIMPLE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_MB_DECISION_SIMPLE;
 		}
 	},
 	FF_MB_DECISION_BITS {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_MB_DECISION_BITS;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_MB_DECISION_BITS;
 		}
 	},
 	FF_MB_DECISION_RD {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_MB_DECISION_RD;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_MB_DECISION_RD;
 		}

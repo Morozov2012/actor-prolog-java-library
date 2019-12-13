@@ -53,14 +53,13 @@ public abstract class DomainAlternative implements Serializable {
 		throw new DomainAlternativeDoesNotCoverTerm(initialValue.getPosition());
 	}
 	protected static Term checkAndCollectSetElements(Term t, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
-		HashMap<Long,Term> setPositiveMap= new HashMap<Long,Term>();
+		HashMap<Long,Term> setPositiveMap= new HashMap<>();
 		Term setEnd= t.exploreSetPositiveElements(setPositiveMap,cp);
 		setEnd= setEnd.dereferenceValue(cp);
 		if (setEnd.thisIsEmptySet() || setEnd.thisIsUnknownValue()) {
 			Set<Long> keys= setPositiveMap.keySet();
 			Long[] functors= new Long[keys.size()];
 			keys.toArray(functors);
-			// Term[] arguments= new Term[functors.length];
 			DomainAlternative[] alternatives= baseDomain.alternatives;
 			Term result= PrologEmptySet.instance;
 			for (int n=functors.length-1; n > 0; n--) {

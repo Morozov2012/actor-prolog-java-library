@@ -5,10 +5,14 @@ package morozov.system.ffmpeg.errors;
 import morozov.system.ffmpeg.*;
 
 public class UnknownFFmpegOperatingMode extends RuntimeException {
+	//
 	protected FFmpegOperatingMode mode;
+	//
 	public UnknownFFmpegOperatingMode(FFmpegOperatingMode m) {
 		mode= m;
 	}
+	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(" + mode.toString() + ")";
 	}

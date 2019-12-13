@@ -16,28 +16,29 @@ public class KinectDataAcquisitionModeTools {
 		KinectCircumscriptionMode[] circumscriptionModes= displayingMode.getActingCircumscriptionModes();
 		KinectSkeletonsMode skeletonsMode= displayingMode.getActingSkeletonsMode();
 		KinectPeopleIndexMode peopleIndexMode= displayingMode.getActingPeopleIndexMode();
+		boolean extractPeople= peopleIndexMode.peopleAreToBeExtracted();
 		if (frameTypes.length > 0) {
 			for (int n=0; n < frameTypes.length; n++) {
 				KinectFrameType frameType= frameTypes[n];
-				frameType.refineDataAcquisitionMode(consolidatedMode);
+				frameType.refineDataAcquisitionMode(consolidatedMode,extractPeople);
 				KinectCircumscriptionModesTools.refineDataAcquisitionMode(circumscriptionModes,consolidatedMode,frameType);
 				skeletonsMode.refineDataAcquisitionMode(consolidatedMode,frameType);
 			}
 		} else {
 			KinectFrameType defaultFrameType= displayingMode.getActingFrameType();
-			defaultFrameType.refineDataAcquisitionMode(consolidatedMode);
+			defaultFrameType.refineDataAcquisitionMode(consolidatedMode,extractPeople);
 			KinectCircumscriptionModesTools.refineDataAcquisitionMode(circumscriptionModes,consolidatedMode,defaultFrameType);
 			skeletonsMode.refineDataAcquisitionMode(consolidatedMode,defaultFrameType);
 		};
 		peopleIndexMode.refineDataAcquisitionMode(consolidatedMode);
 	}
 	//
-	public static void refineDataAcquisitionMode(KinectFrameType[] frameTypes, ConsolidatedDataAcquisitionModeInterface consolidatedMode, KinectFrameType defaultFrameType) {
+	public static void refineDataAcquisitionMode(KinectFrameType[] frameTypes, ConsolidatedDataAcquisitionModeInterface consolidatedMode, KinectFrameType defaultFrameType, boolean extractPeople) {
 		if (frameTypes.length <= 0) {
-			defaultFrameType.refineDataAcquisitionMode(consolidatedMode);
+			defaultFrameType.refineDataAcquisitionMode(consolidatedMode,extractPeople);
 		} else {
 			for (int n=0; n < frameTypes.length; n++) {
-				frameTypes[n].refineDataAcquisitionMode(consolidatedMode);
+				frameTypes[n].refineDataAcquisitionMode(consolidatedMode,extractPeople);
 			}
 		}
 	}
@@ -69,7 +70,7 @@ public class KinectDataAcquisitionModeTools {
 		if (frameTypes.length <= 0) {
 			return "AUTO";
 		} else {
-			StringBuffer buffer= new StringBuffer();
+			StringBuilder buffer= new StringBuilder();
 			buffer.append("[");
 			for (int n=0; n < frameTypes.length; n++) {
 				if (n > 0) {

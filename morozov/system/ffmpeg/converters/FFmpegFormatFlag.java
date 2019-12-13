@@ -151,6 +151,6 @@ public class FFmpegFormatFlag {
 		if (value != 0) {
 			flags.add(new FFmpegFormatFlag(value));
 		};
-		return flags.toArray(new FFmpegFormatFlag[0]);
+		return flags.toArray(new FFmpegFormatFlag[flags.size()]);
 	}
 }

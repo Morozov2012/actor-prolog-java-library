@@ -14,14 +14,14 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class ExtendedJInternalFrame extends JInternalFrame {
 	//
-	public AtomicReference<ExtendedCoordinate> logicalX;
-	public AtomicReference<ExtendedCoordinate> logicalY;
-	public AtomicReference<ExtendedSize> logicalWidth;
-	public AtomicReference<ExtendedSize> logicalHeight;
-	public AtomicBoolean usePixelMeasurements;
+	protected AtomicReference<ExtendedCoordinate> logicalX;
+	protected AtomicReference<ExtendedCoordinate> logicalY;
+	protected AtomicReference<ExtendedSize> logicalWidth;
+	protected AtomicReference<ExtendedSize> logicalHeight;
+	protected AtomicBoolean usePixelMeasurements;
 	//
 	public ExtendedJInternalFrame(InnerPage page, String title, AtomicReference<ExtendedCoordinate> x, AtomicReference<ExtendedCoordinate> y, AtomicReference<ExtendedSize> width, AtomicReference<ExtendedSize> height, AtomicBoolean pixelMeasurements) {
-		super(	title, // "Event Generator"
+		super(	title,
 			true, // Resizable
 			true, // Closable
 			true, // Maximizable

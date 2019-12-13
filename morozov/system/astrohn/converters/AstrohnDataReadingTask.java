@@ -8,6 +8,7 @@ import morozov.system.modes.*;
 
 public class AstrohnDataReadingTask extends DataFrameReadingTask {
 	//
+	@Override
 	protected boolean isTargetArrayType(DataArrayType dataArrayType, CompoundArrayType compoundArrayType, KinectDataArrayType kinectArrayType) {
 		boolean answer= false;
 		if (dataArrayType != null) {

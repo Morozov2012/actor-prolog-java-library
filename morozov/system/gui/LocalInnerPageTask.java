@@ -5,12 +5,14 @@ package morozov.system.gui;
 import java.util.TimerTask;
 
 public class LocalInnerPageTask extends TimerTask {
-	private InnerPage innerPage;
+	//
+	protected InnerPage innerPage;
 	//
 	public LocalInnerPageTask(InnerPage page) {
 		innerPage= page;
 	}
 	//
+	@Override
 	public void run() {
 		innerPage.safelyRepaint();
 	}

@@ -24,6 +24,7 @@ public class BigDecimalFormatException extends LexicalScannerError {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public String toString() {
 		return this.getClass().toString() + "(" + mantissa + "," + radix.toString() + ")";
 	}

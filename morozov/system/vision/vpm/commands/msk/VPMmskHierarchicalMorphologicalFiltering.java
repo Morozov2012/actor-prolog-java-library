@@ -4,7 +4,7 @@ package morozov.system.vision.vpm.commands.msk;
 
 import morozov.system.vision.vpm.commands.*;
 
-abstract public class VPMmskHierarchicalMorphologicalFiltering extends VPM_FrameCommand {
+public abstract class VPMmskHierarchicalMorphologicalFiltering extends VPM_FrameCommand {
 	//
 	protected int halfwidth;
 	//

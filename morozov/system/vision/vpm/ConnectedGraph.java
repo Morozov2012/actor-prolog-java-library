@@ -85,7 +85,7 @@ public class ConnectedGraph {
 			BigInteger owner= s.getOwner();
 			HashMap<Integer,ConnectedSegment> hash2= hash1.get(owner);
 			if (hash2==null) {
-				hash2= new HashMap<Integer,ConnectedSegment>();
+				hash2= new HashMap<>();
 			};
 			int number= s.getNumber();
 			hash2.put(number,c);

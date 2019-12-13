@@ -31,9 +31,8 @@ public class DomainSet extends MonoArgumentDomainItem {
 		key= k;
 	}
 	//
+	@Override
 	public boolean coversTerm(Term t, ChoisePoint cp, PrologDomain baseDomain, boolean ignoreFreeVariables) {
-		// initiateDomainItemIfNecessary();
-		// t= t.dereferenceValue(cp);
 		t= t.dereferenceValue(cp);
 		if (ignoreFreeVariables && t.thisIsFreeVariable()) {
 			return true;
@@ -41,16 +40,14 @@ public class DomainSet extends MonoArgumentDomainItem {
 			return t.isCoveredBySetDomain(key,domainItem,baseDomain,cp,ignoreFreeVariables);
 		}
 	}
+	@Override
 	public boolean coversOptimizedSet(long[] keysOfTerms, Term[] elements, Term tail, PrologDomain baseDomain, ChoisePoint cp, boolean ignoreFreeVariables) {
-		// initiateDomainItemIfNecessary();
 		for (int n=0; n < keysOfTerms.length; n++) {
 			long currentKey= keysOfTerms[n];
 			try {
 				Term value= elements[n].retrieveSetElementValue(cp);
-				// value= value.dereferenceValue(cp);
 				value= value.dereferenceValue(cp);
 				if (ignoreFreeVariables && value.thisIsFreeVariable()) {
-					// return true;
 					continue;
 				} else {
 					boolean elementIsFound= false;
@@ -79,32 +76,33 @@ public class DomainSet extends MonoArgumentDomainItem {
 		};
 		return tail.isCoveredByDomain(baseDomain,cp,ignoreFreeVariables);
 	}
+	@Override
 	public Term checkAndOptimizeTerm(Term t, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
 		throw new DomainAlternativeDoesNotCoverTerm(t.getPosition());
 	}
+	@Override
 	public Term checkTerm(Term t, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
-		// initiateDomainItemIfNecessary();
 		return t.checkSetTerm(key,domainItem,t,cp,baseDomain);
 	}
+	@Override
 	public Term checkOptimizedSet(long[] keysOfTerms, Term[] elements, Term tail, Term initialValue, ChoisePoint cp, PrologDomain baseDomain) throws DomainAlternativeDoesNotCoverTerm {
-		// initiateDomainItemIfNecessary();
 		return checkAndCollectSetElements(initialValue,cp,baseDomain);
 	}
+	@Override
 	public PrologDomain getPairDomain(long keyOfPair) throws TermIsNotPairDomainAlternative {
 		if (keyOfPair==key) {
-			// initiateDomainItemIfNecessary();
 			return domainItem;
 		} else {
 			throw TermIsNotPairDomainAlternative.instance;
 		}
 	}
 	//
+	@Override
 	public boolean isEqualTo(DomainAlternative a, HashSet<PrologDomainPair> stack) {
-		// initiateDomainItemIfNecessary();
 		return a.isEqualToSet(key,domainItem,stack);
 	}
+	@Override
 	public boolean isEqualToSet(long targetKey, PrologDomain domain, HashSet<PrologDomainPair> stack) {
-		// initiateDomainItemIfNecessary();
 		if (targetKey==key) {
 			try {
 				domainItem.isEqualTo(domain,stack);
@@ -116,11 +114,12 @@ public class DomainSet extends MonoArgumentDomainItem {
 			return false;
 		}
 	}
+	@Override
 	public boolean isCoveredBySetAny() {
 		return true;
 	}
+	@Override
 	public boolean isCoveredByOptimizedSet(long[] listOfNamesAndCodes, PrologDomain[] domains, HashSet<PrologDomainPair> stack) {
-		// initiateDomainItemIfNecessary();
 		try {
 			boolean isFound= false;
 			for (int k=0; k < listOfNamesAndCodes.length; k++) {
@@ -135,10 +134,11 @@ public class DomainSet extends MonoArgumentDomainItem {
 			return false;
 		}
 	}
+	@Override
 	public boolean coversAlternative(DomainAlternative a, PrologDomain ownerDomain, HashSet<PrologDomainPair> stack) {
 		return a.isCoveredBySet(ownerDomain);
 	}
-	// Converting Term to String
+	// Converting Term to String:
 	private void writeObject(ObjectOutputStream stream) throws IOException {
 		stream.defaultWriteObject();
 		if (key < 0) {
@@ -153,13 +153,14 @@ public class DomainSet extends MonoArgumentDomainItem {
 		}
 	}
 	//
+	@Override
 	protected String getMonoArgumentDomainTag() {
 		return PrologDomainName.tagDomainAlternative_Set;
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
-		// initiateDomainItemIfNecessary();
-		StringBuffer buffer= new StringBuffer();
+		StringBuilder buffer= new StringBuilder();
 		buffer.append(getMonoArgumentDomainTag());
 		buffer.append("(");
 		buffer.append(Long.toString(key));

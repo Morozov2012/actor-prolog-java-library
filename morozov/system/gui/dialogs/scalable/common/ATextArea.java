@@ -23,11 +23,11 @@ import java.awt.event.FocusListener;
 import java.awt.event.FocusEvent;
 
 public class ATextArea
-	extends JTextArea
-	implements ActiveDocumentReportListener, FocusListener {
+		extends JTextArea
+		implements ActiveDocumentReportListener, FocusListener {
 	//
-	AbstractDialog targetDialog= null;
-	ActiveComponent targetComponent= null;
+	protected AbstractDialog targetDialog= null;
+	protected ActiveComponent targetComponent= null;
 	//
 	public ATextArea(AbstractDialog tD, ActiveComponent tC, int rows, int columns) {
 		this(tD,tC,"",rows,columns);
@@ -40,68 +40,34 @@ public class ATextArea
 		activeDocument.addReportListener(this);
 		addFocusListener(this);
 	}
-	// Method to create default model
+	// Method to create default model:
+	@Override
 	protected Document createDefaultModel() {
 		return new ActivePlainDocument();
 	}
-	//
-	// public void setValue(Number number) {
-	//	setText(getFormat().format(number));
-	// }
-	//
-	// Override to handle insertion error
+	// Override to handle insertion error:
+	@Override
 	public void reportSuccess() {
-		// By default, just beep
-		// Toolkit.getDefaultToolkit().beep();
-		// outerBorder.setActiveFieldValueIsValid(true);
-		// repaint(); // Возможно, это причина глюков.
 		if (targetDialog!=null) {
 			targetDialog.reportValueUpdate(targetComponent);
 			targetDialog.safelyInvalidate();
-			// targetDialog.repaint(); // Возможно, это причина глюков.
-			// Попытка бороться с глюками SWING:
-			// targetDialog.repaintAfterDelay();
 		}
 	}
+	@Override
 	public void reportFailure() {
 		reportSuccess();
 	}
 	//
-	// public void processComponentKeyEvent(KeyEvent evt) {
-	//	switch (evt.getID()) {
-	//	case KeyEvent.KEY_PRESSED:
-	//	case KeyEvent.KEY_RELEASED:
-	//		if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
-	//			return;
-	//		};
-	//		break;
-	//	case KeyEvent.KEY_TYPED:
-	//		if (evt.getKeyChar() == '\r') {
-	//			return;
-	//		};
-	//		break;
-	//	};
-	//	super.processComponentKeyEvent(evt);
-	// }
-	//
+	@Override
 	public void focusGained(FocusEvent e) {
 		// Invoked when a component gains the keyboard focus.
 	}
+	@Override
 	public void focusLost(FocusEvent e) {
 		// Invoked when a component loses the keyboard focus.
 		targetDialog.reportCompleteEditing(targetComponent);
 	}
 	//
-	// public void setFont(Font font) {
-	//	super.setFont(font);
-	//	setMinimumSize(getPreferredSize());
-	// }
-	//
-	// public void setText(String t) {
-	//	if (t.equalsIgnoreCase("#")) {
-	//		throw new WrongArgumentIsNotSwitch();
-	//	}
-	// }
 	public void putValue(Term value, ChoisePoint iX) {
 		setText(value.toString(iX));
 	}

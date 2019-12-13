@@ -7,6 +7,7 @@
 package morozov.system.gui.dialogs.scalable;
 
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.gui.*;
 import morozov.system.gui.dialogs.*;
 import morozov.terms.*;
@@ -50,6 +51,7 @@ public class ScalableButton extends ScalableAbstractButton {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void setMargin() {
 		if (component!=null) {
 			if (horizontalScaling > 0 && verticalScaling > 0) {
@@ -57,8 +59,8 @@ public class ScalableButton extends ScalableAbstractButton {
 				Dimension preferredSize= component.getPreferredSize();
 				double scaledWidth= preferredSize.getWidth() * horizontalScaling;
 				double scaledHeight= preferredSize.getHeight() * verticalScaling;
-				int deltaWidth= PrologInteger.toInteger((scaledWidth - preferredSize.getWidth()) / 2);
-				int deltaHeight= PrologInteger.toInteger((scaledHeight - preferredSize.getHeight()) / 2);
+				int deltaWidth= Arithmetic.toInteger((scaledWidth - preferredSize.getWidth()) / 2);
+				int deltaHeight= Arithmetic.toInteger((scaledHeight - preferredSize.getHeight()) / 2);
 				int topMargin= initialTopMargin + deltaHeight;
 				int leftMargin= initialLeftMargin + deltaWidth;
 				int bottomMargin= initialBottomMargin + deltaHeight;
@@ -70,21 +72,16 @@ public class ScalableButton extends ScalableAbstractButton {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setIndividualText(Term value, ChoisePoint iX) {
 		if (component!=null) {
 			AnnotatedButton.safelyUpdateAbstractButton((AbstractButton)component,value,iX);
-			// ((JButton)component).invalidate();
-			// Без этой команды при изменении надписи на кнопке
-			// соседние кнопки сдвигаются, но перерисовываются
-			// некорректно; новое изображение кнопок ступенькой
-			// накладывается на старое.
 			targetDialog.safelyRevalidateAndRepaint();
-			// Без этой команды при изменении надписи на кнопке
-			// иногда портится фон окна, содержащего кнопку.
 			targetDialog.repaintAfterDelay();
 		}
 	}
 	//
+	@Override
 	public Term getIndividualText() {
 		if (component!=null) {
 			String text= AnnotatedButton.safelyRestoreText((AbstractButton)component);

@@ -17,10 +17,8 @@ public class VPMimgResizeImage extends VPM_FrameCommand {
 		height= h;
 	}
 	//
+	@Override
 	public void execute(VPM vpm) {
-		// if (vpm.imageIsAnalyzed()) {
-		//	throw new ImageResizingIsToBeDoneBeforeImageAnalysis();
-		// };
 		int sourceWidth= vpm.getOperationalImageWidth();
 		int sourceHeight= vpm.getOperationalImageHeight();
 		java.awt.image.BufferedImage sourceImage= vpm.getPreprocessedImage();

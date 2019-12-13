@@ -3,7 +3,9 @@
 package morozov.run.errors;
 
 public class UndefinedSlotTableEntry extends RuntimeException {
-	public String slotName;
+	//
+	protected String slotName;
+	//
 	public UndefinedSlotTableEntry(String name) {
 		slotName= name;
 	}

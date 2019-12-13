@@ -5,6 +5,7 @@ package morozov.system.vision.vpm;
 import java.util.Comparator;
 
 public class BlobIntersectionsComparator implements Comparator<BlobIntersection> {
+	@Override
 	public int compare(BlobIntersection o1, BlobIntersection o2) {
 		if (o1.isStrong()) {
 			if (o2.isStrong()) {

@@ -15,6 +15,7 @@ public class NoDomainName extends PrologDomainName {
 	public NoDomainName() {
 	}
 	//
+	@Override
 	public String toString(CharsetEncoder encoder) {
 		return tagDomainName_None;
 	}

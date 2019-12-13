@@ -16,11 +16,11 @@ public class Resident extends ActiveWorld {
 	//
 	protected Term output;
 	protected Term target;
-	public long domainSignature;
+	protected long domainSignature;
 	protected Term[] arguments;
 	//
-	protected HashSet<AbstractWorld> targetWorlds= new HashSet<AbstractWorld>();
-	protected HashMap<AbstractWorld,Term> resultLists= new HashMap<AbstractWorld,Term>();
+	protected HashSet<AbstractWorld> targetWorlds= new HashSet<>();
+	protected HashMap<AbstractWorld,Term> resultLists= new HashMap<>();
 	protected AtomicBoolean hasNewResults= new AtomicBoolean(false);
 	//
 	private static final long serialVersionUID= 0x528C7BA260C4371BL; // 5948265145187972891L
@@ -33,6 +33,21 @@ public class Resident extends ActiveWorld {
 	//
 	public Resident() {
 		super(true,true);
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public Term getOutput() {
+		return output;
+	}
+	public Term getTarget() {
+		return target;
+	}
+	public long getDomainSignature() {
+		return domainSignature;
+	}
+	public Term[] getArguments() {
+		return arguments;
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -52,40 +67,48 @@ public class Resident extends ActiveWorld {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void actualize(ChoisePoint iX) {
 	}
 	//
+	@Override
 	public void startProcesses() {
 		start();
 	}
 	//
+	@Override
 	public void releaseSystemResources() {
-		// stop();
 	}
 	//
+	@Override
 	public void stopProcesses() {
 		stop();
 	}
 	//
+	@Override
 	public MethodSignature[] getMethodSignatures() {
 		return emptySignatureList;
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public AbstractInternalWorld internalWorld() {
 		throw new AnAttemptToExtractInternalWorldFromResident();
 	}
 	//
+	@Override
 	public void extractWorlds(AbstractProcess process, LinkedHashSet<AbstractInternalWorld> list) {
 	}
 	//
 	final public long getPackageCode() {
 		throw new AnAttemptToExtractPackageCodeFromResident();
 	}
+	@Override
 	final public long[] getClassHierarchy() {
 		throw new AnAttemptToExtractClassHierarchyFromResident();
 	}
+	@Override
 	final public long[] getInterfaceHierarchy() {
 		throw new AnAttemptToExtractInterfaceHierarchyFromResident();
 	}
@@ -95,14 +118,19 @@ public class Resident extends ActiveWorld {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void receiveAsyncCall(AsyncCall item) {
 	}
+	@Override
 	public void receiveTimerMessage(AbstractInternalWorld target) {
 	}
+	@Override
 	public void cancelTimerMessage(AbstractInternalWorld target) {
 	}
+	@Override
 	public void sendResidentRequest(Resident resident, long domainSignature, Term[] arguments, boolean sortAndReduceResultList) {
 	}
+	@Override
 	public void withdrawRequest(Resident resident) {
 	}
 	//
@@ -112,9 +140,10 @@ public class Resident extends ActiveWorld {
 	//
 	// Process Flow Messages
 	//
+	@Override
 	protected void processFlowMessages(ChoisePoint iX) {
 		phaseInitiation();
-		boolean hasUpdatedPorts= acceptPortValues();
+		acceptPortValues();
 		//
 		prepareTargetWorlds(target,iX);
 		Term[] argumentList= prepareArguments(iX);
@@ -132,7 +161,7 @@ public class Resident extends ActiveWorld {
 	}
 	//
 	protected void prepareTargetWorlds(Term target, ChoisePoint cp) {
-		HashSet<AbstractWorld> worlds= new HashSet<AbstractWorld>();
+		HashSet<AbstractWorld> worlds= new HashSet<>();
 		target.registerTargetWorlds(worlds,cp);
 		targetWorlds.removeAll(worlds);
 		if (!targetWorlds.isEmpty()) {
@@ -172,6 +201,7 @@ public class Resident extends ActiveWorld {
 	//
 	// Process One Direct Message
 	//
+	@Override
 	public void acceptDirectMessage() {
 		if (!hasNewResults.compareAndSet(true,false)) {
 			return;
@@ -184,7 +214,7 @@ public class Resident extends ActiveWorld {
 			return;
 		};
 		phaseInitiation();
-		boolean hasUpdatedPorts= acceptPortValues();
+		acceptPortValues();
 		Term resultValue= target.substituteWorlds(resultLists,rootCP);
 		try {
 			output.unifyWith(resultValue,rootCP);
@@ -197,35 +227,44 @@ public class Resident extends ActiveWorld {
 		rootCP.freeTrail();
 	}
 	//
+	@Override
 	protected void acceptTimerMessage() {
 	}
+	@Override
 	protected void sendStateOfProcess() {
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void resetResidentOwners() {
 	}
+	@Override
 	protected void informInternalWorldsAboutFailure() {
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Continuation collectSuspendedCalls(Continuation c0, ChoisePoint iX) {
 		return c0;
 	}
 	//
+	@Override
 	public Continuation createActorNeutralizationNode(Continuation aC) {
 		return aC;
 	}
 	//
+	@Override
 	protected boolean removeNewlyProvedOldActors(HashSet<ActorNumber> oldActors) {
 		return false;
 	}
 	//
+	@Override
 	public void clearActorStore() {
 	}
 	//
+	@Override
 	public void registerActorToBeProved(ActorNumber actorNumber, ChoisePoint cp) {
 	}
 }

@@ -32,7 +32,7 @@ public class KinectCircumscriptionModesTools {
 		if (items.length == 1) {
 			return items[0].toString();
 		} else {
-			StringBuffer buffer= new StringBuffer();
+			StringBuilder buffer= new StringBuilder();
 			buffer.append("[");
 			for (int n=0; n < items.length; n++) {
 				if (n > 0) {

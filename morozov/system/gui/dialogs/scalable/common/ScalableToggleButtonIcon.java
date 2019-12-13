@@ -12,8 +12,8 @@ package morozov.system.gui.dialogs.scalable.common;
  * @author IRE RAS Alexei A. Morozov
 */
 
+import morozov.system.*;
 import morozov.system.gui.*;
-import morozov.terms.*;
 
 import javax.swing.JToggleButton;
 import javax.swing.Icon;
@@ -31,7 +31,6 @@ import java.util.HashMap;
 
 public abstract class ScalableToggleButtonIcon implements Icon, UIResource, Serializable, Cloneable {
 	//
-	// protected Color uncertaincyColor;
 	protected Component relatedComponent;
 	protected Font givenFont;
 	protected HashMap<Font,Integer> measuredFonts;
@@ -50,15 +49,11 @@ public abstract class ScalableToggleButtonIcon implements Icon, UIResource, Seri
 	public ScalableToggleButtonIcon() {
 		initiate();
 	}
-	// public ScalableToggleButtonIcon(Color color) {
-	//	uncertaincyColor= color;
-	// }
 	//
 	public void initiate() {
-		// uncertaincyColor= Color.MAGENTA;
 		relatedComponent= null;
 		givenFont= null;
-		measuredFonts= new HashMap<Font,Integer>();
+		measuredFonts= new HashMap<>();
 		measuredFont= null;
 		measuredSize= 10;
 		backgroundColor= null;
@@ -83,7 +78,6 @@ public abstract class ScalableToggleButtonIcon implements Icon, UIResource, Seri
 			if (size!=null) {
 				measuredSize= size;
 			} else if (relatedComponent!=null) {
-				// Graphics2D g2D= (Graphics2D)relatedComponent.getGraphics();
 				Graphics2D g2D= DesktopUtils.safelyGetGraphics2D(relatedComponent);
 				if (g2D!=null) {
 					try {
@@ -91,9 +85,8 @@ public abstract class ScalableToggleButtonIcon implements Icon, UIResource, Seri
 						Rectangle2D r2D= givenFont.getStringBounds("M",fRC);
 						// Returns an integer Rectangle that completely encloses the Shape:
 						Rectangle rect= r2D.getBounds();
-						int width= PrologInteger.toInteger(rect.getWidth());
-						// int height= PrologInteger.toInteger(rect.getHeight());
-						measuredSize= PrologInteger.toInteger(width*horizontalScaling);
+						int width= Arithmetic.toInteger(rect.getWidth());
+						measuredSize= Arithmetic.toInteger(width*horizontalScaling);
 						measuredFonts.put(givenFont,measuredSize);
 					} finally {
 						g2D.dispose();
@@ -111,29 +104,28 @@ public abstract class ScalableToggleButtonIcon implements Icon, UIResource, Seri
 	}
 	//
 	protected int getControlSize() {
-		// return 130;
 		return (int)StrictMath.floor(measuredSize + getSizeCorrection());
-		// return 13;
 	}
 	//
 	protected int getSizeCorrection() {
 		return 3;
 	}
 	//
+	@Override
 	public int getIconWidth() {
 		return getControlSize();
 	}
 	//
+	@Override
 	public int getIconHeight() {
 		return getControlSize();
 	}
 	//
+	@Override
 	public void paintIcon(Component relatedComponent, Graphics g0, int x, int y) {
 		Graphics gg= g0.create();
 		try {
 			Graphics2D g2= (Graphics2D)gg;
-			// g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-			// g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING,RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
 			JToggleButton tb= (JToggleButton)relatedComponent;
 			int controlSize= getControlSize();
 			drawEye(tb,g2,x,y,controlSize);

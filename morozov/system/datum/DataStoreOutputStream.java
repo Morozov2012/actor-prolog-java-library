@@ -21,6 +21,7 @@ public class DataStoreOutputStream extends ObjectOutputStream {
 		enableReplaceObject(true);
 	}
 	//
+	@Override
 	protected final Object replaceObject(Object obj) throws IOException {
 		if (obj instanceof AbstractWorld) {
 			AbstractWorld world= (AbstractWorld)obj;

@@ -22,11 +22,9 @@ public class I3CameraFlashAttributes implements I3CameraFlashAttributesInterface
 	protected double m_dDriftTempCoeffi3;
 	protected double m_dDriftTempCoeffi4;
 	protected double[] m_dAmbientTempCoeffi;
-	// protected calcAmbientCoeffi();
 	protected double[] ambientConstA;
 	protected double[] ambientConstB;
 	protected double checkcamberTemp;
-	// protected calcAmbientTempOffset();
 	protected double[] ambientOffsetConstA;
 	protected double[] ambientOffsetConstB;
 	protected float[] m_pdSL_Gain;
@@ -119,9 +117,7 @@ public class I3CameraFlashAttributes implements I3CameraFlashAttributesInterface
 		int size2= givenMppfMultiOs_OsData[0].length;
 		m_ppfMultiOs_OsData= new float[size1][size2];
 		for (int k=0; k < size1; k++) {
-			for (int m=0; m < size2; m++) {
-				m_ppfMultiOs_OsData[k][m]= givenMppfMultiOs_OsData[k][m];
-			}
+			System.arraycopy(givenMppfMultiOs_OsData[k],0,m_ppfMultiOs_OsData[k],0,size2);
 		};
 		m_dInitOnTimeCorrFactor= givenMdInitOnTimeCorrFactor;
 		m_pdInitOnTimeCorr= Arrays.copyOf(givenMpdInitOnTimeCorr,givenMpdInitOnTimeCorr.length);
@@ -139,105 +135,138 @@ public class I3CameraFlashAttributes implements I3CameraFlashAttributesInterface
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public byte[] getDeadData() {
 		return m_pbyDeadData;
 	}
+	@Override
 	public double getTemperatureOffset() {
 		return temperatureOffset;
 	}
+	@Override
 	public double getTemperatureGain() {
 		return temperatureGain;
 	}
+	@Override
 	public short getRecognizedCode1() {
 		return recognizedCode1;
 	}
+	@Override
 	public short getRecognizedCode2() {
 		return recognizedCode2;
 	}
+	@Override
 	public short getRecognizedCode3() {
 		return recognizedCode3;
 	}
+	@Override
 	public double[] getSortFpaTemp() {
 		return sortFpaTemp;
 	}
+	@Override
 	public double getDriftInitFactor() {
 		return m_dDriftInitFactor;
 	}
+	@Override
 	public double getDriftTempCoeffi1() {
 		return m_dDriftTempCoeffi1;
 	}
+	@Override
 	public double getDriftTempCoeffi2() {
 		return m_dDriftTempCoeffi2;
 	}
+	@Override
 	public double getDriftTempCoeffi3() {
 		return m_dDriftTempCoeffi3;
 	}
+	@Override
 	public double getDriftTempCoeffi4() {
 		return m_dDriftTempCoeffi4;
 	}
+	@Override
 	public double[] getAmbientTempCoeffi() {
 		return m_dAmbientTempCoeffi;
 	}
 	// public calcAmbientCoeffi();
+	@Override
 	public double[] getAmbientConstA() {
 		return ambientConstA;
 	}
+	@Override
 	public double[] getAmbientConstB() {
 		return ambientConstB;
 	}
+	@Override
 	public double getCheckcamberTemp() {
 		return checkcamberTemp;
 	}
 	// public calcAmbientTempOffset();
+	@Override
 	public double[] getAmbientOffsetConstA() {
 		return ambientOffsetConstA;
 	}
+	@Override
 	public double[] getAmbientOffsetConstB() {
 		return ambientOffsetConstB;
 	}
+	@Override
 	public float[] getSLGain() {
 		return m_pdSL_Gain;
 	}
+	@Override
 	public float[] getSLOffset() {
 		return m_pdSL_Offset;
 	}
+	@Override
 	public boolean isSLLoad() {
 		return m_bIsSLLoad;
 	}
+	@Override
 	public float[][] getMultiOsData() {
 		return m_ppfMultiOs_OsData;
 	}
+	@Override
 	public double getInitOnTimeCorrFactor() {
 		return m_dInitOnTimeCorrFactor;
 	}
+	@Override
 	public double[] getInitOnTimeCorr() {
 		return m_pdInitOnTimeCorr;
 	}
+	@Override
 	public double[] getMultiOs_FpaTemp() {
 		return m_pdMultiOs_FpaTemp;
 	}
+	@Override
 	public boolean isMultiOs() {
 		return m_bIsMultiOs;
 	}
+	@Override
 	public boolean isSkimOs() {
 		return m_bIsSkimOs;
 	}
 	//
+	@Override
 	public double[] getSLSkimOs() {
 		return m_pdSL_SkimOs;
 	}
+	@Override
 	public double[] getShutterTemp() {
 		return m_pdShutterTemp;
 	}
+	@Override
 	public boolean[] getAnomalousPixels() {
 		return m_AnomalousPixels;
 	}
+	@Override
 	public double getShutterCenterTemp() {
 		return m_dShutterCenterTemp;
 	}
+	@Override
 	public int getNumberOfVoltageAnomalousPixels() {
 		return numberOfVoltageAnomalousPixels;
 	}
+	@Override
 	public int getNumberOfTemperatureAnomalousPixels() {
 		return numberOfTemperatureAnomalousPixels;
 	}

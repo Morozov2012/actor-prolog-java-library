@@ -5,6 +5,7 @@ package morozov.system.gui;
 import target.*;
 
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.gui.errors.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
@@ -14,11 +15,11 @@ import java.math.BigInteger;
 
 public class ExtendedSize {
 	//
-	private boolean useDefaultSize= true;
+	protected boolean useDefaultSize= true;
 	//
-	private boolean useDoubleValue= false;
-	private BigInteger integerValue;
-	private double doubleValue= 0;
+	protected boolean useDoubleValue= false;
+	protected BigInteger integerValue;
+	protected double doubleValue= 0;
 	//
 	protected static String stringDefault= "default";
 	protected static Term termDefault= new PrologSymbol(SymbolCodes.symbolCode_E_default);
@@ -43,8 +44,11 @@ public class ExtendedSize {
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	public void useDefaultSize() {
-		useDefaultSize= true;
+	public void setUseDefaultSize(boolean mode) {
+		useDefaultSize= mode;
+	}
+	public void setUseDefaultSize() {
+		setUseDefaultSize(true);
 	}
 	//
 	public boolean isDefault() {
@@ -69,9 +73,9 @@ public class ExtendedSize {
 			throw UseDefaultSize.instance;
 		} else {
 			if (useDoubleValue) {
-				return PrologInteger.toInteger(doubleValue);
+				return Arithmetic.toInteger(doubleValue);
 			} else {
-				return PrologInteger.toInteger(integerValue);
+				return Arithmetic.toInteger(integerValue);
 			}
 		}
 	}
@@ -137,6 +141,7 @@ public class ExtendedSize {
 		}
 	}
 	//
+	@Override
 	public String toString() {
 		if (useDefaultSize) {
 			return stringDefault;

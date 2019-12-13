@@ -10,6 +10,7 @@ public class VPMmskAddForeground extends VPMmskAnalyzeForeground {
 		super(name,left,right);
 	}
 	//
+	@Override
 	protected void analyzeOperationalMatrix(boolean[] foregroundMask, int[] operationalMatrix) {
 		int vectorLength= foregroundMask.length;
 		for (int k=0; k < vectorLength; k++) {

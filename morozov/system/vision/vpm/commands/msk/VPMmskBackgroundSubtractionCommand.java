@@ -5,11 +5,12 @@ package morozov.system.vision.vpm.commands.msk;
 import morozov.system.vision.vpm.*;
 import morozov.system.vision.vpm.commands.*;
 
-abstract public class VPMmskBackgroundSubtractionCommand extends VPM_FrameCommand {
+public abstract class VPMmskBackgroundSubtractionCommand extends VPM_FrameCommand {
 	//
 	public VPMmskBackgroundSubtractionCommand() {
 	}
 	//
+	@Override
 	public boolean isBackgroundSubtractionCommand() {
 		return true;
 	}

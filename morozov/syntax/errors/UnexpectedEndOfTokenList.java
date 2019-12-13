@@ -1,4 +1,4 @@
-// (c) 2010 IRE RAS Alexei A. Morozov
+// (c) 2019 IRE RAS Alexei A. Morozov
 
 package morozov.syntax.errors;
 

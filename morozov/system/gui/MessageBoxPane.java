@@ -8,6 +8,7 @@ public class MessageBoxPane extends JOptionPane {
 	public MessageBoxPane(Object message, int messageType) {
 		super(message,messageType);
 	}
+	@Override
 	public int getMaxCharactersPerLineCount() {
 		return 90;
 	}

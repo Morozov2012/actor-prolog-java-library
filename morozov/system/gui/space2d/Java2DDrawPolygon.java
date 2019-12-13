@@ -6,14 +6,18 @@ import java.awt.Graphics2D;
 import java.awt.geom.Path2D;
 
 public class Java2DDrawPolygon extends Java2DCommand {
+	//
 	protected double[] xPoints;
 	protected double[] yPoints;
 	protected int length;
+	//
 	public Java2DDrawPolygon(double[] aX, double[] aY) {
 		xPoints= aX;
 		yPoints= aY;
 		length= StrictMath.min(xPoints.length,yPoints.length);
 	}
+	//
+	@Override
 	public void execute(Graphics2D g2, DrawingMode drawingMode) {
 		double factorX= drawingMode.getFactorX();
 		double factorY= drawingMode.getFactorY();
@@ -25,6 +29,7 @@ public class Java2DDrawPolygon extends Java2DCommand {
 		polygon.closePath();
 		drawingMode.drawShape(g2,polygon);
 	}
+	@Override
 	public boolean equals(Object o) {
 		if (o==null) {
 			return false;

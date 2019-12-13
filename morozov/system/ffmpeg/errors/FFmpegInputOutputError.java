@@ -3,8 +3,10 @@
 package morozov.system.ffmpeg.errors;
 
 public class FFmpegInputOutputError extends RuntimeException {
-	public String fileName;
-	public String message;
+	//
+	protected String fileName;
+	protected String message;
+	//
 	public FFmpegInputOutputError(String name) {
 		fileName= name;
 	}
@@ -12,6 +14,8 @@ public class FFmpegInputOutputError extends RuntimeException {
 		fileName= name;
 		message= m;
 	}
+	//
+	@Override
 	public String toString() {
 		if (fileName != null) {
 			if (message != null) {

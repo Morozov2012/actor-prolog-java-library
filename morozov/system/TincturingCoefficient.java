@@ -15,8 +15,6 @@ public class TincturingCoefficient implements Serializable {
 	//
 	protected static double defaultColorMapTincturingCoefficient= 0.5;
 	//
-	// private static final long serialVersionUID= 0xDE84F743D0CC3DC7L; // -2412531629725827641L;
-	// private static final long serialVersionUID= 0x1L; // 1L
 	private static final long serialVersionUID= 0xDE84F743D0CC3DC7L; // -2412531629725827641L
 	//
 	// static {
@@ -35,17 +33,41 @@ public class TincturingCoefficient implements Serializable {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public void setUseDefaultValue(boolean mode) {
+		useDefaultValue= mode;
+	}
+	public void setUseDefaultValue() {
+		setUseDefaultValue(true);
+	}
+	//
 	public boolean getUseDefaultValue() {
 		return useDefaultValue;
 	}
+	//
+	public void setValue(double v) {
+		value= v;
+		useDefaultValue= false;
+	}
+	//
 	public double getValue() throws UseDefaultCoefficient {
-		return value;
+		if (useDefaultValue) {
+			throw UseDefaultCoefficient.instance;
+		} else {
+			return value;
+		}
 	}
 	public double getValue(double defaultValue) {
 		if (useDefaultValue) {
 			return defaultValue;
 		} else {
 			return value;
+		}
+	}
+	public TincturingCoefficient getValue(TincturingCoefficient defaultValue) {
+		if (useDefaultValue) {
+			return defaultValue;
+		} else {
+			return this;
 		}
 	}
 	//

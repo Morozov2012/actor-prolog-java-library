@@ -13,13 +13,11 @@ import javax.media.j3d.Transform3D;
 import javax.media.j3d.Group;
 import javax.media.j3d.Appearance;
 import javax.media.j3d.Bounds;
-import javax.media.j3d.WakeupOnElapsedFrames;
 import javax.media.j3d.GeometryArray;
 import javax.media.j3d.IndexedTriangleArray;
 import javax.media.j3d.ColoringAttributes;
 import javax.media.j3d.TransparencyAttributes;
 import javax.media.j3d.PolygonAttributes;
-import javax.media.j3d.Behavior;
 import javax.media.j3d.BoundingSphere;
 import com.sun.j3d.utils.geometry.GeometryInfo;
 import javax.vecmath.Vector4d;
@@ -31,9 +29,9 @@ import javax.vecmath.Point3f;
 import javax.vecmath.SingularMatrixException;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 
 public class MovingShadow extends Group {
+	//
 	public MovingShadow(Canvas3D targetWorld, NodeLabel dodecahedron, Node baseGroup, NodeLabel light, Vector4d plane, double standoff, Appearance appearance, Bounds bounds) {
 		setCapability(Group.ALLOW_CHILDREN_WRITE);
 		//
@@ -51,9 +49,9 @@ public class MovingShadow extends Group {
 		shadowBehavior.setSchedulingBounds(bounds);
 		addChild(shadowBehavior);
 	}
-	protected Shape3D createShadow(Shape3D dodecahedronShape, Node baseGroup, PointLight pointLight, Vector4d plane, double standoff, Appearance appearance) {
-		//
-		ArrayList<TransformGroup> tr_list= new ArrayList<TransformGroup>();
+	//
+	protected static Shape3D createShadow(Shape3D dodecahedronShape, Node baseGroup, PointLight pointLight, Vector4d plane, double standoff, Appearance appearance) {
+		ArrayList<TransformGroup> tr_list= new ArrayList<>();
 		Node current_object= pointLight;
 		while (true) {
 			if (current_object==null) {
@@ -72,10 +70,8 @@ public class MovingShadow extends Group {
 		Transform3D tr= new Transform3D();
 		Transform3D rot= new Transform3D();
 		for (int i=tr_list.size()-1; i >= 0; i--) {
-		// for (int i= 0; i < tr_list.size(); i++) {
 			TransformGroup currentGroup= tr_list.get(i);
 			currentGroup.getTransform(rot);
-			// tr.mul(rot,tr);
 			tr.mul(rot);
 		};
 		//
@@ -140,7 +136,7 @@ public class MovingShadow extends Group {
 		//
 		return result;
 	}
-	protected Transform3D createShadowProjection(Point3f light, Point3f plane, double standoff) {
+	protected static Transform3D createShadowProjection(Point3f light, Point3f plane, double standoff) {
 		Vector3f v= new Vector3f();
 		v.sub(plane,light);
 		//
@@ -150,7 +146,6 @@ public class MovingShadow extends Group {
 		}
 		mat[0]= 1;
 		mat[5]= 1;
-		// mat[10]= 1 - 0.001;
 		mat[10]= 1 - standoff;
 		mat[14]= -1 / v.length();
 		//
@@ -186,7 +181,7 @@ public class MovingShadow extends Group {
 		};
 		return shadowProj;
 	}
-	protected GeometryArray createShadowGeometryArray(Shape3D dodecahedronShape, Node baseGroup, Transform3D shadowProj) {
+	protected static GeometryArray createShadowGeometryArray(Shape3D dodecahedronShape, Node baseGroup, Transform3D shadowProj) {
 		GeometryArray ga= (GeometryArray)dodecahedronShape.getGeometry();
 		GeometryInfo gi= new GeometryInfo(ga);
 		gi.convertToIndexedTriangles();
@@ -205,7 +200,7 @@ public class MovingShadow extends Group {
 		//
 		shadow.setCoordinateIndices(0,indices);
 		//
-		ArrayList<TransformGroup> tr_list= new ArrayList<TransformGroup>();
+		ArrayList<TransformGroup> tr_list= new ArrayList<>();
 		Node current_object= dodecahedronShape;
 		while (true) {
 			if (current_object==null) {
@@ -244,50 +239,5 @@ public class MovingShadow extends Group {
 		};
 		shadow.setCoordinates(0,vert);
 		return shadow;
-	}
-	class ShadowBehavior extends Behavior {
-		//
-		protected MovingShadow shadowGroup;
-		//
-		protected Canvas3D targetWorld;
-		//
-		protected NodeLabel dodecahedronLabel;
-		protected Shape3D dodecahedronShape;
-		//
-		protected NodeLabel lightLabel;
-		protected PointLight pointLight;
-		// protected Point3f lightPosition;
-		//
-		protected Vector4d plane;
-		protected Node baseGroup;
-		protected double standoff;
-		protected Appearance appearance;
-		protected WakeupOnElapsedFrames wakeup= new WakeupOnElapsedFrames(0);
-		//
-		public ShadowBehavior(MovingShadow group, Canvas3D world, NodeLabel dodecahedron, Node base, NodeLabel light, Vector4d p, double s, Appearance a) {
-			shadowGroup= group;
-			targetWorld= world;
-			dodecahedronLabel= dodecahedron;
-			baseGroup= base;
-			lightLabel= light;
-			plane= p;
-			standoff= s;
-			appearance= a;
-		}
-		public void initialize() {
-			dodecahedronShape= targetWorld.retrieveShape3D(dodecahedronLabel);
-			pointLight= targetWorld.retrievePointLight(lightLabel);
-			// lightPosition= targetWorld.retrievePointLightPosition(lightLabel);
-			wakeupOn(wakeup);
-		}
-		public void processStimulus(Enumeration enumeration) {
-			Shape3D shadowShape= createShadow(dodecahedronShape,baseGroup,pointLight,plane,standoff,appearance);
-			BranchGroup newBG= new BranchGroup();
-			newBG.setCapability(BranchGroup.ALLOW_DETACH);
-			newBG.addChild(shadowShape);
-			newBG.compile();
-			shadowGroup.setChild(newBG,0);
-			wakeupOn(wakeup);
-		}
 	}
 }

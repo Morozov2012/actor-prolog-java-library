@@ -11,9 +11,9 @@ import java.math.BigInteger;
 
 public class NodeLabel {
 	//
-	public String textName= "";
-	public BigInteger numericalName;
-	public boolean isTextName= true;
+	protected String textName= "";
+	protected BigInteger numericalName;
+	protected boolean isTextName= true;
 	//
 	public NodeLabel(String text) {
 		textName= text;
@@ -42,6 +42,7 @@ public class NodeLabel {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean equals(Object o) {
 		if (o==null) {
 			return false;
@@ -67,6 +68,7 @@ public class NodeLabel {
 		}
 	}
 	//
+	@Override
 	public int hashCode() {
 		if (isTextName) {
 			return textName.hashCode() * 2 + 1;
@@ -83,6 +85,7 @@ public class NodeLabel {
 		}
 	}
 	//
+	@Override
 	public String toString() {
 		if (isTextName) {
 			return textName;

@@ -14,137 +14,171 @@ import morozov.terms.signals.*;
 public enum FFmpegComparisonFunctionName {
 	//
 	FF_CMP_SAD {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_CMP_SAD;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_CMP_SAD;
 		}
 	},
 	FF_CMP_SSE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_CMP_SSE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_CMP_SSE;
 		}
 	},
 	FF_CMP_SATD {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_CMP_SATD;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_CMP_SATD;
 		}
 	},
 	FF_CMP_DCT {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_CMP_DCT;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_CMP_DCT;
 		}
 	},
 	FF_CMP_PSNR {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_CMP_PSNR;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_CMP_PSNR;
 		}
 	},
 	FF_CMP_BIT {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_CMP_BIT;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_CMP_BIT;
 		}
 	},
 	FF_CMP_RD {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_CMP_RD;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_CMP_RD;
 		}
 	},
 	FF_CMP_ZERO {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_CMP_ZERO;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_CMP_ZERO;
 		}
 	},
 	FF_CMP_VSAD {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_CMP_VSAD;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_CMP_VSAD;
 		}
 	},
 	FF_CMP_VSSE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_CMP_VSSE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_CMP_VSSE;
 		}
 	},
 	FF_CMP_NSSE {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_CMP_NSSE;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_CMP_NSSE;
 		}
 	},
 	FF_CMP_W53 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_CMP_W53;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_CMP_W53;
 		}
 	},
 	FF_CMP_W97 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_CMP_W97;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_CMP_W97;
 		}
 	},
 	FF_CMP_DCTMAX {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_CMP_DCTMAX;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_CMP_DCTMAX;
 		}
 	},
 	FF_CMP_DCT264 {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_CMP_DCT264;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_CMP_DCT264;
 		}
 	},
 	FF_CMP_MEDIAN_SAD {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_CMP_MEDIAN_SAD;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_CMP_MEDIAN_SAD;
 		}
 	},
 	FF_CMP_CHROMA {
+		@Override
 		public int toInteger() {
 			return avcodec.AVCodecContext.FF_CMP_CHROMA;
 		}
+		@Override
 		public Term toTerm() {
 			return term_FF_CMP_CHROMA;
 		}

@@ -22,11 +22,13 @@ import java.util.ArrayList;
 import java.util.StringTokenizer;
 
 public class TabListCellRenderer extends JLabel implements ListCellRenderer<Object> {
+	//
 	protected static Border m_noFocusBorder;
 	protected String[] listItems;
 	protected Font currentFont;
 	protected int m_defaultDistance= 10;
 	protected int[] m_tabs= null;
+	//
 	public TabListCellRenderer(String[] rows) {
 		super();
 		listItems= rows;
@@ -34,6 +36,8 @@ public class TabListCellRenderer extends JLabel implements ListCellRenderer<Obje
 		setOpaque(true);
 		setBorder(m_noFocusBorder);
 	}
+	//
+	@Override
 	public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
 		setText(value.toString());
 		setBackground(isSelected ? list.getSelectionBackground() : list.getBackground());
@@ -56,7 +60,7 @@ public class TabListCellRenderer extends JLabel implements ListCellRenderer<Obje
 		} 
 	}
 	public int[] computeTabs(String[] rows) {
-		ArrayList<Integer> rowWidth= new ArrayList<Integer>();
+		ArrayList<Integer> rowWidth= new ArrayList<>();
 		FontMetrics metrics= getFontMetrics(getFont());
 		for (int n=0; n < rows.length; n++) {
 			StringTokenizer st= new StringTokenizer(rows[n],"\t");
@@ -84,6 +88,7 @@ public class TabListCellRenderer extends JLabel implements ListCellRenderer<Obje
 	public void setTabs(int[] tabs) {
 		m_tabs= tabs;
 	}
+	@Override
 	public void paint(Graphics g) {
 		Font m_font= getFont();
 		g.setFont(m_font);
@@ -93,7 +98,6 @@ public class TabListCellRenderer extends JLabel implements ListCellRenderer<Obje
 		g.fillRect(0,0,getWidth(),getHeight());
 		getBorder().paintBorder(this,g,0,0,getWidth(),getHeight());
 		g.setColor(getForeground());
-		// g.setFont(getFont());
 		Insets m_insets= getInsets();
 		int x= m_insets.left;
 		int y= m_insets.top + m_fm.getAscent();

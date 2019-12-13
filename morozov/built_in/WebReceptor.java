@@ -50,13 +50,13 @@ public abstract class WebReceptor extends WebResource {
 	protected static final BigDecimal decimalDefaultAttemptPeriodInNanoseconds= BigDecimal.valueOf(defaultAttemptPeriodInSeconds);
 	protected static final Term termDefaultRevisionPeriod= new PrologInteger(defaultRevisionPeriodInSeconds);
 	protected static final Term termDefaultAttemptPeriod= new PrologInteger(defaultAttemptPeriodInSeconds);
-	private static final BigInteger oneMillion= BigInteger.valueOf(1_000_000);
+	protected static final BigInteger oneMillion= BigInteger.valueOf(1_000_000);
 	//
 	protected ActiveResource specialProcess;
 	protected SlotVariable specialPort;
 	//
-	HashSet<WebReceptorRecord> backtrackableRecords= new HashSet<WebReceptorRecord>();
-	HashSet<WebReceptorRecord> permanentRecords= new HashSet<WebReceptorRecord>();
+	HashSet<WebReceptorRecord> backtrackableRecords= new HashSet<>();
+	HashSet<WebReceptorRecord> permanentRecords= new HashSet<>();
 	//
 	protected static String[] defaultUnpairedTagsTable= {
 		"AREA","BASE","BASEFONT","BR","COL","FRAME","HR","IMG",
@@ -104,14 +104,14 @@ public abstract class WebReceptor extends WebResource {
 	// get/set revision_period
 	//
 	public void setRevisionPeriod1s(ChoisePoint iX, Term a1) {
-		setRevisionPeriod(ActionPeriod.argumentToActionPeriod(a1,iX));
+		setRevisionPeriod(ActionPeriodConverters.argumentToActionPeriod(a1,iX));
 	}
 	public void setRevisionPeriod(ActionPeriod value) {
 		revisionPeriod= value;
 	}
 	public void getRevisionPeriod0ff(ChoisePoint iX, PrologVariable result) {
 		ActionPeriod value= getRevisionPeriod(iX);
-		result.setNonBacktrackableValue(value.toTerm());
+		result.setNonBacktrackableValue(ActionPeriodConverters.toTerm(value));
 	}
 	public void getRevisionPeriod0fs(ChoisePoint iX) {
 	}
@@ -120,21 +120,21 @@ public abstract class WebReceptor extends WebResource {
 			return revisionPeriod;
 		} else {
 			Term value= getBuiltInSlot_E_revision_period();
-			return ActionPeriod.argumentToActionPeriod(value,iX);
+			return ActionPeriodConverters.argumentToActionPeriod(value,iX);
 		}
 	}
 	//
 	// get/set attempt_period
 	//
 	public void setAttemptPeriod1s(ChoisePoint iX, Term a1) {
-		setAttemptPeriod(ActionPeriod.argumentToActionPeriod(a1,iX));
+		setAttemptPeriod(ActionPeriodConverters.argumentToActionPeriod(a1,iX));
 	}
 	public void setAttemptPeriod(ActionPeriod value) {
 		attemptPeriod= value;
 	}
 	public void getAttemptPeriod0ff(ChoisePoint iX, PrologVariable result) {
 		ActionPeriod value= getAttemptPeriod(iX);
-		result.setNonBacktrackableValue(value.toTerm());
+		result.setNonBacktrackableValue(ActionPeriodConverters.toTerm(value));
 	}
 	public void getAttemptPeriod0fs(ChoisePoint iX) {
 	}
@@ -143,7 +143,7 @@ public abstract class WebReceptor extends WebResource {
 			return attemptPeriod;
 		} else {
 			Term value= getBuiltInSlot_E_attempt_period();
-			return ActionPeriod.argumentToActionPeriod(value,iX);
+			return ActionPeriodConverters.argumentToActionPeriod(value,iX);
 		}
 	}
 	//
@@ -281,7 +281,6 @@ public abstract class WebReceptor extends WebResource {
 	public class GetReference2fs extends GetReference {
 		public GetReference2fs(Continuation aC, Term a1, Term a2) {
 			c0= aC;
-			// argumentResult= result;
 			targetAddress= a1;
 			mask= a2;
 			isFunctionCall= false;
@@ -298,7 +297,6 @@ public abstract class WebReceptor extends WebResource {
 	public class GetReference1fs extends GetReference {
 		public GetReference1fs(Continuation aC, Term a1) {
 			c0= aC;
-			// argumentResult= result;
 			targetAddress= a1;
 			isFunctionCall= false;
 		}
@@ -314,19 +312,19 @@ public abstract class WebReceptor extends WebResource {
 	public class GetReference0fs extends GetReference {
 		public GetReference0fs(Continuation aC) {
 			c0= aC;
-			// argumentResult= result;
 			retrieveAddressFromSlotValue= true;
 			isFunctionCall= false;
 		}
 	}
 	public class GetReference extends Continuation {
-		// private Continuation c0;
+		//
 		protected PrologVariable argumentResult;
 		protected Term targetAddress;
 		protected Term mask;
 		protected boolean retrieveAddressFromSlotValue= false;
 		protected boolean isFunctionCall= false;
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			URI uri;
 			Term content;
@@ -346,14 +344,12 @@ public abstract class WebReceptor extends WebResource {
 				try {
 					if (isFunctionCall) {
 						argumentResult.setNonBacktrackableValue(content.getNextListHead(iX));
-						// newIx.pushTrail(argumentResult);
 					};
 					try {
 						c0.execute(newIx);
 					} catch (Backtracking b) {
 						if (isFunctionCall) {
 							argumentResult.clear();
-							// newIx.pushTrail(argumentResult);
 						};
 						if (newIx.isEnabled()) {
 							newIx.freeTrail();
@@ -367,15 +363,12 @@ public abstract class WebReceptor extends WebResource {
 				} catch (EndOfList eol) {
 					if (isFunctionCall) {
 						argumentResult.clear();
-						// newIx.pushTrail(argumentResult);
 					};
 					throw Backtracking.instance;
 				} catch (TermIsNotAList e) {
 					if (isFunctionCall) {
 						argumentResult.clear();
-						// newIx.pushTrail(argumentResult);
 					};
-					// throw new WrongArgumentIsNotAList(content);
 					throw Backtracking.instance;
 				}
 			}
@@ -385,19 +378,29 @@ public abstract class WebReceptor extends WebResource {
 	///////////////////////////////////////////////////////////////
 	//
 	protected Term getResourceReferences(String mask, ChoisePoint iX) {
-		// boolean backslashIsSeparator= getBackslashAlwaysIsSeparator(iX);
 		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		CharacterSet characters= getCharacterSet(iX);
 		ActionPeriod revision= getRevisionPeriod(iX);
 		ActionPeriod attempts= getAttemptPeriod(iX);
-		String[] tags= getTags(iX);
-		boolean extractAttributes= getExtractAttributes(iX);
-		boolean coalesceAdjacentStrings= getCoalesceAdjacentStrings(iX);
-		boolean truncateStrings= getTruncateStrings(iX);
+		String[] currentTags= getTags(iX);
+		boolean currentExtractAttributes= getExtractAttributes(iX);
+		boolean currentCoalesceAdjacentStrings= getCoalesceAdjacentStrings(iX);
+		boolean currentTruncateStrings= getTruncateStrings(iX);
 		initializeInternalTables(iX);
 		try {
 			ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
-			return getReferencesOfResource(fileName,mask,timeout,characters,revision,attempts,tags,extractAttributes,coalesceAdjacentStrings,truncateStrings,iX);
+			return getReferencesOfResource(
+				fileName,
+				mask,
+				timeout,
+				characters,
+				revision,
+				attempts,
+				currentTags,
+				currentExtractAttributes,
+				currentCoalesceAdjacentStrings,
+				currentTruncateStrings,
+				iX);
 		} catch (Throwable e) {
 			return SimpleFileName.channelExceptionToName(e);
 		}
@@ -407,14 +410,25 @@ public abstract class WebReceptor extends WebResource {
 		CharacterSet characters= getCharacterSet(iX);
 		ActionPeriod revision= getRevisionPeriod(iX);
 		ActionPeriod attempts= getAttemptPeriod(iX);
-		String[] tags= getTags(iX);
-		boolean extractAttributes= getExtractAttributes(iX);
-		boolean coalesceAdjacentStrings= getCoalesceAdjacentStrings(iX);
-		boolean truncateStrings= getTruncateStrings(iX);
+		String[] currentTags= getTags(iX);
+		boolean currentExtractAttributes= getExtractAttributes(iX);
+		boolean currentCoalesceAdjacentStrings= getCoalesceAdjacentStrings(iX);
+		boolean currentTruncateStrings= getTruncateStrings(iX);
 		initializeInternalTables(iX);
 		try {
 			ExtendedFileName fileName= retrieveRealGlobalFileName(argument,iX);
-			return getReferencesOfResource(fileName,mask,timeout,characters,revision,attempts,tags,extractAttributes,coalesceAdjacentStrings,truncateStrings,iX);
+			return getReferencesOfResource(
+				fileName,
+				mask,
+				timeout,
+				characters,
+				revision,
+				attempts,
+				currentTags,
+				currentExtractAttributes,
+				currentCoalesceAdjacentStrings,
+				currentTruncateStrings,
+				iX);
 		} catch (Throwable e) {
 			return SimpleFileName.channelExceptionToName(e);
 		}
@@ -422,8 +436,8 @@ public abstract class WebReceptor extends WebResource {
 	protected Term getReferencesOfResource(ExtendedFileName fileName, String mask, int timeout, CharacterSet characters, ActionPeriod revision, ActionPeriod attempts, String[] tags, boolean extractAttributes, boolean coalesceAdjacentStrings, boolean truncateStrings, ChoisePoint iX) throws Throwable {
 		URL_Attributes attributes= fileName.getUniversalResourceAttributes(timeout,characters,staticContext);
 		Term result;
-		if (attributes.isDirectory) {
-			result= retrieveDirectoryContent(attributes.uri,mask);
+		if (attributes.isDirectory()) {
+			result= retrieveDirectoryContent(attributes.getURI(),mask);
 		} else {
 			String text= SimpleFileName.readStringFromUniversalResource(attributes);
 			HTML_Explorer parser= new HTML_Explorer(
@@ -436,7 +450,7 @@ public abstract class WebReceptor extends WebResource {
 				referenceContainersTable,
 				specialEntitiesTable
 				);
-			result= parser.textToReferences(text,mask,attributes.uri);
+			result= parser.textToReferences(text,mask,attributes.getURI());
 		};
 		pushWebReceptorRecord(attributes,revision,attempts,iX);
 		return result;
@@ -479,14 +493,25 @@ public abstract class WebReceptor extends WebResource {
 		CharacterSet characters= getCharacterSet(iX);
 		ActionPeriod revision= getRevisionPeriod(iX);
 		ActionPeriod attempts= getAttemptPeriod(iX);
-		String[] tags= getTags(iX);
-		boolean extractAttributes= getExtractAttributes(iX);
-		boolean coalesceAdjacentStrings= getCoalesceAdjacentStrings(iX);
-		boolean truncateStrings= getTruncateStrings(iX);
+		String[] currentTags= getTags(iX);
+		boolean currentExtractAttributes= getExtractAttributes(iX);
+		boolean currentCoalesceAdjacentStrings= getCoalesceAdjacentStrings(iX);
+		boolean currentTruncateStrings= getTruncateStrings(iX);
 		initializeInternalTables(iX);
 		try {
 			ExtendedFileName fileName= retrieveRealGlobalFileName(iX);
-			return getTreesOfResource(fileName,mask,timeout,characters,revision,attempts,tags,extractAttributes,coalesceAdjacentStrings,truncateStrings,iX);
+			return getTreesOfResource(
+				fileName,
+				mask,
+				timeout,
+				characters,
+				revision,
+				attempts,
+				currentTags,
+				currentExtractAttributes,
+				currentCoalesceAdjacentStrings,
+				currentTruncateStrings,
+				iX);
 		} catch (Throwable e) {
 			return SimpleFileName.channelExceptionToName(e);
 		}
@@ -496,14 +521,25 @@ public abstract class WebReceptor extends WebResource {
 		CharacterSet characters= getCharacterSet(iX);
 		ActionPeriod revision= getRevisionPeriod(iX);
 		ActionPeriod attempts= getAttemptPeriod(iX);
-		String[] tags= getTags(iX);
-		boolean extractAttributes= getExtractAttributes(iX);
-		boolean coalesceAdjacentStrings= getCoalesceAdjacentStrings(iX);
-		boolean truncateStrings= getTruncateStrings(iX);
+		String[] currentTags= getTags(iX);
+		boolean currentExtractAttributes= getExtractAttributes(iX);
+		boolean currentCoalesceAdjacentStrings= getCoalesceAdjacentStrings(iX);
+		boolean currentTruncateStrings= getTruncateStrings(iX);
 		initializeInternalTables(iX);
 		try {
 			ExtendedFileName fileName= retrieveRealGlobalFileName(argument,iX);
-			return getTreesOfResource(fileName,mask,timeout,characters,revision,attempts,tags,extractAttributes,coalesceAdjacentStrings,truncateStrings,iX);
+			return getTreesOfResource(
+				fileName,
+				mask,
+				timeout,
+				characters,
+				revision,
+				attempts,
+				currentTags,
+				currentExtractAttributes,
+				currentCoalesceAdjacentStrings,
+				currentTruncateStrings,
+				iX);
 		} catch (Throwable e) {
 			return SimpleFileName.channelExceptionToName(e);
 		}
@@ -511,8 +547,8 @@ public abstract class WebReceptor extends WebResource {
 	protected Term getTreesOfResource(ExtendedFileName fileName, String mask, int timeout, CharacterSet characters, ActionPeriod revision, ActionPeriod attempts, String[] tags, boolean extractAttributes, boolean coalesceAdjacentStrings, boolean truncateStrings, ChoisePoint iX) throws Throwable {
 		URL_Attributes attributes= fileName.getUniversalResourceAttributes(timeout,characters,staticContext);
 		Term result;
-		if (attributes.isDirectory) {
-			result= retrieveDirectoryContent(attributes.uri,mask);
+		if (attributes.isDirectory()) {
+			result= retrieveDirectoryContent(attributes.getURI(),mask);
 		} else {
 			String text= SimpleFileName.readStringFromUniversalResource(attributes);
 			HTML_Explorer parser= new HTML_Explorer(
@@ -525,7 +561,7 @@ public abstract class WebReceptor extends WebResource {
 				referenceContainersTable,
 				specialEntitiesTable
 				);
-			result= parser.textToTerm(text,attributes.uri,mask);
+			result= parser.textToTerm(text,attributes.getURI(),mask);
 		};
 		pushWebReceptorRecord(attributes,revision,attempts,iX);
 		return result;
@@ -565,7 +601,7 @@ public abstract class WebReceptor extends WebResource {
 	///////////////////////////////////////////////////////////////
 	//
 	public class UnpairedTagsTable1s extends Continuation {
-		// private Continuation c0;
+		//
 		protected PrologVariable outputResult;
 		protected Term inputResult;
 		protected boolean hasOutputArgument;
@@ -581,12 +617,12 @@ public abstract class WebReceptor extends WebResource {
 			hasOutputArgument= false;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			ChoisePoint newIx= new ChoisePoint(iX);
 			for (int n=0; n < defaultUnpairedTagsTable.length; n++) {
 				if (hasOutputArgument) {
 					outputResult.setBacktrackableValue(new PrologString(defaultUnpairedTagsTable[n]),newIx);
-					//newIx.pushTrail(outputResult);
 				} else {
 					try {
 						inputResult.isString(defaultUnpairedTagsTable[n],newIx);
@@ -600,7 +636,6 @@ public abstract class WebReceptor extends WebResource {
 				} catch (Backtracking b) {
 					if (hasOutputArgument) {
 						outputResult.clear();
-						// newIx.pushTrail(outputResult);
 					};
 					if (newIx.isEnabled()) {
 						newIx.freeTrail();
@@ -613,7 +648,6 @@ public abstract class WebReceptor extends WebResource {
 			};
 			if (hasOutputArgument) {
 				outputResult.clear();
-				// newIx.pushTrail(outputResult);
 			};
 			throw Backtracking.instance;
 		}
@@ -622,7 +656,7 @@ public abstract class WebReceptor extends WebResource {
 	///////////////////////////////////////////////////////////////
 	//
 	public class FlatTagsTable1s extends Continuation {
-		// private Continuation c0;
+		//
 		protected PrologVariable outputResult;
 		protected Term inputResult;
 		protected boolean hasOutputArgument;
@@ -638,12 +672,12 @@ public abstract class WebReceptor extends WebResource {
 			hasOutputArgument= false;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			ChoisePoint newIx= new ChoisePoint(iX);
 			for (int n=0; n < defaultFlatTagsTable.length; n++) {
 				if (hasOutputArgument) {
 					outputResult.setBacktrackableValue(new PrologString(defaultFlatTagsTable[n]),newIx);
-					//newIx.pushTrail(outputResult);
 				} else {
 					try {
 						inputResult.isString(defaultFlatTagsTable[n],newIx);
@@ -657,7 +691,6 @@ public abstract class WebReceptor extends WebResource {
 				} catch (Backtracking b) {
 					if (hasOutputArgument) {
 						outputResult.clear();
-						// newIx.pushTrail(outputResult);
 					};
 					if (newIx.isEnabled()) {
 						newIx.freeTrail();
@@ -670,7 +703,6 @@ public abstract class WebReceptor extends WebResource {
 			};
 			if (hasOutputArgument) {
 				outputResult.clear();
-				// newIx.pushTrail(outputResult);
 			};
 			throw Backtracking.instance;
 		}
@@ -679,7 +711,7 @@ public abstract class WebReceptor extends WebResource {
 	///////////////////////////////////////////////////////////////
 	//
 	public class ReferenceContainersTable2s extends Continuation {
-		// private Continuation c0;
+		//
 		protected PrologVariable outputResult1;
 		protected PrologVariable outputResult2;
 		protected Term inputResult1;
@@ -699,14 +731,13 @@ public abstract class WebReceptor extends WebResource {
 			hasOutputArguments= false;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			ChoisePoint newIx= new ChoisePoint(iX);
 			for (int n=0; n < defaultReferenceContainersTable.length; n++) {
 				if (hasOutputArguments) {
 					outputResult1.setBacktrackableValue(new PrologString(defaultReferenceContainersTable[n][0]),newIx);
 					outputResult2.setBacktrackableValue(new PrologString(defaultReferenceContainersTable[n][1]),newIx);
-					//newIx.pushTrail(outputResult1);
-					//newIx.pushTrail(outputResult2);
 				} else {
 					try {
 						inputResult1.isString(defaultReferenceContainersTable[n][0],newIx);
@@ -722,8 +753,6 @@ public abstract class WebReceptor extends WebResource {
 					if (hasOutputArguments) {
 						outputResult1.clear();
 						outputResult2.clear();
-						// newIx.pushTrail(outputResult1);
-						// newIx.pushTrail(outputResult2);
 					};
 					if (newIx.isEnabled()) {
 						newIx.freeTrail();
@@ -737,8 +766,6 @@ public abstract class WebReceptor extends WebResource {
 			if (hasOutputArguments) {
 				outputResult1.clear();
 				outputResult2.clear();
-				// newIx.pushTrail(outputResult1);
-				// newIx.pushTrail(outputResult2);
 			};
 			throw Backtracking.instance;
 		}
@@ -747,7 +774,7 @@ public abstract class WebReceptor extends WebResource {
 	///////////////////////////////////////////////////////////////
 	//
 	public class SpecialEntitiesTable2s extends Continuation {
-		// private Continuation c0;
+		//
 		protected PrologVariable outputResult1;
 		protected PrologVariable outputResult2;
 		protected Term inputResult1;
@@ -767,14 +794,13 @@ public abstract class WebReceptor extends WebResource {
 			hasOutputArguments= false;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			ChoisePoint newIx= new ChoisePoint(iX);
 			for (int n=0; n < defaultSpecialEntitiesTable.length; n++) {
 				if (hasOutputArguments) {
 					outputResult1.setBacktrackableValue(new PrologString(defaultSpecialEntitiesTable[n][0]),newIx);
 					outputResult2.setBacktrackableValue(new PrologString(defaultSpecialEntitiesTable[n][1]),newIx);
-					//newIx.pushTrail(outputResult1);
-					//newIx.pushTrail(outputResult2);
 				} else {
 					try {
 						inputResult1.isString(defaultSpecialEntitiesTable[n][0],newIx);
@@ -790,8 +816,6 @@ public abstract class WebReceptor extends WebResource {
 					if (hasOutputArguments) {
 						outputResult1.clear();
 						outputResult2.clear();
-						// newIx.pushTrail(outputResult1);
-						// newIx.pushTrail(outputResult2);
 					};
 					if (newIx.isEnabled()) {
 						newIx.freeTrail();
@@ -805,8 +829,6 @@ public abstract class WebReceptor extends WebResource {
 			if (hasOutputArguments) {
 				outputResult1.clear();
 				outputResult2.clear();
-				// newIx.pushTrail(outputResult1);
-				// newIx.pushTrail(outputResult2);
 			};
 			throw Backtracking.instance;
 		}
@@ -845,19 +867,20 @@ public abstract class WebReceptor extends WebResource {
 		final PrologVariable result= new PrologVariable();
 		Term[] targetArguments= new Term[1];
 		targetArguments[0]= result;
-		final ArrayList<String> resultSet= new ArrayList<String>();
+		final ArrayList<String> resultSet= new ArrayList<>();
 		Continuation completion= new Continuation() {
+			@Override
 			public void execute(ChoisePoint iX) throws Backtracking {
 				Term newResult= result.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
-				try {
-					resultSet.add(newResult.getStringValue(iX).toUpperCase());
-				} catch (TermIsNotAString e) {
-				};
+				String newText= GeneralConverters.argumentToString(newResult,iX);
+				resultSet.add(newText.toUpperCase());
 				throw Backtracking.instance;
 			}
+			@Override
 			public boolean isPhaseTermination() {
 				return false;
 			}
+			@Override
 			public String toString() {
 				return "RememberResult&Backtrack;";
 			}
@@ -869,7 +892,7 @@ public abstract class WebReceptor extends WebResource {
 			throw new FailureProcedureSucceed(); // Never happens
 		} catch (Backtracking b) {
 			newIndex.freeTrail();
-			String[] resultArray= resultSet.toArray(new String[0]);
+			String[] resultArray= resultSet.toArray(new String[resultSet.size()]);
 			return resultArray;
 		}
 	}
@@ -879,8 +902,9 @@ public abstract class WebReceptor extends WebResource {
 		Term[] targetArguments= new Term[2];
 		targetArguments[0]= result1;
 		targetArguments[1]= result2;
-		final ArrayList<String[]> resultSet= new ArrayList<String[]>();
+		final ArrayList<String[]> resultSet= new ArrayList<>();
 		Continuation completion= new Continuation() {
+			@Override
 			public void execute(ChoisePoint iX) throws Backtracking {
 				Term newResult1= result1.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
 				Term newResult2= result2.copyValue(iX,TermCircumscribingMode.CIRCUMSCRIBE_FREE_VARIABLES);
@@ -893,9 +917,11 @@ public abstract class WebReceptor extends WebResource {
 				};
 				throw Backtracking.instance;
 			}
+			@Override
 			public boolean isPhaseTermination() {
 				return false;
 			}
+			@Override
 			public String toString() {
 				return "RememberResult&Backtrack;";
 			}
@@ -916,14 +942,13 @@ public abstract class WebReceptor extends WebResource {
 	//
 	protected void linkResource(ExtendedFileName fileName, int timeout, CharacterSet characters, ActionPeriod revision, ActionPeriod attempts, ChoisePoint iX) {
 		try {
-			// URL_Utils.installCookieManagerIfNecessary(staticContext);
 			URL_Attributes attributes= fileName.getUniversalResourceAttributes(timeout,characters,staticContext);
 			pushWebReceptorRecord(attributes,revision,attempts,iX);
 		} catch (Throwable e) {
-			// return SimpleFileName.channelExceptionToName(e);
 		}
 	}
 	//
+	@Override
 	protected Term getUniversalResourceParameters(ChoisePoint iX) {
 		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		CharacterSet characters= getCharacterSet(iX);
@@ -938,6 +963,7 @@ public abstract class WebReceptor extends WebResource {
 			return SimpleFileName.channelExceptionToName(e);
 		}
 	}
+	@Override
 	protected Term getUniversalResourceParameters(Term argument, ChoisePoint iX) {
 		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		CharacterSet characters= getCharacterSet(iX);
@@ -953,6 +979,7 @@ public abstract class WebReceptor extends WebResource {
 		}
 	}
 	//
+	@Override
 	protected Term getUniversalResourceContent(ChoisePoint iX) {
 		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		CharacterSet characters= getCharacterSet(iX);
@@ -975,6 +1002,7 @@ public abstract class WebReceptor extends WebResource {
 			return SimpleFileName.channelExceptionToName(e1);
 		}
 	}
+	@Override
 	protected Term getUniversalResourceContent(Term argument, ChoisePoint iX) {
 		int timeout= getMaximalWaitingTimeInMilliseconds(iX);
 		CharacterSet characters= getCharacterSet(iX);
@@ -1002,23 +1030,26 @@ public abstract class WebReceptor extends WebResource {
 		permanentRecords.add(record);
 	}
 	//
+	@Override
 	protected void storeBacktrackableRecord(PredefinedClassRecord record) {
 		permanentRecords.clear();
 		backtrackableRecords.add((WebReceptorRecord)record);
 	}
 	//
+	@Override
 	public boolean isSpecialWorld() {
 		return true;
 	}
 	//
+	@Override
 	public void finishPhaseSuccessfully() {
 		permanentRecords.clear();
 		createCheckerIfNeed();
-		HashMap<ActorAndURI,WebReceptorRecord> actualRecords= new HashMap<ActorAndURI,WebReceptorRecord>();
+		HashMap<ActorAndURI,WebReceptorRecord> actualRecords= new HashMap<>();
 		Iterator<WebReceptorRecord> backtrackableRecordsIterator= backtrackableRecords.iterator();
 		while (backtrackableRecordsIterator.hasNext()) {
 			WebReceptorRecord currentRecord= backtrackableRecordsIterator.next();
-			ActorAndURI key= new ActorAndURI(currentRecord.actorNumber,currentRecord.attributes.uri);
+			ActorAndURI key= new ActorAndURI(currentRecord.getActorNumber(),currentRecord.getAttributes().getURI());
 			WebReceptorRecord existedRecord= actualRecords.get(key);
 			if (existedRecord==null) {
 				actualRecords.put(key,currentRecord);
@@ -1038,14 +1069,15 @@ public abstract class WebReceptor extends WebResource {
 		backtrackableRecords.clear();
 	}
 	//
+	@Override
 	public void finishPhaseUnsuccessfully() {
 		backtrackableRecords.clear();
 		createCheckerIfNeed();
-		HashMap<ActorAndURI,WebReceptorRecord> actualRecords= new HashMap<ActorAndURI,WebReceptorRecord>();
+		HashMap<ActorAndURI,WebReceptorRecord> actualRecords= new HashMap<>();
 		Iterator<WebReceptorRecord> permanentRecordsIterator= permanentRecords.iterator();
 		while (permanentRecordsIterator.hasNext()) {
 			WebReceptorRecord currentRecord= permanentRecordsIterator.next();
-			ActorAndURI key= new ActorAndURI(currentRecord.actorNumber,currentRecord.attributes.uri);
+			ActorAndURI key= new ActorAndURI(currentRecord.getActorNumber(),currentRecord.getAttributes().getURI());
 			WebReceptorRecord existedRecord= actualRecords.get(key);
 			if (existedRecord==null) {
 				actualRecords.put(key,currentRecord);
@@ -1071,8 +1103,8 @@ public abstract class WebReceptor extends WebResource {
 	}
 	//
 	protected void pushWebReceptorRecord(URL_Attributes attributes, ActionPeriod revision, ActionPeriod attempts, ChoisePoint iX) {
-		BigDecimal revisionTime= revision.toNanosecondsOrDefault(DefaultOptions.revisionPeriod,decimalDefaultRevisionPeriodInNanoseconds,iX);
-		BigDecimal attemptTime= attempts.toNanosecondsOrDefault(DefaultOptions.attemptPeriod,decimalDefaultAttemptPeriodInNanoseconds,iX);
+		BigDecimal revisionTime= ActionPeriodConverters.toNanosecondsOrDefault(revision,DefaultOptions.revisionPeriod,decimalDefaultRevisionPeriodInNanoseconds,iX);
+		BigDecimal attemptTime= ActionPeriodConverters.toNanosecondsOrDefault(attempts,DefaultOptions.attemptPeriod,decimalDefaultAttemptPeriodInNanoseconds,iX);
 		if (revisionTime.compareTo(BigDecimal.ZERO) >= 0) {
 			if (attemptTime.compareTo(BigDecimal.ZERO) < 0) {
 				attemptTime= revisionTime;
@@ -1090,8 +1122,8 @@ public abstract class WebReceptor extends WebResource {
 				return;
 			}
 		};
-		ActorRegister aR= iX.actorRegister;
-		ActorNumber actorNumber= aR.currentActorNumber;
+		ActorRegister aR= iX.getActorRegister();
+		ActorNumber actorNumber= aR.getCurrentActorNumber();
 		WebReceptorRecord receptorRecord= new WebReceptorRecord(this,actorNumber,attributes,revisionTime,attemptTime);
 		pushPredefinedClassRecord(receptorRecord);
 		storePermanentRecord(receptorRecord);
@@ -1099,7 +1131,7 @@ public abstract class WebReceptor extends WebResource {
 		try {
 			specialPort.isUnknownValue(iX);
 		} catch (Backtracking b) {
-			new CannotUnifySpecialPort();
+			throw new CannotUnifySpecialPort();
 		}
 	}
 }

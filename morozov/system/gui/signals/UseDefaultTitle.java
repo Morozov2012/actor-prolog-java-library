@@ -5,6 +5,7 @@ package morozov.system.gui.signals;
 import morozov.run.*;
 
 public final class UseDefaultTitle extends LightweightException {
+	//
 	public static final UseDefaultTitle instance= new UseDefaultTitle();
 	//
 	private UseDefaultTitle() {

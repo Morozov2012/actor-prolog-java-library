@@ -13,7 +13,6 @@ public class KinectPointCloudsFrameText {
 	//
 	public static void writeText(KinectPointCloudsFrameInterface frame, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {
 		if (exportMode==ExportMode.SKELETONS) {
-			// super.writeText(writer,exportMode,locale);
 			KinectFrameText.writeRootFrameText(frame,writer,exportMode,locale);
 		} else {
 			writePointCloudsFrameText(frame,writer,exportMode,locale);
@@ -22,7 +21,6 @@ public class KinectPointCloudsFrameText {
 	//
 	public static void writePointCloudsFrameText(KinectPointCloudsFrameInterface frame, BufferedWriter writer, ExportMode exportMode, Locale locale) throws IOException {
 		writer.write("; POINT CLOUDS FRAME:\n");
-		// super.writeText(writer,exportMode,locale);
 		KinectFrameText.writeRootFrameText(frame,writer,exportMode,locale);
 		float[] xyz= frame.getXYZ();
 		if (xyz != null) {

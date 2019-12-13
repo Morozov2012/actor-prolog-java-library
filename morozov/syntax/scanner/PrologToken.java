@@ -89,6 +89,12 @@ public abstract class PrologToken {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	public boolean correspondsToActorPrologTerm(Term argument, ChoisePoint iX) {
+		return false;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
 	abstract public Term toActorPrologTerm();
 	//
 	public Term toTermTP() {

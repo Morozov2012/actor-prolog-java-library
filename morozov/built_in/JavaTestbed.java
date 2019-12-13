@@ -32,6 +32,7 @@ public abstract class JavaTestbed extends Alpha {
 			c0= aC;
 			variable1= a1;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("Argument1=%s\n",variable1);
 			c0.execute(iX);
@@ -50,6 +51,7 @@ public abstract class JavaTestbed extends Alpha {
 			variable1= result;
 			variable2= a1;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("Argument1=%s, Argument2=%s\n",variable1,variable2);
 			variable1.setNonBacktrackableValue(new PrologInteger(1000));
@@ -66,6 +68,7 @@ public abstract class JavaTestbed extends Alpha {
 			c0= aC;
 			variable1= a1;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("Argument1=%s\n",variable1);
 			c0.execute(iX);
@@ -83,6 +86,7 @@ public abstract class JavaTestbed extends Alpha {
 			variable1= a1;
 			variable2= a2;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("Argument1=%s, Argument2=%s\n",variable1,variable2);
 			c0.execute(iX);
@@ -103,6 +107,7 @@ public abstract class JavaTestbed extends Alpha {
 			variable2= a2;
 			variable3= a3;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("Argument1=%s, Argument2=%s, Argument3=%s\n",variable1,variable2,variable3);
 			variable1.setNonBacktrackableValue(new PrologInteger(1000));
@@ -121,6 +126,7 @@ public abstract class JavaTestbed extends Alpha {
 			variable1= a1;
 			variable2= a2;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("Argument1=%s, Argument2=%s\n",variable1,variable2);
 			c0.execute(iX);
@@ -137,6 +143,7 @@ public abstract class JavaTestbed extends Alpha {
 		}
 	}
 	public static class WriteMetaPredicate extends Continuation {
+		//
 		private long predicateSignatureNumber;
 		private boolean subgoalIsCallOfFunction;
 		private boolean clauseIsFunction;
@@ -150,6 +157,7 @@ public abstract class JavaTestbed extends Alpha {
 			argumentList= (Term[])args;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("MetaPredicate: predicateSignatureNumber=%s, subgoalIsCallOfFunction:%s, clauseIsFunction:%s, Arguments:%s\n",predicateSignatureNumber,subgoalIsCallOfFunction,clauseIsFunction,argumentList);
 			for (int n=0; n < argumentList.length; n++) {
@@ -172,6 +180,7 @@ public abstract class JavaTestbed extends Alpha {
 		}
 	}
 	public static class WriteMetaAtom extends Continuation {
+		//
 		private long predicateSignatureNumber;
 		private boolean subgoalIsCallOfFunction;
 		private boolean clauseIsFunction;
@@ -185,6 +194,7 @@ public abstract class JavaTestbed extends Alpha {
 			argumentList= (Term[])args;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("MetaAtom: predicateSignatureNumber=%s, subgoalIsCallOfFunction:%s, clauseIsFunction:%s, Arguments:%s\n",predicateSignatureNumber,subgoalIsCallOfFunction,clauseIsFunction,argumentList);
 			for (int n=0; n < argumentList.length; n++) {
@@ -212,6 +222,7 @@ public abstract class JavaTestbed extends Alpha {
 			c0= aC;
 			variable1= a1;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("Argument1=%s\n",variable1);
 			if (variable1 instanceof PrologVariable) {
@@ -241,6 +252,7 @@ public abstract class JavaTestbed extends Alpha {
 			variable1= result;
 			variable2= a1;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("Argument1=%s, Argument2=%s\n",variable1,variable2);
 			variable1.setNonBacktrackableValue(new PrologInteger(1000));
@@ -267,6 +279,7 @@ public abstract class JavaTestbed extends Alpha {
 			c0= aC;
 			variable1= a1;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("Argument1=%s\n",variable1);
 			if (variable1 instanceof PrologVariable) {
@@ -297,6 +310,7 @@ public abstract class JavaTestbed extends Alpha {
 			variable1= a1;
 			variable2= a2;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("Argument1=%s, Argument2=%s\n",variable1,variable2);
 			if (variable1 instanceof PrologVariable) {
@@ -335,6 +349,7 @@ public abstract class JavaTestbed extends Alpha {
 			variable2= a1;
 			variable3= a2;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("Argument1=%s, Argument2=%s, Argument3=%s\n",variable1,variable2,variable3);
 			variable1.setNonBacktrackableValue(new PrologInteger(1000));
@@ -370,6 +385,7 @@ public abstract class JavaTestbed extends Alpha {
 			variable1= a1;
 			variable2= a2;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("Argument1=%s, Argument2=%s\n",variable1,variable2);
 			if (variable1 instanceof PrologVariable) {
@@ -394,6 +410,7 @@ public abstract class JavaTestbed extends Alpha {
 		}
 	}
 	public static class AskMetaPredicate extends Continuation {
+		//
 		private long predicateSignatureNumber;
 		private boolean subgoalIsCallOfFunction;
 		private boolean clauseIsFunction;
@@ -407,6 +424,7 @@ public abstract class JavaTestbed extends Alpha {
 			argumentList= (Term[])args;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			System.out.printf("askMetaPredicate: predicateSignatureNumber=%s, subgoalIsCallOfFunction:%s, clauseIsFunction:%s, Arguments:%s\n",predicateSignatureNumber,subgoalIsCallOfFunction,clauseIsFunction,argumentList);
 			for (int n=0; n < argumentList.length; n++) {

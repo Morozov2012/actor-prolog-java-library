@@ -11,9 +11,9 @@ import java.util.HashSet;
 
 public class MethodArgument implements Serializable {
 	//
-	public MethodArgumentDirection direction;
-	public String domainName;
-	public transient PrologDomain domain;
+	protected MethodArgumentDirection direction;
+	protected String domainName;
+	protected transient PrologDomain domain;
 	//
 	private static final long serialVersionUID= 0x49B573A1B3B32849L; // 5311278473895159881L
 	//
@@ -25,6 +25,16 @@ public class MethodArgument implements Serializable {
 		direction= f;
 		domainName= n;
 		domain= d;
+	}
+	//
+	public MethodArgumentDirection getDirection() {
+		return direction;
+	}
+	public String getDomainName() {
+		return domainName;
+	}
+	public PrologDomain getDomain() {
+		return domain;
 	}
 	//
 	public void collectLocalDomainTable(HashMap<String,PrologDomain> localDomainTable) {

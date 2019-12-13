@@ -8,13 +8,13 @@ import morozov.worlds.*;
 
 public class AsyncCall {
 	//
-	public long domainSignatureNumber;
-	public Term target;
-	public AbstractWorld reserveTarget;
+	protected long domainSignatureNumber;
+	protected Term target;
+	protected AbstractWorld reserveTarget;
 	protected GlobalWorldIdentifier globalWorldIdentifier= null;
-	public boolean isControlCall;
-	public boolean useBuffer;
-	public Term[] arguments;
+	protected boolean isControlCall;
+	protected boolean useBuffer;
+	protected Term[] arguments;
 	protected boolean argumentsAreCircumscribed= false;
 	//
 	///////////////////////////////////////////////////////////////
@@ -36,6 +36,33 @@ public class AsyncCall {
 		useBuffer= buffer;
 		arguments= list;
 		argumentsAreCircumscribed= argumentMode;
+	}
+	//
+	///////////////////////////////////////////////////////////////
+	//
+	public long getDomainSignatureNumber() {
+		return domainSignatureNumber;
+	}
+	public Term getTarget() {
+		return target;
+	}
+	public AbstractWorld getReserveTarget() {
+		return reserveTarget;
+	}
+	public GlobalWorldIdentifier getGlobalWorldIdentifier() {
+		return globalWorldIdentifier;
+	}
+	public boolean isControlCall() {
+		return isControlCall;
+	}
+	public boolean useBuffer() {
+		return useBuffer;
+	}
+	public Term[] getArguments() {
+		return arguments;
+	}
+	public boolean argumentsAreCircumscribed() {
+		return argumentsAreCircumscribed;
 	}
 	//
 	///////////////////////////////////////////////////////////////
@@ -74,6 +101,7 @@ public class AsyncCall {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean equals(Object o) {
 		if (o==null) {
 			return false;
@@ -96,6 +124,7 @@ public class AsyncCall {
 		}
 	}
 	//
+	@Override
 	public int hashCode() {
 		int code=
 			(int)domainSignatureNumber +

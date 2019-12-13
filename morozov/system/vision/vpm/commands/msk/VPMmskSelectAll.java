@@ -12,6 +12,7 @@ public class VPMmskSelectAll extends VPM_FrameCommand {
 	public VPMmskSelectAll() {
 	}
 	//
+	@Override
 	public void execute(VPM vpm) {
 		boolean[] foregroundMask= vpm.getForegroundMask();
 		Arrays.fill(foregroundMask,true);

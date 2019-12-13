@@ -22,6 +22,7 @@ public abstract class AbstractInternalWorld extends OwnWorld {
 	///////////////////////////////////////////////////////////////
 	//
 	abstract public Continuation createContinuation(Continuation aC);
+	@Override
 	abstract public void extractWorlds(AbstractProcess process, LinkedHashSet<AbstractInternalWorld> list);
 	abstract public long getPackageCode();
 	//
@@ -44,17 +45,21 @@ public abstract class AbstractInternalWorld extends OwnWorld {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void startProcesses() {
 	}
 	//
+	@Override
 	public void releaseSystemResources() {
 	}
 	//
+	@Override
 	public void stopProcesses() {
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean isInternalWorldOf(AbstractProcess process) {
 		if (currentProcess==process) {
 			return true;
@@ -63,10 +68,12 @@ public abstract class AbstractInternalWorld extends OwnWorld {
 		}
 	}
 	//
+	@Override
 	public AbstractInternalWorld getInternalWorld(ChoisePoint cp) throws Backtracking, TermIsNotAWorld, TermIsDummyWorld, TermIsUnboundVariable {
 		return this;
 	}
 	//
+	@Override
 	public AbstractInternalWorld internalWorld(AbstractProcess process, ChoisePoint cp) throws Backtracking {
 		if (currentProcess==process) {
 			return this;
@@ -75,14 +82,17 @@ public abstract class AbstractInternalWorld extends OwnWorld {
 		}
 	}
 	//
+	@Override
 	public AbstractInternalWorld internalWorld(ChoisePoint iX) {
 		return this;
 	}
 	//
+	@Override
 	public AbstractInternalWorld internalWorld() {
 		return this;
 	}
 	//
+	@Override
 	public boolean isNumberOfTemporaryActor() {
 		return false;
 	}
@@ -108,16 +118,19 @@ public abstract class AbstractInternalWorld extends OwnWorld {
 		currentProcess.sendAsyncCall(iX,domainSignatureNumber,target,currentWorld,isControlCall,useBuffer,arguments);
 	}
 	//
+	@Override
 	public void receiveAsyncCall(AsyncCall item) {
 		currentProcess.receiveAsyncCall(item);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void sendResidentRequest(Resident resident, long domainSignature, Term[] arguments, boolean sortAndReduceResultList) {
 		currentProcess.sendResidentRequest(this,resident,domainSignature,arguments,sortAndReduceResultList);
 	}
 	//
+	@Override
 	public void withdrawRequest(Resident resident) {
 		currentProcess.withdrawRequest(this,resident);
 	}
@@ -162,9 +175,11 @@ public abstract class AbstractInternalWorld extends OwnWorld {
 		public NeutralizeActorsAndContinue(Continuation aC) {
 			c0= aC;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			currentProcess.neutralizeActorsAndContinue(c0,iX);
 		}
+		@Override
 		public String toString() {
 			return "NeutrActorsAndCont " + c0.toString();
 		}
@@ -176,10 +191,12 @@ public abstract class AbstractInternalWorld extends OwnWorld {
 		public CheckSuspendedCalls(Continuation aC) {
 			c0= aC;
 		}
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			Continuation c1= currentProcess.collectSuspendedCalls(c0,iX);
 			c1.execute(iX);
 		}
+		@Override
 		public String toString() {
 			return "CheckSuspendedCalls " + c0.toString();
 		}

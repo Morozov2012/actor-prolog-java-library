@@ -5,6 +5,7 @@ package morozov.built_in;
 import target.*;
 
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.converters.*;
 import morozov.system.files.*;
 import morozov.system.gui.*;
@@ -100,59 +101,59 @@ public abstract class BufferedImage extends BufferedImageController {
 	protected java.awt.image.BufferedImage createImage(Term a1, Term a2, Term a3, ChoisePoint iX) {
 		ExtendedSize eWidth= ExtendedSize.argumentToExtendedSize(a1,iX);
 		ExtendedSize eHeight= ExtendedSize.argumentToExtendedSize(a2,iX);
-		int imageType= Tools2D.argumentToBufferedImageType(a3,iX);
-		return createImage(eWidth,eHeight,imageType,iX);
+		int currentImageType= Tools2D.argumentToBufferedImageType(a3,iX);
+		return createImage(eWidth,eHeight,currentImageType,iX);
 	}
 	protected java.awt.image.BufferedImage createImage(ExtendedSize eWidth, ExtendedSize eHeight, int imageType, ChoisePoint iX) {
 		GenericImageEncodingAttributes attributes= getImageEncodingAttributes(iX);
 		setCurrentImageEncodingAttributes(attributes);
-		int width= computeWidth(eWidth,iX);
-		int height= computeHeight(eHeight,iX);
+		int currentWidth= computeWidth(eWidth,iX);
+		int currentHeight= computeHeight(eHeight,iX);
 		if (imageType==java.awt.image.BufferedImage.TYPE_CUSTOM) {
 			imageType= getImageType(iX);
 		};
 		if (imageType==java.awt.image.BufferedImage.TYPE_CUSTOM) {
 			GraphicsConfiguration gc= DesktopUtils.getGraphicsConfiguration(staticContext);
-			int imageTransparency= getImageTransparency(iX);
-			if (imageTransparency==Tools2D.defaultTransparency) {
-				bufferedImage.set(gc.createCompatibleImage(width,height));
+			int currentImageTransparency= getImageTransparency(iX);
+			if (currentImageTransparency==Tools2D.defaultTransparency) {
+				bufferedImage.set(gc.createCompatibleImage(currentWidth,currentHeight));
 			} else {
-				bufferedImage.set(gc.createCompatibleImage(width,height,imageTransparency));
+				bufferedImage.set(gc.createCompatibleImage(currentWidth,currentHeight,currentImageTransparency));
 			}
 		} else {
-			bufferedImage.set(new java.awt.image.BufferedImage(width,height,imageType));
+			bufferedImage.set(new java.awt.image.BufferedImage(currentWidth,currentHeight,imageType));
 		};
 		return bufferedImage.get();
 	}
 	protected int computeWidth(ExtendedSize eWidth, ChoisePoint iX) {
-		int width;
+		int currentWidth;
 		try {
-			width= eWidth.getIntegerValue();
+			currentWidth= eWidth.getIntegerValue();
 		} catch (UseDefaultSize e1) {
 			try {
 				eWidth= getWidth(iX);
-				width= eWidth.getIntegerValue();
+				currentWidth= eWidth.getIntegerValue();
 			} catch (UseDefaultSize e2) {
 				Rectangle defaultBounds= DesktopUtils.getCurrentDeviceBounds(staticContext);
-				width= defaultBounds.width;
+				currentWidth= defaultBounds.width;
 			}
 		};
-		return width;
+		return currentWidth;
 	}
 	protected int computeHeight(ExtendedSize eHeight, ChoisePoint iX) {
-		int height;
+		int currentHeight;
 		try {
-			height= eHeight.getIntegerValue();
+			currentHeight= eHeight.getIntegerValue();
 		} catch (UseDefaultSize e1) {
 			try {
 				eHeight= getHeight(iX);
-				height= eHeight.getIntegerValue();
+				currentHeight= eHeight.getIntegerValue();
 			} catch (UseDefaultSize e2) {
 				Rectangle defaultBounds= DesktopUtils.getCurrentDeviceBounds(staticContext);
-				height= defaultBounds.height;
+				currentHeight= defaultBounds.height;
 			}
 		};
-		return height;
+		return currentHeight;
 	}
 	//
 	public java.awt.image.BufferedImage getImage() {
@@ -165,6 +166,7 @@ public abstract class BufferedImage extends BufferedImageController {
 		}
 	}
 	//
+	@Override
 	public void setActualSize2s(ChoisePoint iX, Term a1, Term a2) {
 		ExtendedSize eWidth= ExtendedSize.argumentToExtendedSize(a1,iX);
 		ExtendedSize eHeight= ExtendedSize.argumentToExtendedSize(a2,iX);
@@ -178,20 +180,20 @@ public abstract class BufferedImage extends BufferedImageController {
 				return;
 			} else {
 				java.awt.image.BufferedImage newImage;
-				int imageType= image.getType();
-				if (imageType==java.awt.image.BufferedImage.TYPE_CUSTOM) {
-					imageType= getImageType(iX);
+				int currentImageType= image.getType();
+				if (currentImageType==java.awt.image.BufferedImage.TYPE_CUSTOM) {
+					currentImageType= getImageType(iX);
 				};
-				if (imageType==java.awt.image.BufferedImage.TYPE_CUSTOM) {
+				if (currentImageType==java.awt.image.BufferedImage.TYPE_CUSTOM) {
 					GraphicsConfiguration gc= DesktopUtils.getGraphicsConfiguration(staticContext);
-					int imageTransparency= image.getTransparency();
-					if (imageTransparency==Tools2D.defaultTransparency) {
+					int currentImageTransparency= image.getTransparency();
+					if (currentImageTransparency==Tools2D.defaultTransparency) {
 						newImage= gc.createCompatibleImage(givenWidth,givenHeight);
 					} else {
-						newImage= gc.createCompatibleImage(givenWidth,givenHeight,imageTransparency);
+						newImage= gc.createCompatibleImage(givenWidth,givenHeight,currentImageTransparency);
 					}
 				} else {
-					newImage= new java.awt.image.BufferedImage(givenWidth,givenHeight,imageType);
+					newImage= new java.awt.image.BufferedImage(givenWidth,givenHeight,currentImageType);
 				};
 				Graphics2D g2= newImage.createGraphics();
 				try {
@@ -205,6 +207,7 @@ public abstract class BufferedImage extends BufferedImageController {
 			createImage(eWidth,eHeight,java.awt.image.BufferedImage.TYPE_CUSTOM,iX);
 		}
 	}
+	@Override
 	public void getActualSize2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
 		java.awt.image.BufferedImage image= bufferedImage.get();
 		if (image != null) {
@@ -215,6 +218,7 @@ public abstract class BufferedImage extends BufferedImageController {
 			a2.setBacktrackableValue(noValue,iX);
 		}
 	}
+	@Override
 	public void getSizeInPixels2s(ChoisePoint iX, PrologVariable a1, PrologVariable a2) {
 		java.awt.image.BufferedImage image= bufferedImage.get();
 		if (image != null) {
@@ -230,31 +234,31 @@ public abstract class BufferedImage extends BufferedImageController {
 		if (bufferedImage.get()==null) {
 			bufferedImage.set(createImage(symbolDefault,symbolDefault,symbolDefault,iX));
 		};
-		int x= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a1,iX));
-		int y= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a2,iX));
-		int red= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a3,iX));
-		int green= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a4,iX));
-		int blue= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a5,iX));
+		int currentX= Arithmetic.toInteger(GeneralConverters.argumentToRoundInteger(a1,iX));
+		int currentY= Arithmetic.toInteger(GeneralConverters.argumentToRoundInteger(a2,iX));
+		int red= Arithmetic.toInteger(GeneralConverters.argumentToRoundInteger(a3,iX));
+		int green= Arithmetic.toInteger(GeneralConverters.argumentToRoundInteger(a4,iX));
+		int blue= Arithmetic.toInteger(GeneralConverters.argumentToRoundInteger(a5,iX));
 		Color color= new Color(red,green,blue);
-		bufferedImage.get().setRGB(x,y,color.getRGB());
+		bufferedImage.get().setRGB(currentX,currentY,color.getRGB());
 	}
 	public void setPixel3s(ChoisePoint iX, Term a1, Term a2, Term a3) {
 		if (bufferedImage.get()==null) {
 			bufferedImage.set(createImage(symbolDefault,symbolDefault,symbolDefault,iX));
 		};
-		int x= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a1,iX));
-		int y= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a2,iX));
-		int color= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a3,iX));
-		bufferedImage.get().setRGB(x,y,color);
+		int currentX= Arithmetic.toInteger(GeneralConverters.argumentToRoundInteger(a1,iX));
+		int currentY= Arithmetic.toInteger(GeneralConverters.argumentToRoundInteger(a2,iX));
+		int color= Arithmetic.toInteger(GeneralConverters.argumentToRoundInteger(a3,iX));
+		bufferedImage.get().setRGB(currentX,currentY,color);
 	}
 	//
 	public void getPixel5s(ChoisePoint iX, Term a1, Term a2, Term a3, Term a4, Term a5) {
 		if (bufferedImage.get()==null) {
 			bufferedImage.set(createImage(symbolDefault,symbolDefault,symbolDefault,iX));
 		};
-		int x= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a1,iX));
-		int y= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a2,iX));
-		int rgb= getPixel(x,y);
+		int currentX= Arithmetic.toInteger(GeneralConverters.argumentToRoundInteger(a1,iX));
+		int currentY= Arithmetic.toInteger(GeneralConverters.argumentToRoundInteger(a2,iX));
+		int rgb= getPixel(currentX,currentY);
 		int valueRed= rgb >>> 16 & 0x000000FF;
 		int valueGreen= rgb >>> 8 & 0x000000FF;
 		int valueBlue= rgb & 0x000000FF;
@@ -266,17 +270,17 @@ public abstract class BufferedImage extends BufferedImageController {
 		if (bufferedImage.get()==null) {
 			bufferedImage.set(createImage(symbolDefault,symbolDefault,symbolDefault,iX));
 		};
-		int x= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a1,iX));
-		int y= PrologInteger.toInteger(GeneralConverters.argumentToRoundInteger(a2,iX));
-		int rgb= getPixel(x,y);
+		int currentX= Arithmetic.toInteger(GeneralConverters.argumentToRoundInteger(a1,iX));
+		int currentY= Arithmetic.toInteger(GeneralConverters.argumentToRoundInteger(a2,iX));
+		int rgb= getPixel(currentX,currentY);
 		a3.setBacktrackableValue(new PrologInteger(rgb),iX);
 	}
 	protected int getPixel(int x, int y) {
 		java.awt.image.BufferedImage nativeImage= bufferedImage.get();
-		int width= nativeImage.getWidth();
-		int height= nativeImage.getHeight();
+		int currentWidth= nativeImage.getWidth();
+		int currentHeight= nativeImage.getHeight();
 		int rgb;
-		if (x >= 0 && x < width && y >= 0 && y < height) {
+		if (x >= 0 && x < currentWidth && y >= 0 && y < currentHeight) {
 			rgb= nativeImage.getRGB(x,y);
 		} else {
 			rgb= 0;

@@ -15,8 +15,7 @@ import java.lang.reflect.InvocationTargetException;
 
 public class InternalTextFrame extends InnerPage {
 	//
-	// public ExtendedReportSpace scrollPane;
-	public TextPaneNoWrap panel;
+	protected TextPaneNoWrap panel;
 	//
 	public InternalTextFrame(Report world, String title, ReportSpaceAttributes a) {
 		super(title);
@@ -25,7 +24,6 @@ public class InternalTextFrame extends InnerPage {
 		canvasSpace= extendedReportSpace;
 		extendedReportSpace.setAttributes(a);
 		extendedReportSpace.enableMouseListener();
-		// panel.initiate(scrollPane);
 		internalFrame.add(extendedReportSpace.getControl());
 		panel.addFocusListener(this);
 	}
@@ -36,6 +34,7 @@ public class InternalTextFrame extends InnerPage {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						panel.setStyledDocument(doc);
 					}
@@ -48,6 +47,7 @@ public class InternalTextFrame extends InnerPage {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void actionPerformed(ActionEvent event) {
 		if (canvasSpace != null) {
 			CustomControl targetWorld= canvasSpace.getTargetWorld();

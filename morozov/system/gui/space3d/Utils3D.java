@@ -16,6 +16,7 @@ import javax.media.j3d.View;
 import com.sun.j3d.utils.universe.SimpleUniverse;
 
 public class Utils3D extends PrincipalNode3D {
+	//
 	protected static Term termParallelProjection= new PrologSymbol(SymbolCodes.symbolCode_E_PARALLEL_PROJECTION);
 	protected static Term termPerspectiveProjection= new PrologSymbol(SymbolCodes.symbolCode_E_PERSPECTIVE_PROJECTION);
 	protected static Term termVirtualWorld= new PrologSymbol(SymbolCodes.symbolCode_E_VIRTUAL_WORLD);
@@ -25,21 +26,14 @@ public class Utils3D extends PrincipalNode3D {
 	protected static Term termVisibilityDrawAll= new PrologSymbol(SymbolCodes.symbolCode_E_VISIBILITY_DRAW_ALL);
 	protected static Term termTransparencySortNone= new PrologSymbol(SymbolCodes.symbolCode_E_TRANSPARENCY_SORT_NONE);
 	protected static Term termTransparencySortGeometry= new PrologSymbol(SymbolCodes.symbolCode_E_TRANSPARENCY_SORT_GEOMETRY);
-	//protected static Term term= new PrologSymbol(SymbolCodes.symbolCode_E_);
-	//protected static Term term= new PrologSymbol(SymbolCodes.symbolCode_E_);
-	//protected static Term term= new PrologSymbol(SymbolCodes.symbolCode_E_);
 	//
 	public static BranchGroup argumentToBranchGroupOrNodeList(Term value, Canvas3D targetWorld, SimpleUniverse u, javax.media.j3d.Canvas3D space3D, ChoisePoint iX) {
 		try { // BranchGroup
-			// Term[] arguments= value.isStructure(SymbolCodes.symbolCode_E_BranchGroup,1,iX);
-			// return attributesToBranchGroup(arguments[0],targetWorld,u,space3D,iX);
 			return termToBranchGroup(value,targetWorld,u,space3D,iX);
 		} catch (TermIsNotBranchGroup e) {
 			BranchGroup branchGroup= new BranchGroup();
 			argumentToListOfNodes(branchGroup,branchGroup,value,targetWorld,u,space3D,null,iX);
-			// branchGroup.compile(); // 2019-04-07
 			return branchGroup;
-			// throw new WrongArgumentIsNotBranchGroup(value);
 		}
 	}
 	//

@@ -20,9 +20,6 @@ public class VPMmskSubtractGaussianBackground extends VPMmskBackgroundSubtractio
 	protected int[] backgroundSum;
 	protected int[] backgroundSumX2;
 	//
-	// protected static final int maximalColor= 255;
-	// protected static final int maximalSum= Integer.MAX_VALUE - 2;
-	//
 	protected static int maximalStabilityLevel= Integer.MAX_VALUE - maximalColor*maximalColor;
 	protected static int defaultReductionCoefficient= 3;
 	//
@@ -42,6 +39,7 @@ public class VPMmskSubtractGaussianBackground extends VPMmskBackgroundSubtractio
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void execute(VPM vpm) {
 		initializeInternalMatricesIfNecessary(vpm);
 		int[] operationalMatrix= vpm.getOperationalMatrix();
@@ -131,6 +129,7 @@ public class VPMmskSubtractGaussianBackground extends VPMmskBackgroundSubtractio
 		}
 	}
 	//
+	@Override
 	public void forgetStatistics() {
 		counters= null;
 		backgroundSum= null;
@@ -139,6 +138,7 @@ public class VPMmskSubtractGaussianBackground extends VPMmskBackgroundSubtractio
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public int[] getBackgroundImage(VPM vpm) {
 		initializeInternalMatricesIfNecessary(vpm);
 		int[] mean= new int[vectorLength];
@@ -152,6 +152,7 @@ public class VPMmskSubtractGaussianBackground extends VPMmskBackgroundSubtractio
 		return mean;
 	}
 	//
+	@Override
 	public int[] getSigmaImage(VPM vpm) {
 		initializeInternalMatricesIfNecessary(vpm);
 		int[] sigma= new int[vectorLength];

@@ -52,33 +52,43 @@ public class KinectFrameBaseAttributes implements KinectFrameBaseAttributesInter
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public byte getDeviceType() {
 		return deviceType;
 	}
+	@Override
 	public float getFocalLengthX() {
 		return focalLengthX;
 	}
+	@Override
 	public float getFocalLengthY() {
 		return focalLengthY;
 	}
+	@Override
 	public int getDepthFrameWidth() {
 		return depthFrameWidth;
 	}
+	@Override
 	public int getDepthFrameHeight() {
 		return depthFrameHeight;
 	}
+	@Override
 	public int getColorFrameWidth() {
 		return colorFrameWidth;
 	}
+	@Override
 	public int getColorFrameHeight() {
 		return colorFrameHeight;
 	}
+	@Override
 	public int getNumberOfSkeletons() {
 		return numberOfSkeletons;
 	}
+	@Override
 	public int getCorrectionX() {
 		return correctionX;
 	}
+	@Override
 	public int getCorrectionY() {
 		return correctionY;
 	}

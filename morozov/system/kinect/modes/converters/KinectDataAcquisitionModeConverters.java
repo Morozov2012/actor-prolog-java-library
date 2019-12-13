@@ -25,7 +25,7 @@ public class KinectDataAcquisitionModeConverters {
 		} catch (TermIsNotASymbol e1) {
 			ArrayList<KinectFrameType> arrayOfFrameTypes= new ArrayList<>();
 			argumentToArrayOfKinectFrameTypes(value,arrayOfFrameTypes,iX);
-			return arrayOfFrameTypes.toArray(new KinectFrameType[0]);
+			return arrayOfFrameTypes.toArray(new KinectFrameType[arrayOfFrameTypes.size()]);
 		}
 	}
 	//

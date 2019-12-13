@@ -13,6 +13,7 @@ public class VPMmskApplyRankFilter extends VPM_FrameCommand {
 		threshold= t;
 	}
 	//
+	@Override
 	public void execute(VPM vpm) {
 		int imageWidth= vpm.getOperationalImageWidth();
 		int imageHeight= vpm.getOperationalImageHeight();

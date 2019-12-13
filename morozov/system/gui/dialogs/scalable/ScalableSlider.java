@@ -13,6 +13,7 @@ package morozov.system.gui.dialogs.scalable;
 */
 
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.signals.*;
 import morozov.terms.*;
@@ -59,10 +60,12 @@ public class ScalableSlider extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		return new PrologInteger(DialogUtils.termToSmallIntegerOrReject(value,iX));
 	}
 	//
+	@Override
 	public Term standardizeRange(Term value, ChoisePoint iX) throws RejectRange {
 		try {
 			value= value.dereferenceValue(iX);
@@ -89,8 +92,6 @@ public class ScalableSlider extends ActiveComponent {
 			if (rest2.thisIsFreeVariable()) {
 				throw RejectRange.instance;
 			} else if (!rest2.thisIsEmptyList()) {
-				// throw new TermIsNotSliderRange();
-				// return PrologUnknownValue.instance;
 				throw RejectRange.instance;
 			};
 			int minimum= DialogUtils.termToSmallIntegerOrReject(number1,iX);
@@ -100,12 +101,8 @@ public class ScalableSlider extends ActiveComponent {
 			result= new PrologList(new PrologInteger(minimum),result);
 			return result;
 		} catch (TermIsNotAList e1) {
-			// throw new TermIsNotSliderRange();
-			// return PrologUnknownValue.instance;
 			throw RejectRange.instance;
 		} catch (EndOfList e1) {
-			// throw new TermIsNotSliderRange();
-			// return PrologUnknownValue.instance;
 			throw RejectRange.instance;
 		} catch (RejectValue e1) {
 			throw RejectRange.instance;
@@ -114,6 +111,7 @@ public class ScalableSlider extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void putValue(Term value, ChoisePoint iX) {
 		if (component!=null) {
 			try {
@@ -121,7 +119,7 @@ public class ScalableSlider extends ActiveComponent {
 				quicklySetValue(position);
 			} catch (TermIsNotAnInteger e1) {
 				try {
-					int position= PrologInteger.toInteger(value.getRealValue(iX));
+					int position= Arithmetic.toInteger(value.getRealValue(iX));
 					quicklySetValue(position);
 				} catch (TermIsNotAReal e2) {
 				}
@@ -132,12 +130,14 @@ public class ScalableSlider extends ActiveComponent {
 		((JSlider)component).setValue(value);
 	}
 	//
+	@Override
 	public void putRange(Term value, ChoisePoint iX) {
 		if (component!=null) {
 			implementSliderRange(value,iX,((JSlider)component).getModel());
 		}
 	}
 	//
+	@Override
 	public Term getValue() {
 		if (component!=null) {
 			return new PrologInteger(quicklyGetValue());
@@ -149,11 +149,11 @@ public class ScalableSlider extends ActiveComponent {
 		return ((JSlider)component).getValue();
 	}
 	//
+	@Override
 	public Term getRange() {
 		if (component!=null) {
 			return quicklyGetRange();
 		} else {
-			// return PrologEmptyList.instance;
 			return PrologUnknownValue.instance;
 		}
 	}
@@ -166,6 +166,7 @@ public class ScalableSlider extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 		if (component!=null) {
@@ -175,13 +176,13 @@ public class ScalableSlider extends ActiveComponent {
 			int currentWidth= size.width;
 			if (orientation==JSlider.HORIZONTAL) {
 				int charWidth= metrics.charWidth('M');
-				currentWidth= PrologInteger.toInteger(length*charWidth);
+				currentWidth= Arithmetic.toInteger(length*charWidth);
 			} else {
 				FontRenderContext frc= metrics.getFontRenderContext();
 				TextLayout layout= new TextLayout("M",font,frc);
 				Rectangle rectangle= layout.getPixelBounds(null,0,0);
 				double charHeight= rectangle.getHeight();
-				currentHeight= PrologInteger.toInteger(length*charHeight);
+				currentHeight= Arithmetic.toInteger(length*charHeight);
 			};
 			component.setMinimumSize(new Dimension(currentWidth,currentHeight));
 			component.setPreferredSize(new Dimension(currentWidth,currentHeight));
@@ -198,38 +199,31 @@ public class ScalableSlider extends ActiveComponent {
 			Term rest2= rest1.getNextListTail(iX);
 			rest2= rest2.dereferenceValue(iX);
 			if (!rest2.thisIsEmptyList()) {
-				// throw new TermIsNotSliderRange();
 				return;
 			};
-			int minimum= 0;
-			int maximum= 0;
+			int minimum;
+			int maximum;
 			try {
-				minimum= PrologInteger.toInteger(number1.getRealValue(iX));
+				minimum= Arithmetic.toInteger(number1.getRealValue(iX));
 			} catch (TermIsNotAReal e1) {
 				try {
 					minimum= number1.getSmallIntegerValue(iX);
 				} catch (TermIsNotAnInteger e2) {
-					// throw Backtracking.instance;
-					// throw new TermIsNotSliderRange();
 					return;
 				}
 			};
 			try {
-				maximum= PrologInteger.toInteger(number2.getRealValue(iX));
+				maximum= Arithmetic.toInteger(number2.getRealValue(iX));
 			} catch (TermIsNotAReal e1) {
 				try {
 					maximum= number2.getSmallIntegerValue(iX);
 				} catch (TermIsNotAnInteger e2) {
-					// throw Backtracking.instance;
-					// throw new TermIsNotSliderRange();
 					return;
 				}
 			};
 			quicklySetSliderRange(model,minimum,maximum);
 		} catch (TermIsNotAList e1) {
-			// throw new TermIsNotSliderRange();
 		} catch (EndOfList e1) {
-			// throw new TermIsNotSliderRange();
 		}
 	}
 	protected void quicklySetSliderRange(BoundedRangeModel model, int minimum, int maximum) {

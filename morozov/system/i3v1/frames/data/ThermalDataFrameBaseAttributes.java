@@ -88,36 +88,47 @@ public class ThermalDataFrameBaseAttributes extends DataFrameBaseAttributes impl
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public boolean getEliminateAnomalousPixels() {
 		return eliminateAnomalousPixels;
 	}
+	@Override
 	public boolean getVoltageAnomalousPixelDetector() {
 		return voltageAnomalousPixelDetector;
 	}
+	@Override
 	public double getVoltageAnomalousPixelDetectorThreshold() {
 		return voltageAnomalousPixelDetectorThreshold;
 	}
+	@Override
 	public boolean getTemperatureAnomalousPixelDetector() {
 		return temperatureAnomalousPixelDetector;
 	}
+	@Override
 	public double getTemperatureAnomalousPixelDetectorThreshold() {
 		return temperatureAnomalousPixelDetectorThreshold;
 	}
+	@Override
 	public int getNumberOfDeadPixels() {
 		return numberOfDeadPixels;
 	}
+	@Override
 	public int getNumberOfVoltageAnomalousPixels() {
 		return numberOfVoltageAnomalousPixels;
 	}
+	@Override
 	public int getNumberOfTemperatureAnomalousPixels() {
 		return numberOfTemperatureAnomalousPixels;
 	}
+	@Override
 	public boolean isCelsius() {
 		return isCelsius;
 	}
+	@Override
 	public int getReadTimeOut() {
 		return readTimeOut;
 	}
+	@Override
 	public int getWriteTimeOut() {
 		return writeTimeOut;
 	}

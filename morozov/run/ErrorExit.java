@@ -5,12 +5,15 @@ package morozov.run;
 import morozov.terms.*;
 
 public abstract class ErrorExit extends RuntimeException {
+	//
 	protected ChoisePoint choisePoint;
+	//
 	public ErrorExit() {
 	}
 	public ErrorExit(Throwable cause) {
 		super(cause);
 	}
+	//
 	public boolean isNormalTerminationOfTheProgram() {
 		return false;
 	}

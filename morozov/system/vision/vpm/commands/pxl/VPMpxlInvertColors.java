@@ -10,6 +10,7 @@ public class VPMpxlInvertColors extends VPM_FrameCommand {
 	public VPMpxlInvertColors() {
 	}
 	//
+	@Override
 	public void execute(VPM vpm) {
 		int[] red= vpm.getMatrixRed();
 		int[] green= vpm.getMatrixGreen();

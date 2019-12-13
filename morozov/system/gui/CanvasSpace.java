@@ -24,7 +24,7 @@ public abstract class CanvasSpace {
 	//
 	protected CustomControlComponent customControlComponent;
 	protected Component control;
-	protected AtomicReference<Component> owner= new AtomicReference<Component>();
+	protected AtomicReference<Component> owner= new AtomicReference<>();
 	protected AbstractDialog dialog;
 	protected CustomControl targetWorld;
 	//
@@ -61,6 +61,7 @@ public abstract class CanvasSpace {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklyRefineWidth(ratio);
 					}
@@ -83,6 +84,7 @@ public abstract class CanvasSpace {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklyRefineHeight(ratio);
 					}
@@ -107,6 +109,7 @@ public abstract class CanvasSpace {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						quicklySetBackground(color);
 					}
@@ -125,6 +128,7 @@ public abstract class CanvasSpace {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						control.getLocation(location);
 					}
@@ -141,6 +145,7 @@ public abstract class CanvasSpace {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						control.getLocation(location);
 						control.getSize(size);
@@ -157,6 +162,7 @@ public abstract class CanvasSpace {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						control.getSize(size);
 					}
@@ -173,6 +179,7 @@ public abstract class CanvasSpace {
 			try {
 				final AtomicReference<Dimension> result= new AtomicReference<>();
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						result.set(control.getMinimumSize());
 					}
@@ -190,6 +197,7 @@ public abstract class CanvasSpace {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						control.setSize(size);
 					}
@@ -205,6 +213,7 @@ public abstract class CanvasSpace {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						control.getBounds(rectangle);
 					}
@@ -214,21 +223,6 @@ public abstract class CanvasSpace {
 			}
 		}
 	}
-	// public void safelyGetInsets(final Insets insets) {
-	//	if (SwingUtilities.isEventDispatchThread()) {
-	//		control.getInsets(insets);
-	//	} else {
-	//		try {
-	//			SwingUtilities.invokeAndWait(new Runnable() {
-	//				public void run() {
-	//					control.getInsets(insets);
-	//				}
-	//			});
-	//		} catch (InterruptedException e) {
-	//		} catch (InvocationTargetException e) {
-	//		}
-	//	}
-	// }
 	public GraphicsConfiguration safelyGetGraphicsConfiguration() {
 		if (SwingUtilities.isEventDispatchThread()) {
 			return control.getGraphicsConfiguration();
@@ -236,6 +230,7 @@ public abstract class CanvasSpace {
 			try {
 				final AtomicReference<GraphicsConfiguration> result= new AtomicReference<>();
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						result.set(control.getGraphicsConfiguration());
 					}
@@ -254,6 +249,7 @@ public abstract class CanvasSpace {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						control.revalidate();
 					}
@@ -269,6 +265,7 @@ public abstract class CanvasSpace {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						control.repaint();
 					}
@@ -287,34 +284,16 @@ public abstract class CanvasSpace {
 	public void skipDelayedRepainting() {
 		dialog.skipDelayedRepainting();
 	}
-	// public void suspendRedrawing() {
-	// }
-	// public void releaseRedrawing() {
-	// }
 	//
 	///////////////////////////////////////////////////////////////
 	//
-	// public void safelyPaintComponent(final Graphics g) {
-	//	if (SwingUtilities.isEventDispatchThread()) {
-	//		control.paintComponent(g);
-	//	} else {
-	//		try {
-	//			SwingUtilities.invokeAndWait(new Runnable() {
-	//				public void run() {
-	//					control.paintComponent(g);
-	//				}
-	//			});
-	//		} catch (InterruptedException e) {
-	//		} catch (InvocationTargetException e) {
-	//		}
-	//	}
-	// }
 	public void safelyPrint(final Graphics g) {
 		if (SwingUtilities.isEventDispatchThread()) {
 			control.print(g);
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						control.print(g);
 					}
@@ -333,6 +312,7 @@ public abstract class CanvasSpace {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						control.addMouseListener(l);
 					}
@@ -348,6 +328,7 @@ public abstract class CanvasSpace {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						control.removeMouseListener(l);
 					}
@@ -363,6 +344,7 @@ public abstract class CanvasSpace {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						control.addMouseMotionListener(l);
 					}
@@ -378,6 +360,7 @@ public abstract class CanvasSpace {
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						control.removeMouseMotionListener(l);
 					}

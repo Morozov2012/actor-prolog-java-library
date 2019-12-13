@@ -30,9 +30,9 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class DatabaseTableContainer extends LoadableContainer {
 	//
-	protected AtomicReference<DatabaseTable> table= new AtomicReference<DatabaseTable>();
+	protected AtomicReference<DatabaseTable> table= new AtomicReference<>();
 	//
-	protected transient ArrayDeque<WriterAccessMode> writerAccessModesStack= new ArrayDeque<WriterAccessMode>();
+	protected transient ArrayDeque<WriterAccessMode> writerAccessModesStack= new ArrayDeque<>();
 	//
 	protected transient AtomicLong numberOfWaitingWriters= new AtomicLong(0);
 	//
@@ -359,6 +359,7 @@ public class DatabaseTableContainer extends LoadableContainer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected void loadContent(String textBuffer, ActiveWorld currentProcess, boolean checkPrivileges, ParserMasterInterface master, ChoisePoint iX) throws SyntaxError, DatabaseRecordDoesNotBelongToDomain {
 		table.get().loadContent(textBuffer,currentProcess,checkPrivileges,master,iX);
 	}
@@ -374,140 +375,132 @@ public class DatabaseTableContainer extends LoadableContainer {
 			long nanosTimeout= waitingPeriod.toNanosecondsLong();
 			while (true) {
 				if (readers.isEmpty() && writer.get()==null) {
-					// Если мы оказались здесь, значит, таблица
-					// никем не захвачена, и можно её захватить.
-					if (openedDataStore==null || sectionMainLockChannel.get() != null) {
-						// Если мы здесь, значит, таблица
-						// не расположена во внешнем файле или
-						// расположена, но файл этот уже захвачен.
-						if (accessMode==DatabaseAccessMode.READING) {
-							previousLengthOfReaderAccessModesStack= 0;
-							ArrayDeque<DatabaseAccessMode> list= new ArrayDeque<DatabaseAccessMode>();
-							list.add(accessMode);
-							readers.put(currentProcess,list);
-						} else { // accessMode==DatabaseAccessMode.MODIFYING
-							writerAccessModesStack.clear();
-							previousLengthOfWriterAccessModesStack= 0;
-							writer.set(currentProcess);
-							pushWriterAccessModeStack(accessMode,currentProcess,iX);
-						};
-						break;
-					} else {
-						// Если мы здесь, значит, таблица расположена во внешнем
-						// файле и требуется его захватить.
-						if (accessMode==DatabaseAccessMode.READING) {
-							openedDataStore.lockSectionFile(entryName,this,true,reuseNumbers,externalFileIsFree);
-							dataStore.unsafelyDownloadExternalFile(entryName,this);
-							domainIsToBeChecked= true;
-						} else { // accessMode==DatabaseAccessMode.MODIFYING
-							openedDataStore.lockSectionFile(entryName,this,false,reuseNumbers,externalFileIsFree);
-							dataStore.unsafelyDownloadExternalFile(entryName,this);
-							domainIsToBeChecked= true;
-						};
-						continue;
-					}
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+// Если мы оказались здесь, значит, таблица
+// никем не захвачена, и можно её захватить.
+if (openedDataStore==null || sectionMainLockChannel.get() != null) {
+	// Если мы здесь, значит, таблица
+	// не расположена во внешнем файле или
+	// расположена, но файл этот уже захвачен.
+	if (accessMode==DatabaseAccessMode.READING) {
+		previousLengthOfReaderAccessModesStack= 0;
+		ArrayDeque<DatabaseAccessMode> list= new ArrayDeque<>();
+		list.add(accessMode);
+		readers.put(currentProcess,list);
+	} else { // accessMode==DatabaseAccessMode.MODIFYING
+		writerAccessModesStack.clear();
+		previousLengthOfWriterAccessModesStack= 0;
+		writer.set(currentProcess);
+		pushWriterAccessModeStack(accessMode,currentProcess,iX);
+	};
+	break;
+} else {
+	// Если мы здесь, значит, таблица расположена во внешнем
+	// файле и требуется его захватить.
+	if (accessMode==DatabaseAccessMode.READING) {
+		openedDataStore.lockSectionFile(entryName,this,true,reuseNumbers,externalFileIsFree);
+		dataStore.unsafelyDownloadExternalFile(entryName,this);
+		domainIsToBeChecked= true;
+	} else { // accessMode==DatabaseAccessMode.MODIFYING
+		openedDataStore.lockSectionFile(entryName,this,false,reuseNumbers,externalFileIsFree);
+		dataStore.unsafelyDownloadExternalFile(entryName,this);
+		domainIsToBeChecked= true;
+	};
+	continue;
+}
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 				} else {
-					// Если мы здесь, значит, таблица захвачена другим
-					// процессом и надо подождать, пока таблица не будет освобождена.
-					if (writer.get() != currentProcess) {
-						// Если мы здесь, значит:
-						// 1) либо таблица захвачена по записи другим процессом,
-						// 2) либо таблица по записи не захвачена вовсе (writer.get()==null).
-						// При этом вполне возможно, что таблица захвачена кем-то по чтению.
-						if (openedDataStore==null || sectionMainLockChannel.get() != null) {
-							// Если мы здесь, значит, таблица
-							// не расположена во внешнем файле или
-							// расположена, но файл этот уже захвачен.
-							if (accessMode==DatabaseAccessMode.READING) {
-								if (writer.get() != null || numberOfWaitingWriters.get() > 0) {
-									// Если мы здесь, значит, таблица захвачена
-									// по записи другим процессом.
-									nanosTimeout= databaseTableIsFree.awaitNanos(nanosTimeout);
-									if (nanosTimeout <= 0) {
-										throw Backtracking.instance;
-									};
-									continue;
-								} else {
-									// Если мы здесь, значит, таблица НЕ захвачена
-									// по записи другим процессом. Но, вполне может быть,
-									// захвачена по чтению.
-									ArrayDeque<DatabaseAccessMode> list= readers.get(currentProcess);
-									if (list==null) {
-										list= new ArrayDeque<DatabaseAccessMode>();
-										readers.put(currentProcess,list);
-									} else if (!list.isEmpty()) {
-										accessMode.checkAuthority(list.peek());
-									};
-									previousLengthOfReaderAccessModesStack= list.size();
-									list.add(accessMode);
-									break;
-								}
-							} else { // accessMode==DatabaseAccessMode.MODIFYING
-								if (readers.get(currentProcess) != null) {
-									throw new ModifyingTransactionCannotBeInsideReadingTransaction();
-								} else {
-									if ( !(readers.isEmpty() && writer.get()==null) ) {
-										numberOfWaitingWriters.incrementAndGet();
-										try {
-											nanosTimeout= databaseTableIsFree.awaitNanos(nanosTimeout);
-										} finally {
-											numberOfWaitingWriters.decrementAndGet();
-										};
-										if (nanosTimeout <= 0) {
-											throw Backtracking.instance;
-										};
-										continue;
-									} else {
-										writerAccessModesStack.clear();
-										// tableStack.clear();
-										previousLengthOfWriterAccessModesStack= 0;
-										// previousLengthOfTableStack= 0;
-										// writerAccessModesStack.push(accessMode);
-										writer.set(currentProcess);
-										pushWriterAccessModeStack(accessMode,currentProcess,iX);
-										break;
-									}
-								}
-							}
-						} else {
-							// Если мы здесь, значит, таблица расположена во внешнем
-							// файле и требуется его захватить.
-							if (accessMode==DatabaseAccessMode.READING) {
-								// if (numberOfWaitingWriters.get() > 0) {
-								//	nanosTimeout= databaseTableIsFree.awaitNanos(nanosTimeout);
-								//	if (nanosTimeout <= 0) {
-								//		throw Backtracking.instance;
-								//	}
-								// } else {
-								openedDataStore.lockSectionFile(entryName,this,true,reuseNumbers,externalFileIsFree);
-								dataStore.unsafelyDownloadExternalFile(entryName,this);
-								domainIsToBeChecked= true;
-								// }
-							} else { // accessMode==DatabaseAccessMode.MODIFYING
-								if (readers.get(currentProcess) != null) {
-									throw new ModifyingTransactionCannotBeInsideReadingTransaction();
-								} else {
-									openedDataStore.lockSectionFile(entryName,this,false,reuseNumbers,externalFileIsFree);
-									dataStore.unsafelyDownloadExternalFile(entryName,this);
-									domainIsToBeChecked= true;
-								}
-							};
-							continue;
-						}
-					} else {
-						// Если мы здесь, значит:
-						// 1) таблица НЕ захвачена по записи другим процессом,
-						// 2) таблица ВСЁ-ТАКИ захвачена кем-то по записи.
-						// Это означает, что таблица УЖЕ захвачена по записи этим же процессом.
-						if (!writerAccessModesStack.isEmpty()) {
-							accessMode.checkAuthority(writerAccessModesStack.peek().getDatabaseAccessMode());
-						};
-						previousLengthOfWriterAccessModesStack= writerAccessModesStack.size();
-						// previousLengthOfTableStack= tableStack.size();
-						// writerAccessModesStack.push(accessMode);
-						pushWriterAccessModeStack(accessMode,currentProcess,iX);
-						break;
-					}
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+// Если мы здесь, значит, таблица захвачена другим
+// процессом и надо подождать, пока таблица не будет освобождена.
+if (writer.get() != currentProcess) {
+	// Если мы здесь, значит:
+	// 1) либо таблица захвачена по записи другим процессом,
+	// 2) либо таблица по записи не захвачена вовсе (writer.get()==null).
+	// При этом вполне возможно, что таблица захвачена кем-то по чтению.
+	if (openedDataStore==null || sectionMainLockChannel.get() != null) {
+		// Если мы здесь, значит, таблица
+		// не расположена во внешнем файле или
+		// расположена, но файл этот уже захвачен.
+		if (accessMode==DatabaseAccessMode.READING) {
+			if (writer.get() != null || numberOfWaitingWriters.get() > 0) {
+				// Если мы здесь, значит, таблица захвачена
+				// по записи другим процессом.
+				nanosTimeout= databaseTableIsFree.awaitNanos(nanosTimeout);
+				if (nanosTimeout <= 0) {
+					throw Backtracking.instance;
+				};
+				continue;
+			} else {
+				// Если мы здесь, значит, таблица НЕ захвачена
+				// по записи другим процессом. Но, вполне может быть,
+				// захвачена по чтению.
+				ArrayDeque<DatabaseAccessMode> list= readers.get(currentProcess);
+				if (list==null) {
+					list= new ArrayDeque<>();
+					readers.put(currentProcess,list);
+				} else if (!list.isEmpty()) {
+					accessMode.checkAuthority(list.peek());
+				};
+				previousLengthOfReaderAccessModesStack= list.size();
+				list.add(accessMode);
+				break;
+			}
+		} else { // accessMode==DatabaseAccessMode.MODIFYING
+			if (readers.get(currentProcess) != null) {
+				throw new ModifyingTransactionCannotBeInsideReadingTransaction();
+			} else {
+				if ( !(readers.isEmpty() && writer.get()==null) ) {
+					numberOfWaitingWriters.incrementAndGet();
+					try {
+						nanosTimeout= databaseTableIsFree.awaitNanos(nanosTimeout);
+					} finally {
+						numberOfWaitingWriters.decrementAndGet();
+					};
+					if (nanosTimeout <= 0) {
+						throw Backtracking.instance;
+					};
+					continue;
+				} else {
+					writerAccessModesStack.clear();
+					previousLengthOfWriterAccessModesStack= 0;
+					writer.set(currentProcess);
+					pushWriterAccessModeStack(accessMode,currentProcess,iX);
+					break;
+				}
+			}
+		}
+	} else {
+		// Если мы здесь, значит, таблица расположена во внешнем
+		// файле и требуется его захватить.
+		if (accessMode==DatabaseAccessMode.READING) {
+			openedDataStore.lockSectionFile(entryName,this,true,reuseNumbers,externalFileIsFree);
+			dataStore.unsafelyDownloadExternalFile(entryName,this);
+			domainIsToBeChecked= true;
+		} else { // accessMode==DatabaseAccessMode.MODIFYING
+			if (readers.get(currentProcess) != null) {
+				throw new ModifyingTransactionCannotBeInsideReadingTransaction();
+			} else {
+				openedDataStore.lockSectionFile(entryName,this,false,reuseNumbers,externalFileIsFree);
+				dataStore.unsafelyDownloadExternalFile(entryName,this);
+				domainIsToBeChecked= true;
+			}
+		};
+		continue;
+	}
+} else {
+	// Если мы здесь, значит:
+	// 1) таблица НЕ захвачена по записи другим процессом,
+	// 2) таблица ВСЁ-ТАКИ захвачена кем-то по записи.
+	// Это означает, что таблица УЖЕ захвачена по записи этим же процессом.
+	if (!writerAccessModesStack.isEmpty()) {
+		accessMode.checkAuthority(writerAccessModesStack.peek().getDatabaseAccessMode());
+	};
+	previousLengthOfWriterAccessModesStack= writerAccessModesStack.size();
+	pushWriterAccessModeStack(accessMode,currentProcess,iX);
+	break;
+}
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 				}
 			}
 		} catch (InterruptedException e) {
@@ -526,7 +519,6 @@ public class DatabaseTableContainer extends LoadableContainer {
 		DatabaseTable oldTable= table.get();
 		DatabaseTable copyOfTable= (DatabaseTable)oldTable.clone();
 		oldTable.copyContent(copyOfTable,currentProcess,iX);
-		// tableStack.push(oldTable);
 		writerAccessModesStack.push(new WriterAccessMode(mode,oldTable));
 		table.set(copyOfTable);
 	}
@@ -535,7 +527,6 @@ public class DatabaseTableContainer extends LoadableContainer {
 		lock.lock();
 		try {
 			terminateTransaction(database,currentProcess,openedDataStore,updateSectionFile,watchTable);
-		// } catch (InterruptedException e) {
 		} finally {
 			lock.unlock();
 		}
@@ -544,72 +535,76 @@ public class DatabaseTableContainer extends LoadableContainer {
 	protected void terminateTransaction(Database database, ActiveWorld currentProcess, OpenedDataStore openedDataStore, boolean updateSectionFile, boolean watchTable) {
 		if (writer.get()==currentProcess) {
 			if (!writerAccessModesStack.isEmpty()) {
-				WriterAccessMode currentAccessMode= writerAccessModesStack.pop();
-				if (writerAccessModesStack.isEmpty()) {
-					writer.set(null);
-					boolean tableIsModified= currentAccessMode.getTableIsModified();
-					synchronized (informedWorlds) {
-						if (tableIsModified) {
-							informedWorlds.clear();
-						};
-						if (database != null) {
-							informedWorlds.add(database);
-						}
-					};
-					if (watchTable && database != null) {
-						synchronized (linkedWorlds) {
-							linkedWorlds.add(database);
-						}
-					};
-					if (tableIsModified) {
-						sendInternalMessages(database);
-					};
-					if (openedDataStore != null) {
-						if (watchTable) {
-							openedDataStore.registerWatcher(database,this,sectionPath_MainData);
-						};
-						if (tableIsModified && updateSectionFile) {
-							openedDataStore.unsafelyWriteSection(this,externalFileIsFree);
-						};
-						openedDataStore.unlockSectionFile(this);
-					};
-					databaseTableIsFree.signal();
-				} else {
-					writerAccessModesStack.peek().setTableIsModified(currentAccessMode);
-				}
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+WriterAccessMode currentAccessMode= writerAccessModesStack.pop();
+if (writerAccessModesStack.isEmpty()) {
+	writer.set(null);
+	boolean tableIsModified= currentAccessMode.getTableIsModified();
+	synchronized (informedWorlds) {
+		if (tableIsModified) {
+			informedWorlds.clear();
+		};
+		if (database != null) {
+			informedWorlds.add(database);
+		}
+	};
+	if (watchTable && database != null) {
+		synchronized (linkedWorlds) {
+			linkedWorlds.add(database);
+		}
+	};
+	if (tableIsModified) {
+		sendInternalMessages(database);
+	};
+	if (openedDataStore != null) {
+		if (watchTable) {
+			openedDataStore.registerWatcher(database,this,sectionPath_MainData);
+		};
+		if (tableIsModified && updateSectionFile) {
+			openedDataStore.unsafelyWriteSection(this,externalFileIsFree);
+		};
+		openedDataStore.unlockSectionFile(this);
+	};
+	databaseTableIsFree.signal();
+} else {
+	writerAccessModesStack.peek().setTableIsModified(currentAccessMode);
+}
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 			} else {
 				throw new NotInsideTransaction();
 			}
 		} else {
 			ArrayDeque<DatabaseAccessMode> list= readers.get(currentProcess);
 			if (list != null) {
-				if (!list.isEmpty()) {
-					list.pop();
-					if (list.isEmpty()) {
-						readers.remove(currentProcess);
-						if (database != null) {
-							synchronized (informedWorlds) {
-								informedWorlds.add(database);
-							};
-							if (watchTable) {
-								synchronized (linkedWorlds) {
-									linkedWorlds.add(database);
-								}
-							}
-						};
-						if (openedDataStore != null) {
-							if (watchTable) {
-								openedDataStore.registerWatcher(database,this,sectionPath_MainData);
-							};
-							openedDataStore.unlockSectionFile(this);
-						};
-						if (readers.isEmpty()) {
-							databaseTableIsFree.signal();
-						}
-					}
-				} else {
-					throw new NotInsideTransaction();
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+if (!list.isEmpty()) {
+	list.pop();
+	if (list.isEmpty()) {
+		readers.remove(currentProcess);
+		if (database != null) {
+			synchronized (informedWorlds) {
+				informedWorlds.add(database);
+			};
+			if (watchTable) {
+				synchronized (linkedWorlds) {
+					linkedWorlds.add(database);
 				}
+			}
+		};
+		if (openedDataStore != null) {
+			if (watchTable) {
+				openedDataStore.registerWatcher(database,this,sectionPath_MainData);
+			};
+			openedDataStore.unlockSectionFile(this);
+		};
+		if (readers.isEmpty()) {
+			databaseTableIsFree.signal();
+		}
+	}
+} else {
+	throw new NotInsideTransaction();
+}
+//:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 			} else {
 				throw new NotInsideTransaction();
 			}
@@ -634,7 +629,6 @@ public class DatabaseTableContainer extends LoadableContainer {
 		lock.lock();
 		try {
 			cancelOneTransaction(currentWorld,currentProcess,openedDataStore,watchTable);
-		// } catch (InterruptedException e) {
 		} finally {
 			lock.unlock();
 		}
@@ -649,25 +643,13 @@ public class DatabaseTableContainer extends LoadableContainer {
 						table.set(currentAccessMode.getPreviousTable());
 						if (writerAccessModesStack.isEmpty()) {
 							freeWriter(currentWorld,openedDataStore,watchTable);
-							// writer.set(null);
-							// if (openedDataStore != null) {
-							//	unlockSectionFile();
-							// };
-							// databaseTableIsFree.signal();
 							break;
 						}
 					} else {
 						freeWriter(currentWorld,openedDataStore,watchTable);
-						// writer.set(null);
-						// if (openedDataStore != null) {
-						//	unlockSectionFile();
-						// };
-						// databaseTableIsFree.signal();
 						break;
 					}
 				}
-			// } else {
-			//	throw new NotInsideTransaction();
 			}
 		} else {
 			ArrayDeque<DatabaseAccessMode> list= readers.get(currentProcess);
@@ -680,16 +662,12 @@ public class DatabaseTableContainer extends LoadableContainer {
 								freeReader(currentWorld,currentProcess,openedDataStore,watchTable);
 								break;
 							}
-						// } else {
-						//	throw new NotInsideTransaction();
 						} else {
 							freeReader(currentWorld,currentProcess,openedDataStore,watchTable);
 							break;
 						}
 					}
 				}
-			// } else {
-			//	throw new NotInsideTransaction();
 			}
 		}
 	}
@@ -724,7 +702,6 @@ public class DatabaseTableContainer extends LoadableContainer {
 		lock.lock();
 		try {
 			cancelTransactionTree(currentWorld,currentProcess,openedDataStore,watchTable);
-		// } catch (InterruptedException e) {
 		} finally {
 			lock.unlock();
 		}
@@ -737,8 +714,6 @@ public class DatabaseTableContainer extends LoadableContainer {
 				table.set(firstAccessMode.getPreviousTable());
 				writerAccessModesStack.clear();
 				freeWriter(currentWorld,openedDataStore,watchTable);
-			// } else {
-			//	throw new NotInsideTransaction();
 			}
 		} else {
 			ArrayDeque<DatabaseAccessMode> list= readers.get(currentProcess);
@@ -746,11 +721,7 @@ public class DatabaseTableContainer extends LoadableContainer {
 				if (!list.isEmpty()) {
 					list.clear();
 					freeReader(currentWorld,currentProcess,openedDataStore,watchTable);
-				// } else {
-				//	throw new NotInsideTransaction();
 				}
-			// } else {
-			//	throw new NotInsideTransaction();
 			}
 		}
 	}
@@ -769,9 +740,6 @@ public class DatabaseTableContainer extends LoadableContainer {
 		textBuffer.append("(");
 		textBuffer.append(type.toString());
 		textBuffer.append(");\n");
-		// textBuffer.append("use_fair_lock('");
-		// textBuffer.append(Boolean.toString(useFairLock));
-		// textBuffer.append("');\n");
 		table.get().saveToTextBuffer(textBuffer,iX,encoder);
 	}
 	//
@@ -780,20 +748,20 @@ public class DatabaseTableContainer extends LoadableContainer {
 	private void readObject(ObjectInputStream stream) throws IOException, ClassNotFoundException {
 		stream.defaultReadObject();
 		table.get().setContainer(this);
-		// tableStack= new ArrayDeque<DatabaseTable>();
-		writerAccessModesStack= new ArrayDeque<WriterAccessMode>();
+		writerAccessModesStack= new ArrayDeque<>();
 		numberOfWaitingWriters= new AtomicLong(0);
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Object clone() {
 		DatabaseTableContainer o= (DatabaseTableContainer)super.clone();
-		o.table= new AtomicReference<DatabaseTable>();
+		o.table= new AtomicReference<>();
 		DatabaseTable newTable= (DatabaseTable)table.get().clone();
 		o.table.set(newTable);
 		newTable.setContainer(o);
-		o.writerAccessModesStack= new ArrayDeque<WriterAccessMode>();
+		o.writerAccessModesStack= new ArrayDeque<>();
 		o.numberOfWaitingWriters= new AtomicLong(0);
 		return o;
 	}
@@ -805,12 +773,15 @@ public class DatabaseTableContainer extends LoadableContainer {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	protected boolean writerAccessModesStackIsEmpty() {
 		return writerAccessModesStack.isEmpty();
 	}
+	@Override
 	protected DatabaseAccessMode getCurrentDatabaseAccessModes() {
 		return writerAccessModesStack.peek().getDatabaseAccessMode();
 	}
+	@Override
 	protected void registerModifyingAccess() {
 		writerAccessModesStack.peek().registerModifyingAccess();
 	}

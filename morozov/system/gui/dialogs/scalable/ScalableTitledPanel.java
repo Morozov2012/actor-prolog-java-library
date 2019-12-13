@@ -25,9 +25,6 @@ import java.awt.Color;
 public class ScalableTitledPanel extends ScalablePanel {
 	//
 	protected TitledBorder border;
-	protected Font colourlessFont;
-	protected Color textColor;
-	protected Color spaceColor;
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -39,11 +36,13 @@ public class ScalableTitledPanel extends ScalablePanel {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setGeneralForeground(Color c) {
 	}
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setIndividualText(Term value, ChoisePoint iX) {
 		String title1= value.toString(iX);
 		String title2= AnnotatedButton.reduceAmpersands(title1);
@@ -53,9 +52,9 @@ public class ScalableTitledPanel extends ScalablePanel {
 			colourlessFont= getFont();
 		};
 		setGeneralFont(colourlessFont);
-		// targetDialog.safelyRevalidateAndRepaint();
 	}
 	//
+	@Override
 	public Term getIndividualText() {
 		if (border != null) {
 			String title2= border.getTitle();
@@ -68,17 +67,17 @@ public class ScalableTitledPanel extends ScalablePanel {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setFont(Font font) {
 		super.setFont(font);
 		colourlessFont= font;
 		if (border != null) {
 			border.setTitleFont(font);
 			targetDialog.safelyRevalidateAndRepaint();
-			// invalidate();
-			// repaint();
 		}
 	}
 	//
+	@Override
 	public void setForeground(Color c) {
 		super.setForeground(c);
 		if (border != null) {

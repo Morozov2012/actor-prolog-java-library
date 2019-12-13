@@ -14,10 +14,10 @@ import java.util.Collections;
 
 public class ActiveDiagram implements ProcessStateListener {
 	//
-	private Map<String,AbstractProcess> diagramComponents;
-	private StaticContext staticContext;
-	private Map<String,ComponentState> componentSuccess= Collections.synchronizedMap(new HashMap<String,ComponentState>());
-	private DiagramColors diagramColors= new DiagramColors();
+	protected Map<String,AbstractProcess> diagramComponents;
+	protected StaticContext staticContext;
+	protected Map<String,ComponentState> componentSuccess= Collections.synchronizedMap(new HashMap<String,ComponentState>());
+	protected DiagramColors diagramColors= new DiagramColors();
 	//
 	public ActiveDiagram(Map<String,AbstractProcess> components, StaticContext context) {
 		diagramComponents= components;
@@ -31,7 +31,6 @@ public class ActiveDiagram implements ProcessStateListener {
 				process.sendStateRequest(this,identifier);
 			}
 		}
-		// thread= new ThreadHolder(this);
 	}
 	//
 	public void showModel(String identifier) {
@@ -43,6 +42,7 @@ public class ActiveDiagram implements ProcessStateListener {
 		DiagramUtils.showNote(desktop,identifier,staticContext);
 	}
 	//
+	@Override
 	public void rememberStateOfProcess(String identifier, boolean isProven, boolean isSuspended) {
 		ComponentState state= componentSuccess.get(identifier);
 		if (state==null) {

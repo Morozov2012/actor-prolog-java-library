@@ -60,7 +60,7 @@ public abstract class Trap extends Lambda {
 	}
 	//
 	public class CatchException extends Continuation {
-		// private Continuation c0;
+		//
 		private long predicateSignatureNumber;
 		private boolean subgoalIsCallOfFunction;
 		private boolean clauseIsFunction;
@@ -74,6 +74,7 @@ public abstract class Trap extends Lambda {
 			argumentList= (Term[])args;
 		}
 		//
+		@Override
 		public void execute(ChoisePoint iX) throws Backtracking {
 			catch_exception(c0,iX,predicateSignatureNumber,subgoalIsCallOfFunction,clauseIsFunction,argumentList);
 		}
@@ -91,11 +92,8 @@ public abstract class Trap extends Lambda {
 		if (!subgoalIsCallOfFunction && clauseIsFunction) {
 			targetArguments= new Term[args.length+1];
 			targetArguments[0]= new PrologVariable();
-			for(int i= 0; i < args.length; i++) {
-				targetArguments[i+1]= args[i];
-			}
+			System.arraycopy(args,0,targetArguments,1,args.length);
 		} else {
-			// targetArguments= (Term[])args;
 			targetArguments= args;
 		};
 		Continuation c1= new DomainSwitch(c0,worldDomainSignatureNumber,targetWorld,Trap.this,targetArguments);
@@ -105,10 +103,10 @@ public abstract class Trap extends Lambda {
 		} catch (Backtracking b) {
 			throw b;
 		} catch (ProcessedErrorExit e1) {
-			if (c0.containsNode(e1.continuation)) {
+			if (c0.containsNode(e1.getContinuation())) {
 				throw e1;
 			} else {
-				processException(e1.processedException,c0,newIndex,predicateSignatureNumber,subgoalIsCallOfFunction,clauseIsFunction,args);
+				processException(e1.getProcessedException(),c0,newIndex,predicateSignatureNumber,subgoalIsCallOfFunction,clauseIsFunction,args);
 			}
 		} catch (ErrorExit e1) {
 			processException(e1,c0,newIndex,predicateSignatureNumber,subgoalIsCallOfFunction,clauseIsFunction,args);
@@ -133,19 +131,12 @@ public abstract class Trap extends Lambda {
 			Term handlerWorld= getBuiltInSlot_E_handler();
 			Term[] alarmArguments= new Term[2+args.length];
 			alarmArguments[0]= ee.createTerm();
-			// int predicateCode= SymbolTable.retrieveSymbolCode(predicateName);
 			alarmArguments[1]= new PrologSymbol(predicateNameCode);
 			if (subgoalIsCallOfFunction) {
-				for(int i= 1; i < args.length; i++) {
-					alarmArguments[i+1]= args[i];
-				}
+				System.arraycopy(args,1,alarmArguments,2,args.length-1);
 			} else {
-				for(int i= 0; i < args.length; i++) {
-					alarmArguments[i+2]= args[i];
-				}
+				System.arraycopy(args,0,alarmArguments,2,args.length);
 			};
-			// 2017.11.04:
-			// Continuation c2= new DomainSwitch(success,handlerDomainSignatureNumber,targetWorld,Trap.this,alarmArguments);
 			Continuation c2= new DomainSwitch(success,handlerDomainSignatureNumber,handlerWorld,Trap.this,alarmArguments);
 			c2.execute(newIndex);
 		} catch (Backtracking b) {

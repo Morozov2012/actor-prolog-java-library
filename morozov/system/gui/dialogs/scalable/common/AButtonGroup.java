@@ -17,14 +17,15 @@ import java.util.Iterator;
 
 public class AButtonGroup extends ButtonGroup {
 	//
-	AbstractDialog targetDialog= null;
-	ActiveComponent targetComponent= null;
+	protected AbstractDialog targetDialog= null;
+	protected ActiveComponent targetComponent= null;
 	//
 	public AButtonGroup(AbstractDialog tD, ActiveComponent tC) {
 		targetDialog= tD;
 		targetComponent= tC;
 	}
 	//
+	@Override
 	public void setSelected(ButtonModel m, boolean b) {
 		Iterator<AbstractButton> buttonIterator= buttons.iterator();
 		while (buttonIterator.hasNext()) {

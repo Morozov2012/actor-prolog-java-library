@@ -23,73 +23,86 @@ import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 
 public class MyDialog1 extends AbstractDialog {
-	ScalableButton control_14_4_0;
-	ScalableButton control_14_3_0;
-	ScalableButton control_14_2_0;
-	ScalableButton control_14_1_0;
-	ScalablePanel panel14;
-	ScalableSlider control_2_1_2;
-	ScalableSlider control_2_2_1;
-	ScalableListButton control_13_1_2;
-	ScalableComboBox control_13_1_1;
-	ScalablePanel panel13;
-	ScalableList control_12_1_1;
-	ScalableTitledPanel panel12;
-	ScalableCheckBox control_11_1_2;
-	ScalableCheckBox control_11_1_1;
-	ScalableTitledPanel panel11;
-	ScalablePanel panel10;
-	ScalablePanel panel9;
-	ScalableButtonGroup bG8;
-	ScalableRadioButton control_8_3_1;
-	ScalableRadioButton control_8_2_1;
-	ScalableRadioButton control_8_1_1;
-	ScalablePanel panel8;
-	RealField control_7_1_2;
-	IntegerField control_7_1_1;
-	ScalablePanel panel7;
-	ActivePasswordField control_6_1_2;
-	ActiveTextField control_6_1_1;
-	ScalablePanel panel6;
-	ScalableTextArea control_5_2_1;
-	ScalableTextArea control_5_1_1;
-	ScalableTitledPanel panel5;
-	ScalablePanel panel4;
-	ScalablePanel panel3;
-	ScalablePanel panel2;
-	ScalableLabel control_1_0_2;
-	ScalableLabel control_1_0_1;
-	ScalablePanel panel1;
+	//
+	protected ScalableButton control_14_4_0;
+	protected ScalableButton control_14_3_0;
+	protected ScalableButton control_14_2_0;
+	protected ScalableButton control_14_1_0;
+	protected ScalablePanel panel14;
+	protected ScalableSlider control_2_1_2;
+	protected ScalableSlider control_2_2_1;
+	protected ScalableListButton control_13_1_2;
+	protected ScalableComboBox control_13_1_1;
+	protected ScalablePanel panel13;
+	protected ScalableList control_12_1_1;
+	protected ScalableTitledPanel panel12;
+	protected ScalableCheckBox control_11_1_2;
+	protected ScalableCheckBox control_11_1_1;
+	protected ScalableTitledPanel panel11;
+	protected ScalablePanel panel10;
+	protected ScalablePanel panel9;
+	protected ScalableButtonGroup bG8;
+	protected ScalableRadioButton control_8_3_1;
+	protected ScalableRadioButton control_8_2_1;
+	protected ScalableRadioButton control_8_1_1;
+	protected ScalablePanel panel8;
+	protected RealField control_7_1_2;
+	protected IntegerField control_7_1_1;
+	protected ScalablePanel panel7;
+	protected ActivePasswordField control_6_1_2;
+	protected ActiveTextField control_6_1_1;
+	protected ScalablePanel panel6;
+	protected ScalableTextArea control_5_2_1;
+	protected ScalableTextArea control_5_1_1;
+	protected ScalableTitledPanel panel5;
+	protected ScalablePanel panel4;
+	protected ScalablePanel panel3;
+	protected ScalablePanel panel2;
+	protected ScalableLabel control_1_0_2;
+	protected ScalableLabel control_1_0_1;
+	protected ScalablePanel panel1;
+	//
 	public MyDialog1(YesNoDefault isModal, boolean isTopLevel, boolean isAlwaysOnTop, boolean closingConfirmation, YesNoDefault exitOnClose, Window parent) {
 		super(isModal,isTopLevel,isAlwaysOnTop,closingConfirmation,exitOnClose,parent);
 	}
+	//
+	@Override
 	protected String getPredefinedTitle() {
 		return "Demo Panel";
 	}
+	@Override
 	protected Term getPredefinedTextColor() {
 		return new PrologSymbol(SymbolCodes.symbolCode_E_default);
 	}
+	@Override
 	protected Term getPredefinedSpaceColor() {
 		return new PrologSymbol(SymbolCodes.symbolCode_E_default);
 	}
+	@Override
 	protected Term getPredefinedFontName() {
 		return new PrologSymbol(SymbolCodes.symbolCode_E_default);
 	}
+	@Override
 	protected Term getPredefinedFontSize() {
 		return new PrologSymbol(SymbolCodes.symbolCode_E_default);
 	}
+	@Override
 	protected Term getPredefinedFontStyle() {
 		return new PrologSymbol(SymbolCodes.symbolCode_E_default);
 	}
+	@Override
 	protected Term getPredefinedX() {
 		return new PrologReal(5);
 	}
+	@Override
 	protected Term getPredefinedY() {
 		return new PrologReal(5);
 	}
+	@Override
 	protected Term getPredefinedBackgroundColor() {
 		return new PrologString("Emerald");
 	}
+	@Override
 	public void assemble(ChoisePoint iX) {
 		//
 		// mainPanel
@@ -766,6 +779,7 @@ public class MyDialog1 extends AbstractDialog {
 		gBL14.setConstraints(control_14_4_0.component,gBC14);
 		panel14.add(control_14_4_0.component);
 	}
+	@Override
 	protected void setGeneralFont(Font font) {
 		mainPanel.setGeneralFont(font);
 		panel1.setGeneralFont(font);
@@ -805,6 +819,7 @@ public class MyDialog1 extends AbstractDialog {
 		control_14_3_0.setGeneralFont(font);
 		control_14_4_0.setGeneralFont(font);
 	}
+	@Override
 	protected void setGeneralBackground(Color c) {
 		super.setGeneralBackground(c);
 		if (!isDraftMode) {
@@ -875,6 +890,7 @@ public class MyDialog1 extends AbstractDialog {
 		control_14_3_0.setGeneralBackground(c);
 		control_14_4_0.setGeneralBackground(c);
 	}
+	@Override
 	protected void setGeneralForeground(Color c) {
 		mainPanel.setGeneralForeground(c);
 		panel1.setGeneralForeground(c);
@@ -914,6 +930,7 @@ public class MyDialog1 extends AbstractDialog {
 		control_14_3_0.setGeneralForeground(c);
 		control_14_4_0.setGeneralForeground(c);
 	}
+	@Override
 	protected void setGeneralSpaceColor(Color c) {
 		control_1_0_1.setGeneralSpaceColor(c);
 		control_1_0_2.setGeneralSpaceColor(c);
@@ -930,6 +947,7 @@ public class MyDialog1 extends AbstractDialog {
 		control_14_3_0.setGeneralSpaceColor(c);
 		control_14_4_0.setGeneralSpaceColor(c);
 	}
+	@Override
 	protected void setAlarmColors(Color fc, Color bc) {
 		mainPanel.setAlarmColors(fc,bc);
 		panel1.setAlarmColors(fc,bc);
@@ -969,12 +987,14 @@ public class MyDialog1 extends AbstractDialog {
 		control_14_3_0.setAlarmColors(fc,bc);
 		control_14_4_0.setAlarmColors(fc,bc);
 	}
+	@Override
 	protected void defineDefaultButton() {
 		JRootPane root= panel1.getRootPane();
 		if (root!=null) {
 			root.setDefaultButton((JButton)control_14_4_0.component);
 		}
 	}
+	@Override
 	public void registerSlotVariables() {
 		registerPortsAndRecoverPortValues(
 			this,

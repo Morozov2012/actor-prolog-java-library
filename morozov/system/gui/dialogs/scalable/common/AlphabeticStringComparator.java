@@ -9,6 +9,7 @@ package morozov.system.gui.dialogs.scalable.common;
 import java.util.Comparator;
 
 public class AlphabeticStringComparator implements Comparator<StringWithNumber> {
+	@Override
 	public int compare(StringWithNumber o1, StringWithNumber o2) {
 		String s1= o1.text;
 		String s2= o2.text;

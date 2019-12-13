@@ -32,6 +32,7 @@ public class BlobComparator implements Comparator<BlobAttributes> {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public int compare(BlobAttributes o1, BlobAttributes o2) {
 		if (sortingMode==SortingMode.DESCENDING_ORDER) {
 			BlobAttributes o3= o1;

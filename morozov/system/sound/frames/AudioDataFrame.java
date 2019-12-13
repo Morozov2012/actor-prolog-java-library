@@ -28,15 +28,19 @@ public class AudioDataFrame extends DataFrame implements AudioDataFrameInterface
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public DataArrayType getDataArrayType() {
 		return DataArrayType.AUDIO_FRAME;
 	}
+	@Override
 	public byte[] getAudioData() {
 		return data;
 	}
+	@Override
 	public int getDataSize() {
 		return data.length;
 	}
+	@Override
 	public boolean isLightweightFrame() {
 		return true;
 	}

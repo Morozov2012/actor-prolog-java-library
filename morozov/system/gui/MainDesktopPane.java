@@ -18,9 +18,10 @@ import java.awt.event.ActionEvent;
 import java.lang.reflect.InvocationTargetException;
 
 public class MainDesktopPane extends JDesktopPane implements MouseListener, ActionListener {
-	private StaticContext staticContext;
-	private Dimension desktopSize;
-	private JPopupMenu popup;
+	//
+	protected StaticContext staticContext;
+	protected Dimension desktopSize;
+	protected JPopupMenu popup;
 	//
 	public MainDesktopPane(StaticContext context) {
 		staticContext= context;
@@ -34,6 +35,7 @@ public class MainDesktopPane extends JDesktopPane implements MouseListener, Acti
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						add(comp);
 					}
@@ -49,6 +51,7 @@ public class MainDesktopPane extends JDesktopPane implements MouseListener, Acti
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						add(comp,constraints);
 					}
@@ -64,6 +67,7 @@ public class MainDesktopPane extends JDesktopPane implements MouseListener, Acti
 		} else {
 			try {
 				SwingUtilities.invokeAndWait(new Runnable() {
+					@Override
 					public void run() {
 						add(comp,index);
 					}
@@ -74,6 +78,7 @@ public class MainDesktopPane extends JDesktopPane implements MouseListener, Acti
 		}
 	}
 	//
+	@Override
 	public void doLayout() {
 		super.doLayout();
 		boolean enableResizingOfComponents= false;
@@ -91,32 +96,37 @@ public class MainDesktopPane extends JDesktopPane implements MouseListener, Acti
 		};
 		if (enableResizingOfComponents) {
 			DesktopUtils.restoreFrames(staticContext);
-		};
-		// super.doLayout();
+		}
 	}
 	//
+	@Override
 	public void mouseClicked(MouseEvent event) {
 	}
+	@Override
 	public void mouseEntered(MouseEvent event) {
 	}
+	@Override
 	public void mouseExited(MouseEvent event) {
 	}
+	@Override
 	public void mousePressed(MouseEvent event) {
 		mousePressedOrReleased(event);
 	}
+	@Override
 	public void mouseReleased(MouseEvent event) {
 		mousePressedOrReleased(event);
 	}
 	//
-	private void mousePressedOrReleased(MouseEvent event) {
+	protected void mousePressedOrReleased(MouseEvent event) {
 		maybeShowPopup(event);
 	}
-	private void maybeShowPopup(MouseEvent e) {
+	protected void maybeShowPopup(MouseEvent e) {
 		if (e.isPopupTrigger()) {
 			popup.show(e.getComponent(),e.getX(),e.getY());
 		}
 	}
 	//
+	@Override
 	public void actionPerformed(ActionEvent event) {
 		DesktopUtils.actionPerformed(event,staticContext);
 	}

@@ -23,10 +23,12 @@ import java.awt.event.ActionEvent;
 
 public class OpenList extends JPanel
 	implements ListSelectionListener, ActionListener {
+	//
 	protected JLabel m_title;
 	protected JTextField m_text;
 	protected JList<String> m_list;
 	protected JScrollPane m_scroll;
+	//
 	public OpenList(String[] data, String title) {
 		setLayout(null);
 		m_title= new JLabel(title,JLabel.LEFT);
@@ -34,12 +36,13 @@ public class OpenList extends JPanel
 		m_text= new JTextField();
 		m_text.addActionListener(this);
 		add(m_text);
-		m_list= new JList<String>(data);
+		m_list= new JList<>(data);
 		m_list.setVisibleRowCount(4);
 		m_list.addListSelectionListener(this);
 		m_scroll= new JScrollPane(m_list);
 		add(m_scroll);
 	}
+	//
 	public void setSelected(String sel) {
 		m_list.setSelectedValue(sel, true);
 		m_text.setText(sel);
@@ -53,12 +56,14 @@ public class OpenList extends JPanel
 			return Integer.parseInt(getSelected());
 		} catch (NumberFormatException ex) { return -1; }
 	}
+	@Override
 	public void valueChanged(ListSelectionEvent e) {
 		Object obj= m_list.getSelectedValue();
 		if (obj != null) {
 			m_text.setText(obj.toString());
 		}
 	}
+	@Override
 	public void actionPerformed(ActionEvent e) {
 		ListModel model= m_list.getModel();
 		String key= m_text.getText().toLowerCase();
@@ -73,6 +78,7 @@ public class OpenList extends JPanel
 	public void addListSelectionListener(ListSelectionListener lst) {
 		m_list.addListSelectionListener(lst);
 	}
+	@Override
 	public Dimension getPreferredSize() {
 		Insets ins= getInsets();
 		Dimension d1= m_title.getPreferredSize();
@@ -82,6 +88,7 @@ public class OpenList extends JPanel
 		int h= d1.height + d2.height + d3.height;
 		return new Dimension(w+ins.left+ins.right,h+ins.top+ins.bottom);
 	}
+	@Override
 	public Dimension getMaximumSize() {
 		Insets ins= getInsets();
 		Dimension d1= m_title.getMaximumSize();
@@ -91,6 +98,7 @@ public class OpenList extends JPanel
 		int h= d1.height + d2.height + d3.height;
 		return new Dimension(w+ins.left+ins.right,h+ins.top+ins.bottom);
 	}
+	@Override
 	public Dimension getMinimumSize() {
 		Insets ins= getInsets();
 		Dimension d1= m_title.getMinimumSize();
@@ -100,6 +108,7 @@ public class OpenList extends JPanel
 		int h= d1.height + d2.height + d3.height;
 		return new Dimension(w+ins.left+ins.right,h+ins.top+ins.bottom);
 	}
+	@Override
 	public void doLayout() {
 		Insets ins= getInsets();
 		Dimension d= getSize();

@@ -28,6 +28,7 @@ public class ForegroundPointCloud implements ForegroundPointCloudInterface, Seri
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void refineBounds(int w, int h) {
 		if (minimalX < 0) {
 			minimalX= w;
@@ -59,13 +60,14 @@ public class ForegroundPointCloud implements ForegroundPointCloudInterface, Seri
 		}
 	}
 	//
+	@Override
 	public void fillMatrix(float[] xyz, int selectedIndex, byte[] payerIndex) {
 		if (minimalX < 0 || maximalX < 0 || minimalY < 0 || maximalY < 0) {
 			return;
 		};
 		FrameSize frameSize= FrameSize.computeXYZFrameSize(xyz);
-		frameWidth= frameSize.width;
-		frameHeight= frameSize.height;
+		frameWidth= frameSize.getWidth();
+		frameHeight= frameSize.getHeight();
 		int width= maximalX - minimalX + 1;
 		int height= maximalY - minimalY + 1;
 		matrixX= new float[width][height];
@@ -95,6 +97,7 @@ public class ForegroundPointCloud implements ForegroundPointCloudInterface, Seri
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void getValues(float[] xyz) {
 		if (minimalX < 0 || maximalX < 0 || minimalY < 0 || maximalY < 0) {
 			return;
@@ -120,32 +123,41 @@ public class ForegroundPointCloud implements ForegroundPointCloudInterface, Seri
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public int getMinimalX() {
 		return minimalX;
 	}
+	@Override
 	public int getMaximalX() {
 		return maximalX;
 	}
+	@Override
 	public int getMinimalY() {
 		return minimalY;
 	}
+	@Override
 	public int getMaximalY() {
 		return maximalY;
 	}
 	//
+	@Override
 	public float[][] getMatrixX() {
 		return matrixX;
 	}
+	@Override
 	public float[][] getMatrixY() {
 		return matrixY;
 	}
+	@Override
 	public float[][] getMatrixZ() {
 		return matrixZ;
 	}
 	//
+	@Override
 	public int getFrameWidth() {
 		return frameWidth;
 	}
+	@Override
 	public int getFrameHeight() {
 		return frameHeight;
 	}

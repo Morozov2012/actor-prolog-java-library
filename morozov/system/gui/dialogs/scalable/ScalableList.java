@@ -37,6 +37,7 @@ public class ScalableList extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
@@ -55,6 +56,7 @@ public class ScalableList extends ActiveComponent {
 		}
 	}
 	//
+	@Override
 	public Term standardizeRange(Term value, ChoisePoint iX) {
 		ArrayList<String> items= DialogUtils.listToStringArray(value,iX);
 		return GeneralConverters.stringArrayToList(items);
@@ -62,21 +64,21 @@ public class ScalableList extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void putValue(Term value, ChoisePoint iX) {
 		if (component!=null) {
 			((AList)component).putValue(value,iX);
-			// if (targetDialog!=null) {
-			//	targetDialog.reportValueUpdate(this);
-			// }
 		}
 	}
 	//
+	@Override
 	public void putRange(Term value, ChoisePoint iX) {
 		if (component!=null) {
 			((AList)component).putRange(value,iX);
 		}
 	}
 	//
+	@Override
 	public Term getValue() {
 		if (component!=null) {
 			return ((AList)component).getValue();
@@ -85,11 +87,11 @@ public class ScalableList extends ActiveComponent {
 		}
 	}
 	//
+	@Override
 	public Term getRange() {
 		if (component!=null) {
 			return ((AList)component).getRange();
 		} else {
-			// return PrologEmptyList.instance;
 			return PrologUnknownValue.instance;
 		}
 	}

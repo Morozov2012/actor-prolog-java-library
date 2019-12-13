@@ -14,18 +14,18 @@ import java.awt.GraphicsConfiguration;
 import java.awt.Dimension;
 
 public class ExtendedSpace3D extends CanvasSpace {
+	//
 	protected javax.media.j3d.Canvas3D nativeCanvas3D;
 	protected OffScreenCanvas3D offScreenCanvas3D;
-	// protected GraphicsConfiguration graphicsConfiguration;
 	protected SimpleUniverse simpleUniverse;
+	//
 	public ExtendedSpace3D(CustomControlComponent customControl, Canvas3D world, GraphicsConfiguration configuration) {
 		super(customControl);
 		targetWorld= world;
-		// graphicsConfiguration= configuration;
 		nativeCanvas3D= new javax.media.j3d.Canvas3D(configuration);
 		control= nativeCanvas3D;
-		// initializeOffScreenCanvas3D(configuration);
 	}
+	//
 	public void setUniverse(SimpleUniverse universe) {
 		simpleUniverse= universe;
 		attachOffScreenCanvas();
@@ -74,7 +74,6 @@ public class ExtendedSpace3D extends CanvasSpace {
 			repairOffScreenCanvasIfNecessary();
 			Dimension dimension= nativeCanvas3D.getSize();
 			java.awt.image.BufferedImage nativeImage= offScreenCanvas3D.renderImage(dimension.width,dimension.height);
-			// detachOffScreenCanvas();
 			return nativeImage;
 		} else {
 			return null;

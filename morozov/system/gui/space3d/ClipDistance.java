@@ -13,8 +13,8 @@ import morozov.terms.signals.*;
 
 public class ClipDistance {
 	//
-	public double value= 0.0;
-	public boolean isDefault= false;
+	protected double value= 0.0;
+	protected boolean isDefault= false;
 	//
 	protected static Term termDefault= new PrologSymbol(SymbolCodes.symbolCode_E_default);
 	//

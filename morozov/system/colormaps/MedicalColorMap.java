@@ -11,12 +11,15 @@ public class MedicalColorMap extends StraightSegmentColorMapRGBA {
 	public MedicalColorMap() {
 	}
 	//
+	@Override
 	public double[][] getRedChannelStraightSegments() {
 		return redChannelStraightSegments;
 	}
+	@Override
 	public double[][] getGreenChannelStraightSegments() {
 		return greenChannelStraightSegments;
 	}
+	@Override
 	public double[][] getBlueChannelStraightSegments() {
 		return blueChannelStraightSegments;
 	}

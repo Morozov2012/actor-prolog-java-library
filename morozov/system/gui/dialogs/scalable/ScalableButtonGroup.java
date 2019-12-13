@@ -7,6 +7,7 @@
 package morozov.system.gui.dialogs.scalable;
 
 import morozov.run.*;
+import morozov.system.*;
 import morozov.system.converters.*;
 import morozov.system.gui.dialogs.*;
 import morozov.system.gui.dialogs.scalable.common.*;
@@ -22,7 +23,7 @@ import java.util.Enumeration;
 
 public class ScalableButtonGroup extends ActiveComponent {
 	//
-	public AButtonGroup buttonGroup;
+	protected AButtonGroup buttonGroup;
 	//
 	///////////////////////////////////////////////////////////////
 	//
@@ -33,6 +34,7 @@ public class ScalableButtonGroup extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public Term standardizeValue(Term value, ChoisePoint iX) throws RejectValue {
 		value= value.dereferenceValue(iX);
 		if (value.thisIsFreeVariable() || value.thisIsUnknownValue()) {
@@ -40,7 +42,7 @@ public class ScalableButtonGroup extends ActiveComponent {
 		} else {
 			try {
 				BigInteger bigInteger= value.getIntegerValue(iX);
-				if (PrologInteger.isSmallInteger(bigInteger)) {
+				if (Arithmetic.isSmallInteger(bigInteger)) {
 					return new PrologInteger(bigInteger);
 				} else {
 					throw RejectValue.instance;
@@ -49,7 +51,7 @@ public class ScalableButtonGroup extends ActiveComponent {
 				try {
 					double number= StrictMath.round(value.getRealValue(iX));
 					BigInteger bigInteger= GeneralConverters.doubleToBigInteger(number);
-					if (PrologInteger.isSmallInteger(bigInteger)) {
+					if (Arithmetic.isSmallInteger(bigInteger)) {
 						return new PrologInteger(bigInteger);
 					} else {
 						throw RejectValue.instance;
@@ -64,6 +66,7 @@ public class ScalableButtonGroup extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void putValue(Term value, ChoisePoint iX) {
 		if (buttonGroup!=null) {
 			try {
@@ -100,6 +103,7 @@ public class ScalableButtonGroup extends ActiveComponent {
 		}
 	}
 	//
+	@Override
 	public Term getValue() {
 		if (buttonGroup!=null) {
 			Enumeration<AbstractButton> buttons= buttonGroup.getElements();
@@ -121,6 +125,7 @@ public class ScalableButtonGroup extends ActiveComponent {
 	//
 	///////////////////////////////////////////////////////////////
 	//
+	@Override
 	public void setIsEnabled(boolean mode) {
 		if (buttonGroup!=null) {
 			Enumeration<AbstractButton> buttons= buttonGroup.getElements();
@@ -131,6 +136,7 @@ public class ScalableButtonGroup extends ActiveComponent {
 		}
 	}
 	//
+	@Override
 	public boolean isEnabled(boolean mode) {
 		if (buttonGroup!=null) {
 			Enumeration<AbstractButton> buttons= buttonGroup.getElements();
@@ -180,8 +186,5 @@ public class ScalableButtonGroup extends ActiveComponent {
 				currentButton.repaint();
 			}
 		}
-		// if (targetDialog!=null) {
-		//	targetDialog.reportValueUpdate(this);
-		// }
 	}
 }
